@@ -1,0 +1,16 @@
+# Xcode / SwiftPM
+.DS_Store
+/.build
+/Packages
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+
+# Note: Gallery/Gallery.xcodeproj IS committed so you can open it directly.
+# It is generated from Gallery/project.yml — regenerate with `xcodegen generate`.
+
+# SwiftPM resolved
+.swiftpm/
+Package.resolved
