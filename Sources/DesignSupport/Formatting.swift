@@ -26,7 +26,10 @@ public nonisolated struct Formatting {
         if let symbol = currencySymbols[currency.uppercased()] {
             return symbol
         }
-        // DesignKit drops Tenra's full ISO CurrencyInfo lookup — falls back to the code.
+        // Fallback: full ISO CurrencyInfo lookup (covers all currencies).
+        if let info = CurrencyInfo.find(currency.uppercased()) {
+            return info.symbol
+        }
         return currency
     }
 

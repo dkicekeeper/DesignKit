@@ -14,6 +14,7 @@
 		50902C244208E25C87077722 /* TypographyScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7F5B9CB6BDC35112BC591C /* TypographyScreen.swift */; };
 		538B1C0373F76FA92A475BCD /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7CAAD5A8FD5F93399051D7 /* RootView.swift */; };
 		72929EC76EB000954D22180D /* GalleryApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4780A89935593B6A017A4DA6 /* GalleryApp.swift */; };
+		8EBA371266F0355B6BB504D4 /* InputsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C0114CE3E8593E9865CA06 /* InputsScreen.swift */; };
 		9CD03C9A74AB9D2D9C0932D2 /* DesignKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3CA0FBF6BDC0893BC46E1C6D /* DesignKit */; };
 		A488332A0BC20E94F9213E89 /* SpacingScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2940D1B0BA531A06E14CDB /* SpacingScreen.swift */; };
 		B11E8A0AC5B7B80600BDB13E /* Showcase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0927C182D4DB25149A1B6593 /* Showcase.swift */; };
@@ -28,6 +29,7 @@
 		0F86BD467A38493ED0C685D7 /* IconSizesScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconSizesScreen.swift; sourceTree = "<group>"; };
 		3153463AFF49CF7CB2B251E0 /* FormsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormsScreen.swift; sourceTree = "<group>"; };
 		4780A89935593B6A017A4DA6 /* GalleryApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryApp.swift; sourceTree = "<group>"; };
+		52C0114CE3E8593E9865CA06 /* InputsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputsScreen.swift; sourceTree = "<group>"; };
 		7627FD29E06D89B732F4F317 /* ButtonsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonsScreen.swift; sourceTree = "<group>"; };
 		7E22397E4E96E261FF83DF52 /* ColorsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorsScreen.swift; sourceTree = "<group>"; };
 		856B6B02DFD606C960F3CBB0 /* Gallery.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Gallery.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -63,6 +65,7 @@
 				3153463AFF49CF7CB2B251E0 /* FormsScreen.swift */,
 				0F86BD467A38493ED0C685D7 /* IconSizesScreen.swift */,
 				DE846D58B14DF48CE304FA94 /* IconsScreen.swift */,
+				52C0114CE3E8593E9865CA06 /* InputsScreen.swift */,
 				9FC28309B1699E04C833B8D3 /* MotionScreen.swift */,
 				FA2940D1B0BA531A06E14CDB /* SpacingScreen.swift */,
 				FF7F5B9CB6BDC35112BC591C /* TypographyScreen.swift */,
@@ -177,6 +180,7 @@
 				72929EC76EB000954D22180D /* GalleryApp.swift in Sources */,
 				4ED7838DB61DFA96A716492B /* IconSizesScreen.swift in Sources */,
 				C6230EDF90D59790E2838D61 /* IconsScreen.swift in Sources */,
+				8EBA371266F0355B6BB504D4 /* InputsScreen.swift in Sources */,
 				1D262A236C79960F73A3AAAA /* MotionScreen.swift in Sources */,
 				538B1C0373F76FA92A475BCD /* RootView.swift in Sources */,
 				B11E8A0AC5B7B80600BDB13E /* Showcase.swift in Sources */,

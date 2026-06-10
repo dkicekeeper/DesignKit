@@ -25,6 +25,7 @@ struct RootView: View {
                 Section("Components") {
                     row("Components", "square.grid.2x2.fill", AppColors.accent) { ComponentsScreen() }
                     row("Forms & Settings", "list.bullet.rectangle.fill", .mint) { FormsScreen() }
+                    row("Inputs & Charts", "slider.horizontal.3", .pink) { InputsScreen() }
                 }
             }
             .navigationTitle("DesignKit")
