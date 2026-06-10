@@ -7,7 +7,7 @@ options:
 
 packages:
   DesignKit:
-    path: ../
+    path: ".."
 
 targets:
   Gallery:
