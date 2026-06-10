@@ -6,12 +6,23 @@
 import SwiftUI
 import DesignTokens
 import DesignSupport
+import DesignComponents
 
 struct IconsScreen: View {
     private let columns = [GridItem(.adaptive(minimum: 80), spacing: AppSpacing.lg)]
 
     var body: some View {
         ShowcasePage(title: "Icons") {
+            ShowcaseSection(title: "PackedCircleIconsView", subtitle: "Amount-weighted icon facepile") {
+                PackedCircleIconsView(items: [
+                    PackedCircleItem(id: "1", iconSource: .sfSymbol("creditcard.fill"), amount: 1_250_000, tint: AppColors.accent),
+                    PackedCircleItem(id: "2", iconSource: .sfSymbol("banknote.fill"), amount: 480_000, tint: AppColors.success),
+                    PackedCircleItem(id: "3", iconSource: .sfSymbol("wallet.bifold.fill"), amount: 220_000, tint: AppColors.warning),
+                    PackedCircleItem(id: "4", iconSource: .sfSymbol("bitcoinsign.circle.fill"), amount: 90_000, tint: AppColors.transfer),
+                ])
+                .frame(maxWidth: .infinity)
+            }
+
             ShowcaseSection(title: "IconView styles", subtitle: "Unified icon + logo component") {
                 LazyVGrid(columns: columns, spacing: AppSpacing.lg) {
                     specimen("categoryIcon") {
