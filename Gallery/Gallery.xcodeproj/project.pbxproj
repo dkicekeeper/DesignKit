@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1D262A236C79960F73A3AAAA /* MotionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC28309B1699E04C833B8D3 /* MotionScreen.swift */; };
 		38740AC4C1513442A9CEC7A0 /* CardsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1309EC650E866057BA3CEDB /* CardsScreen.swift */; };
+		46777469D14E8DAAFB3C6285 /* FormsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3153463AFF49CF7CB2B251E0 /* FormsScreen.swift */; };
 		4ED7838DB61DFA96A716492B /* IconSizesScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F86BD467A38493ED0C685D7 /* IconSizesScreen.swift */; };
 		50902C244208E25C87077722 /* TypographyScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7F5B9CB6BDC35112BC591C /* TypographyScreen.swift */; };
 		538B1C0373F76FA92A475BCD /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7CAAD5A8FD5F93399051D7 /* RootView.swift */; };
@@ -25,6 +26,7 @@
 /* Begin PBXFileReference section */
 		0927C182D4DB25149A1B6593 /* Showcase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Showcase.swift; sourceTree = "<group>"; };
 		0F86BD467A38493ED0C685D7 /* IconSizesScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconSizesScreen.swift; sourceTree = "<group>"; };
+		3153463AFF49CF7CB2B251E0 /* FormsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormsScreen.swift; sourceTree = "<group>"; };
 		4780A89935593B6A017A4DA6 /* GalleryApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryApp.swift; sourceTree = "<group>"; };
 		7627FD29E06D89B732F4F317 /* ButtonsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonsScreen.swift; sourceTree = "<group>"; };
 		7E22397E4E96E261FF83DF52 /* ColorsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorsScreen.swift; sourceTree = "<group>"; };
@@ -58,6 +60,7 @@
 				B1309EC650E866057BA3CEDB /* CardsScreen.swift */,
 				7E22397E4E96E261FF83DF52 /* ColorsScreen.swift */,
 				CC9AB0C2115F2F8994D7235E /* ComponentsScreen.swift */,
+				3153463AFF49CF7CB2B251E0 /* FormsScreen.swift */,
 				0F86BD467A38493ED0C685D7 /* IconSizesScreen.swift */,
 				DE846D58B14DF48CE304FA94 /* IconsScreen.swift */,
 				9FC28309B1699E04C833B8D3 /* MotionScreen.swift */,
@@ -170,6 +173,7 @@
 				38740AC4C1513442A9CEC7A0 /* CardsScreen.swift in Sources */,
 				B90C310543ACEC758CA45512 /* ColorsScreen.swift in Sources */,
 				E8ECC80D26449882F370201A /* ComponentsScreen.swift in Sources */,
+				46777469D14E8DAAFB3C6285 /* FormsScreen.swift in Sources */,
 				72929EC76EB000954D22180D /* GalleryApp.swift in Sources */,
 				4ED7838DB61DFA96A716492B /* IconSizesScreen.swift in Sources */,
 				C6230EDF90D59790E2838D61 /* IconsScreen.swift in Sources */,
