@@ -54,10 +54,14 @@ struct InputsScreen: View {
                 .cardStyle()
             }
 
-            ShowcaseSection(title: "DonutChart", subtitle: "Ring chart for any slice series") {
-                DonutChart(slices: slices)
-                    .frame(height: 220)
-                    .frame(maxWidth: .infinity)
+            ShowcaseSection(title: "DonutChart / MiniDonut", subtitle: "Ring charts for any slice series") {
+                HStack(spacing: AppSpacing.xl) {
+                    DonutChart(slices: slices)
+                        .frame(height: 200)
+                        .frame(maxWidth: .infinity)
+                    MiniDonut(slices: slices)
+                        .frame(width: 72, height: 72)
+                }
             }
         }
     }
