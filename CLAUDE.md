@@ -10,7 +10,7 @@ SwiftUI design system shared by **Tenra** (personal finance, the reference imple
 # Scheme: DesignKit-Package or DesignKit — `xcodebuild -list` shows which.
 xcodebuild build -scheme DesignKit-Package -destination 'generic/platform=iOS Simulator' -quiet
 
-# Gallery (showcase app). The .xcodeproj is generated from Gallery/project.yml:
+# Gallery (showcase app). The .xcodeproj is generated from Gallery/project.yml and not in git:
 cd Gallery && xcodegen generate
 xcodebuild build -project Gallery.xcodeproj -scheme Gallery \
   -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO -quiet
@@ -19,6 +19,10 @@ xcodebuild build -project Gallery.xcodeproj -scheme Gallery \
 Code is often written in a Linux container where SwiftUI cannot compile. **CI is the compiler
 there**: `.github/workflows/ci.yml` builds the package, the Gallery, and **Dalada against this
 checkout** on macOS for every push to `main` and `claude/**`. Push, then read the job logs.
+
+**TestFlight**: `.github/workflows/testflight.yml` archives the Gallery and uploads it on every
+push to `main` that touches `Sources/`, `Gallery/` or `Package.swift` (version = latest tag,
+build = run number). Setup and troubleshooting: [docs/testflight.md](docs/testflight.md).
 
 ## Package Layout
 
@@ -30,7 +34,8 @@ Sources/
 │                      formatting, haptics, DominantColorExtractor, host hooks
 └── DesignComponents/  → DesignTokens + DesignSupport — Cards, Charts, Feedback, Forms,
                        Headers, Icons, Input, Rows
-Gallery/               showcase app (xcodegen); every public component has a specimen
+Gallery/               showcase app (xcodegen; the .xcodeproj is not in git); every public
+                       component has a specimen; ships to TestFlight (docs/testflight.md)
 docs/                  design-system.md, charts.md, gotchas.md, localization-keys.md
 ```
 
@@ -132,3 +137,4 @@ rather than importing an app type.
 | Charts, progress, gauges, OrbChart, Swift Charts patterns | [docs/charts.md](docs/charts.md) |
 | Package traps (public API, Xcode 26/27, bundles) and SwiftUI layout traps | [docs/gotchas.md](docs/gotchas.md) |
 | Localized strings used by components | [docs/localization-keys.md](docs/localization-keys.md) |
+| Gallery TestFlight pipeline | [docs/testflight.md](docs/testflight.md) |

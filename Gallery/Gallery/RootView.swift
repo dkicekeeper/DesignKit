@@ -6,7 +6,30 @@
 import SwiftUI
 import DesignTokens
 
+/// Brand accents of the apps that consume DesignKit. The Gallery can preview either:
+/// `DesignKitTheme.accent` is read at render time, so switching re-renders the tree.
+enum GalleryTheme: String, CaseIterable, Identifiable {
+    case tenra = "Tenra"
+    case dalada = "Dalada"
+
+    var id: String { rawValue }
+
+    var accent: Color {
+        switch self {
+        case .tenra: return .indigo
+        // Dalada's AccentColor (light #2E8B57 / dark #3CB371).
+        case .dalada: return Color(UIColor { traits in
+            traits.userInterfaceStyle == .dark
+                ? UIColor(red: 0x3C / 255, green: 0xB3 / 255, blue: 0x71 / 255, alpha: 1)
+                : UIColor(red: 0x2E / 255, green: 0x8B / 255, blue: 0x57 / 255, alpha: 1)
+        })
+        }
+    }
+}
+
 struct RootView: View {
+    @State private var theme: GalleryTheme = .tenra
+
     var body: some View {
         NavigationStack {
             List {
@@ -29,7 +52,42 @@ struct RootView: View {
                 }
             }
             .navigationTitle("DesignKit")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Picker("Theme", selection: themeSelection) {
+                        ForEach(GalleryTheme.allCases) { Text($0.rawValue).tag($0) }
+                    }
+                    .pickerStyle(.menu)
+                }
+            }
+            .safeAreaInset(edge: .bottom) {
+                Text(versionLine)
+                    .font(AppTypography.caption2)
+                    .foregroundStyle(AppColors.textSecondary)
+                    .padding(.bottom, AppSpacing.xs)
+            }
         }
+        .tint(AppColors.accent)
+        // Tokens are static reads: a new identity re-renders every screen with the new accent.
+        .id(theme)
+    }
+
+    /// Sets the accent BEFORE the state change, so the re-render already reads the new value.
+    private var themeSelection: Binding<GalleryTheme> {
+        Binding(
+            get: { theme },
+            set: { newTheme in
+                DesignKitTheme.accent = newTheme.accent
+                theme = newTheme
+            }
+        )
+    }
+
+    private var versionLine: String {
+        let info = Bundle.main.infoDictionary
+        let version = info?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = info?["CFBundleVersion"] as? String ?? "?"
+        return "DesignKit \(version) (\(build)) · \(theme.rawValue) theme"
     }
 
     private func row<Destination: View>(
