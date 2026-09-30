@@ -1,0 +1,98 @@
+name: CI
+
+# Сборка пакета, Gallery и приложений-потребителей на macOS. Код DesignKit часто пишется в
+# облачном контейнере на Linux, где SwiftUI не собрать: ошибки компиляции видны здесь.
+on:
+  push:
+    branches: [main, "claude/**"]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    name: Package + Gallery
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build package for iOS Simulator
+        run: |
+          SCHEMES=$(xcodebuild -list -json | python3 -c 'import json, sys; print("\n".join(json.load(sys.stdin)["workspace"]["schemes"]))')
+          echo "Schemes:"; echo "$SCHEMES"
+          SCHEME=$(echo "$SCHEMES" | grep -x 'DesignKit-Package' || echo "$SCHEMES" | grep -x 'DesignKit' || echo "$SCHEMES" | head -1)
+          xcodebuild build \
+            -scheme "$SCHEME" \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            -quiet
+
+      - name: Build Gallery
+        working-directory: Gallery
+        run: |
+          # Gallery.xcodeproj закоммичен, но генерируется из project.yml: пересобираем, чтобы
+          # новые файлы экранов не требовали ручной правки project.pbxproj.
+          brew install xcodegen
+          xcodegen generate
+          xcodebuild build \
+            -project Gallery.xcodeproj \
+            -scheme Gallery \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            -quiet \
+            CODE_SIGNING_ALLOWED=NO
+
+  dalada:
+    name: Dalada against this DesignKit
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: DesignKit
+
+      - uses: actions/checkout@v5
+        with:
+          repository: dkicekeeper/Dalada
+          path: Dalada
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Point Dalada at the local DesignKit
+        run: |
+          MANIFEST=Dalada/ios/Packages/DaladaKit/Package.swift
+          # Любая форма зависимости (revision:/from:/exact:/branch:) заменяется локальным путём.
+          sed -i '' -E 's#\.package\(url: "https://github.com/dkicekeeper/DesignKit"[^)]*\)#.package(path: "'"$GITHUB_WORKSPACE"'/DesignKit")#' "$MANIFEST"
+          grep -n 'DesignKit' "$MANIFEST"
+          grep -q "path: \"$GITHUB_WORKSPACE/DesignKit\"" "$MANIFEST"
+
+      - name: Generate Dalada project
+        working-directory: Dalada/ios
+        run: |
+          brew install xcodegen
+          cp Config/Secrets.example.xcconfig Config/Secrets.xcconfig
+          xcodegen generate
+
+      - name: Build Dalada for iOS Simulator
+        working-directory: Dalada/ios
+        run: |
+          xcodebuild build \
+            -project Dalada.xcodeproj \
+            -scheme Dalada \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            -quiet \
+            CODE_SIGNING_ALLOWED=NO
