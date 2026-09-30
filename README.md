@@ -1,82 +1,89 @@
 # DesignKit
 
-A reusable SwiftUI design system, extracted from the **Tenra** iOS app so it can be
-shared, versioned, and grown across projects.
+A reusable SwiftUI design system extracted from the **Tenra** iOS app and shared with
+**Dalada**. Tokens, components and motion rules are Tenra's (the reference implementation);
+this package makes them versioned and reusable.
 
-> Status: **v0 — visual-evaluation milestone.** The foundation (tokens, support,
-> fonts) and a representative set of components are ported and render in the
-> **Gallery** app. Tenra is **not** wired to this package yet — that comes after
-> visual sign-off.
+> Status: **0.x — pre-1.0.** Synced with Tenra `74a12c5` (2026-09-26). Dalada consumes the
+> package; Tenra still carries its own copy and will migrate to it.
 
 ## Run the Gallery
 
 The Gallery is a standalone iOS app that renders the design system in isolation.
 
 ```bash
-open Gallery/Gallery.xcodeproj   # then Run (⌘R) on an iPhone simulator (iOS 26)
-```
-
-Or from the CLI:
-
-```bash
 cd Gallery
-xcodebuild -project Gallery.xcodeproj -scheme Gallery \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
+xcodegen generate                 # the project is generated from project.yml
+open Gallery.xcodeproj            # then Run (⌘R) on an iPhone simulator (iOS 26+)
 ```
 
-The Gallery has screens for **Colors, Typography (Inter), Spacing & Radius,
-Icon Sizes, Icons, Buttons, Cards & Surfaces, Motion**, and **Components**.
+Screens: **Colors, Typography (Inter), Spacing & Radius, Icon Sizes, Icons, Buttons, Cards &
+Surfaces, Motion, Components, Forms & Settings, Inputs & Charts**.
 
 ## Package layout
 
-Three layered targets (each depends on the one above):
+Three layered targets (each depends on the ones above it):
 
 ```
 Sources/
-├── DesignTokens/      ← leaf, no deps
-│   Colors, Spacing, Typography, Animation, Modifiers (cardStyle/glass), Button
-│   + bundled Inter font  (DesignKitFonts.registerIfNeeded())
-├── DesignSupport/     ← depends DesignTokens
-│   Formatting, AmountFormatter, HapticManager, IconSource, IconStyle, IconView,
-│   BrandLogoView (logo loading injected via DesignKitLogoLoader)
-└── DesignComponents/  ← depends DesignTokens + DesignSupport
-    FinanceCard, RedactableAmount, InsightsStatCard, RecommendationBox, EmptyCardView,
-    UniversalRow, InfoRow, DisclosureChevron, EmptyStateView, InlineStatusText,
-    FormattedAmountText, BudgetProgressBar, BudgetProgressCircle, ProportionBar,
-    ExpenseIncomeProgressBar
+├── DesignTokens/      AppColors, CategoryColors, AppSpacing, AppRadius, AppIconSize,
+│                      AppTypography (+ bundled Inter), AppAnimation, AppModifiers,
+│                      AppButton, AmbientMotionGate, DesignKitTheme, DesignKitFonts
+├── DesignSupport/     IconSource, IconStyle, IconView, BrandLogoView, Formatting,
+│                      AmountFormatter, AmountDisplayConfiguration, HapticManager,
+│                      DominantColorExtractor, host hooks (logos, FX)
+└── DesignComponents/  Cards, Charts, Feedback, Forms, Headers, Icons, Input, Rows
 ```
 
-## Using it in another project
+Highlights of `DesignComponents`: `FinanceCard`, `InsightsStatCard`, `HeroSection`,
+`EditSheetContainer`, `FormSection`, `FormTextField`, `UniversalRow`, `InfoRow`, `MenuPickerRow`,
+`UniversalCarousel`, `UniversalFilterButton`, `MessageBanner`, `EmptyStateView`,
+`FormattedAmountText` (adaptive abbreviation), calculator keypad, `OrbChart`, `ProgressRing`,
+`LinearProgressBar`, Mini*/Hero* gauges and bar pairs, `AccentGlow`, `BlurSlideTransition`,
+`SiriGlowView`. Full inventory: [docs/design-system.md §0](docs/design-system.md).
+
+## Using it in an app
 
 ```swift
 // Package.swift
-.package(path: "../DesignKit")                    // local during development
-// or, once tagged:
-.package(url: "<git-url>", from: "1.0.0")
+.package(url: "https://github.com/dkicekeeper/DesignKit", exact: "0.2.0")
+// during development, point at a local checkout instead:
+.package(path: "../DesignKit")
 ```
 
 ```swift
 import DesignTokens
+import DesignSupport
 import DesignComponents
 
-DesignKitFonts.registerIfNeeded()                 // once at App.init()
-FinanceCard(title: "Accounts", isEmpty: false, emptyTitle: "—", subtitle: "3 accounts") { … }
+@main
+struct MyApp: App {
+    init() {
+        DesignKitTheme.accent = .teal                  // brand accent (default: indigo)
+        DesignKitFonts.registerIfNeeded()              // Inter
+        DesignKitLogoLoader.loader = { brand in await MyLogoService.image(for: brand) }
+        DesignKitCurrencyConverter.convert = { amount, from, to in
+            await MyRates.convert(amount, from: from, to: to)
+        }
+    }
+    // …
+}
 ```
 
-To show brand logos, inject a loader (DesignKit ships no networking):
+DesignKit ships no networking, FX or string tables: logos and currency conversion come through
+the hooks above, and localized strings resolve in the app's own bundle
+([docs/localization-keys.md](docs/localization-keys.md)).
 
-```swift
-DesignKitLogoLoader.loader = { brand in await MyLogoService.image(for: brand) }
-```
+## Working on DesignKit
 
-## Not (yet) included
+Read [CLAUDE.md](CLAUDE.md) first — what belongs here, how to port a component from an app, API
+stability and versioning rules, Xcode 26/27 compatibility. CI (`.github/workflows/ci.yml`)
+builds the package, the Gallery and Dalada against every push.
 
-Domain-coupled components stay in their host app (they depend on Tenra models):
-`TransactionCard`, `AccountRow`, `CategoryRow`, all `Loan*` forms, account/category
-selectors, `HealthScoreBadge`, `InsightTrendBadge`, `MiniSparkline`, `DonutChart`,
-`SegmentedPickerView` (these need their domain enums parameterized first).
+Docs: [design-system.md](docs/design-system.md) · [charts.md](docs/charts.md) ·
+[gotchas.md](docs/gotchas.md) · [localization-keys.md](docs/localization-keys.md)
 
 ## Requirements
 
-iOS 26+, Xcode 26+, Swift 5 language mode. The Gallery project is generated from
+iOS 26+, Xcode 26 or 27, Swift 5 language mode. The Gallery project is generated from
 `Gallery/project.yml` via [xcodegen](https://github.com/yonaskolb/XcodeGen).
