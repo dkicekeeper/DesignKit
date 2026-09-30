@@ -1,12 +1,12 @@
 # Gallery в TestFlight
 
-Каждое обновление DesignKit в `main` (изменения в `Sources/`, `Gallery/`, `Package.swift`)
+Каждое обновление DesignKit в `main` (изменения в `Sources/`, `Gallery/`, `Package.swift`, `VERSION`)
 собирает Gallery и загружает её в TestFlight: workflow **TestFlight**
 (`.github/workflows/testflight.yml`). Mac не нужен — сборка идёт на Mac в GitHub Actions,
 подпись облачная по ключу App Store Connect API (так же, как у Dalada).
 
-- **Версия** сборки = последний тег DesignKit (`0.2.0`), **номер сборки** = номер запуска
-  workflow.
+- **Версия** сборки = файл `VERSION` (он же тег релиза DesignKit, `0.2.0`), **номер сборки** =
+  номер запуска workflow.
 - **What to Test** заполняется сам: коммиты DesignKit с предыдущего тега.
 - В самой Gallery снизу видны версия и номер сборки, а справа вверху — переключатель темы
   **Tenra / Dalada** (акцент каждого приложения).

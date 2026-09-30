@@ -21,8 +21,8 @@ there**: `.github/workflows/ci.yml` builds the package, the Gallery, and **Dalad
 checkout** on macOS for every push to `main` and `claude/**`. Push, then read the job logs.
 
 **TestFlight**: `.github/workflows/testflight.yml` archives the Gallery and uploads it on every
-push to `main` that touches `Sources/`, `Gallery/` or `Package.swift` (version = latest tag,
-build = run number). Setup and troubleshooting: [docs/testflight.md](docs/testflight.md).
+push to `main` that touches `Sources/`, `Gallery/`, `Package.swift` or `VERSION` (version =
+`VERSION`, build = run number). Setup and troubleshooting: [docs/testflight.md](docs/testflight.md).
 
 ## Package Layout
 
@@ -105,6 +105,10 @@ rather than importing an app type.
 
 - Semantic versioning with git tags (`0.2.0`, …). Consumers pin a version (`exact:` or
   `.upToNextMinor(from:)`), never a branch.
+- **Cutting a release:** bump `VERSION` in the PR that should ship. On merge,
+  `.github/workflows/release.yml` tags that commit `X.Y.Z` and creates a GitHub Release with the
+  commits since the previous tag (tags are created by Actions — the Claude session's git proxy
+  only pushes branches). TestFlight's Gallery build carries the same version.
 - **Never remove or rename public API in a minor release.** Deprecate with
   `@available(*, deprecated, message: "… Use X.")` naming the replacement; remove only in the
   next major, once no consumer uses it. Tenra retiring a component is not a reason to delete it

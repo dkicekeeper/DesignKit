@@ -36,8 +36,8 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         TARGETED_DEVICE_FAMILY: "1"
         SWIFT_VERSION: "5.0"
-        # The TestFlight workflow overrides both: the version from the latest DesignKit tag,
-        # the build number from the workflow run number.
+        # The TestFlight workflow overrides both: the version from /VERSION, the build number
+        # from the workflow run number.
         MARKETING_VERSION: "0.2.0"
         CURRENT_PROJECT_VERSION: "1"
         DEVELOPMENT_TEAM: SY2L2VMQP7
