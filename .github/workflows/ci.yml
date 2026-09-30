@@ -27,6 +27,12 @@ jobs:
         with:
           xcode-version: latest-stable
 
+      - name: Toolchain
+        run: |
+          ls -d /Applications/Xcode*.app
+          xcodebuild -version
+          swift --version
+
       - name: Build package for iOS Simulator
         run: |
           SCHEMES=$(xcodebuild -list -json | python3 -c 'import json, sys; print("\n".join(json.load(sys.stdin)["workspace"]["schemes"]))')

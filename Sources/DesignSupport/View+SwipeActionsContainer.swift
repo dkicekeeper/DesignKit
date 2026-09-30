@@ -19,10 +19,15 @@ public extension View {
     /// which stays in place on both versions as the long-press affordance.
     @ViewBuilder
     func swipeActionsContainerIfAvailable() -> some View {
+        #if compiler(>=6.4)
         if #available(iOS 27.0, *) {
             swipeActionsContainer()
         } else {
             self
         }
+        #else
+        // Built with the iOS 26 SDK (Xcode 26): the API does not exist yet.
+        self
+        #endif
     }
 }
