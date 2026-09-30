@@ -16,7 +16,7 @@ public extension View {
     ///
     /// **Use when:** the chip triggers filtering, navigation, or any tap action
     /// (filter buttons, action menu triggers, segmented-style selectors in toolbars).
-    public func filterChipStyle(isSelected: Bool = false) -> some View {
+    func filterChipStyle(isSelected: Bool = false) -> some View {
         self
             .font(AppTypography.bodySmall.weight(.medium))
             .foregroundStyle(AppColors.textPrimary)
@@ -40,7 +40,7 @@ public extension View {
     /// `Menu` triggers, use `formCardStyle()` instead — `glassEffect` is the morph
     /// source for iOS 26 menus, and a single-row section collapses the whole row into
     /// the popover at tap.
-    public func cardStyle(radius: CGFloat = AppRadius.xl) -> some View {
+    func cardStyle(radius: CGFloat = AppRadius.xl) -> some View {
         self
             .contentShape(Rectangle())
             .clipShape(.rect(cornerRadius: radius))
@@ -57,7 +57,7 @@ public extension View {
     /// **Use this for `FormSection`, `BudgetSettingsSection`, and any other
     /// container that wraps rows users tap to open menus.** Use `cardStyle()`
     /// (above) for non-interactive display cards.
-    public func formCardStyle(radius: CGFloat = AppRadius.xl) -> some View {
+    func formCardStyle(radius: CGFloat = AppRadius.xl) -> some View {
         self
             .background(
                 .ultraThinMaterial,
@@ -70,18 +70,18 @@ public extension View {
 
 public extension View {
     /// Стандартный horizontal padding для экранов
-    public func screenPadding() -> some View {
+    func screenPadding() -> some View {
         self.padding(.horizontal, AppSpacing.lg)
     }
 
     /// Визуально приглушает view для будущих / запланированных транзакций.
     /// Применяй вместо inline `opacity(0.5)` чтобы значение было единым по всему проекту.
-    public func futureTransactionStyle(isFuture: Bool) -> some View {
+    func futureTransactionStyle(isFuture: Bool) -> some View {
         self.opacity(isFuture ? 0.55 : 1.0)
     }
 
     /// Card padding (внутренний padding карточек) — 16pt, канон для контента карточек (см. design-system §10)
-    public func cardContentPadding() -> some View {
+    func cardContentPadding() -> some View {
         self.padding(AppSpacing.lg)
     }
 }
@@ -94,7 +94,7 @@ public extension View {
     /// 1pt accent border so an editable field is distinguishable from a static
     /// label in every state.
     @available(*, deprecated, message: "Use FormTextField(style: .inline) — it gives the field a visible chip background and focus state.")
-    public func inlineFieldStyle(
+    func inlineFieldStyle(
         keyboard: UIKeyboardType = .default,
         maxWidth: CGFloat? = nil
     ) -> some View {
@@ -107,7 +107,7 @@ public extension View {
 
     /// Deprecated. Use `FormTextField(style: .inlineMultiline(min:max:))`.
     @available(*, deprecated, message: "Use FormTextField(style: .inlineMultiline(min:max:)) — wraps the multi-line field in a tinted rounded container with focus state.")
-    public func inlineNoteStyle() -> some View {
+    func inlineNoteStyle() -> some View {
         self
             .lineLimit(1...4)
             .multilineTextAlignment(.trailing)
@@ -146,7 +146,7 @@ public struct StaggeredEntranceModifier: ViewModifier {
 public extension View {
     /// Animates entrance with scale + opacity spring, with optional stagger delay.
     /// - Parameter delay: Delay before animation starts (use `Double(index) * AppAnimation.facepileStagger` for facepiles).
-    public func staggeredEntrance(delay: Double = 0) -> some View {
+    func staggeredEntrance(delay: Double = 0) -> some View {
         modifier(StaggeredEntranceModifier(delay: delay))
     }
 }
@@ -184,7 +184,7 @@ public struct ChartAppearModifier: ViewModifier {
 public extension View {
     /// Animates chart entrance with opacity + scale spring from the bottom.
     /// - Parameter delay: Extra delay before animation starts (use to stagger multiple charts).
-    public func chartAppear(delay: Double = 0) -> some View {
+    func chartAppear(delay: Double = 0) -> some View {
         modifier(ChartAppearModifier(delay: delay))
     }
 }

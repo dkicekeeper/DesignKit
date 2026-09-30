@@ -85,7 +85,7 @@ public extension CarouselConfiguration {
     /// - Spacing: medium (16pt)
     /// - Padding: large horizontal (20pt), extra-small vertical (4pt)
     /// - No indicators, clip disabled
-    public static let standard = CarouselConfiguration(
+    static let standard = CarouselConfiguration(
         spacing: AppSpacing.md,
         horizontalPadding: AppSpacing.lg,
         verticalPadding: AppSpacing.xs,
@@ -100,7 +100,7 @@ public extension CarouselConfiguration {
     /// - Spacing: small (12pt)
     /// - Padding: small horizontal (12pt), no vertical padding
     /// - No indicators, clip disabled
-    public static let compact = CarouselConfiguration(
+    static let compact = CarouselConfiguration(
         spacing: AppSpacing.sm,
         horizontalPadding: AppSpacing.sm,
         verticalPadding: 0,
@@ -114,7 +114,7 @@ public extension CarouselConfiguration {
     /// - Spacing: medium (16pt)
     /// - Padding: large horizontal (20pt), no vertical padding
     /// - No indicators, clip disabled
-    public static let filter = CarouselConfiguration(
+    static let filter = CarouselConfiguration(
         spacing: AppSpacing.md,
         horizontalPadding: AppSpacing.lg,
         verticalPadding: 0,
@@ -129,7 +129,7 @@ public extension CarouselConfiguration {
     /// - Padding: no horizontal (uses .screenPadding modifier), extra-small vertical (4pt)
     /// - No indicators, clip disabled
     /// - Note: Apply .screenPadding() modifier separately for proper edge-to-edge layout
-    public static let cards = CarouselConfiguration(
+    static let cards = CarouselConfiguration(
         spacing: AppSpacing.md,
         horizontalPadding: 0,
         verticalPadding: AppSpacing.xs,
@@ -144,7 +144,7 @@ public extension CarouselConfiguration {
     /// - Spacing: small (12pt)
     /// - Padding: medium horizontal (16pt), small vertical (12pt)
     /// - **Shows indicators** (unique), clip enabled
-    public static let csvPreview = CarouselConfiguration(
+    static let csvPreview = CarouselConfiguration(
         spacing: AppSpacing.sm,
         horizontalPadding: AppSpacing.md,
         verticalPadding: AppSpacing.sm,
@@ -159,7 +159,7 @@ public extension CarouselConfiguration {
 #if DEBUG
 public extension CarouselConfiguration {
     /// All preset configurations for testing
-    public static var allPresets: [String: CarouselConfiguration] {
+    static var allPresets: [String: CarouselConfiguration] {
         [
             "standard": .standard,
             "compact": .compact,

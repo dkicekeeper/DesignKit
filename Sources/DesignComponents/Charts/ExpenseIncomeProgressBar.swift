@@ -9,6 +9,7 @@ import SwiftUI
 import DesignTokens
 import DesignSupport
 
+@available(*, deprecated, message: "Removed from Tenra (2026-07). Use AmountComparisonBar(expenseAmount:incomeAmount:currency:).")
 public struct ExpenseIncomeProgressBar: View {
     let expenseAmount: Double
     let incomeAmount: Double

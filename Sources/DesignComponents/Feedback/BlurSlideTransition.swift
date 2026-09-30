@@ -48,12 +48,12 @@ public struct BlurSlideTransition: Transition {
 
 public extension Transition where Self == BlurSlideTransition {
     /// Block-level text reveal — onboarding hero title/subtitle blocks.
-    public static var blurSlideHero: BlurSlideTransition { BlurSlideTransition() }
+    static var blurSlideHero: BlurSlideTransition { BlurSlideTransition() }
 
     /// Per-word reveal for streaming text (voice transcription).
     /// Shorter travel + lighter blur than `blurSlideHero` — tuned for many
     /// small views transitioning simultaneously.
-    public static var blurSlideWord: BlurSlideTransition {
+    static var blurSlideWord: BlurSlideTransition {
         BlurSlideTransition(slideDistance: 18, blurRadius: 6)
     }
 }

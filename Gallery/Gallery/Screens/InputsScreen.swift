@@ -5,6 +5,7 @@
 
 import SwiftUI
 import DesignTokens
+import DesignSupport
 import DesignComponents
 
 struct InputsScreen: View {
@@ -12,6 +13,9 @@ struct InputsScreen: View {
     @State private var title = ""
     @State private var segment = 0
     @State private var calc = CalculatorInputModel()
+    @State private var zoom: CGFloat = 1
+    @State private var colorHex = "#6366f1"
+    @State private var filter = "month"
 
     private let slices: [DonutSlice] = [
         DonutSlice(id: "food", amount: 42_000, color: AppColors.accent, label: "Food", percentage: 42),
@@ -54,14 +58,52 @@ struct InputsScreen: View {
                 .cardStyle()
             }
 
-            ShowcaseSection(title: "DonutChart / MiniDonut", subtitle: "Ring charts for any slice series") {
+            ShowcaseSection(title: "OrbChart / MiniDonut", subtitle: "Breakdown sphere + compact ring for any [DonutSlice]") {
+                OrbChart(slices: slices, size: 240)
+                    .frame(height: 280)
+                    .frame(maxWidth: .infinity)
                 HStack(spacing: AppSpacing.xl) {
-                    DonutChart(slices: slices)
-                        .frame(height: 200)
-                        .frame(maxWidth: .infinity)
                     MiniDonut(slices: slices)
-                        .frame(width: 72, height: 72)
+                        .frame(width: 80, height: 80)
+                    MiniProportionBar(segments: slices)
+                        .frame(maxWidth: .infinity)
                 }
+                HeroProportionBar(segments: slices, currency: "KZT")
+            }
+
+            ShowcaseSection(title: "Gauges", subtitle: "Hero / Mini half-gauge and milestone gauge") {
+                HeroHalfGauge(value: 0.62, norm: 0.5, maxValue: 1, zoneTicks: [0.3, 0.7], color: AppColors.success, diameter: 220)
+                    .frame(maxWidth: .infinity)
+                HeroMilestoneGauge(value: 4.2, target: 6, maxValue: 12, color: AppColors.accent)
+                HStack(spacing: AppSpacing.lg) {
+                    MiniHalfGauge(value: 0.62, norm: 0.5, maxValue: 1, color: AppColors.success)
+                    MiniMilestoneGauge(value: 4.2, target: 6, maxValue: 12, color: AppColors.accent)
+                }
+            }
+
+            ShowcaseSection(title: "Bar pairs", subtitle: "Previous vs current period") {
+                HeroBarPair(previous: 320_000, current: 280_000, color: AppColors.accent, currency: "KZT")
+                    .frame(maxWidth: .infinity)
+                MiniBarPair(previous: 320_000, current: 280_000, color: AppColors.accent, isProjection: true)
+            }
+
+            ShowcaseSection(title: "UniversalCarousel + UniversalFilterButton", subtitle: "The only horizontal scroller · filter chips") {
+                UniversalCarousel(config: .filter) {
+                    ForEach(["week", "month", "year", "all"], id: \.self) { key in
+                        UniversalFilterButton(title: key.capitalized, isSelected: filter == key, onTap: { filter = key })
+                    }
+                }
+            }
+
+            ShowcaseSection(title: "ChartZoomControls", subtitle: "Glass +/− zoom") {
+                ChartZoomControls(zoomScale: $zoom, range: 1...4)
+                Text("zoom \(zoom, specifier: "%.1f")×").font(AppTypography.caption).foregroundStyle(AppColors.textSecondary)
+            }
+
+            ShowcaseSection(title: "ColorPickerRow") {
+                ColorPickerRow(selectedColorHex: $colorHex, title: "Color")
+                    .cardContentPadding()
+                    .formCardStyle()
             }
         }
     }

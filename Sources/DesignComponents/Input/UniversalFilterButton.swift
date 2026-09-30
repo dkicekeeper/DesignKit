@@ -109,7 +109,7 @@ public struct UniversalFilterButton<Icon: View, MenuContent: View>: View {
 
 public extension UniversalFilterButton where Icon == EmptyView {
     /// Text-only button (no icon)
-    public init(
+    init(
         title: String,
         isSelected: Bool = false,
         showChevron: Bool = true,
@@ -125,7 +125,7 @@ public extension UniversalFilterButton where Icon == EmptyView {
     }
 
     /// Text-only menu (no icon)
-    public init(
+    init(
         title: String,
         isSelected: Bool = false,
         showChevron: Bool = true,

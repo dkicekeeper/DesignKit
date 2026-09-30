@@ -76,7 +76,7 @@ public struct InsightEntityRow<Subtitle: View>: View {
 // MARK: - Plain-text subtitle convenience
 
 public extension InsightEntityRow where Subtitle == Text {
-    public init(
+    init(
         iconSource: IconSource?,
         title: String,
         subtitle: String,

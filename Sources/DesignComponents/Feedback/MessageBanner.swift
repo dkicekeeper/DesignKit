@@ -134,22 +134,22 @@ private extension MessageBanner.MessageType {
 
 public extension MessageBanner {
     /// Success message banner (green checkmark)
-    public static func success(_ message: String) -> MessageBanner {
+    static func success(_ message: String) -> MessageBanner {
         MessageBanner(message: message, type: .success)
     }
 
     /// Error message banner (red triangle)
-    public static func error(_ message: String) -> MessageBanner {
+    static func error(_ message: String) -> MessageBanner {
         MessageBanner(message: message, type: .error)
     }
 
     /// Warning message banner (orange circle)
-    public static func warning(_ message: String) -> MessageBanner {
+    static func warning(_ message: String) -> MessageBanner {
         MessageBanner(message: message, type: .warning)
     }
 
     /// Info message banner (blue circle)
-    public static func info(_ message: String) -> MessageBanner {
+    static func info(_ message: String) -> MessageBanner {
         MessageBanner(message: message, type: .info)
     }
 }

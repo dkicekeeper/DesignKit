@@ -18,7 +18,7 @@ public extension View {
     ///
     /// `disabled: true` блокирует тапы (`.disabled` modifier) — glass-стиль сам
     /// затемнит кнопку. Дополняет SwiftUI `.disabled()` modifier.
-    public func primaryButton(disabled: Bool = false) -> some View {
+    func primaryButton(disabled: Bool = false) -> some View {
         self
             .buttonStyle(.glassProminent)
             .tint(AppColors.accent)
@@ -28,7 +28,7 @@ public extension View {
 
     /// Secondary action — `.glass`.
     /// Используй для: Cancel, Back, secondary actions.
-    public func secondaryButton() -> some View {
+    func secondaryButton() -> some View {
         self
             .buttonStyle(.glass)
             .controlSize(.large)

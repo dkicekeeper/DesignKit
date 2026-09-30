@@ -5,9 +5,17 @@
 
 import SwiftUI
 import DesignTokens
+import DesignComponents
 
 struct MotionScreen: View {
     @State private var animateID = 0
+    @State private var phase = 0
+
+    private let phases: [(symbol: String, title: String)] = [
+        ("sparkles", "Blur-slide reveal"),
+        ("chart.pie.fill", "One transition preset"),
+        ("hand.wave.fill", "For hero text")
+    ]
 
     var body: some View {
         ShowcasePage(title: "Motion") {
@@ -43,9 +51,39 @@ struct MotionScreen: View {
             }
 
             ShowcaseSection(title: "Springs", subtitle: "Named animation tokens") {
-                Text("contentSpring · gentleSpring · heroSpring · progressBarSpring")
+                Text("contentSpring · gentleSpring · heroEntranceAnimation · progressBarSpring")
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.textSecondary)
+            }
+
+            ShowcaseSection(title: "LoopOnboardingHero + .blurSlideHero", subtitle: "Onboarding hero · canonical text reveal") {
+                VStack(spacing: AppSpacing.lg) {
+                    LoopOnboardingHero(symbol: phases[phase].symbol)
+                    Text(phases[phase].title)
+                        .font(AppTypography.h3)
+                        .id(phase)
+                        .transition(.blurSlideHero)
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 220)
+                .animation(AppAnimation.gentleSpring, value: phase)
+
+                Button("Next phase") { phase = (phase + 1) % phases.count }
+                    .buttonStyle(.bounce)
+                    .font(AppTypography.caption.weight(.semibold))
+            }
+
+            ShowcaseSection(title: "AccentGlow", subtitle: ".onboardingAccentGlow() · .accentGlow(_:edge:)") {
+                HStack(spacing: AppSpacing.md) {
+                    Color.clear
+                        .frame(height: 160)
+                        .onboardingAccentGlow()
+                        .clipShape(.rect(cornerRadius: AppRadius.lg))
+                    Color.clear
+                        .frame(height: 160)
+                        .accentGlow(AppColors.success, edge: .top)
+                        .clipShape(.rect(cornerRadius: AppRadius.lg))
+                }
             }
         }
     }

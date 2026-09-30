@@ -333,7 +333,7 @@ public extension View {
 
 public extension UniversalRow where Trailing == EmptyView {
     /// Initializer without trailing element
-    public init(
+    init(
         config: RowConfiguration = .standard,
         leadingIcon: IconConfig? = nil,
         hint: String? = nil,
@@ -350,7 +350,7 @@ public extension UniversalRow where Trailing == EmptyView {
 public extension UniversalRow where Content == Text, Trailing == EmptyView {
     /// Initializer with text content and no trailing
     /// Useful for simple labeled rows
-    public init(
+    init(
         config: RowConfiguration = .standard,
         leadingIcon: IconConfig? = nil,
         hint: String? = nil,
@@ -378,7 +378,7 @@ public extension UniversalRow where Content == Text {
     ///
     /// Use `titleColor: AppColors.destructive` for destructive labels; otherwise
     /// stick to the default so all forms remain visually consistent.
-    public init(
+    init(
         config: RowConfiguration = .standard,
         leadingIcon: IconConfig? = nil,
         hint: String? = nil,

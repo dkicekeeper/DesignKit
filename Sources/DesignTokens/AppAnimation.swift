@@ -153,7 +153,7 @@ public struct BounceButtonStyle: ButtonStyle {
 
 public extension ButtonStyle where Self == BounceButtonStyle {
     /// Применяет iOS 16+ стиль с эффектом увеличения и bounce при нажатии
-    public static var bounce: BounceButtonStyle {
+    static var bounce: BounceButtonStyle {
         BounceButtonStyle()
     }
 }
