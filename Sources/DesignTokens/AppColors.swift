@@ -40,8 +40,9 @@ public enum AppColors {
 
     // MARK: Interactive Colors
 
-    /// Accent color (для выделений, selections)
-    public nonisolated static let accent = Color.indigo
+    /// Accent color (для выделений, selections).
+    /// Configured per app via `DesignKitTheme.accent` (default: indigo).
+    public nonisolated static var accent: Color { DesignKitTheme.accent }
 
     /// Destructive actions
     public nonisolated static let destructive = Color.red
