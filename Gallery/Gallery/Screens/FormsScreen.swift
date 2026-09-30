@@ -11,6 +11,7 @@ struct FormsScreen: View {
     @State private var name = "Groceries"
     @State private var empty = ""
     @State private var date = Date()
+    @State private var frequency = "monthly"
 
     var body: some View {
         ShowcasePage(title: "Forms & Settings") {
@@ -39,6 +40,9 @@ struct FormsScreen: View {
                         Text("Theme settings").navigationTitle("Theme")
                     }
                     DatePickerRow(icon: "calendar", title: "Start date", selection: $date)
+                    MenuPickerRow(icon: "arrow.triangle.2.circlepath", title: "Frequency",
+                                  selection: $frequency,
+                                  options: [("Weekly", "weekly"), ("Monthly", "monthly"), ("Yearly", "yearly")])
                     ActionSettingsRow(icon: "trash.fill", title: "Delete all data",
                                       isDestructive: true) {}
                 }
@@ -51,6 +55,10 @@ struct FormsScreen: View {
                 }
                 .font(AppTypography.bodyEmphasis)
                 BulkDeleteButton(count: 3) {}
+                HStack(spacing: AppSpacing.sm) {
+                    EntityActionButton(title: "Edit", systemImage: "pencil") {}
+                    EntityActionButton(title: "Delete", systemImage: "trash", role: .destructive) {}
+                }
             }
 
             ShowcaseSection(title: "SiriGlowView", subtitle: "Apple-Intelligence edge glow") {

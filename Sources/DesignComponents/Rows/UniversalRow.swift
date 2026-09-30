@@ -316,11 +316,16 @@ public extension View {
         isSelected: Bool,
         action: @escaping () -> Void
     ) -> some View {
-        self
-            .contentShape(Rectangle())
-            .onTapGesture(perform: action)
-            .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
-            .accessibilityRemoveTraits(isSelected ? [] : .isSelected)
+        // Button (not bare onTapGesture) so the row gets a `.bounce` press-scale and
+        // coordinates correctly with scrolling. `Button` already carries the `.isButton`
+        // trait, so we only manage `.isSelected` here.
+        Button(action: action) {
+            self
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.bounce)
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+        .accessibilityRemoveTraits(isSelected ? [] : .isSelected)
     }
 }
 
@@ -328,7 +333,7 @@ public extension View {
 
 public extension UniversalRow where Trailing == EmptyView {
     /// Initializer without trailing element
-    public init(
+    init(
         config: RowConfiguration = .standard,
         leadingIcon: IconConfig? = nil,
         hint: String? = nil,
@@ -345,7 +350,7 @@ public extension UniversalRow where Trailing == EmptyView {
 public extension UniversalRow where Content == Text, Trailing == EmptyView {
     /// Initializer with text content and no trailing
     /// Useful for simple labeled rows
-    public init(
+    init(
         config: RowConfiguration = .standard,
         leadingIcon: IconConfig? = nil,
         hint: String? = nil,
@@ -373,7 +378,7 @@ public extension UniversalRow where Content == Text {
     ///
     /// Use `titleColor: AppColors.destructive` for destructive labels; otherwise
     /// stick to the default so all forms remain visually consistent.
-    public init(
+    init(
         config: RowConfiguration = .standard,
         leadingIcon: IconConfig? = nil,
         hint: String? = nil,

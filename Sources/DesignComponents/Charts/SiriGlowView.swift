@@ -31,8 +31,17 @@ public struct SiriGlowView: View {
     public init() {}
 
     public var body: some View {
-        TimelineView(.periodic(from: .now, by: Self.frameInterval)) { timeline in
-            meshGlow(t: timeline.date.timeIntervalSinceReferenceDate)
+        AmbientMotionGate { allowsAmbientMotion in
+            if allowsAmbientMotion {
+                TimelineView(.periodic(from: .now, by: Self.frameInterval)) { timeline in
+                    meshGlow(t: timeline.date.timeIntervalSinceReferenceDate)
+                }
+            } else {
+                // Reduce Motion, or the system asking for reduced resource usage:
+                // freeze the mesh (t = 0). Full-screen ambient motion is exactly the
+                // class of animation both signals exist to suppress.
+                meshGlow(t: 0)
+            }
         }
         .onGeometryChange(for: Double.self) { proxy in
             proxy.size.width / max(proxy.size.height, 1)

@@ -9,10 +9,11 @@
 ///
 /// - `.compact`: 60pt sparkline — hidden axes/labels. Used in `InsightsCardView`.
 /// - `.full`: Full-height chart with axes and gridlines. Used in detail/section views.
+@available(*, deprecated, message: "Only used by the deprecated DonutChart.")
 public enum ChartDisplayMode {
     case compact
     case full
 
     /// Whether axes and gridlines should be rendered.
-    var showAxes: Bool { self == .full }
+    public var showAxes: Bool { self == .full }
 }

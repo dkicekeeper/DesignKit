@@ -25,25 +25,13 @@ public struct SegmentedPickerView<T: Hashable>: View {
     }
     
     public var body: some View {
-        Group {
-            if #available(iOS 26, *) {
-                Picker(title, selection: $selection) {
-                    ForEach(options, id: \.value) { option in
-                        Text(option.label).tag(option.value)
-                    }
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                .glassEffect(.regular.interactive())
-            } else {
-                Picker(title, selection: $selection) {
-                    ForEach(options, id: \.value) { option in
-                        Text(option.label).tag(option.value)
-                    }
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                .background(.ultraThinMaterial)
+        Picker(title, selection: $selection) {
+            ForEach(options, id: \.value) { option in
+                Text(option.label).tag(option.value)
             }
         }
+        .pickerStyle(SegmentedPickerStyle())
+        .glassEffect(.regular.interactive())
     }
 }
 

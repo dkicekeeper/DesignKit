@@ -50,6 +50,7 @@ import DesignSupport
 ///     accessibilityLabel: String(localized: "75% бюджета использовано")
 /// )
 /// ```
+@available(*, deprecated, message: "Removed from Tenra (2026-07). Use ProgressRing(progress:size:lineWidth:isOverBudget:).")
 public struct BudgetProgressCircle: View {
     /// Normalised progress value (0.0 – 1.0+). Values above 1.0 are clamped at
     /// 1.0 visually but `isOverBudget` still drives the colour choice.

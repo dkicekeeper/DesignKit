@@ -24,6 +24,7 @@ import DesignSupport
 /// - Parameter isOverBudget: true → renders the destructive overshoot segment
 /// - Parameter color: brand color for the category (the in-budget portion)
 /// - Parameter height: bar height in points (default 8; InsightsCardView uses 6)
+@available(*, deprecated, message: "Removed from Tenra (2026-07). Use LinearProgressBar(percentage:isOverBudget:color:).")
 public struct BudgetProgressBar: View {
     let percentage: Double
     let isOverBudget: Bool

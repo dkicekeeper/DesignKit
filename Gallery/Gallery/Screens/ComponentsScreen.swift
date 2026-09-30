@@ -11,11 +11,29 @@ import DesignComponents
 struct ComponentsScreen: View {
     var body: some View {
         ShowcasePage(title: "Components") {
+            heroSection
             amountsSection
             cardsSection
             rowsSection
             feedbackSection
             progressSection
+        }
+    }
+
+    // MARK: Hero
+
+    private var heroSection: some View {
+        ShowcaseSection(title: "HeroSection", subtitle: "Entity-detail hero · icon entrance + progress ring") {
+            HeroSection(
+                icon: .sfSymbol("fork.knife"),
+                title: "Food",
+                iconTint: .monochrome(.orange),
+                primaryAmount: 185_000,
+                primaryCurrency: "KZT",
+                subtitle: "This month",
+                progress: ProgressConfig(current: 185_000, total: 250_000, label: "Budget", color: .orange)
+            )
+            .frame(maxWidth: .infinity)
         }
     }
 
@@ -33,6 +51,13 @@ struct ComponentsScreen: View {
                                     prefix: "−", fontSize: AppTypography.h4,
                                     color: AppColors.destructive)
             }
+            TokenLabel(name: "AmountDisplayPolicy.adaptive", value: "abbreviates only when it doesn't fit")
+            HStack {
+                Text("Balance").font(AppTypography.bodySmall).foregroundStyle(AppColors.textSecondary)
+                Spacer()
+                FormattedAmountText(amount: 148_920_450, currency: "KZT")
+            }
+            .frame(width: 150)
         }
     }
 
@@ -82,6 +107,28 @@ struct ComponentsScreen: View {
             }
             .cardContentPadding()
             .formCardStyle()
+
+            DateSectionHeaderView(dateKey: "2026-09-30", amount: 45_000, currency: "KZT")
+
+            VStack(spacing: 0) {
+                InsightEntityRow(iconSource: .sfSymbol("tv.fill"), title: "Streaming",
+                                 subtitle: "3 services", amount: 12_900, currency: "KZT",
+                                 amountCaption: "per month")
+                HStack(spacing: AppSpacing.md) {
+                    SelectionIndicator(isSelected: true)
+                    Text("Selected row").font(AppTypography.body)
+                    Spacer()
+                }
+                .padding(.vertical, AppSpacing.sm)
+                HStack(spacing: AppSpacing.md) {
+                    SelectionIndicator(isSelected: false)
+                    Text("Not selected").font(AppTypography.body)
+                    Spacer()
+                }
+                .padding(.vertical, AppSpacing.sm)
+            }
+            .cardContentPadding()
+            .cardStyle()
         }
     }
 
@@ -89,6 +136,18 @@ struct ComponentsScreen: View {
 
     private var feedbackSection: some View {
         ShowcaseSection(title: "Feedback") {
+            VStack(spacing: AppSpacing.sm) {
+                MessageBanner.success("Saved successfully")
+                MessageBanner.error("Failed to load")
+                MessageBanner.warning("Low balance")
+                MessageBanner.info("Sync completed")
+            }
+            HStack(spacing: AppSpacing.lg) {
+                StatusIndicatorBadge(status: .active)
+                StatusIndicatorBadge(status: .paused)
+                StatusIndicatorBadge(status: .archived)
+                StatusIndicatorBadge(status: .pending)
+            }
             RecommendationBox(text: "You spent 18% less on dining this month.",
                               color: AppColors.success)
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
@@ -106,35 +165,35 @@ struct ComponentsScreen: View {
     // MARK: Progress
 
     private var progressSection: some View {
-        ShowcaseSection(title: "Progress & Charts") {
+        ShowcaseSection(title: "Progress", subtitle: "LinearProgressBar · ProgressRing · AmountComparisonBar · ProportionBar") {
             VStack(alignment: .leading, spacing: AppSpacing.md) {
-                TokenLabel(name: "BudgetProgressBar", value: "72%")
-                BudgetProgressBar(percentage: 72, isOverBudget: false, color: AppColors.accent)
+                TokenLabel(name: "LinearProgressBar", value: "72%")
+                LinearProgressBar(percentage: 72, isOverBudget: false, color: AppColors.accent)
                 TokenLabel(name: "over budget", value: "140%")
-                BudgetProgressBar(percentage: 140, isOverBudget: true, color: AppColors.accent)
+                LinearProgressBar(percentage: 140, isOverBudget: true, color: AppColors.accent)
                 TokenLabel(name: "ProportionBar")
                 ProportionBar(ratio: 0.65, leftColor: AppColors.income, rightColor: AppColors.bgMuted)
             }
 
             HStack(spacing: AppSpacing.xl) {
                 VStack(spacing: AppSpacing.xs) {
-                    BudgetProgressCircle(progress: 0.45, size: AppIconSize.budgetRing, lineWidth: 5)
+                    ProgressRing(progress: 0.45, size: AppIconSize.budgetRing, lineWidth: 5, showsTrack: true)
                     Text("45%").font(AppTypography.caption2).foregroundStyle(AppColors.textSecondary)
                 }
                 VStack(spacing: AppSpacing.xs) {
-                    BudgetProgressCircle(progress: 0.88, size: AppIconSize.budgetRing, lineWidth: 5)
+                    ProgressRing(progress: 0.88, size: AppIconSize.budgetRing, lineWidth: 5, showsTrack: true)
                     Text("88%").font(AppTypography.caption2).foregroundStyle(AppColors.textSecondary)
                 }
                 VStack(spacing: AppSpacing.xs) {
-                    BudgetProgressCircle(progress: 1.15, size: AppIconSize.budgetRing, lineWidth: 5, isOverBudget: true)
+                    ProgressRing(progress: 1.15, size: AppIconSize.budgetRing, lineWidth: 5, isOverBudget: true, showsTrack: true)
                     Text("115%").font(AppTypography.caption2).foregroundStyle(AppColors.textSecondary)
                 }
             }
             .frame(maxWidth: .infinity)
 
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                TokenLabel(name: "ExpenseIncomeProgressBar")
-                ExpenseIncomeProgressBar(expenseAmount: 921_300, incomeAmount: 640_000, currency: "KZT")
+                TokenLabel(name: "AmountComparisonBar")
+                AmountComparisonBar(expenseAmount: 921_300, incomeAmount: 640_000, currency: "KZT")
             }
         }
     }

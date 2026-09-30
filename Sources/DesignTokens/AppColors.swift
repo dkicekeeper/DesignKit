@@ -36,12 +36,13 @@ public enum AppColors {
     public static let textSecondary = Color.secondary
 
     /// Tertiary text (используй системный .gray для мета-информации)
-    public static let textTertiary = Color.gray
+    public nonisolated static let textTertiary = Color.gray
 
     // MARK: Interactive Colors
 
-    /// Accent color (для выделений, selections)
-    public nonisolated static let accent = Color.indigo
+    /// Accent color (для выделений, selections).
+    /// Configured per app via `DesignKitTheme.accent` (default: indigo).
+    public nonisolated static var accent: Color { DesignKitTheme.accent }
 
     /// Destructive actions
     public nonisolated static let destructive = Color.red
@@ -63,7 +64,9 @@ public enum AppColors {
 
     /// Income transactions — финансово-специфичный зелёный.
     /// Не зависит от `success`: если дизайн меняет success, income не изменится.
-    public static let income = Color(red: 0.13, green: 0.70, blue: 0.37)
+    /// `nonisolated` so the nonisolated `InsightsService` can read it without a
+    /// MainActor hop (`Color` is `Sendable`).
+    public nonisolated static let income = Color(red: 0.13, green: 0.70, blue: 0.37)
 
     /// Expense transactions.
     /// Сознательно НЕ красный (как могло бы подсказать "destructive"-чтение расхода):
@@ -73,7 +76,7 @@ public enum AppColors {
     /// и `transfer` (cyan). Резолвится в тот же цвет, что и `textPrimary`,
     /// но семантически это отдельный токен — менять расход на другой цвет
     /// (если когда-нибудь понадобится) можно будет в одной точке.
-    public static let expense = Color.primary
+    public nonisolated static let expense = Color.primary
 
     /// Transfer / internal transactions (distinct cyan-teal, not accent blue)
     public static let transfer = Color(red: 0.0, green: 0.75, blue: 0.85)
@@ -88,7 +91,7 @@ public enum AppColors {
 /// Цвета для категорий транзакций — hash-based assignment из палитры
 public struct CategoryColors {
     /// Pre-computed color palette (avoids hex parsing on every call)
-    private static let palette: [Color] = {
+    private nonisolated static let palette: [Color] = {
         let hexValues: [UInt64] = [
             0x3b82f6, 0x8b5cf6, 0xec4899, 0xf97316, 0xeab308,
             0x22c55e, 0x14b8a6, 0x06b6d4, 0x6366f1, 0xd946ef,
@@ -105,7 +108,7 @@ public struct CategoryColors {
 
     /// Deterministic color for a category name, hashed into the palette.
     /// (DesignKit drops Tenra's custom-category override; the palette is the single source.)
-    public static func hexColor(for category: String, opacity: Double = 1.0) -> Color {
+    public nonisolated static func hexColor(for category: String, opacity: Double = 1.0) -> Color {
         let index = abs(category.hashValue) % palette.count
         return palette[index].opacity(opacity)
     }

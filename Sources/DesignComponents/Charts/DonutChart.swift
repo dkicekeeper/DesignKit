@@ -15,29 +15,7 @@ import DesignTokens
 import DesignSupport
 import Charts
 
-// MARK: - DonutSlice
-
-/// A single sector in a `DonutChart`.
-public struct DonutSlice: Identifiable {
-    public let id: String
-    let amount: Double
-    let color: Color
-    /// Display label (used for VoiceOver / external lists).
-    let label: String
-    /// 0–100 percentage, used for in-sector annotation (shown when > 10%).
-    let percentage: Double
-
-    public init(id: String, amount: Double, color: Color, label: String, percentage: Double) {
-        self.id = id
-        self.amount = amount
-        self.color = color
-        self.label = label
-        self.percentage = percentage
-    }
-}
-
-// (DesignKit drops Tenra's `DonutSlice.from([CategoryBreakdownItem])` /
-//  `from([SubcategoryBreakdownItem])` domain converters — build `[DonutSlice]` directly.)
+// `DonutSlice` now lives in OrbChart.swift (Tenra moved it there when DonutChart was retired).
 
 // MARK: - DonutChart
 
@@ -66,6 +44,7 @@ public struct DonutSlice: Identifiable {
 ///     }
 /// }
 /// ```
+@available(*, deprecated, message: "Removed from Tenra (2026-07). Use OrbChart(slices:) or MiniDonut(slices:).")
 public struct DonutChart<CenterContent: View>: View {
     let slices: [DonutSlice]
     var mode: ChartDisplayMode = .full
@@ -171,10 +150,11 @@ public struct DonutChart<CenterContent: View>: View {
 
 // MARK: - Convenience init (no center content)
 
+@available(*, deprecated, message: "Removed from Tenra (2026-07). Use OrbChart(slices:) or MiniDonut(slices:).")
 public extension DonutChart where CenterContent == EmptyView {
     /// Convenience initializer for the common case of a donut without a center label.
     /// Preserves source-compatibility with existing call sites.
-    public init(
+    init(
         slices: [DonutSlice],
         mode: ChartDisplayMode = .full,
         showAnnotations: Bool = true
