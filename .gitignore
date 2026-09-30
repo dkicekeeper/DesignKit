@@ -8,8 +8,9 @@ xcuserdata/
 *.xcscmblueprint
 *.xccheckout
 
-# Note: Gallery/Gallery.xcodeproj IS committed so you can open it directly.
-# It is generated from Gallery/project.yml — regenerate with `xcodegen generate`.
+# Gallery/Gallery.xcodeproj is generated from Gallery/project.yml and not stored in git:
+# `cd Gallery && xcodegen generate` (CI and the TestFlight workflow do the same).
+Gallery/*.xcodeproj/
 
 # SwiftPM resolved
 .swiftpm/

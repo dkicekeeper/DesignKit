@@ -1,0 +1,192 @@
+name: TestFlight
+
+# Every DesignKit update on main → a Gallery build in TestFlight. Same pipeline as Dalada's:
+# a GitHub-hosted Mac archives the Gallery, Xcode cloud-signs it with an App Store Connect API
+# key, and the build is uploaded. Version = VERSION, build = run number. "What to Test" lists
+# the DesignKit commits since the previous release tag.
+#
+# One-time setup (docs/testflight.md): the app record in App Store Connect and three repository
+# secrets — ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8 (the same Admin key Dalada uses works).
+# Until the secrets exist, pushes skip the upload; a manual run fails with the reason.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Sources/**"
+      - "Gallery/**"
+      - "Package.swift"
+      - "VERSION"
+      - ".github/workflows/testflight.yml"
+      - ".github/scripts/asc.py"
+  workflow_dispatch:
+
+concurrency:
+  group: testflight
+  cancel-in-progress: false
+
+env:
+  TEAM_ID: SY2L2VMQP7
+  BUNDLE_ID: dakacom.DesignKitGallery
+
+jobs:
+  preflight:
+    name: Check secrets
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.check.outputs.ready }}
+    steps:
+      - id: check
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          missing=""
+          for name in ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8; do
+            [ -n "${!name}" ] || missing="$missing $name"
+          done
+          if [ -z "$missing" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          elif [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "::error::Missing secrets:$missing (docs/testflight.md)"
+            exit 1
+          else
+            echo "::notice::TestFlight upload skipped — missing secrets:$missing (docs/testflight.md)"
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  upload:
+    name: Archive and upload Gallery
+    needs: preflight
+    if: needs.preflight.outputs.ready == 'true'
+    runs-on: macos-26
+    timeout-minutes: 60
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      build: ${{ steps.version.outputs.build }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # tags + history for the version and "What to Test"
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Version and build number
+        id: version
+        run: |
+          # The DesignKit release this build shows (VERSION is what Release tags).
+          VERSION=$(tr -d '[:space:]' < VERSION)
+          BUILD=$GITHUB_RUN_NUMBER
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build=$BUILD" >> "$GITHUB_OUTPUT"
+          echo "Gallery $VERSION ($BUILD)"
+
+      - name: Save App Store Connect API key
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/asc"
+          printf '%s\n' "$ASC_KEY_P8" > "$RUNNER_TEMP/asc/AuthKey_$ASC_KEY_ID.p8"
+          echo "ASC_KEY_PATH=$RUNNER_TEMP/asc/AuthKey_$ASC_KEY_ID.p8" >> "$GITHUB_ENV"
+
+      - name: Bundle id, app record, stale certificates
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          python3 -m venv "$RUNNER_TEMP/ascenv"
+          "$RUNNER_TEMP/ascenv/bin/pip" install --quiet pyjwt cryptography
+          "$RUNNER_TEMP/ascenv/bin/python" .github/scripts/asc.py prepare
+
+      - name: Generate Gallery project
+        working-directory: Gallery
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Archive
+        working-directory: Gallery
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          xcodebuild archive \
+            -project Gallery.xcodeproj \
+            -scheme Gallery \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/Gallery.xcarchive" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            -quiet \
+            MARKETING_VERSION="${{ steps.version.outputs.version }}" \
+            CURRENT_PROJECT_VERSION="${{ steps.version.outputs.build }}" \
+            DEVELOPMENT_TEAM="$TEAM_ID"
+
+      - name: Upload to App Store Connect
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>$TEAM_ID</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict>
+          </plist>
+          PLIST
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/Gallery.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+          echo "Gallery ${{ steps.version.outputs.version }} (${{ steps.version.outputs.build }}) uploaded — it appears in TestFlight after processing (10–30 min)." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove API key
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/asc"
+
+  whats-new:
+    name: What to Test
+    needs: upload
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set What to Test
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          VERSION: ${{ needs.upload.outputs.version }}
+          BUILD: ${{ needs.upload.outputs.build }}
+          WAIT_MINUTES: "45"
+        run: |
+          mkdir -p "$RUNNER_TEMP/asc"
+          printf '%s\n' "$ASC_KEY_P8" > "$RUNNER_TEMP/asc/key.p8"
+          export ASC_KEY_PATH="$RUNNER_TEMP/asc/key.p8"
+          # Commits since the previous release tag (or the last 15 when there is none).
+          TAG=$(git describe --tags --abbrev=0 --match '[0-9]*.[0-9]*.[0-9]*' HEAD^ 2>/dev/null || true)
+          if [ -n "$TAG" ]; then RANGE="$TAG..HEAD"; else RANGE="-15"; fi
+          export WHATS_NEW="$(printf 'DesignKit %s — changes:\n' "$VERSION"; git log --no-merges --format='• %s' $RANGE | head -25)"
+          python3 -m venv "$RUNNER_TEMP/ascenv"
+          "$RUNNER_TEMP/ascenv/bin/pip" install --quiet pyjwt cryptography
+          "$RUNNER_TEMP/ascenv/bin/python" .github/scripts/asc.py whats-new
+          rm -rf "$RUNNER_TEMP/asc"

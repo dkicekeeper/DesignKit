@@ -10,7 +10,7 @@ SwiftUI design system shared by **Tenra** (personal finance, the reference imple
 # Scheme: DesignKit-Package or DesignKit — `xcodebuild -list` shows which.
 xcodebuild build -scheme DesignKit-Package -destination 'generic/platform=iOS Simulator' -quiet
 
-# Gallery (showcase app). The .xcodeproj is generated from Gallery/project.yml:
+# Gallery (showcase app). The .xcodeproj is generated from Gallery/project.yml and not in git:
 cd Gallery && xcodegen generate
 xcodebuild build -project Gallery.xcodeproj -scheme Gallery \
   -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO -quiet
@@ -19,6 +19,10 @@ xcodebuild build -project Gallery.xcodeproj -scheme Gallery \
 Code is often written in a Linux container where SwiftUI cannot compile. **CI is the compiler
 there**: `.github/workflows/ci.yml` builds the package, the Gallery, and **Dalada against this
 checkout** on macOS for every push to `main` and `claude/**`. Push, then read the job logs.
+
+**TestFlight**: `.github/workflows/testflight.yml` archives the Gallery and uploads it on every
+push to `main` that touches `Sources/`, `Gallery/`, `Package.swift` or `VERSION` (version =
+`VERSION`, build = run number). Setup and troubleshooting: [docs/testflight.md](docs/testflight.md).
 
 ## Package Layout
 
@@ -30,7 +34,8 @@ Sources/
 │                      formatting, haptics, DominantColorExtractor, host hooks
 └── DesignComponents/  → DesignTokens + DesignSupport — Cards, Charts, Feedback, Forms,
                        Headers, Icons, Input, Rows
-Gallery/               showcase app (xcodegen); every public component has a specimen
+Gallery/               showcase app (xcodegen; the .xcodeproj is not in git); every public
+                       component has a specimen; ships to TestFlight (docs/testflight.md)
 docs/                  design-system.md, charts.md, gotchas.md, localization-keys.md
 ```
 
@@ -100,6 +105,10 @@ rather than importing an app type.
 
 - Semantic versioning with git tags (`0.2.0`, …). Consumers pin a version (`exact:` or
   `.upToNextMinor(from:)`), never a branch.
+- **Cutting a release:** bump `VERSION` in the PR that should ship. On merge,
+  `.github/workflows/release.yml` tags that commit `X.Y.Z` and creates a GitHub Release with the
+  commits since the previous tag (tags are created by Actions — the Claude session's git proxy
+  only pushes branches). TestFlight's Gallery build carries the same version.
 - **Never remove or rename public API in a minor release.** Deprecate with
   `@available(*, deprecated, message: "… Use X.")` naming the replacement; remove only in the
   next major, once no consumer uses it. Tenra retiring a component is not a reason to delete it
@@ -132,3 +141,4 @@ rather than importing an app type.
 | Charts, progress, gauges, OrbChart, Swift Charts patterns | [docs/charts.md](docs/charts.md) |
 | Package traps (public API, Xcode 26/27, bundles) and SwiftUI layout traps | [docs/gotchas.md](docs/gotchas.md) |
 | Localized strings used by components | [docs/localization-keys.md](docs/localization-keys.md) |
+| Gallery TestFlight pipeline | [docs/testflight.md](docs/testflight.md) |

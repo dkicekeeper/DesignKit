@@ -20,6 +20,10 @@ open Gallery.xcodeproj            # then Run (⌘R) on an iPhone simulator (iOS 
 Screens: **Colors, Typography (Inter), Spacing & Radius, Icon Sizes, Icons, Buttons, Cards &
 Surfaces, Motion, Components, Forms & Settings, Inputs & Charts**.
 
+The Gallery also ships to **TestFlight** on every DesignKit update in `main` — with a
+Tenra / Dalada theme switch, so each app's accent can be checked on a device. Setup and details:
+[docs/testflight.md](docs/testflight.md).
+
 ## Package layout
 
 Three layered targets (each depends on the ones above it):
@@ -81,7 +85,8 @@ stability and versioning rules, Xcode 26/27 compatibility. CI (`.github/workflow
 builds the package, the Gallery and Dalada against every push.
 
 Docs: [design-system.md](docs/design-system.md) · [charts.md](docs/charts.md) ·
-[gotchas.md](docs/gotchas.md) · [localization-keys.md](docs/localization-keys.md)
+[gotchas.md](docs/gotchas.md) · [localization-keys.md](docs/localization-keys.md) ·
+[testflight.md](docs/testflight.md)
 
 ## Requirements
 
