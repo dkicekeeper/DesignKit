@@ -10,12 +10,27 @@ import SwiftUI
 import DesignTokens
 import DesignSupport
 
+/// How an amount behaves when its container is too narrow for the full number.
+public enum AmountDisplayPolicy {
+    /// Always the full number. Truncation/scaling is the caller's problem — use where
+    /// the exact figure IS the content (amount editors, calculator display).
+    case full
+    /// Full number when it fits, abbreviated ("1,2 млн ₸") when it doesn't. Default:
+    /// nothing changes visually anywhere the amount already fitted.
+    case adaptive
+    /// Always abbreviated (tight chrome: chart labels, badges).
+    case compact
+}
+
 /// Универсальный компонент для отображения денежных сумм с умной обработкой дробной части
 ///
 /// Логика отображения:
 /// - Если сотые = 0 и showDecimalsWhenZero = false → не показывает дробную часть (1000 ₸)
 /// - Если сотые > 0 → показывает с прозрачностью decimalOpacity (1000.50 ₸)
 /// - Если showDecimalsWhenZero = true → всегда показывает (1000.00 ₸)
+///
+/// Overflow: see `AmountDisplayPolicy`. VoiceOver always reads the FULL amount, whichever
+/// variant is drawn — an abbreviation is a layout concession, not a change of value.
 public struct FormattedAmountText: View {
     let amount: Double
     let currency: String
@@ -25,6 +40,7 @@ public struct FormattedAmountText: View {
     let color: Color
     let showDecimalsWhenZero: Bool
     let decimalOpacity: Double
+    let policy: AmountDisplayPolicy
 
     /// Инициализатор с полным набором параметров
     public init(
@@ -35,7 +51,8 @@ public struct FormattedAmountText: View {
         fontWeight: Font.Weight = .semibold,
         color: Color = .primary,
         showDecimalsWhenZero: Bool = AmountDisplayConfiguration.shared.showDecimalsWhenZero,
-        decimalOpacity: Double = AmountDisplayConfiguration.shared.decimalOpacity
+        decimalOpacity: Double = AmountDisplayConfiguration.shared.decimalOpacity,
+        policy: AmountDisplayPolicy = .adaptive
     ) {
         self.amount = amount
         self.currency = currency
@@ -45,6 +62,7 @@ public struct FormattedAmountText: View {
         self.color = color
         self.showDecimalsWhenZero = showDecimalsWhenZero
         self.decimalOpacity = decimalOpacity
+        self.policy = policy
     }
 
     private var formattedParts: (integer: String, decimal: String, symbol: String) {
@@ -77,22 +95,74 @@ public struct FormattedAmountText: View {
     /// is preserved by colouring that run separately.
     private var composedText: Text {
         let parts = formattedParts
-        var result = Text(prefix + parts.integer)
+
+        // Built by interpolating styled `Text` runs into one `Text`. `Text.+` does the same
+        // thing but was deprecated in iOS 26; interpolating a `Text` value preserves that
+        // run's own font/weight/foregroundStyle, so the decimal run keeps its reduced
+        // opacity exactly as before. Still ONE Text — that is what makes
+        // `.minimumScaleFactor` scale the whole amount uniformly (see comment above).
+        let integerRun = Text(prefix + parts.integer)
             .font(fontSize).fontWeight(fontWeight).foregroundStyle(color)
+        let decimalRun = Text(AmountDisplayConfiguration.shared.decimalSeparator + parts.decimal)
+            .font(fontSize).fontWeight(fontWeight).foregroundStyle(color.opacity(decimalOpacity))
+        let symbolRun = Text(" " + parts.symbol)
+            .font(fontSize).fontWeight(fontWeight).foregroundStyle(color)
+
         if shouldShowDecimal {
-            result = result + Text(AmountDisplayConfiguration.shared.decimalSeparator + parts.decimal)
-                .font(fontSize).fontWeight(fontWeight).foregroundStyle(color.opacity(decimalOpacity))
+            return Text("\(integerRun)\(decimalRun)\(symbolRun)")
         }
-        result = result + Text(" " + parts.symbol)
+        return Text("\(integerRun)\(symbolRun)")
+    }
+
+    // MARK: - Compact variants
+
+    /// Abbreviated string for `digits` fraction digits, as one styled `Text`.
+    /// No dimmed decimal run here: in "1,2 млн" the digit after the separator is a
+    /// significant figure, not a cents tail.
+    private func compactText(digits: Int) -> Text {
+        Text(prefix + Formatting.formatCurrencyCompact(amount, currency: currency, maxFractionDigits: digits))
             .font(fontSize).fontWeight(fontWeight).foregroundStyle(color)
-        return result
+    }
+
+    /// Fallback candidate for `ViewThatFits`, or the full text when abbreviating wouldn't
+    /// actually help.
+    ///
+    /// Compact unit names are localized words, so "10 тыс. ₸" is LONGER than "10 000 ₸";
+    /// swapping in a longer string would overflow harder, not less. Falling back to the
+    /// full text keeps every `ViewThatFits` slot filled — an `if` here would leave an
+    /// `EmptyView` candidate, which always "fits" and would render nothing at all.
+    private func candidate(digits: Int) -> Text {
+        let parts = formattedParts
+        let fullLength = (prefix + parts.integer + parts.symbol).count
+        let compact = prefix + Formatting.formatCurrencyCompact(amount, currency: currency, maxFractionDigits: digits)
+        guard compact.count < fullLength else { return composedText }
+        return compactText(digits: digits)
+    }
+
+    /// Full amount, always — VoiceOver must not lose precision to a layout decision.
+    private var accessibilityText: String {
+        prefix + Formatting.formatCurrencySmart(amount, currency: currency, showDecimalsWhenZero: showDecimalsWhenZero)
     }
 
     public var body: some View {
-        composedText
-            .contentTransition(.numericText())
-            .animation(AppAnimation.gentleSpring, value: amount)
+        Group {
+            switch policy {
+            case .full:
+                composedText
+            case .compact:
+                compactText(digits: 1)
+            case .adaptive:
+                // First candidate that fits wins, so an amount with room to spare renders
+                // exactly as it did before this policy existed.
+                ViewThatFits(in: .horizontal) {
+                    composedText.lineLimit(1)
+                    candidate(digits: 1).lineLimit(1)
+                    candidate(digits: 0).lineLimit(1)
+                }
+            }
+        }
+        .contentTransition(.numericText())
+        .animation(AppAnimation.gentleSpring, value: amount)
+        .accessibilityLabel(accessibilityText)
     }
 }
-
-

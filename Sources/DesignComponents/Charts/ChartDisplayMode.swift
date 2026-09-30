@@ -14,5 +14,5 @@ public enum ChartDisplayMode {
     case full
 
     /// Whether axes and gridlines should be rendered.
-    var showAxes: Bool { self == .full }
+    public var showAxes: Bool { self == .full }
 }

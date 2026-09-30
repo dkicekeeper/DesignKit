@@ -54,7 +54,7 @@ public struct InsightsStatCard: View {
                 Self.deltaBadge(current: amount, previous: previous, upIsGood: upIsGood)
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .padding(AppSpacing.lg)
         .cardStyle()
     }
