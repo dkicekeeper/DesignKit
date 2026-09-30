@@ -36,6 +36,8 @@ Sources/
                        Headers, Icons, Input, Rows
 Gallery/               showcase app (xcodegen; the .xcodeproj is not in git); every public
                        component has a specimen; ships to TestFlight (docs/testflight.md)
+Tests/                 swift-testing unit tests (formatting, ExpressionEvaluator, calculator
+                       model) — run by CI on an iOS Simulator
 docs/                  design-system.md, charts.md, gotchas.md, localization-keys.md
 ```
 
@@ -127,7 +129,7 @@ rather than importing an app type.
 
 - `PeriodDataPoint` chart family (`LineChart`, `BarChart`, `ChartSwitcher`, `MiniSparkline`,
   `HeroSparkline`, `ChartSelectionBanner`, period helpers) is not ported — needs a generic series
-  model. The `InsightsStatCard` trend sparkline waits on it.
+  model. `InsightsStatCard(… trend:)` takes the app's sparkline meanwhile.
 - `EditableHeroSection`, `IconPickerView`/`IconCatalog`, `CurrencySelectorView`,
   `AmountInputView` depend on Tenra services (logo registry, settings, FX).
 - `CategoryColors.hexColor(for:)` hashes with `String.hashValue`, which is seeded per process —

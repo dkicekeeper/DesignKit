@@ -86,7 +86,12 @@ struct ComponentsScreen: View {
                 InsightsStatCard(title: "Income", amount: 640_000, currency: "KZT",
                                  color: AppColors.income, previous: 580_000, upIsGood: true)
                 InsightsStatCard(title: "Expenses", amount: 921_300, currency: "KZT",
-                                 color: AppColors.expense, previous: 870_000, upIsGood: false)
+                                 color: AppColors.expense, previous: 870_000, upIsGood: false) {
+                    // Trend footer slot (Tenra puts a MiniSparkline here).
+                    ProportionBar(ratio: 0.7, leftColor: AppColors.destructive, rightColor: AppColors.bgMuted, height: 6)
+                        .padding(.top, AppSpacing.xxs)
+                        .accessibilityHidden(true)
+                }
             }
         }
     }

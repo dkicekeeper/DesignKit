@@ -28,6 +28,17 @@ let package = Package(
             name: "DesignComponents",
             dependencies: ["DesignTokens", "DesignSupport"]
         ),
+
+        // Unit tests (swift-testing) for the logic behind the views: formatting, the
+        // expression evaluator, the calculator model. Moved here from Tenra with the code.
+        .testTarget(
+            name: "DesignSupportTests",
+            dependencies: ["DesignSupport"]
+        ),
+        .testTarget(
+            name: "DesignComponentsTests",
+            dependencies: ["DesignComponents", "DesignSupport"]
+        ),
     ],
     swiftLanguageModes: [.v5]
 )

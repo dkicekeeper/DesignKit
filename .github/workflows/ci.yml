@@ -38,6 +38,25 @@ jobs:
             -derivedDataPath build \
             -quiet
 
+      - name: Run package tests
+        run: |
+          DEVICE_ID=$(xcrun simctl list devices available --json | python3 -c '
+          import json, sys
+          devices = json.load(sys.stdin)["devices"]
+          ids = [d["udid"] for runtime, items in sorted(devices.items(), reverse=True)
+                 if ".iOS-" in runtime for d in items if d["name"].startswith("iPhone")]
+          print(ids[0])
+          ')
+          SCHEMES=$(xcodebuild -list -json | python3 -c 'import json, sys; print("\n".join(json.load(sys.stdin)["workspace"]["schemes"]))')
+          SCHEME=$(echo "$SCHEMES" | grep -x 'DesignKit-Package' || echo "$SCHEMES" | grep -x 'DesignKit' || echo "$SCHEMES" | head -1)
+          set -o pipefail
+          xcodebuild test \
+            -scheme "$SCHEME" \
+            -destination "id=$DEVICE_ID" \
+            -derivedDataPath build \
+            2>&1 | tee test.log | grep -aE "Test case .* failed|error:|\*\* TEST (SUCCEEDED|FAILED)|Test run with" || true
+          grep -aq "\*\* TEST SUCCEEDED \*\*" test.log
+
       - name: Build Gallery
         working-directory: Gallery
         run: |
