@@ -92,6 +92,23 @@ public struct LinearProgressBar: View {
         self.projectedPercentage = projectedPercentage
     }
 
+    /// Plain progress (downloads, checklists, route): `value` is a fraction 0…1.
+    /// No overshoot, no forecast; same look as the budget bar.
+    public init(
+        value: Double,
+        color: Color = AppColors.accent,
+        height: CGFloat = 8,
+        animatesOnAppear: Bool = true
+    ) {
+        self.init(
+            percentage: value * 100,
+            isOverBudget: false,
+            color: color,
+            height: height,
+            animatesOnAppear: animatesOnAppear
+        )
+    }
+
     public var body: some View {
         ZStack(alignment: .leading) {
             RoundedRectangle(cornerRadius: AppRadius.xs)
@@ -132,6 +149,9 @@ public struct LinearProgressBar: View {
             }
         }
         .animation(AppAnimation.progressFillAnimation, value: isOverBudget)
+        // One element with a percent value, like the system ProgressView.
+        .accessibilityElement()
+        .accessibilityValue(Text(verbatim: (max(percentage, 0) / 100).formatted(.percent.precision(.fractionLength(0)))))
         .onAppear {
             if animatesOnAppear {
                 withAnimation(fillAnimation) { displayPercentage = percentage }

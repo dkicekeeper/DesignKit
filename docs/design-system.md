@@ -63,9 +63,9 @@ These depend on app models/services. Port one only after replacing the dependenc
 generic input or a host hook (see [CLAUDE.md](../CLAUDE.md) → *Porting a component*).
 
 - **Tenra models** (`Transaction`, `Account`, `CustomCategory`, `RecurringSeries`, loans, deposits): `TransactionCard`, `AccountRow`, `CategoryRow`, `CategoryChip`, `BudgetProgressRow`, `BudgetSettingsSection`, `EntityDetailScaffold`, `GroupedTransactionList`, `CategoryStyleHelper` / `CategoryStyleCache`, `TransactionDisplayHelper`, `CategoryDisplay`.
-- **`PeriodDataPoint` chart family** (Tenra's insight model): `LineChart`, `BarChart`, `ChartSwitcher`, `MiniSparkline`, `HeroSparkline`, `ChartSelectionBanner`, `PeriodChartHelpers`, `ChartAxisHelpers`, `PeriodBreakdownRow`, `InsightTrendBadge`. Porting them needs a generic series model first. `InsightsStatCard` takes any trend view in its `trend:` footer slot, so Tenra passes its `MiniSparkline` there.
+- **`PeriodDataPoint` chart family** (Tenra's insight model): `LineChart`, `BarChart`, `ChartSwitcher`, `MiniSparkline`, `HeroSparkline`, `ChartSelectionBanner`, `PeriodChartHelpers`, `ChartAxisHelpers`, `PeriodBreakdownRow`. Porting them needs a generic series model first. `InsightsStatCard` takes any trend view in its `trend:` footer slot, so Tenra passes its `MiniSparkline` there.
 - **Tenra services**: `EditableHeroSection` + `IconPickerView` / `IconCatalog` (logo registry), `CurrencySelectorView` / `AmountInputView` (settings + FX), `DateFormatters`, `FastDateParser`.
-- **Domain convenience inits**: `MenuPickerRow where T == RecurringFrequency / LoanType / ReminderOption`, `StatusIndicatorBadge`'s `RecurringSeries.entityStatus`, `DonutSlice.from([CategoryBreakdownItem])`.
+- **Domain convenience inits / adapters**: `MenuPickerRow where T == RecurringFrequency / LoanType / ReminderOption`, `StatusIndicatorBadge`'s `RecurringSeries.entityStatus`, `DonutSlice.from([CategoryBreakdownItem])`, Tenra's `InsightTrendBadge` (`InsightTrend` → `TrendBadge`), Dalada's `RuleStatusBadge` (`RuleStatus` → `BadgeView`).
 
 ---
 
@@ -632,6 +632,21 @@ Use in: `EditableHeroSection` (automatic when `config.showCurrency`). Not standa
 
 ---
 
+#### `ChipPicker` *(0.4.0)*
+One or none from a horizontally scrolling row of chips; tapping the selected chip clears it.
+
+```swift
+ChipPicker("Weather", options: Weather.allCases, selection: $draft.weather) { $0.title }
+```
+
+Chips use `filterChipStyle(isSelected:)`. A fixed 2–4 way switch → `SegmentedPickerView`; a
+filter that opens a menu → `UniversalFilterButton`.
+
+#### `SelectionIndicator(isSelected:tint:)`
+Check circle for multi-select and checklist rows; the row carries the label and the
+`.isSelected` trait. `tint` (0.4.0, default accent) colours the filled check: `AppColors.success`
+for a done checklist item, `textTertiary` for one that is already owned and disabled.
+
 ### Feedback & Status Components
 
 #### `MessageBanner`
@@ -685,6 +700,31 @@ StatusIndicatorBadge(status: .active, font: AppTypography.h4)
 ```
 
 Cases: `.active` (green checkmark), `.paused` (orange pause), `.archived` (gray archive), `.pending` (blue clock).
+
+#### `BadgeView` *(0.4.0)*
+Capsule with short text and an optional SF Symbol: a status, a tag or a counter.
+
+```swift
+BadgeView("Seasonal ban", color: AppColors.destructive)                       // .tinted: text on a 12 % tint
+BadgeView("3", systemImage: "person.badge.plus", color: AppColors.destructive, style: .filled)
+```
+
+Use `.tinted` for statuses and tags, `.filled` only for counters that need attention. Icon-only
+lifecycle status → `StatusIndicatorBadge`; a change over time → `TrendBadge`. Keep the domain
+mapping (status → text + colour) in the app as a small wrapper (Dalada's `RuleStatusBadge`).
+
+#### `TrendBadge` *(0.4.0)*
+Direction arrow + signed percent ("↗ +12.4%"), from Tenra's insights.
+
+```swift
+TrendBadge(direction: .up, changePercent: 12.4)                                 // .pill
+TrendBadge(direction: .up, changePercent: 8, style: .inline, color: AppColors.destructive) // up is bad
+TrendBadge(direction: .down, changePercent: -3.2, style: .changeIndicator)      // icon over value
+```
+
+Default colours: up = `AppColors.income`, down = `destructive`, flat = `textSecondary`; pass
+`color:` where the direction's meaning flips (expenses). Tenra's `InsightTrendBadge` is an
+adapter over it (`InsightTrend` → direction + percent).
 
 #### `EmptyStateView`
 Empty/error state display.
@@ -749,6 +789,54 @@ Circular progress arc for budget consumption.
 ```swift
 ProgressRing(progress: 0.75, size: AppIconSize.categoryIcon, isOverBudget: false)
 ```
+
+#### `LinearProgressBar(value:)` *(0.4.0)*
+The budget bar's plain form for any progress (downloads, checklists, a followed route):
+`value` is a fraction 0…1, no overshoot or forecast. Replaces the system `ProgressView(value:)`
+so progress looks the same in every app. Both inits expose the percentage to VoiceOver.
+
+```swift
+LinearProgressBar(value: checklist.progress, color: AppColors.success, height: 6)
+LinearProgressBar(value: download.fraction, animatesOnAppear: false)
+```
+
+#### `StatTile` *(0.4.0)*
+One metric: caption over a large monospaced value. The caller formats the value, units included.
+
+```swift
+HStack {
+    StatTile(title: "Distance", value: "12.4 km")
+    StatTile(title: "Moving", value: "2 h 15 min")
+}
+StatTile(title: "Catches", value: "7", systemImage: "fish", valueColor: AppColors.accent)
+```
+
+Use for counts, distances, durations. A money amount compared with the previous period →
+`InsightsStatCard`.
+
+#### `AvatarView` *(0.4.0)*
+Round avatar: the photo when there is one, otherwise initials on a 15 % tint.
+
+```swift
+AvatarView(name: profile.displayName ?? profile.username)          // AppIconSize.avatar (40)
+AvatarView(name: "Ayan Seitkali", size: 64)                         // h3 initials above 48 pt
+AvatarView(name: name, image: Image(uiImage: photo))
+```
+
+Decorative for VoiceOver: put the name in the row next to it. Several faces in a cluster →
+`PackedCircleIconsView`.
+
+#### `RatingView` / `RatingPicker` *(0.4.0)*
+Star rating. `RatingView` displays with half stars (filled from .75, half from .25 of a star);
+`RatingPicker` is the tap-to-rate input (whole stars, haptic on tap).
+
+```swift
+RatingView(rating: summary.average, size: 12)
+RatingPicker(rating: $draft.rating)
+```
+
+Default colour `AppColors.warning`, maximum 5. VoiceOver keys: `rating.value`, `rating.pick`
+([localization-keys.md](localization-keys.md)).
 
 ---
 
