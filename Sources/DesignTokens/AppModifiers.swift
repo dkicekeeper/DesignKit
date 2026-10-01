@@ -127,6 +127,10 @@ public extension View {
 public struct StaggeredEntranceModifier: ViewModifier {
     let delay: Double
 
+    public init(delay: Double = 0) {
+        self.delay = delay
+    }
+
     @State private var appeared = false
 
     public func body(content: Content) -> some View {
@@ -165,6 +169,10 @@ public extension View {
 public struct ChartAppearModifier: ViewModifier {
     @State private var appeared = false
     let delay: Double
+
+    public init(delay: Double = 0) {
+        self.delay = delay
+    }
 
     public func body(content: Content) -> some View {
         content

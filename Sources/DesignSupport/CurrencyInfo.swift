@@ -14,6 +14,12 @@ public struct CurrencyInfo: Identifiable, Sendable, Equatable {
 
     public var id: String { code }
 
+    public init(code: String, name: String, symbol: String) {
+        self.code = code
+        self.name = name
+        self.symbol = symbol
+    }
+
     // MARK: - Static Builders
 
     /// All ISO currencies sorted A-Z by localized name.

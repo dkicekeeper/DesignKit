@@ -30,6 +30,8 @@ public struct AmountDisplayConfiguration {
     /// Максимальное количество знаков после запятой
     public var maximumFractionDigits: Int = 2
 
+    public init() {}
+
     // MARK: - Shared Instance
 
     /// Глобальный экземпляр конфигурации.
