@@ -21,7 +21,7 @@ public final class CalculatorInputModel {
     }
 
     /// Raw canonical expression, e.g. "1200+350".
-    private(set) var expression: String = ""
+    public private(set) var expression: String = ""
 
     /// Whether the keypad currently owns input focus. Driven by `CalculatorKeypad`'s
     /// own appear/disappear — the keypad's presence in the view tree IS the source of
@@ -45,7 +45,7 @@ public final class CalculatorInputModel {
 
     /// Resets the expression to a seeded amount (for forms whose default value is computed
     /// after init, e.g. in `onAppear`). A non-positive / unparseable value clears it.
-    func seed(_ amount: String) {
+    public func seed(_ amount: String) {
         expression = Self.canonicalize(amount)
         lastValidResult = nil
         refresh()
@@ -61,7 +61,7 @@ public final class CalculatorInputModel {
 
     // MARK: - Intents
 
-    func tapDigit(_ digit: Character) {
+    public func tapDigit(_ digit: Character) {
         // Replace a lone leading zero in the current operand: "0" + "5" → "5".
         if currentOperand == "0" {
             expression.removeLast()
@@ -70,7 +70,7 @@ public final class CalculatorInputModel {
         refresh()
     }
 
-    func tapOperator(_ op: Op) {
+    public func tapOperator(_ op: Op) {
         guard !expression.isEmpty else { return } // no leading operator
         if let last = expression.last {
             if Self.operatorChars.contains(last) {
@@ -83,20 +83,20 @@ public final class CalculatorInputModel {
         refresh()
     }
 
-    func tapSeparator() {
+    public func tapSeparator() {
         let operand = currentOperand
         guard !operand.contains(".") else { return } // one separator per operand
         expression.append(operand.isEmpty ? "0." : ".")
         refresh()
     }
 
-    func backspace() {
+    public func backspace() {
         guard !expression.isEmpty else { return }
         expression.removeLast()
         refresh()
     }
 
-    func clear() {
+    public func clear() {
         expression = ""
         lastValidResult = nil
     }
@@ -104,17 +104,17 @@ public final class CalculatorInputModel {
     // MARK: - Derived state
 
     /// Evaluated result of the current expression, or `nil` if incomplete/invalid.
-    var result: Decimal? { ExpressionEvaluator.evaluate(expression) }
+    public var result: Decimal? { ExpressionEvaluator.evaluate(expression) }
 
     /// `true` once the expression contains an operator (drives the secondary line).
-    var hasOperator: Bool { expression.contains { Self.operatorChars.contains($0) } }
+    public var hasOperator: Bool { expression.contains { Self.operatorChars.contains($0) } }
 
     /// Value to show large: the live result, falling back to the last valid result so the
     /// display never blanks mid-typing (e.g. while a divisor is "0").
-    var displayResult: Decimal? { result ?? lastValidResult }
+    public var displayResult: Decimal? { result ?? lastValidResult }
 
     /// Plain amount string the form binds to ("" when there is no valid result).
-    var amountText: String {
+    public var amountText: String {
         guard let result else { return "" }
         return AmountInputFormatting.bindingString(for: result)
     }

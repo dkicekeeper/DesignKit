@@ -13,7 +13,11 @@ import DesignSupport
 
 /// A compact card showing one labeled financial metric with an optional
 /// previous-period delta badge. Designed to tile in a 2-column grid.
-public struct InsightsStatCard: View {
+///
+/// `trend` is an optional footer under the number (Tenra draws a `MiniSparkline` of
+/// the recent periods there). Render it decorative (`accessibilityHidden`) — the card's
+/// text carries the meaning.
+public struct InsightsStatCard<Trend: View>: View {
     let title: String
     let amount: Double
     let currency: String
@@ -23,14 +27,24 @@ public struct InsightsStatCard: View {
     var previous: Double? = nil
     /// Whether an increase is good (income, net flow) or bad (expenses) — colours the delta.
     var upIsGood: Bool = true
+    @ViewBuilder let trend: () -> Trend
 
-    public init(title: String, amount: Double, currency: String, color: Color = AppColors.textPrimary, previous: Double? = nil, upIsGood: Bool = true) {
+    public init(
+        title: String,
+        amount: Double,
+        currency: String,
+        color: Color = AppColors.textPrimary,
+        previous: Double? = nil,
+        upIsGood: Bool = true,
+        @ViewBuilder trend: @escaping () -> Trend
+    ) {
         self.title = title
         self.amount = amount
         self.currency = currency
         self.color = color
         self.previous = previous
         self.upIsGood = upIsGood
+        self.trend = trend
     }
 
     public var body: some View {
@@ -53,6 +67,8 @@ public struct InsightsStatCard: View {
             if let previous {
                 Self.deltaBadge(current: amount, previous: previous, upIsGood: upIsGood)
             }
+
+            trend()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .padding(AppSpacing.lg)
@@ -77,6 +93,21 @@ public struct InsightsStatCard: View {
                 .foregroundStyle(color)
             }
         }
+    }
+}
+
+public extension InsightsStatCard where Trend == EmptyView {
+    /// Card without a trend footer.
+    init(
+        title: String,
+        amount: Double,
+        currency: String,
+        color: Color = AppColors.textPrimary,
+        previous: Double? = nil,
+        upIsGood: Bool = true
+    ) {
+        self.init(title: title, amount: amount, currency: currency, color: color,
+                  previous: previous, upIsGood: upIsGood, trend: { EmptyView() })
     }
 }
 

@@ -152,8 +152,16 @@ public struct UniversalRow<Content: View, Trailing: View>: View {
 /// Configuration for leading icon in UniversalRow
 /// Wraps IconSource and IconStyle for convenient usage
 public struct IconConfig {
-    let source: IconSource?
-    let style: IconStyle
+    public let source: IconSource?
+    public let style: IconStyle
+
+    public init(
+        source: IconSource?,
+        style: IconStyle
+    ) {
+        self.source = source
+        self.style = style
+    }
 
     // MARK: - Convenience Initializers
 
@@ -214,11 +222,25 @@ public struct IconConfig {
 
 /// Configuration for UniversalRow layout and styling
 public struct RowConfiguration {
-    let spacing: CGFloat
-    let verticalPadding: CGFloat
-    let horizontalPadding: CGFloat
-    let backgroundColor: Color
-    let cornerRadius: CGFloat
+    public let spacing: CGFloat
+    public let verticalPadding: CGFloat
+    public let horizontalPadding: CGFloat
+    public let backgroundColor: Color
+    public let cornerRadius: CGFloat
+
+    public init(
+        spacing: CGFloat,
+        verticalPadding: CGFloat,
+        horizontalPadding: CGFloat,
+        backgroundColor: Color,
+        cornerRadius: CGFloat
+    ) {
+        self.spacing = spacing
+        self.verticalPadding = verticalPadding
+        self.horizontalPadding = horizontalPadding
+        self.backgroundColor = backgroundColor
+        self.cornerRadius = cornerRadius
+    }
 
     // MARK: - Presets
 

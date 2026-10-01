@@ -143,6 +143,8 @@ public enum AppAnimation {
 
 /// Интерактивный стиль кнопки с эффектом увеличения и bounce (iOS 16+ style)
 public struct BounceButtonStyle: ButtonStyle {
+    public init() {}
+
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.96 : 1.0)

@@ -16,7 +16,7 @@ public enum IconShape: Equatable, Hashable {
     case square
 
     /// Локализованное название формы
-    var localizedName: String {
+    public var localizedName: String {
         switch self {
         case .circle:
             return String(localized: "iconStyle.shape.circle")
@@ -50,7 +50,7 @@ public enum IconTint: Equatable, Hashable {
     case original               // Оригинальные цвета (для растровых изображений)
 
     /// Локализованное название тинта
-    var localizedName: String {
+    public var localizedName: String {
         switch self {
         case .monochrome:
             return String(localized: "iconStyle.tint.monochrome")
@@ -93,13 +93,31 @@ public enum IconTint: Equatable, Hashable {
 
 /// Полная конфигурация стиля иконки с интеграцией Design System
 public struct IconStyle: Equatable, Hashable {
-    var size: CGFloat
-    var shape: IconShape
-    var tint: IconTint
-    var contentMode: ContentMode
-    var backgroundColor: Color?
-    var padding: CGFloat?  // Внутренний padding (опционально)
-    var hasGlassEffect: Bool  // Применять ли glass effect
+    public var size: CGFloat
+    public var shape: IconShape
+    public var tint: IconTint
+    public var contentMode: ContentMode
+    public var backgroundColor: Color?
+    public var padding: CGFloat?  // Внутренний padding (опционально)
+    public var hasGlassEffect: Bool  // Применять ли glass effect
+
+    public init(
+        size: CGFloat,
+        shape: IconShape,
+        tint: IconTint,
+        contentMode: ContentMode,
+        backgroundColor: Color?,
+        padding: CGFloat?,
+        hasGlassEffect: Bool
+    ) {
+        self.size = size
+        self.shape = shape
+        self.tint = tint
+        self.contentMode = contentMode
+        self.backgroundColor = backgroundColor
+        self.padding = padding
+        self.hasGlassEffect = hasGlassEffect
+    }
 
     // MARK: - Basic Initializers
 
@@ -275,7 +293,7 @@ public struct IconStyle: Equatable, Hashable {
     }
 
     /// Локализованное название пресета
-    var localizedPresetName: String? {
+    public var localizedPresetName: String? {
         // Определяем пресет по характеристикам
         if case .circle = shape,
            case .monochrome(let color) = tint,

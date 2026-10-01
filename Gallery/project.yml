@@ -38,7 +38,7 @@ targets:
         SWIFT_VERSION: "5.0"
         # The TestFlight workflow overrides both: the version from /VERSION, the build number
         # from the workflow run number.
-        MARKETING_VERSION: "0.2.0"
+        MARKETING_VERSION: "0.3.0"
         CURRENT_PROJECT_VERSION: "1"
         DEVELOPMENT_TEAM: SY2L2VMQP7
         CODE_SIGN_STYLE: Automatic

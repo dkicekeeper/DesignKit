@@ -14,11 +14,17 @@ public struct CurrencyInfo: Identifiable, Sendable, Equatable {
 
     public var id: String { code }
 
+    public init(code: String, name: String, symbol: String) {
+        self.code = code
+        self.name = name
+        self.symbol = symbol
+    }
+
     // MARK: - Static Builders
 
     /// All ISO currencies sorted A-Z by localized name.
     /// Computed once per app launch (locale doesn't change at runtime).
-    nonisolated static let allCurrencies: [CurrencyInfo] = {
+    public nonisolated static let allCurrencies: [CurrencyInfo] = {
         let locale = Locale.current
         let symbolExtractor = NumberFormatter()
         symbolExtractor.numberStyle = .currency
@@ -52,7 +58,7 @@ public struct CurrencyInfo: Identifiable, Sendable, Equatable {
     }()
 
     /// Top-3 "popular" currencies: device regional + USD + EUR (deduplicated).
-    nonisolated static let popularCurrencies: [CurrencyInfo] = {
+    public nonisolated static let popularCurrencies: [CurrencyInfo] = {
         let regionalCode = Locale.current.currency?.identifier ?? "KZT"
         var codes: [String] = [regionalCode]
         if regionalCode != "USD" { codes.append("USD") }
@@ -63,7 +69,7 @@ public struct CurrencyInfo: Identifiable, Sendable, Equatable {
     }()
 
     /// Look up a single CurrencyInfo by code. O(1) after first access.
-    nonisolated static func find(_ code: String) -> CurrencyInfo? {
+    public nonisolated static func find(_ code: String) -> CurrencyInfo? {
         lookupTable[code]
     }
 

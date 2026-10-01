@@ -16,9 +16,9 @@ import DesignTokens
 import DesignSupport
 
 public struct LoopOnBoardingPhase: Hashable {
-    let symbol: String
-    let title: String
-    let subtitle: String
+    public let symbol: String
+    public let title: String
+    public let subtitle: String
 
     public init(
         symbol: String,
@@ -32,15 +32,15 @@ public struct LoopOnBoardingPhase: Hashable {
 }
 
 public struct LoopOnBoardingConfig {
-    var tint: Color = AppColors.accent
-    var pulseTint: Color = AppColors.accent.opacity(0.65)
-    var pulseWidth: CGFloat = 1.3
-    var pulseScale: CGFloat = 12
-    var iconSize: CGFloat = 100
-    var iconScale: CGFloat = 1.25
+    public var tint: Color = AppColors.accent
+    public var pulseTint: Color = AppColors.accent.opacity(0.65)
+    public var pulseWidth: CGFloat = 1.3
+    public var pulseScale: CGFloat = 12
+    public var iconSize: CGFloat = 100
+    public var iconScale: CGFloat = 1.25
     /// Seconds per phase. Each phase takes `phaseUpdateAfter * 3` seconds
     /// so the bounce + pulse keyframe track completes exactly once.
-    var phaseUpdateAfter: Int = 1
+    public var phaseUpdateAfter: Int = 1
 
     public init(
         tint: Color = AppColors.accent,

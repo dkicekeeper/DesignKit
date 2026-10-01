@@ -14,11 +14,11 @@ import DesignSupport
 
 public struct PackedCircleItem: Identifiable {
     public let id: String
-    let iconSource: IconSource?
-    let amount: Double
+    public let iconSource: IconSource?
+    public let amount: Double
     /// Optional monochrome tint for SF symbol items (e.g. category color).
     /// Brand-service items always render with `.original` tint regardless.
-    let tint: Color?
+    public let tint: Color?
 
     public init(id: String, iconSource: IconSource?, amount: Double, tint: Color? = nil) {
         self.id = id

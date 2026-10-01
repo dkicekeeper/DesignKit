@@ -63,7 +63,7 @@ These depend on app models/services. Port one only after replacing the dependenc
 generic input or a host hook (see [CLAUDE.md](../CLAUDE.md) → *Porting a component*).
 
 - **Tenra models** (`Transaction`, `Account`, `CustomCategory`, `RecurringSeries`, loans, deposits): `TransactionCard`, `AccountRow`, `CategoryRow`, `CategoryChip`, `BudgetProgressRow`, `BudgetSettingsSection`, `EntityDetailScaffold`, `GroupedTransactionList`, `CategoryStyleHelper` / `CategoryStyleCache`, `TransactionDisplayHelper`, `CategoryDisplay`.
-- **`PeriodDataPoint` chart family** (Tenra's insight model): `LineChart`, `BarChart`, `ChartSwitcher`, `MiniSparkline`, `HeroSparkline`, `ChartSelectionBanner`, `PeriodChartHelpers`, `ChartAxisHelpers`, `PeriodBreakdownRow`, `InsightTrendBadge`, and the `InsightsStatCard` trend sparkline. Porting them needs a generic series model first.
+- **`PeriodDataPoint` chart family** (Tenra's insight model): `LineChart`, `BarChart`, `ChartSwitcher`, `MiniSparkline`, `HeroSparkline`, `ChartSelectionBanner`, `PeriodChartHelpers`, `ChartAxisHelpers`, `PeriodBreakdownRow`, `InsightTrendBadge`. Porting them needs a generic series model first. `InsightsStatCard` takes any trend view in its `trend:` footer slot, so Tenra passes its `MiniSparkline` there.
 - **Tenra services**: `EditableHeroSection` + `IconPickerView` / `IconCatalog` (logo registry), `CurrencySelectorView` / `AmountInputView` (settings + FX), `DateFormatters`, `FastDateParser`.
 - **Domain convenience inits**: `MenuPickerRow where T == RecurringFrequency / LoanType / ReminderOption`, `StatusIndicatorBadge`'s `RecurringSeries.entityStatus`, `DonutSlice.from([CategoryBreakdownItem])`.
 

@@ -20,6 +20,14 @@ public struct InfoRowLayout<Value: View>: View {
     let label: String
     @ViewBuilder let value: () -> Value
 
+    public init(
+        label: String,
+        @ViewBuilder value: @escaping () -> Value
+    ) {
+        self.label = label
+        self.value = value
+    }
+
     public var body: some View {
         HStack(spacing: AppSpacing.md) {
             Text(label)
