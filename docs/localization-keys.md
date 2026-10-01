@@ -8,7 +8,8 @@ component passes a `defaultValue` (shown in the last column).
 
 The keys and their translations come from Tenra's string tables (11 locales) — copy them from
 `Tenra/<locale>.lproj/Localizable.strings` when an app starts using a component. When you add
-a component that introduces a key, add a row here in the same commit.
+a component that introduces a key, add a row here in the same commit. The `rating.*` keys came
+from Dalada (ru / kk / en in `ios/Dalada/Localizable.xcstrings`).
 
 | Key | Used by | Default value |
 |---|---|---|
@@ -52,6 +53,8 @@ a component that introduces a key, add a row here in the same commit.
 | `onboarding.cta.skip` | OnboardingPageContainer | — |
 | `onboarding.stepIndicator.label` | OnboardingStepIndicator | — |
 | `progress.importing` | ImportProgressSheet | — |
+| `rating.pick %lld %lld` | RatingPicker (VoiceOver: "4 out of 5") | — |
+| `rating.value %@ %lld` | RatingView (VoiceOver: "Rated 4.3 out of 5") | — |
 | `status.active` | StatusIndicatorBadge | — |
 | `status.archived` | StatusIndicatorBadge | — |
 | `status.paused` | StatusIndicatorBadge | — |

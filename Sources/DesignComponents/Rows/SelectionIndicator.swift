@@ -19,17 +19,22 @@ import DesignSupport
 public struct SelectionIndicator: View {
 
     let isSelected: Bool
+    let tint: Color
 
+    /// - Parameter tint: colour of the filled check (default accent; e.g. `AppColors.success`
+    ///   for a done checklist item, `AppColors.textTertiary` for a disabled, already-owned one).
     public init(
-        isSelected: Bool
+        isSelected: Bool,
+        tint: Color = AppColors.accent
     ) {
         self.isSelected = isSelected
+        self.tint = tint
     }
 
     public var body: some View {
         Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
             .font(.title3)
-            .foregroundStyle(isSelected ? AppColors.accent : AppColors.textSecondary)
+            .foregroundStyle(isSelected ? tint : AppColors.textSecondary)
             .symbolEffect(.bounce, value: isSelected)
             // The row itself carries the label and the `.isSelected` trait.
             .accessibilityHidden(true)
