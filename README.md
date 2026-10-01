@@ -86,7 +86,7 @@ builds the package, the Gallery and Dalada against every push.
 
 Docs: [design-system.md](docs/design-system.md) · [charts.md](docs/charts.md) ·
 [gotchas.md](docs/gotchas.md) · [localization-keys.md](docs/localization-keys.md) ·
-[testflight.md](docs/testflight.md)
+[testflight.md](docs/testflight.md) · [benchmark.md](docs/benchmark.md)
 
 ## Requirements
 
