@@ -95,6 +95,18 @@ public extension View {
         }
     }
 
+    /// For a stack of `SkeletonView` / `SkeletonRow` (whose shapes are hidden from VoiceOver):
+    /// one element that reads "Loading" (key `skeleton.loading`), so the screen is not silent.
+    ///
+    /// ```swift
+    /// VStack { ForEach(0..<4, id: \.self) { _ in SkeletonRow() } }
+    ///     .skeletonLoadingLabel()
+    /// ```
+    func skeletonLoadingLabel() -> some View {
+        accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(String(localized: "skeleton.loading", defaultValue: "Loading")))
+    }
+
     /// A light band sweeping across the view every 1.4 s. Static under Reduce Motion.
     func shimmer() -> some View {
         modifier(ShimmerModifier())

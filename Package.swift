@@ -37,7 +37,7 @@ let package = Package(
         ),
         .testTarget(
             name: "DesignComponentsTests",
-            dependencies: ["DesignComponents", "DesignSupport"]
+            dependencies: ["DesignComponents", "DesignSupport", "DesignTokens"]
         ),
     ],
     swiftLanguageModes: [.v5]

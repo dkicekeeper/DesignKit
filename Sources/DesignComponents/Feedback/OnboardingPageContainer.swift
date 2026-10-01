@@ -13,7 +13,7 @@ import DesignTokens
 import DesignSupport
 
 public struct OnboardingPageContainer<Content: View>: View {
-    let progressStep: Int            // 1, 2, or 3
+    let progressStep: Int            // 1-based, one of stepSymbols
     let title: String
     let subtitle: String?
     let primaryButtonTitle: String
@@ -23,9 +23,12 @@ public struct OnboardingPageContainer<Content: View>: View {
     /// to `.topBarTrailing` — used on data-collection steps so the user can
     /// bail out to MainTabView with defaults applied.
     var onSkip: (() -> Void)? = nil
+    /// One symbol per step for the indicator; Tenra's three by default.
+    let stepSymbols: [String]
     @ViewBuilder let content: () -> Content
 
-    public init(progressStep: Int, title: String, subtitle: String? = nil, primaryButtonTitle: String, primaryButtonEnabled: Bool = true, onPrimaryTap: @escaping () -> Void, onSkip: (() -> Void)? = nil, @ViewBuilder content: @escaping () -> Content) {
+    public init(progressStep: Int, title: String, subtitle: String? = nil, primaryButtonTitle: String, primaryButtonEnabled: Bool = true, onPrimaryTap: @escaping () -> Void, onSkip: (() -> Void)? = nil, stepSymbols: [String] = OnboardingStepIndicator.tenraSymbols, @ViewBuilder content: @escaping () -> Content) {
+        self.stepSymbols = stepSymbols
         self.progressStep = progressStep
         self.title = title
         self.subtitle = subtitle
@@ -43,7 +46,7 @@ public struct OnboardingPageContainer<Content: View>: View {
             }
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    OnboardingStepIndicator(currentStep: progressStep)
+                    OnboardingStepIndicator(currentStep: progressStep, symbols: stepSymbols)
                 }
                 if let onSkip {
                     ToolbarItem(placement: .topBarTrailing) {

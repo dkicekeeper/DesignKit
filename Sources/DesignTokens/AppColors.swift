@@ -109,7 +109,19 @@ public struct CategoryColors {
     /// Deterministic color for a category name, hashed into the palette.
     /// (DesignKit drops Tenra's custom-category override; the palette is the single source.)
     public nonisolated static func hexColor(for category: String, opacity: Double = 1.0) -> Color {
-        let index = abs(category.hashValue) % palette.count
-        return palette[index].opacity(opacity)
+        palette[paletteIndex(for: category)].opacity(opacity)
+    }
+
+    /// Palette slot for a category name: the same on every launch and every device.
+    ///
+    /// FNV-1a over the UTF-8 bytes. Until 0.7.0 this used `String.hashValue`, which Swift seeds
+    /// per process, so a category's fallback colour changed on every launch.
+    public nonisolated static func paletteIndex(for category: String) -> Int {
+        var hash: UInt64 = 0xcbf2_9ce4_8422_2325
+        for byte in category.utf8 {
+            hash ^= UInt64(byte)
+            hash = hash &* 0x0000_0100_0000_01b3
+        }
+        return Int(hash % UInt64(palette.count))
     }
 }

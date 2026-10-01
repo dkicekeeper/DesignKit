@@ -100,7 +100,7 @@ Background hierarchy: `bgBase` → `bgCard` → `bgMuted` (base screen → eleva
 
 For archived/inactive UI use `Color(.systemGray)` directly — there is no dedicated token.
 
-**Category colors:** `CategoryColors.hexColor(for:opacity:)` — 14-color hex palette hashed by name. DesignKit has no custom-category override; Tenra keeps its `customCategories:` / store-backed overloads app-side. ⚠️ The palette index comes from `String.hashValue`, which Swift seeds per process — the fallback colour of an uncustomized name can change between launches. Persist a colour when it must be stable.
+**Category colors:** `CategoryColors.hexColor(for:opacity:)` — 14-color hex palette hashed by name. DesignKit has no custom-category override; Tenra keeps its `customCategories:` / store-backed overloads app-side. The slot is `CategoryColors.paletteIndex(for:)`, an FNV-1a hash of the name: the same on every launch and device (since 0.7.0; before that it used `String.hashValue`, which Swift seeds per process, so the colour changed between launches).
 
 ### Spacing (`AppSpacing`)
 
@@ -740,7 +740,8 @@ TripRow(trip: trip ?? .placeholder).skeleton(isLoading: trip == nil) // redact a
 ```
 
 `.skeleton` redacts text and images, ignores taps and reads "Loading" to VoiceOver (key
-`skeleton.loading`). Use a spinner (`ProgressView()`) only for short, layout-less waits.
+`skeleton.loading`). A stack of standalone shapes is hidden from VoiceOver: add
+`.skeletonLoadingLabel()` (0.7.0) to it, or your own `accessibilityLabel`. Use a spinner (`ProgressView()`) only for short, layout-less waits.
 
 #### `StepTracker` *(0.6.0)*
 Where the user is in a multi-step flow: numbered circles, done steps checked, current outlined.
@@ -751,6 +752,43 @@ StepTracker(steps: ["Place", "Catch", "Photos", "Review"], current: 1)   // 0-ba
 
 VoiceOver: "Step 2 of 4: Catch" (key `steps.position`). Tenra's 3-symbol onboarding keeps
 `OnboardingStepIndicator`.
+
+#### `PermissionPrimerView` *(0.7.0)*
+Our explanation before a system permission alert (HIG "Requesting permission"): `HeroSymbol`,
+title, message, Allow and Not now. Shared by both apps; fits a `.medium` sheet.
+
+```swift
+PermissionPrimerView(
+    systemImage: "bell.badge",
+    title: String(localized: "push.primer.title"), message: String(localized: "push.primer.body"),
+    allowTitle: String(localized: "push.primer.allow"), laterTitle: String(localized: "push.primer.later"),
+    onAllow: { await requestPermission(); isPresented = false },
+    onLater: { isPresented = false }
+)
+.presentationDetents([.medium])
+```
+
+It does not dismiss itself. While `onAllow` runs the Allow button shows a spinner. Show it at
+the moment of first use (first check-in, first subscription), not at launch.
+`NotificationPermissionView` is the same view with Tenra's `notification.permission.*` texts
+that dismisses itself (since 0.7.0 it has this layout: symbol on a disc, glass buttons).
+
+#### `OnboardingPager` / `OnboardingPage` *(0.7.0)*
+First-launch introduction: swipeable pages with dots, Skip at the top, the page's buttons at
+the bottom. The app owns the pages enum and `selection`.
+
+```swift
+OnboardingPager(pages: Intro.allCases, selection: $page,
+                canSkip: { $0 != .location }, onSkip: finish) { page in
+    OnboardingPage(systemImage: page.symbol, title: page.title, message: page.text)
+} actions: { page in
+    Button { next() } label: { Text("Next").frame(maxWidth: .infinity) }.primaryButton()
+}
+```
+
+`OnboardingPage` takes an optional accessory under the text (a card, a sign-in button) and
+scrolls at large Dynamic Type. A data-collection flow inside a `NavigationStack` (Tenra) keeps
+`OnboardingPageContainer` + `OnboardingStepIndicator` (`symbols:` since 0.7.0).
 
 #### `StatusIndicatorBadge`
 Entity lifecycle status icon.
@@ -905,6 +943,61 @@ ExpandableText(place.description, lineLimit: 5, font: AppTypography.bodySmall)
 ```
 
 Keys `text.more` / `text.less` (defaults "More" / "Less").
+
+#### `MonthCalendar` / `CalendarRange` *(0.7.0)*
+Swipeable week strip that expands to swipeable months (tap the header), with markers on the
+days things happen. From Tenra's subscription calendar; Dalada can show trips and bans.
+
+```swift
+@State private var range = CalendarRange()               // 8 weeks back, 47 ahead, 12 months
+@State private var byDay: [Date: [RecurringSeries]] = [:]
+
+MonthCalendar(range: range, itemsByDay: byDay, itemName: \.description) { sub in
+    IconView(source: sub.iconSource, size: AppIconSize.md)
+} accessory: { period in                                  // visible week or month
+    if let total = totals[period] { FormattedAmountText(amount: total, currency: base, ...) }
+}
+.onAppear { byDay = range.itemsByDay(subscriptions) { sub, interval in sub.occurrences(in: interval) } }
+```
+
+Keep the range in `@State`. `CalendarPeriod.interval` ends at the next period's start;
+`closedInterval` ends a second earlier for APIs that test `date <= end`. Markers are drawn
+`AppIconSize.md` in a circle, up to `maxMarkers` (3), then "+N". Header VoiceOver action:
+keys `calendar.showMonth` / `calendar.showWeek`.
+
+#### `ActivityTimeline` *(0.7.0)*
+Events top to bottom on a continuous line: check-ins of a trip, history of a record.
+
+```swift
+ActivityTimeline(checkins) { checkin in
+    TimelineMarker(systemImage: "mappin", color: AppColors.success)   // or .dot
+} content: { checkin in
+    VStack(alignment: .leading) { Text(checkin.title); Text(checkin.time).font(AppTypography.caption) }
+}
+```
+
+Not lazy (put long histories in a `ScrollView` and page the data). Named "Activity" to avoid
+SwiftUI's `TimelineView` and WidgetKit's `TimelineEntry`.
+
+#### `TagInput` *(0.7.0)*
+Free-form tags as removable chips, a field for the next one, and matching suggestions.
+
+```swift
+TagInput(String(localized: "gear.tags.placeholder"), tags: $item.tags, suggestions: common)
+```
+
+Return or a comma adds; duplicates (ignoring case) and blanks are dropped; `maxTags` hides the
+field when full. VoiceOver on ×: key `tags.remove` ("Remove %@"). A fixed set of options →
+`ChipPicker`.
+
+#### `FlowLayout` *(0.7.0)*
+A `Layout` that wraps subviews to new lines like words: tags, badges, chips that should not
+scroll. `FlowLayout(spacing:lineSpacing:) { ForEach(tags, id: \.self) { BadgeView($0) } }`.
+
+#### `HeroSymbol` *(0.7.0)*
+Large SF Symbol on a disc of its tint at 12%: the picture of `OnboardingPage` and
+`PermissionPrimerView`. `HeroSymbol(systemImage: "map", size: 96, tint: AppColors.success)`.
+Decorative (hidden from VoiceOver).
 
 #### `RatingView` / `RatingPicker` *(0.4.0)*
 Star rating. `RatingView` displays with half stars (filled from .75, half from .25 of a star);
@@ -1227,6 +1320,9 @@ No data to show?
     ├── Full screen → .standard
     ├── Inside card → .compact
     └── Error/failure → .error
+
+Asking for a permission (notifications, location, camera)?
+└── PermissionPrimerView first, then the system alert from onAllow
 ```
 
 ---
