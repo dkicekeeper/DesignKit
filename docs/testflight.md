@@ -65,4 +65,5 @@ iPhone — приложение **TestFlight**, вход тем же Apple ID.
 | `HTTP 401/403`, «needs the Admin role» | Ключ не Admin или секреты перепутаны — шаги 2–3 |
 | `Missing secrets: …` | Шаг 3 |
 | Ошибка 90474 (ориентации) / 90713 (иконка) | Настройки в `Gallery/project.yml` и `Assets.xcassets` — их проверяет Apple при загрузке |
+| ITMS-90129 «bundle name or display name that is already taken» | Название на экране (`CFBundleDisplayName`) или `PRODUCT_NAME` совпало с чужим приложением в App Store. В `Gallery/project.yml` они повторяют имя приложения в App Store Connect («DesignKit Gallery» / `DesignKitGallery`); если меняете имя там, меняйте и здесь |
 | `The bundle version must be higher…` | Номер сборки уже занят (например, загрузкой из Xcode) — запустите workflow ещё раз |

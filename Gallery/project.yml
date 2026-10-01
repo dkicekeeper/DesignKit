@@ -22,9 +22,12 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dakacom.DesignKitGallery
-        PRODUCT_NAME: Gallery
+        # Bundle and display names must not be another App Store app's (ITMS-90129 rejected
+        # "DesignKit"; plain "Gallery" risks the same), so both follow the App Store Connect
+        # app record, "DesignKit Gallery".
+        PRODUCT_NAME: DesignKitGallery
         GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_CFBundleDisplayName: DesignKit
+        INFOPLIST_KEY_CFBundleDisplayName: DesignKit Gallery
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.developer-tools
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
