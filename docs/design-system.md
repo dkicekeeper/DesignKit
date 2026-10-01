@@ -740,7 +740,8 @@ TripRow(trip: trip ?? .placeholder).skeleton(isLoading: trip == nil) // redact a
 ```
 
 `.skeleton` redacts text and images, ignores taps and reads "Loading" to VoiceOver (key
-`skeleton.loading`). Use a spinner (`ProgressView()`) only for short, layout-less waits.
+`skeleton.loading`). A stack of standalone shapes is hidden from VoiceOver: add
+`.skeletonLoadingLabel()` (0.7.0) to it, or your own `accessibilityLabel`. Use a spinner (`ProgressView()`) only for short, layout-less waits.
 
 #### `StepTracker` *(0.6.0)*
 Where the user is in a multi-step flow: numbered circles, done steps checked, current outlined.
