@@ -20,10 +20,6 @@ on:
       - ".github/scripts/asc.py"
   workflow_dispatch:
 
-concurrency:
-  group: testflight
-  cancel-in-progress: false
-
 env:
   TEAM_ID: SY2L2VMQP7
   BUNDLE_ID: dakacom.DesignKitGallery
@@ -61,6 +57,12 @@ jobs:
     if: needs.preflight.outputs.ready == 'true'
     runs-on: macos-26
     timeout-minutes: 60
+    # Uploads go one at a time, in order. Only this job holds the lock: What to Test may wait
+    # up to 45 min for a build that never appears (Apple rejected it), and must not block the
+    # next upload.
+    concurrency:
+      group: testflight-upload
+      cancel-in-progress: false
     outputs:
       version: ${{ steps.version.outputs.version }}
       build: ${{ steps.version.outputs.build }}

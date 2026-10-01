@@ -107,7 +107,8 @@ def whats_new():
             break
         if time.time() > deadline:
             print(f"::warning::Build {version} ({build}) did not appear in App Store Connect in time; "
-                  "What to Test not set.")
+                  "What to Test not set. Either processing is slow, or Apple rejected the build "
+                  "(the reason comes by email to the account holder).")
             return
         time.sleep(60)
     print(f"Build {version} ({build}) found: {build_id}")
