@@ -25,6 +25,20 @@ public struct BorderBeamModifier: ViewModifier {
     var lineWidth: CGFloat
     var duration: Double
 
+    public init(
+        isActive: Bool,
+        colors: [Color],
+        cornerRadius: CGFloat,
+        lineWidth: CGFloat,
+        duration: Double
+    ) {
+        self.isActive = isActive
+        self.colors = colors
+        self.cornerRadius = cornerRadius
+        self.lineWidth = lineWidth
+        self.duration = duration
+    }
+
     public func body(content: Content) -> some View {
         content
             .overlay {
@@ -87,6 +101,22 @@ public struct BorderGlowModifier: ViewModifier {
     var lineWidth: CGFloat
     var glowRadius: CGFloat
     var opacity: Double
+
+    public init(
+        isActive: Bool,
+        colors: [Color],
+        cornerRadius: CGFloat,
+        lineWidth: CGFloat,
+        glowRadius: CGFloat,
+        opacity: Double
+    ) {
+        self.isActive = isActive
+        self.colors = colors
+        self.cornerRadius = cornerRadius
+        self.lineWidth = lineWidth
+        self.glowRadius = glowRadius
+        self.opacity = opacity
+    }
 
     public func body(content: Content) -> some View {
         content

@@ -101,6 +101,24 @@ public struct IconStyle: Equatable, Hashable {
     var padding: CGFloat?  // Внутренний padding (опционально)
     var hasGlassEffect: Bool  // Применять ли glass effect
 
+    public init(
+        size: CGFloat,
+        shape: IconShape,
+        tint: IconTint,
+        contentMode: ContentMode,
+        backgroundColor: Color?,
+        padding: CGFloat?,
+        hasGlassEffect: Bool
+    ) {
+        self.size = size
+        self.shape = shape
+        self.tint = tint
+        self.contentMode = contentMode
+        self.backgroundColor = backgroundColor
+        self.padding = padding
+        self.hasGlassEffect = hasGlassEffect
+    }
+
     // MARK: - Basic Initializers
 
     /// Создает стиль с круглой формой

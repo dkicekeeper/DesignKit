@@ -32,6 +32,16 @@ public struct InfoRowAmount {
     let amount: Double
     let currency: String
     let prefix: String
+
+    public init(
+        amount: Double,
+        currency: String,
+        prefix: String
+    ) {
+        self.amount = amount
+        self.currency = currency
+        self.prefix = prefix
+    }
 }
 
 /// Declarative info row (wraps UniversalRow(.info) at render time).

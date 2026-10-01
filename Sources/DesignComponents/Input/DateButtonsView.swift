@@ -16,6 +16,16 @@ public struct DateButtonsView: View {
     let onSave: (Date) -> Void
     @State private var showingDatePicker = false
 
+    public init(
+        selectedDate: Binding<Date>,
+        isDisabled: Bool = false,
+        onSave: @escaping (Date) -> Void
+    ) {
+        self._selectedDate = selectedDate
+        self.isDisabled = isDisabled
+        self.onSave = onSave
+    }
+
     public var body: some View {
         DateButtonsContent(
             selectedDate: $selectedDate,

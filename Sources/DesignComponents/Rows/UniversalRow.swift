@@ -155,6 +155,14 @@ public struct IconConfig {
     let source: IconSource?
     let style: IconStyle
 
+    public init(
+        source: IconSource?,
+        style: IconStyle
+    ) {
+        self.source = source
+        self.style = style
+    }
+
     // MARK: - Convenience Initializers
 
     /// SF Symbol with color
@@ -219,6 +227,20 @@ public struct RowConfiguration {
     let horizontalPadding: CGFloat
     let backgroundColor: Color
     let cornerRadius: CGFloat
+
+    public init(
+        spacing: CGFloat,
+        verticalPadding: CGFloat,
+        horizontalPadding: CGFloat,
+        backgroundColor: Color,
+        cornerRadius: CGFloat
+    ) {
+        self.spacing = spacing
+        self.verticalPadding = verticalPadding
+        self.horizontalPadding = horizontalPadding
+        self.backgroundColor = backgroundColor
+        self.cornerRadius = cornerRadius
+    }
 
     // MARK: - Presets
 

@@ -20,6 +20,14 @@ public struct ContentRevealModifier: ViewModifier {
 
     @State private var isVisible = false
 
+    public init(
+        isReady: Bool,
+        delay: Double = 0
+    ) {
+        self.isReady = isReady
+        self.delay = delay
+    }
+
     public func body(content: Content) -> some View {
         content
             .opacity(isVisible ? 1 : 0)

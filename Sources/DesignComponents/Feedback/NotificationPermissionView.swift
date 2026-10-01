@@ -15,6 +15,14 @@ public struct NotificationPermissionView: View {
     let onAllow: () async -> Void
     let onSkip: () -> Void
 
+    public init(
+        onAllow: @escaping () async -> Void,
+        onSkip: @escaping () -> Void
+    ) {
+        self.onAllow = onAllow
+        self.onSkip = onSkip
+    }
+
     public var body: some View {
         VStack(spacing: AppSpacing.xl) {
             Spacer()

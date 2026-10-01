@@ -13,6 +13,18 @@ import DesignSupport
 /// Props-based import progress sheet for Settings
 /// Single Responsibility: Display import progress with cancellation
 public struct ImportProgressSheet: View {
+    public init(
+        currentRow: Int,
+        totalRows: Int,
+        progress: Double,
+        onCancel: @escaping () -> Void
+    ) {
+        self.currentRow = currentRow
+        self.totalRows = totalRows
+        self.progress = progress
+        self.onCancel = onCancel
+    }
+
     // MARK: - Props
 
     let currentRow: Int
