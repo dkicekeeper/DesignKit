@@ -93,13 +93,13 @@ public enum IconTint: Equatable, Hashable {
 
 /// Полная конфигурация стиля иконки с интеграцией Design System
 public struct IconStyle: Equatable, Hashable {
-    var size: CGFloat
-    var shape: IconShape
-    var tint: IconTint
-    var contentMode: ContentMode
-    var backgroundColor: Color?
-    var padding: CGFloat?  // Внутренний padding (опционально)
-    var hasGlassEffect: Bool  // Применять ли glass effect
+    public var size: CGFloat
+    public var shape: IconShape
+    public var tint: IconTint
+    public var contentMode: ContentMode
+    public var backgroundColor: Color?
+    public var padding: CGFloat?  // Внутренний padding (опционально)
+    public var hasGlassEffect: Bool  // Применять ли glass effect
 
     public init(
         size: CGFloat,

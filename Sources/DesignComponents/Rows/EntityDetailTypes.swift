@@ -12,10 +12,10 @@ import DesignSupport
 /// Primary / secondary action button config for EntityDetailScaffold's actions bar.
 public struct ActionConfig: Identifiable {
     public let id = UUID()
-    let title: String
-    let systemImage: String?
-    let role: ButtonRole?
-    let action: () -> Void
+    public let title: String
+    public let systemImage: String?
+    public let role: ButtonRole?
+    public let action: () -> Void
 
     public init(title: String, systemImage: String? = nil, role: ButtonRole? = nil, action: @escaping () -> Void) {
         self.title = title
@@ -29,9 +29,9 @@ public struct ActionConfig: Identifiable {
 /// so the trailing zero decimals collapse ("300 $" vs "300.00 $") and non-zero decimals
 /// render at lighter opacity. `value` is still populated as a fallback (e.g. for VoiceOver).
 public struct InfoRowAmount {
-    let amount: Double
-    let currency: String
-    let prefix: String
+    public let amount: Double
+    public let currency: String
+    public let prefix: String
 
     public init(
         amount: Double,
@@ -48,17 +48,17 @@ public struct InfoRowAmount {
 /// Use `icon` for SF Symbol; brand/custom icons pass through `iconConfig` escape hatch.
 public struct InfoRowConfig: Identifiable {
     public let id = UUID()
-    let icon: String?
-    let label: String
-    let value: String
-    let iconColor: Color
-    let trailing: AnyView?
-    let amountDisplay: InfoRowAmount?
+    public let icon: String?
+    public let label: String
+    public let value: String
+    public let iconColor: Color
+    public let trailing: AnyView?
+    public let amountDisplay: InfoRowAmount?
     /// Custom trailing content that replaces the default value `Text`. Use when the row
     /// shows a composite value (e.g. "X / Y (Z%)") where individual amounts must each go
     /// through `FormattedAmountText` to keep the dimmed-decimal styling consistent.
     /// `value` is still populated for VoiceOver fallback.
-    let valueContent: AnyView?
+    public let valueContent: AnyView?
 
     public init(
         icon: String? = nil,
@@ -101,10 +101,10 @@ public struct InfoRowConfig: Identifiable {
 /// Linear progress strip rendered under the primary amount in HeroSection.
 /// Used for: category budget utilization, loan % paid off.
 public struct ProgressConfig {
-    let current: Double
-    let total: Double
-    let label: String?
-    let color: Color
+    public let current: Double
+    public let total: Double
+    public let label: String?
+    public let color: Color
 
     public init(current: Double, total: Double, label: String? = nil, color: Color = AppColors.accent) {
         self.current = current

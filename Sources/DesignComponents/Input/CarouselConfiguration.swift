@@ -22,31 +22,31 @@ public struct CarouselConfiguration {
     // MARK: - Layout Properties
 
     /// Spacing between carousel items
-    let spacing: CGFloat
+    public let spacing: CGFloat
 
     /// Horizontal padding around the carousel content
-    let horizontalPadding: CGFloat
+    public let horizontalPadding: CGFloat
 
     /// Vertical padding around the carousel content
-    let verticalPadding: CGFloat
+    public let verticalPadding: CGFloat
 
     // MARK: - Behavior Properties
 
     /// Whether to show scroll indicators
-    let showsIndicators: Bool
+    public let showsIndicators: Bool
 
     /// Whether to disable clipping for edge items (allows partial visibility)
-    let clipDisabled: Bool
+    public let clipDisabled: Bool
 
     // MARK: - Animation Properties
 
     /// Animation used for auto-scroll behavior (nil = no animation)
-    let scrollAnimation: Animation?
+    public let scrollAnimation: Animation?
 
     // MARK: - Scroll Target Properties
 
     /// Scroll snapping behavior (.none = free scroll, .viewAligned = snap to items)
-    let snapBehavior: SnapBehavior
+    public let snapBehavior: SnapBehavior
 
     /// Scroll snap behavior options
     public enum SnapBehavior {
