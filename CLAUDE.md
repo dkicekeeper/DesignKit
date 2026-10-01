@@ -32,13 +32,13 @@ Sources/
 │                      modifiers, button styles, AmbientMotionGate, DesignKitTheme, fonts
 ├── DesignSupport/     → DesignTokens — icons (IconSource/IconStyle/IconView/BrandLogoView),
 │                      formatting, haptics, DominantColorExtractor, host hooks
-└── DesignComponents/  → DesignTokens + DesignSupport — Cards, Charts, Feedback, Forms,
-                       Headers, Icons, Input, Rows
+└── DesignComponents/  → DesignTokens + DesignSupport — Cards, Charts, Display, Feedback,
+                       Forms, Headers, Icons, Input, Rows
 Gallery/               showcase app (xcodegen; the .xcodeproj is not in git); every public
                        component has a specimen; ships to TestFlight (docs/testflight.md)
 Tests/                 swift-testing unit tests (formatting, ExpressionEvaluator, calculator
                        model) — run by CI on an iOS Simulator
-docs/                  design-system.md, charts.md, gotchas.md, localization-keys.md
+docs/                  design-system.md, charts.md, gotchas.md, localization-keys.md, benchmark.md
 ```
 
 Dependencies only point down the list. One product, `DesignKit`, exports all three modules;
@@ -146,3 +146,4 @@ rather than importing an app type.
 | Package traps (public API, Xcode 26/27, bundles) and SwiftUI layout traps | [docs/gotchas.md](docs/gotchas.md) |
 | Localized strings used by components | [docs/localization-keys.md](docs/localization-keys.md) |
 | Gallery TestFlight pipeline | [docs/testflight.md](docs/testflight.md) |
+| What exists vs Apple HIG / Material / Fluent / Carbon / Polaris / Atlassian, next candidates | [docs/benchmark.md](docs/benchmark.md) |

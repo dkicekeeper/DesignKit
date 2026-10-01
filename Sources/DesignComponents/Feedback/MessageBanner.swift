@@ -28,6 +28,8 @@ private enum BannerAnimation {
 public struct MessageBanner: View {
     let message: String
     let type: MessageType
+    let actionTitle: String?
+    let action: (() -> Void)?
 
     @State private var isVisible = false
     @State private var iconScale: CGFloat = 0.5
@@ -65,6 +67,23 @@ public struct MessageBanner: View {
     ) {
         self.message = message
         self.type = type
+        self.actionTitle = nil
+        self.action = nil
+    }
+
+    /// Banner with a trailing action button — "Undo" after a delete, "Retry" after a
+    /// failure (Material snackbar action). The action does not dismiss the banner itself;
+    /// clear your message state in it.
+    public init(
+        message: String,
+        type: MessageType,
+        actionTitle: String,
+        action: @escaping () -> Void
+    ) {
+        self.message = message
+        self.type = type
+        self.actionTitle = actionTitle
+        self.action = action
     }
 
     public var body: some View {
@@ -112,6 +131,16 @@ public struct MessageBanner: View {
                 // of a hard text swap.
                 .contentTransition(.opacity)
                 .animation(BannerAnimation.reducedFade, value: message)
+
+            if let actionTitle, let action {
+                Spacer(minLength: AppSpacing.sm)
+                Button(action: action) {
+                    Text(actionTitle)
+                        .font(AppTypography.bodyEmphasis)
+                        .foregroundStyle(type.tintColor)
+                }
+                .buttonStyle(.plain)
+            }
         }
         .padding(AppSpacing.md)
     }

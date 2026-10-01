@@ -39,6 +39,9 @@
 | `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `IconView`, `BrandLogoView`, `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `HapticManager`, `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitCurrencyConverter`), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
 | `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2 |
 
+Coverage against Apple HIG, Material 3, Fluent 2, Carbon, Polaris and Atlassian, and the next
+candidates: [benchmark.md](benchmark.md).
+
 ### 0.1 Host-app hooks
 
 DesignKit ships no networking, persistence or FX. A host app wires these once, in `App.init()`:
@@ -642,6 +645,32 @@ ChipPicker("Weather", options: Weather.allCases, selection: $draft.weather) { $0
 Chips use `filterChipStyle(isSelected:)`. A fixed 2–4 way switch → `SegmentedPickerView`; a
 filter that opens a menu → `UniversalFilterButton`.
 
+Several at once (0.6.0): pass a `Binding<Set<Option>>`; optional `systemImage:` per chip.
+
+```swift
+ChipPicker(options: PlaceType.allCases, selection: $types, systemImage: { $0.systemImage }) { $0.title }
+```
+
+#### `LoadingButtonLabel` *(0.6.0)*
+Button label that swaps its title for a spinner while an action runs, keeping the width.
+
+```swift
+Button { Task { await save() } } label: {
+    LoadingButtonLabel("Save", isLoading: isSaving).frame(maxWidth: .infinity)
+}
+.primaryButton(disabled: isSaving)
+```
+
+#### `ToggleSettingsRow` *(0.6.0)*
+The settings row with a switch, next to `NavigationSettingsRow` and `ActionSettingsRow`.
+
+```swift
+ToggleSettingsRow(icon: "bell", title: "Reminders", isOn: $remindersOn)
+ToggleSettingsRow(icon: "location", title: "Share location", hint: "Friends see your trip", isOn: $shares)
+```
+
+VoiceOver focuses the switch (title as label, `hint` as hint).
+
 #### `SelectionIndicator(isSelected:tint:)`
 Check circle for multi-select and checklist rows; the row carries the label and the
 `.isSelected` trait. `tint` (0.4.0, default accent) colours the filled check: `AppColors.success`
@@ -691,6 +720,37 @@ InlineStatusText(message: "Amount must be positive", type: .error)
 ```
 
 Use for: persistent form validation. NOT for transient post-action feedback (use `MessageBanner`).
+
+#### `MessageBanner(message:type:actionTitle:action:)` *(0.6.0)*
+Banner with a trailing action — "Undo" after a delete, "Retry" after a failure (snackbar). The
+action does not dismiss the banner; clear your message state in it.
+
+```swift
+MessageBanner(message: "Trip deleted", type: .info, actionTitle: "Undo") { restore(); message = nil }
+```
+
+#### `SkeletonView` / `SkeletonRow` / `.skeleton(isLoading:)` *(0.6.0)*
+Loading placeholders instead of a spinner: grey shapes in the layout of the content that is
+coming, with a slow shimmer (static under Reduce Motion, via `AmbientMotionGate`).
+
+```swift
+if isLoading { ForEach(0..<5) { _ in SkeletonRow() } }          // list rows
+SkeletonView(height: 160)                                       // an image
+TripRow(trip: trip ?? .placeholder).skeleton(isLoading: trip == nil) // redact a real view
+```
+
+`.skeleton` redacts text and images, ignores taps and reads "Loading" to VoiceOver (key
+`skeleton.loading`). Use a spinner (`ProgressView()`) only for short, layout-less waits.
+
+#### `StepTracker` *(0.6.0)*
+Where the user is in a multi-step flow: numbered circles, done steps checked, current outlined.
+
+```swift
+StepTracker(steps: ["Place", "Catch", "Photos", "Review"], current: 1)   // 0-based
+```
+
+VoiceOver: "Step 2 of 4: Catch" (key `steps.position`). Tenra's 3-symbol onboarding keeps
+`OnboardingStepIndicator`.
 
 #### `StatusIndicatorBadge`
 Entity lifecycle status icon.
@@ -825,6 +885,26 @@ AvatarView(name: name, image: Image(uiImage: photo))
 
 Decorative for VoiceOver: put the name in the row next to it. Several faces in a cluster →
 `PackedCircleIconsView`.
+
+#### `AvatarGroup` *(0.6.0)*
+Overlapping avatars with "+N" for the rest; each has a ring in the background colour.
+
+```swift
+AvatarGroup(names: trip.members.map(\.displayName), accessibilityLabel: "Ayan, Dana and 4 more")
+AvatarGroup(names: names, maxVisible: 3, size: 28)
+```
+
+Hidden from VoiceOver unless you pass `accessibilityLabel`.
+
+#### `ExpandableText` *(0.6.0)*
+Long text clamped to `lineLimit` lines; a More / Less button appears only when it overflows.
+
+```swift
+ExpandableText(review.body)
+ExpandableText(place.description, lineLimit: 5, font: AppTypography.bodySmall)
+```
+
+Keys `text.more` / `text.less` (defaults "More" / "Less").
 
 #### `RatingView` / `RatingPicker` *(0.4.0)*
 Star rating. `RatingView` displays with half stars (filled from .75, half from .25 of a star);
