@@ -16,7 +16,7 @@ public enum IconShape: Equatable, Hashable {
     case square
 
     /// Локализованное название формы
-    var localizedName: String {
+    public var localizedName: String {
         switch self {
         case .circle:
             return String(localized: "iconStyle.shape.circle")
@@ -50,7 +50,7 @@ public enum IconTint: Equatable, Hashable {
     case original               // Оригинальные цвета (для растровых изображений)
 
     /// Локализованное название тинта
-    var localizedName: String {
+    public var localizedName: String {
         switch self {
         case .monochrome:
             return String(localized: "iconStyle.tint.monochrome")
@@ -275,7 +275,7 @@ public struct IconStyle: Equatable, Hashable {
     }
 
     /// Локализованное название пресета
-    var localizedPresetName: String? {
+    public var localizedPresetName: String? {
         // Определяем пресет по характеристикам
         if case .circle = shape,
            case .monochrome(let color) = tint,
