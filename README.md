@@ -4,8 +4,8 @@ A reusable SwiftUI design system extracted from the **Tenra** iOS app and shared
 **Dalada**. Tokens, components and motion rules are Tenra's (the reference implementation);
 this package makes them versioned and reusable.
 
-> Status: **0.x — pre-1.0.** Synced with Tenra `74a12c5` (2026-09-26). Dalada consumes the
-> package; Tenra still carries its own copy and will migrate to it.
+> Status: **0.x — pre-1.0.** Both apps consume the package (Tenra since 0.3.0) and pick up new
+> releases automatically; design-system changes are made here.
 
 ## Run the Gallery
 
@@ -50,7 +50,7 @@ Highlights of `DesignComponents`: `FinanceCard`, `InsightsStatCard`, `HeroSectio
 
 ```swift
 // Package.swift
-.package(url: "https://github.com/dkicekeeper/DesignKit", exact: "0.2.0")
+.package(url: "https://github.com/dkicekeeper/DesignKit", exact: "0.3.0")
 // during development, point at a local checkout instead:
 .package(path: "../DesignKit")
 ```

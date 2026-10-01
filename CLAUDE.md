@@ -48,22 +48,26 @@ consumers `import DesignTokens` / `DesignSupport` / `DesignComponents` as needed
 
 | App | How it depends | Notes |
 |---|---|---|
-| Dalada | `ios/Packages/DaladaKit/Package.swift`, pinned by `revision:` (→ version tags from 0.2.0) | Swift 6, iOS 26, Xcode 26 in CI; uses tokens, `cardStyle`, buttons, `EmptyStateView`, `SectionHeaderView`, `RecommendationBox`, `PlusTabLabel` |
-| Tenra | not wired yet — keeps its own copy of the design system in `Tenra/Utils` + `Tenra/Views/Components` | Reference implementation. Migration to this package is planned; until then DesignKit is synced FROM Tenra (see *Sync log*) |
+| Dalada | `ios/Packages/DaladaKit/Package.swift`, `exact: "X.Y.Z"` | Swift 6, iOS 26; green accent via `DesignKitTheme.accent`; uses tokens, `cardStyle`, buttons, `EmptyStateView`, `SectionHeaderView`, `RecommendationBox`, `PlusTabLabel` |
+| Tenra | `Tenra.xcodeproj` package reference, exact version | Reference look. `Tenra/Utils/DesignKitBridge.swift` re-exports the three modules, wires the host hooks and keeps the Tenra-model adapters (custom category colours, logo registry, breakdown → `DonutSlice`, the stat-card sparkline) |
 
-A consumer only sees a DesignKit change when it bumps its pin. CI's `dalada` job builds Dalada
-against the current checkout, so a change that would break Dalada fails here first.
+A consumer sees a DesignKit change when its pin moves. Each app's **DesignKit update** workflow
+(`.github/workflows/designkit.yml` in the app) checks for a newer release tag daily, bumps the
+pin, builds and tests, and commits the bump to the app's `main` when green. CI's `dalada` and
+`tenra` jobs build both apps against the current checkout, so a change that would break one
+fails here first (manual runs take `dalada_ref` / `tenra_ref` to check an app branch).
 
 ## Source of Truth & Sync
 
-- **Now:** Tenra's design system is the reference. DesignKit is updated by syncing from Tenra:
-  three-way merge per file (base = the Tenra commit of the previous sync, theirs = Tenra `main`,
-  ours = DesignKit), keeping DesignKit's `public` API and parameterization. Record every sync
-  below.
-- **After Tenra consumes DesignKit:** DesignKit is the only place design-system code lives. Apps
-  add or change components by PR here (develop with Xcode's local package override: drag the
-  local DesignKit folder into the app's project), CI builds every consumer, merge → tag →
-  consumers bump.
+- **Since 2026-10 (DesignKit 0.3.0):** both apps consume DesignKit, and it is the only place
+  design-system code lives. Apps add or change components by PR here (develop with Xcode's
+  local package override: drag the local DesignKit folder into the app's project), CI builds
+  every consumer, merge → release tag → each app's update workflow bumps it. Tenra's look stays
+  the reference: a visual change to a shared component is a design decision, called out in the
+  release notes.
+- **Before that:** DesignKit was synced FROM Tenra's own copy: three-way merge per file
+  (base = the Tenra commit of the previous sync, theirs = Tenra `main`, ours = DesignKit),
+  keeping DesignKit's `public` API and parameterization. The log below records those syncs.
 
 ### Sync log
 
@@ -71,6 +75,7 @@ against the current checkout, so a change that would break Dalada fails here fir
 |---|---|---|
 | 2026-06-10 | `4392be3` (2026-06-04) | v0 extraction |
 | 2026-09-30 | `74a12c5` (2026-09-26) | 20 changed files merged; 36 new files (components, charts, helpers); 5 retired components deprecated; docs ported |
+| 2026-10-01 | `b23782c` | Last sync: Tenra's copy removed, Tenra consumes DesignKit 0.3.0 (its unit tests for formatting, the expression evaluator and the calculator model moved here) |
 
 ## What Belongs in DesignKit
 
