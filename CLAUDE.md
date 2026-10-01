@@ -134,8 +134,6 @@ rather than importing an app type.
 
 - `EditableHeroSection`, `IconPickerView`/`IconCatalog`, `CurrencySelectorView`,
   `AmountInputView` depend on Tenra services (logo registry, settings, FX).
-- `CategoryColors.hexColor(for:)` hashes with `String.hashValue`, which is seeded per process —
-  fallback colours are not stable across launches (inherited from Tenra).
 
 ## Reference Docs
 

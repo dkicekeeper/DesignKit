@@ -1,15 +1,18 @@
 //
 //  NotificationPermissionView.swift
-//  Tenra
+//  DesignKit
 //
-//  Created on 2026-02-14
-//  Purpose: Request notification permissions for subscription reminders
+//  Tenra's notification primer (subscription reminders): `PermissionPrimerView` with the
+//  `notification.permission.*` texts, dismissing itself after either button. Since 0.7.0 it
+//  has the shared primer layout (symbol on a disc, glass buttons) instead of its own.
 //
 
 import SwiftUI
 import DesignTokens
 import DesignSupport
 
+/// Notification primer with the `notification.permission.*` keys. For other texts or another
+/// permission use `PermissionPrimerView` directly.
 public struct NotificationPermissionView: View {
     @Environment(\.dismiss) private var dismiss
     let onAllow: () async -> Void
@@ -24,62 +27,20 @@ public struct NotificationPermissionView: View {
     }
 
     public var body: some View {
-        VStack(spacing: AppSpacing.xl) {
-            Spacer()
-
-            // Icon
-            Image(systemName: "bell.badge.fill")
-                .font(.system(size: AppIconSize.mega))
-                .foregroundStyle(AppColors.accent)
-                .padding(.bottom, AppSpacing.md)
-
-            // Title
-            Text(String(localized: "notification.permission.title"))
-                .font(AppTypography.h2)
-                .multilineTextAlignment(.center)
-
-            // Description
-            Text(String(localized: "notification.permission.description"))
-                .font(AppTypography.body)
-                .foregroundStyle(AppColors.textSecondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, AppSpacing.xl)
-
-            Spacer()
-
-            // Buttons
-            VStack(spacing: AppSpacing.md) {
-                Button {
-                    HapticManager.light()
-                    Task {
-                        await onAllow()
-                        dismiss()
-                    }
-                } label: {
-                    Text(String(localized: "notification.permission.allow"))
-                        .font(AppTypography.body)
-                        .bold()
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, AppSpacing.md)
-                        .background(AppColors.accent)
-                        .clipShape(.rect(cornerRadius: AppRadius.md))
-                }
-
-                Button {
-                    HapticManager.light()
-                    onSkip()
-                    dismiss()
-                } label: {
-                    Text(String(localized: "notification.permission.skip"))
-                        .font(AppTypography.body)
-                        .foregroundStyle(AppColors.textSecondary)
-                }
+        PermissionPrimerView(
+            systemImage: "bell.badge.fill",
+            title: String(localized: "notification.permission.title"),
+            message: String(localized: "notification.permission.description"),
+            allowTitle: String(localized: "notification.permission.allow"),
+            laterTitle: String(localized: "notification.permission.skip"),
+            onAllow: {
+                await onAllow()
+                dismiss()
+            },
+            onLater: {
+                onSkip()
+                dismiss()
             }
-            .padding(.horizontal, AppSpacing.xl)
-            .padding(.bottom, AppSpacing.xl)
-        }
-        .padding(.top, AppSpacing.xl)
+        )
     }
 }
-

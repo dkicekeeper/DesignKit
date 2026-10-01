@@ -13,26 +13,23 @@ import DesignSupport
 public struct OnboardingStepIndicator: View {
     /// 1-based current step index.
     let currentStep: Int
+    /// One SF Symbol per step.
+    let symbols: [String]
 
-    public init(currentStep: Int) {
+    /// Tenra's three steps (currency, account, categories).
+    public static let tenraSymbols = ["dollarsign.circle.fill", "creditcard.fill", "square.grid.2x2.fill"]
+
+    /// - Parameter symbols: one per step; Tenra's three by default (0.7.0 made it a parameter).
+    public init(currentStep: Int, symbols: [String] = OnboardingStepIndicator.tenraSymbols) {
         self.currentStep = currentStep
+        self.symbols = symbols
     }
-
-    private struct StepDef {
-        let symbol: String
-    }
-
-    private static let steps: [StepDef] = [
-        StepDef(symbol: "dollarsign.circle.fill"),
-        StepDef(symbol: "creditcard.fill"),
-        StepDef(symbol: "square.grid.2x2.fill"),
-    ]
 
     public var body: some View {
         HStack(spacing: AppSpacing.sm) {
-            ForEach(Self.steps.indices, id: \.self) { idx in
+            ForEach(symbols.indices, id: \.self) { idx in
                 stepIcon(at: idx)
-                if idx < Self.steps.count - 1 {
+                if idx < symbols.count - 1 {
                     separator(precedingIndex: idx)
                 }
             }
@@ -46,7 +43,7 @@ public struct OnboardingStepIndicator: View {
             String(
                 format: String(localized: "onboarding.stepIndicator.label"),
                 currentStep,
-                Self.steps.count
+                symbols.count
             )
         )
     }
@@ -73,7 +70,7 @@ public struct OnboardingStepIndicator: View {
         let isActive = stepNumber == currentStep
         let isCompleted = stepNumber < currentStep
 
-        Image(systemName: Self.steps[index].symbol)
+        Image(systemName: symbols[index])
             .font(.system(size: 16, weight: isActive ? .semibold : .regular))
             .foregroundStyle(
                 isActive

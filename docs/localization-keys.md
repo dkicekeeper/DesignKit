@@ -28,6 +28,8 @@ from Dalada (ru / kk / en in `ios/Dalada/Localizable.xcstrings`).
 | `chart.empty.message` | LineChart, BarChart, ChartSwitcher (default `emptyMessage`) | — |
 | `chart.empty.title` | LineChart, BarChart, ChartSwitcher (default `emptyTitle`) | — |
 | `chart.today` | LineChart, BarChart, ChartSwitcher (default `todayText`) | — |
+| `calendar.showMonth` | MonthCalendar (VoiceOver action on the header) | `Show month` |
+| `calendar.showWeek` | MonthCalendar (VoiceOver action on the header) | `Show week` |
 | `common.cancel` | DateButtonsView | — |
 | `common.color` | ColorPickerRow | — |
 | `common.select` | DateButtonsView | — |
@@ -53,7 +55,7 @@ from Dalada (ru / kk / en in `ios/Dalada/Localizable.xcstrings`).
 | `notification.permission.description` | NotificationPermissionView | — |
 | `notification.permission.skip` | NotificationPermissionView | — |
 | `notification.permission.title` | NotificationPermissionView | — |
-| `onboarding.cta.skip` | OnboardingPageContainer | — |
+| `onboarding.cta.skip` | OnboardingPageContainer; OnboardingPager (default `skipTitle`) | `Skip` (OnboardingPager) |
 | `onboarding.stepIndicator.label` | OnboardingStepIndicator | — |
 | `progress.importing` | ImportProgressSheet | — |
 | `rating.pick %lld %lld` | RatingPicker (VoiceOver: "4 out of 5") | — |
@@ -66,6 +68,7 @@ from Dalada (ru / kk / en in `ios/Dalada/Localizable.xcstrings`).
 | `steps.position` | StepTracker (VoiceOver: "Step 2 of 4", args `%lld %lld`) | `Step %lld of %lld` |
 | `tab.add` | PlusTabLabel | — |
 | `tab.close` | PlusTabLabel | — |
+| `tags.remove` | TagInput (VoiceOver on a tag's ×, arg `%@`) | `Remove %@` |
 | `text.less` | ExpandableText | `Less` |
 | `text.more` | ExpandableText | `More` |
 
