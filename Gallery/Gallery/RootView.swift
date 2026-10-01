@@ -50,6 +50,7 @@ struct RootView: View {
                     row("Badges, Stats & Rating", "star.leadinghalf.filled", .yellow) { DisplayScreen() }
                     row("Forms & Settings", "list.bullet.rectangle.fill", .mint) { FormsScreen() }
                     row("Inputs & Charts", "slider.horizontal.3", .pink) { InputsScreen() }
+                    row("Trend Charts", "chart.xyaxis.line", .teal) { TrendChartsScreen() }
                 }
             }
             .navigationTitle("DesignKit")

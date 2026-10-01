@@ -2,16 +2,59 @@
 
 Swift Charts patterns for `LineChart` / `BarChart` (multi-series), the `OrbChart` breakdown chart, and mini-charts.
 
-> **Source.** Tenra's `docs/domains/charts.md` (Tenra `74a12c5`). In DesignKit: `OrbChart` +
-> `DonutSlice`, `MiniDonut`, the progress family (`ProportionBar`, `LinearProgressBar`,
-> `ProgressRing`, `AmountComparisonBar`), the Mini*/Hero* visuals, `HeroChartEffects` and
-> `ChartZoomControls`. **App-side (Tenra):** everything bound to `PeriodDataPoint` —
-> `LineChart`, `BarChart`, `ChartSwitcher`, `MiniSparkline`, `HeroSparkline`,
-> `ChartSelectionBanner`, `PeriodChartHelpers`, `ChartAxisHelpers`. Their sections stay here
-> because the Swift Charts rules apply to any chart built on top of DesignKit.
+> **Source.** Tenra's `docs/domains/charts.md` (Tenra `74a12c5`). Everything here ships in
+> DesignKit: `OrbChart` + `DonutSlice`, `MiniDonut`, the progress family (`ProportionBar`,
+> `LinearProgressBar`, `ProgressRing`, `AmountComparisonBar`), the Mini*/Hero* visuals,
+> `HeroChartEffects`, `ChartZoomControls`, and since 0.5.0 the trend family — `LineChart`,
+> `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `ChartSelectionBanner` — over a
+> generic `ChartPoint` model (see **Trend charts** below). Tenra keeps adapters only
+> (`PeriodDataPoint: ChartPoint`, `PeriodChartSeries` → `ChartSeries`).
 >
 > DesignKit difference: `DonutSlice.from(_:)` / `from(_:baseColor:)` are Tenra adapters over
 > DesignKit's generic `DonutSlice.foldingSlivers(_:)` / `opacityStepped(_:baseColor:)`.
+
+## Trend charts: `ChartPoint` + `ChartSeries` *(0.5.0)*
+
+The chart family is generic over the point type:
+
+```swift
+// 1. A point: one bucket on the X axis. Only chartLabel is required.
+extension MonthStats: ChartPoint {
+    var chartLabel: String { key }          // unique category, also the selection key
+    var chartAxisLabel: String { short }     // "JAN" under the tick
+    var chartTitle: String { full }          // "January 2025" in the banner
+    var chartDate: Date? { start }           // first future bucket gets the "Today" marker
+}
+// …or ChartValuePoint(label:axisLabel:title:date:values:) for plain data.
+
+// 2. A series: how to read and colour a value.
+let spending = ChartSeries<MonthStats>(id: "spending", name: "Expenses",
+                                       coloring: .solid(AppColors.destructive)) { $0.expenses }
+let net = ChartSeries<MonthStats>(id: "net", name: "Net",
+                                  coloring: .signed(positive: AppColors.success, negative: AppColors.destructive),
+                                  baseline: .signed) { $0.net }
+
+// 3. A chart.
+ChartSwitcher(dataPoints: months, series: [income, spending], valueFormat: .currency("KZT"))
+LineChart(dataPoints: months, series: net)
+HeroSparkline(dataPoints: months, series: spending, projectedValue: forecast, markExtremes: true)
+Sparkline(dataPoints: months, series: net, height: 24)        // Canvas, for cards/feeds
+```
+
+| Piece | Meaning |
+|---|---|
+| `ChartColoring.solid(c)` | one colour for line, area, points, bars |
+| `ChartColoring.signed(positive:negative:)` | colour by sign; the line gradient switches exactly at y = 0; dashed zero rule |
+| `ChartBaseline.zero` / `.signed` | Y from 0, or allowed below 0 |
+| `ChartValueFormat` | banner + VoiceOver: `.compact` ("75K"), `.currency("KZT")` (`FormattedAmountText`), `.custom { "\($0) km" }`. The Y axis is always compact. |
+| `todayText`, `emptyTitle`, `emptyMessage` | texts; defaults are the keys `chart.today`, `chart.empty.title`, `chart.empty.message` |
+
+Several series: `LineChart` overlays them, `BarChart` groups them (`position(by:)`), the banner
+lists each value with a dot, VoiceOver reads `name: value` per series.
+
+Tenra's insight series map onto this: spending / avg-daily → `.solid(destructive)`, income →
+`.solid(success)`, cash flow → `.signed(success, destructive)` + `.signed`, wealth →
+`.solid(accent)` + `.signed`, line width 2.5.
 
 ## 2026-07 charts refactor — rename map
 
@@ -85,9 +128,11 @@ If `MagnifyGesture` is unavoidable, attach `.simultaneousGesture(...)` so native
 
 ⚠️ **For swipeable horizontal paging inside a pushed detail, use `TabView(.page(indexDisplayMode:))`, NOT a custom horizontal `DragGesture`.** A `DragGesture` fights the NavigationStack edge swipe-to-go-back (the user gets inconsistent paging vs. dismiss). TabView paging consumes content-area horizontal swipes; edge-back still works from the screen edge. Precedent: `PagedCategoryBreakdownView` in `InsightDetailView.swift`.
 
-### Adding a `PeriodChartSeries` case
+### Adding a series
 
-Adding a case touches ~9 switches: `value`/`yDomain`/`pointColor`/`lineStyle`/`areaStyle`/`showZeroRuler`/`fullLineWidth` in the enum, `fullYDomain` in `LineChart`, and `tintColor` in `MiniSparkline`. The compiler flags all of them (exhaustive switches) — none are silent.
+A new series is a `ChartSeries` value (id, name, colouring, baseline, value closure) — no
+switches to touch. In Tenra, a new `PeriodChartSeries` case needs one more arm in its
+`chart` mapping (exhaustive switch, compiler-checked).
 
 ### Custom tap selection blocks scroll
 
@@ -166,18 +211,18 @@ Banner placed directly in VStack shifts chart vertically on selection appear/dis
 
 `ChartZoomControls(zoomScale: $zoomScale, range:)` — `+/-` buttons with step ×1.5, own file `Views/Components/Charts/ChartZoomControls.swift` (also hosts `ChartStyle`). Used in `ChartSwitcher` (picker left, zoom right in HStack).
 
-### PeriodChartHelpers
+### Chart support (internal)
 
-Period charts share Views/Components/Charts/PeriodChartHelpers.swift *(Tenra)*:
+The trend charts share `Charts/ChartSupport.swift`:
 
-- `PeriodChartCache` — label→index + yMin/yMax + todayLabel + identity fingerprint
-- `rebuildPeriodCacheIfNeeded(_:dataPoints:values:)`
-- `.periodChartXAxis(labelMap:)` / `.periodChartYAxis()`
+- `ChartPointCache` — label→index, label→axis label, yMin/yMax, today label, identity fingerprint
+- `rebuildChartCacheIfNeeded(_:points:values:)` — one O(N) pass per dataset change
+- `.chartCategoryXAxis(labelMap:)` / `.chartCompactYAxis()`
 - `.chartXLabelSelectionWithFeedback($selectedValueLabel)` (haptic via `HapticManager.selection()`)
 - `.chartBannerSlotStyle(animationKey:)`
-- `.chartSelectionAnnouncement(_:)` + `chartBannerAnnouncementText(...)`
+- `.chartSelectionAnnouncement(_:)` + `chartAnnouncementText(...)`
 
-New `PeriodDataPoint`-driven charts plug into these — don't reimplement inline.
+A new chart in DesignKit plugs into these — don't reimplement inline.
 
 ### Body-time cache priming
 
@@ -187,7 +232,9 @@ New `PeriodDataPoint`-driven charts plug into these — don't reimplement inline
 
 ### ChartSelectionBanner
 
-`ChartSelectionBanner` (Views/Components/Charts/ChartSelectionBanner.swift *(Tenra)*) — `.dual(income:expenses:)` or `.single(value:color:)`. Capitalises the title's first char; falls back to `formatCompact` when `currency` is empty.
+`ChartSelectionBanner(title:entries:format:)` — one `Entry(value:color:showsDot:)` per value
+(Tenra's former `.dual` = two dotted entries, `.single` = one undotted). Capitalises the
+title's first character; `format` as in the charts.
 
 ## Compact Mode
 

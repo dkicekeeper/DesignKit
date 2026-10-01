@@ -132,9 +132,6 @@ rather than importing an app type.
 
 ## Known Gaps / Follow-ups
 
-- `PeriodDataPoint` chart family (`LineChart`, `BarChart`, `ChartSwitcher`, `MiniSparkline`,
-  `HeroSparkline`, `ChartSelectionBanner`, period helpers) is not ported — needs a generic series
-  model. `InsightsStatCard(… trend:)` takes the app's sparkline meanwhile.
 - `EditableHeroSection`, `IconPickerView`/`IconCatalog`, `CurrencySelectorView`,
   `AmountInputView` depend on Tenra services (logo registry, settings, FX).
 - `CategoryColors.hexColor(for:)` hashes with `String.hashValue`, which is seeded per process —
