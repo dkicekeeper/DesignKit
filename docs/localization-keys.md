@@ -25,6 +25,9 @@ from Dalada (ru / kk / en in `ios/Dalada/Localizable.xcstrings`).
 | `calculator.multiply` | CalculatorKeypad | `Multiply` |
 | `calculator.separator` | CalculatorKeypad | `Decimal separator` |
 | `calculator.subtract` | CalculatorKeypad | `Minus` |
+| `chart.empty.message` | LineChart, BarChart, ChartSwitcher (default `emptyMessage`) | — |
+| `chart.empty.title` | LineChart, BarChart, ChartSwitcher (default `emptyTitle`) | — |
+| `chart.today` | LineChart, BarChart, ChartSwitcher (default `todayText`) | — |
 | `common.cancel` | DateButtonsView | — |
 | `common.color` | ColorPickerRow | — |
 | `common.select` | DateButtonsView | — |

@@ -53,7 +53,7 @@ DesignKit ships no networking, persistence or FX. A host app wires these once, i
 
 ### 0.2 Charts in DesignKit
 
-`OrbChart` (+ `DonutSlice`, `DonutSlice.foldingSlivers`, `DonutSlice.opacityStepped`), `MiniDonut`, `ProportionBar`, `LinearProgressBar`, `ProgressRing`, `AmountComparisonBar`, `MiniProportionBar` / `HeroProportionBar`, `MiniHalfGauge` / `HeroHalfGauge`, `MiniMilestoneGauge` / `HeroMilestoneGauge`, `MiniBarPair` / `HeroBarPair`, `HeroChartEffects` (`chartGlow`, `materialize`, `glassBar`), `ChartZoomControls` + `ChartStyle`, `SiriGlowView`, `SiriWaveRecordingView`. See [charts.md](charts.md).
+**Trend charts (0.5.0)** over the generic `ChartPoint` / `ChartSeries` model: `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `ChartSelectionBanner`, `ChartValuePoint`, `ChartValueFormat`. `OrbChart` (+ `DonutSlice`, `DonutSlice.foldingSlivers`, `DonutSlice.opacityStepped`), `MiniDonut`, `ProportionBar`, `LinearProgressBar`, `ProgressRing`, `AmountComparisonBar`, `MiniProportionBar` / `HeroProportionBar`, `MiniHalfGauge` / `HeroHalfGauge`, `MiniMilestoneGauge` / `HeroMilestoneGauge`, `MiniBarPair` / `HeroBarPair`, `HeroChartEffects` (`chartGlow`, `materialize`, `glassBar`), `ChartZoomControls` + `ChartStyle`, `SiriGlowView`, `SiriWaveRecordingView`. See [charts.md](charts.md).
 
 **Deprecated (kept for consumers, removed from Tenra 2026-07):** `BudgetProgressBar` → `LinearProgressBar`, `BudgetProgressCircle` → `ProgressRing`, `ExpenseIncomeProgressBar` → `AmountComparisonBar`, `DonutChart` + `ChartDisplayMode` → `OrbChart` / `MiniDonut`.
 
@@ -63,7 +63,7 @@ These depend on app models/services. Port one only after replacing the dependenc
 generic input or a host hook (see [CLAUDE.md](../CLAUDE.md) → *Porting a component*).
 
 - **Tenra models** (`Transaction`, `Account`, `CustomCategory`, `RecurringSeries`, loans, deposits): `TransactionCard`, `AccountRow`, `CategoryRow`, `CategoryChip`, `BudgetProgressRow`, `BudgetSettingsSection`, `EntityDetailScaffold`, `GroupedTransactionList`, `CategoryStyleHelper` / `CategoryStyleCache`, `TransactionDisplayHelper`, `CategoryDisplay`.
-- **`PeriodDataPoint` chart family** (Tenra's insight model): `LineChart`, `BarChart`, `ChartSwitcher`, `MiniSparkline`, `HeroSparkline`, `ChartSelectionBanner`, `PeriodChartHelpers`, `ChartAxisHelpers`, `PeriodBreakdownRow`. Porting them needs a generic series model first. `InsightsStatCard` takes any trend view in its `trend:` footer slot, so Tenra passes its `MiniSparkline` there.
+- **`PeriodDataPoint` adapters** (Tenra): `PeriodDataPoint: ChartPoint`, `PeriodChartSeries` → `ChartSeries`, and convenience inits keeping the old call sites (`granularity:`, `currency:`). `PeriodBreakdownRow` and `ChartAxisHelpers`' period labels stay app-side.
 - **Tenra services**: `EditableHeroSection` + `IconPickerView` / `IconCatalog` (logo registry), `CurrencySelectorView` / `AmountInputView` (settings + FX), `DateFormatters`, `FastDateParser`.
 - **Domain convenience inits / adapters**: `MenuPickerRow where T == RecurringFrequency / LoanType / ReminderOption`, `StatusIndicatorBadge`'s `RecurringSeries.entityStatus`, `DonutSlice.from([CategoryBreakdownItem])`, Tenra's `InsightTrendBadge` (`InsightTrend` → `TrendBadge`), Dalada's `RuleStatusBadge` (`RuleStatus` → `BadgeView`).
 
