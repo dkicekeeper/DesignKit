@@ -3,12 +3,12 @@
 //  Tenra
 //
 //  Lightweight Canvas-based donut for mini-card overlays in the Insights feed.
-//  Replaces `DonutChart(mode: .compact)` to avoid spinning up an Apple Charts
-//  render-tree per insight card. With 25+ cards visible during scroll, the
+//  Replaced the compact Swift Charts donut (DonutChart, removed in DesignKit 1.0)
+//  to avoid spinning up an Apple Charts render-tree per insight card. With 25+ cards visible during scroll, the
 //  Apple Charts hosting cost dominated frame time when LazyVStack materialised
 //  a section. One stroked Path per slice is ~50× cheaper to instantiate.
 //
-//  Visual contract matches the compact `DonutChart`:
+//  Visual contract (kept from the compact Swift Charts donut):
 //  - Ring proportions: innerRadius = 0.6 × outerRadius
 //  - Sectors separated by a small angular gap (matches `angularInset: 1`)
 //  - Rounded line caps approximate `cornerRadius` on full-size sectors

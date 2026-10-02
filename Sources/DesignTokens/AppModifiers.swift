@@ -86,35 +86,6 @@ public extension View {
     }
 }
 
-// MARK: - Inline Field Styles (deprecated — use FormTextField with .inline style)
-
-public extension View {
-    /// Deprecated. Use `FormTextField(style: .inline)`.
-    /// The new component renders a tinted capsule chip with focus state +
-    /// 1pt accent border so an editable field is distinguishable from a static
-    /// label in every state.
-    @available(*, deprecated, message: "Use FormTextField(style: .inline) — it gives the field a visible chip background and focus state.")
-    func inlineFieldStyle(
-        keyboard: UIKeyboardType = .default,
-        maxWidth: CGFloat? = nil
-    ) -> some View {
-        self
-            .font(AppTypography.body)
-            .multilineTextAlignment(.trailing)
-            .keyboardType(keyboard)
-            .frame(maxWidth: maxWidth ?? .infinity)
-    }
-
-    /// Deprecated. Use `FormTextField(style: .inlineMultiline(min:max:))`.
-    @available(*, deprecated, message: "Use FormTextField(style: .inlineMultiline(min:max:)) — wraps the multi-line field in a tinted rounded container with focus state.")
-    func inlineNoteStyle() -> some View {
-        self
-            .lineLimit(1...4)
-            .multilineTextAlignment(.trailing)
-            .font(AppTypography.body)
-    }
-}
-
 // MARK: - Staggered Entrance Modifier
 
 /// Animates a view's entrance with scale + opacity, typically used for facepile icons.
