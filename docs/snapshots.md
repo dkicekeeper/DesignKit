@@ -39,13 +39,19 @@ Not covered on purpose: views that animate continuously (skeleton shimmer, `OrbC
   cannot do that.
 - `assertComponentSnapshot(_:width:appearances:)` (`SnapshotSupport.swift`) wraps the view:
   360 pt wide, `AppSpacing.lg` around it, `AppColors.bgBase` behind, animations off, US
-  English locale. It waits a second for `onAppear` and layout to settle, then compares with
+  English locale. It waits 1.5 s for `onAppear` and layout, then captures until two frames in
+  a row are identical (Liquid Glass animates its shadow for a moment), and compares with
   [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing)
   (`precision: 0.995, perceptualPrecision: 0.98`: anti-aliasing noise passes, a moved edge
   does not). Images are 2x whatever the simulator.
 - swift-snapshot-testing is a dependency of the **Gallery project only**. The DesignKit package
   has no dependencies, so Tenra and Dalada never fetch it.
 - Tests run one at a time (`@Suite(.serialized)` on `ComponentSnapshots`).
+- Glass needs room and a screen. The window holds 24 pt of plain background around the
+  captured area (glass bends what lies just outside a card's edge) and must fit on the
+  screen: where it does not, glass and its shadow render differently from run to run. A
+  360 pt component is exactly the Pro Max's 440 pt; a test whose window does not fit fails
+  with "does not fit the screen", so split it or narrow it.
 
 ## CI
 
@@ -53,8 +59,8 @@ The `Snapshot tests` job in `.github/workflows/ci.yml` runs `scripts/snapshot-te
 every push and PR. On a failure it uploads the images that differ as the `failing-snapshots`
 artifact. Open them next to the references in the PR's diff.
 
-The job pins **Xcode 26.6** and picks **iPhone 17 Pro** on the newest iOS runtime of that
-Xcode. References depend on the iOS runtime (glass, text rendering). So moving the pin is
+The job pins **Xcode 26.6** and picks **iPhone 17 Pro Max** on the newest installed iOS
+runtime. References depend on the iOS runtime (glass, text rendering). So moving the pin is
 its own PR, together with re-recorded references.
 
 ## Recording and updating references

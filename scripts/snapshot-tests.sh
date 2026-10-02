@@ -6,7 +6,8 @@
 #
 # SNAPSHOT_TESTING_RECORD: never (default here) | missing | failed | all.
 # SNAPSHOT_ARTIFACTS: where the images of failing snapshots are written (CI uploads them).
-# SNAPSHOT_DEVICE: simulator name, "iPhone 17 Pro" by default. References are recorded on
+# SNAPSHOT_DEVICE: simulator name, "iPhone 17 Pro Max" by default (440 pt wide: the snapshot
+# window of a 360 pt component must fit on the screen). References are recorded on
 # CI (manual CI run with record_snapshots) with the Xcode pinned in .github/workflows/ci.yml;
 # see docs/snapshots.md.
 set -euo pipefail
@@ -15,7 +16,7 @@ cd "$(dirname "$0")/../Gallery"
 
 RECORD="${SNAPSHOT_TESTING_RECORD:-never}"
 ARTIFACTS="${SNAPSHOT_ARTIFACTS:-${TMPDIR:-/tmp}/snapshot-artifacts}"
-DEVICE_NAME="${SNAPSHOT_DEVICE:-iPhone 17 Pro}"
+DEVICE_NAME="${SNAPSHOT_DEVICE:-iPhone 17 Pro Max}"
 mkdir -p "$ARTIFACTS"
 
 command -v xcodegen >/dev/null || brew install xcodegen

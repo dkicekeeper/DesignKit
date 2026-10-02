@@ -76,7 +76,11 @@ enum ComponentRenderer {
     /// Empty background around the captured area, inside the window. Liquid Glass bends what
     /// lies just outside a card's edge; without this margin it sampled whatever was beyond the
     /// window and the edges of cards changed from run to run. Not part of the PNG.
-    static let margin: CGFloat = 48
+    /// 360 + 2 × (16 + 24) = 440 pt: the width of the iPhone 17 Pro Max the tests run on.
+    static let margin: CGFloat = 24
+
+    /// Extra captures, 0.4 s apart, while two in a row still differ.
+    static let stabilityAttempts = 8
 
     static func render<V: View>(_ view: V, width: CGFloat, appearance: SnapshotAppearance) async -> UIImage {
         DesignKitFonts.registerIfNeeded()
@@ -110,6 +114,15 @@ enum ComponentRenderer {
         size.height = max(1, size.height.rounded(.up))
 
         let window = makeWindow()
+        // Glass and its shadow render unpredictably where the window is off the screen.
+        let screen = window.windowScene?.screen.bounds.size ?? .zero
+        if size.width > screen.width || size.height > screen.height {
+            Issue.record("""
+                Snapshot window \(Int(size.width))×\(Int(size.height)) pt does not fit the \
+                \(Int(screen.width))×\(Int(screen.height)) pt screen: narrow the component or \
+                split the test (docs/snapshots.md).
+                """)
+        }
         window.overrideUserInterfaceStyle = appearance.interfaceStyle
         // Opaque, so Liquid Glass samples only the component's own background.
         window.backgroundColor = .systemBackground
@@ -132,8 +145,22 @@ enum ComponentRenderer {
         // The renderer's bounds start at the margin, so the drawn window is cropped to the
         // component and its `AppSpacing.lg` padding.
         let captured = window.bounds.insetBy(dx: margin, dy: margin)
-        let image = UIGraphicsImageRenderer(bounds: captured, format: format).image { _ in
-            _ = window.drawHierarchy(in: window.bounds, afterScreenUpdates: true)
+        func capture() -> UIImage {
+            UIGraphicsImageRenderer(bounds: captured, format: format).image { _ in
+                _ = window.drawHierarchy(in: window.bounds, afterScreenUpdates: true)
+            }
+        }
+
+        // Liquid Glass keeps animating its shadow for a moment after layout (a card that is
+        // still changing, like a paging TabView, restarts it). Capture until two frames in a
+        // row are identical, so the reference is the settled picture, not a phase of it.
+        var image = capture()
+        for _ in 0..<stabilityAttempts {
+            try? await Task.sleep(for: .milliseconds(400))
+            let next = capture()
+            let settled = next.pngData() == image.pngData()
+            image = next
+            if settled { break }
         }
 
         window.isHidden = true
