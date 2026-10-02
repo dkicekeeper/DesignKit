@@ -252,7 +252,7 @@ For insight-feed compact charts use **Canvas-based** `MiniSparkline` / `MiniDonu
 
 ## Breakdown Chart (OrbChart)
 
-⚠️ **`DonutChart` was removed from Tenra** (deprecated in DesignKit) — [`OrbChart`](../Sources/DesignComponents/Charts/OrbChart.swift) is the full-size category/subcategory breakdown chart (a blended glass "orb" + thin perimeter arcs + centred `%` labels). `DonutSlice` and its slice-shaping helpers (`foldingSlivers` — merge <5% into "Other", drop a <3% tail; `opacityStepped`) live in that file now, NOT a `DonutChart.swift` (DesignKit keeps a deprecated `DonutChart` for existing consumers). `MiniDonut` still backs compact feed charts.
+⚠️ **`DonutChart` is gone** (retired from Tenra 2026-07, removed from DesignKit in 1.0) — [`OrbChart`](../Sources/DesignComponents/Charts/OrbChart.swift) is the full-size category/subcategory breakdown chart (a blended glass "orb" + thin perimeter arcs + centred `%` labels). `DonutSlice` and its slice-shaping helpers (`foldingSlivers` — merge <5% into "Other", drop a <3% tail; `opacityStepped`) live in that file now, NOT a `DonutChart.swift`. `MiniDonut` still backs compact feed charts.
 - **Params**: `showLabels`, `centerIcon` (white glyph in the sphere centre) + `showsCenterIcon`, `size`, `animatesOnAppear`.
 - **Motion highlight**: `CMMotionManager` device-motion drives the specular glint. No Info.plist usage string needed (only pedometer/activity require one); Simulator `isDeviceMotionAvailable == false` → static no-op; neutral pose captured on first reading. 30 Hz updates isolated in a child view so only it invalidates.
 - **Staggered entrance**: one `@State` flip + per-layer `.animation(anim.delay(i·step), value: entered)` — see the SwiftUI note in [gotchas.md](gotchas.md).

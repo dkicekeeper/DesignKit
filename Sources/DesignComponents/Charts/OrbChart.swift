@@ -2,12 +2,12 @@
 //  OrbChart.swift
 //  Tenra
 //
-//  Alternative to `DonutChart` inspired by the Plata "spending sphere": a soft orb whose
+//  Spending breakdown inspired by the Plata "spending sphere": a soft orb whose
 //  surface blends every category's colour (angular gradient + heavy blur), ringed by thin
 //  perimeter arcs that carry the actual proportions, with percentage labels outside them.
 //
-//  Takes the same `[DonutSlice]` as `DonutChart` (so callers keep using
-//  `DonutSlice.from(items)` and its sliver aggregation). Fully native SwiftUI — no Charts.
+//  Takes `[DonutSlice]` (callers keep using `DonutSlice.from(items)` and its sliver
+//  aggregation). Fully native SwiftUI — no Charts.
 //  The specular highlight tracks device motion (CoreMotion) for a live glass-ball feel.
 //
 
@@ -116,7 +116,7 @@ public extension DonutSlice {
 
 public struct OrbChart: View {
     let slices: [DonutSlice]
-    /// Ring height (square). Matches `DonutChart`'s full mode by default.
+    /// Ring height (square).
     var size: CGFloat = 280
     /// What the perimeter labels show: slice percentages (default) or slice
     /// names (wealth composition — account names beat raw percentages there).
@@ -126,7 +126,7 @@ public struct OrbChart: View {
     }
 
     /// Percentage labels around the perimeter. Off for monochrome breakdowns where the
-    /// numbers would clutter (mirrors `DonutChart`'s `showAnnotations`).
+    /// numbers would clutter.
     var showLabels: Bool = true
     /// Perimeter label content — percent (default) or slice names.
     var labelStyle: LabelStyle = .percent

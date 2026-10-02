@@ -58,7 +58,7 @@ DesignKit ships no networking, persistence or FX. A host app wires these once, i
 
 **Trend charts (0.5.0)** over the generic `ChartPoint` / `ChartSeries` model: `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `ChartSelectionBanner`, `ChartValuePoint`, `ChartValueFormat`. `OrbChart` (+ `DonutSlice`, `DonutSlice.foldingSlivers`, `DonutSlice.opacityStepped`), `MiniDonut`, `ProportionBar`, `LinearProgressBar`, `ProgressRing`, `AmountComparisonBar`, `MiniProportionBar` / `HeroProportionBar`, `MiniHalfGauge` / `HeroHalfGauge`, `MiniMilestoneGauge` / `HeroMilestoneGauge`, `MiniBarPair` / `HeroBarPair`, `HeroChartEffects` (`chartGlow`, `materialize`, `glassBar`), `ChartZoomControls` + `ChartStyle`, `SiriGlowView`, `SiriWaveRecordingView`. See [charts.md](charts.md).
 
-**Deprecated (kept for consumers, removed from Tenra 2026-07):** `BudgetProgressBar` → `LinearProgressBar`, `BudgetProgressCircle` → `ProgressRing`, `ExpenseIncomeProgressBar` → `AmountComparisonBar`, `DonutChart` + `ChartDisplayMode` → `OrbChart` / `MiniDonut`.
+**Removed in 1.0** (retired from Tenra 2026-07, deprecated in DesignKit until then): `BudgetProgressBar` → `LinearProgressBar`, `BudgetProgressCircle` → `ProgressRing`, `ExpenseIncomeProgressBar` → `AmountComparisonBar`, `DonutChart` + `ChartDisplayMode` → `OrbChart` / `MiniDonut`.
 
 ### 0.3 App-side (documented here, not in DesignKit)
 
@@ -443,7 +443,7 @@ UniversalRow(leadingIcon: .sfSymbol("note.text"), title: "Note") {
 ```
 
 **Do NOT:**
-- Drop a bare `TextField(...).inlineFieldStyle(...)` into a `UniversalRow` trailing — the deprecated modifier exists for legacy compatibility only; use `.inline` style instead.
+- Drop a bare `TextField` into a `UniversalRow` trailing — use `FormTextField(style: .inline)` (the old `inlineFieldStyle` / `inlineNoteStyle` modifiers were removed in 1.0).
 - Wrap the inline field in an `HStack` with a suffix `Text("%")` / `Text("KZT")` — bake the unit into the row's title ("Rate (year)", "Term (month)", "Amount, KZT"). Keeps the row stable when typing.
 - Roll a second TextField wrapper. There's exactly one component — `FormTextField`.
 
