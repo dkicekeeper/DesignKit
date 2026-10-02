@@ -7,7 +7,8 @@
 # SNAPSHOT_TESTING_RECORD: never (default here) | missing | failed | all.
 # SNAPSHOT_ARTIFACTS: where the images of failing snapshots are written (CI uploads them).
 # SNAPSHOT_DEVICE: simulator name, "iPhone 17 Pro" by default. References are recorded on
-# CI with the Xcode pinned in .github/workflows/ci.yml; see docs/snapshots.md.
+# CI (manual CI run with record_snapshots) with the Xcode pinned in .github/workflows/ci.yml;
+# see docs/snapshots.md.
 set -euo pipefail
 
 cd "$(dirname "$0")/../Gallery"

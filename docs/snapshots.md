@@ -62,21 +62,22 @@ its own PR, together with re-recorded references.
 References are recorded on CI, not on a laptop, so they match what CI compares with:
 
 1. Push the branch.
-2. Run the **Record snapshots** workflow (Actions → Record snapshots → Run workflow) on that
-   branch, with a mode:
+2. Run the **CI** workflow manually on that branch (Actions → CI → Run workflow, or the API)
+   with `record_snapshots`:
    - `missing`: only tests that have no reference yet (a new test or appearance);
    - `failed`: only references that differ (after an intentional visual change);
    - `all`: every reference (after moving the Xcode pin).
-3. The workflow commits the PNGs to the branch (`test(snapshots): record references`). That
-   push does not start CI, so re-run CI on the branch, or push again. It must be green.
+3. The snapshot job commits the PNGs to the branch (`test(snapshots): record references`).
+   That push does not start CI, so run CI on the branch again with `record_snapshots: never`,
+   or push again. It must be green.
 4. Review the changed PNGs in the PR. They **are** the visual change. Call it out in the
    release notes, since it lands in both apps.
 
-The workflow refuses to run on `main`: references change only through a PR.
+Recording is ignored on `main`: references change only through a PR.
 
 Locally, on a Mac with the same Xcode: `scripts/snapshot-tests.sh` compares, and
 `SNAPSHOT_TESTING_RECORD=failed scripts/snapshot-tests.sh` records. A Mac with another Xcode or
-another runtime records slightly different pixels, so commit references from the workflow.
+another runtime records slightly different pixels, so commit references recorded by CI.
 
 ## Adding a test
 
@@ -96,4 +97,4 @@ extension ComponentSnapshots.Display {
   `CalendarRange(today:calendar:)` in `monthCalendar()` and the chart points without dates.
 - Turn off entrance animations where the component has a switch (`animatesOnAppear: false`).
 - Texts are passed in. Keys from the host bundle would render as raw keys.
-- Then record with mode `missing`.
+- Then run CI with `record_snapshots: missing`.

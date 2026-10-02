@@ -17,6 +17,11 @@ on:
       tenra_ref:
         description: "Tenra branch to build against this DesignKit"
         default: main
+      record_snapshots:
+        description: "Snapshot references to (re)write and commit to this branch (docs/snapshots.md)"
+        type: choice
+        options: [never, missing, failed, all]
+        default: never
 
 concurrency:
   group: ci-${{ github.ref }}-${{ github.event_name }}
@@ -90,16 +95,22 @@ jobs:
     name: Snapshot tests
     runs-on: macos-26
     timeout-minutes: 45
+    permissions:
+      contents: write
+    env:
+      # Manual runs can record references (never on main: they change only through a PR).
+      RECORD: ${{ github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main' && inputs.record_snapshots || 'never' }}
     steps:
       - uses: actions/checkout@v5
 
       # Pinned: the reference images were recorded with this Xcode's iOS runtime. Moving it
-      # means re-recording (Record snapshots workflow, mode "all") in the same PR.
+      # means re-recording (record_snapshots: all) in the same PR.
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: "26.6"
 
       - name: Compare components with the reference images
+        if: env.RECORD == 'never'
         env:
           SNAPSHOT_ARTIFACTS: ${{ runner.temp }}/snapshot-artifacts
         run: scripts/snapshot-tests.sh
@@ -112,6 +123,29 @@ jobs:
           name: failing-snapshots
           path: ${{ runner.temp }}/snapshot-artifacts
           if-no-files-found: ignore
+
+      - name: Record references (${{ env.RECORD }})
+        if: env.RECORD != 'never'
+        env:
+          SNAPSHOT_TESTING_RECORD: ${{ env.RECORD }}
+        # Recording reports every written image as a failure; the images are what we need.
+        run: scripts/snapshot-tests.sh || true
+
+      # A push made with the workflow token does not start CI: re-run CI on the branch.
+      - name: Commit references
+        if: env.RECORD != 'never'
+        run: |
+          git add Gallery/SnapshotTests/__Snapshots__
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+            exit 0
+          fi
+          git diff --cached --stat
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "test(snapshots): record references ($RECORD)" \
+            -m "Recorded by CI (record_snapshots: $RECORD) on $(xcodebuild -version | head -1)."
+          git push origin "HEAD:$GITHUB_REF_NAME"
 
   dalada:
     name: Dalada against this DesignKit

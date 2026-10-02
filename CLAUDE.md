@@ -22,8 +22,8 @@ checkout** on macOS for every push to `main` and `claude/**`. Push, then read th
 
 **Snapshot tests** (`Gallery/SnapshotTests`, hosted in the Gallery app) compare components with
 reference PNGs in light, dark and large text; CI's `Snapshot tests` job fails on a visual
-difference. An intentional change is re-recorded with the **Record snapshots** workflow:
-[docs/snapshots.md](docs/snapshots.md).
+difference. An intentional change is re-recorded by a manual CI run with `record_snapshots`
+(`missing` / `failed` / `all`): [docs/snapshots.md](docs/snapshots.md).
 
 **TestFlight**: `.github/workflows/testflight.yml` archives the Gallery and uploads it on every
 push to `main` that touches `Sources/`, `Gallery/`, `Package.swift` or `VERSION` (version =
@@ -111,8 +111,8 @@ rather than importing an app type.
 3. Replace app dependencies per the decision tree above. Leave a one-line comment naming what
    stayed in the app.
 4. Add a Gallery specimen (existing screen file, or a new one + `xcodegen generate`) and a
-   snapshot test (`Gallery/SnapshotTests`), then record it with the Record snapshots workflow,
-   mode `missing` (docs/snapshots.md).
+   snapshot test (`Gallery/SnapshotTests`), then record it with a manual CI run,
+   `record_snapshots: missing` (docs/snapshots.md).
 5. Add any new `String(localized:)` key to `docs/localization-keys.md`.
 6. Update `docs/design-system.md` (§0 inventory + the component's section).
 7. Push; CI must be green on the package, Gallery, snapshot, Dalada and Tenra jobs.
