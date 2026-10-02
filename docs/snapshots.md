@@ -40,7 +40,10 @@ Not covered on purpose: views that animate continuously (skeleton shimmer, `OrbC
 - `assertComponentSnapshot(_:width:appearances:)` (`SnapshotSupport.swift`) wraps the view:
   360 pt wide, `AppSpacing.lg` around it, `AppColors.bgBase` behind, animations off, US
   English locale. It waits 1.5 s for `onAppear` and layout, then captures until two frames in
-  a row are identical (Liquid Glass animates its shadow for a moment), and compares with
+  a row are identical (Liquid Glass animates its shadow for a moment). The PNG is the
+  component's own frame: the shadow glass casts around a card falls outside it, and the
+  simulator renders that shadow a little differently from run to run, while the component's
+  own pixels do not change. Then it compares with
   [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing)
   (`precision: 0.995, perceptualPrecision: 0.98`: anti-aliasing noise passes, a moved edge
   does not). Images are 2x whatever the simulator.

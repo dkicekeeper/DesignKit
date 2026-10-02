@@ -40,7 +40,8 @@ struct ComponentSnapshots {}
 /// Renders `view` at `width` points and asserts it matches the reference images, one per
 /// appearance (`<test>.light.png`, `<test>.dark.png`, `<test>.largeText.png`).
 ///
-/// The view sits on `AppColors.bgBase` with `AppSpacing.lg` around it, animations off.
+/// The view sits on `AppColors.bgBase` with `AppSpacing.lg` around it, animations off; the PNG
+/// is the view's own frame.
 @MainActor
 func assertComponentSnapshot<V: View>(
     _ view: V,
@@ -142,9 +143,12 @@ enum ComponentRenderer {
         // 8-bit sRGB: the simulator's default is extended range (16 bits per channel), which
         // makes every PNG several times larger for no visible difference.
         format.preferredRange = .standard
-        // The renderer's bounds start at the margin, so the drawn window is cropped to the
-        // component and its `AppSpacing.lg` padding.
-        let captured = window.bounds.insetBy(dx: margin, dy: margin)
+        // The renderer's bounds start at the component's frame, so the drawn window is cropped
+        // to the component itself. The `AppSpacing.lg` around it stays in the layout but out
+        // of the PNG: that is where Liquid Glass casts its shadow, which the simulator renders
+        // slightly differently from run to run (the component's own pixels do not change).
+        let inset = margin + AppSpacing.lg
+        let captured = window.bounds.insetBy(dx: inset, dy: inset)
         func capture() -> UIImage {
             UIGraphicsImageRenderer(bounds: captured, format: format).image { _ in
                 _ = window.drawHierarchy(in: window.bounds, afterScreenUpdates: true)
