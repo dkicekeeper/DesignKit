@@ -73,6 +73,11 @@ enum ComponentRenderer {
     /// Scale of the PNGs, whatever the simulator's screen: keeps references small and stable.
     static let scale: CGFloat = 2
 
+    /// Empty background around the captured area, inside the window. Liquid Glass bends what
+    /// lies just outside a card's edge; without this margin it sampled whatever was beyond the
+    /// window and the edges of cards changed from run to run. Not part of the PNG.
+    static let margin: CGFloat = 48
+
     static func render<V: View>(_ view: V, width: CGFloat, appearance: SnapshotAppearance) async -> UIImage {
         DesignKitFonts.registerIfNeeded()
         UIView.setAnimationsEnabled(false)
@@ -82,6 +87,7 @@ enum ComponentRenderer {
             .frame(width: width)
             .fixedSize(horizontal: false, vertical: true)
             .padding(AppSpacing.lg)
+            .padding(margin)
             .background(AppColors.bgBase)
             .environment(\.colorScheme, appearance.colorScheme)
             .environment(\.locale, Locale(identifier: "en_US"))
@@ -98,7 +104,7 @@ enum ComponentRenderer {
             ? .large
             : .accessibilityLarge
 
-        let fitting = CGSize(width: width + AppSpacing.lg * 2, height: .greatestFiniteMagnitude)
+        let fitting = CGSize(width: width + (AppSpacing.lg + margin) * 2, height: .greatestFiniteMagnitude)
         var size = host.sizeThatFits(in: fitting)
         size.width = fitting.width
         size.height = max(1, size.height.rounded(.up))
@@ -112,8 +118,8 @@ enum ComponentRenderer {
         window.rootViewController = host
         window.isHidden = false
 
-        // Let SwiftUI lay out, run onAppear / onGeometryChange and settle.
-        try? await Task.sleep(for: .seconds(1))
+        // Let SwiftUI lay out, run onAppear / onGeometryChange, and glass settle.
+        try? await Task.sleep(for: .seconds(1.5))
         host.view.frame = window.bounds
         host.view.layoutIfNeeded()
 
@@ -123,7 +129,10 @@ enum ComponentRenderer {
         // 8-bit sRGB: the simulator's default is extended range (16 bits per channel), which
         // makes every PNG several times larger for no visible difference.
         format.preferredRange = .standard
-        let image = UIGraphicsImageRenderer(bounds: window.bounds, format: format).image { _ in
+        // The renderer's bounds start at the margin, so the drawn window is cropped to the
+        // component and its `AppSpacing.lg` padding.
+        let captured = window.bounds.insetBy(dx: margin, dy: margin)
+        let image = UIGraphicsImageRenderer(bounds: captured, format: format).image { _ in
             _ = window.drawHierarchy(in: window.bounds, afterScreenUpdates: true)
         }
 

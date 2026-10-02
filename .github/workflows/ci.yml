@@ -144,7 +144,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "test(snapshots): record references ($RECORD)" \
-            -m "Recorded by CI (record_snapshots: $RECORD) on $(xcodebuild -version | head -1)."
+            -m "Recorded by CI (record_snapshots: $RECORD) on $(xcodebuild -version | awk 'NR == 1')."
           git push origin "HEAD:$GITHUB_REF_NAME"
 
   dalada:

@@ -37,7 +37,7 @@ for runtime in runtimes:
     break
 ')
 DEVICE_ID="${DEVICE%%|*}"
-echo "Snapshot device: ${DEVICE#*|} · $(xcodebuild -version | head -1) · record=$RECORD"
+echo "Snapshot device: ${DEVICE#*|} · $(xcodebuild -version | awk 'NR == 1') · record=$RECORD"
 
 set +e
 TEST_RUNNER_SNAPSHOT_TESTING_RECORD="$RECORD" \
