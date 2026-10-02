@@ -15,3 +15,7 @@ Gallery/*.xcodeproj/
 # SwiftPM resolved
 .swiftpm/
 Package.resolved
+
+# Gallery build output and the snapshot test log (scripts/snapshot-tests.sh)
+Gallery/build/
+Gallery/snapshot-test.log
