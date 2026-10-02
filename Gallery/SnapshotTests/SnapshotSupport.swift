@@ -105,6 +105,9 @@ enum ComponentRenderer {
 
         let window = makeWindow()
         window.overrideUserInterfaceStyle = appearance.interfaceStyle
+        // Opaque, so Liquid Glass samples only the component's own background.
+        window.backgroundColor = .systemBackground
+        host.view.backgroundColor = .systemBackground
         window.frame = CGRect(origin: .zero, size: size)
         window.rootViewController = host
         window.isHidden = false
@@ -117,6 +120,9 @@ enum ComponentRenderer {
         let format = UIGraphicsImageRendererFormat()
         format.scale = scale
         format.opaque = true
+        // 8-bit sRGB: the simulator's default is extended range (16 bits per channel), which
+        // makes every PNG several times larger for no visible difference.
+        format.preferredRange = .standard
         let image = UIGraphicsImageRenderer(bounds: window.bounds, format: format).image { _ in
             _ = window.drawHierarchy(in: window.bounds, afterScreenUpdates: true)
         }
@@ -133,6 +139,11 @@ enum ComponentRenderer {
         guard let scene else {
             Issue.record("No window scene: snapshot tests must run hosted in the Gallery app")
             return UIWindow(frame: .zero)
+        }
+        // Glass samples whatever is on screen below it, other windows included: hide the
+        // Gallery's own UI for the whole run so it never shows through a component.
+        for other in scene.windows where !other.isHidden {
+            other.isHidden = true
         }
         let window = UIWindow(windowScene: scene)
         window.windowLevel = .alert + 1
