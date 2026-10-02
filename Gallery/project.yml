@@ -8,6 +8,11 @@ options:
 packages:
   DesignKit:
     path: ".."
+  # Snapshot tests only (GallerySnapshotTests). The DesignKit package itself has no
+  # dependencies, so the apps that consume it never fetch this.
+  SnapshotTesting:
+    url: https://github.com/pointfreeco/swift-snapshot-testing
+    exactVersion: 1.19.6
 
 targets:
   Gallery:
@@ -19,6 +24,11 @@ targets:
     dependencies:
       - package: DesignKit
         product: DesignKit
+    # Shared "Gallery" scheme: builds and archives the app, `xcodebuild test` runs the
+    # snapshot tests hosted in it (docs/snapshots.md).
+    scheme:
+      testTargets:
+        - GallerySnapshotTests
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dakacom.DesignKitGallery
@@ -43,5 +53,33 @@ targets:
         # from the workflow run number.
         MARKETING_VERSION: "0.7.0"
         CURRENT_PROJECT_VERSION: "1"
+        DEVELOPMENT_TEAM: SY2L2VMQP7
+        CODE_SIGN_STYLE: Automatic
+
+  # Snapshot tests of the DesignKit components, hosted in the Gallery app so Liquid Glass
+  # renders in a real window. References: SnapshotTests/__Snapshots__ (docs/snapshots.md).
+  GallerySnapshotTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: SnapshotTests
+        excludes:
+          - "__Snapshots__"
+          - "__Snapshots__/**"
+    dependencies:
+      - target: Gallery
+      - package: DesignKit
+        product: DesignKit
+      - package: SnapshotTesting
+        product: SnapshotTesting
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dakacom.DesignKitGallery.SnapshotTests
+        GENERATE_INFOPLIST_FILE: YES
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "5.0"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/DesignKitGallery.app/DesignKitGallery"
+        BUNDLE_LOADER: "$(TEST_HOST)"
         DEVELOPMENT_TEAM: SY2L2VMQP7
         CODE_SIGN_STYLE: Automatic

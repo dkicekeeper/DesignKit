@@ -1,0 +1,56 @@
+name: Record snapshots
+
+# Writes the reference images of the component snapshot tests and commits them to the branch
+# it runs on. Use it after an intentional visual change (mode "failed" or "all") or for new
+# tests (mode "missing"), then re-run CI: a push made by this workflow does not start CI.
+# How snapshots work: docs/snapshots.md.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "missing = only new tests · failed = only the ones that differ · all = every reference"
+        type: choice
+        options: [missing, failed, all]
+        default: failed
+
+permissions:
+  contents: write
+
+concurrency:
+  group: snapshots-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  record:
+    name: Record (${{ inputs.mode }})
+    # References change only through a reviewed PR, never straight on main.
+    if: github.ref != 'refs/heads/main'
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+
+      # Same Xcode as the snapshot job in ci.yml: references depend on the iOS runtime.
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "26.6"
+
+      - name: Record
+        env:
+          SNAPSHOT_TESTING_RECORD: ${{ inputs.mode }}
+        # Recording reports every written image as a failure; the images are what we need.
+        run: scripts/snapshot-tests.sh || true
+
+      - name: Commit references
+        run: |
+          git add Gallery/SnapshotTests/__Snapshots__
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+            exit 0
+          fi
+          git diff --cached --stat
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "test(snapshots): record references (${{ inputs.mode }})" \
+            -m "Recorded by the Record snapshots workflow on $(xcodebuild -version | head -1)."
+          git push

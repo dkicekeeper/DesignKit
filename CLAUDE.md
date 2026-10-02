@@ -20,6 +20,11 @@ Code is often written in a Linux container where SwiftUI cannot compile. **CI is
 there**: `.github/workflows/ci.yml` builds the package, the Gallery, and **Dalada against this
 checkout** on macOS for every push to `main` and `claude/**`. Push, then read the job logs.
 
+**Snapshot tests** (`Gallery/SnapshotTests`, hosted in the Gallery app) compare components with
+reference PNGs in light, dark and large text; CI's `Snapshot tests` job fails on a visual
+difference. An intentional change is re-recorded with the **Record snapshots** workflow:
+[docs/snapshots.md](docs/snapshots.md).
+
 **TestFlight**: `.github/workflows/testflight.yml` archives the Gallery and uploads it on every
 push to `main` that touches `Sources/`, `Gallery/`, `Package.swift` or `VERSION` (version =
 `VERSION`, build = run number). Setup and troubleshooting: [docs/testflight.md](docs/testflight.md).
@@ -36,6 +41,8 @@ Sources/
                        Forms, Headers, Icons, Input, Rows
 Gallery/               showcase app (xcodegen; the .xcodeproj is not in git); every public
                        component has a specimen; ships to TestFlight (docs/testflight.md)
+Gallery/SnapshotTests/ snapshot tests hosted in the Gallery app; references in __Snapshots__
+scripts/               snapshot-tests.sh (CI and local runs of the snapshot tests)
 Tests/                 swift-testing unit tests (formatting, ExpressionEvaluator, calculator
                        model) — run by CI on an iOS Simulator
 docs/                  design-system.md, charts.md, gotchas.md, localization-keys.md, benchmark.md
@@ -103,10 +110,12 @@ rather than importing an app type.
    (`id`, `body(content:)`, `==`). Write an explicit `public init` — memberwise inits are internal.
 3. Replace app dependencies per the decision tree above. Leave a one-line comment naming what
    stayed in the app.
-4. Add a Gallery specimen (existing screen file, or a new one + `xcodegen generate`).
+4. Add a Gallery specimen (existing screen file, or a new one + `xcodegen generate`) and a
+   snapshot test (`Gallery/SnapshotTests`), then record it with the Record snapshots workflow,
+   mode `missing` (docs/snapshots.md).
 5. Add any new `String(localized:)` key to `docs/localization-keys.md`.
 6. Update `docs/design-system.md` (§0 inventory + the component's section).
-7. Push; CI must be green on the package, Gallery and Dalada jobs.
+7. Push; CI must be green on the package, Gallery, snapshot, Dalada and Tenra jobs.
 
 ## API Stability & Versioning
 
@@ -121,7 +130,7 @@ rather than importing an app type.
   next major, once no consumer uses it. Tenra retiring a component is not a reason to delete it
   here.
 - Visual changes to shared components land in every consumer on its next bump — call them out in
-  the release notes.
+  the release notes. The changed snapshot PNGs in the PR show exactly what changed.
 
 ## Toolchains & Language
 
@@ -144,4 +153,5 @@ rather than importing an app type.
 | Package traps (public API, Xcode 26/27, bundles) and SwiftUI layout traps | [docs/gotchas.md](docs/gotchas.md) |
 | Localized strings used by components | [docs/localization-keys.md](docs/localization-keys.md) |
 | Gallery TestFlight pipeline | [docs/testflight.md](docs/testflight.md) |
+| Snapshot tests: what is covered, recording references, the pinned Xcode | [docs/snapshots.md](docs/snapshots.md) |
 | What exists vs Apple HIG / Material / Fluent / Carbon / Polaris / Atlassian, next candidates | [docs/benchmark.md](docs/benchmark.md) |

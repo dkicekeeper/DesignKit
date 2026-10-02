@@ -86,6 +86,33 @@ jobs:
           xcodebuild -version
           swift --version
 
+  snapshots:
+    name: Snapshot tests
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+
+      # Pinned: the reference images were recorded with this Xcode's iOS runtime. Moving it
+      # means re-recording (Record snapshots workflow, mode "all") in the same PR.
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "26.6"
+
+      - name: Compare components with the reference images
+        env:
+          SNAPSHOT_ARTIFACTS: ${{ runner.temp }}/snapshot-artifacts
+        run: scripts/snapshot-tests.sh
+
+      # The images that differ, to look at next to the references in the repo.
+      - name: Upload failing snapshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failing-snapshots
+          path: ${{ runner.temp }}/snapshot-artifacts
+          if-no-files-found: ignore
+
   dalada:
     name: Dalada against this DesignKit
     runs-on: macos-26
