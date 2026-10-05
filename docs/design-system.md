@@ -398,6 +398,12 @@ MenuPickerRow(
 
 Use in: form sections for frequency, period, reminder, etc.
 
+#### `NetAmountRow` *(1.1.0)*
+A label with a net amount (destructive when negative) and "+inflow −outflow" under it, or one amount (`singleValue`, `singleColor`) with no second line. Vertical padding `AppSpacing.md`; separate rows with `Divider()`. Tenra: `PeriodBreakdownRow` (period lists of the insights) is an adapter.
+
+#### `ScheduleRow` *(1.1.0)*
+A schedule entry: a checked circle when `isDone` (the row is dimmed with `futureTransactionStyle` when not), title + date subtitle, the amount and an optional detail line under it (`detailColor`, `AppColors.expense` by default). Tenra: `AmortizationScheduleRow` (payment number, date format, interest) is an adapter.
+
 #### `DatePickerRow`
 Inline `DatePicker` inside `UniversalRow`.
 
@@ -489,6 +495,18 @@ Tinted "lightbulb + advice" callout (icon + text on `color.opacity(0.10)`, `AppR
 
 #### `EmptyCardView`
 Distinct from `FinanceCard`'s inline empty state: a standalone, optionally-tappable empty card (section title + compact empty message) for empty home sections that act as an "add first item" CTA.
+
+#### `TotalsCard` *(1.1.0)*
+Labelled totals side by side (`[TotalsCard.Item]`: title, amount, optional `previous`, colour, `increaseIsGood`), an optional title above, and a small "↑ 12%" change badge under each value that has a `previous`. Full amounts via `FormattedAmountText` (`minimumScaleFactor(0.5)`, never "1.2M"). Tenra: `InsightsTotalsCard` (income / expenses / net flow) is an adapter over it.
+
+#### `LimitProgressCard` *(1.1.0)*
+Progress towards a limit: circle icon + title + percentage (destructive when over), `LinearProgressBar`, `SpentBudgetText` "spent / limit" and a trailing caption ("9 days left"). `percentage` is passed in (0…100+, not clamped); `isOverLimit` defaults to `percentage > 100`. Tenra: `BudgetProgressRow` is an adapter.
+
+#### `WeightBreakdownCard` *(1.1.0)*
+How a whole splits into weighted parts: title, explanation, a quieter caption, one 14 pt stacked bar (weights add up to 100) and a legend of icon, name and weight label, with an optional footnote. Tenra: `HealthScoreWeightingCard` (the health-score parts and weights) is an adapter.
+
+#### `CalculationCard` *(1.1.0)*
+"How it's calculated": icon + title, an optional headline value (`heroLabel` / `heroValue`; `nil` hides it when the screen shows the figure above), rows `label …… value` (`.amount(_:currency:)` through `FormattedAmountText`, or pre-formatted `.text`), the `isEmphasised` result row in the card's colour, an explanation and a `RecommendationBox`. Tenra: `InsightFormulaCard` maps its formula model onto it.
 
 ---
 

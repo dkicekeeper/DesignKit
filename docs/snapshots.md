@@ -24,6 +24,7 @@ appearances it lists:
 | `FeedbackSnapshotTests` | `EmptyStateView` (3 styles), `MessageBanner`, `InlineStatusText`, `RecommendationBox`, `StepTracker`, `OnboardingStepIndicator`, `PermissionPrimerView`, `OnboardingPage` |
 | `DisplaySnapshotTests` | `BadgeView`, `TrendBadge`, `StatusIndicatorBadge`, `StatTile`, `AvatarView`, `AvatarGroup`, `RatingView`, `ActivityTimeline`, `MonthCalendar`, `ExpandableText`, `FlowLayout`, `HeroSymbol` |
 | `ChartsSnapshotTests` | `LinearProgressBar`, `ProgressRing`, `AmountComparisonBar`, `FormattedAmountText`, `Sparkline`, `LineChart`, `BarChart`, `HeroSparkline`, `OrbChart`, `MiniDonut`, `ProportionBar`, `MiniProportionBar`, `HeroProportionBar`, `HeroHalfGauge`, `MiniHalfGauge`, `HeroMilestoneGauge`, `MiniMilestoneGauge`, `HeroBarPair`, `MiniBarPair` |
+| `SummarySnapshotTests` | `TotalsCard`, `LimitProgressCard`, `WeightBreakdownCard`, `CalculationCard`, `NetAmountRow`, `ScheduleRow` |
 | `InputsSnapshotTests` | `SegmentedPickerView`, `ChipPicker` (single / several), `RatingPicker`, `FormTextField`, `TagInput`, `CalculatorKeypad`, `AmountDigitDisplay`, `FormattedAmountView`, `SpentBudgetText`, `PlusTabLabel`, `BulkDeleteButton`, `EntityActionButton` |
 
 Appearances (`SnapshotAppearance`): `light`, `dark`, and `largeText` (light at accessibility
