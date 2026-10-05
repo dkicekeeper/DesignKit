@@ -35,15 +35,19 @@ struct PatternsScreen: View {
         }
     }
 
+    @ViewBuilder
     private var skeletonSection: some View {
-        ShowcaseSection(title: "SkeletonView · .skeleton(isLoading:)", subtitle: "Shimmer stops under Reduce Motion") {
-            Toggle("Loading", isOn: $isLoading)
+        ShowcaseSection(title: "SkeletonRow", subtitle: "SkeletonView rows · shimmer stops under Reduce Motion") {
             VStack(spacing: 0) {
                 SkeletonRow()
                 SkeletonRow()
             }
             .cardContentPadding()
             .cardStyle()
+        }
+
+        ShowcaseSection(title: ".skeleton(isLoading:)", subtitle: "Any view as its own placeholder") {
+            Toggle("Loading", isOn: $isLoading)
             HStack(spacing: AppSpacing.md) {
                 AvatarView(name: "Ayan Seitkali")
                 VStack(alignment: .leading, spacing: AppSpacing.xxs) {
@@ -103,7 +107,7 @@ struct PatternsScreen: View {
     }
 
     private var chipsSection: some View {
-        ShowcaseSection(title: "ChipPicker · several", subtitle: "Set selection, icons") {
+        ShowcaseSection(title: "ChipPicker (several)", subtitle: "Set selection, icons") {
             ChipPicker("Place type", options: ["Lake", "River", "Camp", "Viewpoint"], selection: $types,
                        systemImage: { ["Lake": "drop", "River": "water.waves", "Camp": "tent", "Viewpoint": "binoculars"][$0] }) { $0 }
         }
@@ -124,7 +128,7 @@ struct PatternsScreen: View {
     }
 
     private var bannerSection: some View {
-        ShowcaseSection(title: "MessageBanner · action", subtitle: "Snackbar with Undo / Retry") {
+        ShowcaseSection(title: "MessageBanner (action)", subtitle: "Snackbar with Undo / Retry") {
             if showsUndo {
                 MessageBanner(message: "Trip deleted", type: .info, actionTitle: "Undo") { showsUndo = false }
             } else {

@@ -67,13 +67,9 @@ struct FlowsScreen: View {
         }
     }
 
+    @ViewBuilder
     private var primerSection: some View {
         ShowcaseSection(title: "PermissionPrimerView", subtitle: "Before the system alert · .medium sheet") {
-            HStack(spacing: AppSpacing.lg) {
-                HeroSymbol(systemImage: "bell.badge", size: 72)
-                HeroSymbol(systemImage: "location", size: 72, tint: AppColors.success)
-                HeroSymbol(systemImage: "camera", size: 72, tint: AppColors.warning)
-            }
             Button {
                 showsPrimer = true
             } label: {
@@ -81,17 +77,32 @@ struct FlowsScreen: View {
             }
             .secondaryButton()
         }
+
+        ShowcaseSection(title: "HeroSymbol", subtitle: "The big symbol of a primer or an onboarding page") {
+            HStack(spacing: AppSpacing.lg) {
+                HeroSymbol(systemImage: "bell.badge", size: 72)
+                HeroSymbol(systemImage: "location", size: 72, tint: AppColors.success)
+                HeroSymbol(systemImage: "camera", size: 72, tint: AppColors.warning)
+            }
+        }
     }
 
+    @ViewBuilder
     private var onboardingSection: some View {
-        ShowcaseSection(title: "OnboardingPager · OnboardingPage", subtitle: "Pages, dots, Skip, per-page buttons") {
+        ShowcaseSection(title: "OnboardingPager", subtitle: "OnboardingPage pages, dots, Skip, per-page buttons") {
             Button {
                 showsOnboarding = true
             } label: {
                 Text("Show onboarding").frame(maxWidth: .infinity)
             }
             .secondaryButton()
+        }
+
+        ShowcaseSection(title: "OnboardingStepIndicator", subtitle: "Steps as symbols") {
             OnboardingStepIndicator(currentStep: 2, symbols: ["map", "tent.fill", "person.2.fill", "checkmark.seal.fill"])
+        }
+
+        ShowcaseSection(title: "OnboardingPageContainer", subtitle: "One onboarding step: title, content, Continue, Skip") {
             Button {
                 showsPageContainer = true
             } label: {

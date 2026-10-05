@@ -23,7 +23,7 @@ struct IconsScreen: View {
                 .frame(maxWidth: .infinity)
             }
 
-            ShowcaseSection(title: "IconView styles", subtitle: "Unified icon + logo component") {
+            ShowcaseSection(title: "IconView", subtitle: "Unified icon + logo component · styles") {
                 LazyVGrid(columns: columns, spacing: AppSpacing.lg) {
                     specimen("categoryIcon") {
                         IconView(source: .sfSymbol("fork.knife"),
@@ -54,13 +54,16 @@ struct IconsScreen: View {
                         IconView(source: .brandService("netflix.com"),
                                  style: .serviceLogo(size: AppIconSize.xxl))
                     }
-                    specimen("BrandLogoView") {
-                        BrandLogoView(brandName: "Kaspi", size: AppIconSize.xxl)
-                    }
                 }
             }
 
-            ShowcaseSection(title: "Tints") {
+            ShowcaseSection(title: "BrandLogoView", subtitle: "A brand's logo through DesignKitLogoLoader") {
+                specimen("Kaspi") {
+                    BrandLogoView(brandName: "Kaspi", size: AppIconSize.xxl)
+                }
+            }
+
+            ShowcaseSection(title: "IconTint", subtitle: "Monochrome tints") {
                 HStack(spacing: AppSpacing.lg) {
                     ForEach(tintSamples, id: \.0) { name, tint in
                         VStack(spacing: AppSpacing.xs) {

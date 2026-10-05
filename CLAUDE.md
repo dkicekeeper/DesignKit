@@ -40,7 +40,8 @@ Sources/
 └── DesignComponents/  → DesignTokens + DesignSupport — Cards, Charts, Display, Feedback,
                        Forms, Headers, Icons, Input, Rows
 Gallery/               showcase app (xcodegen; the .xcodeproj is not in git); every public
-                       component has a specimen; ships to TestFlight (docs/testflight.md)
+                       component has a specimen; each ShowcaseSection is a page of its
+                       category (chips on top, swipe); ships to TestFlight (docs/testflight.md)
 Gallery/SnapshotTests/ snapshot tests hosted in the Gallery app; references in __Snapshots__
 scripts/               snapshot-tests.sh (CI and local runs of the snapshot tests)
 Tests/                 swift-testing unit tests (formatting, ExpressionEvaluator, calculator
@@ -117,8 +118,8 @@ rather than importing an app type.
    (`id`, `body(content:)`, `==`). Write an explicit `public init` — memberwise inits are internal.
 3. Replace app dependencies per the decision tree above. Leave a one-line comment naming what
    stayed in the app.
-4. Add a Gallery specimen (existing screen file, or a new one + `xcodegen generate`) and a
-   snapshot test (`Gallery/SnapshotTests`), then record it with a manual CI run,
+4. Add a Gallery specimen (one `ShowcaseSection` per component, so it gets its own page, in
+   an existing screen file or a new one + `xcodegen generate`) and a snapshot test (`Gallery/SnapshotTests`), then record it with a manual CI run,
    `record_snapshots: missing` (docs/snapshots.md).
 5. Add any new `String(localized:)` key to `docs/localization-keys.md` and its English value
    to `Gallery/Gallery/Localizable.xcstrings`.

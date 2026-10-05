@@ -17,15 +17,23 @@ struct FormsScreen: View {
 
     var body: some View {
         ShowcasePage(title: "Forms & Settings") {
-            ShowcaseSection(title: "Section headers") {
-                VStack(alignment: .leading, spacing: AppSpacing.md) {
-                    SectionHeaderView("Accounts", systemImage: "creditcard.fill")
-                    SettingsSectionHeaderView(title: "Appearance")
+            ShowcaseSection(title: "SectionHeaderView", subtitle: "A section title over content") {
+                SectionHeaderView("Accounts", systemImage: "creditcard.fill")
+            }
+
+            ShowcaseSection(title: "SettingsSectionHeaderView", subtitle: "A settings group title") {
+                SettingsSectionHeaderView(title: "Appearance")
+            }
+
+            ShowcaseSection(title: "FormSection", subtitle: "A titled group of fields") {
+                FormSection(header: "Transaction") {
+                    FormTextField(text: $name, placeholder: "Title")
+                    FormTextField(text: $empty, placeholder: "Note (optional)")
                 }
             }
 
-            ShowcaseSection(title: "FormSection + FormTextField") {
-                FormSection(header: "Transaction") {
+            ShowcaseSection(title: "FormTextField", subtitle: "Plain · help text · error") {
+                FormSection {
                     FormTextField(text: $name, placeholder: "Title")
                     FormTextField(text: $empty, placeholder: "Note (optional)",
                                   helpText: "Shown on the transaction detail")
@@ -35,7 +43,7 @@ struct FormsScreen: View {
                 }
             }
 
-            ShowcaseSection(title: "UniversalRow · InfoRowLayout", subtitle: "The base row: icon, content, trailing, hint") {
+            ShowcaseSection(title: "UniversalRow", subtitle: "The base row: icon, content, trailing, hint") {
                 VStack(spacing: 0) {
                     UniversalRow(config: .standard, leadingIcon: .sfSymbol("creditcard", color: AppColors.accent)) {
                         Text("Kaspi Gold").font(AppTypography.body)
@@ -51,6 +59,9 @@ struct FormsScreen: View {
                     }
                 }
                 .cardStyle()
+            }
+
+            ShowcaseSection(title: "InfoRowLayout", subtitle: "A label over any trailing content") {
                 InfoRowLayout(label: "Status") {
                     Text("Active")
                         .font(AppTypography.body)
@@ -81,28 +92,49 @@ struct FormsScreen: View {
                 }
             }
 
-            ShowcaseSection(title: "Settings rows") {
+            ShowcaseSection(title: "NavigationSettingsRow", subtitle: "Opens a settings screen") {
                 FormSection {
                     NavigationSettingsRow(icon: "paintbrush.fill", title: "Theme",
                                           iconColor: AppColors.accent) {
                         Text("Theme settings").navigationTitle("Theme")
                     }
+                }
+            }
+
+            ShowcaseSection(title: "DatePickerRow", subtitle: "Inline DatePicker in a row") {
+                FormSection {
                     DatePickerRow(icon: "calendar", title: "Start date", selection: $date)
+                }
+            }
+
+            ShowcaseSection(title: "MenuPickerRow", subtitle: "A menu of options in a row") {
+                FormSection {
                     MenuPickerRow(icon: "arrow.triangle.2.circlepath", title: "Frequency",
                                   selection: $frequency,
                                   options: [("Weekly", "weekly"), ("Monthly", "monthly"), ("Yearly", "yearly")])
+                }
+            }
+
+            ShowcaseSection(title: "ActionSettingsRow", subtitle: "A row that runs an action · destructive") {
+                FormSection {
                     ActionSettingsRow(icon: "trash.fill", title: "Delete all data",
                                       isDestructive: true) {}
                 }
             }
 
-            ShowcaseSection(title: "Buttons & labels") {
+            ShowcaseSection(title: "PlusTabLabel", subtitle: "The tab bar's add button · expanded") {
                 HStack(spacing: AppSpacing.xl) {
                     PlusTabLabel(isExpanded: false)
                     PlusTabLabel(isExpanded: true)
                 }
                 .font(AppTypography.bodyEmphasis)
+            }
+
+            ShowcaseSection(title: "BulkDeleteButton", subtitle: "Deletes the selected items") {
                 BulkDeleteButton(count: 3) {}
+            }
+
+            ShowcaseSection(title: "EntityActionButton", subtitle: "Edit · delete on a detail screen") {
                 HStack(spacing: AppSpacing.sm) {
                     EntityActionButton(title: "Edit", systemImage: "pencil") {}
                     EntityActionButton(title: "Delete", systemImage: "trash", role: .destructive) {}

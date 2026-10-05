@@ -12,6 +12,7 @@ struct ComponentsScreen: View {
     @State private var cashFlowState = CashFlowSpecimenState.loaded
 
     var body: some View {
+        // Every ShowcaseSection is a page; the properties below group them by kind.
         ShowcasePage(title: "Components") {
             heroSection
             amountsSection
@@ -46,6 +47,7 @@ struct ComponentsScreen: View {
 
     // MARK: Amounts
 
+    @ViewBuilder
     private var amountsSection: some View {
         ShowcaseSection(title: "FormattedAmountText", subtitle: "Smart decimals · dimmed .XX") {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
@@ -65,20 +67,27 @@ struct ComponentsScreen: View {
                 FormattedAmountText(amount: 148_920_450, currency: "KZT")
             }
             .frame(width: 150)
-            TokenLabel(name: "FormattedAmountView", value: "plain text, no dimmed decimals")
+        }
+
+        ShowcaseSection(title: "FormattedAmountView", subtitle: "Plain text, no dimmed decimals") {
             FormattedAmountView(amount: 4_990, currency: "USD", prefix: "+", color: AppColors.income)
-            TokenLabel(name: "ConvertedAmountView", value: "≈ in another currency · DesignKitCurrencyConverter")
+        }
+
+        ShowcaseSection(title: "ConvertedAmountView", subtitle: "≈ in another currency · DesignKitCurrencyConverter") {
             ConvertedAmountView(amount: 49.90, fromCurrency: "USD", toCurrency: "KZT",
                                 fontSize: AppTypography.bodySmall, color: AppColors.textSecondary)
-            TokenLabel(name: "SpentBudgetText", value: "spent / budget")
+        }
+
+        ShowcaseSection(title: "SpentBudgetText", subtitle: "Spent / budget") {
             SpentBudgetText(spent: 185_000, budget: 250_000, currency: "KZT")
         }
     }
 
     // MARK: Cards
 
+    @ViewBuilder
     private var cardsSection: some View {
-        ShowcaseSection(title: "FinanceCard", subtitle: "Home-screen section shell") {
+        ShowcaseSection(title: "FinanceCard", subtitle: "Home-screen section shell · RedactableAmount") {
             FinanceCard(title: "Accounts", isEmpty: false, emptyTitle: "No accounts",
                         subtitle: "3 accounts") {
                 RedactableAmount(amount: 1_884_500, currency: "KZT", isLoading: false)
@@ -93,9 +102,13 @@ struct ComponentsScreen: View {
                     }
                 }
             }
+        }
 
+        ShowcaseSection(title: "EmptyCardView", subtitle: "A home section with nothing in it yet") {
             EmptyCardView(sectionTitle: "Loans", emptyTitle: "No active loans")
+        }
 
+        ShowcaseSection(title: "InsightsStatCard", subtitle: "Total with a change badge and a footer slot") {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: AppSpacing.md) {
                 InsightsStatCard(title: "Income", amount: 640_000, currency: "KZT",
                                  color: AppColors.income, previous: 580_000, upIsGood: true)
@@ -112,21 +125,26 @@ struct ComponentsScreen: View {
 
     // MARK: Summary cards (1.1.0, ported from Tenra)
 
+    @ViewBuilder
     private var summaryCardsSection: some View {
-        ShowcaseSection(title: "Summary cards", subtitle: "TotalsCard · LimitProgressCard · WeightBreakdownCard · CalculationCard") {
+        ShowcaseSection(title: "TotalsCard", subtitle: "Totals side by side with change badges") {
             TotalsCard([
                 .init(title: "Income", amount: 530_000, previous: 480_000, color: AppColors.success),
                 .init(title: "Expenses", amount: 320_000, previous: 350_000, color: AppColors.destructive,
                       increaseIsGood: false),
                 .init(title: "Net", amount: 210_000, previous: 130_000),
             ], currency: "KZT", title: "May 2026")
+        }
 
+        ShowcaseSection(title: "LimitProgressCard", subtitle: "Progress towards a limit") {
             LimitProgressCard(iconSource: .sfSymbol("fork.knife"), title: "Food", color: .orange,
                               spent: 185_000, limit: 250_000, currency: "KZT", percentage: 74,
                               caption: "9 days left")
             LimitProgressCard(iconSource: .sfSymbol("bag.fill"), title: "Shopping", color: AppColors.accent,
                               spent: 132_000, limit: 100_000, currency: "KZT", percentage: 132)
+        }
 
+        ShowcaseSection(title: "WeightBreakdownCard", subtitle: "A whole split into weighted parts") {
             WeightBreakdownCard(
                 title: "How the score works",
                 message: "Each part counts by how much it matters for the whole.",
@@ -139,7 +157,9 @@ struct ComponentsScreen: View {
                 ],
                 footnote: "No budgets set, so their weight is shared among the other parts."
             )
+        }
 
+        ShowcaseSection(title: "CalculationCard", subtitle: "How a figure is calculated") {
             CalculationCard(
                 systemImage: "banknote.fill",
                 color: AppColors.success,
@@ -159,16 +179,21 @@ struct ComponentsScreen: View {
 
     // MARK: Score cards (1.2.0, ported from Tenra)
 
+    @ViewBuilder
     private var scoreCardsSection: some View {
-        ShowcaseSection(title: "Score cards", subtitle: "ScoreGaugeCard · ScoreCard · TargetProgressCard") {
+        ShowcaseSection(title: "ScoreGaugeCard", subtitle: "A score as a hero gauge · no data yet") {
             ScoreGaugeCard(score: 72, zoneTicks: [40, 70], grade: "Good",
                            color: AppColors.success, subtitle: "You're on track")
             ScoreGaugeCard(score: nil, zoneTicks: [40, 70], grade: "Not enough data",
                            color: AppColors.textSecondary, subtitle: "Add a month of income to see your score")
+        }
 
+        ShowcaseSection(title: "ScoreCard", subtitle: "A score in a feed, with a mini gauge") {
             ScoreCard(title: "Health score", grade: "Good", score: 72, color: AppColors.success)
             ScoreCard(title: "Health score", grade: "Needs attention", score: 34, color: AppColors.destructive)
+        }
 
+        ShowcaseSection(title: "TargetProgressCard", subtitle: "A metric against its target · muted") {
             TargetProgressCard(
                 systemImage: "banknote.fill",
                 color: AppColors.success,
@@ -199,14 +224,17 @@ struct ComponentsScreen: View {
 
     // MARK: Period cards (1.2.0, ported from Tenra)
 
+    @ViewBuilder
     private var periodCardsSection: some View {
-        ShowcaseSection(title: "Period cards", subtitle: "ComparisonCard · CashFlowCard (loading / empty / loaded)") {
+        ShowcaseSection(title: "ComparisonCard", subtitle: "Before and now · a rise is bad / good") {
             ComparisonCard(previousLabel: "Jan 2026", previousAmount: 95_000,
                            currentLabel: "Feb 2026", currentAmount: 120_000,
                            currency: "KZT", increaseIsGood: false)
             ComparisonCard(previousLabel: "Jan 2026", previousAmount: 530_000,
                            currentLabel: "Feb 2026", currentAmount: 620_000, currency: "KZT")
+        }
 
+        ShowcaseSection(title: "CashFlowCard", subtitle: "Loading / empty / loaded, cross-faded") {
             Picker("State", selection: $cashFlowState) {
                 ForEach(CashFlowSpecimenState.allCases, id: \.self) { state in
                     Text(state.rawValue).tag(state)
@@ -228,14 +256,17 @@ struct ComponentsScreen: View {
 
     // MARK: Payment cards (1.2.0, ported from Tenra)
 
+    @ViewBuilder
     private var paymentCardsSection: some View {
-        ShowcaseSection(title: "Payment cards", subtitle: "RecurringPaymentCard · PayoffProgressCard") {
+        ShowcaseSection(title: "RecurringPaymentCard", subtitle: "A subscription or a bill · converted amount") {
             RecurringPaymentCard(iconSource: .brandService("Netflix"), title: "Netflix",
                                  amount: 9.99, currency: "USD", baseCurrency: "KZT",
                                  caption: "Next charge on 12 Oct", status: .active)
             RecurringPaymentCard(iconSource: .sfSymbol("dumbbell.fill"), title: "Gym",
                                  amount: 15_000, currency: "KZT", status: .paused)
+        }
 
+        ShowcaseSection(title: "PayoffProgressCard", subtitle: "Being paid off · repaid") {
             PayoffProgressCard(
                 iconSource: .sfSymbol("car.fill"), title: "Car loan", subtitle: "Halyk Bank",
                 remaining: 1_200_000, total: 3_000_000, currency: "KZT", progress: 0.6,
@@ -255,9 +286,9 @@ struct ComponentsScreen: View {
 
     // MARK: List rows (1.1.0, ported from Tenra)
 
+    @ViewBuilder
     private var listRowsSection: some View {
-        ShowcaseSection(title: "NetAmountRow · ScheduleRow · BreakdownRow",
-                        subtitle: "Period totals · schedule entries · parts of a whole") {
+        ShowcaseSection(title: "NetAmountRow", subtitle: "A period's net, with what came in and went out") {
             VStack(spacing: 0) {
                 NetAmountRow(label: "May 2026", inflow: 530_000, outflow: 320_000, net: 210_000, currency: "KZT")
                 Divider()
@@ -268,7 +299,9 @@ struct ComponentsScreen: View {
             }
             .cardContentPadding()
             .cardStyle()
+        }
 
+        ShowcaseSection(title: "ScheduleRow", subtitle: "A schedule entry, done or upcoming") {
             VStack(spacing: AppSpacing.md) {
                 ScheduleRow(title: "#3", subtitle: "12 Mar 2026", amount: 45_000, currency: "KZT",
                             detail: "int: 3 200 ₸", isDone: true)
@@ -277,7 +310,9 @@ struct ComponentsScreen: View {
             }
             .cardContentPadding()
             .cardStyle()
+        }
 
+        ShowcaseSection(title: "BreakdownRow", subtitle: "A part of a whole · AmountPercentageView") {
             VStack(spacing: 0) {
                 BreakdownRow(iconSource: .sfSymbol("fork.knife"), color: AppColors.warning, title: "Food",
                              subtitle: "Groceries, Cafés", amount: 85_000, currency: "KZT", percentage: 42,
@@ -292,68 +327,77 @@ struct ComponentsScreen: View {
 
     // MARK: Rows
 
+    @ViewBuilder
     private var rowsSection: some View {
         ShowcaseSection(title: "InfoRow", subtitle: "Label + value / amount") {
             VStack(spacing: 0) {
                 InfoRow(icon: "calendar", label: "Date", value: "Jun 10, 2026")
                 InfoRow(icon: "creditcard", label: "Paid", amount: 49.90, currency: "USD")
-                HStack {
-                    Text("Tap to open").font(AppTypography.body)
-                    Spacer()
-                    DisclosureChevron()
-                }
-                .padding(.vertical, AppSpacing.sm)
             }
             .cardContentPadding()
             .formCardStyle()
+        }
 
-            DateSectionHeaderView(dateKey: "2026-09-30", amount: 45_000, currency: "KZT")
-
-            VStack(spacing: 0) {
-                InsightEntityRow(iconSource: .sfSymbol("tv.fill"), title: "Streaming",
-                                 subtitle: "3 services", amount: 12_900, currency: "KZT",
-                                 amountCaption: "per month")
-                HStack(spacing: AppSpacing.md) {
-                    SelectionIndicator(isSelected: true)
-                    Text("Selected row").font(AppTypography.body)
-                    Spacer()
-                }
-                .padding(.vertical, AppSpacing.sm)
-                HStack(spacing: AppSpacing.md) {
-                    SelectionIndicator(isSelected: false)
-                    Text("Not selected").font(AppTypography.body)
-                    Spacer()
-                }
-                .padding(.vertical, AppSpacing.sm)
+        ShowcaseSection(title: "DisclosureChevron", subtitle: "Navigation chevron outside a List") {
+            HStack {
+                Text("Tap to open").font(AppTypography.body)
+                Spacer()
+                DisclosureChevron()
             }
+            .padding(.vertical, AppSpacing.sm)
             .cardContentPadding()
-            .cardStyle()
+            .formCardStyle()
+        }
+
+        ShowcaseSection(title: "DateSectionHeaderView", subtitle: "A day in a list, with its total") {
+            DateSectionHeaderView(dateKey: "2026-09-30", amount: 45_000, currency: "KZT")
+        }
+
+        ShowcaseSection(title: "InsightEntityRow", subtitle: "Icon, title and subtitle, amount with a caption") {
+            InsightEntityRow(iconSource: .sfSymbol("tv.fill"), title: "Streaming",
+                             subtitle: "3 services", amount: 12_900, currency: "KZT",
+                             amountCaption: "per month")
+                .cardContentPadding()
+                .cardStyle()
         }
     }
 
     // MARK: Feedback
 
+    @ViewBuilder
     private var feedbackSection: some View {
-        ShowcaseSection(title: "Feedback") {
+        ShowcaseSection(title: "MessageBanner", subtitle: "Success · error · warning · info") {
             VStack(spacing: AppSpacing.sm) {
                 MessageBanner.success("Saved successfully")
                 MessageBanner.error("Failed to load")
                 MessageBanner.warning("Low balance")
                 MessageBanner.info("Sync completed")
             }
+        }
+
+        ShowcaseSection(title: "StatusIndicatorBadge", subtitle: "Active · paused · archived · pending") {
             HStack(spacing: AppSpacing.lg) {
                 StatusIndicatorBadge(status: .active)
                 StatusIndicatorBadge(status: .paused)
                 StatusIndicatorBadge(status: .archived)
                 StatusIndicatorBadge(status: .pending)
             }
+        }
+
+        ShowcaseSection(title: "RecommendationBox", subtitle: "Advice at the bottom of a card") {
             RecommendationBox(text: "You spent 18% less on dining this month.",
                               color: AppColors.success)
+        }
+
+        ShowcaseSection(title: "InlineStatusText", subtitle: "Error · warning · success under a field") {
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 InlineStatusText(message: "Amount must be greater than zero", type: .error)
                 InlineStatusText(message: "Rate is older than 24h", type: .warning)
                 InlineStatusText(message: "Synced just now", type: .success)
             }
+        }
+
+        ShowcaseSection(title: "EmptyStateView", subtitle: "Nothing to show yet") {
             EmptyStateView(icon: "tray", title: "Nothing here yet",
                            description: "Add your first transaction to get started.",
                            style: .standard)
@@ -363,17 +407,22 @@ struct ComponentsScreen: View {
 
     // MARK: Progress
 
+    @ViewBuilder
     private var progressSection: some View {
-        ShowcaseSection(title: "Progress", subtitle: "LinearProgressBar · ProgressRing · AmountComparisonBar · ProportionBar") {
+        ShowcaseSection(title: "LinearProgressBar", subtitle: "Within the limit · over it") {
             VStack(alignment: .leading, spacing: AppSpacing.md) {
-                TokenLabel(name: "LinearProgressBar", value: "72%")
+                TokenLabel(name: "72%")
                 LinearProgressBar(percentage: 72, isOverBudget: false, color: AppColors.accent)
                 TokenLabel(name: "over budget", value: "140%")
                 LinearProgressBar(percentage: 140, isOverBudget: true, color: AppColors.accent)
-                TokenLabel(name: "ProportionBar")
-                ProportionBar(ratio: 0.65, leftColor: AppColors.income, rightColor: AppColors.bgMuted)
             }
+        }
 
+        ShowcaseSection(title: "ProportionBar", subtitle: "One share of two") {
+            ProportionBar(ratio: 0.65, leftColor: AppColors.income, rightColor: AppColors.bgMuted)
+        }
+
+        ShowcaseSection(title: "ProgressRing", subtitle: "45% · 88% · over 100%") {
             HStack(spacing: AppSpacing.xl) {
                 VStack(spacing: AppSpacing.xs) {
                     ProgressRing(progress: 0.45, size: AppIconSize.budgetRing, lineWidth: 5, showsTrack: true)
@@ -389,11 +438,10 @@ struct ComponentsScreen: View {
                 }
             }
             .frame(maxWidth: .infinity)
+        }
 
-            VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                TokenLabel(name: "AmountComparisonBar")
-                AmountComparisonBar(expenseAmount: 921_300, incomeAmount: 640_000, currency: "KZT")
-            }
+        ShowcaseSection(title: "AmountComparisonBar", subtitle: "Expenses against income") {
+            AmountComparisonBar(expenseAmount: 921_300, incomeAmount: 640_000, currency: "KZT")
         }
     }
 }
