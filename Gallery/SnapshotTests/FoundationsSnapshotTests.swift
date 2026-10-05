@@ -43,8 +43,8 @@ extension ComponentSnapshots {
                         .primaryButton(disabled: true)
                     Button {} label: { Text(verbatim: "Secondary").frame(maxWidth: .infinity) }
                         .secondaryButton()
-                    Button {} label: { LoadingButtonLabel("Saving", isLoading: true).frame(maxWidth: .infinity) }
-                        .primaryButton(disabled: true)
+                    // No LoadingButtonLabel(isLoading: true): its spinner turns on a clock, so no
+                    // two captures match (docs/snapshots.md, "Not covered on purpose").
                 },
                 appearances: [.light, .dark, .largeText]
             )

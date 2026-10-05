@@ -16,7 +16,7 @@ appearances it lists:
 
 | File | Components |
 |---|---|
-| `FoundationsSnapshotTests` | typography scale, primary / secondary / loading buttons, `cardStyle`, filter chips, Dalada's accent through `DesignKitTheme.accent` |
+| `FoundationsSnapshotTests` | typography scale, primary / secondary buttons (enabled, disabled), `cardStyle`, filter chips, Dalada's accent through `DesignKitTheme.accent` |
 | `RowsSnapshotTests` | `UniversalRow`, `ActionSettingsRow`, `ToggleSettingsRow`, `InfoRow`, `SectionHeaderView`, `SelectionIndicator` |
 | `FormsSnapshotTests` | `FormSection`, `DatePickerRow`, `MenuPickerRow`, `SettingsSectionHeaderView`, `HeroSection` |
 | `IconsSnapshotTests` | `IconView` (category, circle, rounded square, glass hero, placeholder, brand fallback), `BrandLogoView`, `PackedCircleIconsView` |
@@ -35,9 +35,9 @@ text size AX2, which catches truncation and clipping). References live in
 Not covered on purpose:
 - views that animate continuously on a clock, so no two frames match: `SiriGlowView`,
   `SiriWaveRecordingView`, `AccentGlow`, `.borderBeam()`, and the skeleton shimmer
-  (`SkeletonView`, `SkeletonRow`, `.skeleton`, the loading state of `CashFlowCard`). Reduce
-  Motion stops the shimmer, but SwiftUI does not let a test set it (`accessibilityReduceMotion`
-  is read-only);
+  (`SkeletonView`, `SkeletonRow`, `.skeleton`, the loading state of `CashFlowCard`), and the
+  spinner of `LoadingButtonLabel(isLoading: true)`. Reduce Motion stops the shimmer, but
+  SwiftUI does not let a test set it (`accessibilityReduceMotion` is read-only);
 - views whose content depends on today's date: `DateButtonsView`, `DateSectionHeaderView`;
 - `ConvertedAmountView` (and `RecurringPaymentCard`'s converted line), which waits for the host
   app's currency converter;
