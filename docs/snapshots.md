@@ -84,7 +84,7 @@ under another shows a faint copy of its neighbour's content along the edge and i
 reflection is stable within a run but appears in some runs and not in others, so a test that
 puts two glass cards side by side failed now and then with nothing changed (`financeCards`,
 `scoreCards`, `statCards` in October 2026). Give each glass card its own snapshot with
-`assertComponentSnapshot(_:named:…)` (`<test>.<named>.<appearance>.png`); a row of chips or
+`assertComponentSnapshot(_:named:…)` (`<test>.<named>-<appearance>.png`); a row of chips or
 buttons that belongs together stays one snapshot.
 
 ## CI

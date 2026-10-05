@@ -121,9 +121,9 @@ rather than importing an app type.
 3. Replace app dependencies per the decision tree above. Leave a one-line comment naming what
    stayed in the app.
 4. Add a Gallery specimen (one `ShowcaseSection` per component, so it gets its own page, in
-   an existing screen file or a new one + `xcodegen generate`) and a snapshot test (one
-   Liquid Glass card per snapshot, `named:` tells them apart) (`Gallery/SnapshotTests`), then record it with a manual CI run,
-   `record_snapshots: missing` (docs/snapshots.md).
+   an existing screen file or a new one + `xcodegen generate`) and a snapshot test in
+   `Gallery/SnapshotTests` (one Liquid Glass card per snapshot; `named:` tells them apart),
+   then record it with a manual CI run, `record_snapshots: missing` (docs/snapshots.md).
 5. Add any new `String(localized:)` key to `docs/localization-keys.md` and its English value
    to `Gallery/Gallery/Localizable.xcstrings`.
 6. Update `docs/design-system.md` (§0 inventory + the component's section).

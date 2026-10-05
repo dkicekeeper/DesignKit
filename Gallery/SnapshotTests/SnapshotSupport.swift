@@ -43,7 +43,7 @@ struct ComponentSnapshots {}
 /// The view sits on `AppColors.bgBase` with `AppSpacing.lg` around it, animations off; the PNG
 /// is the view's own frame.
 ///
-/// - Parameter named: Tells several snapshots of one test apart (`<test>.<named>.<appearance>.png`).
+/// - Parameter named: Tells several snapshots of one test apart (`<test>.<named>-<appearance>.png`).
 ///   Give each Liquid Glass card its own snapshot: glass reflects a card next to it, and whether
 ///   that reflection shows varies from run to run (docs/snapshots.md).
 @MainActor
