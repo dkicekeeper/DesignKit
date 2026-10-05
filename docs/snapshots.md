@@ -16,7 +16,7 @@ appearances it lists:
 
 | File | Components |
 |---|---|
-| `FoundationsSnapshotTests` | typography scale, primary / secondary / loading buttons, `cardStyle`, filter chips, Dalada's accent through `DesignKitTheme.accent` |
+| `FoundationsSnapshotTests` | typography scale, primary / secondary buttons (enabled, disabled), `cardStyle`, filter chips, Dalada's accent through `DesignKitTheme.accent` |
 | `RowsSnapshotTests` | `UniversalRow`, `ActionSettingsRow`, `ToggleSettingsRow`, `InfoRow`, `SectionHeaderView`, `SelectionIndicator` |
 | `FormsSnapshotTests` | `FormSection`, `DatePickerRow`, `MenuPickerRow`, `SettingsSectionHeaderView`, `HeroSection` |
 | `IconsSnapshotTests` | `IconView` (category, circle, rounded square, glass hero, placeholder, brand fallback), `BrandLogoView`, `PackedCircleIconsView` |
@@ -35,9 +35,9 @@ text size AX2, which catches truncation and clipping). References live in
 Not covered on purpose:
 - views that animate continuously on a clock, so no two frames match: `SiriGlowView`,
   `SiriWaveRecordingView`, `AccentGlow`, `.borderBeam()`, and the skeleton shimmer
-  (`SkeletonView`, `SkeletonRow`, `.skeleton`, the loading state of `CashFlowCard`). Reduce
-  Motion stops the shimmer, but SwiftUI does not let a test set it (`accessibilityReduceMotion`
-  is read-only);
+  (`SkeletonView`, `SkeletonRow`, `.skeleton`, the loading state of `CashFlowCard`), and the
+  spinner of `LoadingButtonLabel(isLoading: true)`. Reduce Motion stops the shimmer, but
+  SwiftUI does not let a test set it (`accessibilityReduceMotion` is read-only);
 - views whose content depends on today's date: `DateButtonsView`, `DateSectionHeaderView`;
 - `ConvertedAmountView` (and `RecurringPaymentCard`'s converted line), which waits for the host
   app's currency converter;
@@ -59,8 +59,11 @@ All of them have a specimen in the Gallery.
   360 pt wide, `AppSpacing.lg` around it, `AppColors.bgBase` behind, animations off, US
   English locale. It waits 1.5 s for `onAppear` and layout, measures the view again and
   resizes the window if it grew (a view that measures itself, like `ExpandableText` adding its
-  More button, would otherwise be cut off at the top and bottom), then captures until two
-  frames in a row are identical (Liquid Glass animates its shadow for a moment). The PNG is the
+  More button, would otherwise be cut off at the top and bottom), then captures every 0.4 s
+  until three frames in a row are identical, for up to 8 s (Liquid Glass animates its shadow
+  for a moment; two frames were not enough between stacked cards, whose shadows can hold still
+  for one interval and move again). A snapshot that never settles prints
+  `SNAPSHOT-UNSETTLED <test>.<appearance>` to the log. The PNG is the
   component's own frame: the shadow glass casts around a card falls outside it, and the
   simulator renders that shadow a little differently from run to run, while the component's
   own pixels do not change. Then it compares with
@@ -76,11 +79,22 @@ All of them have a specimen in the Gallery.
   360 pt component is exactly the Pro Max's 440 pt; a test whose window does not fit fails
   with "does not fit the screen", so split it or narrow it.
 
+**One Liquid Glass card per snapshot.** Glass reflects what lies next to it: a card beside or
+under another shows a faint copy of its neighbour's content along the edge and in the gap. That
+reflection is stable within a run but appears in some runs and not in others, so a test that
+puts two glass cards side by side failed now and then with nothing changed (`financeCards`,
+`scoreCards`, `statCards` in October 2026). Give each glass card its own snapshot with
+`assertComponentSnapshot(_:named:…)` (`<test>.<named>-<appearance>.png`); a row of chips or
+buttons that belongs together stays one snapshot.
+
 ## CI
 
 The `Snapshot tests` job in `.github/workflows/ci.yml` runs `scripts/snapshot-tests.sh` on
 every push and PR. On a failure it uploads the images that differ as the `failing-snapshots`
-artifact. Open them next to the references in the PR's diff.
+artifact. Open them next to the references in the PR's diff. The job log has the same in
+text: the library's message for each failing image (which reference, how much it differs)
+under "Snapshot differences", and each failing image base64-encoded between
+`BEGIN-SNAPSHOT-PNG <path>` and `END-SNAPSHOT-PNG` (decode with `base64 -d`).
 
 The job pins **Xcode 26.6** and picks **iPhone 17 Pro Max** on the newest installed iOS
 runtime. References depend on the iOS runtime (glass, text rendering). So moving the pin is

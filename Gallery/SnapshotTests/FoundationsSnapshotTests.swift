@@ -43,8 +43,8 @@ extension ComponentSnapshots {
                         .primaryButton(disabled: true)
                     Button {} label: { Text(verbatim: "Secondary").frame(maxWidth: .infinity) }
                         .secondaryButton()
-                    Button {} label: { LoadingButtonLabel("Saving", isLoading: true).frame(maxWidth: .infinity) }
-                        .primaryButton(disabled: true)
+                    // No LoadingButtonLabel(isLoading: true): its spinner turns on a clock, so no
+                    // two captures match (docs/snapshots.md, "Not covered on purpose").
                 },
                 appearances: [.light, .dark, .largeText]
             )
@@ -52,23 +52,25 @@ extension ComponentSnapshots {
 
         @Test func cardAndChips() async {
             await assertComponentSnapshot(
-                VStack(alignment: .leading, spacing: AppSpacing.lg) {
-                    VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                        Text(verbatim: "Card title")
-                            .font(AppTypography.h4)
-                        Text(verbatim: "cardStyle() is a Liquid Glass surface")
-                            .font(AppTypography.bodySmall)
-                            .foregroundStyle(AppColors.textSecondary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .cardContentPadding()
-                    .cardStyle()
-
-                    HStack(spacing: AppSpacing.sm) {
-                        Text(verbatim: "Selected").filterChipStyle(isSelected: true)
-                        Text(verbatim: "Chip").filterChipStyle()
-                    }
+                VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                    Text(verbatim: "Card title")
+                        .font(AppTypography.h4)
+                    Text(verbatim: "cardStyle() is a Liquid Glass surface")
+                        .font(AppTypography.bodySmall)
+                        .foregroundStyle(AppColors.textSecondary)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .cardContentPadding()
+                .cardStyle(),
+                named: "card"
+            )
+            await assertComponentSnapshot(
+                HStack(spacing: AppSpacing.sm) {
+                    Text(verbatim: "Selected").filterChipStyle(isSelected: true)
+                    Text(verbatim: "Chip").filterChipStyle()
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                named: "chips"
             )
         }
 

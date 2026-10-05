@@ -32,13 +32,15 @@ extension ComponentSnapshots {
 
         @Test func limitProgressCards() async {
             await assertComponentSnapshot(
-                VStack(spacing: AppSpacing.lg) {
-                    LimitProgressCard(iconSource: .sfSymbol("fork.knife"), title: "Food", color: .orange,
-                                      spent: 185_000, limit: 250_000, currency: "KZT", percentage: 74,
-                                      caption: "9 days left")
-                    LimitProgressCard(iconSource: .sfSymbol("bag.fill"), title: "Shopping", color: AppColors.accent,
-                                      spent: 132_000, limit: 100_000, currency: "KZT", percentage: 132)
-                }
+                LimitProgressCard(iconSource: .sfSymbol("fork.knife"), title: "Food", color: .orange,
+                                  spent: 185_000, limit: 250_000, currency: "KZT", percentage: 74,
+                                  caption: "9 days left"),
+                named: "within"
+            )
+            await assertComponentSnapshot(
+                LimitProgressCard(iconSource: .sfSymbol("bag.fill"), title: "Shopping", color: AppColors.accent,
+                                  spent: 132_000, limit: 100_000, currency: "KZT", percentage: 132),
+                named: "over"
             )
         }
 
@@ -110,64 +112,78 @@ extension ComponentSnapshots {
 
         @Test func comparisonCards() async {
             await assertComponentSnapshot(
-                VStack(spacing: AppSpacing.md) {
-                    ComparisonCard(previousLabel: "Jan 2026", previousAmount: 95_000,
-                                   currentLabel: "Feb 2026", currentAmount: 120_000,
-                                   currency: "KZT", increaseIsGood: false)
-                    ComparisonCard(previousLabel: "Jan 2026", previousAmount: 530_000,
-                                   currentLabel: "Feb 2026", currentAmount: 620_000, currency: "KZT")
-                    ComparisonCard(previousLabel: "Jan 2026", previousAmount: 100_000,
-                                   currentLabel: "Feb 2026", currentAmount: 101_000, currency: "KZT")
-                },
+                ComparisonCard(previousLabel: "Jan 2026", previousAmount: 95_000,
+                               currentLabel: "Feb 2026", currentAmount: 120_000,
+                               currency: "KZT", increaseIsGood: false),
+                named: "riseIsBad",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                ComparisonCard(previousLabel: "Jan 2026", previousAmount: 530_000,
+                               currentLabel: "Feb 2026", currentAmount: 620_000, currency: "KZT"),
+                named: "riseIsGood",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                ComparisonCard(previousLabel: "Jan 2026", previousAmount: 100_000,
+                               currentLabel: "Feb 2026", currentAmount: 101_000, currency: "KZT"),
+                named: "flat",
                 appearances: [.light, .dark, .largeText]
             )
         }
 
         @Test func cashFlowCards() async {
             await assertComponentSnapshot(
-                VStack(spacing: AppSpacing.md) {
-                    CashFlowCard(
-                        title: "History",
-                        totals: .init(income: 50_000, expenses: 35_000,
-                                      extra: .init(label: "Planned", amount: 5_000)),
-                        currency: "KZT",
-                        emptyMessage: "No transactions yet"
-                    )
-                    CashFlowCard(title: "History", totals: nil, currency: "KZT", isEmpty: true,
-                                 emptyMessage: "No transactions yet")
-                }
+                CashFlowCard(
+                    title: "History",
+                    totals: .init(income: 50_000, expenses: 35_000,
+                                  extra: .init(label: "Planned", amount: 5_000)),
+                    currency: "KZT",
+                    emptyMessage: "No transactions yet"
+                ),
+                named: "loaded"
+            )
+            await assertComponentSnapshot(
+                CashFlowCard(title: "History", totals: nil, currency: "KZT", isEmpty: true,
+                             emptyMessage: "No transactions yet"),
+                named: "empty"
             )
         }
 
         @Test func recurringPaymentCards() async {
             await assertComponentSnapshot(
-                VStack(spacing: AppSpacing.md) {
-                    RecurringPaymentCard(iconSource: .sfSymbol("play.tv.fill"), title: "Streaming",
-                                         amount: 4_990, currency: "KZT",
-                                         caption: "Next charge on 12 Oct", status: .active)
-                    RecurringPaymentCard(iconSource: .sfSymbol("dumbbell.fill"), title: "Gym",
-                                         amount: 15_000, currency: "KZT", status: .paused)
-                },
+                RecurringPaymentCard(iconSource: .sfSymbol("play.tv.fill"), title: "Streaming",
+                                     amount: 4_990, currency: "KZT",
+                                     caption: "Next charge on 12 Oct", status: .active),
+                named: "active",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                RecurringPaymentCard(iconSource: .sfSymbol("dumbbell.fill"), title: "Gym",
+                                     amount: 15_000, currency: "KZT", status: .paused),
+                named: "paused",
                 appearances: [.light, .dark, .largeText]
             )
         }
 
         @Test func payoffProgressCards() async {
             await assertComponentSnapshot(
-                VStack(spacing: AppSpacing.md) {
-                    PayoffProgressCard(
-                        iconSource: .sfSymbol("car.fill"), title: "Car loan", subtitle: "Halyk Bank",
-                        remaining: 1_200_000, total: 3_000_000, currency: "KZT", progress: 0.6,
-                        phase: .inProgress(nextDate: "12 Nov 2026", remainingCaption: "18 left")
-                    ) {
-                        BadgeView("Credit", color: AppColors.expense)
-                    }
-                    PayoffProgressCard(
-                        iconSource: .sfSymbol("iphone"), title: "Phone", subtitle: "Kaspi",
-                        remaining: 0, total: 480_000, currency: "KZT", progress: 1,
-                        phase: .done(caption: "Closed 15 Jun 2026")
-                    )
-                }
+                PayoffProgressCard(
+                    iconSource: .sfSymbol("car.fill"), title: "Car loan", subtitle: "Halyk Bank",
+                    remaining: 1_200_000, total: 3_000_000, currency: "KZT", progress: 0.6,
+                    phase: .inProgress(nextDate: "12 Nov 2026", remainingCaption: "18 left")
+                ) {
+                    BadgeView("Credit", color: AppColors.expense)
+                },
+                named: "inProgress"
+            )
+            await assertComponentSnapshot(
+                PayoffProgressCard(
+                    iconSource: .sfSymbol("iphone"), title: "Phone", subtitle: "Kaspi",
+                    remaining: 0, total: 480_000, currency: "KZT", progress: 1,
+                    phase: .done(caption: "Closed 15 Jun 2026")
+                ),
+                named: "done"
             )
         }
 
