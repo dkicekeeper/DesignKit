@@ -48,7 +48,7 @@ struct TrendChartsScreen: View {
     }
 
     private var signedSection: some View {
-        ShowcaseSection(title: "LineChart · signed series", subtitle: "Green above zero, red below, dashed zero rule") {
+        ShowcaseSection(title: "LineChart", subtitle: "Signed series: green above zero, red below, dashed zero rule") {
             LineChart(dataPoints: months, series: netFlow, valueFormat: .currency("KZT"), todayText: "Today")
                 .padding(.horizontal, -AppSpacing.lg)
         }

@@ -49,7 +49,7 @@ struct InputsScreen: View {
                 ])
             }
 
-            ShowcaseSection(title: "Calculator", subtitle: "CalculatorAmountDisplay + CalculatorKeypad") {
+            ShowcaseSection(title: "CalculatorKeypad", subtitle: "Drives a CalculatorAmountDisplay") {
                 VStack(spacing: AppSpacing.md) {
                     CalculatorAmountDisplay(model: calc, baseFontSize: 44)
                         .frame(maxWidth: .infinity)
@@ -59,36 +59,61 @@ struct InputsScreen: View {
                 .cardStyle()
             }
 
-            ShowcaseSection(title: "OrbChart / MiniDonut", subtitle: "Breakdown sphere + compact ring for any [DonutSlice]") {
+            ShowcaseSection(title: "OrbChart", subtitle: "Breakdown sphere for any [DonutSlice]") {
                 OrbChart(slices: slices, size: 240)
                     .frame(height: 280)
                     .frame(maxWidth: .infinity)
-                HStack(spacing: AppSpacing.xl) {
-                    MiniDonut(slices: slices)
-                        .frame(width: 80, height: 80)
-                    MiniProportionBar(segments: slices)
-                        .frame(maxWidth: .infinity)
-                }
+            }
+
+            ShowcaseSection(title: "MiniDonut", subtitle: "Compact ring for cards") {
+                MiniDonut(slices: slices)
+                    .frame(width: 80, height: 80)
+            }
+
+            ShowcaseSection(title: "MiniProportionBar", subtitle: "Compact stacked bar for cards") {
+                MiniProportionBar(segments: slices)
+                    .frame(maxWidth: .infinity)
+            }
+
+            ShowcaseSection(title: "HeroProportionBar", subtitle: "Stacked bar with a legend") {
                 HeroProportionBar(segments: slices, currency: "KZT")
             }
 
-            ShowcaseSection(title: "Gauges", subtitle: "Hero / Mini half-gauge and milestone gauge") {
+            ShowcaseSection(title: "HeroHalfGauge", subtitle: "Half-gauge with a norm and zone ticks") {
                 HeroHalfGauge(value: 0.62, norm: 0.5, maxValue: 1, zoneTicks: [0.3, 0.7], color: AppColors.success, diameter: 220)
                     .frame(maxWidth: .infinity)
-                HeroMilestoneGauge(value: 4.2, target: 6, maxValue: 12, color: AppColors.accent)
-                HStack(spacing: AppSpacing.lg) {
-                    MiniHalfGauge(value: 0.62, norm: 0.5, maxValue: 1, color: AppColors.success)
-                    MiniMilestoneGauge(value: 4.2, target: 6, maxValue: 12, color: AppColors.accent)
-                }
             }
 
-            ShowcaseSection(title: "Bar pairs", subtitle: "Previous vs current period") {
+            ShowcaseSection(title: "MiniHalfGauge", subtitle: "Compact half-gauge for cards") {
+                MiniHalfGauge(value: 0.62, norm: 0.5, maxValue: 1, color: AppColors.success)
+            }
+
+            ShowcaseSection(title: "HeroMilestoneGauge", subtitle: "Progress towards a target on a scale") {
+                HeroMilestoneGauge(value: 4.2, target: 6, maxValue: 12, color: AppColors.accent)
+            }
+
+            ShowcaseSection(title: "MiniMilestoneGauge", subtitle: "Compact milestone gauge for cards") {
+                MiniMilestoneGauge(value: 4.2, target: 6, maxValue: 12, color: AppColors.accent)
+            }
+
+            ShowcaseSection(title: "HeroBarPair", subtitle: "Previous vs current period") {
                 HeroBarPair(previous: 320_000, current: 280_000, color: AppColors.accent, currency: "KZT")
                     .frame(maxWidth: .infinity)
+            }
+
+            ShowcaseSection(title: "MiniBarPair", subtitle: "Compact pair for cards · projection") {
                 MiniBarPair(previous: 320_000, current: 280_000, color: AppColors.accent, isProjection: true)
             }
 
-            ShowcaseSection(title: "UniversalCarousel + UniversalFilterButton", subtitle: "The only horizontal scroller · filter chips") {
+            ShowcaseSection(title: "UniversalFilterButton", subtitle: "A filter chip") {
+                HStack(spacing: AppSpacing.sm) {
+                    ForEach(["week", "month"], id: \.self) { key in
+                        UniversalFilterButton(title: key.capitalized, isSelected: filter == key, onTap: { filter = key })
+                    }
+                }
+            }
+
+            ShowcaseSection(title: "UniversalCarousel", subtitle: "The only horizontal scroller") {
                 UniversalCarousel(config: .filter) {
                     ForEach(["week", "month", "year", "all"], id: \.self) { key in
                         UniversalFilterButton(title: key.capitalized, isSelected: filter == key, onTap: { filter = key })

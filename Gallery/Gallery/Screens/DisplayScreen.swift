@@ -92,8 +92,9 @@ struct DisplayScreen: View {
 
     // MARK: Rating
 
+    @ViewBuilder
     private var ratingSection: some View {
-        ShowcaseSection(title: "RatingView · RatingPicker", subtitle: "Half stars from .25 · tap to rate") {
+        ShowcaseSection(title: "RatingView", subtitle: "Half stars from .25") {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 ForEach([4.8, 3.4, 2.0, 0.3], id: \.self) { value in
                     HStack {
@@ -102,6 +103,9 @@ struct DisplayScreen: View {
                     }
                 }
             }
+        }
+
+        ShowcaseSection(title: "RatingPicker", subtitle: "Tap to rate") {
             RatingPicker(rating: $rating)
         }
     }
@@ -117,7 +121,7 @@ struct DisplayScreen: View {
     // MARK: Selection
 
     private var selectionSection: some View {
-        ShowcaseSection(title: "SelectionIndicator · LinearProgressBar(value:)", subtitle: "Checklist rows · plain progress") {
+        ShowcaseSection(title: "SelectionIndicator", subtitle: "Checklist rows, over a LinearProgressBar(value:)") {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 LinearProgressBar(value: Double(checked.count) / 3, color: AppColors.success, height: 6)
                 ForEach(["Tent", "Sleeping bag", "Headlamp"], id: \.self) { item in
