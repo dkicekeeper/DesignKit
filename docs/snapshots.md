@@ -80,7 +80,10 @@ All of them have a specimen in the Gallery.
 
 The `Snapshot tests` job in `.github/workflows/ci.yml` runs `scripts/snapshot-tests.sh` on
 every push and PR. On a failure it uploads the images that differ as the `failing-snapshots`
-artifact. Open them next to the references in the PR's diff.
+artifact. Open them next to the references in the PR's diff. The job log has the same in
+text: the library's message for each failing image (which reference, how much it differs)
+under "Snapshot differences", and each failing image base64-encoded between
+`BEGIN-SNAPSHOT-PNG <path>` and `END-SNAPSHOT-PNG` (decode with `base64 -d`).
 
 The job pins **Xcode 26.6** and picks **iPhone 17 Pro Max** on the newest installed iOS
 runtime. References depend on the iOS runtime (glass, text rendering). So moving the pin is

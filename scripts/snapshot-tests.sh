@@ -53,4 +53,23 @@ xcodebuild test \
   2>&1 | tee snapshot-test.log | grep -aE "error:|failed|recorded|Test run with|\*\* TEST (SUCCEEDED|FAILED)"
 set -e
 
-grep -aq "\*\* TEST SUCCEEDED \*\*" snapshot-test.log
+if grep -aq "\*\* TEST SUCCEEDED \*\*" snapshot-test.log; then
+  exit 0
+fi
+# Recording reports every written image as a failure: nothing to diagnose.
+[ "$RECORD" = never ] || exit 1
+
+# A failure is diagnosable from the job log alone (the artifact is not always at hand):
+# the snapshot library's message for each failing image (which reference, how much it
+# differs), then each failing image base64-encoded (decode with `base64 -d`).
+echo "::group::Snapshot differences"
+grep -aE -B2 -A12 "does not match reference" snapshot-test.log || true
+echo "::endgroup::"
+find "$ARTIFACTS" -name '*.png' -type f | sort | while read -r png; do
+  echo "::group::base64 ${png#"$ARTIFACTS"/}"
+  echo "BEGIN-SNAPSHOT-PNG ${png#"$ARTIFACTS"/}"
+  base64 < "$png"
+  echo "END-SNAPSHOT-PNG"
+  echo "::endgroup::"
+done
+exit 1
