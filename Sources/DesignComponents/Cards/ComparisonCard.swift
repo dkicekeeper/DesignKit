@@ -15,6 +15,7 @@ import DesignSupport
 ///
 /// A change within ±`flatThreshold` percent reads as flat. With `increaseIsGood: false`
 /// (spending, for example) a rise is drawn in the destructive colour and a fall in success.
+/// At accessibility text sizes the three columns stack: before, now, then the change.
 ///
 /// ```swift
 /// ComparisonCard(previousLabel: "Jan 2026", previousAmount: 95_000,
@@ -29,6 +30,8 @@ public struct ComparisonCard: View {
     let currency: String
     let increaseIsGood: Bool
     let flatThreshold: Double
+
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     /// - Parameters:
     ///   - increaseIsGood: A rise is green when `true`, red when `false`.
@@ -69,6 +72,19 @@ public struct ComparisonCard: View {
     }
 
     public var body: some View {
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                stackedLayout
+            } else {
+                rowLayout
+            }
+        }
+        .padding(AppSpacing.lg)
+        .cardStyle()
+    }
+
+    /// Before | change | now, side by side.
+    private var rowLayout: some View {
         HStack {
             // Previous period
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
@@ -110,7 +126,44 @@ public struct ComparisonCard: View {
                 )
             }
         }
-        .padding(AppSpacing.lg)
-        .cardStyle()
+    }
+
+    /// Accessibility text sizes: the three columns do not fit side by side, so they stack.
+    private var stackedLayout: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
+            VStack(alignment: .leading, spacing: AppSpacing.xxs) {
+                Text(previousLabel)
+                    .font(AppTypography.bodySmall)
+                    .foregroundStyle(AppColors.textSecondary)
+                FormattedAmountText(
+                    amount: previousAmount,
+                    currency: currency,
+                    fontSize: AppTypography.h3,
+                    fontWeight: .semibold,
+                    color: AppColors.textSecondary
+                )
+            }
+
+            VStack(alignment: .leading, spacing: AppSpacing.xxs) {
+                Text(currentLabel)
+                    .font(AppTypography.bodySmall)
+                    .foregroundStyle(AppColors.textSecondary)
+                FormattedAmountText(
+                    amount: currentAmount,
+                    currency: currency,
+                    fontSize: AppTypography.h3,
+                    fontWeight: .bold,
+                    color: AppColors.textPrimary
+                )
+            }
+
+            TrendBadge(
+                direction: direction,
+                changePercent: change,
+                style: .inline,
+                color: changeColor
+            )
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

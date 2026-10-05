@@ -25,6 +25,8 @@ public struct InsightEntityRow<Subtitle: View>: View {
     var amountCaption: String? = nil
     @ViewBuilder let subtitle: () -> Subtitle
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     public init(
         iconSource: IconSource?,
         title: String,
@@ -44,30 +46,53 @@ public struct InsightEntityRow<Subtitle: View>: View {
     }
 
     public var body: some View {
-        UniversalRow(
-            config: .info,
-            leadingIcon: iconSource.map { .auto(source: $0, size: AppIconSize.xxl) }
-        ) {
-            VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                Text(title)
-                    .font(AppTypography.body)
-                    .foregroundStyle(AppColors.textPrimary)
-                subtitle()
-            }
-        } trailing: {
-            VStack(alignment: .trailing, spacing: AppSpacing.xs) {
-                FormattedAmountText(
-                    amount: amount,
-                    currency: currency,
-                    fontSize: AppTypography.body,
-                    fontWeight: .semibold,
-                    color: amountColor
-                )
-                if let amountCaption {
-                    Text(amountCaption)
-                        .font(AppTypography.bodySmall)
-                        .foregroundStyle(AppColors.textSecondary)
+        if dynamicTypeSize.isAccessibilitySize {
+            // Accessibility text sizes: the amount moves under the title, which then has the
+            // row's full width and does not break mid-word.
+            UniversalRow(
+                config: .info,
+                leadingIcon: iconSource.map { .auto(source: $0, size: AppIconSize.xxl) }
+            ) {
+                VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                    Text(title)
+                        .font(AppTypography.body)
+                        .foregroundStyle(AppColors.textPrimary)
+                    subtitle()
+                    amountStack(alignment: .leading)
                 }
+            } trailing: {
+                EmptyView()
+            }
+        } else {
+            UniversalRow(
+                config: .info,
+                leadingIcon: iconSource.map { .auto(source: $0, size: AppIconSize.xxl) }
+            ) {
+                VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                    Text(title)
+                        .font(AppTypography.body)
+                        .foregroundStyle(AppColors.textPrimary)
+                    subtitle()
+                }
+            } trailing: {
+                amountStack(alignment: .trailing)
+            }
+        }
+    }
+
+    private func amountStack(alignment: HorizontalAlignment) -> some View {
+        VStack(alignment: alignment, spacing: AppSpacing.xs) {
+            FormattedAmountText(
+                amount: amount,
+                currency: currency,
+                fontSize: AppTypography.body,
+                fontWeight: .semibold,
+                color: amountColor
+            )
+            if let amountCaption {
+                Text(amountCaption)
+                    .font(AppTypography.bodySmall)
+                    .foregroundStyle(AppColors.textSecondary)
             }
         }
     }
