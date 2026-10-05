@@ -361,7 +361,7 @@ Every row in `Views/Components/Rows/` follows these token rules. New rows MUST c
 
 | Slot | Token | Notes |
 |------|-------|-------|
-| **Leading icon — content rows** | `AppIconSize.xxl` (44) | AccountRow, CategoryRow, CategoryBreakdownRow, InsightEntityRow, BudgetProgressRow |
+| **Leading icon — content rows** | `AppIconSize.xxl` (44) | AccountRow, CategoryRow, BreakdownRow, InsightEntityRow, LimitProgressCard |
 | **Leading icon — form rows** | `AppIconSize.lg` (24) | InfoRow, MenuPickerRow, DatePickerRow |
 | **Leading icon — settings rows** | `AppIconSize.md` (20) | ActionSettingsRow, NavigationSettingsRow |
 | **HStack spacing (icon ↔ content)** | `AppSpacing.md` (12) | All rows |
@@ -373,7 +373,7 @@ Every row in `Views/Components/Rows/` follows these token rules. New rows MUST c
 | **Horizontal inset** | per-row `.screenPadding()` | Rows declare `hPad 0` (UniversalRow `.info`) and own their inset at the call site, so the full width — incl. padding — is tappable inside `NavigationLink`. Lists do NOT wrap the whole `VStack` (would double-pad self-padding `SectionHeaderView(.large)`) |
 | **Navigation chevron (outside `List`)** | `DisclosureChevron` | `chevron.forward` (RTL-aware) + tertiary. Never hand-roll `chevron.right` |
 
-**Shared row sub-components:** `AmountPercentageView` (amount + %), `SpentBudgetText` (spent / budget), `DisclosureChevron`, `PeriodBreakdownRow`, `BudgetProgressRow`. Reuse before building a new row.
+**Shared row sub-components:** `AmountPercentageView` (amount + %), `SpentBudgetText` (spent / budget), `DisclosureChevron`, `NetAmountRow`, `LimitProgressCard`. Reuse before building a new row.
 
 #### `InfoRow`
 Read-only label + value. Wrapper for `UniversalRow(config: .info)`.
@@ -403,6 +403,9 @@ A label with a net amount (destructive when negative) and "+inflow −outflow" u
 
 #### `ScheduleRow` *(1.1.0)*
 A schedule entry: a checked circle when `isDone` (the row is dimmed with `futureTransactionStyle` when not), title + date subtitle, the amount and an optional detail line under it (`detailColor`, `AppColors.expense` by default). Tenra: `AmortizationScheduleRow` (payment number, date format, interest) is an adapter.
+
+#### `BreakdownRow` *(1.2.0)*
+One part of a breakdown on `UniversalRow(.info)`: a 44 pt circle icon tinted with `color`, the title and an optional one-line subtitle, `AmountPercentageView` (the amount over "42.0%") and, with `showsChevron: true`, a `DisclosureChevron` (wrap the row in a `NavigationLink`). `AmountPercentageView` is public for other rows. Tenra: `CategoryBreakdownRow` (category name, subcategories) is an adapter.
 
 #### `DatePickerRow`
 Inline `DatePicker` inside `UniversalRow`.
@@ -491,7 +494,7 @@ FinanceCard(
 - Don't reintroduce the inline `HStack(.top, md) → VStack(.leading, lg) → title → if isEmpty …` shell in a new finance card — wrap `FinanceCard`.
 
 #### `RecommendationBox`
-Tinted "lightbulb + advice" callout (icon + text on `color.opacity(0.10)`, `AppRadius.md`). Shared by `InsightFormulaCard` and `HealthComponentCard`. Use for any card-bottom recommendation line.
+Tinted "lightbulb + advice" callout (icon + text on `color.opacity(0.10)`, `AppRadius.md`). Shared by `CalculationCard` and `TargetProgressCard`. Use for any card-bottom recommendation line.
 
 #### `EmptyCardView`
 Distinct from `FinanceCard`'s inline empty state: a standalone, optionally-tappable empty card (section title + compact empty message) for empty home sections that act as an "add first item" CTA.
@@ -507,6 +510,27 @@ How a whole splits into weighted parts: title, explanation, a quieter caption, o
 
 #### `CalculationCard` *(1.1.0)*
 "How it's calculated": icon + title, an optional headline value (`heroLabel` / `heroValue`; `nil` hides it when the screen shows the figure above), rows `label …… value` (`.amount(_:currency:)` through `FormattedAmountText`, or pre-formatted `.text`), the `isEmphasised` result row in the card's colour, an explanation and a `RecommendationBox`. Tenra: `InsightFormulaCard` maps its formula model onto it.
+
+#### `ComparisonCard` *(1.2.0)*
+Two amounts, before (leading, secondary, semibold) and now (trailing, bold), with a `TrendBadge(.changeIndicator)` between them. A change within ±`flatThreshold` percent (2 by default) reads as flat; `increaseIsGood: false` turns a rise red and a fall green. Tenra: `PeriodComparisonCard` (`isExpenseContext`) is an adapter.
+
+#### `CashFlowCard` *(1.2.0)*
+Money in against money out: the title (h3), `AmountComparisonBar` and an optional extra line (`Totals.extra`, e.g. "Planned"). `isEmpty` shows `EmptyCardView` with the same title; `totals == nil` shows a skeleton in the card's shape (`loadingLabel` for VoiceOver, key `skeleton.loading` by default). The three states cross-fade with `AppAnimation.gentleSpring`. Tenra: `TransactionsSummaryCard` (home screen) is an adapter.
+
+#### `ScoreGaugeCard` *(1.2.0)*
+A score as a hero: `HeroHalfGauge` (220 pt, 16 pt line, `zoneTicks`) with the score (h1 bold) and a grade capsule inside, both with `materialize`, and a centred subtitle below. `score == nil` leaves the gauge empty and shows "—". Tenra: `HealthScoreHeroCard` (grade colour, grade-band copy) is an adapter.
+
+#### `ScoreCard` *(1.2.0)*
+A score in the insight feed: title, grade and "72 / 100" on the left, a 120 pt `MiniHalfGauge` on the trailing edge (the same footprint as the feed cards' mini charts). Tenra: `HealthScoreCardView` is an adapter.
+
+#### `TargetProgressCard` *(1.2.0)*
+One metric against a target: icon, title and a grey capsule badge ("Weight 30%"), a summary line, "Current" (h2 bold) next to "Target", a `LinearProgressBar` (red below a third, amber below two thirds, green above, unless `progressColor` is set), an explanation and a `RecommendationBox`. `isMuted` dims the card to 60%. Tenra: `HealthComponentCard` (the health-score parts) is an adapter.
+
+#### `RecurringPaymentCard` *(1.2.0)*
+A recurring payment: `IconView` (44 pt), the name, the amount, the amount in `baseCurrency` when it differs (`ConvertedAmountView`, so the host's `DesignKitCurrencyConverter`), a caption ("Next charge on 12 Oct") and a `StatusIndicatorBadge`. Tenra: `SubscriptionCard` (recurring series, next-charge date) is an adapter.
+
+#### `PayoffProgressCard` *(1.2.0)*
+Something being paid off: icon, name (h4) and subtitle with an `accessory` view on the right (a type badge), "left ……… total" over an income-tinted `ProgressView`, and a footer: `.inProgress(nextDate:remainingCaption:)` (calendar mark + date, "18 left") or `.done(caption:)` (check mark + "Closed 15 Jun 2026"). Tenra: `LoanCard` is an adapter; its `LoanTypeBadge` stays in Tenra and goes in the accessory.
 
 ---
 
@@ -1228,7 +1252,7 @@ Each section uses `UniversalRow(config: .settings)` with `.navigationRow {}` or 
 ScrollView
 └── VStack(spacing: AppSpacing.lg)
     ├── AccountsCarousel (UniversalCarousel)
-    ├── TransactionsSummaryCard (3-state: loading/empty/data)
+    ├── CashFlowCard (3-state: loading/empty/data)
     ├── CategoryGridView (adaptive grid of category chips)
     ├── SubscriptionsCardView (.cardStyle())
     └── LoansCardView (.cardStyle())
