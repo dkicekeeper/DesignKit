@@ -21,7 +21,7 @@ appearances it lists:
 | `FormsSnapshotTests` | `FormSection`, `DatePickerRow`, `MenuPickerRow`, `SettingsSectionHeaderView`, `HeroSection` |
 | `IconsSnapshotTests` | `IconView` (category, circle, rounded square, glass hero, placeholder, brand fallback), `BrandLogoView`, `PackedCircleIconsView` |
 | `CardsSnapshotTests` | `FinanceCard`, `RedactableAmount`, `EmptyCardView`, `InsightsStatCard`, `InsightEntityRow`, `UniversalCarousel`, `UniversalFilterButton` |
-| `FeedbackSnapshotTests` | `EmptyStateView` (3 styles), `MessageBanner`, `InlineStatusText`, `RecommendationBox`, `StepTracker`, `OnboardingStepIndicator`, `PermissionPrimerView`, `OnboardingPage`, `SkeletonView`, `SkeletonRow` |
+| `FeedbackSnapshotTests` | `EmptyStateView` (3 styles), `MessageBanner`, `InlineStatusText`, `RecommendationBox`, `StepTracker`, `OnboardingStepIndicator`, `PermissionPrimerView`, `OnboardingPage` |
 | `DisplaySnapshotTests` | `BadgeView`, `TrendBadge`, `StatusIndicatorBadge`, `StatTile`, `AvatarView`, `AvatarGroup`, `RatingView`, `ActivityTimeline`, `MonthCalendar`, `ExpandableText`, `FlowLayout`, `HeroSymbol` |
 | `ChartsSnapshotTests` | `LinearProgressBar`, `ProgressRing`, `AmountComparisonBar`, `FormattedAmountText`, `Sparkline`, `LineChart`, `BarChart`, `HeroSparkline`, `OrbChart`, `MiniDonut`, `ProportionBar`, `MiniProportionBar`, `HeroProportionBar`, `HeroHalfGauge`, `MiniHalfGauge`, `HeroMilestoneGauge`, `MiniMilestoneGauge`, `HeroBarPair`, `MiniBarPair` |
 | `InputsSnapshotTests` | `SegmentedPickerView`, `ChipPicker` (single / several), `RatingPicker`, `FormTextField`, `TagInput`, `CalculatorKeypad`, `AmountDigitDisplay`, `FormattedAmountView`, `SpentBudgetText`, `PlusTabLabel`, `BulkDeleteButton`, `EntityActionButton` |
@@ -32,8 +32,9 @@ text size AX2, which catches truncation and clipping). References live in
 
 Not covered on purpose:
 - views that animate continuously on a clock, so no two frames match: `SiriGlowView`,
-  `SiriWaveRecordingView`, `AccentGlow`, `.borderBeam()`. The skeleton shimmer is the same kind,
-  so `skeletons` sets Reduce Motion, which stops it, and snapshots the resting look;
+  `SiriWaveRecordingView`, `AccentGlow`, `.borderBeam()`, and the skeleton shimmer
+  (`SkeletonView`, `SkeletonRow`, `.skeleton`). Reduce Motion stops the shimmer, but SwiftUI
+  does not let a test set it (`accessibilityReduceMotion` is read-only);
 - views whose content depends on today's date: `DateButtonsView`, `DateSectionHeaderView`;
 - `ConvertedAmountView`, which waits for the host app's currency converter;
 - containers whose look is the system's (`EditSheetContainer` is a `Form` in a navigation bar)
