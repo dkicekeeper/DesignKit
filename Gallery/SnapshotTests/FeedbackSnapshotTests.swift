@@ -2,7 +2,8 @@
 //  FeedbackSnapshotTests.swift
 //  DesignKit Gallery snapshot tests
 //
-//  Empty states, banners, inline status, steps, permission primer, onboarding pieces.
+//  Empty states, banners, inline status, steps, permission primer, onboarding pieces,
+//  skeletons.
 //
 
 import SwiftUI
@@ -93,6 +94,30 @@ extension ComponentSnapshots {
                     message: "Lakes, rivers and camps with reviews from people who were there."
                 )
                 .frame(height: 440)
+            )
+        }
+
+        /// Reduce Motion stops the shimmer, which otherwise sweeps on a clock and never
+        /// draws the same frame twice: the snapshot is the skeleton's resting look.
+        @Test func skeletons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    VStack(spacing: 0) {
+                        SkeletonRow()
+                        SkeletonRow(showsIcon: false)
+                    }
+                    .cardContentPadding()
+                    .cardStyle()
+                    HStack(spacing: AppSpacing.md) {
+                        SkeletonView(height: 44, width: 44, cornerRadius: AppRadius.md)
+                        VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                            SkeletonView(width: 160)
+                            SkeletonView(height: 12, width: 96)
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .environment(\.accessibilityReduceMotion, true)
             )
         }
     }

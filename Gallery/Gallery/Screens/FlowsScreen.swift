@@ -14,6 +14,7 @@ import DesignComponents
 struct FlowsScreen: View {
     @State private var showsPrimer = false
     @State private var showsOnboarding = false
+    @State private var showsPageContainer = false
     @State private var range = CalendarRange()
     @State private var tripsByDay: [Date: [SampleTrip]] = [:]
     @State private var tags = ["Pike", "Early morning"]
@@ -45,6 +46,22 @@ struct FlowsScreen: View {
         .fullScreenCover(isPresented: $showsOnboarding) {
             SampleOnboarding { showsOnboarding = false }
         }
+        .fullScreenCover(isPresented: $showsPageContainer) {
+            OnboardingPageContainer(
+                progressStep: 1,
+                title: "Main currency",
+                subtitle: "Totals and charts are shown in it. You can change it later.",
+                primaryButtonTitle: "Continue",
+                onPrimaryTap: { showsPageContainer = false },
+                onSkip: { showsPageContainer = false }
+            ) {
+                FlowLayout {
+                    ForEach(["KZT", "USD", "EUR", "RUB"], id: \.self) {
+                        BadgeView($0, color: AppColors.accent)
+                    }
+                }
+            }
+        }
         .onAppear {
             tripsByDay = range.itemsByDay(SampleTrip.samples) { trip, _ in trip.days }
         }
@@ -75,6 +92,12 @@ struct FlowsScreen: View {
             }
             .secondaryButton()
             OnboardingStepIndicator(currentStep: 2, symbols: ["map", "tent.fill", "person.2.fill", "checkmark.seal.fill"])
+            Button {
+                showsPageContainer = true
+            } label: {
+                Text("Show OnboardingPageContainer").frame(maxWidth: .infinity)
+            }
+            .secondaryButton()
         }
     }
 

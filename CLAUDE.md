@@ -142,7 +142,8 @@ rather than importing an app type.
 ## Known Gaps / Follow-ups
 
 - `EditableHeroSection`, `IconPickerView`/`IconCatalog`, `CurrencySelectorView`,
-  `AmountInputView` depend on Tenra services (logo registry, settings, FX).
+  `AmountInputView` live in Tenra, not here: they depend on Tenra services (logo registry,
+  settings, FX). Porting one means turning that dependency into a host hook first.
 
 ## Reference Docs
 

@@ -2,8 +2,10 @@
 //  ChartsSnapshotTests.swift
 //  DesignKit Gallery snapshot tests
 //
-//  Progress bars and rings, amount text, sparklines, line and bar charts.
-//  Entrance animations are off (`animatesOnAppear: false`) so the final state is drawn.
+//  Progress bars and rings, amount text, sparklines, line and bar charts, the hero
+//  sparkline, breakdown charts (orb, donut, proportion bars), gauges and bar pairs.
+//  Entrance animations are off (`animatesOnAppear: false`) where a component offers it;
+//  the others have finished by the time the renderer captures.
 //
 
 import SwiftUI
@@ -77,6 +79,75 @@ extension ComponentSnapshots {
                 }
             )
         }
+
+        @Test func heroSparkline() async {
+            let income = ChartSeries<ChartValuePoint>.keyed("income", name: "Income", coloring: .solid(AppColors.success))
+
+            await assertComponentSnapshot(
+                HeroSparkline(
+                    dataPoints: ChartSample.months,
+                    series: income,
+                    projectedValue: 590_000,
+                    markExtremes: true,
+                    valueFormat: .currency("KZT")
+                )
+            )
+        }
+
+        @Test func orbChart() async {
+            await assertComponentSnapshot(
+                OrbChart(slices: ChartSample.slices, size: 240, animatesOnAppear: false)
+                    .frame(height: 280)
+                    .frame(maxWidth: .infinity)
+            )
+        }
+
+        @Test func proportions() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.lg) {
+                    HStack(spacing: AppSpacing.xl) {
+                        MiniDonut(slices: ChartSample.slices)
+                            .frame(width: 80, height: 80)
+                        MiniProportionBar(segments: ChartSample.slices)
+                            .frame(maxWidth: .infinity)
+                    }
+                    ProportionBar(ratio: 0.65, leftColor: AppColors.income, rightColor: AppColors.bgMuted, animatesOnAppear: false)
+                    HeroProportionBar(segments: ChartSample.slices, currency: "KZT")
+                }
+            )
+        }
+
+        @Test func gauges() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.lg) {
+                    HeroHalfGauge(
+                        value: 0.62,
+                        norm: 0.5,
+                        maxValue: 1,
+                        zoneTicks: [0.3, 0.7],
+                        color: AppColors.success,
+                        diameter: 220,
+                        animatesOnAppear: false
+                    )
+                    HeroMilestoneGauge(value: 4.2, target: 6, maxValue: 12, color: AppColors.accent, animatesOnAppear: false)
+                    HStack(spacing: AppSpacing.lg) {
+                        MiniHalfGauge(value: 0.62, norm: 0.5, maxValue: 1, color: AppColors.success)
+                        MiniMilestoneGauge(value: 4.2, target: 6, maxValue: 12, color: AppColors.accent)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+            )
+        }
+
+        @Test func barPairs() async {
+            await assertComponentSnapshot(
+                HStack(alignment: .bottom, spacing: AppSpacing.xl) {
+                    HeroBarPair(previous: 320_000, current: 280_000, color: AppColors.accent, currency: "KZT", animatesOnAppear: false)
+                    MiniBarPair(previous: 320_000, current: 280_000, color: AppColors.accent, isProjection: true)
+                }
+                .frame(maxWidth: .infinity)
+            )
+        }
     }
 }
 
@@ -91,4 +162,12 @@ private enum ChartSample {
     static let months: [ChartValuePoint] = rows.map { row in
         ChartValuePoint(label: row.0, values: ["income": row.1 * 1_000, "expenses": row.2 * 1_000])
     }
+
+    /// A spending breakdown for the orb, donut and proportion bars.
+    static let slices: [DonutSlice] = [
+        DonutSlice(id: "food", amount: 42_000, color: AppColors.accent, label: "Food", percentage: 42),
+        DonutSlice(id: "rent", amount: 30_000, color: AppColors.success, label: "Rent", percentage: 30),
+        DonutSlice(id: "fun", amount: 18_000, color: AppColors.warning, label: "Fun", percentage: 18),
+        DonutSlice(id: "misc", amount: 10_000, color: AppColors.transfer, label: "Misc", percentage: 10),
+    ]
 }
