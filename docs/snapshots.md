@@ -59,8 +59,11 @@ All of them have a specimen in the Gallery.
   360 pt wide, `AppSpacing.lg` around it, `AppColors.bgBase` behind, animations off, US
   English locale. It waits 1.5 s for `onAppear` and layout, measures the view again and
   resizes the window if it grew (a view that measures itself, like `ExpandableText` adding its
-  More button, would otherwise be cut off at the top and bottom), then captures until two
-  frames in a row are identical (Liquid Glass animates its shadow for a moment). The PNG is the
+  More button, would otherwise be cut off at the top and bottom), then captures every 0.4 s
+  until three frames in a row are identical, for up to 8 s (Liquid Glass animates its shadow
+  for a moment; two frames were not enough between stacked cards, whose shadows can hold still
+  for one interval and move again). A snapshot that never settles prints
+  `SNAPSHOT-UNSETTLED <test>.<appearance>` to the log. The PNG is the
   component's own frame: the shadow glass casts around a card falls outside it, and the
   simulator renders that shadow a little differently from run to run, while the component's
   own pixels do not change. Then it compares with

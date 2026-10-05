@@ -54,7 +54,9 @@ func assertComponentSnapshot<V: View>(
     column: UInt = #column
 ) async {
     for appearance in appearances {
-        let image = await ComponentRenderer.render(view, width: width, appearance: appearance)
+        let image = await ComponentRenderer.render(
+            view, width: width, appearance: appearance, label: "\(testName).\(appearance.rawValue)"
+        )
         assertSnapshot(
             of: image,
             // Tolerates anti-aliasing noise; a moved edge, a new colour or other text fails.
@@ -80,10 +82,19 @@ enum ComponentRenderer {
     /// 360 + 2 × (16 + 24) = 440 pt: the width of the iPhone 17 Pro Max the tests run on.
     static let margin: CGFloat = 24
 
-    /// Extra captures, 0.4 s apart, while two in a row still differ.
-    static let stabilityAttempts = 8
+    /// Extra captures, 0.4 s apart, until `stableCaptures` in a row are identical.
+    static let stabilityAttempts = 20
+    /// Identical captures in a row that make a picture settled. Two was not enough: Liquid
+    /// Glass shadows between stacked cards can hold still for one interval and move again.
+    static let stableCaptures = 3
 
-    static func render<V: View>(_ view: V, width: CGFloat, appearance: SnapshotAppearance) async -> UIImage {
+    /// - Parameter label: Names the snapshot in the log line printed when it never settles.
+    static func render<V: View>(
+        _ view: V,
+        width: CGFloat,
+        appearance: SnapshotAppearance,
+        label: String = ""
+    ) async -> UIImage {
         DesignKitFonts.registerIfNeeded()
         UIView.setAnimationsEnabled(false)
         defer { UIView.setAnimationsEnabled(true) }
@@ -168,15 +179,22 @@ enum ComponentRenderer {
         }
 
         // Liquid Glass keeps animating its shadow for a moment after layout (a card that is
-        // still changing, like a paging TabView, restarts it). Capture until two frames in a
-        // row are identical, so the reference is the settled picture, not a phase of it.
+        // still changing, like a paging TabView, restarts it). Capture until several frames in
+        // a row are identical, so the reference is the settled picture, not a phase of it.
         var image = capture()
-        for _ in 0..<stabilityAttempts {
+        var identical = 1
+        var attempts = 0
+        while identical < stableCaptures, attempts < stabilityAttempts {
             try? await Task.sleep(for: .milliseconds(400))
             let next = capture()
-            let settled = next.pngData() == image.pngData()
+            identical = next.pngData() == image.pngData() ? identical + 1 : 1
             image = next
-            if settled { break }
+            attempts += 1
+        }
+        if identical < stableCaptures {
+            // Not an error by itself (the comparison decides), but the first suspect when a
+            // snapshot fails in one run and passes in another: scripts/snapshot-tests.sh prints it.
+            print("SNAPSHOT-UNSETTLED \(label): \(attempts) captures, last \(identical) identical")
         }
 
         window.isHidden = true

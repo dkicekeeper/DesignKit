@@ -50,7 +50,7 @@ xcodebuild test \
   -derivedDataPath build \
   -parallel-testing-enabled NO \
   CODE_SIGNING_ALLOWED=NO \
-  2>&1 | tee snapshot-test.log | grep -aE "error:|failed|recorded|Test run with|\*\* TEST (SUCCEEDED|FAILED)"
+  2>&1 | tee snapshot-test.log | grep -aE "error:|failed|recorded|SNAPSHOT-UNSETTLED|Test run with|\*\* TEST (SUCCEEDED|FAILED)"
 set -e
 
 if grep -aq "\*\* TEST SUCCEEDED \*\*" snapshot-test.log; then
@@ -64,6 +64,9 @@ fi
 # differs), then each failing image base64-encoded (decode with `base64 -d`).
 echo "::group::Snapshot differences"
 grep -aE -B2 -A12 "does not match reference" snapshot-test.log || true
+echo "::endgroup::"
+echo "::group::Snapshots that never settled"
+grep -a "SNAPSHOT-UNSETTLED" snapshot-test.log || echo "none"
 echo "::endgroup::"
 find "$ARTIFACTS" -name '*.png' -type f | sort | while read -r png; do
   echo "::group::base64 ${png#"$ARTIFACTS"/}"
