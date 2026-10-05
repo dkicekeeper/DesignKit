@@ -16,6 +16,7 @@ struct InputsScreen: View {
     @State private var zoom: CGFloat = 1
     @State private var colorHex = "#6366f1"
     @State private var filter = "month"
+    @State private var paymentDate = Date()
 
     private let slices: [DonutSlice] = [
         DonutSlice(id: "food", amount: 42_000, color: AppColors.accent, label: "Food", percentage: 42),
@@ -104,6 +105,13 @@ struct InputsScreen: View {
                 ColorPickerRow(selectedColorHex: $colorHex, title: "Color")
                     .cardContentPadding()
                     .formCardStyle()
+            }
+
+            ShowcaseSection(title: "DateButtonsView", subtitle: "Yesterday · Today · a past date (no future dates)") {
+                DateButtonsView(selectedDate: $paymentDate) { _ in }
+                Text(paymentDate, format: .dateTime.day().month().year())
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.textSecondary)
             }
         }
     }

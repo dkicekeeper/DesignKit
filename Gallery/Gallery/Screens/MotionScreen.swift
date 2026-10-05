@@ -10,6 +10,7 @@ import DesignComponents
 struct MotionScreen: View {
     @State private var animateID = 0
     @State private var phase = 0
+    @State private var isRevealed = false
 
     private let phases: [(symbol: String, title: String)] = [
         ("sparkles", "Blur-slide reveal"),
@@ -84,6 +85,31 @@ struct MotionScreen: View {
                         .accentGlow(AppColors.success, edge: .top)
                         .clipShape(.rect(cornerRadius: AppRadius.lg))
                 }
+            }
+
+            ShowcaseSection(title: "Border beam & glow", subtitle: ".borderBeam() · .borderGlow() · AI / live states") {
+                Text("Analysing your spending…")
+                    .font(AppTypography.body)
+                    .frame(maxWidth: .infinity)
+                    .padding(AppSpacing.xl)
+                    .cardStyle()
+                    .borderGlow()
+                    .borderBeam()
+            }
+
+            ShowcaseSection(title: "Content reveal", subtitle: ".contentReveal(isReady:) · loaded content fades in") {
+                Toggle("Ready", isOn: $isRevealed)
+                Text("Loaded content")
+                    .font(AppTypography.body)
+                    .frame(maxWidth: .infinity)
+                    .padding(AppSpacing.xl)
+                    .cardStyle()
+                    .contentReveal(isReady: isRevealed)
+            }
+
+            ShowcaseSection(title: "SiriWaveRecordingView", subtitle: "Voice input wave") {
+                SiriWaveRecordingView()
+                    .frame(maxWidth: .infinity)
             }
         }
     }

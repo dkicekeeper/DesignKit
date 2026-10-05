@@ -58,6 +58,13 @@ struct ComponentsScreen: View {
                 FormattedAmountText(amount: 148_920_450, currency: "KZT")
             }
             .frame(width: 150)
+            TokenLabel(name: "FormattedAmountView", value: "plain text, no dimmed decimals")
+            FormattedAmountView(amount: 4_990, currency: "USD", prefix: "+", color: AppColors.income)
+            TokenLabel(name: "ConvertedAmountView", value: "≈ in another currency · DesignKitCurrencyConverter")
+            ConvertedAmountView(amount: 49.90, fromCurrency: "USD", toCurrency: "KZT",
+                                fontSize: AppTypography.bodySmall, color: AppColors.textSecondary)
+            TokenLabel(name: "SpentBudgetText", value: "spent / budget")
+            SpentBudgetText(spent: 185_000, budget: 250_000, currency: "KZT")
         }
     }
 

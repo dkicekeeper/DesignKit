@@ -54,6 +54,9 @@ struct IconsScreen: View {
                         IconView(source: .brandService("netflix.com"),
                                  style: .serviceLogo(size: AppIconSize.xxl))
                     }
+                    specimen("BrandLogoView") {
+                        BrandLogoView(brandName: "Kaspi", size: AppIconSize.xxl)
+                    }
                 }
             }
 

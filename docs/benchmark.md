@@ -122,6 +122,10 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
   разрешения, меняет вид экрана в Tenra), `OnboardingPager` / `OnboardingPage` / `HeroSymbol`,
   `MonthCalendar` / `CalendarRange` (из Tenra), `ActivityTimeline`, `TagInput`, `FlowLayout`;
   `OnboardingStepIndicator(symbols:)`; стабильные цвета категорий (`CategoryColors.paletteIndex`).
+- **1.0.0** — первая мажорная версия: удалены устаревшие API, которые не использует ни одно
+  приложение (`BudgetProgressBar`, `BudgetProgressCircle`, `ExpenseIncomeProgressBar`,
+  `DonutChart`, `ChartDisplayMode`, `inlineFieldStyle`, `inlineNoteStyle`). Снапшот-тесты
+  покрывают внешний вид компонентов (docs/snapshots.md).
 
 ## Кандидаты на следующие раунды
 

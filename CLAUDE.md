@@ -113,7 +113,8 @@ rather than importing an app type.
 4. Add a Gallery specimen (existing screen file, or a new one + `xcodegen generate`) and a
    snapshot test (`Gallery/SnapshotTests`), then record it with a manual CI run,
    `record_snapshots: missing` (docs/snapshots.md).
-5. Add any new `String(localized:)` key to `docs/localization-keys.md`.
+5. Add any new `String(localized:)` key to `docs/localization-keys.md` and its English value
+   to `Gallery/Gallery/Localizable.xcstrings`.
 6. Update `docs/design-system.md` (§0 inventory + the component's section).
 7. Push; CI must be green on the package, Gallery, snapshot, Dalada and Tenra jobs.
 
@@ -136,13 +137,15 @@ rather than importing an app type.
 
 - iOS 26+, Swift 5 language mode (`swiftLanguageModes: [.v5]`), no default MainActor isolation.
 - Must compile with **Xcode 26 and Xcode 27**: iOS 27 SDK APIs go behind
-  `#if compiler(>=6.4)` **and** `#available(iOS 27, *)`.
+  `#if compiler(>=6.4)` **and** `#available(iOS 27, *)`. CI's `Package on Xcode 27` job builds
+  the package with Xcode 27 once the runner image has it; until then it passes with a warning.
 - Tokens that nonisolated app code reads are `nonisolated`.
 
 ## Known Gaps / Follow-ups
 
 - `EditableHeroSection`, `IconPickerView`/`IconCatalog`, `CurrencySelectorView`,
-  `AmountInputView` depend on Tenra services (logo registry, settings, FX).
+  `AmountInputView` live in Tenra, not here: they depend on Tenra services (logo registry,
+  settings, FX). Porting one means turning that dependency into a host hook first.
 
 ## Reference Docs
 

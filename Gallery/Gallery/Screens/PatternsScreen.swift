@@ -31,6 +31,7 @@ struct PatternsScreen: View {
             chipsSection
             expandableSection
             bannerSection
+            importProgressSection
         }
     }
 
@@ -112,6 +113,13 @@ struct PatternsScreen: View {
         ShowcaseSection(title: "ExpandableText", subtitle: "More / Less only when it overflows") {
             ExpandableText("Great spot for pike in the early morning. The road is rough after rain, a 4x4 is better. Camping is allowed on the north shore; bring your own firewood, the rangers check permits at the gate on weekends.")
             ExpandableText("Short note fits in one line.")
+        }
+    }
+
+    private var importProgressSection: some View {
+        ShowcaseSection(title: "ImportProgressSheet", subtitle: "Row-by-row import progress with Cancel (a sheet in Tenra)") {
+            ImportProgressSheet(currentRow: 128, totalRows: 412, progress: 128.0 / 412.0, onCancel: {})
+                .cardStyle()
         }
     }
 

@@ -117,13 +117,15 @@ enum ComponentRenderer {
         let window = makeWindow()
         // Glass and its shadow render unpredictably where the window is off the screen.
         let screen = window.windowScene?.screen.bounds.size ?? .zero
-        if size.width > screen.width || size.height > screen.height {
+        func checkFitsScreen() {
+            guard size.width > screen.width || size.height > screen.height else { return }
             Issue.record("""
                 Snapshot window \(Int(size.width))×\(Int(size.height)) pt does not fit the \
                 \(Int(screen.width))×\(Int(screen.height)) pt screen: narrow the component or \
                 split the test (docs/snapshots.md).
                 """)
         }
+        checkFitsScreen()
         window.overrideUserInterfaceStyle = appearance.interfaceStyle
         // Opaque, so Liquid Glass samples only the component's own background.
         window.backgroundColor = .systemBackground
@@ -134,6 +136,16 @@ enum ComponentRenderer {
 
         // Let SwiftUI lay out, run onAppear / onGeometryChange, and glass settle.
         try? await Task.sleep(for: .seconds(1.5))
+        // Content that measures itself after the first layout can grow (ExpandableText adds its
+        // More button once it knows the text is truncated). Size the window again, or the grown
+        // content sits centred in the old height and is cut off at the top and bottom.
+        let settledHeight = max(1, host.sizeThatFits(in: fitting).height.rounded(.up))
+        if settledHeight != size.height {
+            size.height = settledHeight
+            checkFitsScreen()
+            window.frame = CGRect(origin: .zero, size: size)
+            try? await Task.sleep(for: .seconds(1))
+        }
         host.view.frame = window.bounds
         host.view.layoutIfNeeded()
 

@@ -2,7 +2,8 @@
 //  InputsSnapshotTests.swift
 //  DesignKit Gallery snapshot tests
 //
-//  Pickers, chips, rating input, text fields, tags. Nothing is focused.
+//  Pickers, chips, rating input, text fields, tags, the calculator keypad, amount text,
+//  action buttons. Nothing is focused.
 //
 
 import SwiftUI
@@ -44,6 +45,43 @@ extension ComponentSnapshots {
                     FormTextField(text: .constant("-5"), placeholder: "Amount", errorMessage: "Amount must be positive")
                     TagInput("Add a tag", tags: .constant(["Pike", "Early morning"]), suggestions: ["Perch", "Night"])
                 }
+            )
+        }
+
+        @Test func calculatorKeypad() async {
+            await assertComponentSnapshot(
+                CalculatorKeypad(model: CalculatorInputModel(seed: "1250"))
+            )
+        }
+
+        @Test func amountText() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    AmountDigitDisplay(rawAmount: "1250.5")
+                    FormattedAmountView(amount: 1_234_567.89, currency: "KZT")
+                    FormattedAmountView(amount: 4_990, currency: "USD", prefix: "+", color: AppColors.income)
+                    SpentBudgetText(spent: 185_000, budget: 250_000, currency: "KZT")
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        @Test func actionButtons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    HStack(spacing: AppSpacing.xl) {
+                        PlusTabLabel(isExpanded: false)
+                        PlusTabLabel(isExpanded: true)
+                    }
+                    .font(AppTypography.bodyEmphasis)
+                    BulkDeleteButton(count: 3) {}
+                    HStack(spacing: AppSpacing.sm) {
+                        EntityActionButton(title: "Edit", systemImage: "pencil") {}
+                        EntityActionButton(title: "Delete", systemImage: "trash", role: .destructive) {}
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             )
         }
     }

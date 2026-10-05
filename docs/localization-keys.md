@@ -11,6 +11,10 @@ The keys and their translations come from Tenra's string tables (11 locales) —
 a component that introduces a key, add a row here in the same commit. The `rating.*` keys came
 from Dalada (ru / kk / en in `ios/Dalada/Localizable.xcstrings`).
 
+The Gallery is a host app too: `Gallery/Gallery/Localizable.xcstrings` holds the English value
+of every key below, so its specimens, its TestFlight build and the snapshot references show
+text, not keys. A new key goes there as well.
+
 | Key | Used by | Default value |
 |---|---|---|
 | `bulk.deleteCount` | BulkDeleteButton | — |

@@ -18,17 +18,31 @@ appearances it lists:
 |---|---|
 | `FoundationsSnapshotTests` | typography scale, primary / secondary / loading buttons, `cardStyle`, filter chips, Dalada's accent through `DesignKitTheme.accent` |
 | `RowsSnapshotTests` | `UniversalRow`, `ActionSettingsRow`, `ToggleSettingsRow`, `InfoRow`, `SectionHeaderView`, `SelectionIndicator` |
+| `FormsSnapshotTests` | `FormSection`, `DatePickerRow`, `MenuPickerRow`, `SettingsSectionHeaderView`, `HeroSection` |
+| `IconsSnapshotTests` | `IconView` (category, circle, rounded square, glass hero, placeholder, brand fallback), `BrandLogoView`, `PackedCircleIconsView` |
+| `CardsSnapshotTests` | `FinanceCard`, `RedactableAmount`, `EmptyCardView`, `InsightsStatCard`, `InsightEntityRow`, `UniversalCarousel`, `UniversalFilterButton` |
 | `FeedbackSnapshotTests` | `EmptyStateView` (3 styles), `MessageBanner`, `InlineStatusText`, `RecommendationBox`, `StepTracker`, `OnboardingStepIndicator`, `PermissionPrimerView`, `OnboardingPage` |
 | `DisplaySnapshotTests` | `BadgeView`, `TrendBadge`, `StatusIndicatorBadge`, `StatTile`, `AvatarView`, `AvatarGroup`, `RatingView`, `ActivityTimeline`, `MonthCalendar`, `ExpandableText`, `FlowLayout`, `HeroSymbol` |
-| `ChartsSnapshotTests` | `LinearProgressBar`, `ProgressRing`, `AmountComparisonBar`, `FormattedAmountText`, `Sparkline`, `LineChart`, `BarChart` |
-| `InputsSnapshotTests` | `SegmentedPickerView`, `ChipPicker` (single / several), `RatingPicker`, `FormTextField`, `TagInput` |
+| `ChartsSnapshotTests` | `LinearProgressBar`, `ProgressRing`, `AmountComparisonBar`, `FormattedAmountText`, `Sparkline`, `LineChart`, `BarChart`, `HeroSparkline`, `OrbChart`, `MiniDonut`, `ProportionBar`, `MiniProportionBar`, `HeroProportionBar`, `HeroHalfGauge`, `MiniHalfGauge`, `HeroMilestoneGauge`, `MiniMilestoneGauge`, `HeroBarPair`, `MiniBarPair` |
+| `InputsSnapshotTests` | `SegmentedPickerView`, `ChipPicker` (single / several), `RatingPicker`, `FormTextField`, `TagInput`, `CalculatorKeypad`, `AmountDigitDisplay`, `FormattedAmountView`, `SpentBudgetText`, `PlusTabLabel`, `BulkDeleteButton`, `EntityActionButton` |
 
 Appearances (`SnapshotAppearance`): `light`, `dark`, and `largeText` (light at accessibility
 text size AX2, which catches truncation and clipping). References live in
 `Gallery/SnapshotTests/__Snapshots__/<File>/<test>.<appearance>.png`.
 
-Not covered on purpose: views that animate continuously (skeleton shimmer, `OrbChart`,
-`SiriWaveView`, `AccentGlow`), whose frame depends on the clock, and screens that need app data.
+Not covered on purpose:
+- views that animate continuously on a clock, so no two frames match: `SiriGlowView`,
+  `SiriWaveRecordingView`, `AccentGlow`, `.borderBeam()`, and the skeleton shimmer
+  (`SkeletonView`, `SkeletonRow`, `.skeleton`). Reduce Motion stops the shimmer, but SwiftUI
+  does not let a test set it (`accessibilityReduceMotion` is read-only);
+- views whose content depends on today's date: `DateButtonsView`, `DateSectionHeaderView`;
+- `ConvertedAmountView`, which waits for the host app's currency converter;
+- containers whose look is the system's (`EditSheetContainer` is a `Form` in a navigation bar)
+  or that show the host app's localized strings (`ImportProgressSheet`,
+  `OnboardingPageContainer`, `NotificationPermissionView`);
+- screens that need app data.
+
+All of them have a specimen in the Gallery.
 
 ## How it works
 
@@ -39,8 +53,10 @@ Not covered on purpose: views that animate continuously (skeleton shimmer, `OrbC
   cannot do that.
 - `assertComponentSnapshot(_:width:appearances:)` (`SnapshotSupport.swift`) wraps the view:
   360 pt wide, `AppSpacing.lg` around it, `AppColors.bgBase` behind, animations off, US
-  English locale. It waits 1.5 s for `onAppear` and layout, then captures until two frames in
-  a row are identical (Liquid Glass animates its shadow for a moment). The PNG is the
+  English locale. It waits 1.5 s for `onAppear` and layout, measures the view again and
+  resizes the window if it grew (a view that measures itself, like `ExpandableText` adding its
+  More button, would otherwise be cut off at the top and bottom), then captures until two
+  frames in a row are identical (Liquid Glass animates its shadow for a moment). The PNG is the
   component's own frame: the shadow glass casts around a card falls outside it, and the
   simulator renders that shadow a little differently from run to run, while the component's
   own pixels do not change. Then it compares with

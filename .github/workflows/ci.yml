@@ -91,6 +91,42 @@ jobs:
           xcodebuild -version
           swift --version
 
+  xcode27:
+    name: Package on Xcode 27
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      # DesignKit обязан собираться и в Xcode 26, и в Xcode 27 (CLAUDE.md). Код под iOS 27 SDK
+      # стоит за `#if compiler(>=6.4)`, и компилирует его только Xcode 27: задача Package + Gallery
+      # (latest-stable, Xcode 26) его не видит. Пока на раннере GitHub нет Xcode 27, задача
+      # предупреждает и проходит; когда он появится в образе, проверка включится сама.
+      - name: Find Xcode 27
+        id: xcode
+        run: |
+          XCODE=$(ls -d /Applications/Xcode_27*.app 2>/dev/null | sort -V | tail -1)
+          if [ -z "$XCODE" ]; then
+            INSTALLED=$(ls -d /Applications/Xcode_*.app | xargs -n1 basename | tr '\n' ' ')
+            echo "::warning title=Xcode 27 not installed::The runner image has no Xcode 27 ($INSTALLED), so the iOS 27 code paths were not compiled."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          else
+            sudo xcode-select -s "$XCODE"
+            xcodebuild -version
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build package for iOS Simulator
+        if: steps.xcode.outputs.found == 'true'
+        run: |
+          SCHEMES=$(xcodebuild -list -json | python3 -c 'import json, sys; print("\n".join(json.load(sys.stdin)["workspace"]["schemes"]))')
+          SCHEME=$(echo "$SCHEMES" | grep -x 'DesignKit-Package' || echo "$SCHEMES" | grep -x 'DesignKit' || echo "$SCHEMES" | head -1)
+          xcodebuild build \
+            -scheme "$SCHEME" \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            -quiet
+
   snapshots:
     name: Snapshot tests
     runs-on: macos-26
