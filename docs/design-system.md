@@ -401,10 +401,10 @@ MenuPickerRow(
 Use in: form sections for frequency, period, reminder, etc.
 
 #### `NetAmountRow` *(1.1.0)*
-A label with a net amount (destructive when negative) and "+inflow −outflow" under it, or one amount (`singleValue`, `singleColor`) with no second line. Vertical padding `AppSpacing.md`; separate rows with `Divider()`. Tenra: `PeriodBreakdownRow` (period lists of the insights) is an adapter.
+A label with a net amount (destructive when negative) and "+inflow −outflow" under it, or one amount (`singleValue`, `singleColor`) with no second line. Vertical padding of the `.info` preset (8; `AppSpacing.md` before 1.4.0); separate rows with `Divider()`. Tenra: `PeriodBreakdownRow` (period lists of the insights) is an adapter.
 
 #### `ScheduleRow` *(1.1.0)*
-A schedule entry: a checked circle when `isDone` (the row is dimmed with `futureTransactionStyle` when not), title + date subtitle, the amount and an optional detail line under it (`detailColor`, `AppColors.expense` by default). Tenra: `AmortizationScheduleRow` (payment number, date format, interest) is an adapter.
+A schedule entry: a checked circle when `isDone` (the row is dimmed with `futureTransactionStyle` when not), title + date subtitle, the amount and an optional detail line under it (`detailColor`, `AppColors.expense` by default). Vertical padding of the `.info` preset (8; none before 1.4.0). Tenra: `AmortizationScheduleRow` (payment number, date format, interest) is an adapter.
 
 #### `BreakdownRow` *(1.2.0)*
 One part of a breakdown on `UniversalRow(.info)`: a 44 pt circle icon tinted with `color`, the title and an optional one-line subtitle, `AmountPercentageView` (the amount over "42.0%") and, with `showsChevron: true`, a `DisclosureChevron` (wrap the row in a `NavigationLink`). `AmountPercentageView` is public for other rows. Tenra: `CategoryBreakdownRow` (category name, subcategories) is an adapter.
@@ -1629,6 +1629,20 @@ with the iOS 27 SDK — Xcode 27; built with Xcode 26 the gate honours Reduce Mo
 ## 10. cardStyle Padding Contract
 
 `cardStyle()` = **pure visual only** (shape + material, NO padding). Never rely on it for spacing.
+
+### Who owns which padding
+
+| Kind of component | Inner padding | Horizontal inset | Examples |
+|---|---|---|---|
+| **Card**: has its own surface | Its own: `.padding(AppSpacing.lg)` before `.cardStyle()`, inside the component | — | `TotalsCard`, `LimitProgressCard`, `ComparisonCard`, `CashFlowCard`, `ScoreCard`, `FinanceCard`, `EmptyCardView`, `InsightsStatCard`, `DateSectionHeaderView` |
+| **Compact surface** | Its own, smaller | — | `MessageBanner` (`md`), `ChartSelectionBanner` (`lg` × `sm`) |
+| **Row**: no surface, lives in a container | Vertical only, from its `RowConfiguration` preset | The container's: a card's `.cardContentPadding()`, `List` / `Form` insets, or `.screenPadding()` | `InfoRow`, `InsightEntityRow`, `BreakdownRow`, `NetAmountRow`, `ScheduleRow` (`.info`, 8) |
+| **Row in a `FormSection`** | Vertical and horizontal (`.standard`: 12 × 16), since `FormSection`'s surface has none | — | `MenuPickerRow`, `DatePickerRow` |
+| **Primitive** | None: the parent places it | — | `BadgeView`, `TrendBadge`, `FormattedAmountText`, `LinearProgressBar`, charts |
+
+Outer spacing is never a component's: the screen insets with `.screenPadding()` and spaces cards with its stack's `spacing`.
+
+A stack of rows in a card: `spacing: 0` with `Divider()`s between rows, or `AppSpacing.sm` without dividers (Tenra's detail list cards). The rows' own vertical padding does the rest.
 
 ### Rows own their padding
 

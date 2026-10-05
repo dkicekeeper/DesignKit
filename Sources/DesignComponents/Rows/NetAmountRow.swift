@@ -3,6 +3,7 @@
 //  DesignKit
 //
 //  A labelled net amount with what came in and went out beneath it, or a single amount.
+//  Like every row it owns its vertical padding (the `.info` preset's) and none horizontally.
 //  Ported from Tenra's PeriodBreakdownRow; Tenra's period metrics (which value a list shows
 //  for a period) stay in Tenra as an adapter.
 //
@@ -100,7 +101,7 @@ public struct NetAmountRow: View {
                     }
                 }
             }
-            .padding(.vertical, AppSpacing.md)
+            .padding(.vertical, RowConfiguration.info.verticalPadding)
         }
     }
 }
