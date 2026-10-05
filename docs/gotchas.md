@@ -23,7 +23,9 @@ Known traps and surprising behaviors when building UI with DesignKit.
 - **Build with Xcode 26 and 27.** Consumers' CI (Dalada) runs Xcode 26 (iOS 26 SDK); Tenra builds
   with Xcode 27. An iOS 27 SDK API behind `#available(iOS 27, *)` still fails to *compile* on
   Xcode 26 — wrap it in `#if compiler(>=6.4)` as well (see `AmbientMotionGate`,
-  `swipeActionsContainerIfAvailable`). CI builds on the runner's latest stable Xcode.
+  `swipeActionsContainerIfAvailable`). CI builds on the runner's latest stable Xcode (26.x as
+  of October 2026); the `Package on Xcode 27` job adds an Xcode 27 build once the runner image
+  has it, and only warns until then.
 - **Language mode is per package.** DesignKit compiles in Swift 5 mode even inside Dalada's
   Swift 6 build, and without Tenra's `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`. Code that
   relied on implicit MainActor isolation in Tenra is nonisolated here. Tokens are `nonisolated`

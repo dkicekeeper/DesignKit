@@ -136,7 +136,8 @@ rather than importing an app type.
 
 - iOS 26+, Swift 5 language mode (`swiftLanguageModes: [.v5]`), no default MainActor isolation.
 - Must compile with **Xcode 26 and Xcode 27**: iOS 27 SDK APIs go behind
-  `#if compiler(>=6.4)` **and** `#available(iOS 27, *)`.
+  `#if compiler(>=6.4)` **and** `#available(iOS 27, *)`. CI's `Package on Xcode 27` job builds
+  the package with Xcode 27 once the runner image has it; until then it passes with a warning.
 - Tokens that nonisolated app code reads are `nonisolated`.
 
 ## Known Gaps / Follow-ups
