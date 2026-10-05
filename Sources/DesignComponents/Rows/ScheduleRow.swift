@@ -4,6 +4,8 @@
 //
 //  One entry of a schedule (payments, instalments, sessions): a done / not-done mark, a title
 //  and a date, an amount and an optional detail line. Entries not done yet are dimmed.
+//  Like every row it owns its vertical padding (the `.info` preset's) and none horizontally:
+//  the container insets it.
 //  Ported from Tenra's AmortizationScheduleRow; the mapping from a loan's amortization entry
 //  (number, date format, interest copy) stays in Tenra as an adapter.
 //
@@ -78,6 +80,7 @@ public struct ScheduleRow: View {
                 }
             }
         }
+        .padding(.vertical, RowConfiguration.info.verticalPadding)
         .futureTransactionStyle(isFuture: !isDone)
         .accessibilityElement(children: .combine)
     }

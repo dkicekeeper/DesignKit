@@ -116,6 +116,8 @@ rather than importing an app type.
    blocks (the Gallery replaces them) and add `import DesignTokens` / `import DesignSupport`.
 2. `public` on the type, `body`, nested types used in the API, and protocol requirements
    (`id`, `body(content:)`, `==`). Write an explicit `public init` — memberwise inits are internal.
+   Padding follows docs/design-system.md §10: a card pads itself, a row pads only vertically
+   (its `RowConfiguration` preset), a primitive not at all.
 3. Replace app dependencies per the decision tree above. Leave a one-line comment naming what
    stayed in the app.
 4. Add a Gallery specimen (one `ShowcaseSection` per component, so it gets its own page, in

@@ -302,7 +302,7 @@ struct ComponentsScreen: View {
         }
 
         ShowcaseSection(title: "ScheduleRow", subtitle: "A schedule entry, done or upcoming") {
-            VStack(spacing: AppSpacing.md) {
+            VStack(spacing: AppSpacing.sm) {
                 ScheduleRow(title: "#3", subtitle: "12 Mar 2026", amount: 45_000, currency: "KZT",
                             detail: "int: 3 200 ₸", isDone: true)
                 ScheduleRow(title: "#4", subtitle: "12 Apr 2026", amount: 45_000, currency: "KZT",
