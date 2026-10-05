@@ -97,6 +97,13 @@ New or changed UI code?
 └─ A screen, navigation, or feature flow? → the app
 ```
 
+**Every component that can be generic lives here, even if one app uses it** (owner's decision,
+2026-10; the old "rule of two" is gone): DesignKit is the single source of truth for how things
+look. A component ported from an app gets a **context-neutral name and API** that any app could
+use: Tenra's `BudgetProgressRow` became `LimitProgressCard`, its `AmortizationScheduleRow`
+became `ScheduleRow`, and the app keeps a thin adapter under the old name that maps its model.
+The port is pixel-identical: the layout code moves as it is, only its inputs change.
+
 Host hooks (set once in `App.init()`): `DesignKitTheme.accent`, `DesignKitFonts.registerIfNeeded()`,
 `DesignKitLogoLoader.loader`, `DesignKitCurrencyConverter.convert`. Add a new hook (same shape:
 a `public static var` closure/value in `DesignSupport` or `DesignTokens`, documented default)
