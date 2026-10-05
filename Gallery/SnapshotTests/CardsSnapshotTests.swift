@@ -17,78 +17,89 @@ extension ComponentSnapshots {
     struct Cards {
         @Test func financeCards() async {
             await assertComponentSnapshot(
-                VStack(spacing: AppSpacing.lg) {
-                    FinanceCard(title: "Accounts", isEmpty: false, emptyTitle: "No accounts", subtitle: "3 accounts") {
-                        RedactableAmount(amount: 1_884_500, currency: "KZT", isLoading: false)
-                    } trailing: {
-                        HStack(spacing: -AppSpacing.sm) {
-                            ForEach(CardsSample.accountIcons) { icon in
-                                IconView(
-                                    source: .sfSymbol(icon.symbol),
-                                    style: .circle(size: AppIconSize.avatar, tint: .monochrome(.white), backgroundColor: icon.color)
-                                )
-                                .overlay(Circle().strokeBorder(AppColors.bgBase, lineWidth: 2))
-                            }
+                FinanceCard(title: "Accounts", isEmpty: false, emptyTitle: "No accounts", subtitle: "3 accounts") {
+                    RedactableAmount(amount: 1_884_500, currency: "KZT", isLoading: false)
+                } trailing: {
+                    HStack(spacing: -AppSpacing.sm) {
+                        ForEach(CardsSample.accountIcons) { icon in
+                            IconView(
+                                source: .sfSymbol(icon.symbol),
+                                style: .circle(size: AppIconSize.avatar, tint: .monochrome(.white), backgroundColor: icon.color)
+                            )
+                            .overlay(Circle().strokeBorder(AppColors.bgBase, lineWidth: 2))
                         }
                     }
-                    EmptyCardView(sectionTitle: "Loans", emptyTitle: "No active loans")
                 },
+                named: "financeCard",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                EmptyCardView(sectionTitle: "Loans", emptyTitle: "No active loans"),
+                named: "emptyCard",
                 appearances: [.light, .dark, .largeText]
             )
         }
 
         @Test func statCards() async {
+            // One card per snapshot, at the width each has in a two-column grid.
             await assertComponentSnapshot(
-                HStack(alignment: .top, spacing: AppSpacing.md) {
-                    InsightsStatCard(
-                        title: "Income",
-                        amount: 640_000,
-                        currency: "KZT",
-                        color: AppColors.income,
-                        previous: 580_000,
-                        upIsGood: true
+                InsightsStatCard(
+                    title: "Income",
+                    amount: 640_000,
+                    currency: "KZT",
+                    color: AppColors.income,
+                    previous: 580_000,
+                    upIsGood: true
+                ),
+                named: "income",
+                width: 174
+            )
+            await assertComponentSnapshot(
+                InsightsStatCard(
+                    title: "Expenses",
+                    amount: 921_300,
+                    currency: "KZT",
+                    color: AppColors.expense,
+                    previous: 870_000,
+                    upIsGood: false
+                ) {
+                    ProportionBar(
+                        ratio: 0.7,
+                        leftColor: AppColors.destructive,
+                        rightColor: AppColors.bgMuted,
+                        height: 6,
+                        animatesOnAppear: false
                     )
-                    InsightsStatCard(
-                        title: "Expenses",
-                        amount: 921_300,
-                        currency: "KZT",
-                        color: AppColors.expense,
-                        previous: 870_000,
-                        upIsGood: false
-                    ) {
-                        ProportionBar(
-                            ratio: 0.7,
-                            leftColor: AppColors.destructive,
-                            rightColor: AppColors.bgMuted,
-                            height: 6,
-                            animatesOnAppear: false
-                        )
-                        .padding(.top, AppSpacing.xxs)
-                    }
-                }
+                    .padding(.top, AppSpacing.xxs)
+                },
+                named: "expenses",
+                width: 174
             )
         }
 
         @Test func entityRowsAndFilters() async {
             await assertComponentSnapshot(
-                VStack(alignment: .leading, spacing: AppSpacing.lg) {
-                    InsightEntityRow(
-                        iconSource: .sfSymbol("tv.fill"),
-                        title: "Streaming",
-                        subtitle: "3 services",
-                        amount: 12_900,
-                        currency: "KZT",
-                        amountCaption: "per month"
-                    )
-                    .cardContentPadding()
-                    .cardStyle()
-                    UniversalCarousel(config: .filter) {
-                        UniversalFilterButton(title: "Week", onTap: {})
-                        UniversalFilterButton(title: "Month", isSelected: true, onTap: {})
-                        UniversalFilterButton(title: "Year", showChevron: false, onTap: {})
-                    }
+                InsightEntityRow(
+                    iconSource: .sfSymbol("tv.fill"),
+                    title: "Streaming",
+                    subtitle: "3 services",
+                    amount: 12_900,
+                    currency: "KZT",
+                    amountCaption: "per month"
+                )
+                .cardContentPadding()
+                .cardStyle(),
+                named: "row",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                UniversalCarousel(config: .filter) {
+                    UniversalFilterButton(title: "Week", onTap: {})
+                    UniversalFilterButton(title: "Month", isSelected: true, onTap: {})
+                    UniversalFilterButton(title: "Year", showChevron: false, onTap: {})
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
+                named: "filters",
                 appearances: [.light, .dark, .largeText]
             )
         }

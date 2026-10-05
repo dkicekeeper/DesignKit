@@ -79,6 +79,14 @@ All of them have a specimen in the Gallery.
   360 pt component is exactly the Pro Max's 440 pt; a test whose window does not fit fails
   with "does not fit the screen", so split it or narrow it.
 
+**One Liquid Glass card per snapshot.** Glass reflects what lies next to it: a card beside or
+under another shows a faint copy of its neighbour's content along the edge and in the gap. That
+reflection is stable within a run but appears in some runs and not in others, so a test that
+puts two glass cards side by side failed now and then with nothing changed (`financeCards`,
+`scoreCards`, `statCards` in October 2026). Give each glass card its own snapshot with
+`assertComponentSnapshot(_:named:…)` (`<test>.<named>.<appearance>.png`); a row of chips or
+buttons that belongs together stays one snapshot.
+
 ## CI
 
 The `Snapshot tests` job in `.github/workflows/ci.yml` runs `scripts/snapshot-tests.sh` on

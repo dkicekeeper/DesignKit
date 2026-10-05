@@ -52,23 +52,25 @@ extension ComponentSnapshots {
 
         @Test func cardAndChips() async {
             await assertComponentSnapshot(
-                VStack(alignment: .leading, spacing: AppSpacing.lg) {
-                    VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                        Text(verbatim: "Card title")
-                            .font(AppTypography.h4)
-                        Text(verbatim: "cardStyle() is a Liquid Glass surface")
-                            .font(AppTypography.bodySmall)
-                            .foregroundStyle(AppColors.textSecondary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .cardContentPadding()
-                    .cardStyle()
-
-                    HStack(spacing: AppSpacing.sm) {
-                        Text(verbatim: "Selected").filterChipStyle(isSelected: true)
-                        Text(verbatim: "Chip").filterChipStyle()
-                    }
+                VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                    Text(verbatim: "Card title")
+                        .font(AppTypography.h4)
+                    Text(verbatim: "cardStyle() is a Liquid Glass surface")
+                        .font(AppTypography.bodySmall)
+                        .foregroundStyle(AppColors.textSecondary)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .cardContentPadding()
+                .cardStyle(),
+                named: "card"
+            )
+            await assertComponentSnapshot(
+                HStack(spacing: AppSpacing.sm) {
+                    Text(verbatim: "Selected").filterChipStyle(isSelected: true)
+                    Text(verbatim: "Chip").filterChipStyle()
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                named: "chips"
             )
         }
 

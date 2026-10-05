@@ -42,9 +42,14 @@ struct ComponentSnapshots {}
 ///
 /// The view sits on `AppColors.bgBase` with `AppSpacing.lg` around it, animations off; the PNG
 /// is the view's own frame.
+///
+/// - Parameter named: Tells several snapshots of one test apart (`<test>.<named>.<appearance>.png`).
+///   Give each Liquid Glass card its own snapshot: glass reflects a card next to it, and whether
+///   that reflection shows varies from run to run (docs/snapshots.md).
 @MainActor
 func assertComponentSnapshot<V: View>(
     _ view: V,
+    named: String? = nil,
     width: CGFloat = 360,
     appearances: [SnapshotAppearance] = lightAndDark,
     fileID: StaticString = #fileID,
@@ -54,14 +59,15 @@ func assertComponentSnapshot<V: View>(
     column: UInt = #column
 ) async {
     for appearance in appearances {
+        let name = named.map { "\($0).\(appearance.rawValue)" } ?? appearance.rawValue
         let image = await ComponentRenderer.render(
-            view, width: width, appearance: appearance, label: "\(testName).\(appearance.rawValue)"
+            view, width: width, appearance: appearance, label: "\(testName).\(name)"
         )
         assertSnapshot(
             of: image,
             // Tolerates anti-aliasing noise; a moved edge, a new colour or other text fails.
             as: .image(precision: 0.995, perceptualPrecision: 0.98),
-            named: appearance.rawValue,
+            named: name,
             fileID: fileID,
             file: file,
             testName: testName,
