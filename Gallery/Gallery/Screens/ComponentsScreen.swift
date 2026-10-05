@@ -9,12 +9,17 @@ import DesignSupport
 import DesignComponents
 
 struct ComponentsScreen: View {
+    @State private var cashFlowState = CashFlowSpecimenState.loaded
+
     var body: some View {
         ShowcasePage(title: "Components") {
             heroSection
             amountsSection
             cardsSection
             summaryCardsSection
+            scoreCardsSection
+            periodCardsSection
+            paymentCardsSection
             rowsSection
             listRowsSection
             feedbackSection
@@ -152,10 +157,107 @@ struct ComponentsScreen: View {
         }
     }
 
+    // MARK: Score cards (1.2.0, ported from Tenra)
+
+    private var scoreCardsSection: some View {
+        ShowcaseSection(title: "Score cards", subtitle: "ScoreGaugeCard · ScoreCard · TargetProgressCard") {
+            ScoreGaugeCard(score: 72, zoneTicks: [40, 70], grade: "Good",
+                           color: AppColors.success, subtitle: "You're on track")
+            ScoreGaugeCard(score: nil, zoneTicks: [40, 70], grade: "Not enough data",
+                           color: AppColors.textSecondary, subtitle: "Add a month of income to see your score")
+
+            ScoreCard(title: "Health score", grade: "Good", score: 72, color: AppColors.success)
+            ScoreCard(title: "Health score", grade: "Needs attention", score: 34, color: AppColors.destructive)
+
+            TargetProgressCard(
+                systemImage: "banknote.fill",
+                color: AppColors.success,
+                title: "Savings rate",
+                badge: "Weight 30%",
+                summary: "Score 50 of 100",
+                currentLabel: "Current", currentValue: "10.0%",
+                targetLabel: "Target", targetValue: "20% or more",
+                progress: 0.5,
+                explanation: "The share of income left after expenses.",
+                recommendation: "Cut expenses by about 60 000 ₸ a month to reach 20%."
+            )
+            TargetProgressCard(
+                systemImage: "gauge.with.dots.needle.33percent",
+                color: AppColors.warning,
+                title: "Budgets",
+                badge: "Weight 25%",
+                summary: "Score 0 of 100",
+                currentLabel: "Current", currentValue: "—",
+                targetLabel: "Target", targetValue: "Within budget",
+                progress: 0,
+                explanation: "How many categories stayed within their budget.",
+                recommendation: "Set budgets on your categories to count this part.",
+                isMuted: true
+            )
+        }
+    }
+
+    // MARK: Period cards (1.2.0, ported from Tenra)
+
+    private var periodCardsSection: some View {
+        ShowcaseSection(title: "Period cards", subtitle: "ComparisonCard · CashFlowCard (loading / empty / loaded)") {
+            ComparisonCard(previousLabel: "Jan 2026", previousAmount: 95_000,
+                           currentLabel: "Feb 2026", currentAmount: 120_000,
+                           currency: "KZT", increaseIsGood: false)
+            ComparisonCard(previousLabel: "Jan 2026", previousAmount: 530_000,
+                           currentLabel: "Feb 2026", currentAmount: 620_000, currency: "KZT")
+
+            Picker("State", selection: $cashFlowState) {
+                ForEach(CashFlowSpecimenState.allCases, id: \.self) { state in
+                    Text(state.rawValue).tag(state)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            CashFlowCard(
+                title: "History",
+                totals: cashFlowState == .loaded
+                    ? .init(income: 50_000, expenses: 35_000, extra: .init(label: "Planned", amount: 5_000))
+                    : nil,
+                currency: "KZT",
+                isEmpty: cashFlowState == .empty,
+                emptyMessage: "No transactions yet"
+            )
+        }
+    }
+
+    // MARK: Payment cards (1.2.0, ported from Tenra)
+
+    private var paymentCardsSection: some View {
+        ShowcaseSection(title: "Payment cards", subtitle: "RecurringPaymentCard · PayoffProgressCard") {
+            RecurringPaymentCard(iconSource: .brandService("Netflix"), title: "Netflix",
+                                 amount: 9.99, currency: "USD", baseCurrency: "KZT",
+                                 caption: "Next charge on 12 Oct", status: .active)
+            RecurringPaymentCard(iconSource: .sfSymbol("dumbbell.fill"), title: "Gym",
+                                 amount: 15_000, currency: "KZT", status: .paused)
+
+            PayoffProgressCard(
+                iconSource: .sfSymbol("car.fill"), title: "Car loan", subtitle: "Halyk Bank",
+                remaining: 1_200_000, total: 3_000_000, currency: "KZT", progress: 0.6,
+                phase: .inProgress(nextDate: "12 Nov 2026", remainingCaption: "18 left")
+            ) {
+                BadgeView("Credit", color: AppColors.expense)
+            }
+            PayoffProgressCard(
+                iconSource: .sfSymbol("iphone"), title: "Phone", subtitle: "Kaspi",
+                remaining: 0, total: 480_000, currency: "KZT", progress: 1,
+                phase: .done(caption: "Closed 15 Jun 2026")
+            ) {
+                BadgeView("Paid off", color: AppColors.income)
+            }
+        }
+    }
+
     // MARK: List rows (1.1.0, ported from Tenra)
 
     private var listRowsSection: some View {
-        ShowcaseSection(title: "NetAmountRow · ScheduleRow", subtitle: "Period totals · schedule entries") {
+        ShowcaseSection(title: "NetAmountRow · ScheduleRow · BreakdownRow",
+                        subtitle: "Period totals · schedule entries · parts of a whole") {
             VStack(spacing: 0) {
                 NetAmountRow(label: "May 2026", inflow: 530_000, outflow: 320_000, net: 210_000, currency: "KZT")
                 Divider()
@@ -172,6 +274,16 @@ struct ComponentsScreen: View {
                             detail: "int: 3 200 ₸", isDone: true)
                 ScheduleRow(title: "#4", subtitle: "12 Apr 2026", amount: 45_000, currency: "KZT",
                             detail: "int: 2 950 ₸", isDone: false)
+            }
+            .cardContentPadding()
+            .cardStyle()
+
+            VStack(spacing: 0) {
+                BreakdownRow(iconSource: .sfSymbol("fork.knife"), color: AppColors.warning, title: "Food",
+                             subtitle: "Groceries, Cafés", amount: 85_000, currency: "KZT", percentage: 42,
+                             showsChevron: true)
+                BreakdownRow(iconSource: .sfSymbol("car.fill"), color: AppColors.accent, title: "Transport",
+                             amount: 38_000, currency: "KZT", percentage: 19)
             }
             .cardContentPadding()
             .cardStyle()
@@ -287,3 +399,10 @@ struct ComponentsScreen: View {
 }
 
 #Preview { NavigationStack { ComponentsScreen() } }
+
+/// The CashFlowCard specimen's state switch.
+private enum CashFlowSpecimenState: String, CaseIterable {
+    case loading = "Loading"
+    case empty = "Empty"
+    case loaded = "Loaded"
+}

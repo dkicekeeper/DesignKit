@@ -24,7 +24,8 @@ appearances it lists:
 | `FeedbackSnapshotTests` | `EmptyStateView` (3 styles), `MessageBanner`, `InlineStatusText`, `RecommendationBox`, `StepTracker`, `OnboardingStepIndicator`, `PermissionPrimerView`, `OnboardingPage` |
 | `DisplaySnapshotTests` | `BadgeView`, `TrendBadge`, `StatusIndicatorBadge`, `StatTile`, `AvatarView`, `AvatarGroup`, `RatingView`, `ActivityTimeline`, `MonthCalendar`, `ExpandableText`, `FlowLayout`, `HeroSymbol` |
 | `ChartsSnapshotTests` | `LinearProgressBar`, `ProgressRing`, `AmountComparisonBar`, `FormattedAmountText`, `Sparkline`, `LineChart`, `BarChart`, `HeroSparkline`, `OrbChart`, `MiniDonut`, `ProportionBar`, `MiniProportionBar`, `HeroProportionBar`, `HeroHalfGauge`, `MiniHalfGauge`, `HeroMilestoneGauge`, `MiniMilestoneGauge`, `HeroBarPair`, `MiniBarPair` |
-| `SummarySnapshotTests` | `TotalsCard`, `LimitProgressCard`, `WeightBreakdownCard`, `CalculationCard`, `NetAmountRow`, `ScheduleRow` |
+| `SummarySnapshotTests` | `TotalsCard`, `LimitProgressCard`, `WeightBreakdownCard`, `CalculationCard`, `NetAmountRow`, `ScheduleRow`, `ComparisonCard`, `CashFlowCard` (loaded, empty), `RecurringPaymentCard`, `PayoffProgressCard`, `BreakdownRow`, `AmountPercentageView` |
+| `ScoresSnapshotTests` | `ScoreGaugeCard`, `ScoreCard`, `TargetProgressCard` |
 | `InputsSnapshotTests` | `SegmentedPickerView`, `ChipPicker` (single / several), `RatingPicker`, `FormTextField`, `TagInput`, `CalculatorKeypad`, `AmountDigitDisplay`, `FormattedAmountView`, `SpentBudgetText`, `PlusTabLabel`, `BulkDeleteButton`, `EntityActionButton` |
 
 Appearances (`SnapshotAppearance`): `light`, `dark`, and `largeText` (light at accessibility
@@ -34,10 +35,12 @@ text size AX2, which catches truncation and clipping). References live in
 Not covered on purpose:
 - views that animate continuously on a clock, so no two frames match: `SiriGlowView`,
   `SiriWaveRecordingView`, `AccentGlow`, `.borderBeam()`, and the skeleton shimmer
-  (`SkeletonView`, `SkeletonRow`, `.skeleton`). Reduce Motion stops the shimmer, but SwiftUI
-  does not let a test set it (`accessibilityReduceMotion` is read-only);
+  (`SkeletonView`, `SkeletonRow`, `.skeleton`, the loading state of `CashFlowCard`). Reduce
+  Motion stops the shimmer, but SwiftUI does not let a test set it (`accessibilityReduceMotion`
+  is read-only);
 - views whose content depends on today's date: `DateButtonsView`, `DateSectionHeaderView`;
-- `ConvertedAmountView`, which waits for the host app's currency converter;
+- `ConvertedAmountView` (and `RecurringPaymentCard`'s converted line), which waits for the host
+  app's currency converter;
 - containers whose look is the system's (`EditSheetContainer` is a `Form` in a navigation bar)
   or that show the host app's localized strings (`ImportProgressSheet`,
   `OnboardingPageContainer`, `NotificationPermissionView`);

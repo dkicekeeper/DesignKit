@@ -130,6 +130,9 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
   именами): `TotalsCard`, `LimitProgressCard`, `WeightBreakdownCard`, `CalculationCard`,
   `NetAmountRow`, `ScheduleRow`. Модели Tenra в них не попали: Tenra передаёт данные через
   переходники.
+- **1.2.0** — вторая партия: `ComparisonCard`, `CashFlowCard`, `ScoreGaugeCard`, `ScoreCard`,
+  `TargetProgressCard`, `RecurringPaymentCard`, `PayoffProgressCard`, `BreakdownRow`,
+  `AmountPercentageView`. В Tenra остались переходники со старыми именами.
 
 ## Кандидаты на следующие раунды
 

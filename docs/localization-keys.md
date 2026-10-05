@@ -64,7 +64,7 @@ text, not keys. A new key goes there as well.
 | `progress.importing` | ImportProgressSheet | — |
 | `rating.pick %lld %lld` | RatingPicker (VoiceOver: "4 out of 5") | — |
 | `rating.value %@ %lld` | RatingView (VoiceOver: "Rated 4.3 out of 5") | — |
-| `skeleton.loading` | `.skeleton(isLoading:)`, `.skeletonLoadingLabel()`, LoadingButtonLabel (VoiceOver) | `Loading` |
+| `skeleton.loading` | `.skeleton(isLoading:)`, `.skeletonLoadingLabel()`, LoadingButtonLabel, `CashFlowCard`'s default `loadingLabel` (VoiceOver) | `Loading` |
 | `status.active` | StatusIndicatorBadge | — |
 | `status.archived` | StatusIndicatorBadge | — |
 | `status.paused` | StatusIndicatorBadge | — |
