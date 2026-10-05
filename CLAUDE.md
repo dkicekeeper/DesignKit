@@ -113,7 +113,8 @@ rather than importing an app type.
 4. Add a Gallery specimen (existing screen file, or a new one + `xcodegen generate`) and a
    snapshot test (`Gallery/SnapshotTests`), then record it with a manual CI run,
    `record_snapshots: missing` (docs/snapshots.md).
-5. Add any new `String(localized:)` key to `docs/localization-keys.md`.
+5. Add any new `String(localized:)` key to `docs/localization-keys.md` and its English value
+   to `Gallery/Gallery/Localizable.xcstrings`.
 6. Update `docs/design-system.md` (§0 inventory + the component's section).
 7. Push; CI must be green on the package, Gallery, snapshot, Dalada and Tenra jobs.
 

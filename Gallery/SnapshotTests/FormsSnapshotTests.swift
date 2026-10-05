@@ -50,6 +50,8 @@ extension ComponentSnapshots {
                     HeroSection(icon: .sfSymbol("tv.fill"), title: "Streaming", primaryText: "3 services")
                 }
                 .frame(maxWidth: .infinity)
+                // The progress ring is wider than the icon and reaches above the hero's frame.
+                .padding(.vertical, AppSpacing.md)
             )
         }
     }
