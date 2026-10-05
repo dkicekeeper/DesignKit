@@ -54,8 +54,11 @@ public struct TotalsCard: View {
     let title: String?
     let amountFont: Font
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     /// - Parameters:
-    ///   - items: The totals, left to right, spread across the card's width.
+    ///   - items: The totals, left to right, spread across the card's width (one per line
+    ///     at accessibility text sizes).
     ///   - title: A line above the totals (the period shown, for example); `nil` hides it.
     ///   - amountFont: Font of the amounts.
     public init(
@@ -78,17 +81,54 @@ public struct TotalsCard: View {
                     .foregroundStyle(AppColors.textPrimary)
             }
 
-            HStack(alignment: .top, spacing: AppSpacing.xs) {
-                ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                    if index > 0 {
-                        Spacer()
+            if dynamicTypeSize.isAccessibilitySize {
+                // Accessibility text sizes: one item per line, so no title breaks mid-word.
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    ForEach(items) { item in
+                        stackedItem(item)
                     }
-                    totalItem(item)
+                }
+            } else {
+                HStack(alignment: .top, spacing: AppSpacing.xs) {
+                    ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                        if index > 0 {
+                            Spacer()
+                        }
+                        totalItem(item)
+                    }
                 }
             }
         }
         .padding(AppSpacing.lg)
         .cardStyle()
+    }
+
+    /// "Expenses ……… 320 000 ₸ / ↓ 9%": the title on the left, the value on the right.
+    private func stackedItem(_ item: Item) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: AppSpacing.sm) {
+            Text(item.title)
+                .font(AppTypography.bodySmall)
+                .foregroundStyle(AppColors.textSecondary)
+                .layoutPriority(1)
+
+            Spacer(minLength: 0)
+
+            VStack(alignment: .trailing, spacing: AppSpacing.xs) {
+                FormattedAmountText(
+                    amount: item.amount,
+                    currency: currency,
+                    fontSize: amountFont,
+                    fontWeight: .semibold,
+                    color: item.color
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+
+                if let previous = item.previous {
+                    Self.changeBadge(current: item.amount, previous: previous, increaseIsGood: item.increaseIsGood)
+                }
+            }
+        }
     }
 
     private func totalItem(_ item: Item) -> some View {

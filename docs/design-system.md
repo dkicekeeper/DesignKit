@@ -168,6 +168,8 @@ All use Inter variable font with Dynamic Type scaling:
 
 For dynamic-size amount inputs use `Font.custom(AppTypography.fontFamily, …)` directly — that's the one place the family name is exposed.
 
+**Accessibility text sizes (AX1–AX5).** Side-by-side layouts stack when `dynamicTypeSize.isAccessibilitySize` (Apple's HIG rule): a row of columns or a "title …… value" row does not truncate values or break words mid-word, it puts them one under another. Standard sizes keep the side-by-side layout untouched — branch on `isAccessibilitySize`, don't rework the regular layout. Since 1.3.0: `ComparisonCard` (before, now, change), `TotalsCard` (one total per line), `InsightEntityRow` and `BreakdownRow` (the amount under the title), `MenuPickerRow` (the value under the title). Snapshot tests check AX2 (`largeText`).
+
 ### Animations (`AppAnimation`)
 
 | Token | Type | Use For |

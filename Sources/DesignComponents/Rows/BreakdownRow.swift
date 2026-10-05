@@ -53,6 +53,8 @@ public struct BreakdownRow: View {
     let percentage: Double
     let showsChevron: Bool
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     /// - Parameters:
     ///   - color: Tints the icon and its circle.
     ///   - subtitle: One line under the title (the part's own parts, for example).
@@ -79,19 +81,54 @@ public struct BreakdownRow: View {
     }
 
     public var body: some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            stackedBody
+        } else {
+            rowBody
+        }
+    }
+
+    private var leadingIcon: IconConfig {
+        .custom(
+            source: iconSource,
+            style: .circle(
+                size: AppIconSize.xxl,
+                tint: .monochrome(color),
+                backgroundColor: color.opacity(0.15)
+            )
+        )
+    }
+
+    /// Accessibility text sizes: the amount and the share move under the title, which then
+    /// has the row's full width.
+    private var stackedBody: some View {
+        UniversalRow(config: .info, leadingIcon: leadingIcon) {
+            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                Text(title)
+                    .font(AppTypography.body)
+                    .foregroundStyle(AppColors.textPrimary)
+                if let subtitle {
+                    Text(subtitle)
+                        .font(AppTypography.bodySmall)
+                        .foregroundStyle(AppColors.textSecondary)
+                        .lineLimit(1)
+                }
+                FormattedAmountText(amount: amount, currency: currency, color: AppColors.textPrimary)
+                Text(String(format: "%.1f%%", percentage))
+                    .font(AppTypography.bodySmall)
+                    .foregroundStyle(AppColors.textSecondary)
+            }
+        } trailing: {
+            if showsChevron {
+                DisclosureChevron()
+            }
+        }
+    }
+
+    private var rowBody: some View {
         // Built on UniversalRow(.info), the same base as InsightEntityRow: both breakdown rows
         // share the icon slot, spacing (md) and vertical padding (sm).
-        UniversalRow(
-            config: .info,
-            leadingIcon: .custom(
-                source: iconSource,
-                style: .circle(
-                    size: AppIconSize.xxl,
-                    tint: .monochrome(color),
-                    backgroundColor: color.opacity(0.15)
-                )
-            )
-        ) {
+        UniversalRow(config: .info, leadingIcon: leadingIcon) {
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(title)
                     .font(AppTypography.body)

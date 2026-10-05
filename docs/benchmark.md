@@ -133,6 +133,9 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
 - **1.2.0** — вторая партия: `ComparisonCard`, `CashFlowCard`, `ScoreGaugeCard`, `ScoreCard`,
   `TargetProgressCard`, `RecurringPaymentCard`, `PayoffProgressCard`, `BreakdownRow`,
   `AmountPercentageView`. В Tenra остались переходники со старыми именами.
+- **1.3.0** — крупный шрифт (AX1–AX5): `ComparisonCard`, `TotalsCard`, `InsightEntityRow`,
+  `BreakdownRow` и `MenuPickerRow` раскладываются в столбик вместо обрезки и переносов посреди
+  слова. На обычных размерах вид прежний.
 
 ## Кандидаты на следующие раунды
 
