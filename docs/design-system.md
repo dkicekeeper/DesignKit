@@ -865,7 +865,7 @@ if let accounts {
 | `HeroSection`, `SectionHeaderView`, `SettingsSectionHeaderView`, `DateSectionHeaderView` | `HeroSectionSkeleton`, `SectionHeaderViewSkeleton(style:)` (`.compact` for the settings header), `DateSectionHeaderViewSkeleton` |
 | `ExpandableText`, `ActivityTimeline`, `MonthCalendar` | `…Skeleton` |
 
-**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `SegmentedPickerView`, `DateButtonsView`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `BulkDeleteButton`, `EntityActionButton`, `LoadingButtonLabel`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`); messages and flows that appear once something is known (`EmptyStateView`, `EmptyCardView`, `MessageBanner`, `InlineStatusText`, `PromptSheet`, `PermissionPrimerView`, `NotificationPermissionView`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`GradientOrbsBackground`, `SiriGlowView`, `SiriWaveRecordingView`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
+**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `SegmentedPickerView`, `DateButtonsView`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `BulkDeleteButton`, `EntityActionButton`, `LoadingButtonLabel`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`); messages and flows that appear once something is known (`EmptyStateView`, `EmptyCardView`, `MessageBanner`, `InlineStatusText`, `PromptSheet`, `PermissionPrimerView`, `NotificationPermissionView`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`GradientOrbsBackground`, `SiriGlowView`, `SiriWaveRecordingView`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
 
 #### `SkeletonText` *(1.7.0)*
 A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `SkeletonView`. For a component, use its skeleton (above); `.skeleton(isLoading:)` redacts a real view in place, with the system's placeholder shapes.
@@ -1155,6 +1155,34 @@ Return or a comma adds; duplicates (ignoring case) and blanks are dropped; `maxT
 field when full. VoiceOver on ×: key `tags.remove` ("Remove %@"). A fixed set of options →
 `ChipPicker`.
 
+#### `MessageComposer` *(1.11.0)*
+The field at the bottom of a conversation (comments, replies): Liquid Glass that grows to five
+lines, the send button inside it, the quote of the message being answered above the text, the
+send error over the field.
+
+```swift
+List { … }
+    .safeAreaBar(edge: .bottom) {
+        MessageComposer(text: $text, placeholder: String(localized: "comments.placeholder"),
+                        quote: quote, isSending: isSending, canSend: draft.isValid,
+                        errorMessage: sendError, focus: $isFocused,
+                        onCancelQuote: { quote = nil }) {
+            Task { await send() }
+        }
+        .screenPadding()
+        .padding(.bottom, AppSpacing.sm)
+    }
+```
+
+- **Send button:** an accent circle with an arrow; grey while the text is blank (or `canSend` is
+  false), a spinner while `isSending`. The glass corner is concentric with it (radius 20).
+- **Placement:** the glass floats over the content, so use `safeAreaBar` (the scroll edge
+  blurs under it), not a `.bar` background; the caller gives the side margins.
+- **Disabled:** `.disabled(true)` greys it out; let the placeholder say why ("Sign in to
+  comment").
+- VoiceOver: keys `composer.send` ("Send") and `composer.cancelQuote` ("Remove quote").
+- An input: no skeleton.
+
 #### `FlowLayout` *(0.7.0)*
 A `Layout` that wraps subviews to new lines like words: tags, badges, chips that should not
 scroll. `FlowLayout(spacing:lineSpacing:) { ForEach(tags, id: \.self) { BadgeView($0) } }`.
@@ -1398,7 +1426,8 @@ Amount input?
 Text input?
 ├── Hero title (large, animated) → AnimatedTitleInput
 ├── Multiline description → FormTextField(style: .multiline(min:max:))
-└── Single-line form field → FormTextField(style: .standard)
+├── Single-line form field → FormTextField(style: .standard)
+└── A message sent at once (comment, reply) → MessageComposer
 
 Date input?
 ├── Transaction (needs Yesterday/Today shortcuts) → DateButtonsView / .dateButtonsSafeArea()

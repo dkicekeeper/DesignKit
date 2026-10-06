@@ -29,7 +29,7 @@ appearances it lists:
 | `ScoresSnapshotTests` | `ScoreGaugeCard`, `ScoreCard`, `TargetProgressCard` |
 | `BalancesSnapshotTests` | `BalanceCard`, `SelectableBalanceCard`, `BalanceRow`, `ProgressRingRow`, `ProgressRingTile`, `ProgressRingTileGrid`, `MetricCard` (mini chart, none, bottom chart), `GradientOrbsBackground`, `PromptSheet` |
 | `SkeletonsSnapshotTests` | every component skeleton (1.10.0): each card skeleton on its own, rows, charts, gauges and bars, badges, icons, amounts, headers, timeline; the shimmer is stopped (`.skeletonShimmer(false)` in the renderer) |
-| `InputsSnapshotTests` | `FormattedAmountText` sign and unit, hidden amounts (`.amountsHidden`, `AmountVisibilityToggle`, the `HeroProportionBar` legend), `CurrencyPickerMenu` and `CurrencyAmountInput` (calculator display, error), `SegmentedPickerView`, `ChipPicker` (single / several), `RatingPicker`, `FormTextField`, `TagInput`, `CalculatorKeypad`, `AmountDigitDisplay`, `FormattedAmountView`, `SpentBudgetText`, `PlusTabLabel`, `BulkDeleteButton`, `EntityActionButton` |
+| `InputsSnapshotTests` | `FormattedAmountText` sign and unit, hidden amounts (`.amountsHidden`, `AmountVisibilityToggle`, the `HeroProportionBar` legend), `CurrencyPickerMenu` and `CurrencyAmountInput` (calculator display, error), `SegmentedPickerView`, `ChipPicker` (single / several), `RatingPicker`, `FormTextField`, `TagInput`, `MessageComposer` (empty, quote and error, disabled), `CalculatorKeypad`, `AmountDigitDisplay`, `FormattedAmountView`, `SpentBudgetText`, `PlusTabLabel`, `BulkDeleteButton`, `EntityActionButton` |
 
 Appearances (`SnapshotAppearance`): `light`, `dark`, and `largeText` (light at accessibility
 text size AX2, which catches truncation and clipping). References live in

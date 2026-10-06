@@ -42,6 +42,8 @@ text, not keys. A new key goes there as well.
 | `common.color` | ColorPickerRow | — |
 | `common.select` | DateButtonsView | — |
 | `common.startDate` | DatePickerRow | — |
+| `composer.cancelQuote` | MessageComposer (VoiceOver on the quote's ×) | `Remove quote` |
+| `composer.send` | MessageComposer (VoiceOver on the send button) | `Send` |
 | `currency.all` | CurrencyList | `All Currencies` |
 | `currency.conversion.approximate` | CurrencyAmountInput | `≈` |
 | `currency.customizeAction` | CurrencyPickerMenu (with `onCustomize`) | `Customize…` |

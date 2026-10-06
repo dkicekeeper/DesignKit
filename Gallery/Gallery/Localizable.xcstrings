@@ -276,6 +276,28 @@
         }
       }
     },
+    "composer.cancelQuote" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove quote"
+          }
+        }
+      }
+    },
+    "composer.send" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send"
+          }
+        }
+      }
+    },
     "currency.all" : {
       "extractionState" : "manual",
       "localizations" : {

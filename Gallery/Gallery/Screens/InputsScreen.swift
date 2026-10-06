@@ -21,6 +21,12 @@ struct InputsScreen: View {
     @State private var colorHex = "#6366f1"
     @State private var filter = "month"
     @State private var paymentDate = Date()
+    @State private var message = ""
+    @State private var replyText = "Same here, the ice was thin"
+    @State private var replyQuote: MessageComposer.Quote? = MessageComposer.Quote(
+        title: "Replying to Aida", text: "Was anyone on the lake this weekend?"
+    )
+    @State private var isSendingMessage = false
 
     private let slices: [DonutSlice] = [
         DonutSlice(id: "food", amount: 42_000, color: AppColors.accent, label: "Food", percentage: 42),
@@ -164,6 +170,28 @@ struct InputsScreen: View {
                                     amount: 120_000, currency: "KZT")
                             .carouselItemTransition()
                     }
+                }
+            }
+
+            ShowcaseSection(title: "MessageComposer", subtitle: "Glass field · send inside · quote · error · disabled") {
+                VStack(spacing: AppSpacing.lg) {
+                    MessageComposer(text: $message, placeholder: "Add a comment…", isSending: isSendingMessage) {
+                        isSendingMessage = true
+                        Task {
+                            try? await Task.sleep(for: .seconds(1))
+                            message = ""
+                            isSendingMessage = false
+                        }
+                    }
+                    MessageComposer(
+                        text: $replyText,
+                        placeholder: "Reply…",
+                        quote: replyQuote,
+                        errorMessage: "No connection. Try again.",
+                        onCancelQuote: { replyQuote = nil }
+                    ) {}
+                    MessageComposer(text: .constant(""), placeholder: "Sign in to comment") {}
+                        .disabled(true)
                 }
             }
 
