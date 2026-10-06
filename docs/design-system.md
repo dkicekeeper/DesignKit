@@ -56,7 +56,7 @@ DesignKit ships no networking, persistence or FX. A host app wires these once, i
 
 ### 0.2 Charts in DesignKit
 
-**Trend charts (0.5.0)** over the generic `ChartPoint` / `ChartSeries` model: `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `ChartSelectionBanner`, `ChartValuePoint`, `ChartValueFormat`. `OrbChart` (+ `DonutSlice`, `DonutSlice.foldingSlivers`, `DonutSlice.opacityStepped`), `MiniDonut`, `ProportionBar`, `LinearProgressBar`, `ProgressRing`, `AmountComparisonBar`, `MiniProportionBar` / `HeroProportionBar`, `MiniHalfGauge` / `HeroHalfGauge`, `MiniMilestoneGauge` / `HeroMilestoneGauge`, `MiniBarPair` / `HeroBarPair`, `HeroChartEffects` (`chartGlow`, `materialize`, `glassBar`), `ChartZoomControls` + `ChartStyle`, `SiriGlowView`, `SiriWaveRecordingView`. See [charts.md](charts.md).
+**Trend charts (0.5.0)** over the generic `ChartPoint` / `ChartSeries` model: `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `ChartSelectionBanner`, `ChartValuePoint`, `ChartValueFormat`. `OrbChart` (+ `DonutSlice`, `DonutSlice.foldingSlivers`, `DonutSlice.opacityStepped`), `MiniDonut`, `ProportionBar`, `LinearProgressBar`, `ProgressRing` (+ `LimitProgress`, 1.5.0), `AmountComparisonBar`, `MiniProportionBar` / `HeroProportionBar`, `MiniHalfGauge` / `HeroHalfGauge`, `MiniMilestoneGauge` / `HeroMilestoneGauge`, `MiniBarPair` / `HeroBarPair`, `HeroChartEffects` (`chartGlow`, `materialize`, `glassBar`), `ChartZoomControls` + `ChartStyle`, `SiriGlowView`, `SiriWaveRecordingView`. See [charts.md](charts.md).
 
 **Removed in 1.0** (retired from Tenra 2026-07, deprecated in DesignKit until then): `BudgetProgressBar` → `LinearProgressBar`, `BudgetProgressCircle` → `ProgressRing`, `ExpenseIncomeProgressBar` → `AmountComparisonBar`, `DonutChart` + `ChartDisplayMode` → `OrbChart` / `MiniDonut`.
 
@@ -65,10 +65,10 @@ DesignKit ships no networking, persistence or FX. A host app wires these once, i
 These depend on app models/services. Port one only after replacing the dependency with a
 generic input or a host hook (see [CLAUDE.md](../CLAUDE.md) → *Porting a component*).
 
-- **Tenra models** (`Transaction`, `Account`, `CustomCategory`, `RecurringSeries`, loans, deposits): `TransactionCard`, `AccountRow`, `CategoryRow`, `CategoryChip`, `BudgetProgressRow`, `BudgetSettingsSection`, `EntityDetailScaffold`, `GroupedTransactionList`, `CategoryStyleHelper` / `CategoryStyleCache`, `TransactionDisplayHelper`, `CategoryDisplay`.
+- **Tenra models** (`Transaction`, `Account`, `CustomCategory`, `RecurringSeries`, loans, deposits): `TransactionCard`, `BudgetSettingsSection`, `EntityDetailScaffold`, `GroupedTransactionList`, `CategoryStyleHelper` / `CategoryStyleCache`, `TransactionDisplayHelper`, `CategoryDisplay`.
 - **`PeriodDataPoint` adapters** (Tenra): `PeriodDataPoint: ChartPoint`, `PeriodChartSeries` → `ChartSeries`, and convenience inits keeping the old call sites (`granularity:`, `currency:`). `PeriodBreakdownRow` and `ChartAxisHelpers`' period labels stay app-side.
 - **Tenra services**: `EditableHeroSection` + `IconPickerView` / `IconCatalog` (logo registry), `CurrencySelectorView` / `AmountInputView` (settings + FX), `DateFormatters`, `FastDateParser`.
-- **Domain convenience inits / adapters**: `MenuPickerRow where T == RecurringFrequency / LoanType / ReminderOption`, `StatusIndicatorBadge`'s `RecurringSeries.entityStatus`, `DonutSlice.from([CategoryBreakdownItem])`, Tenra's `InsightTrendBadge` (`InsightTrend` → `TrendBadge`), Dalada's `RuleStatusBadge` (`RuleStatus` → `BadgeView`).
+- **Domain convenience inits / adapters**: `MenuPickerRow where T == RecurringFrequency / LoanType / ReminderOption`, `StatusIndicatorBadge`'s `RecurringSeries.entityStatus`, `DonutSlice.from([CategoryBreakdownItem])`, Tenra's `InsightTrendBadge` (`InsightTrend` → `TrendBadge`), Tenra's adapters under the old names of the components ported in 1.1.0–1.5.0 (`AccountRow` → `BalanceRow`, `CategoryRow` → `ProgressRingRow`, `CategoryChip` → `ProgressRingTile`, `BudgetProgressRow` → `LimitProgressCard`, …), Dalada's `RuleStatusBadge` (`RuleStatus` → `BadgeView`).
 
 ---
 
@@ -191,7 +191,7 @@ For dynamic-size amount inputs use `Font.custom(AppTypography.fontFamily, …)` 
 
 **Reduce-motion-aware:** `fastAnimation` (replaces `easeInOut(fast)`), `adaptiveSpring` (overshoot spring used by `BounceButtonStyle`). Check `isReduceMotionEnabled` flag directly when rolling your own.
 
-**Component-local animation constants** live as `private enum` inside the component file (precedent: `BannerAnimation` in `MessageBanner.swift`, `Orb.opacity/blur` in `CategoryGradientBackground.swift`). Don't pull single-component tunables back into `AppAnimation`.
+**Component-local animation constants** live as `private enum` inside the component file (precedent: `BannerAnimation` in `MessageBanner.swift`, `OrbStyle.opacity/blur` in `GradientOrbsBackground.swift`). Don't pull single-component tunables back into `AppAnimation`.
 
 **`BounceButtonStyle`:** `scaleEffect(0.96)` + `brightness(-0.05)` on press. Apply via `.buttonStyle(.bounce)`.
 
@@ -363,12 +363,12 @@ Every row in `Views/Components/Rows/` follows these token rules. New rows MUST c
 
 | Slot | Token | Notes |
 |------|-------|-------|
-| **Leading icon — content rows** | `AppIconSize.xxl` (44) | AccountRow, CategoryRow, BreakdownRow, InsightEntityRow, LimitProgressCard |
+| **Leading icon — content rows** | `AppIconSize.xxl` (44) | BalanceRow, ProgressRingRow, BreakdownRow, InsightEntityRow, LimitProgressCard |
 | **Leading icon — form rows** | `AppIconSize.lg` (24) | InfoRow, MenuPickerRow, DatePickerRow |
 | **Leading icon — settings rows** | `AppIconSize.md` (20) | ActionSettingsRow, NavigationSettingsRow |
 | **HStack spacing (icon ↔ content)** | `AppSpacing.md` (12) | All rows |
 | **Inner VStack (title ↔ subtitle)** | `AppSpacing.xs` (4) | Never `xxs` |
-| **Title — management lists** | `AppTypography.h4` (20 semibold) | AccountRow, CategoryRow (larger touch lists) |
+| **Title — management lists** | `AppTypography.h4` (20 semibold) | BalanceRow, ProgressRingRow (larger touch lists) |
 | **Title — detail / breakdown rows** | `AppTypography.body` (18) or `bodyEmphasis` (18 semibold) | Insights detail rows. Use the `bodyEmphasis` **token** — never `body` + `.fontWeight(.semibold)` |
 | **Subtitle / secondary line** | `AppTypography.bodySmall` (16) / `AppColors.textSecondary` | One token for all secondary subtitles |
 | **Trailing amount** | `FormattedAmountText` (default body/semibold) | Never hand-format money |
@@ -408,6 +408,12 @@ A schedule entry: a checked circle when `isDone` (the row is dimmed with `future
 
 #### `BreakdownRow` *(1.2.0)*
 One part of a breakdown on `UniversalRow(.info)`: a 44 pt circle icon tinted with `color`, the title and an optional one-line subtitle, `AmountPercentageView` (the amount over "42.0%") and, with `showsChevron: true`, a `DisclosureChevron` (wrap the row in a `NavigationLink`). `AmountPercentageView` is public for other rows. Tenra: `CategoryBreakdownRow` (category name, subcategories) is an adapter.
+
+#### `BalanceRow` *(1.5.0)*
+A named balance in a `List`: `IconView` (44 pt, the zoom-transition source with `transitionSourceID` / `transitionNamespace`), the name (h4), the amount (bodySmall, secondary), an optional `Detail` caption line ("Posting: 30 Oct  ·  " followed by an amount in `AppColors.planned`) and an optional secondary `trailingSystemImage` (a lock). No padding: the list's row insets place it; the tap (`Button` + `.plain`) and `.swipeActions` stay at the call site. Tenra: `AccountRow` (account, deposit interest copy, delete) is an adapter.
+
+#### `ProgressRingRow` *(1.5.0)*
+A row whose icon wears a progress ring: a 44 pt circle icon tinted with `color` inside a 3 pt `ProgressRing` (`LimitProgress`; no ring when `nil`), the name (h4), then `SpentBudgetText` (semibold, destructive when over) and "(74%)", or `placeholder` ("No budget set") without a limit. A `List` row like `BalanceRow`: no padding, tap and swipe at the call site. Tenra: `CategoryRow` (category, budget, the over-budget haptic) is an adapter.
 
 #### `DatePickerRow`
 Inline `DatePicker` inside `UniversalRow`.
@@ -533,6 +539,12 @@ A recurring payment: `IconView` (44 pt), the name, the amount, the amount in `ba
 
 #### `PayoffProgressCard` *(1.2.0)*
 Something being paid off: icon, name (h4) and subtitle with an `accessory` view on the right (a type badge), "left ……… total" over an income-tinted `ProgressView`, and a footer: `.inProgress(nextDate:remainingCaption:)` (calendar mark + date, "18 left") or `.done(caption:)` (check mark + "Closed 15 Jun 2026"). Tenra: `LoanCard` is an adapter; its `LoanTypeBadge` stays in Tenra and goes in the accessory.
+
+#### `BalanceCard` *(1.5.0)*
+A named balance sized for a carousel: `IconView` (44 pt), the name (h4) and the amount (bodySmall semibold), `AppSpacing.sm` apart, padded `lg` on `cardStyle`. Navigation, `glassEffectID` and `matchedTransitionSource` go on it at the call site. Tenra: `AccountCard` (accounts carousel) is an adapter.
+
+#### `MetricCard` *(1.5.0)*
+One metric in a feed: a one-line title (secondary), a statement of up to three lines (bodyEmphasis), the value (`.amount` through `FormattedAmountText` or pre-formatted `.text`, h2 bold) with an optional unit and a `TrendBadge(.pill)` that drops under the value when both do not fit (`ViewThatFits`). An optional chart: `.trailing` overlays it at 120 × 120 pt on the trailing edge and the text keeps 128 pt clear; `.bottom` puts it full width under the text. Without a chart the text takes the full width. `ScoreCard` shares the mini-chart footprint. Tenra: `InsightsCardView` (the insight model and which mini chart each insight gets) is an adapter.
 
 ---
 
@@ -720,6 +732,12 @@ Check circle for multi-select and checklist rows; the row carries the label and 
 `.isSelected` trait. `tint` (0.4.0, default accent) colours the filled check: `AppColors.success`
 for a done checklist item, `textTertiary` for one that is already owned and disabled.
 
+#### `SelectableBalanceCard` *(1.5.0)*
+One option of a "pick a balance" list: a full-width card with `IconView` (44 pt), the name (body, secondary) and the amount (body semibold), outlined in `AppColors.accent` (2 pt, `gentleSpring`) when `isSelected`, `.bounce` on press, `.isSelected` trait. Tenra: `AccountRadioButton` (balance from its store) is an adapter.
+
+#### `ProgressRingTile` *(1.5.0)*
+A picker-grid tile: the name (bodyEmphasis, one line) over a 64 pt Liquid Glass circle with the symbol (h2) in `color`, the glass tinted with `color` at 30% when `isSelected`, and an optional 4 pt `ProgressRing` (72 pt) around it. As tall with a ring as without, so grid rows line up. VoiceOver label and hint at the call site. Tenra: `CategoryChip` (category style lookup) is an adapter.
+
 ### Feedback & Status Components
 
 #### `MessageBanner`
@@ -888,6 +906,9 @@ EmptyStateView(
 | `.compact` | Inside cards (home summary) |
 | `.error` | Load failures (with pulse icon + retry) |
 
+#### `PromptSheet` *(1.5.0)*
+A short question in a small sheet: a 44 pt symbol in the accent colour, the title and message centred, a filled accent primary button and a plain secondary one; either answer runs its closure and closes the sheet. Sets its own detent (`height`, 340 pt) and drag indicator. It keeps Tenra's system fonts and 14 pt button radius as they ship (tokens would change the look). Tenra: `RatingSurveyView` (rating service, feedback e-mail) is an adapter.
+
 ---
 
 ### Display Components
@@ -1054,6 +1075,9 @@ RatingPicker(rating: $draft.rating)
 
 Default colour `AppColors.warning`, maximum 5. VoiceOver keys: `rating.value`, `rating.pick`
 ([localization-keys.md](localization-keys.md)).
+
+#### `GradientOrbsBackground` *(1.5.0)*
+Up to three soft, heavily blurred colour orbs (`Orb(color:weight:)`, heaviest first) at fixed positions; weight sets an orb's size and brightness, the first two blur deeper (44) than the third (28), blended `.screen` and rasterised once (`drawingGroup`). Static by design (animating it was the home screen's main jank). Put it behind a glass card, clipped to the card's shape; never inside `List` / `ForEach`. Tenra: `CategoryGradientBackground` (top expense categories → colours) is an adapter.
 
 ---
 
@@ -1308,8 +1332,11 @@ Inside List (settings)?
 Transaction list row?
 └── TransactionCard (NOT UniversalRow)
 
-Account list row?
-└── AccountRow (custom, NOT UniversalRow)
+Balance list row (accounts, wallets)?
+└── BalanceRow (custom, NOT UniversalRow)
+
+Row with a limit (budget ring around the icon)?
+└── ProgressRingRow (custom, NOT UniversalRow)
 ```
 
 ### "Which container?"
@@ -1637,6 +1664,7 @@ with the iOS 27 SDK — Xcode 27; built with Xcode 26 the gate honours Reduce Mo
 | **Card**: has its own surface | Its own: `.padding(AppSpacing.lg)` before `.cardStyle()`, inside the component | — | `TotalsCard`, `LimitProgressCard`, `ComparisonCard`, `CashFlowCard`, `ScoreCard`, `FinanceCard`, `EmptyCardView`, `InsightsStatCard`, `DateSectionHeaderView` |
 | **Compact surface** | Its own, smaller | — | `MessageBanner` (`md`), `ChartSelectionBanner` (`lg` × `sm`) |
 | **Row**: no surface, lives in a container | Vertical only, from its `RowConfiguration` preset | The container's: a card's `.cardContentPadding()`, `List` / `Form` insets, or `.screenPadding()` | `InfoRow`, `InsightEntityRow`, `BreakdownRow`, `NetAmountRow`, `ScheduleRow` (`.info`, 8) |
+| **List row**: lives only in a `List` | None: the `List`'s row insets give both | `List` | `BalanceRow`, `ProgressRingRow` |
 | **Row in a `FormSection`** | Vertical and horizontal (`.standard`: 12 × 16), since `FormSection`'s surface has none | — | `MenuPickerRow`, `DatePickerRow` |
 | **Primitive** | None: the parent places it | — | `BadgeView`, `TrendBadge`, `FormattedAmountText`, `LinearProgressBar`, charts |
 

@@ -138,6 +138,9 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
   слова. На обычных размерах вид прежний.
 - **1.4.0** — единое правило отступов (design-system.md §10): `ScheduleRow` и `NetAmountRow`
   получили вертикальный отступ пресета строк `.info` (8), как остальные строки.
+- **1.5.0** — третья партия: `BalanceCard`, `SelectableBalanceCard`, `BalanceRow`,
+  `ProgressRingRow`, `ProgressRingTile` (с `LimitProgress`), `MetricCard`,
+  `GradientOrbsBackground`, `PromptSheet`. В Tenra остались переходники со старыми именами.
 
 ## Кандидаты на следующие раунды
 
