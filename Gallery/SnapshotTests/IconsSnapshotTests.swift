@@ -22,12 +22,12 @@ extension ComponentSnapshots {
                     HStack(spacing: AppSpacing.lg) {
                         IconView(
                             source: .sfSymbol("fork.knife"),
-                            style: .categoryIcon(size: AppIconSize.xxl, backgroundColor: AppColors.accent.opacity(0.15))
+                            style: .categoryIcon(size: AppIconSize.Tile.sm, backgroundColor: AppColors.accent.opacity(0.15))
                         )
                         IconView(
                             source: .sfSymbol("heart.fill"),
                             style: .circle(
-                                size: AppIconSize.xxl,
+                                size: AppIconSize.Tile.sm,
                                 tint: .monochrome(AppColors.destructive),
                                 backgroundColor: AppColors.destructive.opacity(0.15)
                             )
@@ -35,17 +35,17 @@ extension ComponentSnapshots {
                         IconView(
                             source: .sfSymbol("bolt.fill"),
                             style: .roundedSquare(
-                                size: AppIconSize.xxl,
+                                size: AppIconSize.Tile.sm,
                                 tint: .monochrome(AppColors.warning),
                                 backgroundColor: AppColors.warning.opacity(0.15)
                             )
                         )
-                        IconView(source: nil, style: .placeholder(size: AppIconSize.xxl))
+                        IconView(source: nil, style: .placeholder(size: AppIconSize.Tile.sm))
                     }
                     HStack(spacing: AppSpacing.lg) {
                         IconView(
                             source: .sfSymbol("creditcard.fill"),
-                            style: .glassHero(size: AppIconSize.xxl, tint: .monochrome(AppColors.accent))
+                            style: .glassHero(size: AppIconSize.Tile.sm, tint: .monochrome(AppColors.accent))
                         )
                         IconView(source: .sfSymbol("cart.fill"), size: AppIconSize.xl)
                         IconView(source: .brandService("netflix"), style: .serviceLogo())

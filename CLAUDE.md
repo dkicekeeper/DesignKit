@@ -35,13 +35,17 @@ push to `main` that touches `Sources/`, `Gallery/`, `Package.swift` or `VERSION`
 Sources/
 ├── DesignTokens/      leaf — colors, spacing, radius, icon sizes, typography (Inter), animation,
 │                      modifiers, button styles, AmbientMotionGate, DesignKitTheme, fonts
-├── DesignSupport/     → DesignTokens — icons (IconSource/IconStyle/IconView/BrandLogoView),
+├── DesignSupport/     → DesignTokens — icons (IconSource/IconStyle/IconView),
 │                      formatting, haptics, DominantColorExtractor, host hooks
-└── DesignComponents/  → DesignTokens + DesignSupport — Cards, Charts, Display, Feedback,
-                       Forms, Headers, Icons, Input, Rows
-Gallery/               showcase app (xcodegen; the .xcodeproj is not in git); every public
-                       component has a specimen; each ShowcaseSection is a page of its
-                       category (chips on top, swipe); ships to TestFlight (docs/testflight.md)
+└── DesignComponents/  → DesignTokens + DesignSupport — by what a component does (1.13.0,
+                       docs/gallery-structure.md): Actions, TextInput, Selection, Amounts,
+                       Rows, Cards, Charts, Progress, Feedback, Navigation, Media, Content,
+                       Sheets, Effects
+Gallery/               showcase app (xcodegen; the .xcodeproj is not in git): Foundations and
+                       17 component sections by what a component does (docs/gallery-structure.md);
+                       every public component has a ComponentPage — header, preview canvas
+                       (light/dark), controls for its parameters and states (Loading = its
+                       skeleton), usage notes; ships to TestFlight (docs/testflight.md)
 Gallery/SnapshotTests/ snapshot tests hosted in the Gallery app; references in __Snapshots__
 scripts/               snapshot-tests.sh (CI and local runs of the snapshot tests)
 Tests/                 swift-testing unit tests (formatting, ExpressionEvaluator, calculator
@@ -113,7 +117,8 @@ rather than importing an app type.
 
 ## Porting a Component (checklist)
 
-1. Copy the file into the matching `Sources/DesignComponents/<Group>/` folder; drop `#Preview`
+1. Copy the file into the matching `Sources/DesignComponents/<Group>/` folder (the group by what
+   the component does, docs/gallery-structure.md); drop `#Preview`
    blocks (the Gallery replaces them) and add `import DesignTokens` / `import DesignSupport`.
 2. `public` on the type, `body`, nested types used in the API, and protocol requirements
    (`id`, `body(content:)`, `==`). Write an explicit `public init` — memberwise inits are internal.
@@ -126,10 +131,11 @@ rather than importing an app type.
    grey shapes for its text, amounts, icons and charts, `AppRadius.soft` for a shape with no
    corner of its own. One `.shimmer()` on the content, `.skeletonLoadingLabel()` on the whole
    (docs/design-system.md, "Component skeletons").
-4. Add a Gallery specimen (one `ShowcaseSection` per component, so it gets its own page, in
-   an existing screen file or a new one + `xcodegen generate`; the skeleton on the Skeletons
-   page) and a snapshot test (the skeleton's in `SkeletonsSnapshotTests`) in
-   `Gallery/SnapshotTests` (one Liquid Glass card per snapshot; `named:` tells them apart),
+4. Add a Gallery page: a `ComponentPage` in its section's screen (`Gallery/Gallery/Screens/`, by
+   what the component does), with a control for each parameter and a `StateControl` whose
+   "Loading" shows its skeleton (plus Empty / Error / Disabled when it has them); a new screen
+   needs `xcodegen generate`. Add a snapshot test in `Gallery/SnapshotTests` (the skeleton's in
+   `SkeletonsSnapshotTests`; one Liquid Glass card per snapshot; `named:` tells them apart),
    then record it with a manual CI run, `record_snapshots: missing` (docs/snapshots.md).
 5. Add any new `String(localized:)` key to `docs/localization-keys.md` and its English value
    to `Gallery/Gallery/Localizable.xcstrings`.
@@ -176,3 +182,4 @@ rather than importing an app type.
 | Gallery TestFlight pipeline | [docs/testflight.md](docs/testflight.md) |
 | Snapshot tests: what is covered, recording references, the pinned Xcode | [docs/snapshots.md](docs/snapshots.md) |
 | What exists vs Apple HIG / Material / Fluent / Carbon / Polaris / Atlassian, next candidates | [docs/benchmark.md](docs/benchmark.md) |
+| Where a component goes (Gallery sections, source folders), how its Gallery page is built | [docs/gallery-structure.md](docs/gallery-structure.md) |

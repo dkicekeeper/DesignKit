@@ -52,8 +52,8 @@ public struct IconView: View {
     /// Convenience initializer с автоматическим выбором стиля по типу источника
     /// - Parameters:
     ///   - source: Источник иконки (IconSource)
-    ///   - size: Размер иконки (по умолчанию AppIconSize.xxl=44pt из Design System)
-    public init(source: IconSource?, size: CGFloat = AppIconSize.xxl) {
+    ///   - size: Размер иконки (по умолчанию AppIconSize.Tile.sm=44pt из Design System)
+    public init(source: IconSource?, size: CGFloat = AppIconSize.Tile.sm) {
         self.source = source
 
         // Автоматический выбор стиля в зависимости от типа источника
@@ -194,8 +194,7 @@ public struct IconView: View {
 
     @ViewBuilder
     private func brandServiceView(_ brandName: String) -> some View {
-        // Интегрируем BrandLogoView напрямую для унификации
-        BrandLogoView(brandName: brandName, size: contentSize)
+        BrandLogoImage(brandName: brandName, size: contentSize)
     }
 
     // MARK: - Placeholder View

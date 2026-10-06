@@ -195,7 +195,7 @@ public struct IconStyle: Equatable, Hashable {
     }
 
     /// Крупная иконка категории для монеты (в CategoryRow)
-    public static func categoryCoin(size: CGFloat = AppIconSize.mega) -> IconStyle {
+    public static func categoryCoin(size: CGFloat = AppIconSize.Tile.xl) -> IconStyle {
         .circle(
             size: size,
             tint: .accentMonochrome,
@@ -213,7 +213,7 @@ public struct IconStyle: Equatable, Hashable {
     }
 
     /// Крупный логотип для карточек счетов (круг)
-    public static func roundedLogoLarge(size: CGFloat = AppIconSize.avatar) -> IconStyle {
+    public static func roundedLogoLarge(size: CGFloat = AppIconSize.Tile.xs) -> IconStyle {
         .circle(
             size: size,
             tint: .original
@@ -230,7 +230,7 @@ public struct IconStyle: Equatable, Hashable {
     }
 
     /// Крупная иконка сервиса для карточек подписок (круг)
-    public static func serviceLogoLarge(size: CGFloat = AppIconSize.avatar) -> IconStyle {
+    public static func serviceLogoLarge(size: CGFloat = AppIconSize.Tile.xs) -> IconStyle {
         .circle(
             size: size,
             tint: .original
@@ -268,14 +268,14 @@ public struct IconStyle: Equatable, Hashable {
     /// Иконка для Empty State
     public static func emptyState() -> IconStyle {
         .circle(
-            size: AppIconSize.ultra,
+            size: AppIconSize.Tile.xxxl,
             tint: .accentMonochrome
         )
     }
 
     /// Стеклянная иконка для hero секций (подписки, счета)
     /// Используется в: SubscriptionDetailView, AccountDetailView
-    public static func glassHero(size: CGFloat = AppIconSize.ultra, tint: IconTint = .original) -> IconStyle {
+    public static func glassHero(size: CGFloat = AppIconSize.Tile.xxxl, tint: IconTint = .original) -> IconStyle {
         .circle(
             size: size,
             tint: tint,
@@ -284,7 +284,7 @@ public struct IconStyle: Equatable, Hashable {
     }
 
     /// Стеклянная иконка сервиса (круг)
-    public static func glassService(size: CGFloat = AppIconSize.avatar) -> IconStyle {
+    public static func glassService(size: CGFloat = AppIconSize.Tile.xs) -> IconStyle {
         .circle(
             size: size,
             tint: .original,
@@ -304,7 +304,7 @@ public struct IconStyle: Equatable, Hashable {
 
         if case .circle = shape,
            case .original = tint,
-           (size == AppIconSize.xl || size == AppIconSize.avatar) {
+           (size == AppIconSize.xl || size == AppIconSize.Tile.xs) {
             return String(localized: "iconStyle.preset.serviceLogo")
         }
 

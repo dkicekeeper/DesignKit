@@ -237,7 +237,7 @@ public struct OrbChart: View {
         if showsCenterIcon, let centerIcon {
             IconView(
                 source: centerIcon,
-                style: .circle(size: AppIconSize.ultra, tint: .monochrome(.white), backgroundColor: nil)
+                style: .circle(size: AppIconSize.Tile.xxxl, tint: .monochrome(.white), backgroundColor: nil)
             )
         }
     }

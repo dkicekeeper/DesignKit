@@ -210,7 +210,7 @@ private enum ThumbnailText {
 public enum ThumbnailMetrics {
     public static let cardWidth: CGFloat = 200
     public static let cardImageHeight: CGFloat = 110
-    public static let rowImageSize: CGFloat = AppIconSize.mega
+    public static let rowImageSize: CGFloat = AppIconSize.Tile.xl
 }
 
 // MARK: - Skeletons

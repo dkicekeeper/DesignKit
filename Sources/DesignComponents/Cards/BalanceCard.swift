@@ -37,7 +37,7 @@ public struct BalanceCard: View {
 
     public var body: some View {
         HStack(spacing: AppSpacing.sm) {
-            IconView(source: iconSource, size: AppIconSize.xxl)
+            IconView(source: iconSource, size: AppIconSize.Tile.sm)
 
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(title)
@@ -66,7 +66,7 @@ public struct BalanceCardSkeleton: View {
 
     public var body: some View {
         HStack(spacing: AppSpacing.sm) {
-            IconViewSkeleton(size: AppIconSize.xxl)
+            IconViewSkeleton(size: AppIconSize.Tile.sm)
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 SkeletonText(AppTypography.h4, width: 120)
                 SkeletonText(AppTypography.bodySmall, width: 90)

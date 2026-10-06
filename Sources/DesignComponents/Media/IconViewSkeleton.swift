@@ -2,7 +2,7 @@
 //  IconViewSkeleton.swift
 //  DesignKit
 //
-//  Placeholder of an `IconView` (and so of `BrandLogoView`): the icon's size and shape, grey.
+//  Placeholder of an `IconView` (a brand logo too): the icon's size and shape, grey.
 //  `IconView` lives in DesignSupport; its skeleton needs the skeleton primitives, so it lives
 //  here.
 //
@@ -26,7 +26,7 @@ public struct IconViewSkeleton: View {
     }
 
     /// Like `IconView(source:size:)`: a circle.
-    public init(size: CGFloat = AppIconSize.xxl) {
+    public init(size: CGFloat = AppIconSize.Tile.sm) {
         self.style = .circle(size: size)
     }
 

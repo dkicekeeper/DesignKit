@@ -39,7 +39,7 @@ import DesignSupport
 /// // Embedded in row — parent row carries accessibility meaning
 /// ProgressRing(
 ///     progress: budgetProgress.percentage / 100,
-///     size: AppIconSize.categoryIcon,
+///     size: AppIconSize.Tile.lg,
 ///     lineWidth: 3,
 ///     isOverBudget: budgetProgress.isOverBudget
 /// )
@@ -47,7 +47,7 @@ import DesignSupport
 /// // Standalone — provide label for VoiceOver
 /// ProgressRing(
 ///     progress: 0.75,
-///     size: AppIconSize.budgetRing,
+///     size: AppIconSize.Tile.xxl,
 ///     lineWidth: 4,
 ///     isOverBudget: false,
 ///     accessibilityLabel: String(localized: "75% бюджета использовано")
@@ -59,7 +59,7 @@ public struct ProgressRing: View {
     let progress: Double
 
     /// Width and height of the circular ring frame.
-    var size: CGFloat = AppIconSize.categoryIcon
+    var size: CGFloat = AppIconSize.Tile.lg
 
     /// Stroke line width.
     var lineWidth: CGFloat = 3
@@ -125,7 +125,7 @@ public struct ProgressRing: View {
 
     public init(
         progress: Double,
-        size: CGFloat = AppIconSize.categoryIcon,
+        size: CGFloat = AppIconSize.Tile.lg,
         lineWidth: CGFloat = 3,
         isOverBudget: Bool = false,
         overrideColor: Color? = nil,
@@ -200,7 +200,7 @@ public struct ProgressRingSkeleton: View {
     let size: CGFloat
     let lineWidth: CGFloat
 
-    public init(size: CGFloat = AppIconSize.categoryIcon, lineWidth: CGFloat = 3) {
+    public init(size: CGFloat = AppIconSize.Tile.lg, lineWidth: CGFloat = 3) {
         self.size = size
         self.lineWidth = lineWidth
     }

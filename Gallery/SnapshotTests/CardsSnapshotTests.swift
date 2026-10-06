@@ -24,7 +24,7 @@ extension ComponentSnapshots {
                         ForEach(CardsSample.accountIcons) { icon in
                             IconView(
                                 source: .sfSymbol(icon.symbol),
-                                style: .circle(size: AppIconSize.avatar, tint: .monochrome(.white), backgroundColor: icon.color)
+                                style: .circle(size: AppIconSize.Tile.xs, tint: .monochrome(.white), backgroundColor: icon.color)
                             )
                             .overlay(Circle().strokeBorder(AppColors.bgBase, lineWidth: 2))
                         }

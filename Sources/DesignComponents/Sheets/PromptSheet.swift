@@ -45,7 +45,7 @@ public struct PromptSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     /// - Parameters:
-    ///   - systemImage: A 44 pt (`AppIconSize.xxl`) symbol in the accent colour at the top.
+    ///   - systemImage: A 44 pt (`AppIconSize.Tile.sm`) symbol in the accent colour at the top.
     ///   - height: The sheet's detent.
     ///   - onPrimary: Runs, then the sheet closes.
     ///   - onSecondary: Runs, then the sheet closes.
@@ -72,7 +72,7 @@ public struct PromptSheet: View {
     public var body: some View {
         VStack(spacing: AppSpacing.lg) {
             Image(systemName: systemImage)
-                .font(.system(size: AppIconSize.xxl))
+                .font(.system(size: AppIconSize.Tile.sm))
                 .foregroundStyle(AppColors.accent)
                 .padding(.top, AppSpacing.xl)
 

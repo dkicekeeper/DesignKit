@@ -92,7 +92,7 @@ public struct BreakdownRow: View {
         .custom(
             source: iconSource,
             style: .circle(
-                size: AppIconSize.xxl,
+                size: AppIconSize.Tile.sm,
                 tint: .monochrome(color),
                 backgroundColor: AppColors.pale(color)
             )
@@ -163,7 +163,7 @@ public struct BreakdownRowSkeleton: View {
 
     public var body: some View {
         HStack(spacing: RowConfiguration.info.spacing) {
-            IconViewSkeleton(size: AppIconSize.xxl)
+            IconViewSkeleton(size: AppIconSize.Tile.sm)
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 SkeletonText(AppTypography.body, width: 110)
                 SkeletonText(AppTypography.bodySmall, width: 70)

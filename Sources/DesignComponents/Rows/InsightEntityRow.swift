@@ -51,7 +51,7 @@ public struct InsightEntityRow<Subtitle: View>: View {
             // row's full width and does not break mid-word.
             UniversalRow(
                 config: .info,
-                leadingIcon: iconSource.map { .auto(source: $0, size: AppIconSize.xxl) }
+                leadingIcon: iconSource.map { .auto(source: $0, size: AppIconSize.Tile.sm) }
             ) {
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text(title)
@@ -66,7 +66,7 @@ public struct InsightEntityRow<Subtitle: View>: View {
         } else {
             UniversalRow(
                 config: .info,
-                leadingIcon: iconSource.map { .auto(source: $0, size: AppIconSize.xxl) }
+                leadingIcon: iconSource.map { .auto(source: $0, size: AppIconSize.Tile.sm) }
             ) {
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text(title)
@@ -139,7 +139,7 @@ public struct InsightEntityRowSkeleton: View {
 
     public var body: some View {
         HStack(spacing: RowConfiguration.info.spacing) {
-            IconViewSkeleton(size: AppIconSize.xxl)
+            IconViewSkeleton(size: AppIconSize.Tile.sm)
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 SkeletonText(AppTypography.body, width: 110)
                 SkeletonText(AppTypography.bodySmall, width: 70)

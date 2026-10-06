@@ -10,14 +10,12 @@ import SwiftUI
 // MARK: - Convenience Extensions
 
 public extension View {
-    /// Primary CTA — `.glassProminent` + accent tint + capsule.
-    /// Используй для: Save, Add, Confirm, primary actions.
+    /// The main action: shorthand of `appButton(.primary, disabled:)` — `.glassProminent`,
+    /// the accent, `.large`. Save, Add, Confirm.
     ///
-    /// Sizing follows the button's label — для full-width CTA добавь
-    /// `.frame(maxWidth: .infinity)` к содержимому Button.
-    ///
-    /// `disabled: true` блокирует тапы (`.disabled` modifier) — glass-стиль сам
-    /// затемнит кнопку. Дополняет SwiftUI `.disabled()` modifier.
+    /// Sizing follows the button's label; for a full-width call to action put
+    /// `.frame(maxWidth: .infinity)` on the label. `disabled: true` blocks taps and the glass
+    /// dims itself. For another role or size use `appButton(_:role:size:disabled:)`.
     func primaryButton(disabled: Bool = false) -> some View {
         self
             .buttonStyle(.glassProminent)
@@ -26,8 +24,8 @@ public extension View {
             .disabled(disabled)
     }
 
-    /// Secondary action — `.glass`.
-    /// Используй для: Cancel, Back, secondary actions.
+    /// A secondary action: shorthand of `appButton(.secondary)` — `.glass`, `.large`, no tint.
+    /// Cancel, Back.
     func secondaryButton() -> some View {
         self
             .buttonStyle(.glass)

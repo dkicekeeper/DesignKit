@@ -81,12 +81,12 @@ private struct ColorSwatch: View {
             ZStack {
                 Circle()
                     .fill(color)
-                    .frame(width: AppIconSize.xxl, height: AppIconSize.xxl)
+                    .frame(width: AppIconSize.Tile.sm, height: AppIconSize.Tile.sm)
 
                 if isSelected {
                     Circle()
                         .stroke(.white, lineWidth: 3)
-                        .frame(width: AppIconSize.xxl, height: AppIconSize.xxl)
+                        .frame(width: AppIconSize.Tile.sm, height: AppIconSize.Tile.sm)
 
                     Image(systemName: "checkmark")
                         .font(.system(size: AppIconSize.md, weight: .bold))
@@ -133,7 +133,7 @@ public struct ColorPickerRowSkeleton: View {
             SkeletonText(AppTypography.bodyEmphasis, width: 100)
             HStack(spacing: AppSpacing.sm) {
                 ForEach(0..<swatches, id: \.self) { _ in
-                    SkeletonView.circle(AppIconSize.xxl)
+                    SkeletonView.circle(AppIconSize.Tile.sm)
                 }
             }
             .padding(.horizontal, AppSpacing.sm)

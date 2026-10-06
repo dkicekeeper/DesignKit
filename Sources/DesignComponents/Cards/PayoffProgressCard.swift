@@ -74,7 +74,7 @@ public struct PayoffProgressCard<Accessory: View>: View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
             // Header: icon + name + subtitle + accessory
             HStack(alignment: .top) {
-                IconView(source: iconSource, size: AppIconSize.xxl)
+                IconView(source: iconSource, size: AppIconSize.Tile.sm)
 
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text(title)
@@ -185,7 +185,7 @@ public struct PayoffProgressCardSkeleton: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
             HStack(alignment: .top) {
-                IconViewSkeleton(size: AppIconSize.xxl)
+                IconViewSkeleton(size: AppIconSize.Tile.sm)
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     SkeletonText(AppTypography.h4, width: 140)
                     SkeletonText(AppTypography.bodySmall, width: 100)
