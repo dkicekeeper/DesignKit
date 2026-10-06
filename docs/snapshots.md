@@ -66,7 +66,13 @@ All of them have a specimen in the Gallery.
   until three frames in a row are identical, for up to 8 s (Liquid Glass animates its shadow
   for a moment; two frames were not enough between stacked cards, whose shadows can hold still
   for one interval and move again). A snapshot that never settles prints
-  `SNAPSHOT-UNSETTLED <test>.<appearance>` to the log. The PNG is the
+  `SNAPSHOT-UNSETTLED <test>.<appearance>` to the log. When the run compares (not when it
+  records), a render that differs from its reference is drawn once more in a new window and
+  only the second one is asserted (`SNAPSHOT-RETRY <test>.<appearance>` in the log): Liquid
+  Glass now and then draws a tall card without the shading along its bottom edge for a whole
+  render (October 2026, about one tall-card render in 25 at large text; a probe showed the
+  shading either there from the first frame for 10 s, or not). The comparison is as strict as
+  before; a real change differs twice and fails. The PNG is the
   component's own frame: the shadow glass casts around a card falls outside it, and the
   simulator renders that shadow a little differently from run to run, while the component's
   own pixels do not change. Then it compares with
