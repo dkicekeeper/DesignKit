@@ -148,24 +148,32 @@ private struct CurrencyAmountInputPage: View {
     @State private var amount = "1250"
     @State private var currency = "USD"
     @State private var showsError = false
+    /// The "≈" line's currency: the base currency (KZT, the same as leaving it out) or a
+    /// euro card's.
+    @State private var equivalentCurrency = "KZT"
 
     var body: some View {
         ComponentPage(
             name: "CurrencyAmountInput",
-            summary: "An amount with its currency chip and, in another currency, ≈ the amount in the base one.",
+            summary: "An amount with its currency chip and, in another currency, ≈ the amount in the base currency or in an account's (equivalentCurrency).",
             since: "1.10.0",
             apps: [.tenra],
-            notes: ["The ≈ line needs the app's DesignKitCurrencyConverter."]
+            notes: [
+                "The ≈ line needs the app's DesignKitCurrencyConverter.",
+                "With a EUR card, USD shows ≈ €; EUR, the card's own currency, shows ≈ ₸."
+            ]
         ) {
             CurrencyAmountInput(
                 amount: $amount,
                 currency: $currency,
                 baseCurrency: "KZT",
+                equivalentCurrency: equivalentCurrency,
                 currencies: ["KZT", "USD", "EUR", "RUB"],
                 errorMessage: showsError ? "Not enough on the account" : nil
             )
         } controls: {
             ChoiceControl("Currency", selection: $currency, options: [("KZT", "KZT"), ("USD", "USD"), ("EUR", "EUR")])
+            ChoiceControl("≈ in", selection: $equivalentCurrency, options: [("Base currency", "KZT"), ("EUR card", "EUR")])
             ToggleControl("Error", isOn: $showsError)
         }
     }
