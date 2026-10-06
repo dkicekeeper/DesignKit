@@ -96,7 +96,8 @@ All of them have a specimen in the Gallery.
 under another shows a faint copy of its neighbour's content along the edge and in the gap. That
 reflection is stable within a run but appears in some runs and not in others, so a test that
 puts two glass cards side by side failed now and then with nothing changed (`financeCards`,
-`scoreCards`, `statCards` in October 2026). Give each glass card its own snapshot with
+`scoreCards`, `statCards` in October 2026; `messageComposer`, three glass fields in a column,
+settled half a pixel apart from run to run). Give each glass card its own snapshot with
 `assertComponentSnapshot(_:named:…)` (`<test>.<named>-<appearance>.png`); a row of chips or
 buttons that belongs together stays one snapshot.
 

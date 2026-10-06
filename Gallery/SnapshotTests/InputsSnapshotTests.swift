@@ -48,22 +48,28 @@ extension ComponentSnapshots {
             )
         }
 
+        /// One composer per snapshot: three glass fields stacked in one picture settled in one of
+        /// two layouts from run to run (October 2026), half a pixel apart.
         @Test func messageComposer() async {
             await assertComponentSnapshot(
-                VStack(spacing: AppSpacing.lg) {
-                    MessageComposer(text: .constant(""), placeholder: "Add a comment…") {}
-                    MessageComposer(
-                        text: .constant("Same here, the ice was thin near the north shore"),
-                        placeholder: "Reply…",
-                        quote: MessageQuote(title: "Replying to Aida", text: "Was anyone on the lake this weekend?"),
-                        errorMessage: "No connection. Try again.",
-                        onCancelQuote: {}
-                    ) {}
-                    MessageComposer(text: .constant(""), placeholder: "Sign in to comment") {}
-                        .disabled(true)
-                }
-                .frame(maxWidth: .infinity),
+                MessageComposer(text: .constant(""), placeholder: "Add a comment…") {},
+                named: "empty"
+            )
+            await assertComponentSnapshot(
+                MessageComposer(
+                    text: .constant("Same here, thin ice up north"),
+                    placeholder: "Reply…",
+                    quote: MessageQuote(title: "Replying to Aida", text: "Was anyone on the lake this weekend?"),
+                    errorMessage: "No connection. Try again.",
+                    onCancelQuote: {}
+                ) {},
+                named: "reply",
                 appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                MessageComposer(text: .constant(""), placeholder: "Sign in to comment") {}
+                    .disabled(true),
+                named: "disabled"
             )
         }
 
