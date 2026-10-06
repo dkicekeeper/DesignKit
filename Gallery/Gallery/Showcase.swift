@@ -107,7 +107,7 @@ extension ContainerValues {
 // MARK: - Component page
 
 /// Which app uses a component, shown in its page header.
-enum GalleryApp: String {
+enum ConsumerApp: String {
     case tenra = "Tenra"
     case dalada = "Dalada"
 }
@@ -139,7 +139,7 @@ struct ComponentPage<Preview: View, Controls: View>: View {
     let name: String
     let summary: String
     var since: String? = nil
-    var apps: [GalleryApp] = []
+    var apps: [ConsumerApp] = []
     var canvas: CanvasStyle = .standard
     var notes: [String] = []
     @ViewBuilder var preview: Preview
@@ -183,7 +183,7 @@ extension ComponentPage where Controls == EmptyView {
         name: String,
         summary: String,
         since: String? = nil,
-        apps: [GalleryApp] = [],
+        apps: [ConsumerApp] = [],
         canvas: CanvasStyle = .standard,
         notes: [String] = [],
         @ViewBuilder preview: () -> Preview
@@ -204,7 +204,7 @@ private struct ComponentHeader: View {
     let name: String
     let summary: String
     let since: String?
-    let apps: [GalleryApp]
+    let apps: [ConsumerApp]
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
