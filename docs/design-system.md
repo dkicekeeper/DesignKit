@@ -864,7 +864,7 @@ if let accounts {
 | `FormattedAmountText`, `FormattedAmountView`, `ConvertedAmountView`, `SpentBudgetText`, `AmountPercentageView` | `FormattedAmountTextSkeleton(font:width:)`; `RedactableAmount(isLoading: true)` draws one itself |
 | `HeroSection`, `SectionHeaderView`, `SettingsSectionHeaderView`, `DateSectionHeaderView` | `HeroSectionSkeleton`, `SectionHeaderViewSkeleton(style:)` (`.compact` for the settings header), `DateSectionHeaderViewSkeleton` |
 | `ExpandableText`, `ActivityTimeline`, `MonthCalendar` | `…Skeleton` |
-| `PersonRow`, `CommentRow`, `ThreadCard`, `ReviewCard`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.11.0) | `…Skeleton` (`StatsStripSkeleton(count:)`, `AchievementTileSkeleton(medalSize:)`, `ThumbnailCardSkeleton(width:)`, `PersonRowSkeleton(showsSubtitle:)`) |
+| `PersonRow`, `CommentRow`, `ThreadCard`, `ReviewCard`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.12.0) | `…Skeleton` (`StatsStripSkeleton(count:)`, `AchievementTileSkeleton(medalSize:)`, `ThumbnailCardSkeleton(width:)`, `PersonRowSkeleton(showsSubtitle:)`) |
 
 **No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPickerView`, `DateButtonsView`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `BulkDeleteButton`, `EntityActionButton`, `LoadingButtonLabel`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`); messages and flows that appear once something is known (`EmptyStateView`, `EmptyCardView`, `MessageBanner`, `InlineStatusText`, `PromptSheet`, `PermissionPrimerView`, `NotificationPermissionView`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`GradientOrbsBackground`, `SiriGlowView`, `SiriWaveRecordingView`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
 
@@ -1156,7 +1156,7 @@ Return or a comma adds; duplicates (ignoring case) and blanks are dropped; `maxT
 field when full. VoiceOver on ×: key `tags.remove` ("Remove %@"). A fixed set of options →
 `ChipPicker`.
 
-#### `MessageComposer` *(1.11.0)*
+#### `MessageComposer` *(1.12.0)*
 The field at the bottom of a conversation (comments, replies): Liquid Glass that grows to five
 lines, the send button inside it, the quote of the message being answered above the text, the
 send error over the field.
@@ -1212,7 +1212,7 @@ Up to three soft, heavily blurred colour orbs (`Orb(color:weight:)`, heaviest fi
 
 ---
 
-### Community & Progress Components *(1.11.0)*
+### Community & Progress Components *(1.12.0)*
 
 Ported from Dalada with neutral names. The app keeps what loads and acts (photos behind signed
 URLs, the reactions store, moderation, the achievement catalogue) and passes views and

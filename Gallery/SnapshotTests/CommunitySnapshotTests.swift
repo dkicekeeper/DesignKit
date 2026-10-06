@@ -3,7 +3,7 @@
 //  DesignKit Gallery snapshot tests
 //
 //  People, comments, discussions, reviews, reactions; achievements, checklists, counters,
-//  streaks and picture cards (1.11.0, from Dalada). Times are relative to now ("10 minutes
+//  streaks and picture cards (1.12.0, from Dalada). Times are relative to now ("10 minutes
 //  ago"), so they render the same on every run.
 //
 

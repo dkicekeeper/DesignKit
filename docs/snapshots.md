@@ -28,8 +28,8 @@ appearances it lists:
 | `SummarySnapshotTests` | `TotalsCard`, `LimitProgressCard`, `WeightBreakdownCard`, `CalculationCard`, `NetAmountRow`, `ScheduleRow`, `ComparisonCard`, `CashFlowCard` (loaded, empty), `RecurringPaymentCard`, `PayoffProgressCard`, `BreakdownRow`, `AmountPercentageView` |
 | `ScoresSnapshotTests` | `ScoreGaugeCard`, `ScoreCard`, `TargetProgressCard` |
 | `BalancesSnapshotTests` | `BalanceCard`, `SelectableBalanceCard`, `BalanceRow`, `ProgressRingRow`, `ProgressRingTile`, `ProgressRingTileGrid`, `MetricCard` (mini chart, none, bottom chart), `GradientOrbsBackground`, `PromptSheet` |
-| `SkeletonsSnapshotTests` | every component skeleton (1.10.0): each card skeleton on its own, rows, charts, gauges and bars, badges, icons, amounts, headers, timeline, the community and progress components (1.11.0); the shimmer is stopped (`.skeletonShimmer(false)` in the renderer) |
-| `CommunitySnapshotTests` | `PersonRow`, `CommentRow` (with a quote and actions), `ThreadCard`, `ReviewCard`, `ReactionButton`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.11.0) |
+| `SkeletonsSnapshotTests` | every component skeleton (1.10.0): each card skeleton on its own, rows, charts, gauges and bars, badges, icons, amounts, headers, timeline, the community and progress components (1.12.0); the shimmer is stopped (`.skeletonShimmer(false)` in the renderer) |
+| `CommunitySnapshotTests` | `PersonRow`, `CommentRow` (with a quote and actions), `ThreadCard`, `ReviewCard`, `ReactionButton`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.12.0) |
 | `InputsSnapshotTests` | `FormattedAmountText` sign and unit, hidden amounts (`.amountsHidden`, `AmountVisibilityToggle`, the `HeroProportionBar` legend), `CurrencyPickerMenu` and `CurrencyAmountInput` (calculator display, error), `SegmentedPickerView`, `ChipPicker` (single / several), `RatingPicker`, `FormTextField`, `TagInput`, `MessageComposer` (empty, quote and error, disabled), `CalculatorKeypad`, `AmountDigitDisplay`, `FormattedAmountView`, `SpentBudgetText`, `PlusTabLabel`, `BulkDeleteButton`, `EntityActionButton` |
 
 Appearances (`SnapshotAppearance`): `light`, `dark`, and `largeText` (light at accessibility
@@ -96,7 +96,8 @@ All of them have a specimen in the Gallery.
 under another shows a faint copy of its neighbour's content along the edge and in the gap. That
 reflection is stable within a run but appears in some runs and not in others, so a test that
 puts two glass cards side by side failed now and then with nothing changed (`financeCards`,
-`scoreCards`, `statCards` in October 2026). Give each glass card its own snapshot with
+`scoreCards`, `statCards` in October 2026; `messageComposer`, three glass fields in a column,
+settled half a pixel apart from run to run). Give each glass card its own snapshot with
 `assertComponentSnapshot(_:named:…)` (`<test>.<named>-<appearance>.png`); a row of chips or
 buttons that belongs together stays one snapshot.
 
