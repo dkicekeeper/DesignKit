@@ -59,7 +59,7 @@ extension ComponentSnapshots {
             }
         }
 
-        /// The community and progress components (1.11.0): each card on its own, the rows together.
+        /// The community and progress components (1.12.0): each card on its own, the rows together.
         @Test func communityCardSkeletons() async {
             let cards: [(String, AnyView)] = [
                 ("thread", AnyView(ThreadCardSkeleton())),

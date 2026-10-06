@@ -3,7 +3,7 @@
 //  DesignKit Gallery
 //
 //  People, comments, discussions, reviews and reactions; achievements, checklists, counters,
-//  streaks and picture cards (1.11.0, ported from Dalada).
+//  streaks and picture cards (1.12.0, ported from Dalada).
 //
 
 import SwiftUI

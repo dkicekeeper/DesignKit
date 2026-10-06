@@ -167,7 +167,9 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
   на 11 языках), `CurrencyPickerMenu`, `CurrencyAmountInput`, `CurrencyList`. Новые хуки:
   `DesignKitLogoCatalog` (бренды выбора иконки) и `DesignKitCurrencyConverter.convertSync`.
   Экраны фильтров и секции главного экрана остались в Tenra: это экраны над моделями приложения.
-- **1.11.0** — `MessageComposer`: поле сообщения внизу переписки (комментарии, ответы) на Liquid
+- **1.11.0** — `CategoryColors.pickerPalette`: в выборе цвета категории 30 цветов вместо 14
+  (14 цветов хеша, затем 16 глубоких и нейтральных оттенков); палитра хеша осталась из 14.
+- **1.12.0** — `MessageComposer`: поле сообщения внизу переписки (комментарии, ответы) на Liquid
   Glass, растёт до пяти строк, кнопка отправки внутри, цитата того, на что отвечают, ошибка
   отправки над полем. Вторая партия из Dalada, с нейтральными именами и скелетонами: `PersonRow`,
   `CommentRow` (с цитатой `MessageQuote`), `ThreadCard`, `ReviewCard`, `ReactionButton`,
