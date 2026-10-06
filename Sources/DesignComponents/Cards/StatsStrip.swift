@@ -22,8 +22,8 @@ import DesignSupport
 /// ```
 ///
 /// Two to five items read well on an iPhone; numbers shrink to fit (down to 60%), captions
-/// wrap to two lines. A card: pads itself and draws its own glass. For one figure with a
-/// trend, `StatTile`.
+/// wrap to two lines; at accessibility text sizes the counters take two columns. A card: pads
+/// itself and draws its own glass. For one figure with a trend, `StatTile`.
 public struct StatsStrip: View {
     /// One counter.
     public struct Item: Identifiable, Sendable {
@@ -39,12 +39,14 @@ public struct StatsStrip: View {
 
     let items: [Item]
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     public init(items: [Item]) {
         self.items = items
     }
 
     public var body: some View {
-        HStack(alignment: .top, spacing: AppSpacing.sm) {
+        StatsStripLayout(isStacked: dynamicTypeSize.isAccessibilitySize) {
             ForEach(items) { item in
                 VStack(spacing: AppSpacing.xxs) {
                     Text(verbatim: item.value)
@@ -68,6 +70,29 @@ public struct StatsStrip: View {
     }
 }
 
+/// The counters in one row, or at accessibility text sizes in two columns, so a caption is
+/// not broken mid-word.
+struct StatsStripLayout<Content: View>: View {
+    let isStacked: Bool
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        if isStacked {
+            LazyVGrid(
+                columns: Array(repeating: GridItem(.flexible(), spacing: AppSpacing.sm), count: 2),
+                alignment: .center,
+                spacing: AppSpacing.md
+            ) {
+                content
+            }
+        } else {
+            HStack(alignment: .top, spacing: AppSpacing.sm) {
+                content
+            }
+        }
+    }
+}
+
 // MARK: - Skeleton
 
 /// Placeholder of a `StatsStrip`: the same glass card with `count` columns of a number line
@@ -75,12 +100,14 @@ public struct StatsStrip: View {
 public struct StatsStripSkeleton: View {
     let count: Int
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     public init(count: Int = 4) {
         self.count = max(1, count)
     }
 
     public var body: some View {
-        HStack(alignment: .top, spacing: AppSpacing.sm) {
+        StatsStripLayout(isStacked: dynamicTypeSize.isAccessibilitySize) {
             ForEach(0..<count, id: \.self) { _ in
                 VStack(spacing: AppSpacing.xxs) {
                     SkeletonText(AppTypography.h4, width: 40)

@@ -1278,7 +1278,8 @@ A control: no skeleton.
 
 #### `StatsStrip`
 Counters side by side in a card: the number (h4, tabular, shrinks to 60%) over its caption
-(two lines, centred), equal widths. `StatsStrip(items: [.init(value: "42", title: "days")])`.
+(two lines, centred), equal widths; at accessibility text sizes two columns, so a caption is not
+broken mid-word. `StatsStrip(items: [.init(value: "42", title: "days")])`.
 For one figure with a trend, `StatTile`.
 
 #### `StreakCard`
