@@ -3,7 +3,7 @@
 //  DesignKit
 //
 //  Semantic colour tokens v2 (1.6.0): grouped by what they colour (Text, Background, Status,
-//  Border), named "group / name / modifier" after T-Bank's TUI structure. Modifiers:
+//  Border), named "group / name / modifier". Modifiers:
 //  `OnDark` / `OnLight` stay the same in both themes (content on photos, gradients, coloured
 //  headers); `Pale` is a tinted container; `Opaque` has no transparency.
 //

@@ -10,6 +10,7 @@ import DesignComponents
 
 struct ComponentsScreen: View {
     @State private var cashFlowState = CashFlowSpecimenState.loaded
+    @State private var hidesAmounts = true
 
     var body: some View {
         // Every ShowcaseSection is a page; the properties below group them by kind.
@@ -80,6 +81,37 @@ struct ComponentsScreen: View {
 
         ShowcaseSection(title: "SpentBudgetText", subtitle: "Spent / budget") {
             SpentBudgetText(spent: 185_000, budget: 250_000, currency: "KZT")
+        }
+
+        ShowcaseSection(title: "Amount sign and unit", subtitle: "sign: .always / .never · currencyDisplay: code, symbol image, number only") {
+            VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                FormattedAmountText(amount: 5_000, currency: "KZT", fontSize: AppTypography.h4,
+                                    color: AppColors.income, sign: .always)
+                FormattedAmountText(amount: -1_200.5, currency: "KZT", fontSize: AppTypography.h4, sign: .always)
+                FormattedAmountText(amount: -1_200.5, currency: "KZT", fontSize: AppTypography.h4, sign: .never)
+                FormattedAmountText(amount: 49.9, currency: "USD", fontSize: AppTypography.h4, currencyDisplay: .code)
+                FormattedAmountText(amount: 1_250, currency: "KZT", fontSize: AppTypography.h4,
+                                    color: AppColors.warning, sign: .always, currencyDisplay: .systemImage("star.fill"))
+                FormattedAmountText(amount: 318_400, currency: "KZT", fontSize: AppTypography.h4, currencyDisplay: .numberOnly)
+            }
+        }
+
+        ShowcaseSection(title: "Hidden amounts", subtitle: ".amountsHidden() · AmountVisibilityToggle") {
+            VStack(alignment: .leading, spacing: AppSpacing.md) {
+                HStack {
+                    FormattedAmountText(amount: 1_284_500, currency: "KZT",
+                                        fontSize: AppTypography.h1, fontWeight: .bold,
+                                        color: AppColors.Text.primary)
+                    AmountVisibilityToggle(isHidden: $hidesAmounts)
+                }
+                TotalsCard([
+                    .init(title: "Income", amount: 530_000, previous: 480_000, color: AppColors.success),
+                    .init(title: "Expenses", amount: 320_000, previous: 350_000, color: AppColors.destructive,
+                          increaseIsGood: false),
+                ], currency: "KZT")
+                SpentBudgetText(spent: 185_000, budget: 250_000, currency: "KZT")
+            }
+            .amountsHidden(hidesAmounts)
         }
     }
 
@@ -372,6 +404,17 @@ struct ComponentsScreen: View {
                 MessageBanner.error("Failed to load")
                 MessageBanner.warning("Low balance")
                 MessageBanner.info("Sync completed")
+            }
+        }
+
+        ShowcaseSection(title: "StatusBanner", subtitle: "A notice that stays · 5 statuses · compact · with an action") {
+            VStack(spacing: AppSpacing.sm) {
+                StatusBanner("Your statement for September is ready", status: .info) {}
+                StatusBanner("Payment sent", status: .positive)
+                StatusBanner("Card expires on 30 Nov", status: .warning)
+                StatusBanner("Transfer failed: try again later", status: .negative) {}
+                StatusBanner("Subscription paused", status: .neutral)
+                StatusBanner("Synced a minute ago", status: .positive, style: .compact)
             }
         }
 

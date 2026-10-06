@@ -67,6 +67,40 @@ extension ComponentSnapshots {
             )
         }
 
+        @Test func amountSignAndUnit() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    FormattedAmountText(amount: 5_000, currency: "KZT", fontSize: AppTypography.h4,
+                                        color: AppColors.income, sign: .always)
+                    FormattedAmountText(amount: -1_200.5, currency: "KZT", fontSize: AppTypography.h4, sign: .always)
+                    FormattedAmountText(amount: -1_200.5, currency: "KZT", fontSize: AppTypography.h4, sign: .never)
+                    FormattedAmountText(amount: 49.9, currency: "USD", fontSize: AppTypography.h4, currencyDisplay: .code)
+                    FormattedAmountText(amount: 1_250, currency: "KZT", fontSize: AppTypography.h4,
+                                        color: AppColors.warning, sign: .always,
+                                        currencyDisplay: .systemImage("star.fill"))
+                    FormattedAmountText(amount: 318_400, currency: "KZT", fontSize: AppTypography.h4,
+                                        currencyDisplay: .numberOnly)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            )
+        }
+
+        @Test func hiddenAmounts() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    FormattedAmountText(amount: 1_284_500, currency: "KZT", fontSize: AppTypography.h1,
+                                        fontWeight: .bold, color: AppColors.Text.primary)
+                    FormattedAmountText(amount: -1_200.5, currency: "USD", fontSize: AppTypography.h4,
+                                        sign: .always, currencyDisplay: .code)
+                    SpentBudgetText(spent: 185_000, budget: 250_000, currency: "KZT")
+                    AmountVisibilityToggle(isHidden: .constant(true))
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .amountsHidden(),
+                appearances: [.light, .largeText]
+            )
+        }
+
         @Test func actionButtons() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {

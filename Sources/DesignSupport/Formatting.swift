@@ -97,12 +97,21 @@ public nonisolated struct Formatting {
         maxFractionDigits: Int = 1,
         locale: Locale = .current
     ) -> String {
-        let symbol = currencySymbol(for: currency)
+        "\(formatCompactNumber(amount, maxFractionDigits: maxFractionDigits, locale: locale)) \(currencySymbol(for: currency))"
+    }
+
+    /// The number of `formatCurrencyCompact` without a currency ("1.2M", "1,2 млн"), for a
+    /// caller that puts its own unit after it.
+    public static func formatCompactNumber(
+        _ amount: Double,
+        maxFractionDigits: Int = 1,
+        locale: Locale = .current
+    ) -> String {
         let style = FloatingPointFormatStyle<Double>
             .number
             .notation(.compactName)
             .precision(.fractionLength(0...max(0, maxFractionDigits)))
             .locale(locale)
-        return "\(amount.formatted(style)) \(symbol)"
+        return amount.formatted(style)
     }
 }

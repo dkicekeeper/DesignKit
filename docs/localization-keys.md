@@ -17,6 +17,9 @@ text, not keys. A new key goes there as well.
 
 | Key | Used by | Default value |
 |---|---|---|
+| `amount.hidden` | FormattedAmountText under `.amountsHidden()` (VoiceOver) | `Hidden amount` |
+| `amount.hide` | AmountVisibilityToggle (VoiceOver, amounts shown) | `Hide amounts` |
+| `amount.show` | AmountVisibilityToggle (VoiceOver, amounts hidden) | `Show amounts` |
 | `bulk.deleteCount` | BulkDeleteButton | — |
 | `button.cancel` | EditSheetContainer, ImportProgressSheet | — |
 | `button.copy` | AnimatedInputComponents | — |
