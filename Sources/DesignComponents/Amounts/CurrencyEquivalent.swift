@@ -3,9 +3,9 @@
 //  DesignKit
 //
 //  The logic behind the "≈" line of CurrencyAmountInput, kept out of the view so it is
-//  unit-tested (Tests/DesignComponentsTests/CurrencyEquivalentTests.swift): which conversion
-//  result the line may show, and what it shows while a conversion runs or after one finds
-//  no rate. Plain values, no SwiftUI.
+//  unit-tested (Tests/DesignComponentsTests/CurrencyEquivalentTests.swift): which currency
+//  the line shows, which conversion result it may show, and what it shows while a
+//  conversion runs or after one finds no rate. Plain values, no SwiftUI.
 //
 
 import Foundation
@@ -23,10 +23,28 @@ struct CurrencyEquivalentRequest: Hashable, Sendable {
     }
 
     /// The conversion for an amount typed in `currency`, or `nil` when there is no line:
-    /// no amount above zero, or the amount is in `baseCurrency` already.
-    init?(amount: Double?, currency: String, baseCurrency: String) {
-        guard let amount, amount > 0, currency != baseCurrency else { return nil }
-        self.init(amount: amount, from: currency, to: baseCurrency)
+    /// no amount above zero, or nothing to convert into.
+    init?(amount: Double?, currency: String, equivalentCurrency: String?, baseCurrency: String) {
+        guard let amount, amount > 0,
+              let target = Self.targetCurrency(
+                  for: currency,
+                  equivalentCurrency: equivalentCurrency,
+                  baseCurrency: baseCurrency
+              )
+        else { return nil }
+        self.init(amount: amount, from: currency, to: target)
+    }
+
+    /// The currency of the line for an amount in `currency`: `equivalentCurrency`
+    /// (`baseCurrency` when nil), or `baseCurrency` when the amount is already in
+    /// `equivalentCurrency`; nil (no line) when the amount is in both. So with the account's
+    /// currency as `equivalentCurrency`, an amount in another currency shows its value in the
+    /// account's, and an amount in the account's own foreign currency its base-currency value.
+    static func targetCurrency(for currency: String, equivalentCurrency: String?, baseCurrency: String) -> String? {
+        let preferred = equivalentCurrency ?? baseCurrency
+        if currency != preferred { return preferred }
+        if currency != baseCurrency { return baseCurrency }
+        return nil
     }
 
     /// The same pair of currencies, whatever the amounts.

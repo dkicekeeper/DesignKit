@@ -2,8 +2,10 @@
 //  CurrencyEquivalentTests.swift
 //  DesignKit
 //
-//  The "≈" line of CurrencyAmountInput (1.12.0): the latest input wins over a slower, older
-//  conversion, and no rate clears the line instead of leaving the previous number on it.
+//  The "≈" line of CurrencyAmountInput (1.12.0): which currency it shows (without
+//  `equivalentCurrency` the base currency, as before; with it the rule of Tenra's saved
+//  rows), that the latest input wins over a slower, older conversion, and that no rate
+//  clears the line instead of leaving the previous number on it.
 //
 
 import Testing
@@ -16,6 +18,10 @@ struct CurrencyEquivalentTests {
         CurrencyEquivalentRequest(amount: amount, from: from, to: to)
     }
 
+    private func target(_ currency: String, equivalent: String?, base: String = "KZT") -> String? {
+        CurrencyEquivalentRequest.targetCurrency(for: currency, equivalentCurrency: equivalent, baseCurrency: base)
+    }
+
     /// `state.begin(request)`, which hands out a ticket for any request. Called outside
     /// `#require`: the macro would call the mutating `begin` on a copy of `state`.
     private func begin(
@@ -26,16 +32,39 @@ struct CurrencyEquivalentTests {
         return try #require(ticket)
     }
 
-    // MARK: - When there is a line
+    // MARK: - Which currency
 
-    @Test("A line only for an amount above zero in another currency than the base")
+    @Test("Without equivalentCurrency the line shows the base currency, as before 1.12.0")
+    func defaultIsBaseCurrency() {
+        #expect(target("USD", equivalent: nil) == "KZT")
+        #expect(target("KZT", equivalent: nil) == nil)
+        // Passing the base currency is the same as passing nothing.
+        #expect(target("USD", equivalent: "KZT") == "KZT")
+        #expect(target("KZT", equivalent: "KZT") == nil)
+    }
+
+    @Test("An amount in another currency than the account's shows it in the account's")
+    func accountCurrency() {
+        // USD typed for a EUR card: "≈ €", as the saved row shows it (not "≈ ₸").
+        #expect(target("USD", equivalent: "EUR") == "EUR")
+        // The base currency typed for a EUR card: "≈ €" too.
+        #expect(target("KZT", equivalent: "EUR") == "EUR")
+    }
+
+    @Test("An amount in the account's own foreign currency shows the base currency")
+    func accountsOwnCurrency() {
+        #expect(target("EUR", equivalent: "EUR") == "KZT")
+    }
+
+    @Test("A line only for an amount above zero")
     func amountAboveZero() {
-        #expect(CurrencyEquivalentRequest(amount: nil, currency: "USD", baseCurrency: "KZT") == nil)
-        #expect(CurrencyEquivalentRequest(amount: 0, currency: "USD", baseCurrency: "KZT") == nil)
-        #expect(CurrencyEquivalentRequest(amount: -5, currency: "USD", baseCurrency: "KZT") == nil)
+        #expect(CurrencyEquivalentRequest(amount: nil, currency: "USD", equivalentCurrency: nil, baseCurrency: "KZT") == nil)
+        #expect(CurrencyEquivalentRequest(amount: 0, currency: "USD", equivalentCurrency: nil, baseCurrency: "KZT") == nil)
+        #expect(CurrencyEquivalentRequest(amount: -5, currency: "USD", equivalentCurrency: nil, baseCurrency: "KZT") == nil)
         // The base currency itself: no line (the snapshot of CurrencyAmountInput).
-        #expect(CurrencyEquivalentRequest(amount: 1_250, currency: "KZT", baseCurrency: "KZT") == nil)
-        #expect(CurrencyEquivalentRequest(amount: 10, currency: "USD", baseCurrency: "KZT") == request(10, "USD", "KZT"))
+        #expect(CurrencyEquivalentRequest(amount: 1_250, currency: "KZT", equivalentCurrency: nil, baseCurrency: "KZT") == nil)
+        #expect(CurrencyEquivalentRequest(amount: 10, currency: "USD", equivalentCurrency: "EUR", baseCurrency: "KZT")
+                == request(10, "USD", "EUR"))
     }
 
     // MARK: - When to convert
