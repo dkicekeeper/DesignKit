@@ -58,9 +58,13 @@ All of them have a specimen in the Gallery.
   cannot do that.
 - `assertComponentSnapshot(_:width:appearances:)` (`SnapshotSupport.swift`) wraps the view:
   360 pt wide, `AppSpacing.lg` around it, `AppColors.bgBase` behind, animations off, US
-  English locale. It waits 1.5 s for `onAppear` and layout, measures the view again and
-  resizes the window if it grew (a view that measures itself, like `ExpandableText` adding its
-  More button, would otherwise be cut off at the top and bottom), then captures every 0.4 s
+  English locale. It waits 1.5 s for `onAppear` and layout and measures the view again. If it
+  grew (a view that measures itself, like `ExpandableText` adding its More button, would
+  otherwise be cut off at the top and bottom), it shows the view again in a new window of the
+  final size and waits another 1.5 s: glass drawn in a window that was then resized did not
+  always redraw, so a card's bottom edge kept or lost its shading from run to run. The log
+  lists those snapshots as `SNAPSHOT-RESIZED <test>.<appearance>: <old> → <new> pt`. Then it
+  captures every 0.4 s
   until three frames in a row are identical, for up to 8 s (Liquid Glass animates its shadow
   for a moment; two frames were not enough between stacked cards, whose shadows can hold still
   for one interval and move again). A snapshot that never settles prints

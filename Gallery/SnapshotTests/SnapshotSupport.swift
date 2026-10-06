@@ -119,19 +119,14 @@ enum ComponentRenderer {
                 transaction.animation = nil
             }
 
-        let host = UIHostingController(rootView: content)
-        host.safeAreaRegions = []
-        host.overrideUserInterfaceStyle = appearance.interfaceStyle
-        host.traitOverrides.preferredContentSizeCategory = appearance.dynamicTypeSize == .large
-            ? .large
-            : .accessibilityLarge
+        var host = makeHost(content, appearance: appearance)
 
         let fitting = CGSize(width: width + (AppSpacing.lg + margin) * 2, height: .greatestFiniteMagnitude)
         var size = host.sizeThatFits(in: fitting)
         size.width = fitting.width
         size.height = max(1, size.height.rounded(.up))
 
-        let window = makeWindow()
+        var window = show(host, size: size, appearance: appearance)
         // Glass and its shadow render unpredictably where the window is off the screen.
         let screen = window.windowScene?.screen.bounds.size ?? .zero
         func checkFitsScreen() {
@@ -143,25 +138,25 @@ enum ComponentRenderer {
                 """)
         }
         checkFitsScreen()
-        window.overrideUserInterfaceStyle = appearance.interfaceStyle
-        // Opaque, so Liquid Glass samples only the component's own background.
-        window.backgroundColor = .systemBackground
-        host.view.backgroundColor = .systemBackground
-        window.frame = CGRect(origin: .zero, size: size)
-        window.rootViewController = host
-        window.isHidden = false
 
         // Let SwiftUI lay out, run onAppear / onGeometryChange, and glass settle.
         try? await Task.sleep(for: .seconds(1.5))
         // Content that measures itself after the first layout can grow (ExpandableText adds its
-        // More button once it knows the text is truncated). Size the window again, or the grown
-        // content sits centred in the old height and is cut off at the top and bottom.
+        // More button once it knows the text is truncated). Show it again in a new window of the
+        // final size, or the grown content sits centred in the old height and is cut off at the
+        // top and bottom. A new window, not the old one resized: glass drawn at the first size
+        // did not always redraw after a resize, so a card's bottom edge kept or lost its shading
+        // from run to run (large-text snapshots, October 2026).
         let settledHeight = max(1, host.sizeThatFits(in: fitting).height.rounded(.up))
         if settledHeight != size.height {
+            print("SNAPSHOT-RESIZED \(label): \(Int(size.height)) → \(Int(settledHeight)) pt")
             size.height = settledHeight
             checkFitsScreen()
-            window.frame = CGRect(origin: .zero, size: size)
-            try? await Task.sleep(for: .seconds(1))
+            window.isHidden = true
+            window.rootViewController = nil
+            host = makeHost(content, appearance: appearance)
+            window = show(host, size: size, appearance: appearance)
+            try? await Task.sleep(for: .seconds(1.5))
         }
         host.view.frame = window.bounds
         host.view.layoutIfNeeded()
@@ -206,6 +201,32 @@ enum ComponentRenderer {
         window.isHidden = true
         window.rootViewController = nil
         return image
+    }
+
+    private static func makeHost<Content: View>(
+        _ content: Content,
+        appearance: SnapshotAppearance
+    ) -> UIHostingController<Content> {
+        let host = UIHostingController(rootView: content)
+        host.safeAreaRegions = []
+        host.overrideUserInterfaceStyle = appearance.interfaceStyle
+        host.traitOverrides.preferredContentSizeCategory = appearance.dynamicTypeSize == .large
+            ? .large
+            : .accessibilityLarge
+        host.view.backgroundColor = .systemBackground
+        return host
+    }
+
+    /// A new window of `size` at the top of the screen, showing `host`.
+    private static func show(_ host: UIViewController, size: CGSize, appearance: SnapshotAppearance) -> UIWindow {
+        let window = makeWindow()
+        window.overrideUserInterfaceStyle = appearance.interfaceStyle
+        // Opaque, so Liquid Glass samples only the component's own background.
+        window.backgroundColor = .systemBackground
+        window.frame = CGRect(origin: .zero, size: size)
+        window.rootViewController = host
+        window.isHidden = false
+        return window
     }
 
     private static func makeWindow() -> UIWindow {
