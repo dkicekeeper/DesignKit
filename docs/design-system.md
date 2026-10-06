@@ -35,7 +35,7 @@
 
 | Module | Contents |
 |---|---|
-| `DesignTokens` | `AppColors`, `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation`, `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, inline field styles), `AppButton` (`primaryButton`, `secondaryButton`, `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
+| `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation`, `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, inline field styles), `AppButton` (`primaryButton`, `secondaryButton`, `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
 | `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `IconView`, `BrandLogoView`, `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `HapticManager`, `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitCurrencyConverter`), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
 | `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2 |
 
@@ -78,25 +78,50 @@ All tokens live in `Sources/DesignTokens/`. Never use raw values — always refe
 
 ### Colors (`AppColors`)
 
-Background hierarchy: `bgBase` → `bgCard` → `bgMuted` (base screen → elevated card → sunken control).
+**Semantic colours v2 (1.6.0)**, after T-Bank's TUI: tokens are grouped by what they colour and named *group / name / modifier* (`AppColors.Text.secondaryOnDark`, `AppColors.Status.warningPale`). Every token has a doc comment saying where it goes; the Gallery's Colors page shows them with their use.
+
+Modifiers:
+- **`OnDark` / `OnLight`**: the same value in both themes, for content on photos, gradients and coloured headers (a trip photo in Dalada, `GradientOrbsBackground`, an accent hero).
+- **`Pale`**: a tinted container behind status text, badges and icons. `AppColors.pale(_:)` makes one from any colour (a category colour too): 12% in light, 24% in dark.
+- **Opaque** (`Border.opaque`): no transparency, for outlines that overlap.
+
+**`AppColors.Text`** — text and icons
+
+| Token | Value | Use |
+|---|---|---|
+| `primary` / `secondary` / `tertiary` | `.primary` / `.secondary` / `.gray` | Main text; subtitles and metadata; hints, disclaimers, disabled labels |
+| `action` | `DesignKitTheme.accent` | Links, text buttons |
+| `positive` / `negative` / `warning` | `.green` / `.red` / `.orange` | A rise or "done"; a fall or an error; a warning |
+| `onAccent` | `.white` | On an accent fill (filled button, badge) |
+| `primaryOnDark` / `secondaryOnDark` / `tertiaryOnDark` | white; iOS dark-mode label grey at 60% / 30% | On dark photos and headers, both themes |
+| `primaryOnLight` / `secondaryOnLight` / `tertiaryOnLight` | black; iOS light-mode label grey at 60% / 30% | On light photos and pale fills, both themes |
+
+**`AppColors.Background`** — screens, surfaces, containers
+
+| Token | Value (light / dark) | Use |
+|---|---|---|
+| `base` | `.systemBackground` | The screen |
+| `baseAlt` | `.systemGroupedBackground` | A grouped-list screen |
+| `elevation1` / `elevation2` / `elevation3` | white / `#1C1C1E`, `#2C2C2E`, `#3A3A3C` | Sheets and cards on base; cards on elevation 1; above everything. In light a shadow tells the levels apart, in dark the colour (TUI's rule; iOS's own elevated backgrounds) |
+| `neutral1` | `.secondarySystemBackground` | Opaque, minimal contrast: fields, grouped blocks, inactive chips |
+| `neutral2` | `.systemGray5` | Opaque, more contrast: progress tracks, sunken controls, secondary buttons |
+| `fill` | `.tertiarySystemFill` | Translucent container on any surface, glass included |
+| `fillOnDark` / `fillOnLight` | white 15% / black 5% | Translucent container on dark / light photos, both themes |
+| `overlayOnImage` | black 30% | Darkens a photo under text |
+
+**`AppColors.Status`** — banners, badges, notices: `info` (`.blue`), `positive` (`.green`), `negative` (`.red`), `warning` (`.orange`), `neutral` (`.gray`), each with a `…Pale` container (`AppColors.pale`).
+
+**`AppColors.Border`** — `normal` (`.separator`), `opaque` (`.opaqueSeparator`), `selected` (accent), `darkModeOnly` (clear in light, white 10% in dark: a hairline around logos, avatars and images that would melt into black), `onDark` (white 10%), `onLight` (black 5%).
+
+**Flat names (1.x)** stay as aliases of the groups, with the same values: `bgBase` = `Background.base`, `bgCard` = `Background.neutral1`, `bgMuted` = `Background.neutral2`, `textPrimary` / `textSecondary` / `textTertiary` = `Text.*`, `destructive` = `Status.negative`, `success` = `Status.positive`, `warning` = `Status.warning`, `staticWhite` = `Text.primaryOnDark`, `planned` = `Status.info`. New code uses the groups; the components move over in later releases, where a move changes nothing visible or is called out.
 
 | Token | Value | Use For |
 |-------|-------|---------|
-| `bgBase` | `.systemBackground` | Screen-level background |
-| `bgCard` | `.secondarySystemBackground` | Elevated cards, `cardStyle` pre-iOS-26 fallback |
-| `bgMuted` | `.systemGray5` | Chips, progress-bar tracks, sunken controls |
-| `textPrimary` | `.primary` | Main text |
-| `textSecondary` | `.secondary` | Subtitles, metadata |
-| `textTertiary` | `.gray` | Hints, placeholders |
 | `accent` | `DesignKitTheme.accent` (default `.indigo`) | Interactive elements, primary CTA tint. Per-app brand value — set `DesignKitTheme.accent` in `App.init()`. The host app's asset-catalog `AccentColor` must be the SAME colour — it drives system chrome (active tab tint, default buttons, search cursor). Keep the two in sync: an empty AccentColor silently falls back to system blue (Tenra shipped that until 2026-08-26). Tenra: system indigo (light 0x5856D6 / dark 0x5E5CE6). |
-| `destructive` | `.red` | Delete, errors |
-| `success` | `.green` | Positive UI feedback (active status, success banners) |
-| `warning` | `.orange` | Caution feedback (paused status, warning banners) |
-| `staticWhite` | `.white` | Text on dark/coloured fills — does NOT adapt to theme |
 | `income` | RGB(0.13, 0.70, 0.37) | Income amounts (deliberately distinct from `success`) |
 | `expense` | `.primary` | Expense amounts — deliberately NOT red (see comment in AppColors.swift) |
 | `transfer` | Cyan-teal | Internal transfer amounts |
-| `planned` | `.blue` | Future/planned transactions |
+| `planned` | `.blue` (= `Status.info`) | Future/planned transactions |
 
 For archived/inactive UI use `Color(.systemGray)` directly — there is no dedicated token.
 
