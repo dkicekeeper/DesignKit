@@ -45,8 +45,9 @@ Not covered on purpose:
   is not: its shapes are the system's redaction;
 - views whose content depends on today's date: `DateButtonsView`, `DateSectionHeaderView`;
 - full-screen pickers with a search in the navigation bar: `IconPicker`, `CurrencyList`;
-- `ConvertedAmountView` (and `RecurringPaymentCard`'s converted line), which waits for the host
-  app's currency converter;
+- `ConvertedAmountView`, `RecurringPaymentCard`'s converted line and `CurrencyAmountInput`'s
+  "≈" line (its snapshot is in the base currency, so without the line), which wait for the
+  host app's currency converter;
 - containers whose look is the system's (`EditSheetContainer` is a `Form` in a navigation bar)
   or that show the host app's localized strings (`ImportProgressSheet`,
   `OnboardingPageContainer`, `NotificationPermissionView`);
