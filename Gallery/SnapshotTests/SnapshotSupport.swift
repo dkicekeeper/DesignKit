@@ -58,15 +58,29 @@ func assertComponentSnapshot<V: View>(
     line: UInt = #line,
     column: UInt = #column
 ) async {
+    // Tolerates anti-aliasing noise; a moved edge, a new colour or other text fails.
+    let strategy: Snapshotting<UIImage, UIImage> = .image(precision: 0.995, perceptualPrecision: 0.98)
     for appearance in appearances {
         let name = named.map { "\($0).\(appearance.rawValue)" } ?? appearance.rawValue
-        let image = await ComponentRenderer.render(
-            view, width: width, appearance: appearance, label: "\(testName).\(name)"
-        )
+        let label = "\(testName).\(name)"
+        var image = await ComponentRenderer.render(view, width: width, appearance: appearance, label: label)
+        // Liquid Glass now and then draws a tall card without the shading along its bottom
+        // edge, for the whole render: in October 2026 about one tall-card render in 25 lost it
+        // (progressRingRows, entityRowsAndFilters.row, financeCard, scoreCards at large text),
+        // and a probe showed the shading either there from the first frame for 10 s, or not.
+        // So when comparing, a render that differs is drawn once more in a new window; the test
+        // fails only if the second render differs too. The comparison itself is as strict.
+        if isComparingSnapshots,
+           verifySnapshot(
+               of: image, as: strategy, named: name, record: .never,
+               fileID: fileID, file: file, testName: testName, line: line, column: column
+           ) != nil {
+            print("SNAPSHOT-RETRY \(label)")
+            image = await ComponentRenderer.render(view, width: width, appearance: appearance, label: label)
+        }
         assertSnapshot(
             of: image,
-            // Tolerates anti-aliasing noise; a moved edge, a new colour or other text fails.
-            as: .image(precision: 0.995, perceptualPrecision: 0.98),
+            as: strategy,
             named: name,
             fileID: fileID,
             file: file,
@@ -76,6 +90,11 @@ func assertComponentSnapshot<V: View>(
         )
     }
 }
+
+/// `true` when the run compares with the references (`SNAPSHOT_TESTING_RECORD` unset or
+/// `never`); a recording run draws each snapshot once.
+private let isComparingSnapshots =
+    (ProcessInfo.processInfo.environment["SNAPSHOT_TESTING_RECORD"] ?? "never") == "never"
 
 @MainActor
 enum ComponentRenderer {
