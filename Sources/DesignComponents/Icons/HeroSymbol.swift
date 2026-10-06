@@ -38,7 +38,7 @@ public struct HeroSymbol: View {
             .font(.system(size: size * 3 / 7))
             .foregroundStyle(color)
             .frame(width: size, height: size)
-            .background(color.opacity(0.12), in: Circle())
+            .background(AppColors.pale(color), in: Circle())
             .accessibilityHidden(true)
     }
 }

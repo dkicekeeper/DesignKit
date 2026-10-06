@@ -125,7 +125,7 @@ public struct AmountDigitDisplay: View {
             Spacer(minLength: 0)
             HStack(spacing: AppSpacing.xs) {
                 Text(attributedDisplay)
-                    .font(.custom(AppTypography.fontFamily, size: baseFontSize).weight(.bold))
+                    .font(AppTypography.numbers(.custom(AppTypography.fontFamily, size: baseFontSize).weight(.bold)))
                     .contentTransition(.numericText())
                     .foregroundStyle(color)
                     .animation(AppAnimation.contentSpring, value: displayAmount)

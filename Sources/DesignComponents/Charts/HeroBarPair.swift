@@ -39,6 +39,7 @@ public struct HeroBarPair: View {
     /// Tap-selected bar: 0 = "was", 1 = "now". Shows the amount above the bar —
     /// the same explore-by-tap interaction the period charts have.
     @State private var selectedBar: Int?
+    @Environment(\.amountsHidden) private var amountsHidden
     private var immediate: Bool { !animatesOnAppear || AppAnimation.isReduceMotionEnabled }
     private static let cornerRadius: CGFloat = 10
     /// Bars shorter than this read as "missing" — a zero value stays visible.
@@ -134,12 +135,14 @@ public struct HeroBarPair: View {
     @ViewBuilder
     private func valueAnnotation(_ value: Double, index: Int, tint: Color) -> some View {
         if selectedBar == index {
-            Text(Formatting.formatCurrencySmart(value, currency: currency))
-                .font(AppTypography.bodySmall.bold())
+            Text(amountsHidden
+                 ? Formatting.hiddenAmount(currency: currency)
+                 : Formatting.formatCurrencySmart(value, currency: currency))
+                .font(AppTypography.numbers(AppTypography.bodySmall.bold()))
                 .foregroundStyle(tint)
                 .padding(.horizontal, AppSpacing.sm)
                 .padding(.vertical, AppSpacing.xs)
-                .background(tint.opacity(0.12), in: Capsule())
+                .background(AppColors.pale(tint), in: Capsule())
                 .fixedSize()
                 .offset(y: -30)
                 .transition(.opacity)

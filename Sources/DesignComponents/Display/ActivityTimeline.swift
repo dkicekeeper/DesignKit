@@ -97,7 +97,7 @@ public struct ActivityTimeline<Item: Identifiable, Content: View>: View {
         return ZStack {
             if let symbol = marker.systemImage {
                 Circle()
-                    .fill(color.opacity(0.15))
+                    .fill(AppColors.pale(color))
                 Image(systemName: symbol)
                     .font(.system(size: AppIconSize.sm * 0.8, weight: .semibold))
                     .foregroundStyle(color)

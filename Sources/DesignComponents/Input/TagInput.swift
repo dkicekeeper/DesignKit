@@ -117,7 +117,7 @@ public struct TagInput: View {
         .padding(.leading, AppSpacing.md)
         .padding(.trailing, AppSpacing.sm)
         .padding(.vertical, AppSpacing.xs)
-        .background(AppColors.accent.opacity(0.12), in: Capsule())
+        .background(AppColors.pale(AppColors.accent), in: Capsule())
         .foregroundStyle(AppColors.textPrimary)
         .transition(.scale(scale: 0.8).combined(with: .opacity))
     }

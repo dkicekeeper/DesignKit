@@ -228,7 +228,7 @@ public struct MonthCalendar<Item: Identifiable, Marker: View, Accessory: View>: 
                 .font(isToday ? AppTypography.body.weight(.semibold) : AppTypography.body)
                 .foregroundStyle(isToday ? AppColors.accent : AppColors.textPrimary)
                 .frame(width: 48, height: 48)
-                .background(isToday ? AppColors.accent.opacity(0.1) : Color.clear)
+                .background(isToday ? AppColors.pale(AppColors.accent) : Color.clear)
                 .clipShape(Circle())
                 .animation(.easeInOut(duration: AppAnimation.fast), value: isToday)
 

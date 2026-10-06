@@ -84,7 +84,7 @@ public struct ProgressRingRow: View {
                     style: .circle(
                         size: AppIconSize.xxl,
                         tint: .monochrome(color),
-                        backgroundColor: color.opacity(0.15)
+                        backgroundColor: AppColors.pale(color)
                     )
                 )
             }

@@ -82,7 +82,7 @@ public struct TrendBadge: View {
                 Image(systemName: direction.systemImage)
                 if let percent = changePercent {
                     Text(Self.format(percent))
-                        .font(AppTypography.bodyEmphasis)
+                        .font(AppTypography.numbers(AppTypography.bodyEmphasis))
                         .lineLimit(1)
                 }
             }
@@ -94,7 +94,7 @@ public struct TrendBadge: View {
 
                 if let percent = changePercent {
                     Text(Self.format(percent))
-                        .font(AppTypography.bodyEmphasis)
+                        .font(AppTypography.numbers(AppTypography.bodyEmphasis))
                         .fontWeight(.semibold)
                 }
             }
@@ -124,7 +124,7 @@ private struct TrendPillModifier: ViewModifier {
             content
                 .padding(.horizontal, AppSpacing.sm)
                 .padding(.vertical, AppSpacing.xs)
-                .background(color.opacity(0.12))
+                .background(AppColors.pale(color))
                 .clipShape(Capsule())
         } else {
             content

@@ -70,6 +70,25 @@ extension ComponentSnapshots {
             )
         }
 
+        @Test func numbers() async {
+            await assertComponentSnapshot(
+                HStack(alignment: .top, spacing: AppSpacing.xl) {
+                    // Proportional, then tabular figures.
+                    ForEach([false, true], id: \.self) { tabular in
+                        VStack(alignment: .trailing, spacing: AppSpacing.xs) {
+                            ForEach(["1 111 111", "8 888 888", "407 150"], id: \.self) { amount in
+                                Text(verbatim: amount)
+                                    .font(tabular ? AppTypography.numbers(AppTypography.h4) : AppTypography.h4)
+                            }
+                        }
+                    }
+                }
+                .foregroundStyle(AppColors.textPrimary)
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light]
+            )
+        }
+
         @Test func fadeTruncation() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.sm) {

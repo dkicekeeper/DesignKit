@@ -30,6 +30,7 @@ public struct HeroProportionBar: View {
 
     @State private var entered = false
     @State private var selectedID: String?
+    @Environment(\.amountsHidden) private var amountsHidden
 
     private var immediate: Bool { AppAnimation.isReduceMotionEnabled }
     private static let waveStep: Double = 0.08
@@ -129,8 +130,10 @@ public struct HeroProportionBar: View {
                 .font(AppTypography.bodySmall)
                 .foregroundStyle(AppColors.textSecondary)
 
-            Text(Formatting.formatCurrencySmart(segment.amount, currency: currency))
-                .font(AppTypography.bodyEmphasis)
+            Text(amountsHidden
+                 ? Formatting.hiddenAmount(currency: currency)
+                 : Formatting.formatCurrencySmart(segment.amount, currency: currency))
+                .font(AppTypography.numbers(AppTypography.bodyEmphasis))
                 .foregroundStyle(AppColors.textPrimary)
         }
         .opacity(opacity(for: segment.id))

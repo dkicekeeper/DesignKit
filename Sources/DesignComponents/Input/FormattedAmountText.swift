@@ -106,6 +106,10 @@ public struct FormattedAmountText: View {
         self.currencyDisplay = currencyDisplay
     }
 
+    /// The caller's style with tabular figures (`AppTypography.numbers`): digits keep one
+    /// width, so amounts in a column line up and a changing amount does not shift.
+    private var numberFont: Font { AppTypography.numbers(fontSize) }
+
     // MARK: - Sign and unit
 
     /// The number drawn: the absolute value when the sign is drawn separately (or not at all).
@@ -147,7 +151,7 @@ public struct FormattedAmountText: View {
         case .numberOnly:
             return nil
         }
-        return unit.font(fontSize).fontWeight(fontWeight).foregroundStyle(color)
+        return unit.font(numberFont).fontWeight(fontWeight).foregroundStyle(color)
     }
 
     /// `run` followed by the unit, as one `Text`.
@@ -193,9 +197,9 @@ public struct FormattedAmountText: View {
         // opacity exactly as before. Still ONE Text — that is what makes
         // `.minimumScaleFactor` scale the whole amount uniformly (see comment above).
         let integerRun = Text(leadingText + parts.integer)
-            .font(fontSize).fontWeight(fontWeight).foregroundStyle(color)
+            .font(numberFont).fontWeight(fontWeight).foregroundStyle(color)
         let decimalRun = Text(AmountDisplayConfiguration.shared.decimalSeparator + parts.decimal)
-            .font(fontSize).fontWeight(fontWeight).foregroundStyle(color.opacity(decimalOpacity))
+            .font(numberFont).fontWeight(fontWeight).foregroundStyle(color.opacity(decimalOpacity))
 
         // Runs side by side in one interpolation, as in 1.x (no nested Text).
         switch (shouldShowDecimal, unitRun) {
@@ -208,7 +212,7 @@ public struct FormattedAmountText: View {
 
     /// "•••• ₸": the number and sign hidden, the unit kept.
     private var hiddenText: Text {
-        withUnit(Text(verbatim: "••••").font(fontSize).fontWeight(fontWeight).foregroundStyle(color))
+        withUnit(Text(verbatim: Formatting.hiddenAmount()).font(numberFont).fontWeight(fontWeight).foregroundStyle(color))
     }
 
     // MARK: - Compact variants
@@ -220,11 +224,11 @@ public struct FormattedAmountText: View {
         if currencyDisplay == .symbol {
             // One run, as in 1.x.
             return Text(leadingText + Formatting.formatCurrencyCompact(displayAmount, currency: currency, maxFractionDigits: digits))
-                .font(fontSize).fontWeight(fontWeight).foregroundStyle(color)
+                .font(numberFont).fontWeight(fontWeight).foregroundStyle(color)
         }
         return withUnit(
             Text(leadingText + Formatting.formatCompactNumber(displayAmount, maxFractionDigits: digits))
-                .font(fontSize).fontWeight(fontWeight).foregroundStyle(color)
+                .font(numberFont).fontWeight(fontWeight).foregroundStyle(color)
         )
     }
 

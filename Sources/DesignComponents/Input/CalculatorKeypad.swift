@@ -64,7 +64,7 @@ public struct CalculatorKeypad: View {
     }
 
     private func op(_ op: CalculatorInputModel.Op, _ glyph: String) -> some View {
-        keyButton(background: AppColors.accent.opacity(0.12)) {
+        keyButton(background: AppColors.pale(AppColors.accent)) {
             model.tapOperator(op)
         } label: {
             Text(glyph).foregroundStyle(AppColors.accent)

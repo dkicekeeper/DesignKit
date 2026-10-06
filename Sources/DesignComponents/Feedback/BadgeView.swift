@@ -51,7 +51,7 @@ public struct BadgeView: View {
             .foregroundStyle(style == .filled ? AppColors.staticWhite : color)
             .padding(.horizontal, AppSpacing.sm)
             .padding(.vertical, AppSpacing.xxs)
-            .background(style == .filled ? color : color.opacity(0.12), in: Capsule())
+            .background(style == .filled ? color : AppColors.pale(color), in: Capsule())
             .fixedSize()
     }
 

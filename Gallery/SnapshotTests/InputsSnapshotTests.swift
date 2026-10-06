@@ -93,6 +93,10 @@ extension ComponentSnapshots {
                     FormattedAmountText(amount: -1_200.5, currency: "USD", fontSize: AppTypography.h4,
                                         sign: .always, currencyDisplay: .code)
                     SpentBudgetText(spent: 185_000, budget: 250_000, currency: "KZT")
+                    HeroProportionBar(segments: [
+                        DonutSlice(id: "food", amount: 42_000, color: AppColors.accent, label: "Food", percentage: 58),
+                        DonutSlice(id: "rent", amount: 30_000, color: AppColors.success, label: "Rent", percentage: 42),
+                    ], currency: "KZT")
                     AmountVisibilityToggle(isHidden: .constant(true))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
