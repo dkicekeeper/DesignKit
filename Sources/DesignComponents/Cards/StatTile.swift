@@ -69,3 +69,20 @@ public struct StatTile: View {
         }
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `StatTile`: the caption and the value.
+public struct StatTileSkeleton: View {
+    public init() {}
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.xxs) {
+            SkeletonText(AppTypography.caption, width: 72)
+            SkeletonText(AppTypography.h4, width: 96)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}

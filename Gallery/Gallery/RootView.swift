@@ -50,6 +50,7 @@ struct RootView: View {
                     row("Balances, Metrics & More", "creditcard.fill", .green) { BalancesScreen() }
                     row("Badges, Stats & Rating", "star.leadinghalf.filled", .yellow) { DisplayScreen() }
                     row("Loading, Steps & More", "rectangle.dashed", .gray) { PatternsScreen() }
+                    row("Skeletons", "text.below.photo", .gray) { SkeletonsScreen() }
                     row("Onboarding, Calendar & More", "calendar", .orange) { FlowsScreen() }
                     row("Forms & Settings", "list.bullet.rectangle.fill", .mint) { FormsScreen() }
                     row("Inputs & Charts", "slider.horizontal.3", .pink) { InputsScreen() }

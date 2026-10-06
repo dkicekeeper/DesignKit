@@ -89,3 +89,27 @@ public struct MiniDonut: View {
 
 
 
+
+// MARK: - Skeleton
+
+/// Placeholder of a `MiniDonut`: the whole ring, in the slot the donut would fill.
+public struct MiniDonutSkeleton: View {
+    public init() {}
+
+    public var body: some View {
+        Canvas { context, size in
+            // The donut's geometry: the ring between 60% and 100% of the radius.
+            let outerRadius = min(size.width, size.height) / 2
+            let innerRadius = outerRadius * 0.6
+            let strokeRadius = (outerRadius + innerRadius) / 2
+            let center = CGPoint(x: size.width / 2, y: size.height / 2)
+            let ring = Path(ellipseIn: CGRect(
+                x: center.x - strokeRadius, y: center.y - strokeRadius,
+                width: strokeRadius * 2, height: strokeRadius * 2
+            ))
+            context.stroke(ring, with: .color(SkeletonView.fill), lineWidth: outerRadius - innerRadius)
+        }
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}

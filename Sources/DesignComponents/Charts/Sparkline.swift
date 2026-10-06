@@ -209,3 +209,19 @@ public struct Sparkline: View {
         .frame(height: height)
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `Sparkline`: its plot area with a soft corner.
+public struct SparklineSkeleton: View {
+    let height: CGFloat
+
+    public init(height: CGFloat = 60) {
+        self.height = height
+    }
+
+    public var body: some View {
+        SkeletonView(height: height)
+            .skeletonLoadingLabel()
+    }
+}

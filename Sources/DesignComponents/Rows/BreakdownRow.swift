@@ -150,3 +150,37 @@ public struct BreakdownRow: View {
         }
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `BreakdownRow`: the round icon, the title and subtitle, and the amount with its
+/// caption on the trailing edge; the amount goes under the title at accessibility text sizes,
+/// like the row.
+public struct BreakdownRowSkeleton: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    public init() {}
+
+    public var body: some View {
+        HStack(spacing: RowConfiguration.info.spacing) {
+            IconViewSkeleton(size: AppIconSize.xxl)
+            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                SkeletonText(AppTypography.body, width: 110)
+                SkeletonText(AppTypography.bodySmall, width: 70)
+                if dynamicTypeSize.isAccessibilitySize {
+                    SkeletonText(AppTypography.body, width: 90)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            if !dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .trailing, spacing: AppSpacing.xs) {
+                    SkeletonText(AppTypography.body, width: 90)
+                    SkeletonText(AppTypography.bodySmall, width: 40)
+                }
+            }
+        }
+        .shimmer()
+        .padding(.vertical, RowConfiguration.info.verticalPadding)
+        .skeletonLoadingLabel()
+    }
+}

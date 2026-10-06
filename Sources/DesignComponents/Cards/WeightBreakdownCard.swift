@@ -148,3 +148,38 @@ public struct WeightBreakdownCard: View {
         }
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `WeightBreakdownCard`: the same card, the title and message, the stacked
+/// bar with its corner and a legend line per segment.
+public struct WeightBreakdownCardSkeleton: View {
+    let segments: Int
+
+    public init(segments: Int = 3) {
+        self.segments = max(1, segments)
+    }
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
+            SkeletonText(AppTypography.bodyEmphasis, width: 140)
+            SkeletonText(AppTypography.body, lines: 2)
+            SkeletonView(height: 14, cornerRadius: 7)
+            VStack(spacing: AppSpacing.sm) {
+                ForEach(0..<segments, id: \.self) { _ in
+                    HStack(spacing: AppSpacing.md) {
+                        SkeletonView.circle(AppIconSize.sm)
+                            .frame(width: 24)
+                        SkeletonText(AppTypography.body, width: 100)
+                        Spacer()
+                        SkeletonText(AppTypography.bodySmall, width: 40)
+                    }
+                }
+            }
+        }
+        .shimmer()
+        .padding(AppSpacing.lg)
+        .cardStyle()
+        .skeletonLoadingLabel()
+    }
+}

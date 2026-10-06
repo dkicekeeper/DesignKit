@@ -41,7 +41,7 @@ public struct MonthCalendar<Item: Identifiable, Marker: View, Accessory: View>: 
     @State private var weekIndex: Int
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
-    private static var cellHeight: CGFloat { 80 }
+    private static var cellHeight: CGFloat { CalendarMetrics.cellHeight }
 
     /// - Parameters:
     ///   - itemsByDay: items keyed by the start of their day (`CalendarRange.itemsByDay`).
@@ -329,5 +329,54 @@ private enum CalendarText {
         let start = week.interval.start
         let end = calendar.date(byAdding: .day, value: 6, to: start) ?? start
         return "\(dayMonthFormatter.string(from: start)) – \(dayMonthFormatter.string(from: end))"
+    }
+}
+
+/// Sizes `MonthCalendar` and its skeleton share.
+enum CalendarMetrics {
+    /// A day cell: the 48 pt circle, the gap and the marker row.
+    static let cellHeight: CGFloat = 80
+}
+
+// MARK: - Skeleton
+
+/// Placeholder of a `MonthCalendar`: the same card, the month's title, the weekday row and
+/// `weeks` rows of round days (one: the collapsed week).
+public struct MonthCalendarSkeleton: View {
+    let weeks: Int
+
+    public init(weeks: Int = 1) {
+        self.weeks = max(1, weeks)
+    }
+
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.lg) {
+            HStack(spacing: AppSpacing.sm) {
+                SkeletonText(AppTypography.h4, width: 140)
+                Spacer()
+            }
+            .padding(.vertical, AppSpacing.sm)
+
+            LazyVGrid(columns: columns, spacing: 0) {
+                ForEach(0..<7, id: \.self) { _ in
+                    SkeletonView(height: 14, width: 24)
+                        .frame(height: 20)
+                }
+            }
+
+            LazyVGrid(columns: columns, spacing: AppSpacing.xs) {
+                ForEach(0..<(weeks * 7), id: \.self) { _ in
+                    SkeletonView.circle(48)
+                        .frame(height: CalendarMetrics.cellHeight, alignment: .top)
+                }
+            }
+            .padding(.top, AppSpacing.md)
+        }
+        .shimmer()
+        .padding(AppSpacing.lg)
+        .cardStyle()
+        .skeletonLoadingLabel()
     }
 }

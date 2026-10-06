@@ -75,8 +75,8 @@ public struct MetricCard<ChartContent: View>: View {
     // Mini-chart footprint. The chart is overlaid (not a layout sibling) so it can bleed to
     // the card's trailing edge; the text column reserves matching room so titles, amounts and
     // badges never run underneath it. Keep these in sync.
-    private static var miniChartWidth: CGFloat { 120 }
-    private static var miniChartHeight: CGFloat { 120 }
+    static var miniChartWidth: CGFloat { 120 }
+    static var miniChartHeight: CGFloat { 120 }
 
     /// - Parameters:
     ///   - title: One line, secondary.
@@ -218,5 +218,47 @@ public extension MetricCard where ChartContent == EmptyView {
         self.init(title: title, subtitle: subtitle, value: value, unit: unit, trend: trend) {
             EmptyView()
         }
+    }
+}
+
+// MARK: - Skeleton
+
+/// Placeholder of a `MetricCard`: the same card, the title, subtitle and value, and the
+/// chart's slot (a soft block) where the card has one.
+public struct MetricCardSkeleton: View {
+    /// Where the card's chart is; `nil` for a card without one.
+    let chartPlacement: MetricCardChartPlacement?
+
+    public init(chartPlacement: MetricCardChartPlacement? = .trailing) {
+        self.chartPlacement = chartPlacement
+    }
+
+    private var miniChartWidth: CGFloat { MetricCard<EmptyView>.miniChartWidth }
+    private var miniChartHeight: CGFloat { MetricCard<EmptyView>.miniChartHeight }
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                SkeletonText(AppTypography.body, width: 100)
+                SkeletonText(AppTypography.bodyEmphasis, width: 180)
+                SkeletonText(AppTypography.h2, width: 130)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.trailing, chartPlacement == .trailing ? miniChartWidth + AppSpacing.sm : 0)
+
+            if chartPlacement == .bottom {
+                SkeletonView(height: miniChartHeight)
+            }
+        }
+        .shimmer()
+        .padding(AppSpacing.lg)
+        .cardStyle()
+        .overlay(alignment: .trailing) {
+            if chartPlacement == .trailing {
+                SkeletonView(height: miniChartHeight * 0.6, width: miniChartWidth)
+                    .padding(.trailing, AppSpacing.lg)
+            }
+        }
+        .skeletonLoadingLabel()
     }
 }

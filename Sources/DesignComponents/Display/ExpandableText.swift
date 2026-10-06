@@ -86,3 +86,21 @@ public struct ExpandableText: View {
         .accessibilityHidden(true)
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of an `ExpandableText`: `lines` lines of its text, the last one shorter.
+public struct ExpandableTextSkeleton: View {
+    let font: Font
+    let lines: Int
+
+    public init(font: Font = AppTypography.body, lines: Int = 3) {
+        self.font = font
+        self.lines = max(1, lines)
+    }
+
+    public var body: some View {
+        SkeletonText(font, lines: lines)
+            .skeletonLoadingLabel()
+    }
+}

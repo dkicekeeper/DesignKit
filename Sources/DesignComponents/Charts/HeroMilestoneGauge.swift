@@ -40,9 +40,9 @@ public struct HeroMilestoneGauge: View {
     private var immediate: Bool { !animatesOnAppear || AppAnimation.isReduceMotionEnabled || suppressAnimation }
     private var currentEntranceDelay: Double { hasEnteredOnce ? 0 : entranceDelay }
 
-    private static let cornerRadius: CGFloat = 6
-    private static let segmentGap: CGFloat = 6
-    private static let tickOvershoot: CGFloat = 9
+    static let cornerRadius: CGFloat = 6
+    static let segmentGap: CGFloat = 6
+    static let tickOvershoot: CGFloat = 9
     private static let waveStep: Double = 0.08
 
     private var segments: Int { max(1, Int(maxValue.rounded())) }
@@ -175,3 +175,27 @@ public struct HeroMilestoneGauge: View {
 }
 
 // MARK: - Previews
+
+// MARK: - Skeleton
+
+/// Placeholder of a `HeroMilestoneGauge`: its row of rounded segments, the same height.
+public struct HeroMilestoneGaugeSkeleton: View {
+    let segments: Int
+    let segmentHeight: CGFloat
+
+    public init(segments: Int = 6, segmentHeight: CGFloat = 22) {
+        self.segments = max(1, segments)
+        self.segmentHeight = segmentHeight
+    }
+
+    public var body: some View {
+        HStack(spacing: HeroMilestoneGauge.segmentGap) {
+            ForEach(0..<segments, id: \.self) { _ in
+                SkeletonView(height: segmentHeight, cornerRadius: HeroMilestoneGauge.cornerRadius)
+            }
+        }
+        .frame(height: segmentHeight + HeroMilestoneGauge.tickOvershoot * 2)
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}

@@ -54,3 +54,19 @@ public struct ProportionBar: View {
         }
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `ProportionBar`: one rounded bar of the same height.
+public struct ProportionBarSkeleton: View {
+    let height: CGFloat
+
+    public init(height: CGFloat = 8) {
+        self.height = height
+    }
+
+    public var body: some View {
+        SkeletonView(height: height, cornerRadius: AppRadius.xl)
+            .skeletonLoadingLabel()
+    }
+}

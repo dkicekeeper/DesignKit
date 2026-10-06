@@ -6,7 +6,7 @@
 //  icon+title contexts (TransactionAddModal, TransactionEditView, InsightDeepDiveView).
 //  - Amount / subtitle / progress / currency-conversion are all optional.
 //  - Icon animates in with a spring scale-up on appear.
-//  - For edit flows with bindings + IconPicker use `EditableHeroSection` instead.
+//  - For edit flows with bindings + IconPicker use `EditableHero` instead.
 //
 
 import SwiftUI
@@ -71,7 +71,7 @@ public struct HeroSection<Accessory: View>: View {
     /// Diameter of the progress ring that wraps the hero icon.
     /// Icon is `AppIconSize.ultra` (80pt); ring sits 6pt outside.
     /// (Computed, not `static let` — the type is generic, which bars stored statics.)
-    private static var ringSize: CGFloat { AppIconSize.ultra + 12 }
+    private static var ringSize: CGFloat { HeroSectionMetrics.ringSize }
 
     public var body: some View {
         VStack(spacing: AppSpacing.md) {
@@ -187,5 +187,47 @@ public extension HeroSection where Accessory == EmptyView {
             baseCurrency: baseCurrency,
             accessory: { EmptyView() }
         )
+    }
+}
+
+/// Sizes `HeroSection` and its skeleton share.
+enum HeroSectionMetrics {
+    /// The progress ring around the hero icon.
+    static let ringSize: CGFloat = AppIconSize.ultra + 12
+}
+
+// MARK: - Skeleton
+
+/// Placeholder of a `HeroSection`: the round glass icon (in its ring's track when the hero
+/// shows progress), the title and the amount, centred.
+public struct HeroSectionSkeleton: View {
+    let showsIcon: Bool
+    let showsProgress: Bool
+
+    public init(showsIcon: Bool = true, showsProgress: Bool = false) {
+        self.showsIcon = showsIcon
+        self.showsProgress = showsProgress
+    }
+
+    public var body: some View {
+        VStack(spacing: AppSpacing.md) {
+            if showsIcon {
+                ZStack {
+                    if showsProgress {
+                        Circle()
+                            .stroke(SkeletonView.fill, lineWidth: 4)
+                            .frame(width: HeroSectionMetrics.ringSize, height: HeroSectionMetrics.ringSize)
+                    }
+                    SkeletonView.circle(AppIconSize.ultra)
+                }
+            }
+            VStack(spacing: AppSpacing.xs) {
+                SkeletonText(AppTypography.h1, width: 180)
+                SkeletonText(AppTypography.h3, width: 120)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .shimmer()
+        .skeletonLoadingLabel()
     }
 }

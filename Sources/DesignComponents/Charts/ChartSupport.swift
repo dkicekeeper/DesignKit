@@ -138,7 +138,7 @@ extension View {
 
     /// Fixed-height slot for the selection banner so the chart does not jump.
     func chartBannerSlotStyle(animationKey: AnyHashable?) -> some View {
-        frame(height: 56)
+        frame(height: ChartMetrics.bannerHeight)
             .screenPadding()
             .animation(AppAnimation.chartBannerFade, value: animationKey)
     }
@@ -178,4 +178,14 @@ func chartBannerEntries<Point>(point: Point, series: [ChartSeries<Point>]) -> [C
         let v = s.value(point)
         return .init(value: v, color: s.color(for: v), showsDot: true)
     }
+}
+
+/// Heights the charts and their skeletons share.
+enum ChartMetrics {
+    /// Plot area of `LineChart` and `BarChart`.
+    static let plotHeight: CGFloat = 200
+    /// Plot area of `HeroSparkline`.
+    static let heroPlotHeight: CGFloat = 220
+    /// The slot above a plot where the selection banner appears.
+    static let bannerHeight: CGFloat = 56
 }

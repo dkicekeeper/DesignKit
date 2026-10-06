@@ -66,3 +66,19 @@ public struct AvatarView: View {
         return letters.isEmpty ? "?" : letters
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of an `AvatarView`: a circle of its size.
+public struct AvatarViewSkeleton: View {
+    let size: CGFloat
+
+    public init(size: CGFloat = AppIconSize.avatar) {
+        self.size = size
+    }
+
+    public var body: some View {
+        SkeletonView.circle(size)
+            .skeletonLoadingLabel()
+    }
+}

@@ -174,3 +174,42 @@ public extension PayoffProgressCard where Accessory == EmptyView {
         ) { EmptyView() }
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `PayoffProgressCard`: the same card, the header, the two amounts over the
+/// progress track and the footer line.
+public struct PayoffProgressCardSkeleton: View {
+    public init() {}
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
+            HStack(alignment: .top) {
+                IconViewSkeleton(size: AppIconSize.xxl)
+                VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                    SkeletonText(AppTypography.h4, width: 140)
+                    SkeletonText(AppTypography.bodySmall, width: 100)
+                }
+                Spacer()
+            }
+            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                HStack {
+                    SkeletonText(AppTypography.body, width: 90)
+                    Spacer()
+                    SkeletonText(AppTypography.body, width: 90)
+                }
+                // The system linear ProgressView's track: 4 pt, rounded ends.
+                SkeletonView.capsule(height: 4)
+            }
+            HStack {
+                SkeletonText(AppTypography.bodySmall, width: 110)
+                Spacer()
+                SkeletonText(AppTypography.bodySmall, width: 80)
+            }
+        }
+        .shimmer()
+        .padding(AppSpacing.lg)
+        .cardStyle()
+        .skeletonLoadingLabel()
+    }
+}

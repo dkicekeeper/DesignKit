@@ -85,3 +85,25 @@ public struct ScheduleRow: View {
         .accessibilityElement(children: .combine)
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `ScheduleRow`: the status circle, the title and subtitle, the amount.
+public struct ScheduleRowSkeleton: View {
+    public init() {}
+
+    public var body: some View {
+        HStack(alignment: .top, spacing: AppSpacing.md) {
+            SkeletonView.circle(AppIconSize.lg)
+            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                SkeletonText(AppTypography.bodyEmphasis, width: 120)
+                SkeletonText(AppTypography.bodySmall, width: 90)
+            }
+            Spacer(minLength: AppSpacing.sm)
+            SkeletonText(AppTypography.bodyEmphasis, width: 90)
+        }
+        .shimmer()
+        .padding(.vertical, RowConfiguration.info.verticalPadding)
+        .skeletonLoadingLabel()
+    }
+}

@@ -14,6 +14,7 @@ import UIKit
 import Testing
 import SnapshotTesting
 import DesignTokens
+import DesignComponents
 
 /// The ways a component is drawn. Every snapshot test picks a subset.
 enum SnapshotAppearance: String, CaseIterable {
@@ -132,6 +133,8 @@ enum ComponentRenderer {
             .background(AppColors.bgBase)
             .environment(\.colorScheme, appearance.colorScheme)
             .environment(\.locale, Locale(identifier: "en_US"))
+            // Skeletons stand still: the shimmer moves on a clock, so no two frames match.
+            .skeletonShimmer(false)
             .dynamicTypeSize(appearance.dynamicTypeSize)
             .transaction { transaction in
                 transaction.disablesAnimations = true

@@ -44,7 +44,7 @@ public struct MiniHalfGauge: View {
     var height: CGFloat = 60
 
     /// How far the norm tick overshoots the stroke on each side.
-    private static let tickOvershoot: CGFloat = 8
+    static let tickOvershoot: CGFloat = 8
 
     public init(
         value: Double,
@@ -142,3 +142,32 @@ public struct MiniHalfGauge: View {
 }
 
 // MARK: - Previews
+
+// MARK: - Skeleton
+
+/// Placeholder of a `MiniHalfGauge`: its track, the same arc and round caps.
+public struct MiniHalfGaugeSkeleton: View {
+    let lineWidth: CGFloat
+    let height: CGFloat
+
+    public init(lineWidth: CGFloat = 9, height: CGFloat = 60) {
+        self.lineWidth = lineWidth
+        self.height = height
+    }
+
+    public var body: some View {
+        Canvas { context, size in
+            // The gauge's geometry (see MiniHalfGauge.body).
+            let center = CGPoint(x: size.width / 2, y: size.height - 4)
+            let radius = min(size.width / 2, size.height - 4) - MiniHalfGauge.tickOvershoot - 4
+            var track = Path()
+            track.addArc(center: center, radius: radius,
+                         startAngle: .degrees(180), endAngle: .degrees(360), clockwise: false)
+            context.stroke(track, with: .color(SkeletonView.fill),
+                           style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+        }
+        .frame(height: height)
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}

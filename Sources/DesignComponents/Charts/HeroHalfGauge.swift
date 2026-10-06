@@ -44,7 +44,7 @@ public struct HeroHalfGauge: View {
     @State private var displayFraction: Double = 0
     private var fillAnimation: Animation? { AppAnimation.progressFillAnimation }
 
-    private static let tickOvershoot: CGFloat = 8
+    static let tickOvershoot: CGFloat = 8
 
     private var scale: Double {
         if let maxValue { return max(maxValue, .leastNonzeroMagnitude) }
@@ -169,3 +169,33 @@ public struct HeroHalfGauge: View {
 }
 
 // MARK: - Previews
+
+// MARK: - Skeleton
+
+/// Placeholder of a `HeroHalfGauge`: its track, the same diameter, line width and frame.
+public struct HeroHalfGaugeSkeleton: View {
+    let diameter: CGFloat
+    let lineWidth: CGFloat
+
+    public init(diameter: CGFloat = 240, lineWidth: CGFloat = 20) {
+        self.diameter = diameter
+        self.lineWidth = lineWidth
+    }
+
+    public var body: some View {
+        // The gauge's track (see HeroHalfGauge.halfArc).
+        Circle()
+            .inset(by: lineWidth / 2)
+            .trim(from: 0, to: 0.5)
+            .rotation(.degrees(180))
+            .stroke(SkeletonView.fill, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+            .frame(width: diameter, height: diameter)
+            .frame(
+                width: diameter + HeroHalfGauge.tickOvershoot * 2,
+                height: diameter / 2 + lineWidth / 2 + HeroHalfGauge.tickOvershoot,
+                alignment: .top
+            )
+            .shimmer()
+            .skeletonLoadingLabel()
+    }
+}

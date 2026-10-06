@@ -40,3 +40,31 @@ public struct RecommendationBox: View {
     }
 }
 
+
+// MARK: - Skeleton
+
+/// Placeholder of a `RecommendationBox`: one grey box with its corner, as tall as an icon
+/// and `lines` lines of its text.
+public struct RecommendationBoxSkeleton: View {
+    let lines: Int
+
+    public init(lines: Int = 2) {
+        self.lines = max(1, lines)
+    }
+
+    public var body: some View {
+        // The box's own layout, invisible, gives the height (it grows with Dynamic Type).
+        HStack(alignment: .top, spacing: AppSpacing.sm) {
+            Image(systemName: "lightbulb.fill")
+                .font(.system(size: AppIconSize.sm))
+            Text(verbatim: Array(repeating: "Ag", count: lines).joined(separator: "\n"))
+                .font(AppTypography.bodySmall)
+        }
+        .hidden()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(AppSpacing.md)
+        .background(SkeletonView.fill, in: RoundedRectangle(cornerRadius: AppRadius.md))
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}

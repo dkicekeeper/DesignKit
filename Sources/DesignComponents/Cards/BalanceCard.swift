@@ -57,3 +57,24 @@ public struct BalanceCard: View {
         .cardStyle()
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `BalanceCard`: the same card, a round icon, the title and the amount.
+public struct BalanceCardSkeleton: View {
+    public init() {}
+
+    public var body: some View {
+        HStack(spacing: AppSpacing.sm) {
+            IconViewSkeleton(size: AppIconSize.xxl)
+            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                SkeletonText(AppTypography.h4, width: 120)
+                SkeletonText(AppTypography.bodySmall, width: 90)
+            }
+        }
+        .shimmer()
+        .padding(AppSpacing.lg)
+        .cardStyle()
+        .skeletonLoadingLabel()
+    }
+}

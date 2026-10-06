@@ -99,3 +99,30 @@ public struct InfoRow: View {
     }
 }
 
+
+// MARK: - Skeleton
+
+/// Placeholder of an `InfoRow`: the label and the value, and the icon when the row has one.
+public struct InfoRowSkeleton: View {
+    let showsIcon: Bool
+
+    public init(showsIcon: Bool = false) {
+        self.showsIcon = showsIcon
+    }
+
+    public var body: some View {
+        HStack(spacing: RowConfiguration.info.spacing) {
+            if showsIcon {
+                SkeletonView.circle(AppIconSize.lg)
+            }
+            HStack(spacing: AppSpacing.md) {
+                SkeletonText(AppTypography.body, width: 100)
+                Spacer(minLength: AppSpacing.sm)
+                SkeletonText(AppTypography.bodyEmphasis, width: 90)
+            }
+        }
+        .shimmer()
+        .padding(.vertical, RowConfiguration.info.verticalPadding)
+        .skeletonLoadingLabel()
+    }
+}

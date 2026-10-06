@@ -106,6 +106,27 @@ struct BalancesScreen: View {
                 tile("Transport", "car.fill", .blue, nil)
             }
         }
+
+        ShowcaseSection(title: "ProgressRingTileGrid", subtitle: "Tiles with the amount and the limit under each") {
+            ProgressRingTileGrid(items: gridItems, currency: "KZT") { item in
+                selectedTile = item.title
+            }
+        }
+    }
+
+    private var gridItems: [ProgressRingTileGridItem] {
+        [
+            ProgressRingTileGridItem(id: "food", title: "Food", systemImage: "fork.knife", color: .orange,
+                                     progress: LimitProgress(spent: 185_000, limit: 250_000),
+                                     amount: 185_000, limit: 250_000),
+            ProgressRingTileGridItem(id: "shopping", title: "Shopping", systemImage: "bag.fill", color: AppColors.accent,
+                                     progress: LimitProgress(spent: 132_000, limit: 100_000),
+                                     amount: 132_000, limit: 100_000),
+            ProgressRingTileGridItem(id: "transport", title: "Transport", systemImage: "car.fill", color: .blue,
+                                     amount: 24_500),
+            ProgressRingTileGridItem(id: "home", title: "Home", systemImage: "house.fill", color: .green,
+                                     amount: 210_000),
+        ]
     }
 
     private func tile(_ title: String, _ symbol: String, _ color: Color, _ progress: LimitProgress?) -> some View {

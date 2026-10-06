@@ -84,3 +84,24 @@ public struct StatusIndicatorBadge: View {
 }
 
 // The domain bridge (`RecurringSeries.entityStatus`) stays in the host app.
+
+// MARK: - Skeleton
+
+/// Placeholder of a `StatusIndicatorBadge`: a circle the size of its symbol.
+public struct StatusIndicatorBadgeSkeleton: View {
+    let font: Font
+
+    public init(font: Font = AppTypography.body) {
+        self.font = font
+    }
+
+    public var body: some View {
+        // The symbol's own size, invisible, under a grey circle.
+        Image(systemName: "circle.fill")
+            .font(font)
+            .hidden()
+            .background(SkeletonView.fill, in: Circle())
+            .shimmer()
+            .skeletonLoadingLabel()
+    }
+}

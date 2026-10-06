@@ -154,3 +154,37 @@ public struct UniversalCarousel<Content: View>: View {
         }
     }
 }
+
+// MARK: - Item transition
+
+public extension View {
+    /// A card in a carousel that dims to 75% and shrinks to 95% as it scrolls off, and comes
+    /// back as it scrolls in (Tenra's accounts carousel). Pass `false` for a short carousel
+    /// that never scrolls, where the effect would only flicker at the edges.
+    ///
+    /// ```swift
+    /// UniversalCarousel(config: .cards) {
+    ///     ForEach(accounts) { BalanceCard(…).carouselItemTransition(isEnabled: accounts.count >= 3) }
+    /// }
+    /// ```
+    func carouselItemTransition(isEnabled: Bool = true) -> some View {
+        modifier(CarouselItemTransition(isEnabled: isEnabled))
+    }
+}
+
+private struct CarouselItemTransition: ViewModifier {
+    let isEnabled: Bool
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if isEnabled {
+            content.scrollTransition(.interactive) { content, phase in
+                content
+                    .opacity(phase.isIdentity ? 1 : 0.75)
+                    .scaleEffect(phase.isIdentity ? 1 : 0.95)
+            }
+        } else {
+            content
+        }
+    }
+}

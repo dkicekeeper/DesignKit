@@ -9,6 +9,12 @@
 //  The shimmer is ambient motion: it stops under Reduce Motion (and, on iOS 27, when the
 //  system asks apps to save resources) via AmbientMotionGate, leaving a static placeholder.
 //
+//  Every component that shows data has its own skeleton next to it (`BalanceCardSkeleton` in
+//  BalanceCard.swift, …): the component's container and corner as they are, grey shapes in
+//  place of its text, amounts, icons and charts. A shape keeps the corner of what it stands
+//  for (a chip is a capsule, an icon its own shape); one with no corner of its own (a line of
+//  text, a plot area) takes `AppRadius.soft`. One shimmer sweeps a whole skeleton.
+//
 
 import SwiftUI
 import DesignTokens
@@ -21,12 +27,14 @@ import DesignSupport
 /// SkeletonView(height: 40, width: 40, cornerRadius: 20) // an avatar
 /// SkeletonView(height: 160)                            // an image, full width
 /// ```
+///
+/// The corner is `AppRadius.soft` unless the shape stands for something with its own corner.
 public struct SkeletonView: View {
     let height: CGFloat
     let width: CGFloat?
     let cornerRadius: CGFloat
 
-    public init(height: CGFloat = 14, width: CGFloat? = nil, cornerRadius: CGFloat = AppRadius.xs) {
+    public init(height: CGFloat = 14, width: CGFloat? = nil, cornerRadius: CGFloat = AppRadius.soft) {
         self.height = height
         self.width = width
         self.cornerRadius = cornerRadius
@@ -34,11 +42,24 @@ public struct SkeletonView: View {
 
     public var body: some View {
         RoundedRectangle(cornerRadius: cornerRadius)
-            .fill(AppColors.bgMuted)
+            .fill(SkeletonView.fill)
             .frame(width: width, height: height)
             .frame(maxWidth: width == nil ? .infinity : nil, alignment: .leading)
             .shimmer()
             .accessibilityHidden(true)
+    }
+
+    /// The grey of every skeleton shape.
+    static let fill = AppColors.bgMuted
+
+    /// A circle: an avatar, a round icon, a dot.
+    public static func circle(_ diameter: CGFloat) -> SkeletonView {
+        SkeletonView(height: diameter, width: diameter, cornerRadius: diameter / 2)
+    }
+
+    /// A capsule: a chip, a badge, a glass button. Full width without `width`.
+    public static func capsule(height: CGFloat, width: CGFloat? = nil) -> SkeletonView {
+        SkeletonView(height: height, width: width, cornerRadius: height / 2)
     }
 }
 
@@ -83,8 +104,8 @@ public struct SkeletonText: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .overlay(alignment: .leading) {
                 GeometryReader { proxy in
-                    RoundedRectangle(cornerRadius: AppRadius.xs)
-                        .fill(AppColors.bgMuted)
+                    RoundedRectangle(cornerRadius: AppRadius.soft)
+                        .fill(SkeletonView.fill)
                         .frame(width: proxy.size.width * (isLast ? 0.6 : 1), height: proxy.size.height * 0.7)
                         .frame(maxHeight: .infinity)
                 }
@@ -157,28 +178,55 @@ public extension View {
             .accessibilityLabel(Text(String(localized: "skeleton.loading", defaultValue: "Loading")))
     }
 
-    /// A light band sweeping across the view every 1.4 s. Static under Reduce Motion.
+    /// A light band sweeping across the view every 1.4 s. Static under Reduce Motion and
+    /// under `.skeletonShimmer(false)`. Inside a view that already shimmers it does nothing,
+    /// so a component skeleton sweeps as one piece.
     func shimmer() -> some View {
         modifier(ShimmerModifier())
     }
+
+    /// Stops (or restarts) the shimmer of every skeleton below: static placeholders, for a
+    /// screenshot or a host that wants no motion there. Snapshot tests draw skeletons this way.
+    func skeletonShimmer(_ isEnabled: Bool) -> some View {
+        environment(\.skeletonShimmers, isEnabled)
+    }
+}
+
+public extension EnvironmentValues {
+    /// Whether skeletons shimmer (`.skeletonShimmer(_:)`). Default `true`.
+    @Entry var skeletonShimmers: Bool = true
+}
+
+extension EnvironmentValues {
+    /// Set by a shimmer for the views inside it, which then do not shimmer again.
+    @Entry var isInsideShimmer: Bool = false
 }
 
 private struct ShimmerModifier: ViewModifier {
+    @Environment(\.skeletonShimmers) private var shimmers
+    @Environment(\.isInsideShimmer) private var isInsideShimmer
+
+    @ViewBuilder
     func body(content: Content) -> some View {
-        AmbientMotionGate { allowsMotion in
-            if allowsMotion {
-                TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { context in
-                    content.overlay {
-                        GeometryReader { proxy in
-                            band(width: proxy.size.width, at: context.date)
+        if !shimmers || isInsideShimmer {
+            content
+        } else {
+            AmbientMotionGate { allowsMotion in
+                if allowsMotion {
+                    TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { context in
+                        content.overlay {
+                            GeometryReader { proxy in
+                                band(width: proxy.size.width, at: context.date)
+                            }
+                            .mask(content)
+                            .allowsHitTesting(false)
                         }
-                        .mask(content)
-                        .allowsHitTesting(false)
                     }
+                } else {
+                    content
                 }
-            } else {
-                content
             }
+            .environment(\.isInsideShimmer, true)
         }
     }
 

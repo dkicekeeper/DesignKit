@@ -87,3 +87,35 @@ public struct ScoreGaugeCard: View {
         .cardStyle()
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `ScoreGaugeCard`: the same card, the gauge's track, the score, the grade
+/// capsule and the subtitle.
+public struct ScoreGaugeCardSkeleton: View {
+    public init() {}
+
+    public var body: some View {
+        VStack(spacing: AppSpacing.lg) {
+            ZStack(alignment: .bottom) {
+                HeroHalfGaugeSkeleton(diameter: 220, lineWidth: 16)
+                VStack(spacing: AppSpacing.xs) {
+                    SkeletonText(AppTypography.h1, width: 72)
+                    // The grade's capsule: a line of its text with its padding.
+                    Text(verbatim: "Grade")
+                        .font(AppTypography.bodySmall)
+                        .hidden()
+                        .padding(.horizontal, AppSpacing.md)
+                        .padding(.vertical, AppSpacing.xs)
+                        .background(SkeletonView.fill, in: Capsule())
+                }
+            }
+            SkeletonText(AppTypography.bodyEmphasis, width: 180)
+        }
+        .frame(maxWidth: .infinity)
+        .shimmer()
+        .padding(AppSpacing.lg)
+        .cardStyle()
+        .skeletonLoadingLabel()
+    }
+}

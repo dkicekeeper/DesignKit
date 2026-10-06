@@ -166,3 +166,19 @@ public struct LinearProgressBar: View {
 }
 
 // MARK: - Previews
+
+// MARK: - Skeleton
+
+/// Placeholder of a `LinearProgressBar`: its track, with the same height and corner.
+public struct LinearProgressBarSkeleton: View {
+    let height: CGFloat
+
+    public init(height: CGFloat = 8) {
+        self.height = height
+    }
+
+    public var body: some View {
+        SkeletonView(height: height, cornerRadius: AppRadius.xs)
+            .skeletonLoadingLabel()
+    }
+}

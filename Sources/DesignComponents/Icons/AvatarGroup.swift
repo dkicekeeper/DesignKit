@@ -68,3 +68,29 @@ public struct AvatarGroup: View {
         .accessibilityHidden(label == nil)
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of an `AvatarGroup`: overlapping circles, with the group's overlap.
+public struct AvatarGroupSkeleton: View {
+    let count: Int
+    let size: CGFloat
+
+    public init(count: Int = 3, size: CGFloat = 32) {
+        self.count = max(1, count)
+        self.size = size
+    }
+
+    public var body: some View {
+        HStack(spacing: -size / 3) {
+            ForEach(0..<count, id: \.self) { index in
+                SkeletonView.circle(size)
+                    // The ring that separates the avatars.
+                    .overlay(Circle().stroke(AppColors.bgBase, lineWidth: 2))
+                    .zIndex(Double(count - index))
+            }
+        }
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}

@@ -99,3 +99,26 @@ public struct RecurringPaymentCard: View {
         .accessibilityElement(children: .combine)
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `RecurringPaymentCard`: the same card, the round icon, the title and the
+/// amount.
+public struct RecurringPaymentCardSkeleton: View {
+    public init() {}
+
+    public var body: some View {
+        HStack(spacing: AppSpacing.md) {
+            IconViewSkeleton(size: AppIconSize.xxl)
+            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                SkeletonText(AppTypography.bodyEmphasis, width: 120)
+                SkeletonText(AppTypography.body, width: 90)
+            }
+            Spacer()
+        }
+        .shimmer()
+        .padding(AppSpacing.lg)
+        .cardStyle()
+        .skeletonLoadingLabel()
+    }
+}

@@ -158,3 +158,31 @@ public struct BalanceRow: View {
     /// Spaces and the "·" that separate a detail's text from its amount on one line.
     private static let trailingSeparator = CharacterSet.whitespaces.union(CharacterSet(charactersIn: "·"))
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `BalanceRow`: the round icon, the title and the amount, and the detail
+/// line when the row has one.
+public struct BalanceRowSkeleton: View {
+    let showsDetail: Bool
+
+    public init(showsDetail: Bool = false) {
+        self.showsDetail = showsDetail
+    }
+
+    public var body: some View {
+        HStack(spacing: AppSpacing.md) {
+            IconViewSkeleton(size: AppIconSize.xxl)
+            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                SkeletonText(AppTypography.h4, width: 130)
+                SkeletonText(AppTypography.bodySmall, width: 90)
+                if showsDetail {
+                    SkeletonText(AppTypography.caption, width: 150)
+                }
+            }
+            Spacer()
+        }
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}

@@ -75,7 +75,7 @@ public struct BarChart<Point: ChartPoint>: View {
         )
     }
 
-    private let chartHeight: CGFloat = 200
+    private var chartHeight: CGFloat { ChartMetrics.plotHeight }
 
     /// Static Y domain over the whole dataset with ~6 % headroom (bars touching the plot
     /// edge read as clipped).
@@ -225,5 +225,37 @@ public struct BarChart<Point: ChartPoint>: View {
         .chartCategoryXAxis(labelMap: axisLabels)
         .chartCompactYAxis()
         .chartLegend(.hidden)
+    }
+}
+
+// MARK: - Skeleton
+
+/// Placeholder of a `BarChart`: the banner slot, then a row of bars with the chart's corner.
+public struct BarChartSkeleton: View {
+    let bars: Int
+
+    public init(bars: Int = 12) {
+        self.bars = max(1, bars)
+    }
+
+    /// Heights of the bars, as shares of the plot: varied, so the row reads as a bar chart.
+    private static let shares: [CGFloat] = [0.55, 0.75, 0.45, 0.85, 0.65, 0.95, 0.6, 0.8, 0.5, 0.7, 0.9, 0.65]
+
+    public var body: some View {
+        VStack(spacing: AppSpacing.lg) {
+            Color.clear.frame(height: ChartMetrics.bannerHeight)
+            HStack(alignment: .bottom, spacing: AppSpacing.sm) {
+                ForEach(0..<bars, id: \.self) { index in
+                    SkeletonView(
+                        height: ChartMetrics.plotHeight * Self.shares[index % Self.shares.count],
+                        cornerRadius: AppRadius.xs
+                    )
+                }
+            }
+            .frame(height: ChartMetrics.plotHeight, alignment: .bottom)
+            .padding(.leading, AppSpacing.lg)
+            .shimmer()
+        }
+        .skeletonLoadingLabel()
     }
 }

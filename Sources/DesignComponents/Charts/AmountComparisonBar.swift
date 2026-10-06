@@ -78,3 +78,23 @@ public struct AmountComparisonBar: View {
         }
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of an `AmountComparisonBar`: the bar, then an amount under each end.
+public struct AmountComparisonBarSkeleton: View {
+    public init() {}
+
+    public var body: some View {
+        VStack(spacing: AppSpacing.sm) {
+            SkeletonView(height: AppSpacing.md, cornerRadius: AppRadius.xl)
+            HStack {
+                SkeletonText(AppTypography.h4, width: 110)
+                Spacer()
+                SkeletonText(AppTypography.h4, width: 110)
+            }
+        }
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}

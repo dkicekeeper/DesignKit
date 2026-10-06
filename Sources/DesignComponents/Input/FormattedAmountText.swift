@@ -298,3 +298,23 @@ public struct FormattedAmountText: View {
         }
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of an amount: `FormattedAmountText`, and the views that draw one
+/// (`FormattedAmountView`, `ConvertedAmountView`, `SpentBudgetText`, `RedactableAmount`).
+/// A line of the amount's style, as tall as its text.
+public struct FormattedAmountTextSkeleton: View {
+    let font: Font
+    let width: CGFloat
+
+    public init(font: Font = AppTypography.body, width: CGFloat = 100) {
+        self.font = font
+        self.width = width
+    }
+
+    public var body: some View {
+        SkeletonText(font, width: width)
+            .skeletonLoadingLabel()
+    }
+}

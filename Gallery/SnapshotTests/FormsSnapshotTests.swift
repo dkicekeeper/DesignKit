@@ -35,6 +35,22 @@ extension ComponentSnapshots {
             )
         }
 
+        @Test func editableHero() async {
+            await assertComponentSnapshot(
+                EditableHero(
+                    icon: .constant(.sfSymbol("creditcard.fill")),
+                    title: .constant("Kaspi Gold"),
+                    titlePlaceholder: "Account name",
+                    amount: .constant("125000"),
+                    currency: .constant("KZT"),
+                    // No currency chip: it is a NavigationLink, dimmed outside a NavigationStack.
+                    options: .init(showsAmount: true)
+                )
+                .frame(maxWidth: .infinity),
+                appearances: [.light, .dark]
+            )
+        }
+
         @Test func heroSection() async {
             await assertComponentSnapshot(
                 VStack(spacing: AppSpacing.xl) {

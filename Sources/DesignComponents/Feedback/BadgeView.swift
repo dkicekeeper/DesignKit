@@ -68,3 +68,26 @@ public struct BadgeView: View {
         }
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `BadgeView`: its capsule, as tall as a badge.
+public struct BadgeViewSkeleton: View {
+    let width: CGFloat
+
+    public init(width: CGFloat = 64) {
+        self.width = width
+    }
+
+    public var body: some View {
+        // A badge's own layout, invisible, gives the height; the capsule is the badge's shape.
+        Text(verbatim: "Ag")
+            .font(AppTypography.caption)
+            .hidden()
+            .frame(width: width)
+            .padding(.vertical, AppSpacing.xxs)
+            .background(SkeletonView.fill, in: Capsule())
+            .shimmer()
+            .skeletonLoadingLabel()
+    }
+}

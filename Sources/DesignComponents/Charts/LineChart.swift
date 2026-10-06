@@ -84,7 +84,7 @@ public struct LineChart<Point: ChartPoint>: View {
         )
     }
 
-    private let chartHeight: CGFloat = 200
+    private var chartHeight: CGFloat { ChartMetrics.plotHeight }
 
     /// Static Y domain over the whole dataset (all series), from the cached envelope.
     private var fullYDomain: ClosedRange<Double> {
@@ -270,5 +270,21 @@ public struct LineChart<Point: ChartPoint>: View {
         .chartCategoryXAxis(labelMap: axisLabels)
         .chartCompactYAxis()
         .chartLegend(.hidden)
+    }
+}
+
+// MARK: - Skeleton
+
+/// Placeholder of a `LineChart`: the banner slot, then the plot area with a soft corner.
+public struct LineChartSkeleton: View {
+    public init() {}
+
+    public var body: some View {
+        VStack(spacing: AppSpacing.lg) {
+            Color.clear.frame(height: ChartMetrics.bannerHeight)
+            SkeletonView(height: ChartMetrics.plotHeight)
+                .padding(.leading, AppSpacing.lg)
+        }
+        .skeletonLoadingLabel()
     }
 }

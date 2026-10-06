@@ -37,7 +37,7 @@
 |---|---|
 | `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation`, `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, inline field styles), `AppButton` (`primaryButton`, `secondaryButton`, `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
 | `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `IconView`, `BrandLogoView`, `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `HapticManager`, `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
-| `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2 |
+| `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons") |
 
 Coverage against Apple HIG, Material 3, Fluent 2, Carbon, Polaris and Atlassian, and the next
 candidates: [benchmark.md](benchmark.md).
@@ -51,7 +51,9 @@ DesignKit ships no networking, persistence or FX. A host app wires these once, i
 | `DesignKitTheme.accent` | `.indigo` | Brand accent behind `AppColors.accent`. Also set the asset-catalog `AccentColor` to the same colour (system chrome never reads `AppColors`). |
 | `DesignKitFonts.registerIfNeeded()` | — | Call once; registers the bundled Inter variable fonts. |
 | `DesignKitLogoLoader.loader` | `nil` → fallback icon | Brand-logo images for `IconSource.brandService` (`BrandLogoView`, `IconView`, `heroAccentGlow`). |
-| `DesignKitCurrencyConverter.convert` | `nil` → nothing rendered | FX for `ConvertedAmountView` / `HeroSection(showBaseConversion:)`. |
+| `DesignKitCurrencyConverter.convert` | `nil` → nothing rendered | FX for `ConvertedAmountView` / `HeroSection(showBaseConversion:)` / `CurrencyAmountInput`. |
+| `DesignKitCurrencyConverter.convertSync` *(1.10.0)* | `nil` → `convert` is asked | Instant conversion from cached rates, so `CurrencyAmountInput` shows "≈ …" while the user types. |
+| `DesignKitLogoCatalog.sections` / `.search` / `.domainSuffixes` *(1.10.0)* | no sections → no logos tab; `["com"]` | The brands `IconPicker` offers (titled sections of domain + name), its search, and the domains tried for a typed name (Tenra: `["com", "kz"]`). |
 | Localization keys | raw key shown | Components resolve `String(localized:)` in the **host app's** main bundle. The full key list is in [localization-keys.md](localization-keys.md). |
 
 ### 0.2 Charts in DesignKit
@@ -67,7 +69,8 @@ generic input or a host hook (see [CLAUDE.md](../CLAUDE.md) → *Porting a compo
 
 - **Tenra models** (`Transaction`, `Account`, `CustomCategory`, `RecurringSeries`, loans, deposits): `TransactionCard`, `BudgetSettingsSection`, `EntityDetailScaffold`, `GroupedTransactionList`, `CategoryStyleHelper` / `CategoryStyleCache`, `TransactionDisplayHelper`, `CategoryDisplay`.
 - **`PeriodDataPoint` adapters** (Tenra): `PeriodDataPoint: ChartPoint`, `PeriodChartSeries` → `ChartSeries`, and convenience inits keeping the old call sites (`granularity:`, `currency:`). `PeriodBreakdownRow` and `ChartAxisHelpers`' period labels stay app-side.
-- **Tenra services**: `EditableHeroSection` + `IconPickerView` / `IconCatalog` (logo registry), `CurrencySelectorView` / `AmountInputView` (settings + FX), `DateFormatters`, `FastDateParser`.
+- **Tenra services**: `DateFormatters`, `FastDateParser`. (`EditableHeroSection`, `IconPickerView`, `CurrencySelectorView`, `AmountInputView` and `CurrencyListContent` became `EditableHero`, `IconPicker`, `CurrencyPickerMenu`, `CurrencyAmountInput` and `CurrencyList` in 1.10.0, behind the `DesignKitLogoCatalog` and `convertSync` hooks.)
+- **Screens over Tenra models**: the account, category and time filter sheets (built from `CheckmarkRow`), the home sections (`FinanceCard` + `PackedCircleIconsView`).
 - **Domain convenience inits / adapters**: `MenuPickerRow where T == RecurringFrequency / LoanType / ReminderOption`, `StatusIndicatorBadge`'s `RecurringSeries.entityStatus`, `DonutSlice.from([CategoryBreakdownItem])`, Tenra's `InsightTrendBadge` (`InsightTrend` → `TrendBadge`), Tenra's adapters under the old names of the components ported in 1.1.0–1.5.0 (`AccountRow` → `BalanceRow`, `CategoryRow` → `ProgressRingRow`, `CategoryChip` → `ProgressRingTile`, `BudgetProgressRow` → `LimitProgressCard`, …), Dalada's `RuleStatusBadge` (`RuleStatus` → `BadgeView`).
 
 ---
@@ -125,7 +128,7 @@ Modifiers:
 
 For archived/inactive UI use `Color(.systemGray)` directly — there is no dedicated token.
 
-**Category colors:** `CategoryColors.hexColor(for:opacity:)` — 14-color hex palette hashed by name. DesignKit has no custom-category override; Tenra keeps its `customCategories:` / store-backed overloads app-side. The slot is `CategoryColors.paletteIndex(for:)`, an FNV-1a hash of the name: the same on every launch and device (since 0.7.0; before that it used `String.hashValue`, which Swift seeds per process, so the colour changed between launches).
+**Category colors:** `CategoryColors.hexColor(for:opacity:)` — 14-color hex palette hashed by name; `CategoryColors.paletteColors` (1.10.0) is the palette itself, for an app's own name-coloured visuals (Tenra's letter avatars). DesignKit has no custom-category override; Tenra keeps its `customCategories:` / store-backed overloads app-side. The slot is `CategoryColors.paletteIndex(for:)`, an FNV-1a hash of the name: the same on every launch and device (since 0.7.0; before that it used `String.hashValue`, which Swift seeds per process, so the colour changed between launches).
 
 ### Spacing (`AppSpacing`)
 
@@ -152,6 +155,7 @@ For archived/inactive UI use `Color(.systemGray)` directly — there is no dedic
 | `md` / `card` / `button` | 12 | Standard cards and buttons |
 | `lg` | 16 | Large cards |
 | `xl` | 20 | Pills, filter chips, `.cardStyle()` default |
+| `soft` | 12 | A skeleton shape whose component has no corner of its own (1.10.0) |
 
 For full circles use `.infinity` inline (rare — only avatars/icon backgrounds use it). For values between tokens (8pt chips, 6pt compact corners) inline the numeric literal — no token.
 
@@ -299,26 +303,13 @@ FormSection(header: "Settings", footer: nil, style: .card) {
 | `.list` | None | Inside `List` |
 | `.plain` | None | Raw passthrough |
 
-#### `EditableHeroSection` *(app-side, Tenra)*
-**Purpose:** Animated hero section for entity edit views.
+#### `EditableHero` *(1.10.0)*
+The top of an edit sheet: a glass hero icon (entrance spring) that opens `IconPicker`, the name typed in place (`AnimatedTitleInput`), and with `.amountAndCurrency` an amount (`AmountInput`, 48 pt) and a currency chip that pushes `CurrencyList` (so put the hero in a `NavigationStack`). `iconTint` draws a symbol in that colour on glass (a category); `.symbolsOnly` hides the logos tab. Tenra: `EditableHeroSection` (its `HeroConfig` presets, the category hex colour) is an adapter.
 
 ```swift
-EditableHeroSection(
-    iconSource: $iconSource,
-    title: $name,
-    balance: $balance,        // only if config.showBalance
-    currency: $currency,      // only if config.showCurrency
-    selectedColor: $colorHex, // only if config.showColorPicker
-    titlePlaceholder: "Name",
-    config: .accountHero
-)
+EditableHero(icon: $icon, title: $name, titlePlaceholder: "Account name",
+             amount: $balance, currency: $currency, options: .amountAndCurrency)
 ```
-
-| Preset | Shows |
-|--------|-------|
-| `.accountHero` | Balance + Currency |
-| `.categoryHero` | Color picker |
-| `.subscriptionHero` | Balance + Currency |
 
 #### `HeroSection`
 **Purpose:** Read-only icon + title (+ optional amount / subtitle / progress) hero for entity-**detail** screens and simple icon+title contexts (`InsightDetailView`, `InsightDeepDiveView`, `TransactionAddModal`). For edit flows with bindings use `EditableHeroSection` instead.
@@ -415,6 +406,9 @@ InfoRow(icon: "calendar", label: "Next Payment", value: "March 15, 2026")
 ```
 
 Use in: detail views for metadata display. NOT for editable fields.
+
+#### `CheckmarkRow` *(1.10.0)*
+A row of a choice list (a filter or picker sheet): `UniversalRow(.settings)` with an optional icon (`IconConfig`), the title in h4 medium, an optional trailing value (secondary h4, e.g. a balance), and the accent checkmark on the picked row. A tap plays the selection haptic and runs the action; VoiceOver hears a button, "Selected" on the picked one (`.selectableRow`). `CheckmarkRow("All accounts", isSelected: selection == nil) { selection = nil }`. Tenra: the rows of its account, category and time filters. Skeleton: `UniversalRowSkeleton.checkmark(iconStyle:)`.
 
 #### `MenuPickerRow`
 In-form single-select picker with dropdown menu.
@@ -647,6 +641,8 @@ UniversalCarousel(config: .filter) {
 | `.cards` | 12 | 0 | Edge-to-edge cards (apply `.screenPadding()` externally) |
 | `.csvPreview` | 8 | 12 | CSV column preview (shows indicators) |
 
+
+**`.carouselItemTransition(isEnabled:)`** *(1.10.0)*: a card in a carousel dims to 75% and shrinks to 95% as it scrolls off (`scrollTransition(.interactive)`). Pass `false` for a carousel too short to scroll. Tenra: the accounts carousel (`isEnabled: accounts.count >= 3`).
 #### `UniversalFilterButton`
 Filter chip in two modes.
 
@@ -710,14 +706,21 @@ Yesterday / Today / Calendar picker for transaction forms.
 
 Use for: transaction entry/edit forms only. For other date fields use `DatePickerRow`.
 
-#### `CurrencySelectorView` *(app-side, Tenra)*
-Currency symbol menu button styled as filter chip.
+#### `CurrencyPickerMenu` *(1.10.0)*
+The currency of an amount as a filter chip, "₸ ⌄", that opens a menu of the given currencies (sorted by name, the chosen one checked) and, with `onCustomize`, a "Customize…" item (`currency.customizeAction`) under a divider. Which currencies to offer stays the caller's. Tenra: `CurrencySelectorView` (account currencies + quick picks, the customize sheet) is an adapter.
 
 ```swift
-CurrencySelectorView(selectedCurrency: $currency, availableCurrencies: ["KZT", "USD", "EUR"])
+CurrencyPickerMenu(selection: $currency, currencies: ["KZT", "USD", "EUR"]) { showsQuickPicks = true }
 ```
 
-Use in: `EditableHeroSection` (automatic when `config.showCurrency`). Not standalone.
+#### `CurrencyAmountInput` *(1.10.0)*
+The amount at the top of an add sheet: the 56 pt `AmountInput` (or `CalculatorAmountDisplay` with a `calculatorModel`), "≈ 1 234 ₸" in `baseCurrency` when another currency is chosen (`DesignKitCurrencyConverter`: `convertSync`, then `convert`; a spinner until a rate comes; typing waits 0.3 s), the `CurrencyPickerMenu`, and the error in red. Tenra: `AmountInputView` is an adapter.
+
+#### `CurrencyList` *(1.10.0)*
+Every `CurrencyInfo` currency to pick from: "Popular", then all, in cards (a `ScrollView`, so the screen's background shows through), each row code, name and symbol, the chosen one checked, with a search in the navigation bar's drawer. `CurrencyList(selection: code) { code in … }`; the screen around it is the caller's. Tenra: `CurrencyListContent` (Settings, onboarding) is an adapter.
+
+#### `IconPicker` / `IconCatalog` *(1.10.0)*
+An icon picker sheet with its own navigation bar: SF Symbols from `IconCatalog` (DesignSupport; about 550 symbols available on iOS 26 in 18 groups, "Frequently Used" first, a search across 11 languages through concepts, group titles and Apple's keywords; data generated by `scripts/generate_icon_catalog.py`), and, when the app sets `DesignKitLogoCatalog`, a logos tab (sections, search, the typed name tried as a domain). Picking closes it. `IconPicker(selection: $icon, allowsLogos: false)` for symbols only. Tenra: `IconPickerView` is an adapter; its brand registry feeds the hook.
 
 ---
 
@@ -767,6 +770,9 @@ One option of a "pick a balance" list: a full-width card with `IconView` (44 pt)
 
 #### `ProgressRingTile` *(1.5.0)*
 A picker-grid tile: the name (bodyEmphasis, one line) over a 64 pt Liquid Glass circle with the symbol (h2) in `color`, the glass tinted with `color` at 30% when `isSelected`, and an optional 4 pt `ProgressRing` (72 pt) around it. As tall with a ring as without, so grid rows line up. VoiceOver label and hint at the call site. Tenra: `CategoryChip` (category style lookup) is an adapter.
+
+#### `ProgressRingTileGrid` *(1.10.0)*
+`ProgressRingTile`s in a `LazyVGrid` (rows 32 pt apart, columns 16), each with its amount under it (bodySmall, primary) and, when there is one, its limit under that (secondary). Columns: as many 108–180 pt columns as fit (four on an iPhone), or exactly `columns`. Items are `ProgressRingTileGridItem(id:title:systemImage:color:progress:amount:limit:accessibilityLabel:accessibilityHint:)`; the id is the tile's zoom-transition source in `transitionNamespace`; `onTap` gets the item. The empty state is the caller's (`EmptyCardView`). Tenra: `CategoryGridView` (categories, budgets, the empty card) is an adapter. Skeleton: `ProgressRingTileGridSkeleton(count:columns:)`.
 
 ### Feedback & Status Components
 
@@ -829,8 +835,40 @@ action does not dismiss the banner; clear your message state in it.
 MessageBanner(message: "Trip deleted", type: .info, actionTitle: "Undo") { restore(); message = nil }
 ```
 
+#### Component skeletons *(1.10.0)*
+Every component that shows data has a skeleton, named after it (`BalanceCard` → `BalanceCardSkeleton`) and declared at the end of the component's file, so a layout change and its skeleton are edited together. Show it while the data loads, in the component's place:
+
+```swift
+if let accounts {
+    ForEach(accounts) { BalanceRow(…) }
+} else {
+    ForEach(0..<3, id: \.self) { _ in BalanceRowSkeleton() }
+}
+```
+
+**The corner rule.** A skeleton keeps its component's container and corner as they are: a card skeleton is the same glass card (`cardStyle`, the card's radius), a pale box (`RecommendationBox`, `StatusBanner`) keeps `AppRadius.md`, a chip keeps the chip's `AppRadius.xl`, a badge, pill or switch is a capsule, an icon keeps its `IconStyle` shape (`IconViewSkeleton(style:)`), a progress track keeps its corner (`AppRadius.xs` for `LinearProgressBar`, the round caps of rings and gauges, the segment corners of milestone gauges and bar pairs). A shape whose component has no corner of its own (a line of text, an amount, a chart's plot area, a star) takes the soft corner, `AppRadius.soft` (12 pt; a line of text gets fully round ends). `SkeletonView` and `SkeletonText` use it by default since 1.10.0 (before: `AppRadius.xs`).
+
+**Shimmer.** One band sweeps a whole skeleton (a shimmer inside another one is off). `.skeletonShimmer(false)` stops it under a view (snapshot tests do this); Reduce Motion stops it too. Each skeleton is one VoiceOver element that reads "Loading" (`skeleton.loading`).
+
+| Component | Skeleton |
+|---|---|
+| `BalanceCard`, `SelectableBalanceCard`, `FinanceCard`, `CashFlowCard` (also its own loading state), `TotalsCard`, `ComparisonCard`, `InsightsStatCard`, `StatTile`, `RecurringPaymentCard`, `RecommendationBox` | `…Skeleton` (`TotalsCardSkeleton(count:showsTitle:amountFont:)`, `FinanceCardSkeleton(showsTrailing:)`, `RecommendationBoxSkeleton(lines:)`) |
+| `LimitProgressCard`, `TargetProgressCard`, `PayoffProgressCard`, `ScoreCard`, `ScoreGaugeCard`, `MetricCard`, `WeightBreakdownCard`, `CalculationCard`, `ProgressRingTile`, `ProgressRingTileGrid` | `…Skeleton` (`MetricCardSkeleton(chartPlacement:)`, `WeightBreakdownCardSkeleton(segments:)`, `CalculationCardSkeleton(rows:showsHero:)`) |
+| `UniversalRow` | `UniversalRowSkeleton(config:iconStyle:titleFont:showsSubtitle:trailing:)` |
+| `NavigationSettingsRow`, `ToggleSettingsRow`, `ActionSettingsRow`, `MenuPickerRow`, `DatePickerRow`, `CheckmarkRow` | `UniversalRowSkeleton.navigationSettings`, `.toggleSettings`, `.actionSettings`, `.menuPicker`, `.datePicker`, `.checkmark(iconStyle:)` |
+| `BalanceRow`, `ProgressRingRow`, `BreakdownRow`, `InsightEntityRow`, `NetAmountRow`, `ScheduleRow`, `InfoRow`, `ColorPickerRow` | `…Skeleton` |
+| `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `OrbChart` | `…Skeleton` |
+| `LinearProgressBar`, `ProportionBar`, `MiniProportionBar`, `AmountComparisonBar`, `HeroProportionBar`, `ProgressRing`, `MiniDonut`, `MiniHalfGauge`, `HeroHalfGauge`, `MiniMilestoneGauge`, `HeroMilestoneGauge`, `MiniBarPair`, `HeroBarPair` | `…Skeleton`, with the component's size parameters |
+| `IconView`, `BrandLogoView` | `IconViewSkeleton(style:)` / `IconViewSkeleton(size:)` |
+| `AvatarView`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIconsView`, `BadgeView`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `RatingView`, `ChipPicker` | `…Skeleton` |
+| `FormattedAmountText`, `FormattedAmountView`, `ConvertedAmountView`, `SpentBudgetText`, `AmountPercentageView` | `FormattedAmountTextSkeleton(font:width:)`; `RedactableAmount(isLoading: true)` draws one itself |
+| `HeroSection`, `SectionHeaderView`, `SettingsSectionHeaderView`, `DateSectionHeaderView` | `HeroSectionSkeleton`, `SectionHeaderViewSkeleton(style:)` (`.compact` for the settings header), `DateSectionHeaderViewSkeleton` |
+| `ExpandableText`, `ActivityTimeline`, `MonthCalendar` | `…Skeleton` |
+
+**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `SegmentedPickerView`, `DateButtonsView`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `BulkDeleteButton`, `EntityActionButton`, `LoadingButtonLabel`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`); messages and flows that appear once something is known (`EmptyStateView`, `EmptyCardView`, `MessageBanner`, `InlineStatusText`, `PromptSheet`, `PermissionPrimerView`, `NotificationPermissionView`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`GradientOrbsBackground`, `SiriGlowView`, `SiriWaveRecordingView`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
+
 #### `SkeletonText` *(1.7.0)*
-A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `SkeletonView`. A whole component as its own placeholder stays `.skeleton(isLoading:)`, which redacts every text and image in place.
+A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `SkeletonView`. For a component, use its skeleton (above); `.skeleton(isLoading:)` redacts a real view in place, with the system's placeholder shapes.
 
 #### `SkeletonView` / `SkeletonRow` / `.skeleton(isLoading:)` *(0.6.0)*
 Loading placeholders instead of a spinner: grey shapes in the layout of the content that is
@@ -838,7 +876,8 @@ coming, with a slow shimmer (static under Reduce Motion, via `AmbientMotionGate`
 
 ```swift
 if isLoading { ForEach(0..<5) { _ in SkeletonRow() } }          // list rows
-SkeletonView(height: 160)                                       // an image
+SkeletonView(height: 160)                                       // an image, soft corner
+SkeletonView.circle(40); SkeletonView.capsule(height: 28, width: 80) // 1.10.0
 TripRow(trip: trip ?? .placeholder).skeleton(isLoading: trip == nil) // redact a real view
 ```
 

@@ -106,7 +106,8 @@ became `ScheduleRow`, and the app keeps a thin adapter under the old name that m
 The port is pixel-identical: the layout code moves as it is, only its inputs change.
 
 Host hooks (set once in `App.init()`): `DesignKitTheme.accent`, `DesignKitFonts.registerIfNeeded()`,
-`DesignKitLogoLoader.loader`, `DesignKitCurrencyConverter.convert`. Add a new hook (same shape:
+`DesignKitLogoLoader.loader`, `DesignKitCurrencyConverter.convert` / `.convertSync`,
+`DesignKitLogoCatalog` (the icon picker's brands). Add a new hook (same shape:
 a `public static var` closure/value in `DesignSupport` or `DesignTokens`, documented default)
 rather than importing an app type.
 
@@ -120,8 +121,14 @@ rather than importing an app type.
    (its `RowConfiguration` preset), a row that lives only in a `List` and a primitive not at all.
 3. Replace app dependencies per the decision tree above. Leave a one-line comment naming what
    stayed in the app.
+   **Every component that shows data has a skeleton** (owner's rule, 2026-10): `<Name>Skeleton`
+   at the end of the component's file, the component's container and corner kept as they are,
+   grey shapes for its text, amounts, icons and charts, `AppRadius.soft` for a shape with no
+   corner of its own. One `.shimmer()` on the content, `.skeletonLoadingLabel()` on the whole
+   (docs/design-system.md, "Component skeletons").
 4. Add a Gallery specimen (one `ShowcaseSection` per component, so it gets its own page, in
-   an existing screen file or a new one + `xcodegen generate`) and a snapshot test in
+   an existing screen file or a new one + `xcodegen generate`; the skeleton on the Skeletons
+   page) and a snapshot test (the skeleton's in `SkeletonsSnapshotTests`) in
    `Gallery/SnapshotTests` (one Liquid Glass card per snapshot; `named:` tells them apart),
    then record it with a manual CI run, `record_snapshots: missing` (docs/snapshots.md).
 5. Add any new `String(localized:)` key to `docs/localization-keys.md` and its English value
@@ -154,9 +161,9 @@ rather than importing an app type.
 
 ## Known Gaps / Follow-ups
 
-- `EditableHeroSection`, `IconPickerView`/`IconCatalog`, `CurrencySelectorView`,
-  `AmountInputView` live in Tenra, not here: they depend on Tenra services (logo registry,
-  settings, FX). Porting one means turning that dependency into a host hook first.
+- Nothing generic is known to be left in the apps (1.10.0 ported Tenra's last batch and the
+  components that waited for hooks). Tenra keeps screens over its models (filter sheets, home
+  sections, transaction lists) and its date parsing.
 
 ## Reference Docs
 

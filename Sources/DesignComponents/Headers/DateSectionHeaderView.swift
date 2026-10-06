@@ -51,3 +51,22 @@ public struct DateSectionHeaderView: View {
 }
 
 // MARK: - Previews
+
+// MARK: - Skeleton
+
+/// Placeholder of a `DateSectionHeaderView`: the same card, the date and the day's total.
+public struct DateSectionHeaderViewSkeleton: View {
+    public init() {}
+
+    public var body: some View {
+        HStack {
+            SkeletonText(AppTypography.bodyEmphasis, width: 100)
+            Spacer()
+            SkeletonText(AppTypography.bodySmall, width: 80)
+        }
+        .shimmer()
+        .padding(AppSpacing.lg)
+        .cardStyle()
+        .skeletonLoadingLabel()
+    }
+}

@@ -96,6 +96,21 @@ extension ComponentSnapshots {
             )
         }
 
+        @Test func progressRingTileGrid() async {
+            // Two tiles: each has its own glass circle, and glass reflects its neighbour.
+            await assertComponentSnapshot(
+                ProgressRingTileGrid(items: [
+                    ProgressRingTileGridItem(id: "food", title: "Food", systemImage: "fork.knife", color: .orange,
+                                             progress: LimitProgress(spent: 185_000, limit: 250_000),
+                                             amount: 185_000, limit: 250_000),
+                    ProgressRingTileGridItem(id: "home", title: "Home", systemImage: "house.fill", color: .green,
+                                             amount: 210_000),
+                ], currency: "KZT", columns: 2) { _ in },
+                width: 260,
+                appearances: [.light]
+            )
+        }
+
         @Test func metricCards() async {
             await assertComponentSnapshot(
                 MetricCard(title: "Top category", subtitle: "Food took 42% of spending",

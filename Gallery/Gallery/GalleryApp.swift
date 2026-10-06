@@ -21,6 +21,20 @@ struct GalleryApp: App {
             guard let fromRate = tengePerUnit[from], let toRate = tengePerUnit[to] else { return nil }
             return amount * fromRate / toRate
         }
+        // A few brands, so the icon picker has a logos tab. Apps list their own.
+        DesignKitLogoCatalog.sections = {
+            [
+                .init(title: "Banks", entries: [
+                    .init(domain: "kaspi.kz", name: "Kaspi"),
+                    .init(domain: "halykbank.kz", name: "Halyk"),
+                ]),
+                .init(title: "Streaming", entries: [
+                    .init(domain: "netflix.com", name: "Netflix"),
+                    .init(domain: "spotify.com", name: "Spotify"),
+                ]),
+            ]
+        }
+        DesignKitLogoCatalog.domainSuffixes = ["com", "kz"]
     }
 
     var body: some Scene {

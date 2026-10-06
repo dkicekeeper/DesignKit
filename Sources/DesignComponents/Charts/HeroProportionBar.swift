@@ -155,3 +155,35 @@ public struct HeroProportionBar: View {
 }
 
 // MARK: - Previews
+
+// MARK: - Skeleton
+
+/// Placeholder of a `HeroProportionBar`: the capsule bar, then a legend line per segment.
+public struct HeroProportionBarSkeleton: View {
+    let segments: Int
+    let barHeight: CGFloat
+
+    public init(segments: Int = 4, barHeight: CGFloat = 20) {
+        self.segments = max(1, segments)
+        self.barHeight = barHeight
+    }
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.lg) {
+            SkeletonView.capsule(height: barHeight)
+            VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                ForEach(0..<segments, id: \.self) { _ in
+                    HStack(spacing: AppSpacing.sm) {
+                        SkeletonView.circle(9)
+                        SkeletonText(AppTypography.body, width: 90)
+                        Spacer(minLength: AppSpacing.sm)
+                        SkeletonText(AppTypography.bodySmall, width: 32)
+                        SkeletonText(AppTypography.bodyEmphasis, width: 80)
+                    }
+                }
+            }
+        }
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}
