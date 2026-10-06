@@ -7,9 +7,9 @@
 //  RatingSurveyView (the "Enjoying Tenra?" pre-prompt); the rating service, the feedback
 //  e-mail and the copy stay in Tenra as an adapter.
 //
-//  The system fonts, the 44 pt symbol and the 14 pt button radius are Tenra's as they ship;
-//  moving them to AppTypography / AppRadius tokens would change the look (an open design
-//  decision).
+//  1.5.0 moved Tenra's system fonts to AppTypography (owner's decision): the title is h3,
+//  the message bodySmall, the buttons bodyEmphasis. The 14 pt button radius is Tenra's as it
+//  ships.
 //
 
 import SwiftUI
@@ -45,7 +45,7 @@ public struct PromptSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     /// - Parameters:
-    ///   - systemImage: A 44 pt symbol in the accent colour at the top.
+    ///   - systemImage: A 44 pt (`AppIconSize.xxl`) symbol in the accent colour at the top.
     ///   - height: The sheet's detent.
     ///   - onPrimary: Runs, then the sheet closes.
     ///   - onSecondary: Runs, then the sheet closes.
@@ -72,18 +72,18 @@ public struct PromptSheet: View {
     public var body: some View {
         VStack(spacing: AppSpacing.lg) {
             Image(systemName: systemImage)
-                .font(.system(size: 44))
+                .font(.system(size: AppIconSize.xxl))
                 .foregroundStyle(AppColors.accent)
                 .padding(.top, AppSpacing.xl)
 
             VStack(spacing: AppSpacing.sm) {
                 Text(title)
-                    .font(.title2.weight(.bold))
+                    .font(AppTypography.h3)
                     .foregroundStyle(AppColors.textPrimary)
                     .multilineTextAlignment(.center)
 
                 Text(message)
-                    .font(.subheadline)
+                    .font(AppTypography.bodySmall)
                     .foregroundStyle(AppColors.textSecondary)
                     .multilineTextAlignment(.center)
             }
@@ -97,11 +97,11 @@ public struct PromptSheet: View {
                     dismiss()
                 } label: {
                     Text(primaryTitle)
-                        .font(.headline)
+                        .font(AppTypography.bodyEmphasis)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, AppSpacing.md)
                         .background(AppColors.accent, in: RoundedRectangle(cornerRadius: 14))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(AppColors.staticWhite)
                 }
 
                 Button {
@@ -109,7 +109,7 @@ public struct PromptSheet: View {
                     dismiss()
                 } label: {
                     Text(secondaryTitle)
-                        .font(.headline)
+                        .font(AppTypography.bodyEmphasis)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, AppSpacing.md)
                         .foregroundStyle(AppColors.textSecondary)

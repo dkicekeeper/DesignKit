@@ -907,7 +907,7 @@ EmptyStateView(
 | `.error` | Load failures (with pulse icon + retry) |
 
 #### `PromptSheet` *(1.5.0)*
-A short question in a small sheet: a 44 pt symbol in the accent colour, the title and message centred, a filled accent primary button and a plain secondary one; either answer runs its closure and closes the sheet. Sets its own detent (`height`, 340 pt) and drag indicator. It keeps Tenra's system fonts and 14 pt button radius as they ship (tokens would change the look). Tenra: `RatingSurveyView` (rating service, feedback e-mail) is an adapter.
+A short question in a small sheet: a 44 pt symbol in the accent colour, the title and message centred, a filled accent primary button and a plain secondary one; either answer runs its closure and closes the sheet. Sets its own detent (`height`, 340 pt) and drag indicator. Type: title `h3`, message `bodySmall`, buttons `bodyEmphasis` (Tenra's sheet used system fonts until 1.5.0). Tenra: `RatingSurveyView` (rating service, feedback e-mail) is an adapter.
 
 ---
 
