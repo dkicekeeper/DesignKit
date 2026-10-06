@@ -128,7 +128,7 @@ Modifiers:
 
 For archived/inactive UI use `Color(.systemGray)` directly — there is no dedicated token.
 
-**Category colors:** `CategoryColors.hexColor(for:opacity:)` — 14-color hex palette hashed by name; `CategoryColors.paletteColors` (1.10.0) is the palette itself, for an app's own name-coloured visuals (Tenra's letter avatars). DesignKit has no custom-category override; Tenra keeps its `customCategories:` / store-backed overloads app-side. The slot is `CategoryColors.paletteIndex(for:)`, an FNV-1a hash of the name: the same on every launch and device (since 0.7.0; before that it used `String.hashValue`, which Swift seeds per process, so the colour changed between launches).
+**Category colors:** `CategoryColors.hexColor(for:opacity:)` — 14-color hex palette hashed by name; `CategoryColors.paletteColors` (1.10.0) is the palette itself, for an app's own name-coloured visuals (Tenra's letter avatars). DesignKit has no custom-category override; Tenra keeps its `customCategories:` / store-backed overloads app-side. The slot is `CategoryColors.paletteIndex(for:)`, an FNV-1a hash of the name: the same on every launch and device (since 0.7.0; before that it used `String.hashValue`, which Swift seeds per process, so the colour changed between launches). `CategoryColors.pickerPalette` (1.11.0) is what a user can pick (`ColorPickerRow`'s default): the 14 hash colours first, then 16 deeper and neutral shades (30 `#rrggbb` strings). The hash palette itself stays at 14: `paletteIndex` is `hash % count`, so growing it would re-colour every category and avatar that relies on the name; new colours go to the picker only.
 
 ### Spacing (`AppSpacing`)
 

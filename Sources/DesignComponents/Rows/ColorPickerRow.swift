@@ -20,11 +20,7 @@ public struct ColorPickerRow: View {
     public init(
         selectedColorHex: Binding<String>,
         title: String = String(localized: "common.color"),
-        palette: [String] = [
-            "#3b82f6", "#8b5cf6", "#ec4899", "#f97316", "#eab308",
-            "#22c55e", "#14b8a6", "#06b6d4", "#6366f1", "#d946ef",
-            "#f43f5e", "#a855f7", "#10b981", "#f59e0b"
-        ]
+        palette: [String] = CategoryColors.pickerPalette
     ) {
         self._selectedColorHex = selectedColorHex
         self.title = title
