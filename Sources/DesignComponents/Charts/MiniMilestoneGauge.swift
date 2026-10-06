@@ -32,10 +32,10 @@ public struct MiniMilestoneGauge: View {
 
     var height: CGFloat = 60
 
-    private static let segmentHeight: CGFloat = 10
-    private static let segmentGap: CGFloat = 3
-    private static let cornerRadius: CGFloat = 3
-    private static let tickOvershoot: CGFloat = 7
+    static let segmentHeight: CGFloat = 10
+    static let segmentGap: CGFloat = 3
+    static let cornerRadius: CGFloat = 3
+    static let tickOvershoot: CGFloat = 7
 
     public init(
         value: Double,
@@ -103,3 +103,27 @@ public struct MiniMilestoneGauge: View {
 }
 
 // MARK: - Previews
+
+// MARK: - Skeleton
+
+/// Placeholder of a `MiniMilestoneGauge`: its row of rounded segments.
+public struct MiniMilestoneGaugeSkeleton: View {
+    let segments: Int
+    let height: CGFloat
+
+    public init(segments: Int = 6, height: CGFloat = 60) {
+        self.segments = max(1, segments)
+        self.height = height
+    }
+
+    public var body: some View {
+        HStack(spacing: MiniMilestoneGauge.segmentGap) {
+            ForEach(0..<segments, id: \.self) { _ in
+                SkeletonView(height: MiniMilestoneGauge.segmentHeight, cornerRadius: MiniMilestoneGauge.cornerRadius)
+            }
+        }
+        .frame(height: height)
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}

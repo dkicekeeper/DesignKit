@@ -24,8 +24,8 @@ public struct ScoreCard: View {
     let color: Color
 
     // Mini-chart footprint, the same as the insight feed cards'.
-    private static var miniChartWidth: CGFloat { 120 }
-    private static var miniChartHeight: CGFloat { 120 }
+    static var miniChartWidth: CGFloat { 120 }
+    static var miniChartHeight: CGFloat { 120 }
 
     /// - Parameters:
     ///   - color: Tints the score and the gauge arc.
@@ -75,5 +75,31 @@ public struct ScoreCard: View {
             .padding(.trailing, AppSpacing.lg)
             .allowsHitTesting(false)
         }
+    }
+}
+
+// MARK: - Skeleton
+
+/// Placeholder of a `ScoreCard`: the same card, its three lines and the mini gauge's track.
+public struct ScoreCardSkeleton: View {
+    public init() {}
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            SkeletonText(AppTypography.body, width: 110)
+            SkeletonText(AppTypography.bodyEmphasis, width: 140)
+            SkeletonText(AppTypography.h2, width: 90)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.trailing, ScoreCard.miniChartWidth + AppSpacing.sm)
+        .shimmer()
+        .padding(AppSpacing.lg)
+        .cardStyle()
+        .overlay(alignment: .trailing) {
+            MiniHalfGaugeSkeleton()
+                .frame(width: ScoreCard.miniChartWidth, height: ScoreCard.miniChartHeight)
+                .padding(.trailing, AppSpacing.lg)
+        }
+        .skeletonLoadingLabel()
     }
 }

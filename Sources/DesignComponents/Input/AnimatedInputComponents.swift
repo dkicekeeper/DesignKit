@@ -153,7 +153,7 @@ public struct AmountDigitDisplay: View {
 ///
 /// Replaces both `AmountInputView`'s core and the old `AnimatedAmountInput`.
 /// `AmountInputView` wraps this with currency selector, conversion display, and error.
-/// `EditableHeroSection` uses this directly.
+/// `EditableHero` uses this directly.
 ///
 /// Usage:
 /// ```swift

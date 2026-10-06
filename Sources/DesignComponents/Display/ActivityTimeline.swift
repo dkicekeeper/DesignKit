@@ -48,8 +48,8 @@ public struct ActivityTimeline<Item: Identifiable, Content: View>: View {
     let marker: (Item) -> TimelineMarker
     let content: (Item) -> Content
 
-    private static var markerSize: CGFloat { AppIconSize.lg + AppSpacing.xs }
-    private static var lineWidth: CGFloat { 2 }
+    private static var markerSize: CGFloat { TimelineMetrics.markerSize }
+    private static var lineWidth: CGFloat { TimelineMetrics.lineWidth }
 
     public init(
         _ items: [Item],
@@ -109,5 +109,53 @@ public struct ActivityTimeline<Item: Identifiable, Content: View>: View {
         }
         .frame(width: Self.markerSize, height: Self.markerSize)
         .accessibilityHidden(true)
+    }
+}
+
+/// Sizes `ActivityTimeline` and its skeleton share.
+enum TimelineMetrics {
+    static let markerSize: CGFloat = AppIconSize.lg + AppSpacing.xs
+    static let lineWidth: CGFloat = 2
+}
+
+// MARK: - Skeleton
+
+/// Placeholder of an `ActivityTimeline`: `count` round markers on the line, each with a
+/// title and a caption.
+public struct ActivityTimelineSkeleton: View {
+    let count: Int
+
+    public init(count: Int = 3) {
+        self.count = max(1, count)
+    }
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(0..<count, id: \.self) { index in
+                let isLast = index == count - 1
+                HStack(alignment: .top, spacing: AppSpacing.md) {
+                    SkeletonView.circle(TimelineMetrics.markerSize)
+                    VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                        SkeletonText(AppTypography.bodyEmphasis, width: 140)
+                        SkeletonText(AppTypography.caption, width: 90)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, AppSpacing.xxs)
+                    .padding(.bottom, isLast ? 0 : AppSpacing.lg)
+                }
+                .background(alignment: .topLeading) {
+                    if !isLast {
+                        Rectangle()
+                            .fill(SkeletonView.fill)
+                            .frame(width: TimelineMetrics.lineWidth)
+                            .frame(maxHeight: .infinity)
+                            .padding(.top, TimelineMetrics.markerSize)
+                            .padding(.leading, (TimelineMetrics.markerSize - TimelineMetrics.lineWidth) / 2)
+                    }
+                }
+            }
+        }
+        .shimmer()
+        .skeletonLoadingLabel()
     }
 }

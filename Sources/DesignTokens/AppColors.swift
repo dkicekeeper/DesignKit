@@ -108,6 +108,10 @@ public struct CategoryColors {
         }
     }()
 
+    /// The 14 palette colours in order: what categories hash into, and what an app's own
+    /// name-coloured visuals (letter avatars) draw from, so both share one palette.
+    public nonisolated static var paletteColors: [Color] { palette }
+
     /// Deterministic color for a category name, hashed into the palette.
     /// (DesignKit drops Tenra's custom-category override; the palette is the single source.)
     public nonisolated static func hexColor(for category: String, opacity: Double = 1.0) -> Color {

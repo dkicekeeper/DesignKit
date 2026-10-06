@@ -66,3 +66,22 @@ public struct MiniProportionBar: View {
 }
 
 // MARK: - Previews
+
+// MARK: - Skeleton
+
+/// Placeholder of a `MiniProportionBar`: the capsule bar, centred in the same slot.
+public struct MiniProportionBarSkeleton: View {
+    let barHeight: CGFloat
+    let height: CGFloat
+
+    public init(barHeight: CGFloat = 10, height: CGFloat = 60) {
+        self.barHeight = barHeight
+        self.height = height
+    }
+
+    public var body: some View {
+        SkeletonView.capsule(height: barHeight)
+            .frame(height: height)
+            .skeletonLoadingLabel()
+    }
+}

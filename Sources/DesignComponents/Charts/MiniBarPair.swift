@@ -38,7 +38,7 @@ public struct MiniBarPair: View {
 
     /// Bars shorter than this read as "missing" — a zero value stays visible.
     private static let minBarHeight: CGFloat = 6
-    private static let cornerRadius: CGFloat = 3
+    static let cornerRadius: CGFloat = 3
 
     public init(
         previous: Double,
@@ -116,3 +116,38 @@ public struct MiniBarPair: View {
 }
 
 // MARK: - Previews
+
+// MARK: - Skeleton
+
+/// Placeholder of a `MiniBarPair`: two bars with rounded tops on the baseline, centred.
+public struct MiniBarPairSkeleton: View {
+    let barWidth: CGFloat
+    let barGap: CGFloat
+    let height: CGFloat
+
+    public init(barWidth: CGFloat = 26, barGap: CGFloat = 10, height: CGFloat = 60) {
+        self.barWidth = barWidth
+        self.barGap = barGap
+        self.height = height
+    }
+
+    public var body: some View {
+        HStack(alignment: .bottom, spacing: barGap) {
+            bar(height: (height - 3) * 0.7)
+            bar(height: height - 3)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        .frame(height: height)
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+
+    private func bar(height: CGFloat) -> some View {
+        UnevenRoundedRectangle(
+            topLeadingRadius: MiniBarPair.cornerRadius,
+            topTrailingRadius: MiniBarPair.cornerRadius
+        )
+        .fill(SkeletonView.fill)
+        .frame(width: barWidth, height: height)
+    }
+}

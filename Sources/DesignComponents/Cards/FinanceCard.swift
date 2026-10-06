@@ -73,8 +73,8 @@ public struct FinanceCard<Hero: View, Trailing: View>: View {
     }
 }
 
-/// Hero amount that shows a redacted placeholder while an async total is being
-/// computed, then cross-fades to the formatted value. Used by the finance cards
+/// Hero amount that shows a skeleton line while an async total is being computed, then
+/// cross-fades to the formatted value. Used by the finance cards
 /// whose total requires FX conversion (accounts, deposits, subscriptions).
 public struct RedactableAmount: View {
     let amount: Double
@@ -92,10 +92,13 @@ public struct RedactableAmount: View {
     public var body: some View {
         ZStack {
             if isLoading {
-                Text("0000.00")
+                // A skeleton line as wide as a typical amount in this style.
+                Text(verbatim: "0000.00")
                     .font(fontSize)
                     .fontWeight(.bold)
-                    .redacted(reason: .placeholder)
+                    .hidden()
+                    .overlay { SkeletonText(fontSize) }
+                    .skeletonLoadingLabel()
                     .transition(.opacity)
             } else {
                 FormattedAmountText(
@@ -116,3 +119,37 @@ public struct RedactableAmount: View {
 
 
 
+
+// MARK: - Skeleton
+
+/// Placeholder of a `FinanceCard`: the same card, the title, the hero amount and subtitle,
+/// and the packed circles of icons on the trailing edge (`PackedCircleIconsViewSkeleton`).
+public struct FinanceCardSkeleton: View {
+    let showsTrailing: Bool
+
+    /// - Parameter showsTrailing: The trailing circles of icons; `false` for a card without them.
+    public init(showsTrailing: Bool = true) {
+        self.showsTrailing = showsTrailing
+    }
+
+    public var body: some View {
+        HStack(alignment: .top, spacing: AppSpacing.md) {
+            VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                SkeletonText(AppTypography.h3, width: 120)
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    SkeletonText(AppTypography.h2, width: 150)
+                    SkeletonText(AppTypography.bodySmall, width: 90)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            if showsTrailing {
+                PackedCircleIconsViewSkeleton()
+            }
+        }
+        .shimmer()
+        .padding(AppSpacing.lg)
+        .cardStyle()
+        .skeletonLoadingLabel()
+    }
+}

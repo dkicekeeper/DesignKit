@@ -158,3 +158,29 @@ public struct ProgressRingRow: View {
             .foregroundStyle(AppColors.textSecondary)
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `ProgressRingRow`: the ring's track around the round icon, the title
+/// and the limit line.
+public struct ProgressRingRowSkeleton: View {
+    public init() {}
+
+    public var body: some View {
+        HStack(spacing: AppSpacing.md) {
+            ZStack {
+                Circle()
+                    .stroke(SkeletonView.fill, lineWidth: 3)
+                    .frame(width: AppIconSize.categoryIcon, height: AppIconSize.categoryIcon)
+                IconViewSkeleton(size: AppIconSize.xxl)
+            }
+            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                SkeletonText(AppTypography.h4, width: 120)
+                SkeletonText(AppTypography.bodySmall, width: 150)
+            }
+            Spacer(minLength: 0)
+        }
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}

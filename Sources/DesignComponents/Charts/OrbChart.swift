@@ -446,3 +446,25 @@ private extension View {
 }
 
 // MARK: - Previews
+
+// MARK: - Skeleton
+
+/// Placeholder of an `OrbChart`: the orb's circle, centred in the same slot.
+public struct OrbChartSkeleton: View {
+    let size: CGFloat
+
+    public init(size: CGFloat = 280) {
+        self.size = size
+    }
+
+    public var body: some View {
+        GeometryReader { geo in
+            // The orb is 52% of the slot's shorter side (see OrbChart).
+            let diameter = min(geo.size.width, geo.size.height) * 0.52
+            SkeletonView.circle(diameter)
+                .frame(width: geo.size.width, height: geo.size.height)
+        }
+        .frame(height: size)
+        .skeletonLoadingLabel()
+    }
+}

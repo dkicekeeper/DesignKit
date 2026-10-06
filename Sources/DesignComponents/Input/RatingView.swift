@@ -107,3 +107,26 @@ public struct RatingPicker: View {
         .frame(maxWidth: .infinity)
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `RatingView`: a soft square in place of each star.
+public struct RatingViewSkeleton: View {
+    let maximum: Int
+    let size: CGFloat
+
+    public init(maximum: Int = 5, size: CGFloat = 14) {
+        self.maximum = max(1, maximum)
+        self.size = size
+    }
+
+    public var body: some View {
+        HStack(spacing: 2) {
+            ForEach(0..<maximum, id: \.self) { _ in
+                SkeletonView(height: size, width: size)
+            }
+        }
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}

@@ -57,7 +57,7 @@ public struct HeroSparkline<Point: ChartPoint>: View {
         self.entranceDelay = entranceDelay
     }
 
-    private let chartHeight: CGFloat = 220
+    private var chartHeight: CGFloat { ChartMetrics.heroPlotHeight }
     /// Synthetic category carrying the projection endpoint. Not in `labelToIndex`, so
     /// tapping it never selects anything.
     private static var projectionLabel: String { "→" }
@@ -244,5 +244,21 @@ public struct HeroSparkline<Point: ChartPoint>: View {
         .chartCategoryXAxis(labelMap: axisLabels)
         .chartCompactYAxis()
         .chartLegend(.hidden)
+    }
+}
+
+// MARK: - Skeleton
+
+/// Placeholder of a `HeroSparkline`: the banner slot, then the plot area with a soft corner.
+public struct HeroSparklineSkeleton: View {
+    public init() {}
+
+    public var body: some View {
+        VStack(spacing: AppSpacing.lg) {
+            Color.clear.frame(height: ChartMetrics.bannerHeight)
+            SkeletonView(height: ChartMetrics.heroPlotHeight)
+                .padding(.horizontal, AppSpacing.lg)
+        }
+        .skeletonLoadingLabel()
     }
 }

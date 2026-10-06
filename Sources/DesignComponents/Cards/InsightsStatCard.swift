@@ -113,3 +113,22 @@ public extension InsightsStatCard where Trend == EmptyView {
 
 // MARK: - Previews
 
+
+// MARK: - Skeleton
+
+/// Placeholder of an `InsightsStatCard`: the same card, the title and the amount.
+public struct InsightsStatCardSkeleton: View {
+    public init() {}
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.xs) {
+            SkeletonText(AppTypography.bodySmall, width: 90)
+            SkeletonText(AppTypography.h3, width: 120)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .shimmer()
+        .padding(AppSpacing.lg)
+        .cardStyle()
+        .skeletonLoadingLabel()
+    }
+}

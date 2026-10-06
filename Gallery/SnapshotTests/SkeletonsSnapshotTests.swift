@@ -1,0 +1,184 @@
+//
+//  SkeletonsSnapshotTests.swift
+//  DesignKit Gallery snapshot tests
+//
+//  The skeleton of every component that shows data (1.10.0). The renderer stops the shimmer
+//  (`.skeletonShimmer(false)`), so a skeleton is a still picture. Every card skeleton has
+//  its own snapshot: glass reflects a card next to it.
+//
+
+import SwiftUI
+import Testing
+import DesignTokens
+import DesignSupport
+import DesignComponents
+
+extension ComponentSnapshots {
+    @MainActor
+    @Suite("Skeletons")
+    struct Skeletons {
+        @Test func shapes() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    SkeletonView(height: 48)
+                    SkeletonText(AppTypography.h3, width: 160)
+                    SkeletonText(AppTypography.body, lines: 2)
+                    HStack(spacing: AppSpacing.md) {
+                        SkeletonView.circle(AppIconSize.xxl)
+                        IconViewSkeleton(style: .roundedSquare(size: AppIconSize.xxl))
+                        SkeletonView.capsule(height: 32, width: 96)
+                    }
+                    SkeletonRow()
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            )
+        }
+
+        @Test func cardSkeletons() async {
+            let cards: [(String, AnyView)] = [
+                ("finance", AnyView(FinanceCardSkeleton())),
+                ("balance", AnyView(BalanceCardSkeleton())),
+                ("selectableBalance", AnyView(SelectableBalanceCardSkeleton())),
+                ("cashFlow", AnyView(CashFlowCardSkeleton())),
+                ("insightsStat", AnyView(InsightsStatCardSkeleton())),
+                ("recurringPayment", AnyView(RecurringPaymentCardSkeleton())),
+                ("limitProgress", AnyView(LimitProgressCardSkeleton())),
+                ("targetProgress", AnyView(TargetProgressCardSkeleton())),
+                ("payoffProgress", AnyView(PayoffProgressCardSkeleton())),
+                ("score", AnyView(ScoreCardSkeleton())),
+                ("scoreGauge", AnyView(ScoreGaugeCardSkeleton())),
+                ("metricTrailing", AnyView(MetricCardSkeleton())),
+                ("metricBottom", AnyView(MetricCardSkeleton(chartPlacement: .bottom))),
+                ("weightBreakdown", AnyView(WeightBreakdownCardSkeleton())),
+                ("calculation", AnyView(CalculationCardSkeleton())),
+                ("dateSectionHeader", AnyView(DateSectionHeaderViewSkeleton())),
+                ("monthCalendar", AnyView(MonthCalendarSkeleton())),
+            ]
+            for (name, card) in cards {
+                await assertComponentSnapshot(card, named: name, appearances: [.light])
+            }
+        }
+
+        /// Cards that stack at accessibility text sizes, like their components.
+        @Test func stackingCardSkeletons() async {
+            await assertComponentSnapshot(
+                TotalsCardSkeleton(count: 2, showsTitle: true),
+                named: "totals",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                ComparisonCardSkeleton(),
+                named: "comparison",
+                appearances: [.light, .largeText]
+            )
+        }
+
+        @Test func rowSkeletons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    UniversalRowSkeleton(showsSubtitle: true, trailing: .value)
+                    UniversalRowSkeleton.navigationSettings
+                    UniversalRowSkeleton.toggleSettings
+                    UniversalRowSkeleton.datePicker
+                    UniversalRowSkeleton.checkmark(iconStyle: .roundedSquare(size: AppIconSize.xl))
+                    BalanceRowSkeleton(showsDetail: true)
+                    ProgressRingRowSkeleton()
+                    BreakdownRowSkeleton()
+                    InsightEntityRowSkeleton()
+                    NetAmountRowSkeleton()
+                    ScheduleRowSkeleton()
+                    InfoRowSkeleton(showsIcon: true)
+                    ColorPickerRowSkeleton(swatches: 5)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        @Test func chartSkeletons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    ChartSwitcherSkeleton(style: .bar)
+                    SparklineSkeleton()
+                    OrbChartSkeleton(size: 160)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light]
+            )
+        }
+
+        @Test func gaugeAndBarSkeletons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    LinearProgressBarSkeleton()
+                    ProportionBarSkeleton(height: 12)
+                    AmountComparisonBarSkeleton()
+                    HeroProportionBarSkeleton(segments: 2)
+                    HeroHalfGaugeSkeleton(diameter: 200, lineWidth: 16)
+                    HeroMilestoneGaugeSkeleton()
+                    HeroBarPairSkeleton(maxBarHeight: 100)
+                        .frame(maxWidth: .infinity)
+                    HStack(spacing: AppSpacing.md) {
+                        MiniHalfGaugeSkeleton().frame(width: 100)
+                        MiniMilestoneGaugeSkeleton().frame(width: 100)
+                        MiniBarPairSkeleton().frame(width: 80)
+                    }
+                    HStack(spacing: AppSpacing.md) {
+                        MiniProportionBarSkeleton().frame(width: 100)
+                        MiniDonutSkeleton().frame(width: 60, height: 60)
+                        ProgressRingSkeleton()
+                        ProgressRingTileSkeleton()
+                    }
+                    ProgressRingTileGridSkeleton(count: 4)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark]
+            )
+        }
+
+        @Test func smallSkeletons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    HStack(spacing: AppSpacing.md) {
+                        BadgeViewSkeleton()
+                        TrendBadgeSkeleton()
+                        TrendBadgeSkeleton(style: .inline)
+                        StatusIndicatorBadgeSkeleton(font: AppTypography.h4)
+                    }
+                    StatusBannerSkeleton()
+                    StatusBannerSkeleton(style: .compact)
+                    RecommendationBoxSkeleton()
+                    HStack(spacing: AppSpacing.lg) {
+                        AvatarViewSkeleton()
+                        AvatarGroupSkeleton()
+                        HeroSymbolSkeleton(size: 64)
+                        StatTileSkeleton()
+                    }
+                    HStack(spacing: AppSpacing.lg) {
+                        PackedCircleIconsViewSkeleton()
+                        RatingViewSkeleton(size: 20)
+                    }
+                    ChipPickerSkeleton(count: 3)
+                    FormattedAmountTextSkeleton(font: AppTypography.h1, width: 200)
+                    RedactableAmount(amount: 0, currency: "KZT", isLoading: true)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        @Test func headerSkeletons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    HeroSectionSkeleton(showsProgress: true)
+                    SectionHeaderViewSkeleton()
+                    SectionHeaderViewSkeleton(style: .large)
+                    ExpandableTextSkeleton()
+                    ActivityTimelineSkeleton()
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light]
+            )
+        }
+    }
+}

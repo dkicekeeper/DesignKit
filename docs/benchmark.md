@@ -157,6 +157,16 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
   и иконок на `AppColors.pale(_:)` (12% в светлой теме, 24% в тёмной, раньше 10–15% везде по-разному).
   Скрытие сумм дошло до легенды `HeroProportionBar` и подсказки `HeroBarPair`, для своего текста
   приложения есть `Formatting.hiddenAmount(currency:)`.
+- **1.10.0** — скелетон у каждого компонента с данными (`BalanceCardSkeleton`, `UniversalRowSkeleton`,
+  `LineChartSkeleton`, …, около 70): контейнер и скругление компонента как есть, серые формы
+  вместо текста, сумм, иконок и графиков; форма без своего скругления берёт «мягкое»
+  `AppRadius.soft`. Один блик на весь скелетон, `.skeletonShimmer(false)` его останавливает.
+  Последняя партия из Tenra: `CheckmarkRow` (строка списка выбора в фильтрах),
+  `ProgressRingTileGrid` (сетка категорий с суммами), `.carouselItemTransition()`; и компоненты,
+  ждавшие хуков: `EditableHero`, `IconPicker` (с каталогом `IconCatalog` на 550 символов и поиском
+  на 11 языках), `CurrencyPickerMenu`, `CurrencyAmountInput`, `CurrencyList`. Новые хуки:
+  `DesignKitLogoCatalog` (бренды выбора иконки) и `DesignKitCurrencyConverter.convertSync`.
+  Экраны фильтров и секции главного экрана остались в Tenra: это экраны над моделями приложения.
 
 Для 1.6.0–1.7.0 смотрели и на дизайн-систему TUI Т-Банка (Figma): как референс устройства токенов
 и списка состояний, а не как образец внешнего вида. Вид остаётся своим: Liquid Glass, Inter,

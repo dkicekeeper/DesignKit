@@ -109,3 +109,31 @@ public struct LimitProgressCard: View {
         .cardStyle(radius: AppRadius.xl)
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `LimitProgressCard`: the same card, the round icon, title and share, the
+/// bar's track and the "spent / limit" line.
+public struct LimitProgressCardSkeleton: View {
+    public init() {}
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            HStack {
+                IconViewSkeleton(size: AppIconSize.xxl)
+                SkeletonText(AppTypography.bodyEmphasis, width: 120)
+                Spacer()
+                SkeletonText(AppTypography.body, width: 40)
+            }
+            LinearProgressBarSkeleton()
+            HStack {
+                SkeletonText(AppTypography.caption, width: 140)
+                Spacer()
+            }
+        }
+        .shimmer()
+        .padding(AppSpacing.lg)
+        .cardStyle(radius: AppRadius.xl)
+        .skeletonLoadingLabel()
+    }
+}

@@ -80,3 +80,26 @@ public struct SelectableBalanceCard: View {
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `SelectableBalanceCard`: the same card, a round icon, the title and the
+/// amount, unselected.
+public struct SelectableBalanceCardSkeleton: View {
+    public init() {}
+
+    public var body: some View {
+        HStack(spacing: AppSpacing.md) {
+            IconViewSkeleton(size: AppIconSize.xxl)
+            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                SkeletonText(AppTypography.body, width: 100)
+                SkeletonText(AppTypography.body, width: 120)
+            }
+        }
+        .shimmer()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(AppSpacing.lg)
+        .cardStyle()
+        .skeletonLoadingLabel()
+    }
+}

@@ -62,6 +62,21 @@ extension ComponentSnapshots {
             )
         }
 
+        @Test func checkmarkRows() async {
+            await assertComponentSnapshot(
+                VStack(spacing: 0) {
+                    CheckmarkRow("All accounts", isSelected: false) {}
+                    CheckmarkRow("Kaspi Gold",
+                                 icon: .custom(source: .sfSymbol("creditcard.fill"),
+                                               style: .roundedSquare(size: AppIconSize.xl, tint: .accentMonochrome)),
+                                 value: "120 000 ₸",
+                                 isSelected: true) {}
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
         @Test func infoRows() async {
             await assertComponentSnapshot(
                 VStack(spacing: 0) {

@@ -54,6 +54,25 @@ extension ComponentSnapshots {
             )
         }
 
+        @Test func currencyInputs() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.lg) {
+                    CurrencyPickerMenu(selection: .constant("KZT"), currencies: ["KZT", "USD"])
+                    // The calculator's display (no cursor); the base currency, so no ≈ line.
+                    CurrencyAmountInput(
+                        amount: .constant("1250"),
+                        currency: .constant("KZT"),
+                        baseCurrency: "KZT",
+                        currencies: ["KZT", "USD"],
+                        errorMessage: "Not enough on the account",
+                        calculatorModel: CalculatorInputModel(seed: "1250")
+                    )
+                }
+                .frame(maxWidth: .infinity),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
         @Test func amountText() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.md) {

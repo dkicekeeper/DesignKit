@@ -125,3 +125,40 @@ public struct ChipPicker<Option: Hashable>: View {
         }
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `ChipPicker`: the title and a row of chips with the chips' corner.
+public struct ChipPickerSkeleton: View {
+    let count: Int
+    let showsTitle: Bool
+
+    public init(count: Int = 4, showsTitle: Bool = true) {
+        self.count = max(1, count)
+        self.showsTitle = showsTitle
+    }
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            if showsTitle {
+                SkeletonText(AppTypography.caption, width: 80)
+            }
+            HStack(spacing: AppSpacing.sm) {
+                ForEach(0..<count, id: \.self) { index in
+                    // A chip's own layout (filterChipStyle), invisible, in its corner.
+                    Text(verbatim: "Ag")
+                        .font(AppTypography.bodySmall.weight(.medium))
+                        .hidden()
+                        .frame(width: index.isMultiple(of: 2) ? 56 : 72)
+                        .padding(.horizontal, AppSpacing.lg)
+                        .padding(.vertical, AppSpacing.sm)
+                        .background(SkeletonView.fill, in: RoundedRectangle(cornerRadius: AppRadius.xl))
+                }
+            }
+            .padding(.vertical, AppSpacing.xxs)
+        }
+        .padding(.vertical, AppSpacing.xs)
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}

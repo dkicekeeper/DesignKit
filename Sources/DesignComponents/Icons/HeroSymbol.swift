@@ -42,3 +42,19 @@ public struct HeroSymbol: View {
             .accessibilityHidden(true)
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `HeroSymbol`: its disc.
+public struct HeroSymbolSkeleton: View {
+    let size: CGFloat
+
+    public init(size: CGFloat = 140) {
+        self.size = size
+    }
+
+    public var body: some View {
+        SkeletonView.circle(size)
+            .skeletonLoadingLabel()
+    }
+}

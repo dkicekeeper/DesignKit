@@ -121,3 +121,28 @@ private func colorFromHex(_ hex: String) -> Color {
 }
 
 // MARK: - Previews
+
+// MARK: - Skeleton
+
+/// Placeholder of a `ColorPickerRow`: the title, then a row of round swatches.
+public struct ColorPickerRowSkeleton: View {
+    let swatches: Int
+
+    public init(swatches: Int = 6) {
+        self.swatches = max(1, swatches)
+    }
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            SkeletonText(AppTypography.bodyEmphasis, width: 100)
+            HStack(spacing: AppSpacing.sm) {
+                ForEach(0..<swatches, id: \.self) { _ in
+                    SkeletonView.circle(AppIconSize.xxl)
+                }
+            }
+            .padding(.horizontal, AppSpacing.sm)
+        }
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}

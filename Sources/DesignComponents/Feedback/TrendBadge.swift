@@ -131,3 +131,42 @@ private struct TrendPillModifier: ViewModifier {
         }
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `TrendBadge`: the pill's capsule, or the arrow and percentage of the
+/// inline and change-indicator styles.
+public struct TrendBadgeSkeleton: View {
+    let style: TrendBadge.Style
+
+    public init(style: TrendBadge.Style = .pill) {
+        self.style = style
+    }
+
+    public var body: some View {
+        Group {
+            switch style {
+            case .pill:
+                Text(verbatim: "Ag")
+                    .font(AppTypography.bodyEmphasis)
+                    .hidden()
+                    .frame(width: 56)
+                    .padding(.horizontal, AppSpacing.sm)
+                    .padding(.vertical, AppSpacing.xs)
+                    .background(SkeletonView.fill, in: Capsule())
+            case .inline:
+                HStack(spacing: AppSpacing.xs) {
+                    SkeletonView.circle(AppIconSize.sm)
+                    SkeletonText(AppTypography.bodyEmphasis, width: 40)
+                }
+            case .changeIndicator:
+                VStack(spacing: AppSpacing.xs) {
+                    SkeletonView.circle(AppIconSize.sm)
+                    SkeletonText(AppTypography.bodyEmphasis, width: 40)
+                }
+            }
+        }
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}

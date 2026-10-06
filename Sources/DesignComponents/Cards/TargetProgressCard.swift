@@ -176,3 +176,38 @@ public struct TargetProgressCard: View {
         }
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `TargetProgressCard`: the same card, the header, current and target
+/// values and the bar's track.
+public struct TargetProgressCardSkeleton: View {
+    public init() {}
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
+            HStack(spacing: AppSpacing.md) {
+                SkeletonView.circle(AppIconSize.md)
+                    .frame(width: 28)
+                SkeletonText(AppTypography.bodyEmphasis, width: 140)
+                Spacer()
+            }
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: AppSpacing.xxs) {
+                    SkeletonText(AppTypography.caption, width: 60)
+                    SkeletonText(AppTypography.h2, width: 110)
+                }
+                Spacer()
+                VStack(alignment: .trailing, spacing: AppSpacing.xxs) {
+                    SkeletonText(AppTypography.caption, width: 50)
+                    SkeletonText(AppTypography.body, width: 80)
+                }
+            }
+            LinearProgressBarSkeleton()
+        }
+        .shimmer()
+        .padding(AppSpacing.lg)
+        .cardStyle()
+        .skeletonLoadingLabel()
+    }
+}

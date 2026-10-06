@@ -86,3 +86,33 @@ public struct SectionHeaderView: View {
 
 
 
+
+// MARK: - Skeleton
+
+/// Placeholder of a `SectionHeaderView` (and `SettingsSectionHeaderView`, `.compact`): a line
+/// of the style's text, with its padding.
+public struct SectionHeaderViewSkeleton: View {
+    let style: SectionHeaderView.Style
+
+    public init(style: SectionHeaderView.Style = .default) {
+        self.style = style
+    }
+
+    public var body: some View {
+        Group {
+            switch style {
+            case .default:
+                SkeletonText(AppTypography.bodyEmphasis, width: 120)
+            case .compact:
+                SkeletonText(AppTypography.bodySmall, width: 100)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .screenPadding()
+            case .large:
+                SkeletonText(AppTypography.h3, width: 160)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .screenPadding()
+            }
+        }
+        .skeletonLoadingLabel()
+    }
+}

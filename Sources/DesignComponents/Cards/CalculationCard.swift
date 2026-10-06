@@ -171,3 +171,49 @@ public struct CalculationCard: View {
         .padding(.vertical, AppSpacing.xs)
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `CalculationCard`: the same card, the header, the hero value and `rows`
+/// label/value lines.
+public struct CalculationCardSkeleton: View {
+    let rows: Int
+    let showsHero: Bool
+
+    public init(rows: Int = 3, showsHero: Bool = true) {
+        self.rows = max(0, rows)
+        self.showsHero = showsHero
+    }
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.lg) {
+            HStack(spacing: AppSpacing.md) {
+                SkeletonView.circle(AppIconSize.md)
+                    .frame(width: 28)
+                SkeletonText(AppTypography.bodyEmphasis, width: 140)
+                Spacer()
+            }
+            if showsHero {
+                VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                    SkeletonText(AppTypography.body, width: 100)
+                    SkeletonText(AppTypography.h1, width: 160)
+                }
+                .padding(.vertical, AppSpacing.md)
+            }
+            VStack(spacing: AppSpacing.xs) {
+                ForEach(0..<rows, id: \.self) { _ in
+                    HStack {
+                        SkeletonText(AppTypography.body, width: 110)
+                        Spacer()
+                        SkeletonText(AppTypography.body, width: 80)
+                    }
+                    .padding(.vertical, AppSpacing.xs)
+                }
+            }
+        }
+        .shimmer()
+        .padding(AppSpacing.lg)
+        .cardStyle()
+        .skeletonLoadingLabel()
+    }
+}

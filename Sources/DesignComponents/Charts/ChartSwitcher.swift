@@ -134,3 +134,37 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
         }
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `ChartSwitcher`: the style picker and zoom buttons, then the chart's
+/// skeleton.
+public struct ChartSwitcherSkeleton: View {
+    let style: ChartStyle
+
+    public init(style: ChartStyle = .line) {
+        self.style = style
+    }
+
+    public var body: some View {
+        VStack(spacing: AppSpacing.sm) {
+            HStack(spacing: AppSpacing.md) {
+                // The segmented picker (a capsule) and the two round zoom buttons.
+                SkeletonView.capsule(height: 32, width: 120)
+                Spacer()
+                HStack(spacing: 0) {
+                    SkeletonView.circle(44)
+                    SkeletonView.circle(44)
+                }
+            }
+            .shimmer()
+            .screenPadding()
+
+            switch style {
+            case .line: LineChartSkeleton()
+            case .bar: BarChartSkeleton()
+            }
+        }
+        .skeletonLoadingLabel()
+    }
+}

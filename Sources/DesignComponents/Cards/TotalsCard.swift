@@ -175,3 +175,56 @@ public struct TotalsCard: View {
         }
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `TotalsCard`: the same card, the title and `count` totals side by side;
+/// one per line at accessibility text sizes, like the card.
+public struct TotalsCardSkeleton: View {
+    let count: Int
+    let showsTitle: Bool
+    let amountFont: Font
+
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    public init(count: Int = 2, showsTitle: Bool = false, amountFont: Font = AppTypography.body) {
+        self.count = max(1, count)
+        self.showsTitle = showsTitle
+        self.amountFont = amountFont
+    }
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
+            if showsTitle {
+                SkeletonText(AppTypography.bodyEmphasis, width: 120)
+            }
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    ForEach(0..<count, id: \.self) { _ in
+                        HStack(spacing: AppSpacing.sm) {
+                            SkeletonText(AppTypography.bodySmall, width: 70)
+                            Spacer(minLength: 0)
+                            SkeletonText(amountFont, width: 110)
+                        }
+                    }
+                }
+            } else {
+                HStack(alignment: .top, spacing: AppSpacing.xs) {
+                    ForEach(0..<count, id: \.self) { index in
+                        if index > 0 {
+                            Spacer()
+                        }
+                        VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                            SkeletonText(AppTypography.bodySmall, width: 70)
+                            SkeletonText(amountFont, width: 100)
+                        }
+                    }
+                }
+            }
+        }
+        .shimmer()
+        .padding(AppSpacing.lg)
+        .cardStyle()
+        .skeletonLoadingLabel()
+    }
+}

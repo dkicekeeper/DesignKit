@@ -105,3 +105,34 @@ public struct NetAmountRow: View {
         }
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `NetAmountRow`: the label and the net amount, then the in and out flows.
+public struct NetAmountRowSkeleton: View {
+    let showsFlows: Bool
+
+    /// - Parameter showsFlows: The "+in −out" line (a row with a single value has none).
+    public init(showsFlows: Bool = true) {
+        self.showsFlows = showsFlows
+    }
+
+    public var body: some View {
+        VStack(alignment: .trailing, spacing: AppSpacing.xs) {
+            HStack {
+                SkeletonText(AppTypography.body, width: 110)
+                Spacer()
+                SkeletonText(AppTypography.body, width: 90)
+            }
+            if showsFlows {
+                HStack(spacing: AppSpacing.md) {
+                    SkeletonText(AppTypography.bodySmall, width: 70)
+                    SkeletonText(AppTypography.bodySmall, width: 70)
+                }
+            }
+        }
+        .shimmer()
+        .padding(.vertical, RowConfiguration.info.verticalPadding)
+        .skeletonLoadingLabel()
+    }
+}

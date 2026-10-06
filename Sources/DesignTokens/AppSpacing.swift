@@ -60,6 +60,12 @@ public enum AppRadius {
 
     /// Button corner radius (alias для md)
     public static let button: CGFloat = md
+
+    /// The soft corner of a skeleton shape whose component has no corner of its own: a line of
+    /// text, an amount, a chart's plot area. 12 pt, which on a line of text (shorter than 24 pt)
+    /// rounds the ends fully. A shape that stands for something with its own corner (a card, a
+    /// chip, an icon) takes that corner instead.
+    public static let soft: CGFloat = md
 }
 
 // MARK: - Icon Sizing System

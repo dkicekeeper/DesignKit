@@ -167,3 +167,48 @@ public struct ComparisonCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `ComparisonCard`: the same card, the two periods and the change between
+/// them; stacked at accessibility text sizes, like the card.
+public struct ComparisonCardSkeleton: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    public init() {}
+
+    public var body: some View {
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    period(alignment: .leading)
+                    period(alignment: .leading)
+                    SkeletonText(AppTypography.bodyEmphasis, width: 64)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                HStack {
+                    period(alignment: .leading)
+                    Spacer()
+                    VStack(spacing: AppSpacing.xs) {
+                        SkeletonView.circle(AppIconSize.sm)
+                        SkeletonText(AppTypography.bodyEmphasis, width: 40)
+                    }
+                    Spacer()
+                    period(alignment: .trailing)
+                }
+            }
+        }
+        .shimmer()
+        .padding(AppSpacing.lg)
+        .cardStyle()
+        .skeletonLoadingLabel()
+    }
+
+    private func period(alignment: HorizontalAlignment) -> some View {
+        VStack(alignment: alignment, spacing: AppSpacing.xxs) {
+            SkeletonText(AppTypography.bodySmall, width: 70)
+            SkeletonText(AppTypography.h3, width: 100)
+        }
+    }
+}

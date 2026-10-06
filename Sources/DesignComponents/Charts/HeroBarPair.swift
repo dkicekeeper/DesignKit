@@ -41,7 +41,7 @@ public struct HeroBarPair: View {
     @State private var selectedBar: Int?
     @Environment(\.amountsHidden) private var amountsHidden
     private var immediate: Bool { !animatesOnAppear || AppAnimation.isReduceMotionEnabled }
-    private static let cornerRadius: CGFloat = 10
+    static let cornerRadius: CGFloat = 10
     /// Bars shorter than this read as "missing" — a zero value stays visible.
     private static let minBarHeight: CGFloat = 10
 
@@ -163,3 +163,31 @@ public struct HeroBarPair: View {
 }
 
 // MARK: - Previews
+
+// MARK: - Skeleton
+
+/// Placeholder of a `HeroBarPair`: two bars with its corner and spacing, and the baseline.
+public struct HeroBarPairSkeleton: View {
+    let barWidth: CGFloat
+    let maxBarHeight: CGFloat
+
+    public init(barWidth: CGFloat = 64, maxBarHeight: CGFloat = 150) {
+        self.barWidth = barWidth
+        self.maxBarHeight = maxBarHeight
+    }
+
+    public var body: some View {
+        VStack(spacing: 0) {
+            HStack(alignment: .bottom, spacing: AppSpacing.xxl) {
+                SkeletonView(height: maxBarHeight * 0.7, width: barWidth, cornerRadius: HeroBarPair.cornerRadius)
+                SkeletonView(height: maxBarHeight, width: barWidth, cornerRadius: HeroBarPair.cornerRadius)
+            }
+            .frame(height: maxBarHeight, alignment: .bottom)
+
+            SkeletonView(height: 1, width: barWidth * 2 + AppSpacing.xxl + AppSpacing.xl * 2, cornerRadius: 0.5)
+                .padding(.top, AppSpacing.xs)
+        }
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}

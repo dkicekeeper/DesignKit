@@ -9,6 +9,10 @@ import DesignSupport
 import DesignComponents
 
 struct InputsScreen: View {
+    @State private var pickedCurrency = "KZT"
+    @State private var enteredAmount = "1250"
+    @State private var pickedIcon: IconSource? = .sfSymbol("cart.fill")
+    @State private var showsIconPicker = false
     @State private var amount = "1250"
     @State private var title = ""
     @State private var segment = 0
@@ -117,6 +121,48 @@ struct InputsScreen: View {
                 UniversalCarousel(config: .filter) {
                     ForEach(["week", "month", "year", "all"], id: \.self) { key in
                         UniversalFilterButton(title: key.capitalized, isSelected: filter == key, onTap: { filter = key })
+                    }
+                }
+            }
+
+            ShowcaseSection(title: "CurrencyPickerMenu", subtitle: "The currency chip: a menu of currencies · Customize…") {
+                CurrencyPickerMenu(selection: $pickedCurrency, currencies: ["KZT", "USD", "EUR", "RUB"]) {}
+            }
+
+            ShowcaseSection(title: "CurrencyAmountInput", subtitle: "Amount, ≈ base currency, currency chip, error") {
+                CurrencyAmountInput(amount: $enteredAmount, currency: $pickedCurrency, baseCurrency: "KZT",
+                                    currencies: ["KZT", "USD", "EUR"],
+                                    errorMessage: enteredAmount.isEmpty ? "Enter an amount" : nil)
+            }
+
+            ShowcaseSection(title: "CurrencyList", subtitle: "Popular, then all · search · pushed from a chip") {
+                NavigationLink {
+                    CurrencyList(selection: pickedCurrency) { pickedCurrency = $0 }
+                        .navigationTitle("Currency")
+                } label: {
+                    Text("Currency: \(pickedCurrency)").filterChipStyle()
+                }
+                .buttonStyle(.plain)
+            }
+
+            ShowcaseSection(title: "IconPicker", subtitle: "SF Symbols by group · logos from DesignKitLogoCatalog") {
+                Button {
+                    showsIconPicker = true
+                } label: {
+                    IconView(source: pickedIcon, style: .glassHero(size: AppIconSize.mega))
+                }
+                .buttonStyle(.plain)
+                .sheet(isPresented: $showsIconPicker) {
+                    IconPicker(selection: $pickedIcon)
+                }
+            }
+
+            ShowcaseSection(title: ".carouselItemTransition()", subtitle: "Cards dim and shrink as they scroll off") {
+                UniversalCarousel(config: .cards) {
+                    ForEach(["Kaspi Gold", "Halyk", "Freedom", "Jusan"], id: \.self) { name in
+                        BalanceCard(iconSource: .sfSymbol("creditcard.fill"), title: name,
+                                    amount: 120_000, currency: "KZT")
+                            .carouselItemTransition()
                     }
                 }
             }

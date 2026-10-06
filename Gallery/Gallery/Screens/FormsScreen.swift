@@ -5,6 +5,7 @@
 
 import SwiftUI
 import DesignTokens
+import DesignSupport
 import DesignComponents
 
 struct FormsScreen: View {
@@ -13,6 +14,11 @@ struct FormsScreen: View {
     @State private var date = Date()
     @State private var frequency = "monthly"
     @State private var showsEditSheet = false
+    @State private var pickedAccount: String? = "gold"
+    @State private var heroIcon: IconSource? = .sfSymbol("creditcard.fill")
+    @State private var heroTitle = "Kaspi Gold"
+    @State private var heroAmount = "125000"
+    @State private var heroCurrency = "KZT"
     @State private var accountName = "Kaspi Gold"
 
     var body: some View {
@@ -89,6 +95,27 @@ struct FormsScreen: View {
                     Section("Name") {
                         TextField("Account name", text: $accountName)
                     }
+                }
+            }
+
+            ShowcaseSection(title: "EditableHero", subtitle: "Icon (opens IconPicker), name, amount, currency") {
+                EditableHero(icon: $heroIcon, title: $heroTitle, titlePlaceholder: "Account name",
+                             amount: $heroAmount, currency: $heroCurrency, options: .amountAndCurrency)
+            }
+
+            ShowcaseSection(title: "CheckmarkRow", subtitle: "A choice list: all · with an icon and a value") {
+                FormSection {
+                    CheckmarkRow("All accounts", isSelected: pickedAccount == nil) { pickedAccount = nil }
+                    CheckmarkRow("Kaspi Gold",
+                                 icon: .custom(source: .sfSymbol("creditcard.fill"),
+                                               style: .roundedSquare(size: AppIconSize.xl, tint: .accentMonochrome)),
+                                 value: "120 000 ₸",
+                                 isSelected: pickedAccount == "gold") { pickedAccount = "gold" }
+                    CheckmarkRow("Halyk Savings",
+                                 icon: .custom(source: .sfSymbol("banknote.fill"),
+                                               style: .roundedSquare(size: AppIconSize.xl, tint: .accentMonochrome)),
+                                 value: "1 250 000 ₸",
+                                 isSelected: pickedAccount == "savings") { pickedAccount = "savings" }
                 }
             }
 

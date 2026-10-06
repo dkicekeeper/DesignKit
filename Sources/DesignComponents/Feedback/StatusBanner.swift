@@ -116,3 +116,34 @@ public struct StatusBanner: View {
         .accessibilityElement(children: .combine)
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `StatusBanner`: one grey box with its corner, as tall as the banner with
+/// `lines` lines of text.
+public struct StatusBannerSkeleton: View {
+    let style: StatusBanner.Style
+    let lines: Int
+
+    public init(style: StatusBanner.Style = .standard, lines: Int = 1) {
+        self.style = style
+        self.lines = max(1, lines)
+    }
+
+    public var body: some View {
+        // The banner's own layout, invisible, gives the height (it grows with Dynamic Type).
+        HStack(alignment: .top, spacing: AppSpacing.sm) {
+            Image(systemName: "info.circle.fill")
+                .font(style == .standard ? .system(size: AppIconSize.sm) : AppTypography.caption)
+            Text(verbatim: Array(repeating: "Ag", count: lines).joined(separator: "\n"))
+                .font(style == .standard ? AppTypography.bodySmall : AppTypography.caption)
+        }
+        .hidden()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, AppSpacing.md)
+        .padding(.vertical, style == .standard ? AppSpacing.md : AppSpacing.sm)
+        .background(SkeletonView.fill, in: RoundedRectangle(cornerRadius: AppRadius.md))
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}

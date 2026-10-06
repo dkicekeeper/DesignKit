@@ -192,3 +192,24 @@ public struct ProgressRing: View {
 }
 
 // MARK: - Preview
+
+// MARK: - Skeleton
+
+/// Placeholder of a `ProgressRing`: its track, the same size and line width.
+public struct ProgressRingSkeleton: View {
+    let size: CGFloat
+    let lineWidth: CGFloat
+
+    public init(size: CGFloat = AppIconSize.categoryIcon, lineWidth: CGFloat = 3) {
+        self.size = size
+        self.lineWidth = lineWidth
+    }
+
+    public var body: some View {
+        Circle()
+            .stroke(SkeletonView.fill, lineWidth: lineWidth)
+            .frame(width: size, height: size)
+            .shimmer()
+            .skeletonLoadingLabel()
+    }
+}

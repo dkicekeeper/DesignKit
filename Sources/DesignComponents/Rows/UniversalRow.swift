@@ -431,3 +431,118 @@ public extension UniversalRow where Content == Text {
 
 
 
+
+// MARK: - Skeleton
+
+/// Placeholder of a `UniversalRow`, and so of the rows built on it: the row's padding and
+/// spacing, the icon's shape, the title (and subtitle) and the trailing element.
+///
+/// ```swift
+/// UniversalRowSkeleton(trailing: .value)
+/// UniversalRowSkeleton.toggleSettings          // ToggleSettingsRow
+/// ```
+public struct UniversalRowSkeleton: View {
+    /// What sits on the trailing edge.
+    public enum Trailing: Hashable, Sendable {
+        /// Nothing (an action row).
+        case empty
+        /// A short value ("KZT", "On").
+        case value
+        /// The disclosure chevron of a row that opens a screen.
+        case chevron
+        /// A switch (51 × 31, a capsule).
+        case toggle
+        /// A compact control in a capsule: a date, a menu's value.
+        case capsule
+    }
+
+    let config: RowConfiguration
+    let iconStyle: IconStyle?
+    let titleFont: Font
+    let showsSubtitle: Bool
+    let trailing: Trailing
+
+    /// - Parameters:
+    ///   - iconStyle: The leading icon's style (its shape and size); `nil` for no icon.
+    ///   - showsSubtitle: A second, shorter line under the title.
+    public init(
+        config: RowConfiguration = .standard,
+        iconStyle: IconStyle? = .circle(size: AppIconSize.xxl),
+        titleFont: Font = AppTypography.body,
+        showsSubtitle: Bool = false,
+        trailing: Trailing = .empty
+    ) {
+        self.config = config
+        self.iconStyle = iconStyle
+        self.titleFont = titleFont
+        self.showsSubtitle = showsSubtitle
+        self.trailing = trailing
+    }
+
+    /// `NavigationSettingsRow`: a small icon, the title and a chevron.
+    public static var navigationSettings: UniversalRowSkeleton {
+        UniversalRowSkeleton(config: .settings, iconStyle: .circle(size: AppIconSize.md), trailing: .chevron)
+    }
+
+    /// `ToggleSettingsRow`: a small icon, the title and a switch.
+    public static var toggleSettings: UniversalRowSkeleton {
+        UniversalRowSkeleton(config: .settings, iconStyle: .circle(size: AppIconSize.md), trailing: .toggle)
+    }
+
+    /// `ActionSettingsRow`: a small icon and the title.
+    public static var actionSettings: UniversalRowSkeleton {
+        UniversalRowSkeleton(config: .settings, iconStyle: .circle(size: AppIconSize.md))
+    }
+
+    /// `MenuPickerRow`: a small icon, the title and the chosen value.
+    public static var menuPicker: UniversalRowSkeleton {
+        UniversalRowSkeleton(iconStyle: .circle(size: AppIconSize.md), trailing: .value)
+    }
+
+    /// `CheckmarkRow`: the row of a choice list, its title in `h4`; pass the icon's style
+    /// when the rows have one.
+    public static func checkmark(iconStyle: IconStyle? = nil) -> UniversalRowSkeleton {
+        UniversalRowSkeleton(config: .settings, iconStyle: iconStyle, titleFont: AppTypography.h4)
+    }
+
+    /// `DatePickerRow`: a small icon, the title and the date in its capsule.
+    public static var datePicker: UniversalRowSkeleton {
+        UniversalRowSkeleton(iconStyle: .circle(size: AppIconSize.md), trailing: .capsule)
+    }
+
+    public var body: some View {
+        HStack(spacing: config.spacing) {
+            if let iconStyle {
+                IconViewSkeleton(style: iconStyle)
+            }
+            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                SkeletonText(titleFont, width: 140)
+                if showsSubtitle {
+                    SkeletonText(AppTypography.bodySmall, width: 90)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            trailingView
+        }
+        .shimmer()
+        .padding(.vertical, config.verticalPadding)
+        .padding(.horizontal, config.horizontalPadding)
+        .skeletonLoadingLabel()
+    }
+
+    @ViewBuilder
+    private var trailingView: some View {
+        switch trailing {
+        case .empty:
+            EmptyView()
+        case .value:
+            SkeletonText(AppTypography.body, width: 60)
+        case .chevron:
+            DisclosureChevron()
+        case .toggle:
+            SkeletonView.capsule(height: 31, width: 51)
+        case .capsule:
+            SkeletonView.capsule(height: 34, width: 110)
+        }
+    }
+}

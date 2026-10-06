@@ -137,20 +137,29 @@ public struct CashFlowCard: View {
 
     // MARK: - Loading State
 
-    /// Skeleton in the shape of the loaded card: the title, then the comparison bar.
     private var loadingState: some View {
+        CashFlowCardSkeleton(loadingLabel: loadingLabel)
+    }
+}
+
+// MARK: - Skeleton
+
+/// Placeholder of a `CashFlowCard`, and its own loading state: the same card, the title,
+/// then the comparison bar with an amount under each end.
+public struct CashFlowCardSkeleton: View {
+    let loadingLabel: String
+
+    /// - Parameter loadingLabel: What VoiceOver reads (key `skeleton.loading`, "Loading").
+    public init(loadingLabel: String = String(localized: "skeleton.loading", defaultValue: "Loading")) {
+        self.loadingLabel = loadingLabel
+    }
+
+    public var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.lg) {
-            SkeletonView(height: 24, width: 120)
-            VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                // Half the bar's height: a capsule, like the bar it stands in for.
-                SkeletonView(height: 12, cornerRadius: 6)
-                HStack {
-                    SkeletonView(height: 14, width: 90)
-                    Spacer()
-                    SkeletonView(height: 14, width: 90)
-                }
-            }
+            SkeletonText(AppTypography.h3, width: 120)
+            AmountComparisonBarSkeleton()
         }
+        .shimmer()
         .frame(maxWidth: .infinity)
         .padding(AppSpacing.lg)
         .cardStyle()

@@ -100,3 +100,26 @@ public struct ProgressRingTile: View {
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 }
+
+// MARK: - Skeleton
+
+/// Placeholder of a `ProgressRingTile`: the title, the ring's track and the round glass
+/// button inside it.
+public struct ProgressRingTileSkeleton: View {
+    public init() {}
+
+    public var body: some View {
+        VStack(spacing: AppSpacing.sm) {
+            SkeletonText(AppTypography.bodyEmphasis, width: 70)
+            ZStack {
+                Circle()
+                    .stroke(SkeletonView.fill, lineWidth: 4)
+                    .frame(width: AppIconSize.budgetRing, height: AppIconSize.budgetRing)
+                SkeletonView.circle(AppIconSize.mega)
+            }
+            .frame(height: AppIconSize.budgetRing)
+        }
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}

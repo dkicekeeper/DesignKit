@@ -221,3 +221,34 @@ private struct PackedOverflowBadge: View {
 
 
 
+
+// MARK: - Skeleton
+
+/// Placeholder of a `PackedCircleIconsView`: a few circles of falling sizes packed in the
+/// same box.
+public struct PackedCircleIconsViewSkeleton: View {
+    let containerWidth: CGFloat
+
+    public init(containerWidth: CGFloat = 120) {
+        self.containerWidth = containerWidth
+    }
+
+    public var body: some View {
+        // Three circles touching each other, centred in the box: a big one and two smaller.
+        let height: CGFloat = 100
+        let big = min(containerWidth, height) * 0.56
+        let medium = big * 0.7
+        let small = big * 0.5
+        ZStack {
+            SkeletonView.circle(big)
+                .offset(x: -medium * 0.35, y: -small * 0.15)
+            SkeletonView.circle(medium)
+                .offset(x: big * 0.45, y: -small * 0.35)
+            SkeletonView.circle(small)
+                .offset(x: big * 0.35, y: medium * 0.5)
+        }
+        .frame(width: containerWidth, height: height)
+        .shimmer()
+        .skeletonLoadingLabel()
+    }
+}
