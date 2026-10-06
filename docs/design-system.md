@@ -82,7 +82,7 @@ All tokens live in `Sources/DesignTokens/`. Never use raw values — always refe
 
 Modifiers:
 - **`OnDark` / `OnLight`**: the same value in both themes, for content on photos, gradients and coloured headers (a trip photo in Dalada, `GradientOrbsBackground`, an accent hero).
-- **`Pale`**: a tinted container behind status text, badges and icons. `AppColors.pale(_:)` makes one from any colour (a category colour too): 12% in light, 24% in dark. Since 1.8.0 every tinted container in DesignKit uses it, so they are equally strong everywhere: `BadgeView` (tinted), `TrendBadge` (pill), `RecommendationBox`, `HeroSymbol`, `AvatarView` (initials), `ActivityTimeline` markers, the `ScoreGaugeCard` grade and `TargetProgressCard` badge, `HeroBarPair`'s amount pill, `MonthCalendar`'s today, `TagInput` chips and the calculator's operator keys. Progress tracks and chart fills are not containers and keep their own opacity.
+- **`Pale`**: a tinted container behind status text, badges and icons. `AppColors.pale(_:)` makes one from any colour (a category colour too): 12% in light, 24% in dark. Since 1.8.0 every tinted container in DesignKit uses it, so they are equally strong everywhere: `BadgeView` (tinted), `TrendBadge` (pill), `RecommendationBox`, `HeroSymbol`, `AvatarView` (initials), the round icons of `LimitProgressCard`, `BreakdownRow` and `ProgressRingRow`, `ActivityTimeline` markers, the `ScoreGaugeCard` grade and `TargetProgressCard` badge, `HeroBarPair`'s amount pill, `MonthCalendar`'s today, `TagInput` chips and the calculator's operator keys. Progress tracks and chart fills are not containers and keep their own opacity.
 - **Opaque** (`Border.opaque`): no transparency, for outlines that overlap.
 
 **`AppColors.Text`** — text and icons
