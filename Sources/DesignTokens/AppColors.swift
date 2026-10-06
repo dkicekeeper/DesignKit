@@ -92,21 +92,42 @@ public enum AppColors {
 
 /// Цвета для категорий транзакций — hash-based assignment из палитры
 public struct CategoryColors {
+    /// The hash palette as RGB values. Its size and order are frozen: `paletteIndex` maps a
+    /// name to a slot by `hash % count`, so growing or reordering it would re-colour every
+    /// category and avatar that relies on the name hash. New colours go to `pickerExtraRGB`.
+    private nonisolated static let hashPaletteRGB: [UInt64] = [
+        0x3b82f6, 0x8b5cf6, 0xec4899, 0xf97316, 0xeab308,
+        0x22c55e, 0x14b8a6, 0x06b6d4, 0x6366f1, 0xd946ef,
+        0xf43f5e, 0xa855f7, 0x10b981, 0xf59e0b
+    ]
+
+    /// Colours offered in the picker only, never hashed into: deeper and neutral shades
+    /// (sky, petrol, deep teal, forest, lime, olive, ochre, rust, maroon, berry, plum,
+    /// deep violet, lavender, navy, slate, stone). Chosen to stay at least as distinct from
+    /// each other and from the hash palette as the hash palette's own closest pairs, and to
+    /// keep at least 2.7:1 against white and 2.3:1 against a dark card.
+    private nonisolated static let pickerExtraRGB: [UInt64] = [
+        0x0ea5e9, 0x0e7490, 0x0f766e, 0x15803d, 0x65a30d, 0x4d7c0f,
+        0xa16207, 0x9a3412, 0xb91c1c, 0xbe185d, 0xa21caf, 0x6d28d9,
+        0xa78bfa, 0x1d4ed8, 0x64748b, 0x78716c
+    ]
+
     /// Pre-computed color palette (avoids hex parsing on every call)
-    private nonisolated static let palette: [Color] = {
-        let hexValues: [UInt64] = [
-            0x3b82f6, 0x8b5cf6, 0xec4899, 0xf97316, 0xeab308,
-            0x22c55e, 0x14b8a6, 0x06b6d4, 0x6366f1, 0xd946ef,
-            0xf43f5e, 0xa855f7, 0x10b981, 0xf59e0b
-        ]
-        return hexValues.map { rgb in
-            Color(
-                red:   Double((rgb & 0xFF0000) >> 16) / 255.0,
-                green: Double((rgb & 0x00FF00) >> 8)  / 255.0,
-                blue:  Double( rgb & 0x0000FF)         / 255.0
-            )
-        }
-    }()
+    private nonisolated static let palette: [Color] = hashPaletteRGB.map { rgb in
+        Color(
+            red:   Double((rgb & 0xFF0000) >> 16) / 255.0,
+            green: Double((rgb & 0x00FF00) >> 8)  / 255.0,
+            blue:  Double( rgb & 0x0000FF)         / 255.0
+        )
+    }
+
+    /// The colours a user can pick for a category (`ColorPickerRow`'s default), as the
+    /// lowercase `#rrggbb` strings apps store: the 14 palette colours first, in palette order,
+    /// so every fallback colour can also be chosen explicitly, then 16 deeper and neutral shades.
+    public nonisolated static let pickerPalette: [String] = (hashPaletteRGB + pickerExtraRGB).map { rgb in
+        let digits = String(rgb, radix: 16)
+        return "#" + String(repeating: "0", count: max(0, 6 - digits.count)) + digits
+    }
 
     /// The 14 palette colours in order: what categories hash into, and what an app's own
     /// name-coloured visuals (letter avatars) draw from, so both share one palette.
