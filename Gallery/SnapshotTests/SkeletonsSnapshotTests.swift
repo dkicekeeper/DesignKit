@@ -73,7 +73,8 @@ extension ComponentSnapshots {
             )
         }
 
-        @Test func rowSkeletons() async {
+        // Rows and gauges come in two snapshots each: one would be taller than the screen.
+        @Test func settingsRowSkeletons() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.sm) {
                     UniversalRowSkeleton(showsSubtitle: true, trailing: .value)
@@ -81,6 +82,16 @@ extension ComponentSnapshots {
                     UniversalRowSkeleton.toggleSettings
                     UniversalRowSkeleton.datePicker
                     UniversalRowSkeleton.checkmark(iconStyle: .roundedSquare(size: AppIconSize.xl))
+                    ColorPickerRowSkeleton(swatches: 5)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        @Test func dataRowSkeletons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
                     BalanceRowSkeleton(showsDetail: true)
                     ProgressRingRowSkeleton()
                     BreakdownRowSkeleton()
@@ -88,7 +99,6 @@ extension ComponentSnapshots {
                     NetAmountRowSkeleton()
                     ScheduleRowSkeleton()
                     InfoRowSkeleton(showsIcon: true)
-                    ColorPickerRowSkeleton(swatches: 5)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light, .dark, .largeText]
@@ -107,17 +117,26 @@ extension ComponentSnapshots {
             )
         }
 
-        @Test func gaugeAndBarSkeletons() async {
+        @Test func barSkeletons() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {
                     LinearProgressBarSkeleton()
                     ProportionBarSkeleton(height: 12)
                     AmountComparisonBarSkeleton()
                     HeroProportionBarSkeleton(segments: 2)
-                    HeroHalfGaugeSkeleton(diameter: 200, lineWidth: 16)
                     HeroMilestoneGaugeSkeleton()
                     HeroBarPairSkeleton(maxBarHeight: 100)
                         .frame(maxWidth: .infinity)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark]
+            )
+        }
+
+        @Test func gaugeSkeletons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    HeroHalfGaugeSkeleton(diameter: 200, lineWidth: 16)
                     HStack(spacing: AppSpacing.md) {
                         MiniHalfGaugeSkeleton().frame(width: 100)
                         MiniMilestoneGaugeSkeleton().frame(width: 100)
@@ -129,7 +148,7 @@ extension ComponentSnapshots {
                         ProgressRingSkeleton()
                         ProgressRingTileSkeleton()
                     }
-                    ProgressRingTileGridSkeleton(count: 4)
+                    ProgressRingTileGridSkeleton(count: 3)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light, .dark]
