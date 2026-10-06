@@ -47,6 +47,7 @@ struct RootView: View {
                 }
                 Section("Components") {
                     row("Components", "square.grid.2x2.fill", AppColors.accent) { ComponentsScreen() }
+                    row("Balances, Metrics & More", "creditcard.fill", .green) { BalancesScreen() }
                     row("Badges, Stats & Rating", "star.leadinghalf.filled", .yellow) { DisplayScreen() }
                     row("Loading, Steps & More", "rectangle.dashed", .gray) { PatternsScreen() }
                     row("Onboarding, Calendar & More", "calendar", .orange) { FlowsScreen() }

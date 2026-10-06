@@ -26,6 +26,7 @@ appearances it lists:
 | `ChartsSnapshotTests` | `LinearProgressBar`, `ProgressRing`, `AmountComparisonBar`, `FormattedAmountText`, `Sparkline`, `LineChart`, `BarChart`, `HeroSparkline`, `OrbChart`, `MiniDonut`, `ProportionBar`, `MiniProportionBar`, `HeroProportionBar`, `HeroHalfGauge`, `MiniHalfGauge`, `HeroMilestoneGauge`, `MiniMilestoneGauge`, `HeroBarPair`, `MiniBarPair` |
 | `SummarySnapshotTests` | `TotalsCard`, `LimitProgressCard`, `WeightBreakdownCard`, `CalculationCard`, `NetAmountRow`, `ScheduleRow`, `ComparisonCard`, `CashFlowCard` (loaded, empty), `RecurringPaymentCard`, `PayoffProgressCard`, `BreakdownRow`, `AmountPercentageView` |
 | `ScoresSnapshotTests` | `ScoreGaugeCard`, `ScoreCard`, `TargetProgressCard` |
+| `BalancesSnapshotTests` | `BalanceCard`, `SelectableBalanceCard`, `BalanceRow`, `ProgressRingRow`, `ProgressRingTile`, `MetricCard` (mini chart, none, bottom chart), `GradientOrbsBackground`, `PromptSheet` |
 | `InputsSnapshotTests` | `SegmentedPickerView`, `ChipPicker` (single / several), `RatingPicker`, `FormTextField`, `TagInput`, `CalculatorKeypad`, `AmountDigitDisplay`, `FormattedAmountView`, `SpentBudgetText`, `PlusTabLabel`, `BulkDeleteButton`, `EntityActionButton` |
 
 Appearances (`SnapshotAppearance`): `light`, `dark`, and `largeText` (light at accessibility
@@ -59,7 +60,8 @@ All of them have a specimen in the Gallery.
   360 pt wide, `AppSpacing.lg` around it, `AppColors.bgBase` behind, animations off, US
   English locale. It waits 1.5 s for `onAppear` and layout, measures the view again and
   resizes the window if it grew (a view that measures itself, like `ExpandableText` adding its
-  More button, would otherwise be cut off at the top and bottom), then captures every 0.4 s
+  More button, would otherwise be cut off at the top and bottom; the log lists those as
+  `SNAPSHOT-RESIZED <test>.<appearance>: <old> → <new> pt`), then captures every 0.4 s
   until three frames in a row are identical, for up to 8 s (Liquid Glass animates its shadow
   for a moment; two frames were not enough between stacked cards, whose shadows can hold still
   for one interval and move again). A snapshot that never settles prints

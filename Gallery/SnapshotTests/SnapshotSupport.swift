@@ -158,6 +158,7 @@ enum ComponentRenderer {
         // content sits centred in the old height and is cut off at the top and bottom.
         let settledHeight = max(1, host.sizeThatFits(in: fitting).height.rounded(.up))
         if settledHeight != size.height {
+            print("SNAPSHOT-RESIZED \(label): \(Int(size.height)) → \(Int(settledHeight)) pt")
             size.height = settledHeight
             checkFitsScreen()
             window.frame = CGRect(origin: .zero, size: size)
