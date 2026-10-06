@@ -141,6 +141,8 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
 - **1.5.0** — третья партия: `BalanceCard`, `SelectableBalanceCard`, `BalanceRow`,
   `ProgressRingRow`, `ProgressRingTile` (с `LimitProgress`), `MetricCard`,
   `GradientOrbsBackground`, `PromptSheet`. В Tenra остались переходники со старыми именами.
+- **1.5.1** — крупный шрифт в новых строках: в `BalanceRow` сумма начисления встаёт под подпись,
+  в `ProgressRingRow` «потрачено», «/ лимит» и доля идут тремя строками вместо «185… / 250…».
 
 ## Кандидаты на следующие раунды
 

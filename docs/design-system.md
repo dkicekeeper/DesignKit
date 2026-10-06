@@ -168,7 +168,7 @@ All use Inter variable font with Dynamic Type scaling:
 
 For dynamic-size amount inputs use `Font.custom(AppTypography.fontFamily, …)` directly — that's the one place the family name is exposed.
 
-**Accessibility text sizes (AX1–AX5).** Side-by-side layouts stack when `dynamicTypeSize.isAccessibilitySize` (Apple's HIG rule): a row of columns or a "title …… value" row does not truncate values or break words mid-word, it puts them one under another. Standard sizes keep the side-by-side layout untouched — branch on `isAccessibilitySize`, don't rework the regular layout. Since 1.3.0: `ComparisonCard` (before, now, change), `TotalsCard` (one total per line), `InsightEntityRow` and `BreakdownRow` (the amount under the title), `MenuPickerRow` (the value under the title). Snapshot tests check AX2 (`largeText`).
+**Accessibility text sizes (AX1–AX5).** Side-by-side layouts stack when `dynamicTypeSize.isAccessibilitySize` (Apple's HIG rule): a row of columns or a "title …… value" row does not truncate values or break words mid-word, it puts them one under another. Standard sizes keep the side-by-side layout untouched — branch on `isAccessibilitySize`, don't rework the regular layout. Since 1.3.0: `ComparisonCard` (before, now, change), `TotalsCard` (one total per line), `InsightEntityRow` and `BreakdownRow` (the amount under the title), `MenuPickerRow` (the value under the title); since 1.5.1 `BalanceRow` (a detail's amount under its text) and `ProgressRingRow` (spent, "/ limit" and the share on three lines). Snapshot tests check AX2 (`largeText`).
 
 ### Animations (`AppAnimation`)
 
@@ -410,10 +410,10 @@ A schedule entry: a checked circle when `isDone` (the row is dimmed with `future
 One part of a breakdown on `UniversalRow(.info)`: a 44 pt circle icon tinted with `color`, the title and an optional one-line subtitle, `AmountPercentageView` (the amount over "42.0%") and, with `showsChevron: true`, a `DisclosureChevron` (wrap the row in a `NavigationLink`). `AmountPercentageView` is public for other rows. Tenra: `CategoryBreakdownRow` (category name, subcategories) is an adapter.
 
 #### `BalanceRow` *(1.5.0)*
-A named balance in a `List`: `IconView` (44 pt, the zoom-transition source with `transitionSourceID` / `transitionNamespace`), the name (h4), the amount (bodySmall, secondary), an optional `Detail` caption line ("Posting: 30 Oct  ·  " followed by an amount in `AppColors.planned`) and an optional secondary `trailingSystemImage` (a lock). No padding: the list's row insets place it; the tap (`Button` + `.plain`) and `.swipeActions` stay at the call site. Tenra: `AccountRow` (account, deposit interest copy, delete) is an adapter.
+A named balance in a `List`: `IconView` (44 pt, the zoom-transition source with `transitionSourceID` / `transitionNamespace`), the name (h4), the amount (bodySmall, secondary), an optional `Detail` caption line ("Posting: 30 Oct  ·  " followed by an amount in `AppColors.planned`) and an optional secondary `trailingSystemImage` (a lock). At accessibility text sizes the detail's amount goes under its text, which drops a trailing "·". No padding: the list's row insets place it; the tap (`Button` + `.plain`) and `.swipeActions` stay at the call site. Tenra: `AccountRow` (account, deposit interest copy, delete) is an adapter.
 
 #### `ProgressRingRow` *(1.5.0)*
-A row whose icon wears a progress ring: a 44 pt circle icon tinted with `color` inside a 3 pt `ProgressRing` (`LimitProgress`; no ring when `nil`), the name (h4), then `SpentBudgetText` (semibold, destructive when over) and "(74%)", or `placeholder` ("No budget set") without a limit. A `List` row like `BalanceRow`: no padding, tap and swipe at the call site. Tenra: `CategoryRow` (category, budget, the over-budget haptic) is an adapter.
+A row whose icon wears a progress ring: a 44 pt circle icon tinted with `color` inside a 3 pt `ProgressRing` (`LimitProgress`; no ring when `nil`), the name (h4), then `SpentBudgetText` (semibold, destructive when over) and "(74%)", or `placeholder` ("No budget set") without a limit; at accessibility text sizes the spent amount, "/ limit" and the share go on three lines. A `List` row like `BalanceRow`: no padding, tap and swipe at the call site. Tenra: `CategoryRow` (category, budget, the over-budget haptic) is an adapter.
 
 #### `DatePickerRow`
 Inline `DatePicker` inside `UniversalRow`.
