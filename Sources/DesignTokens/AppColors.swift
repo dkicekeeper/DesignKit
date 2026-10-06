@@ -9,7 +9,9 @@ import SwiftUI
 
 // MARK: - Semantic Colors
 
-/// Семантические цвета приложения (дополняют существующую систему)
+/// Semantic colours. Since 1.6.0 the canonical tokens are grouped (`AppColors.Text`,
+/// `.Background`, `.Status`, `.Border`: AppColors+Semantic.swift); the flat names below are
+/// aliases of them and keep working.
 public enum AppColors {
     // MARK: Backgrounds
     //
@@ -19,24 +21,24 @@ public enum AppColors {
     // bgMuted  — "утопленный" слой внутри карточек (треки прогресс-баров, фон чипов).
 
     /// Фон самого экрана.
-    public static let bgBase = Color(.systemBackground)
+    public static let bgBase = Background.base
 
     /// Приподнятая поверхность — карточки, elevated containers.
-    public static let bgCard = Color(.secondarySystemBackground)
+    public static let bgCard = Background.neutral1
 
     /// "Утопленный" фон — chips, прогресс-бар треки, secondary buttons.
-    public static let bgMuted = Color(.systemGray5)
+    public static let bgMuted = Background.neutral2
 
     // MARK: Text Colors
 
     /// Primary text (используй системный .primary для auto light/dark)
-    public static let textPrimary = Color.primary
+    public static let textPrimary = Text.primary
 
     /// Secondary text — системный адаптивный цвет (.secondary).
-    public static let textSecondary = Color.secondary
+    public static let textSecondary = Text.secondary
 
     /// Tertiary text (используй системный .gray для мета-информации)
-    public nonisolated static let textTertiary = Color.gray
+    public nonisolated static let textTertiary = Text.tertiary
 
     // MARK: Interactive Colors
 
@@ -45,20 +47,20 @@ public enum AppColors {
     public nonisolated static var accent: Color { DesignKitTheme.accent }
 
     /// Destructive actions
-    public nonisolated static let destructive = Color.red
+    public nonisolated static let destructive = Status.negative
 
     /// Success/positive — используй для UI-состояний (кнопки, индикаторы).
     /// Для финансового дохода используй `income`.
-    public nonisolated static let success = Color.green
+    public nonisolated static let success = Status.positive
 
     /// Warning
-    public nonisolated static let warning = Color.orange
+    public nonisolated static let warning = Status.warning
 
     // MARK: Static Colors
 
     /// Белый цвет без адаптации к теме — для текста поверх тёмных/цветных фонов.
     /// Не используй для обычного текста: предпочитай `textPrimary`.
-    public static let staticWhite = Color.white
+    public static let staticWhite = Text.primaryOnDark
 
     // MARK: Transaction Type Colors (semantic)
 
@@ -82,7 +84,7 @@ public enum AppColors {
     public static let transfer = Color(red: 0.0, green: 0.75, blue: 0.85)
 
     /// Planned / future / scheduled transactions
-    public static let planned = Color.blue
+    public static let planned = Status.info
 
 }
 
