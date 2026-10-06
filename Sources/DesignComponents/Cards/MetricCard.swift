@@ -13,6 +13,39 @@ import SwiftUI
 import DesignTokens
 import DesignSupport
 
+/// The large value of a `MetricCard` (`MetricCard.Value`).
+///
+/// Top-level, not nested in the generic card, so one value can feed cards with different
+/// charts.
+public enum MetricCardValue: Equatable, Sendable {
+    /// An amount through `FormattedAmountText`.
+    case amount(Double, currency: String)
+    /// A pre-formatted value ("21", "3.4×").
+    case text(String)
+}
+
+/// The trend badge after a `MetricCard`'s value (`MetricCard.Trend`; `TrendBadge`, `.pill`).
+public struct MetricCardTrend {
+    public let direction: TrendBadge.Direction
+    public let changePercent: Double?
+    public let color: Color?
+
+    /// - Parameter color: Overrides the direction's colour (expenses, where up is bad).
+    public init(direction: TrendBadge.Direction, changePercent: Double?, color: Color? = nil) {
+        self.direction = direction
+        self.changePercent = changePercent
+        self.color = color
+    }
+}
+
+/// Where a `MetricCard`'s chart goes (`MetricCard.ChartPlacement`).
+public enum MetricCardChartPlacement: Hashable, Sendable {
+    /// 120 × 120 pt on the trailing edge; the text keeps clear of it.
+    case trailing
+    /// Full width under the text.
+    case bottom
+}
+
 /// "Top category / Food took 38% of spending / 185 000 ₸ ↗ +12.4%" with a `MiniDonut` on the
 /// right.
 ///
@@ -27,35 +60,9 @@ import DesignSupport
 ///            value: .text("21"), unit: "%")
 /// ```
 public struct MetricCard<ChartContent: View>: View {
-    /// The large value.
-    public enum Value: Equatable {
-        /// An amount through `FormattedAmountText`.
-        case amount(Double, currency: String)
-        /// A pre-formatted value ("21", "3.4×").
-        case text(String)
-    }
-
-    /// The trend badge after the value (`TrendBadge`, `.pill`).
-    public struct Trend {
-        public let direction: TrendBadge.Direction
-        public let changePercent: Double?
-        public let color: Color?
-
-        /// - Parameter color: Overrides the direction's colour (expenses, where up is bad).
-        public init(direction: TrendBadge.Direction, changePercent: Double?, color: Color? = nil) {
-            self.direction = direction
-            self.changePercent = changePercent
-            self.color = color
-        }
-    }
-
-    /// Where the chart goes.
-    public enum ChartPlacement: Hashable, Sendable {
-        /// 120 × 120 pt on the trailing edge; the text keeps clear of it.
-        case trailing
-        /// Full width under the text.
-        case bottom
-    }
+    public typealias Value = MetricCardValue
+    public typealias Trend = MetricCardTrend
+    public typealias ChartPlacement = MetricCardChartPlacement
 
     let title: String
     let subtitle: String
