@@ -55,7 +55,7 @@ extension ComponentSnapshots {
                     MessageComposer(
                         text: .constant("Same here, the ice was thin near the north shore"),
                         placeholder: "Reply…",
-                        quote: MessageComposer.Quote(title: "Replying to Aida", text: "Was anyone on the lake this weekend?"),
+                        quote: MessageQuote(title: "Replying to Aida", text: "Was anyone on the lake this weekend?"),
                         errorMessage: "No connection. Try again.",
                         onCancelQuote: {}
                     ) {}

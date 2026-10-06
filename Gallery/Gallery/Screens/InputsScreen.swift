@@ -23,7 +23,7 @@ struct InputsScreen: View {
     @State private var paymentDate = Date()
     @State private var message = ""
     @State private var replyText = "Same here, the ice was thin"
-    @State private var replyQuote: MessageComposer.Quote? = MessageComposer.Quote(
+    @State private var replyQuote: MessageQuote? = MessageQuote(
         title: "Replying to Aida", text: "Was anyone on the lake this weekend?"
     )
     @State private var isSendingMessage = false

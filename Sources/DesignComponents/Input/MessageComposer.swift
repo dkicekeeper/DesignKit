@@ -13,6 +13,20 @@ import SwiftUI
 import DesignTokens
 import DesignSupport
 
+/// A quoted message: who wrote it and what. `MessageComposer` shows the one being answered,
+/// `CommentRow` the one a reply quotes.
+public struct MessageQuote: Equatable, Sendable {
+    /// Who is quoted ("Aida", or "Replying to Aida" in the composer).
+    public let title: String
+    /// The quoted text.
+    public let text: String
+
+    public init(title: String, text: String) {
+        self.title = title
+        self.text = text
+    }
+}
+
 /// A message field with a send button.
 ///
 /// ```swift
@@ -33,22 +47,9 @@ import DesignSupport
 /// VoiceOver labels: keys `composer.send` (default "Send") and `composer.cancelQuote`
 /// (default "Remove quote").
 public struct MessageComposer: View {
-    /// The message being answered, shown above the text.
-    public struct Quote: Equatable, Sendable {
-        /// Who is answered, in the accent colour ("Replying to Aida").
-        public let title: String
-        /// The answered text, on one line.
-        public let text: String
-
-        public init(title: String, text: String) {
-            self.title = title
-            self.text = text
-        }
-    }
-
     @Binding var text: String
     let placeholder: String
-    let quote: Quote?
+    let quote: MessageQuote?
     let isSending: Bool
     let canSend: Bool?
     let errorMessage: String?
@@ -60,7 +61,8 @@ public struct MessageComposer: View {
     @Environment(\.isEnabled) private var isEnabled
 
     /// - Parameters:
-    ///   - quote: Shown above the text; the × calls `onCancelQuote`.
+    ///   - quote: Shown above the text ("Replying to Aida", their text); the × calls
+    ///     `onCancelQuote`.
     ///   - isSending: A spinner replaces the arrow and sending is off.
     ///   - canSend: Whether the text may be sent; by default, when it is not blank.
     ///   - errorMessage: Shown over the field (the last send failed).
@@ -68,7 +70,7 @@ public struct MessageComposer: View {
     public init(
         text: Binding<String>,
         placeholder: String,
-        quote: Quote? = nil,
+        quote: MessageQuote? = nil,
         isSending: Bool = false,
         canSend: Bool? = nil,
         errorMessage: String? = nil,
@@ -157,7 +159,7 @@ public struct MessageComposer: View {
         .accessibilityLabel(String(localized: "composer.send", defaultValue: "Send"))
     }
 
-    private func quoteView(_ quote: Quote) -> some View {
+    private func quoteView(_ quote: MessageQuote) -> some View {
         HStack(spacing: AppSpacing.sm) {
             Capsule()
                 .fill(AppColors.accent)

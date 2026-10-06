@@ -25,6 +25,7 @@ struct SkeletonsScreen: View {
             barsSection
             smallSection
             headersSection
+            communitySection
         }
         .skeletonShimmer(shimmers)
     }
@@ -270,6 +271,33 @@ struct SkeletonsScreen: View {
                 specimen("ExpandableTextSkeleton") { ExpandableTextSkeleton() }
                 specimen("ActivityTimelineSkeleton") { ActivityTimelineSkeleton() }
                 specimen("MonthCalendarSkeleton") { MonthCalendarSkeleton() }
+            }
+        }
+    }
+
+    // MARK: Community & progress
+
+    private var communitySection: some View {
+        ShowcaseSection(title: "Community and progress skeletons", subtitle: "People, comments, reviews, achievements, checklists") {
+            VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                specimen("PersonRowSkeleton") { PersonRowSkeleton() }
+                specimen("CommentRowSkeleton") { CommentRowSkeleton() }
+                specimen("ThreadCardSkeleton") { ThreadCardSkeleton() }
+                specimen("ReviewCardSkeleton") { ReviewCardSkeleton() }
+                specimen("AchievementTileSkeleton · AchievementMedalSkeleton") {
+                    HStack(spacing: AppSpacing.md) {
+                        AchievementTileSkeleton(medalSize: 64)
+                        AchievementTileSkeleton(medalSize: 64)
+                        AchievementMedalSkeleton(size: 40)
+                    }
+                }
+                specimen("AchievementProgressRowSkeleton") { AchievementProgressRowSkeleton() }
+                specimen("ChecklistRowSkeleton") { ChecklistRowSkeleton() }
+                specimen("ChecklistSummaryRowSkeleton") { ChecklistSummaryRowSkeleton() }
+                specimen("StatsStripSkeleton") { StatsStripSkeleton() }
+                specimen("StreakCardSkeleton") { StreakCardSkeleton() }
+                specimen("ThumbnailCardSkeleton") { ThumbnailCardSkeleton() }
+                specimen("ThumbnailRowSkeleton") { ThumbnailRowSkeleton() }
             }
         }
     }

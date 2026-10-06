@@ -59,6 +59,38 @@ extension ComponentSnapshots {
             }
         }
 
+        /// The community and progress components (1.11.0): each card on its own, the rows together.
+        @Test func communityCardSkeletons() async {
+            let cards: [(String, AnyView)] = [
+                ("thread", AnyView(ThreadCardSkeleton())),
+                ("review", AnyView(ReviewCardSkeleton())),
+                ("statsStrip", AnyView(StatsStripSkeleton())),
+                ("streak", AnyView(StreakCardSkeleton())),
+            ]
+            for (name, card) in cards {
+                await assertComponentSnapshot(card, named: name, appearances: [.light])
+            }
+        }
+
+        @Test func communityRowSkeletons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    PersonRowSkeleton()
+                    CommentRowSkeleton()
+                    AchievementProgressRowSkeleton()
+                    ChecklistRowSkeleton()
+                    ChecklistSummaryRowSkeleton()
+                    ThumbnailRowSkeleton()
+                    HStack(alignment: .top, spacing: AppSpacing.md) {
+                        ThumbnailCardSkeleton(width: 160)
+                        AchievementTileSkeleton(medalSize: 64)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark]
+            )
+        }
+
         /// Cards that stack at accessibility text sizes, like their components.
         @Test func stackingCardSkeletons() async {
             await assertComponentSnapshot(
