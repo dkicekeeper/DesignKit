@@ -144,7 +144,7 @@ public struct TargetProgressCard: View {
                     .foregroundStyle(AppColors.textSecondary)
                     .padding(.horizontal, AppSpacing.sm)
                     .padding(.vertical, AppSpacing.xxs)
-                    .background(AppColors.textSecondary.opacity(0.12))
+                    .background(AppColors.pale(AppColors.textSecondary))
                     .clipShape(Capsule())
             }
         }

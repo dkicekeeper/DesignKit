@@ -71,7 +71,7 @@ public struct ScoreGaugeCard: View {
                         .foregroundStyle(color)
                         .padding(.horizontal, AppSpacing.md)
                         .padding(.vertical, AppSpacing.xs)
-                        .background(color.opacity(0.12))
+                        .background(AppColors.pale(color))
                         .clipShape(Capsule())
                         .materialize(delay: 0.45)
                 }

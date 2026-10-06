@@ -65,4 +65,18 @@ public enum AppTypography {
     /// Применяй только для не-критичного декоративного текста (бейджи, мета-информация).
     public static let caption2 = Font.custom(AppInterFont.family, size: 12, relativeTo: .caption2).weight(.regular)
 
+    // MARK: Numbers
+
+    /// `font` with tabular figures: every digit as wide as the others, so amounts in a column
+    /// line up and a number that changes (`.numericText()`) does not jump. Amounts
+    /// (`FormattedAmountText`, the amount input), trend percentages and chart readouts use it;
+    /// use it for any other figure that changes or stacks.
+    ///
+    /// ```swift
+    /// Text(count, format: .number).font(AppTypography.numbers(AppTypography.h3))
+    /// ```
+    public static func numbers(_ font: Font) -> Font {
+        font.monospacedDigit()
+    }
+
 }

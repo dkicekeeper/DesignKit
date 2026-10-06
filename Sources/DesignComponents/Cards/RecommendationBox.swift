@@ -35,7 +35,7 @@ public struct RecommendationBox: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(AppSpacing.md)
-        .background(color.opacity(0.10))
+        .background(AppColors.pale(color))
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.md))
     }
 }

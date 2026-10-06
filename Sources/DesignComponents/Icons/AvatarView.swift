@@ -46,7 +46,7 @@ public struct AvatarView: View {
                     .scaledToFill()
             } else {
                 Circle()
-                    .fill(tint.opacity(0.15))
+                    .fill(AppColors.pale(tint))
                     .overlay {
                         Text(verbatim: Self.initials(from: name))
                             .font(size > 48 ? AppTypography.h3 : AppTypography.bodyEmphasis)

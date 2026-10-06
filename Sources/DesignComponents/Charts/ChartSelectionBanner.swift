@@ -83,12 +83,12 @@ public struct ChartSelectionBanner: View {
                 .lineLimit(1)
             case .custom(let text):
                 Text(verbatim: text(entry.value))
-                    .font(AppTypography.body)
+                    .font(AppTypography.numbers(AppTypography.body))
                     .foregroundStyle(entry.color)
                     .lineLimit(1)
             default:
                 Text(verbatim: ChartValueFormat.compactString(entry.value))
-                    .font(AppTypography.body)
+                    .font(AppTypography.numbers(AppTypography.body))
                     .foregroundStyle(entry.color)
             }
         }

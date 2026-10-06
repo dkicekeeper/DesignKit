@@ -82,7 +82,7 @@ All tokens live in `Sources/DesignTokens/`. Never use raw values — always refe
 
 Modifiers:
 - **`OnDark` / `OnLight`**: the same value in both themes, for content on photos, gradients and coloured headers (a trip photo in Dalada, `GradientOrbsBackground`, an accent hero).
-- **`Pale`**: a tinted container behind status text, badges and icons. `AppColors.pale(_:)` makes one from any colour (a category colour too): 12% in light, 24% in dark.
+- **`Pale`**: a tinted container behind status text, badges and icons. `AppColors.pale(_:)` makes one from any colour (a category colour too): 12% in light, 24% in dark. Since 1.8.0 every tinted container in DesignKit uses it, so they are equally strong everywhere: `BadgeView` (tinted), `TrendBadge` (pill), `RecommendationBox`, `HeroSymbol`, `AvatarView` (initials), `ActivityTimeline` markers, the `ScoreGaugeCard` grade and `TargetProgressCard` badge, `HeroBarPair`'s amount pill, `MonthCalendar`'s today, `TagInput` chips and the calculator's operator keys. Progress tracks and chart fills are not containers and keep their own opacity.
 - **Opaque** (`Border.opaque`): no transparency, for outlines that overlap.
 
 **`AppColors.Text`** — text and icons
@@ -192,6 +192,8 @@ All use Inter variable font with Dynamic Type scaling:
 | `caption2` | 12 | regular | Non-critical decorative text only |
 
 For dynamic-size amount inputs use `Font.custom(AppTypography.fontFamily, …)` directly — that's the one place the family name is exposed.
+
+**Numbers (1.8.0).** `AppTypography.numbers(_:)` is any of the styles above with tabular figures (every digit equally wide): amounts in a column line up and a number that changes (`.numericText()`) keeps its width. `FormattedAmountText`, `AmountDigitDisplay` (the amount input), `TrendBadge` percentages, `ChartSelectionBanner` readouts and the chart legend and pill amounts use it; `StatTile`, `CalculationCard` and `AvatarGroup` already used `.monospacedDigit()`. Use it for any other figure that changes or stacks: `Text(count, format: .number).font(AppTypography.numbers(AppTypography.h3))`.
 
 **Accessibility text sizes (AX1–AX5).** Side-by-side layouts stack when `dynamicTypeSize.isAccessibilitySize` (Apple's HIG rule): a row of columns or a "title …… value" row does not truncate values or break words mid-word, it puts them one under another. Standard sizes keep the side-by-side layout untouched — branch on `isAccessibilitySize`, don't rework the regular layout. Since 1.3.0: `ComparisonCard` (before, now, change), `TotalsCard` (one total per line), `InsightEntityRow` and `BreakdownRow` (the amount under the title), `MenuPickerRow` (the value under the title); since 1.5.1 `BalanceRow` (a detail's amount under its text) and `ProgressRingRow` (spent, "/ limit" and the share on three lines). Snapshot tests check AX2 (`largeText`).
 
@@ -970,7 +972,13 @@ Use for: ALL display-only amounts — detail view balances, row subtitles, card 
 
 **Sign and unit (1.7.0).** `sign: .always` puts "+" before a positive amount and a true minus "−" (U+2212) before a negative one, for changes of money ("+5 000 ₸", "−1 200,50 ₸"); `.never` draws the absolute value; `.automatic` (default) is the 1.x behaviour. With a sign, `prefix` follows it. `currencyDisplay`: `.symbol` (default, "1 200 ₸"), `.code` ("49,90 USD", for foreign currencies or shared symbols), `.systemImage("star.fill")` (points, miles, bonuses), `.numberOnly` (a header names the currency). The compact forms ("1,2 млн") keep the chosen unit.
 
-**Hidden amounts (1.7.0).** `.amountsHidden(_:)` (DesignSupport; environment `amountsHidden`) hides every `FormattedAmountText` below it, and so every card, row and badge built on it: "•••• ₸" (the number and sign go, the unit stays), VoiceOver reads "Hidden amount" (`amount.hidden`). Amount inputs and chart axes are not hidden. The app keeps the switch (a setting) and applies the modifier near the root; `AmountVisibilityToggle(isHidden:)` is the eye button for it (44 pt target, selection haptic, "Hide amounts" / "Show amounts").
+**Hidden amounts (1.7.0).** `.amountsHidden(_:)` (DesignSupport; environment `amountsHidden`) hides every `FormattedAmountText` below it, and so every card, row and badge built on it: "•••• ₸" (the number and sign go, the unit stays), VoiceOver reads "Hidden amount" (`amount.hidden`). Since 1.8.0 also the legend amounts of `HeroProportionBar` and the tap pill of `HeroBarPair`. Amount inputs and chart axes are not hidden. An amount the app writes into its own text reads the environment value and shows `Formatting.hiddenAmount(currency:)` ("•••• ₸"):
+
+```swift
+@Environment(\.amountsHidden) private var amountsHidden
+
+Text(amountsHidden ? Formatting.hiddenAmount(currency: code) : Formatting.formatCurrencySmart(total, currency: code))
+``` The app keeps the switch (a setting) and applies the modifier near the root; `AmountVisibilityToggle(isHidden:)` is the eye button for it (44 pt target, selection haptic, "Hide amounts" / "Show amounts").
 
 ```swift
 @AppStorage("hidesAmounts") private var hidesAmounts = false

@@ -110,6 +110,15 @@ struct ComponentsScreen: View {
                           increaseIsGood: false),
                 ], currency: "KZT")
                 SpentBudgetText(spent: 185_000, budget: 250_000, currency: "KZT")
+                HeroProportionBar(segments: [
+                    DonutSlice(id: "food", amount: 42_000, color: AppColors.accent, label: "Food", percentage: 58),
+                    DonutSlice(id: "rent", amount: 30_000, color: AppColors.success, label: "Rent", percentage: 42),
+                ], currency: "KZT")
+                Text(verbatim: "Own text: " + (hidesAmounts
+                    ? Formatting.hiddenAmount(currency: "KZT")
+                    : Formatting.formatCurrencySmart(48_000, currency: "KZT")))
+                    .font(AppTypography.bodySmall)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
             .amountsHidden(hidesAmounts)
         }
