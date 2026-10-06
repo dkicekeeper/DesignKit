@@ -13,6 +13,9 @@ import DesignSupport
 
 /// "(🍴) Food / 185 000 / 250 000 ₸ (74%)", the ring around the icon at 74%.
 ///
+/// At accessibility text sizes "spent / limit (74%)" does not fit beside the ring: the spent
+/// amount, "/ limit" and the share go on three lines.
+///
 /// A `List` row: it has no padding of its own, the list's row insets place it. Make it
 /// tappable with a `Button` (`.buttonStyle(.plain)`, `.contentShape(Rectangle())`) and add
 /// `.swipeActions` at the call site.
@@ -32,6 +35,8 @@ public struct ProgressRingRow: View {
     let placeholder: String?
     let transitionSourceID: String?
     let transitionNamespace: Namespace.ID?
+
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     /// - Parameters:
     ///   - color: Tints the icon and its circle.
@@ -94,20 +99,7 @@ public struct ProgressRingRow: View {
                     .font(AppTypography.h4)
 
                 if let progress {
-                    HStack(spacing: AppSpacing.xs) {
-                        SpentBudgetText(
-                            spent: progress.spent,
-                            budget: progress.limit,
-                            currency: currency,
-                            fontWeight: .semibold,
-                            amountColor: progress.isOverLimit ? AppColors.destructive : AppColors.textSecondary,
-                            separatorColor: progress.isOverLimit ? AppColors.destructive : AppColors.textSecondary
-                        )
-
-                        Text(verbatim: "(\(Int(progress.percentage))%)")
-                            .font(AppTypography.bodySmall)
-                            .foregroundStyle(AppColors.textSecondary)
-                    }
+                    limitLine(progress)
                 } else if let placeholder {
                     Text(placeholder)
                         .font(AppTypography.bodySmall)
@@ -115,5 +107,54 @@ public struct ProgressRingRow: View {
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private func limitLine(_ progress: LimitProgress) -> some View {
+        let amountColor = progress.isOverLimit ? AppColors.destructive : AppColors.textSecondary
+        if dynamicTypeSize.isAccessibilitySize {
+            // Accessibility text sizes: on one line both amounts were cut to "185… / 250…".
+            VStack(alignment: .leading, spacing: AppSpacing.xxs) {
+                FormattedAmountText(
+                    amount: progress.spent,
+                    currency: currency,
+                    fontSize: AppTypography.bodySmall,
+                    fontWeight: .semibold,
+                    color: amountColor
+                )
+                HStack(spacing: 0) {
+                    Text(verbatim: "/ ")
+                        .font(AppTypography.bodySmall)
+                        .foregroundStyle(amountColor)
+                    FormattedAmountText(
+                        amount: progress.limit,
+                        currency: currency,
+                        fontSize: AppTypography.bodySmall,
+                        fontWeight: .semibold,
+                        color: amountColor
+                    )
+                }
+                percentageText(progress)
+            }
+        } else {
+            HStack(spacing: AppSpacing.xs) {
+                SpentBudgetText(
+                    spent: progress.spent,
+                    budget: progress.limit,
+                    currency: currency,
+                    fontWeight: .semibold,
+                    amountColor: amountColor,
+                    separatorColor: amountColor
+                )
+
+                percentageText(progress)
+            }
+        }
+    }
+
+    private func percentageText(_ progress: LimitProgress) -> some View {
+        Text(verbatim: "(\(Int(progress.percentage))%)")
+            .font(AppTypography.bodySmall)
+            .foregroundStyle(AppColors.textSecondary)
     }
 }

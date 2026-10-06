@@ -14,6 +14,9 @@ import DesignSupport
 
 /// "🏦 Deposit / 2 000 000 ₸ / Posting: 30 Oct · 12 400 ₸ ……… 🔒".
 ///
+/// At accessibility text sizes the detail's amount moves under its text, which then drops a
+/// trailing "·" separator.
+///
 /// A `List` row: it has no padding of its own, the list's row insets place it. Make it
 /// tappable with a `Button` (`.buttonStyle(.plain)`, `.contentShape(Rectangle())`) and add
 /// `.swipeActions` at the call site.
@@ -33,7 +36,8 @@ public struct BalanceRow: View {
 
         /// - Parameters:
         ///   - text: Caption text, in secondary. Include the separator before the amount
-        ///     ("Posting: 30 Oct  ·  ").
+        ///     ("Posting: 30 Oct  ·  "); at accessibility text sizes, where the amount goes on
+        ///     the next line, trailing spaces and "·" are dropped.
         ///   - amount: Follows the text on the same line, in the row's currency.
         ///   - amountColor: `AppColors.planned` by default.
         public init(_ text: String, amount: Double? = nil, amountColor: Color = AppColors.planned) {
@@ -51,6 +55,8 @@ public struct BalanceRow: View {
     let trailingSystemImage: String?
     let transitionSourceID: String?
     let transitionNamespace: Namespace.ID?
+
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     /// - Parameters:
     ///   - detail: A caption line under the amount; `nil` hides it.
@@ -98,20 +104,7 @@ public struct BalanceRow: View {
                 )
 
                 if let detail {
-                    HStack(spacing: 0) {
-                        Text(detail.text)
-                            .font(AppTypography.caption)
-                            .foregroundStyle(.secondary)
-
-                        if let detailAmount = detail.amount {
-                            FormattedAmountText(
-                                amount: detailAmount,
-                                currency: currency,
-                                fontSize: AppTypography.caption,
-                                color: detail.amountColor
-                            )
-                        }
-                    }
+                    detailLine(detail)
                 }
             }
 
@@ -124,4 +117,44 @@ public struct BalanceRow: View {
             }
         }
     }
+
+    @ViewBuilder
+    private func detailLine(_ detail: Detail) -> some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            // Accessibility text sizes: text and amount side by side broke the text mid-phrase
+            // and abbreviated the amount ("12K"), so the amount goes on its own line.
+            VStack(alignment: .leading, spacing: AppSpacing.xxs) {
+                Text(detail.text.trimmingCharacters(in: Self.trailingSeparator))
+                    .font(AppTypography.caption)
+                    .foregroundStyle(.secondary)
+
+                if let detailAmount = detail.amount {
+                    FormattedAmountText(
+                        amount: detailAmount,
+                        currency: currency,
+                        fontSize: AppTypography.caption,
+                        color: detail.amountColor
+                    )
+                }
+            }
+        } else {
+            HStack(spacing: 0) {
+                Text(detail.text)
+                    .font(AppTypography.caption)
+                    .foregroundStyle(.secondary)
+
+                if let detailAmount = detail.amount {
+                    FormattedAmountText(
+                        amount: detailAmount,
+                        currency: currency,
+                        fontSize: AppTypography.caption,
+                        color: detail.amountColor
+                    )
+                }
+            }
+        }
+    }
+
+    /// Spaces and the "·" that separate a detail's text from its amount on one line.
+    private static let trailingSeparator = CharacterSet.whitespaces.union(CharacterSet(charactersIn: "·"))
 }
