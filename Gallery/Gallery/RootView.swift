@@ -52,6 +52,7 @@ struct RootView: View {
                     row("Loading, Steps & More", "rectangle.dashed", .gray) { PatternsScreen() }
                     row("Skeletons", "text.below.photo", .gray) { SkeletonsScreen() }
                     row("Onboarding, Calendar & More", "calendar", .orange) { FlowsScreen() }
+                    row("Community & Progress", "person.2.fill", .green) { CommunityScreen() }
                     row("Forms & Settings", "list.bullet.rectangle.fill", .mint) { FormsScreen() }
                     row("Inputs & Charts", "slider.horizontal.3", .pink) { InputsScreen() }
                     row("Trend Charts", "chart.xyaxis.line", .teal) { TrendChartsScreen() }

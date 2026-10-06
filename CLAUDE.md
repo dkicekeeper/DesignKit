@@ -56,7 +56,7 @@ consumers `import DesignTokens` / `DesignSupport` / `DesignComponents` as needed
 
 | App | How it depends | Notes |
 |---|---|---|
-| Dalada | `ios/Packages/DaladaKit/Package.swift`, `exact: "X.Y.Z"` | Swift 6, iOS 26; green accent via `DesignKitTheme.accent`; uses tokens, `cardStyle`, buttons, `EmptyStateView`, `SectionHeaderView`, `RecommendationBox`, `PlusTabLabel` |
+| Dalada | `ios/Packages/DaladaKit/Package.swift`, `exact: "X.Y.Z"` | Swift 6, iOS 26; green accent via `DesignKitTheme.accent`; uses tokens, `cardStyle`, buttons, `EmptyStateView`, `SectionHeaderView`, `RecommendationBox`, `PlusTabLabel`, and since 1.11.0 `MessageComposer` and the community and progress components (people, comments, threads, reviews, reactions, achievements, checklists, stats, streak, thumbnails), with thin adapters over its models |
 | Tenra | `Tenra.xcodeproj` package reference, exact version | Reference look. `Tenra/Utils/DesignKitBridge.swift` re-exports the three modules, wires the host hooks and keeps the Tenra-model adapters (custom category colours, logo registry, breakdown → `DonutSlice`, the stat-card sparkline) |
 
 A consumer sees a DesignKit change when its pin moves. Each app's **DesignKit update** workflow

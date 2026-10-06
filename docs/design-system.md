@@ -864,8 +864,9 @@ if let accounts {
 | `FormattedAmountText`, `FormattedAmountView`, `ConvertedAmountView`, `SpentBudgetText`, `AmountPercentageView` | `FormattedAmountTextSkeleton(font:width:)`; `RedactableAmount(isLoading: true)` draws one itself |
 | `HeroSection`, `SectionHeaderView`, `SettingsSectionHeaderView`, `DateSectionHeaderView` | `HeroSectionSkeleton`, `SectionHeaderViewSkeleton(style:)` (`.compact` for the settings header), `DateSectionHeaderViewSkeleton` |
 | `ExpandableText`, `ActivityTimeline`, `MonthCalendar` | `…Skeleton` |
+| `PersonRow`, `CommentRow`, `ThreadCard`, `ReviewCard`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.11.0) | `…Skeleton` (`StatsStripSkeleton(count:)`, `AchievementTileSkeleton(medalSize:)`, `ThumbnailCardSkeleton(width:)`, `PersonRowSkeleton(showsSubtitle:)`) |
 
-**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `SegmentedPickerView`, `DateButtonsView`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `BulkDeleteButton`, `EntityActionButton`, `LoadingButtonLabel`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`); messages and flows that appear once something is known (`EmptyStateView`, `EmptyCardView`, `MessageBanner`, `InlineStatusText`, `PromptSheet`, `PermissionPrimerView`, `NotificationPermissionView`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`GradientOrbsBackground`, `SiriGlowView`, `SiriWaveRecordingView`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
+**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPickerView`, `DateButtonsView`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `BulkDeleteButton`, `EntityActionButton`, `LoadingButtonLabel`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`); messages and flows that appear once something is known (`EmptyStateView`, `EmptyCardView`, `MessageBanner`, `InlineStatusText`, `PromptSheet`, `PermissionPrimerView`, `NotificationPermissionView`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`GradientOrbsBackground`, `SiriGlowView`, `SiriWaveRecordingView`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
 
 #### `SkeletonText` *(1.7.0)*
 A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `SkeletonView`. For a component, use its skeleton (above); `.skeleton(isLoading:)` redacts a real view in place, with the system's placeholder shapes.
@@ -1155,6 +1156,36 @@ Return or a comma adds; duplicates (ignoring case) and blanks are dropped; `maxT
 field when full. VoiceOver on ×: key `tags.remove` ("Remove %@"). A fixed set of options →
 `ChipPicker`.
 
+#### `MessageComposer` *(1.11.0)*
+The field at the bottom of a conversation (comments, replies): Liquid Glass that grows to five
+lines, the send button inside it, the quote of the message being answered above the text, the
+send error over the field.
+
+```swift
+List { … }
+    .safeAreaBar(edge: .bottom) {
+        MessageComposer(text: $text, placeholder: String(localized: "comments.placeholder"),
+                        quote: quote, isSending: isSending, canSend: draft.isValid,
+                        errorMessage: sendError, focus: $isFocused,
+                        onCancelQuote: { quote = nil }) {
+            Task { await send() }
+        }
+        .screenPadding()
+        .padding(.bottom, AppSpacing.sm)
+    }
+```
+
+- **Send button:** an accent circle with an arrow; grey while the text is blank (or `canSend` is
+  false), a spinner while `isSending`. The glass corner is concentric with it (radius 20).
+- **Placement:** the glass floats over the content, so use `safeAreaBar` (the scroll edge
+  blurs under it), not a `.bar` background; the caller gives the side margins.
+- **Disabled:** `.disabled(true)` greys it out; let the placeholder say why ("Sign in to
+  comment").
+- **Quote:** `MessageQuote(title: "Replying to Aida", text: …)`, the same type `CommentRow`
+  shows in a reply; the × calls `onCancelQuote`.
+- VoiceOver: keys `composer.send` ("Send") and `composer.cancelQuote` ("Remove quote").
+- An input: no skeleton.
+
 #### `FlowLayout` *(0.7.0)*
 A `Layout` that wraps subviews to new lines like words: tags, badges, chips that should not
 scroll. `FlowLayout(spacing:lineSpacing:) { ForEach(tags, id: \.self) { BadgeView($0) } }`.
@@ -1180,6 +1211,91 @@ Default colour `AppColors.warning`, maximum 5. VoiceOver keys: `rating.value`, `
 Up to three soft, heavily blurred colour orbs (`Orb(color:weight:)`, heaviest first) at fixed positions; weight sets an orb's size and brightness, the first two blur deeper (44) than the third (28), blended `.screen` and rasterised once (`drawingGroup`). Static by design (animating it was the home screen's main jank). Put it behind a glass card, clipped to the card's shape; never inside `List` / `ForEach`. Tenra: `CategoryGradientBackground` (top expense categories → colours) is an adapter.
 
 ---
+
+### Community & Progress Components *(1.11.0)*
+
+Ported from Dalada with neutral names. The app keeps what loads and acts (photos behind signed
+URLs, the reactions store, moderation, the achievement catalogue) and passes views and
+strings in. Gallery: "Community & Progress"; snapshots: `CommunitySnapshotTests`.
+
+#### `PersonRow`
+Avatar (40), name (bodyEmphasis), a caption line under it (the @username, a status) and a
+trailing slot. `PersonRow(name:subtitle:avatar:trailing:)` takes the app's avatar view;
+without `avatar` it draws the initials (`AvatarView`). A row that lives in a `List`: no padding. Dalada: friends, requests,
+search, the people a trip is shared with.
+
+#### `CommentRow` and `MessageQuote`
+A comment or a reply: a 32 pt avatar, the author, the time ("10 minutes ago") on the right
+with a menu slot after it, the quoted message (`MessageQuote(title:text:)`: a grey bar, who,
+three lines of what), the text (`AttributedString`, selectable, bodySmall) and an actions row
+(caption font, 16 apart: reactions, "Reply", "edited"). The same `MessageQuote` is what
+`MessageComposer` shows above the text being written.
+
+```swift
+CommentRow(author: "Timur", date: post.createdAt, text: MentionText.attributed(post.body),
+           quote: quote, avatar: AppAvatar(path: post.author.avatarPath, size: CommentRowMetrics.avatarSize)) {
+    ModerationMenu(…)
+} actions: {
+    ReactionButton(…)
+    Button("Reply") { … }
+}
+```
+
+#### `ThreadCard`
+A discussion in a list (a card): the title (two lines), the start of the text (two lines,
+caption, secondary), and a tertiary caption footer with the replies count (`bubble.left`),
+the author and the last activity on the right.
+`ThreadCard(title:preview:repliesCount:author:lastActivity:)`.
+
+#### `ReviewCard`
+A review (a card): author, `RatingView` (12 pt stars), the time and a menu slot; a caption line
+(when the place was visited); the text in an `ExpandableText` folded to four lines; a media
+slot (photos) and an actions row (12 apart). `ReviewCard(author:rating:date:subtitle:text:menu:media:actions:)`.
+
+#### `ReactionButton`
+A symbol and a count under a post ("👍 12"), or a title ("Helpful · 3"); filled and in the
+accent colour once the user has reacted, a selection haptic on tap, a tap area of at least
+44 pt. With `action: nil` (one's own post, a guest) it is the outlined symbol and the count,
+and nothing at zero. `ReactionButton(systemImage:selectedSystemImage:count:isSelected:title:accessibilityLabel:action:)`.
+A control: no skeleton.
+
+#### `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`
+- **Medal:** an SF Symbol in white on a disc of the achievement's colour once earned; a
+  tertiary symbol on `bgMuted` until then. Decorative for VoiceOver.
+- **Tile:** the medal, the title under it (caption, two lines, centred) and, while not earned,
+  the progress text ("7 of 10", caption2, tertiary). For grids.
+- **Progress row:** a 32 pt medal, "Up next:" (secondary), the title, the progress text on the
+  right and a 6 pt `LinearProgressBar` under them.
+
+#### `ChecklistRow`, `ChecklistSummaryRow`
+- **Item:** `SelectionIndicator` (success tint), the title struck through and secondary once
+  ticked, an optional tertiary mark on the right (`accessorySystemImage`, `accessoryLabel`);
+  a tap calls `onToggle`.
+- **Checklist in a list:** the title with a success seal once complete, a caption line with a
+  calendar (the day it is for), a 6 pt bar (success when complete) and "12 of 20" under it; an
+  empty list says "No items yet". Keys: `checklist.progress %lld %lld`, `checklist.empty`,
+  `checklist.complete`, each replaceable by a parameter (Dalada keeps "Packed").
+
+#### `StatsStrip`
+Counters side by side in a card: the number (h4, tabular, shrinks to 60%) over its caption
+(two lines, centred), equal widths; at accessibility text sizes two columns, so a caption is not
+broken mid-word. `StatsStrip(items: [.init(value: "42", title: "days")])`.
+For one figure with a trend, `StatTile`.
+
+#### `StreakCard`
+A streak in a card: a 24 pt symbol (accent while it runs, tertiary once it stopped), the title
+and what to do next, the best result on the right with its caption.
+`StreakCard(systemImage:isActive:title:subtitle:value:valueCaption:)`.
+
+#### `ThumbnailCard`, `ThumbnailRow`, `ThumbnailPlaceholder`
+Something with a picture: the picture slot (a photo, or `ThumbnailPlaceholder(systemImage:tint:)`,
+a symbol on the pale tint), the title (bodyEmphasis) with an accent seal (`isVerified`) and a
+bookmark (`isSaved`), and a details slot in caption secondary.
+- **Card:** for carousels; the picture is 200 × 110 (`ThumbnailMetrics`), `AppRadius.md`, the
+  bookmark an accent disc on its corner; no glass, no padding.
+- **Row:** for lists; a 64 pt picture on the left, the title on two lines.
+- VoiceOver: keys `thumbnail.verified` ("Verified"), `thumbnail.saved` ("Saved"), or
+  `verifiedLabel` / `savedLabel`.
 
 ### Content Reveal (Loading Transitions)
 
@@ -1398,7 +1514,8 @@ Amount input?
 Text input?
 ├── Hero title (large, animated) → AnimatedTitleInput
 ├── Multiline description → FormTextField(style: .multiline(min:max:))
-└── Single-line form field → FormTextField(style: .standard)
+├── Single-line form field → FormTextField(style: .standard)
+└── A message sent at once (comment, reply) → MessageComposer
 
 Date input?
 ├── Transaction (needs Yesterday/Today shortcuts) → DateButtonsView / .dateButtonsSafeArea()

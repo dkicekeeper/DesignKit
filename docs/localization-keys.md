@@ -37,11 +37,16 @@ text, not keys. A new key goes there as well.
 | `chart.empty.message` | LineChart, BarChart, ChartSwitcher (default `emptyMessage`) | — |
 | `chart.empty.title` | LineChart, BarChart, ChartSwitcher (default `emptyTitle`) | — |
 | `chart.today` | LineChart, BarChart, ChartSwitcher (default `todayText`) | — |
+| `checklist.complete` | ChecklistSummaryRow (VoiceOver on the seal; `completeLabel` replaces it) | `Complete` |
+| `checklist.empty` | ChecklistSummaryRow (no items; `emptyText` replaces it) | `No items yet` |
+| `checklist.progress %lld %lld` | ChecklistSummaryRow (under the bar; `progressText` replaces it) | `%lld of %lld` |
 | `common.cancel` | DateButtonsView | — |
 | `common.changeIcon` | EditableHero (VoiceOver on the icon) | `Change icon` |
 | `common.color` | ColorPickerRow | — |
 | `common.select` | DateButtonsView | — |
 | `common.startDate` | DatePickerRow | — |
+| `composer.cancelQuote` | MessageComposer (VoiceOver on the quote's ×) | `Remove quote` |
+| `composer.send` | MessageComposer (VoiceOver on the send button) | `Send` |
 | `currency.all` | CurrencyList | `All Currencies` |
 | `currency.conversion.approximate` | CurrencyAmountInput | `≈` |
 | `currency.customizeAction` | CurrencyPickerMenu (with `onCustomize`) | `Customize…` |
@@ -114,6 +119,8 @@ text, not keys. A new key goes there as well.
 | `tags.remove` | TagInput (VoiceOver on a tag's ×, arg `%@`) | `Remove %@` |
 | `text.less` | ExpandableText | `Less` |
 | `text.more` | ExpandableText | `More` |
+| `thumbnail.saved` | ThumbnailCard, ThumbnailRow (VoiceOver on the bookmark; `savedLabel` replaces it) | `Saved` |
+| `thumbnail.verified` | ThumbnailCard, ThumbnailRow (VoiceOver on the seal; `verifiedLabel` replaces it) | `Verified` |
 
 Regenerate the table after changing components:
 

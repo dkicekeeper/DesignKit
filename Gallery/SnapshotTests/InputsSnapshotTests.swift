@@ -2,8 +2,8 @@
 //  InputsSnapshotTests.swift
 //  DesignKit Gallery snapshot tests
 //
-//  Pickers, chips, rating input, text fields, tags, the calculator keypad, amount text,
-//  action buttons. Nothing is focused.
+//  Pickers, chips, rating input, text fields, tags, the message composer, the calculator
+//  keypad, amount text, action buttons. Nothing is focused.
 //
 
 import SwiftUI
@@ -45,6 +45,25 @@ extension ComponentSnapshots {
                     FormTextField(text: .constant("-5"), placeholder: "Amount", errorMessage: "Amount must be positive")
                     TagInput("Add a tag", tags: .constant(["Pike", "Early morning"]), suggestions: ["Perch", "Night"])
                 }
+            )
+        }
+
+        @Test func messageComposer() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.lg) {
+                    MessageComposer(text: .constant(""), placeholder: "Add a comment…") {}
+                    MessageComposer(
+                        text: .constant("Same here, the ice was thin near the north shore"),
+                        placeholder: "Reply…",
+                        quote: MessageQuote(title: "Replying to Aida", text: "Was anyone on the lake this weekend?"),
+                        errorMessage: "No connection. Try again.",
+                        onCancelQuote: {}
+                    ) {}
+                    MessageComposer(text: .constant(""), placeholder: "Sign in to comment") {}
+                        .disabled(true)
+                }
+                .frame(maxWidth: .infinity),
+                appearances: [.light, .dark, .largeText]
             )
         }
 
