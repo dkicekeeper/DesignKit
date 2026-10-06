@@ -36,7 +36,7 @@
 | Module | Contents |
 |---|---|
 | `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation`, `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, inline field styles), `AppButton` (`primaryButton`, `secondaryButton`, `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
-| `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `IconView`, `BrandLogoView`, `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `HapticManager`, `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitCurrencyConverter`), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
+| `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `IconView`, `BrandLogoView`, `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `HapticManager`, `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
 | `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2 |
 
 Coverage against Apple HIG, Material 3, Fluent 2, Carbon, Polaris and Atlassian, and the next
@@ -78,7 +78,7 @@ All tokens live in `Sources/DesignTokens/`. Never use raw values — always refe
 
 ### Colors (`AppColors`)
 
-**Semantic colours v2 (1.6.0)**, after T-Bank's TUI: tokens are grouped by what they colour and named *group / name / modifier* (`AppColors.Text.secondaryOnDark`, `AppColors.Status.warningPale`). Every token has a doc comment saying where it goes; the Gallery's Colors page shows them with their use.
+**Semantic colours v2 (1.6.0)**: tokens are grouped by what they colour and named *group / name / modifier* (`AppColors.Text.secondaryOnDark`, `AppColors.Status.warningPale`). Every token has a doc comment saying where it goes; the Gallery's Colors page shows them with their use.
 
 Modifiers:
 - **`OnDark` / `OnLight`**: the same value in both themes, for content on photos, gradients and coloured headers (a trip photo in Dalada, `GradientOrbsBackground`, an accent hero).
@@ -102,7 +102,7 @@ Modifiers:
 |---|---|---|
 | `base` | `.systemBackground` | The screen |
 | `baseAlt` | `.systemGroupedBackground` | A grouped-list screen |
-| `elevation1` / `elevation2` / `elevation3` | white / `#1C1C1E`, `#2C2C2E`, `#3A3A3C` | Sheets and cards on base; cards on elevation 1; above everything. In light a shadow tells the levels apart, in dark the colour (TUI's rule; iOS's own elevated backgrounds) |
+| `elevation1` / `elevation2` / `elevation3` | white / `#1C1C1E`, `#2C2C2E`, `#3A3A3C` | Sheets and cards on base; cards on elevation 1; above everything. In light a shadow tells the levels apart, in dark the colour (iOS's own elevated backgrounds) |
 | `neutral1` | `.secondarySystemBackground` | Opaque, minimal contrast: fields, grouped blocks, inactive chips |
 | `neutral2` | `.systemGray5` | Opaque, more contrast: progress tracks, sunken controls, secondary buttons |
 | `fill` | `.tertiarySystemFill` | Translucent container on any surface, glass included |
@@ -239,6 +239,8 @@ For dynamic-size amount inputs use `Font.custom(AppTypography.fontFamily, …)` 
 | `.contentReveal(isReady:delay:)` | Opacity fade-in when ready | Staggered section reveals during initialization |
 | `.borderBeam(isActive:colors:cornerRadius:lineWidth:duration:)` | Animated glowing beam traveling around the border via rotating `AngularGradient`. Two-layer (sharp + blurred glow). `TimelineView`-driven; ticks only while `isActive == true`. Reduce-Motion aware | Highlighting cards during transient active states (voice recognition preview, focus, processing). Match `cornerRadius` to the underlying card |
 
+**`.fadeTruncation(fadeLength:)`** *(1.7.0)*: one line that fades out over 24 pt at its trailing edge instead of ending in "…", only when it does not fit. For names in carousels and tiles. RTL-aware.
+
 ### Button Styles (`AppButton`)
 
 | Style | Visual | Usage |
@@ -246,8 +248,9 @@ For dynamic-size amount inputs use `Font.custom(AppTypography.fontFamily, …)` 
 | `.primaryButton(disabled:)` | `.glassProminent` + `.tint(AppColors.accent)` + `.controlSize(.large)` | Primary CTA. Sizing follows label — wrap with `.frame(maxWidth: .infinity)` for full-width |
 | `.secondaryButton()` | `.glass` + `.controlSize(.large)` | Cancel, Back, secondary actions |
 | `.buttonStyle(.bounce)` | Scale 0.96 on press | Interactive card taps (non-glass) |
+| `.appButton(_:role:size:disabled:)` *(1.7.0)* | appearance `.primary` (`.glassProminent`) / `.secondary` (`.glass`) / `.flat` (`.borderless`) × role `.normal` (accent; none on secondary) / `.destructive` (`Status.negative`) / `.neutral` (`Text.primary`) × size `.large` / `.medium` / `.small` (control sizes) | The full matrix. `.appButton()` = `.primaryButton()`, `.appButton(.secondary)` = `.secondaryButton()`. Loading: `LoadingButtonLabel` in the label + `disabled: isLoading` |
 
-⚠️ **For destructive buttons, do NOT use `.primaryButton()`** — it forces `.tint(AppColors.accent)` which silently overrides `role: .destructive` (button looks accent-colored instead of red). Use native directly: `.buttonStyle(.glassProminent).tint(AppColors.destructive).controlSize(.large)` with `Button(role: .destructive, ...)`. See [BulkDeleteButton.swift](../Sources/DesignComponents/Input/BulkDeleteButton.swift) and [EntityActionButton.swift](../Sources/DesignComponents/Input/EntityActionButton.swift).
+⚠️ **For destructive buttons, do NOT use `.primaryButton()`** — it forces `.tint(AppColors.accent)` which silently overrides `role: .destructive` (button looks accent-colored instead of red). Since 1.7.0 use `.appButton(role: .destructive)`; before it, the native styles directly: `.buttonStyle(.glassProminent).tint(AppColors.destructive).controlSize(.large)` with `Button(role: .destructive, ...)`. See [BulkDeleteButton.swift](../Sources/DesignComponents/Input/BulkDeleteButton.swift) and [EntityActionButton.swift](../Sources/DesignComponents/Input/EntityActionButton.swift).
 
 **Group adjacent glass elements in `GlassEffectContainer`** (glass can't sample other glass → inconsistent rendering otherwise). Use it for rows of `.glass`/`.glassProminent` buttons or clusters of `.glassEffect()` views; set its `spacing:` to match the stack spacing. Used ungated in app code (app target = iOS 26). Precedents: `EntityDetailScaffold` action bar, `DateButtonsView`, `ChartZoomControls`. Leaf components that still support pre-iOS-26 (`CategoryChip`, `SegmentedPickerView`) gate glass with `#available(iOS 26)` + `.ultraThinMaterial` fallback.
 
@@ -765,6 +768,14 @@ A picker-grid tile: the name (bodyEmphasis, one line) over a 64 pt Liquid Glass 
 
 ### Feedback & Status Components
 
+#### `StatusBanner` *(1.7.0)*
+A notice that stays in the layout, built like `RecommendationBox` (icon, wrapping text, a tinted `AppRadius.md` box) and coloured by status: `status:` `.info` / `.positive` / `.negative` / `.warning` / `.neutral` (icon and `AppColors.Status.*Pale` box), `style:` `.standard` (bodySmall, on a screen) or `.compact` (caption, inside a card). With an `action` it is a `.bounce` button with a `DisclosureChevron`. VoiceOver reads it as one element. For a message that comes and goes use `MessageBanner`; for one line under a field, `InlineStatusText`.
+
+```swift
+StatusBanner("Card expires on 30 Nov", status: .warning)
+StatusBanner("Statement is ready", status: .info) { showStatement() }
+```
+
 #### `MessageBanner`
 Transient animated feedback banner.
 
@@ -815,6 +826,9 @@ action does not dismiss the banner; clear your message state in it.
 ```swift
 MessageBanner(message: "Trip deleted", type: .info, actionTitle: "Undo") { restore(); message = nil }
 ```
+
+#### `SkeletonText` *(1.7.0)*
+A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `SkeletonView`. A whole component as its own placeholder stays `.skeleton(isLoading:)`, which redacts every text and image in place.
 
 #### `SkeletonView` / `SkeletonRow` / `.skeleton(isLoading:)` *(0.6.0)*
 Loading placeholders instead of a spinner: grey shapes in the layout of the content that is
@@ -953,6 +967,20 @@ FormattedAmountText(
 ```
 
 Use for: ALL display-only amounts — detail view balances, row subtitles, card totals, section headers.
+
+**Sign and unit (1.7.0).** `sign: .always` puts "+" before a positive amount and a true minus "−" (U+2212) before a negative one, for changes of money ("+5 000 ₸", "−1 200,50 ₸"); `.never` draws the absolute value; `.automatic` (default) is the 1.x behaviour. With a sign, `prefix` follows it. `currencyDisplay`: `.symbol` (default, "1 200 ₸"), `.code` ("49,90 USD", for foreign currencies or shared symbols), `.systemImage("star.fill")` (points, miles, bonuses), `.numberOnly` (a header names the currency). The compact forms ("1,2 млн") keep the chosen unit.
+
+**Hidden amounts (1.7.0).** `.amountsHidden(_:)` (DesignSupport; environment `amountsHidden`) hides every `FormattedAmountText` below it, and so every card, row and badge built on it: "•••• ₸" (the number and sign go, the unit stays), VoiceOver reads "Hidden amount" (`amount.hidden`). Amount inputs and chart axes are not hidden. The app keeps the switch (a setting) and applies the modifier near the root; `AmountVisibilityToggle(isHidden:)` is the eye button for it (44 pt target, selection haptic, "Hide amounts" / "Show amounts").
+
+```swift
+@AppStorage("hidesAmounts") private var hidesAmounts = false
+
+HStack {
+    FormattedAmountText(amount: balance, currency: "KZT", fontSize: AppTypography.h1)
+    AmountVisibilityToggle(isHidden: $hidesAmounts)
+}
+.amountsHidden(hidesAmounts)
+```
 
 #### `SectionHeaderView`
 Section header text with four styles.
@@ -1404,6 +1432,9 @@ Semantic UI indicator?
 ```
 Transient post-action result?
 └── MessageBanner (.success/.error/.warning/.info)
+
+A notice that stays on the screen or in a card?
+└── StatusBanner (.info/.positive/.negative/.warning/.neutral; action → chevron)
 
 Persistent form validation?
 └── InlineStatusText (.error/.warning/.info/.success)

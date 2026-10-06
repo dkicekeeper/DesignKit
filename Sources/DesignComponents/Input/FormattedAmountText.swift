@@ -22,6 +22,29 @@ public enum AmountDisplayPolicy {
     case compact
 }
 
+/// How the sign of an amount shows.
+public enum AmountSign: Hashable, Sendable {
+    /// As the number formats: a minus on negatives, nothing on positives. Default (1.x).
+    case automatic
+    /// "+" before a positive amount and "−" (U+2212) before a negative one: a change of money
+    /// ("+5 000 ₸", "−1 200 ₸"). Zero has no sign.
+    case always
+    /// No sign: the absolute value.
+    case never
+}
+
+/// What follows the number.
+public enum AmountCurrencyDisplay: Hashable, Sendable {
+    /// The currency's symbol: "1 200 ₸". Default.
+    case symbol
+    /// The ISO code: "1 200 USD", for foreign currencies or symbols shared by several ($).
+    case code
+    /// An SF Symbol instead of a currency: points, miles, bonuses ("1 200 ★").
+    case systemImage(String)
+    /// The number alone, when a header already names the currency.
+    case numberOnly
+}
+
 /// Универсальный компонент для отображения денежных сумм с умной обработкой дробной части
 ///
 /// Логика отображения:
@@ -31,6 +54,9 @@ public enum AmountDisplayPolicy {
 ///
 /// Overflow: see `AmountDisplayPolicy`. VoiceOver always reads the FULL amount, whichever
 /// variant is drawn — an abbreviation is a layout concession, not a change of value.
+///
+/// Under `.amountsHidden()` it draws "•••• ₸" (the unit stays, the number and sign
+/// go) and VoiceOver reads "Hidden amount" (key `amount.hidden`).
 public struct FormattedAmountText: View {
     let amount: Double
     let currency: String
@@ -41,8 +67,19 @@ public struct FormattedAmountText: View {
     let showDecimalsWhenZero: Bool
     let decimalOpacity: Double
     let policy: AmountDisplayPolicy
+    let sign: AmountSign
+    let currencyDisplay: AmountCurrencyDisplay
+
+    @Environment(\.amountsHidden) private var isHidden
 
     /// Инициализатор с полным набором параметров
+    ///
+    /// - Parameters:
+    ///   - prefix: Text before the number. With `sign` other than `.automatic`, it follows
+    ///     the sign.
+    ///   - sign: `.always` for a change of money ("+5 000 ₸", "−1 200 ₸"), `.never` for the
+    ///     absolute value.
+    ///   - currencyDisplay: `.code` ("1 200 USD"), `.systemImage` (points), `.numberOnly`.
     public init(
         amount: Double,
         currency: String,
@@ -52,7 +89,9 @@ public struct FormattedAmountText: View {
         color: Color = .primary,
         showDecimalsWhenZero: Bool = AmountDisplayConfiguration.shared.showDecimalsWhenZero,
         decimalOpacity: Double = AmountDisplayConfiguration.shared.decimalOpacity,
-        policy: AmountDisplayPolicy = .adaptive
+        policy: AmountDisplayPolicy = .adaptive,
+        sign: AmountSign = .automatic,
+        currencyDisplay: AmountCurrencyDisplay = .symbol
     ) {
         self.amount = amount
         self.currency = currency
@@ -63,13 +102,65 @@ public struct FormattedAmountText: View {
         self.showDecimalsWhenZero = showDecimalsWhenZero
         self.decimalOpacity = decimalOpacity
         self.policy = policy
+        self.sign = sign
+        self.currencyDisplay = currencyDisplay
+    }
+
+    // MARK: - Sign and unit
+
+    /// The number drawn: the absolute value when the sign is drawn separately (or not at all).
+    private var displayAmount: Double {
+        sign == .automatic ? amount : abs(amount)
+    }
+
+    /// The sign, then the caller's prefix.
+    private var leadingText: String {
+        switch sign {
+        case .automatic, .never:
+            return prefix
+        case .always:
+            if amount > 0 { return "+" + prefix }
+            if amount < 0 { return "\u{2212}" + prefix }
+            return prefix
+        }
+    }
+
+    /// The unit as plain text (symbol, code), for lengths and VoiceOver; `nil` for an image or
+    /// no unit.
+    private var unitString: String? {
+        switch currencyDisplay {
+        case .symbol: return Formatting.currencySymbol(for: currency)
+        case .code: return currency.uppercased()
+        case .systemImage, .numberOnly: return nil
+        }
+    }
+
+    /// " ₸", " USD", " ★" or nothing, styled like the number.
+    private var unitRun: Text? {
+        let unit: Text
+        switch currencyDisplay {
+        case .symbol, .code:
+            guard let unitString else { return nil }
+            unit = Text(" " + unitString)
+        case .systemImage(let name):
+            unit = Text(" \(Image(systemName: name))")
+        case .numberOnly:
+            return nil
+        }
+        return unit.font(fontSize).fontWeight(fontWeight).foregroundStyle(color)
+    }
+
+    /// `run` followed by the unit, as one `Text`.
+    private func withUnit(_ run: Text) -> Text {
+        guard let unitRun else { return run }
+        return Text("\(run)\(unitRun)")
     }
 
     private var formattedParts: (integer: String, decimal: String, symbol: String) {
         let symbol = Formatting.currencySymbol(for: currency)
         let numberFormatter = AmountDisplayConfiguration.formatter
 
-        let formatted = numberFormatter.string(from: NSNumber(value: amount)) ?? String(format: "%.2f", amount)
+        let formatted = numberFormatter.string(from: NSNumber(value: displayAmount)) ?? String(format: "%.2f", displayAmount)
 
         // Разделяем на целую и дробную части
         let components = formatted.split(separator: Character(AmountDisplayConfiguration.shared.decimalSeparator))
@@ -101,17 +192,23 @@ public struct FormattedAmountText: View {
         // run's own font/weight/foregroundStyle, so the decimal run keeps its reduced
         // opacity exactly as before. Still ONE Text — that is what makes
         // `.minimumScaleFactor` scale the whole amount uniformly (see comment above).
-        let integerRun = Text(prefix + parts.integer)
+        let integerRun = Text(leadingText + parts.integer)
             .font(fontSize).fontWeight(fontWeight).foregroundStyle(color)
         let decimalRun = Text(AmountDisplayConfiguration.shared.decimalSeparator + parts.decimal)
             .font(fontSize).fontWeight(fontWeight).foregroundStyle(color.opacity(decimalOpacity))
-        let symbolRun = Text(" " + parts.symbol)
-            .font(fontSize).fontWeight(fontWeight).foregroundStyle(color)
 
-        if shouldShowDecimal {
-            return Text("\(integerRun)\(decimalRun)\(symbolRun)")
+        // Runs side by side in one interpolation, as in 1.x (no nested Text).
+        switch (shouldShowDecimal, unitRun) {
+        case (true, let unit?): return Text("\(integerRun)\(decimalRun)\(unit)")
+        case (true, nil): return Text("\(integerRun)\(decimalRun)")
+        case (false, let unit?): return Text("\(integerRun)\(unit)")
+        case (false, nil): return integerRun
         }
-        return Text("\(integerRun)\(symbolRun)")
+    }
+
+    /// "•••• ₸": the number and sign hidden, the unit kept.
+    private var hiddenText: Text {
+        withUnit(Text(verbatim: "••••").font(fontSize).fontWeight(fontWeight).foregroundStyle(color))
     }
 
     // MARK: - Compact variants
@@ -120,8 +217,15 @@ public struct FormattedAmountText: View {
     /// No dimmed decimal run here: in "1,2 млн" the digit after the separator is a
     /// significant figure, not a cents tail.
     private func compactText(digits: Int) -> Text {
-        Text(prefix + Formatting.formatCurrencyCompact(amount, currency: currency, maxFractionDigits: digits))
-            .font(fontSize).fontWeight(fontWeight).foregroundStyle(color)
+        if currencyDisplay == .symbol {
+            // One run, as in 1.x.
+            return Text(leadingText + Formatting.formatCurrencyCompact(displayAmount, currency: currency, maxFractionDigits: digits))
+                .font(fontSize).fontWeight(fontWeight).foregroundStyle(color)
+        }
+        return withUnit(
+            Text(leadingText + Formatting.formatCompactNumber(displayAmount, maxFractionDigits: digits))
+                .font(fontSize).fontWeight(fontWeight).foregroundStyle(color)
+        )
     }
 
     /// Fallback candidate for `ViewThatFits`, or the full text when abbreviating wouldn't
@@ -133,18 +237,45 @@ public struct FormattedAmountText: View {
     /// `EmptyView` candidate, which always "fits" and would render nothing at all.
     private func candidate(digits: Int) -> Text {
         let parts = formattedParts
-        let fullLength = (prefix + parts.integer + parts.symbol).count
-        let compact = prefix + Formatting.formatCurrencyCompact(amount, currency: currency, maxFractionDigits: digits)
-        guard compact.count < fullLength else { return composedText }
+        // As in 1.x: the full length counts the unit without its space, the compact one with it.
+        let unit = unitString ?? ""
+        let fullLength = (leadingText + parts.integer + unit).count
+        let compactLength = (leadingText + Formatting.formatCompactNumber(displayAmount, maxFractionDigits: digits)).count
+            + (unit.isEmpty ? 0 : unit.count + 1)
+        guard compactLength < fullLength else { return composedText }
         return compactText(digits: digits)
     }
 
     /// Full amount, always — VoiceOver must not lose precision to a layout decision.
     private var accessibilityText: String {
-        prefix + Formatting.formatCurrencySmart(amount, currency: currency, showDecimalsWhenZero: showDecimalsWhenZero)
+        if isHidden {
+            return String(localized: "amount.hidden", defaultValue: "Hidden amount")
+        }
+        switch currencyDisplay {
+        case .symbol:
+            return leadingText + Formatting.formatCurrencySmart(displayAmount, currency: currency, showDecimalsWhenZero: showDecimalsWhenZero)
+        case .code, .systemImage, .numberOnly:
+            let number = AmountDisplayConfiguration.formatter.string(from: NSNumber(value: displayAmount))
+                ?? String(format: "%.2f", displayAmount)
+            return leadingText + number + (unitString.map { " " + $0 } ?? "")
+        }
     }
 
     public var body: some View {
+        Group {
+            if isHidden {
+                hiddenText.lineLimit(1)
+            } else {
+                amountText
+            }
+        }
+        .contentTransition(.numericText())
+        .animation(AppAnimation.gentleSpring, value: amount)
+        .accessibilityLabel(accessibilityText)
+    }
+
+    @ViewBuilder
+    private var amountText: some View {
         Group {
             switch policy {
             case .full:
@@ -161,8 +292,5 @@ public struct FormattedAmountText: View {
                 }
             }
         }
-        .contentTransition(.numericText())
-        .animation(AppAnimation.gentleSpring, value: amount)
-        .accessibilityLabel(accessibilityText)
     }
 }

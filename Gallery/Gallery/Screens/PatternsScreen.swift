@@ -46,6 +46,16 @@ struct PatternsScreen: View {
             .cardStyle()
         }
 
+        ShowcaseSection(title: "SkeletonText", subtitle: "A line as tall as its text style · grows with Dynamic Type") {
+            VStack(alignment: .leading, spacing: AppSpacing.md) {
+                SkeletonText(AppTypography.h3, width: 180)
+                SkeletonText(AppTypography.body, lines: 3)
+                SkeletonText(AppTypography.caption, width: 120)
+            }
+            .cardContentPadding()
+            .cardStyle()
+        }
+
         ShowcaseSection(title: ".skeleton(isLoading:)", subtitle: "Any view as its own placeholder") {
             Toggle("Loading", isOn: $isLoading)
             HStack(spacing: AppSpacing.md) {

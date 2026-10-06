@@ -35,6 +35,21 @@ struct TypographyScreen: View {
                     }
                 }
             }
+            ShowcaseSection(title: ".fadeTruncation()", subtitle: "One line that fades out instead of \"…\"") {
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    Text("Halyk Bank savings account for the summer trip")
+                        .font(AppTypography.h4)
+                        .fadeTruncation()
+                    Text("Halyk Bank savings account for the summer trip")
+                        .font(AppTypography.h4)
+                        .lineLimit(1)
+                    Text("Fits as it is")
+                        .font(AppTypography.h4)
+                        .fadeTruncation()
+                }
+                .frame(width: 240, alignment: .leading)
+                .foregroundStyle(AppColors.Text.primary)
+            }
         }
     }
 }

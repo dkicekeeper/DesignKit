@@ -15,6 +15,20 @@ extension ComponentSnapshots {
     @MainActor
     @Suite("Feedback")
     struct Feedback {
+        @Test func statusBanners() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.sm) {
+                    StatusBanner("Your statement for September is ready", status: .info) {}
+                    StatusBanner("Payment sent", status: .positive)
+                    StatusBanner("Card expires on 30 Nov", status: .warning)
+                    StatusBanner("Transfer failed: try again later", status: .negative) {}
+                    StatusBanner("Subscription paused", status: .neutral)
+                    StatusBanner("Synced a minute ago", status: .positive, style: .compact)
+                },
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
         @Test func emptyStates() async {
             await assertComponentSnapshot(
                 VStack(spacing: AppSpacing.xl) {

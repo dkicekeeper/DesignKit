@@ -50,6 +50,43 @@ extension ComponentSnapshots {
             )
         }
 
+        @Test func buttonMatrix() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    ForEach([AppButtonRole.normal, .destructive, .neutral], id: \.self) { role in
+                        HStack(spacing: AppSpacing.sm) {
+                            Button {} label: { Text(verbatim: "Primary") }.appButton(.primary, role: role, size: .medium)
+                            Button {} label: { Text(verbatim: "Secondary") }.appButton(.secondary, role: role, size: .medium)
+                            Button {} label: { Text(verbatim: "Flat") }.appButton(.flat, role: role, size: .medium)
+                        }
+                    }
+                    HStack(spacing: AppSpacing.sm) {
+                        Button {} label: { Text(verbatim: "Small") }.appButton(size: .small)
+                        Button {} label: { Text(verbatim: "Disabled") }.appButton(size: .medium, disabled: true)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark]
+            )
+        }
+
+        @Test func fadeTruncation() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    Text(verbatim: "Halyk Bank savings account for the summer trip")
+                        .font(AppTypography.h4)
+                        .fadeTruncation()
+                    Text(verbatim: "Fits as it is")
+                        .font(AppTypography.h4)
+                        .fadeTruncation()
+                }
+                .foregroundStyle(AppColors.Text.primary)
+                .frame(width: 240, alignment: .leading),
+                width: 240,
+                appearances: [.light]
+            )
+        }
+
         @Test func cardAndChips() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {

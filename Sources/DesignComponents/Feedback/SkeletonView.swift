@@ -42,6 +42,56 @@ public struct SkeletonView: View {
     }
 }
 
+/// Placeholder of a line of text in a given style: as tall as that style's line (so it grows
+/// with Dynamic Type), the bar 70% of it.
+///
+/// ```swift
+/// SkeletonText(AppTypography.h4, width: 140)          // a title
+/// SkeletonText(AppTypography.bodySmall, lines: 2)     // a paragraph; the last line is shorter
+/// ```
+public struct SkeletonText: View {
+    let font: Font
+    let width: CGFloat?
+    let lines: Int
+
+    /// - Parameters:
+    ///   - width: The bar's width; full width by default.
+    ///   - lines: With more than one, the last line is 60% as wide.
+    public init(_ font: Font = AppTypography.body, width: CGFloat? = nil, lines: Int = 1) {
+        self.font = font
+        self.width = width
+        self.lines = max(1, lines)
+    }
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.xs) {
+            ForEach(0..<lines, id: \.self) { line in
+                bar(isLast: line == lines - 1 && lines > 1)
+            }
+        }
+        .frame(maxWidth: width ?? .infinity, alignment: .leading)
+        .shimmer()
+        .accessibilityHidden(true)
+    }
+
+    private func bar(isLast: Bool) -> some View {
+        // A hidden line of the style gives the height; the bar is drawn over it, 70% as tall,
+        // centred, and 60% as wide on the last line of several.
+        Text(verbatim: "Ag")
+            .font(font)
+            .hidden()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .overlay(alignment: .leading) {
+                GeometryReader { proxy in
+                    RoundedRectangle(cornerRadius: AppRadius.xs)
+                        .fill(AppColors.bgMuted)
+                        .frame(width: proxy.size.width * (isLast ? 0.6 : 1), height: proxy.size.height * 0.7)
+                        .frame(maxHeight: .infinity)
+                }
+            }
+    }
+}
+
 /// Placeholder of a list row: a round icon and two lines of text.
 ///
 /// ```swift
