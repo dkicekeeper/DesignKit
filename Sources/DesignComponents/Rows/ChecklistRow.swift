@@ -158,7 +158,10 @@ public struct ChecklistSummaryRow: View {
     }
 
     static func defaultProgressText(checked: Int, total: Int) -> String {
-        String(localized: "checklist.progress \(checked) \(total)", defaultValue: "\(checked) of \(total)")
+        String(
+            format: String(localized: "checklist.progress %lld %lld", defaultValue: "%1$lld of %2$lld"),
+            checked, total
+        )
     }
 }
 
