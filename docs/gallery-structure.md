@@ -47,7 +47,7 @@ DesignKit: в Gallery, в `docs/design-system.md` и в папках `Sources/De
 (`cardStyle`, `formCardStyle`, `filterChipStyle`, стекло), **Motion** (кривые, длительности,
 появление контента, `AmbientMotionGate`).
 
-Компоненты (16 разделов, 4–13 страниц в каждом):
+Компоненты (17 разделов, 4–13 страниц в каждом):
 
 | Раздел | Компоненты | Аналог |
 |---|---|---|
