@@ -64,7 +64,10 @@ half4 EdgeGlow(
         + 0.30 * sin(angle * 3.0 + time * 1.1)
         + 0.20 * sin(angle * 5.0 - time * 0.7)
         + 0.15 * sin(angle * 2.0 + time * 1.7);
-    float width = max(thickness * wobble * (1.0 + level * 1.2), 1.0);
+    // The depth follows the voice but stays a fraction of the surface, so a card keeps a dark
+    // middle as a screen does.
+    float reach = min(size.x, size.y) * 0.12;
+    float width = max(min(thickness * (1.0 + level * 1.2), reach) * wobble, 1.0);
 
     // A soft bloom that falls off fast inside, so the middle stays dark even on a small surface,
     // and a hot rim along the exact rounded edge.
