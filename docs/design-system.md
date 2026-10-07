@@ -1278,8 +1278,9 @@ ProgressRing(progress: 0.75, size: AppIconSize.Tile.lg, isOverBudget: false)
 ```
 
 A goal ring (2.3.0): `celebratesCompletion: true` draws a checkmark in at 100 % and plays the
-completion moment (a glow and the success haptic) when it gets there. Off for budgets, where
-100 % is not good news.
+completion moment (a glow and the success haptic) when it gets there. Since 2.3.1 a goal ring is
+green at any fill, one hue with depth like `overrideColor`, never the budget's amber and red,
+also past 100 %. Off for budgets, where 100 % is not good news.
 
 #### `LinearProgressBar(value:)` *(0.4.0)*
 The budget bar's plain form for any progress (downloads, checklists, a followed route):
