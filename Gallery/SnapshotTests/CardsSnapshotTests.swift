@@ -79,13 +79,13 @@ extension ComponentSnapshots {
 
         @Test func entityRowsAndFilters() async {
             await assertComponentSnapshot(
-                InsightEntityRow(
-                    iconSource: .sfSymbol("tv.fill"),
-                    title: "Streaming",
+                // AmountRow with an amount and a caption (InsightEntityRow before 2.1).
+                AmountRow(
+                    "Streaming",
                     subtitle: "3 services",
-                    amount: 12_900,
-                    currency: "KZT",
-                    amountCaption: "per month"
+                    leading: .icon(.sfSymbol("tv.fill")),
+                    value: .amount(12_900, caption: "per month"),
+                    currency: "KZT"
                 )
                 .cardContentPadding()
                 .cardStyle(),

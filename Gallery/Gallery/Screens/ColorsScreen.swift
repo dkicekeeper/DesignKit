@@ -281,7 +281,7 @@ struct ColorsScreen: View {
 
     /// The 30 colours a user picks from (`CategoryColors.pickerPalette`, `ColorPickerRow`'s
     /// default). The first 14, marked "#", are the hash palette too: the colour of a name that
-    /// has none stored (`CategoryColors.hexColor(for:)`: an insight's item, a letter avatar,
+    /// has none stored (`CategoryColors.color(for:)`: an insight's item, a letter avatar,
     /// a category before the user picks one). Under them, a few names and the colour they hash to.
     private var paletteDemo: some View {
         let hashed = CategoryColors.paletteColors.count
@@ -314,7 +314,7 @@ struct ColorsScreen: View {
                 .fixedSize(horizontal: false, vertical: true)
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 76), spacing: AppSpacing.sm)], spacing: AppSpacing.sm) {
                 ForEach(names, id: \.self) { name in
-                    let color = CategoryColors.hexColor(for: name)
+                    let color = CategoryColors.color(for: name)
                     Text(name)
                         .font(AppTypography.caption.weight(.medium))
                         .foregroundStyle(color)

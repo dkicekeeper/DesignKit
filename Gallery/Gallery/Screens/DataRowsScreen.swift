@@ -14,10 +14,8 @@ import DesignComponents
 struct DataRowsScreen: View {
     var body: some View {
         ShowcasePage(title: "Rows: Data") {
-            BalanceRowPage()
-            BreakdownRowPage()
-            ProgressRingRowPage()
-            InsightEntityRowPage()
+            AmountRowPage()
+            AmountRowLimitListPage()
             NetAmountRowPage()
             ScheduleRowPage()
             PersonRowPage()
@@ -40,139 +38,131 @@ private struct InCard<Content: View>: View {
     }
 }
 
-private struct BalanceRowPage: View {
-    @State private var detail = 1
-    @State private var lock = true
+private struct AmountRowPage: View {
+    @State private var style: AmountRow.Style = .info
+    @State private var leading = 1
+    @State private var value = 0
+    @State private var spent = 185_000.0
+    @State private var showsSubtitle = true
+    @State private var detail = 0
+    @State private var accessory = 0
     @State private var hidden = false
     @State private var state: SpecimenState = .content
 
-    private var rowDetail: BalanceRow.Detail? {
+    private var rowLeading: AmountRow.Leading {
+        switch leading {
+        case 0: .icon(.sfSymbol("banknote.fill"))
+        case 1: .tinted(.sfSymbol("fork.knife"), AppColors.warning)
+        default: .none
+        }
+    }
+
+    private var rowValue: AmountRow.Value {
+        switch value {
+        case 0: .amount(85_000, color: style == .list ? AppColors.Text.secondary : AppColors.Text.primary,
+                        caption: style == .info ? "per month" : nil)
+        case 1: .share(85_000, percentage: 42)
+        case 2: .limit(LimitProgress(spent: spent, limit: 250_000))
+        default: .limit(nil, placeholder: "No budget set")
+        }
+    }
+
+    private var rowDetail: AmountRow.Detail? {
         switch detail {
-        case 1: return .init("Posting: 30 Oct  ·  ", amount: 12_400)
-        case 2: return .init("Next posting: 1 Nov")
-        default: return nil
+        case 1: .init("Posting: 30 Oct  ·  ", amount: 12_400)
+        case 2: .init("Next posting: 1 Nov")
+        default: nil
+        }
+    }
+
+    private var rowAccessory: AmountRow.Accessory {
+        switch accessory {
+        case 1: .chevron
+        case 2: .systemImage("lock.square.stack.fill")
+        default: .none
         }
     }
 
     var body: some View {
         ComponentPage(
-            name: "BalanceRow",
-            summary: "An account or deposit in a list: icon, name, balance, a caption line (with an amount) and a trailing mark.",
-            since: "1.5.0",
+            name: "AmountRow",
+            summary: "A row about money: an icon, a name, and an amount, a share or a limit. List style (the value under the name) or info style (the value on the trailing edge).",
+            since: "2.1.0",
             apps: [.tenra],
-            canvas: .fill
+            canvas: .fill,
+            notes: [
+                "2.1.0 merged BalanceRow (list, .amount), ProgressRingRow (list, .limit), BreakdownRow (info, .share) and InsightEntityRow (info, .amount); their names are deprecated wrappers.",
+                "A limit row keeps the ring's room around its icon with or without a limit, so a list of both lines up.",
+                "The info style stacks the value under the name at accessibility text sizes.",
+            ]
         ) {
             InCard {
                 if state == .loading {
-                    BalanceRowSkeleton(showsDetail: detail != 0)
+                    AmountRowSkeleton(style: style, showsRing: value >= 2 && style == .list,
+                                      showsDetail: detail != 0)
                 } else {
-                    BalanceRow(
-                        iconSource: .sfSymbol("banknote.fill"),
-                        title: "Deposit",
-                        amount: 2_000_000,
+                    AmountRow(
+                        value >= 2 ? "Food" : "Deposit",
+                        subtitle: showsSubtitle ? "Groceries, Cafés" : nil,
+                        subtitleLineLimit: 1,
+                        leading: rowLeading,
+                        value: rowValue,
                         currency: "KZT",
+                        style: style,
                         detail: rowDetail,
-                        trailingSystemImage: lock ? "lock.square.stack.fill" : nil
+                        accessory: rowAccessory
                     )
                     .amountsHidden(hidden)
                 }
             }
         } controls: {
             StateControl(state: $state)
-            ChoiceControl("Caption", selection: $detail, options: [("None", 0), ("With amount", 1), ("Text", 2)])
-            ToggleControl("Trailing mark", isOn: $lock)
+            ChoiceControl("Style", selection: $style, options: [("Info", .info), ("List", .list)])
+            ChoiceControl("Icon", selection: $leading, options: [("Icon", 0), ("Tinted", 1), ("None", 2)])
+            ChoiceControl("Value", selection: $value, options: [("Amount", 0), ("Share", 1), ("Limit", 2), ("No limit", 3)])
+            if value == 2 {
+                SliderControl("Spent of 250 000", value: $spent, in: 0...400_000, step: 1_000)
+            }
+            ToggleControl("Subtitle", isOn: $showsSubtitle)
+            ChoiceControl("Detail", selection: $detail, options: [("None", 0), ("With amount", 1), ("Text", 2)])
+            ChoiceControl("Accessory", selection: $accessory, options: [("None", 0), ("Chevron", 1), ("Mark", 2)])
             ToggleControl("Amounts hidden", isOn: $hidden)
         }
     }
 }
 
-private struct BreakdownRowPage: View {
-    @State private var percentage = 42.0
-    @State private var showsSubtitle = true
-    @State private var showsChevron = true
+/// Categories with and without a budget in one list: the names line up (2.1.0; before, a
+/// row without a ring had its icon and name 8 pt to the left).
+private struct AmountRowLimitListPage: View {
     @State private var state: SpecimenState = .content
 
     var body: some View {
         ComponentPage(
-            name: "BreakdownRow",
-            summary: "A part of a whole: icon in its colour, name, amount and share; stacks at large text sizes.",
-            since: "1.2.0",
+            name: "AmountRow: a list of limits",
+            summary: "Categories with and without a budget: every limit row keeps the ring's room, so icons and names line up.",
+            since: "2.1.0",
             apps: [.tenra],
             canvas: .fill
         ) {
             InCard {
                 if state == .loading {
-                    BreakdownRowSkeleton()
+                    ForEach(0..<3, id: \.self) { _ in
+                        AmountRowSkeleton(style: .list, showsRing: true)
+                    }
                 } else {
-                    BreakdownRow(iconSource: .sfSymbol("fork.knife"), color: AppColors.warning, title: "Food",
-                                 subtitle: showsSubtitle ? "Groceries, Cafés" : nil,
-                                 amount: 85_000, currency: "KZT", percentage: percentage,
-                                 showsChevron: showsChevron)
+                    AmountRow("Food", leading: .tinted(.sfSymbol("fork.knife"), .orange),
+                              value: .limit(LimitProgress(spent: 185_000, limit: 250_000)),
+                              currency: "KZT", style: .list)
+                    AmountRow("Transport", leading: .tinted(.sfSymbol("car.fill"), .blue),
+                              value: .limit(nil, placeholder: "No budget set"),
+                              currency: "KZT", style: .list)
+                    AmountRow("Shopping", leading: .tinted(.sfSymbol("bag.fill"), AppColors.accent),
+                              value: .limit(LimitProgress(spent: 320_000, limit: 300_000)),
+                              currency: "KZT", style: .list)
                 }
             }
         } controls: {
             StateControl(state: $state)
-            SliderControl("Share", value: $percentage, in: 0...100, step: 1) { "\(Int($0))%" }
-            ToggleControl("Subtitle", isOn: $showsSubtitle)
-            ToggleControl("Chevron", isOn: $showsChevron)
-        }
-    }
-}
-
-private struct ProgressRingRowPage: View {
-    @State private var spent = 185_000.0
-    @State private var hasLimit = true
-    @State private var state: SpecimenState = .content
-
-    var body: some View {
-        ComponentPage(
-            name: "ProgressRingRow",
-            summary: "A budget in a list: the icon inside its progress ring, spent / limit and the share; red once over.",
-            since: "1.5.0",
-            apps: [.tenra],
-            canvas: .fill
-        ) {
-            InCard {
-                if state == .loading {
-                    ProgressRingRowSkeleton()
-                } else {
-                    ProgressRingRow(iconSource: .sfSymbol("fork.knife"), color: .orange, title: "Food",
-                                    progress: hasLimit ? LimitProgress(spent: spent, limit: 250_000) : nil,
-                                    currency: "KZT", placeholder: "No budget set")
-                }
-            }
-        } controls: {
-            StateControl(state: $state)
-            SliderControl("Spent of 250 000", value: $spent, in: 0...400_000, step: 1_000)
-            ToggleControl("Has a limit", isOn: $hasLimit)
-        }
-    }
-}
-
-private struct InsightEntityRowPage: View {
-    @State private var showsCaption = true
-    @State private var state: SpecimenState = .content
-
-    var body: some View {
-        ComponentPage(
-            name: "InsightEntityRow",
-            summary: "An item in an insight's list: icon, title and subtitle, an amount with a caption.",
-            since: "1.2.0",
-            apps: [.tenra],
-            canvas: .fill
-        ) {
-            InCard {
-                if state == .loading {
-                    InsightEntityRowSkeleton()
-                } else {
-                    InsightEntityRow(iconSource: .sfSymbol("tv.fill"), title: "Streaming",
-                                     subtitle: "3 services", amount: 12_900, currency: "KZT",
-                                     amountCaption: showsCaption ? "per month" : nil)
-                }
-            }
-        } controls: {
-            StateControl(state: $state)
-            ToggleControl("Amount caption", isOn: $showsCaption)
         }
     }
 }

@@ -133,10 +133,17 @@ public struct CategoryColors {
     /// name-coloured visuals (letter avatars) draw from, so both share one palette.
     public nonisolated static var paletteColors: [Color] { palette }
 
-    /// Deterministic color for a category name, hashed into the palette.
+    /// The colour of a name that has none stored, hashed into the 14 palette colours: a
+    /// category before the user picks one, an insight's item, a letter avatar.
     /// (DesignKit drops Tenra's custom-category override; the palette is the single source.)
+    /// `hexColor(for:)` before 2.1.0: it returns a colour, not a hex string.
+    public nonisolated static func color(for name: String, opacity: Double = 1.0) -> Color {
+        palette[paletteIndex(for: name)].opacity(opacity)
+    }
+
+    @available(*, deprecated, renamed: "color(for:opacity:)")
     public nonisolated static func hexColor(for category: String, opacity: Double = 1.0) -> Color {
-        palette[paletteIndex(for: category)].opacity(opacity)
+        color(for: category, opacity: opacity)
     }
 
     /// Palette slot for a category name: the same on every launch and every device.

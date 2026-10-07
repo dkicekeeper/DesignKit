@@ -5,7 +5,7 @@
 //  Summary cards and rows ported from Tenra. 1.1.0: TotalsCard, LimitProgressCard,
 //  WeightBreakdownCard, CalculationCard, NetAmountRow, ScheduleRow. 1.2.0: ComparisonCard,
 //  CashFlowCard (its loading skeleton shimmers, so it is not snapshot), RecurringPaymentCard
-//  (without a base currency: the conversion is async), PayoffProgressCard, BreakdownRow.
+//  (without a base currency: the conversion is async), PayoffProgressCard, AmountRow with a share (BreakdownRow before 2.1).
 //
 
 import SwiftUI
@@ -187,14 +187,16 @@ extension ComponentSnapshots {
             )
         }
 
+        /// `AmountRow` with a share (BreakdownRow before 2.1, the same pixels).
         @Test func breakdownRows() async {
             await assertComponentSnapshot(
                 VStack(spacing: 0) {
-                    BreakdownRow(iconSource: .sfSymbol("fork.knife"), color: AppColors.warning, title: "Food",
-                                 subtitle: "Groceries, Cafés, Delivery", amount: 85_000, currency: "KZT",
-                                 percentage: 42, showsChevron: true)
-                    BreakdownRow(iconSource: .sfSymbol("car.fill"), color: AppColors.accent, title: "Transport",
-                                 amount: 38_000, currency: "KZT", percentage: 19)
+                    AmountRow("Food", subtitle: "Groceries, Cafés, Delivery", subtitleLineLimit: 1,
+                              leading: .tinted(.sfSymbol("fork.knife"), AppColors.warning),
+                              value: .share(85_000, percentage: 42), currency: "KZT", accessory: .chevron)
+                    AmountRow("Transport", subtitleLineLimit: 1,
+                              leading: .tinted(.sfSymbol("car.fill"), AppColors.accent),
+                              value: .share(38_000, percentage: 19), currency: "KZT")
                 }
                 .cardContentPadding()
                 .cardStyle(),

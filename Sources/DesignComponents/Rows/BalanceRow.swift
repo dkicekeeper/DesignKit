@@ -6,6 +6,7 @@
 //  it, and an optional mark on the trailing edge. Ported from Tenra's AccountRow; its account
 //  model, the deposit interest copy, the tap and the swipe-to-delete stay in Tenra as an
 //  adapter.
+//  2.1.0: an `AmountRow` in the list style; this name is deprecated.
 //
 
 import SwiftUI
@@ -27,25 +28,10 @@ import DesignSupport
 ///            detail: .init("Interest today: ", amount: 1_250),
 ///            trailingSystemImage: "lock.square.stack.fill")
 /// ```
+@available(*, deprecated, message: "Use AmountRow(title, leading: .icon(source), value: .amount(amount, color: AppColors.Text.secondary), currency:, style: .list, detail:, accessory: .systemImage(name)).")
 public struct BalanceRow: View {
-    /// A caption line under the amount: text, then an optional amount in `amountColor`.
-    public struct Detail {
-        public let text: String
-        public let amount: Double?
-        public let amountColor: Color
-
-        /// - Parameters:
-        ///   - text: Caption text, in secondary. Include the separator before the amount
-        ///     ("Posting: 30 Oct  ·  "); at accessibility text sizes, where the amount goes on
-        ///     the next line, trailing spaces and "·" are dropped.
-        ///   - amount: Follows the text on the same line, in the row's currency.
-        ///   - amountColor: `AppColors.planned` by default.
-        public init(_ text: String, amount: Double? = nil, amountColor: Color = AppColors.planned) {
-            self.text = text
-            self.amount = amount
-            self.amountColor = amountColor
-        }
-    }
+    /// A caption line under the amount: `AmountRow.Detail` since 2.1.0.
+    public typealias Detail = AmountRow.Detail
 
     let iconSource: IconSource?
     let title: String
@@ -55,8 +41,6 @@ public struct BalanceRow: View {
     let trailingSystemImage: String?
     let transitionSourceID: String?
     let transitionNamespace: Namespace.ID?
-
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     /// - Parameters:
     ///   - detail: A caption line under the amount; `nil` hides it.
@@ -85,84 +69,24 @@ public struct BalanceRow: View {
     }
 
     public var body: some View {
-        HStack(spacing: AppSpacing.md) {
-            Icon(source: iconSource, size: AppIconSize.Tile.sm)
-                .matchedTransitionSourceIfPresent(
-                    id: transitionSourceID,
-                    namespace: transitionNamespace
-                )
-
-            VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                Text(title)
-                    .font(AppTypography.h4)
-
-                FormattedAmountText(
-                    amount: amount,
-                    currency: currency,
-                    fontSize: AppTypography.bodySmall,
-                    color: .secondary
-                )
-
-                if let detail {
-                    detailLine(detail)
-                }
-            }
-
-            Spacer()
-
-            if let trailingSystemImage {
-                Image(systemName: trailingSystemImage)
-                    .foregroundStyle(.secondary)
-                    .font(.system(size: AppIconSize.sm))
-            }
-        }
+        AmountRow(
+            title,
+            leading: .icon(iconSource),
+            value: .amount(amount, color: AppColors.Text.secondary),
+            currency: currency,
+            style: .list,
+            detail: detail,
+            accessory: trailingSystemImage.map(AmountRow.Accessory.systemImage) ?? AmountRow.Accessory.none,
+            transitionSourceID: transitionSourceID,
+            transitionNamespace: transitionNamespace
+        )
     }
-
-    @ViewBuilder
-    private func detailLine(_ detail: Detail) -> some View {
-        if dynamicTypeSize.isAccessibilitySize {
-            // Accessibility text sizes: text and amount side by side broke the text mid-phrase
-            // and abbreviated the amount ("12K"), so the amount goes on its own line.
-            VStack(alignment: .leading, spacing: AppSpacing.xxs) {
-                Text(detail.text.trimmingCharacters(in: Self.trailingSeparator))
-                    .font(AppTypography.caption)
-                    .foregroundStyle(.secondary)
-
-                if let detailAmount = detail.amount {
-                    FormattedAmountText(
-                        amount: detailAmount,
-                        currency: currency,
-                        fontSize: AppTypography.caption,
-                        color: detail.amountColor
-                    )
-                }
-            }
-        } else {
-            HStack(spacing: 0) {
-                Text(detail.text)
-                    .font(AppTypography.caption)
-                    .foregroundStyle(.secondary)
-
-                if let detailAmount = detail.amount {
-                    FormattedAmountText(
-                        amount: detailAmount,
-                        currency: currency,
-                        fontSize: AppTypography.caption,
-                        color: detail.amountColor
-                    )
-                }
-            }
-        }
-    }
-
-    /// Spaces and the "·" that separate a detail's text from its amount on one line.
-    private static let trailingSeparator = CharacterSet.whitespaces.union(CharacterSet(charactersIn: "·"))
 }
 
 // MARK: - Skeleton
 
-/// Placeholder of a `BalanceRow`: the round icon, the title and the amount, and the detail
-/// line when the row has one.
+/// Placeholder of a `BalanceRow`: `AmountRowSkeleton(style: .list, showsDetail:)`.
+@available(*, deprecated, message: "Use AmountRowSkeleton(style: .list, showsDetail:).")
 public struct BalanceRowSkeleton: View {
     let showsDetail: Bool
 
@@ -171,18 +95,6 @@ public struct BalanceRowSkeleton: View {
     }
 
     public var body: some View {
-        HStack(spacing: AppSpacing.md) {
-            IconSkeleton(size: AppIconSize.Tile.sm)
-            VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                SkeletonText(AppTypography.h4, width: 130)
-                SkeletonText(AppTypography.bodySmall, width: 90)
-                if showsDetail {
-                    SkeletonText(AppTypography.caption, width: 150)
-                }
-            }
-            Spacer()
-        }
-        .shimmer()
-        .skeletonLoadingLabel()
+        AmountRowSkeleton(style: .list, showsDetail: showsDetail)
     }
 }

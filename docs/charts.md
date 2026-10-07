@@ -94,7 +94,7 @@ Feature-bound names replaced with reusable ones (old → new; grep for the new n
 
 `ProportionBar` (base two-segment primitive), `LinearProgressBar` (percentage + overshoot), `ProgressRing`, `AmountComparisonBar` (ProportionBar + amount labels) all share the sweep-from-zero entrance pattern: `@State` display value + `onAppear`/`onChange` + Reduce Motion → `.linear(duration: 0)`.
 
-⚠️ **`animatesOnAppear: false` in lazy containers** (`ProgressRingRow`, `ProgressRingTile`, the `MetricCard` feed) — `onAppear` re-fires each time a lazy row re-materialises during scroll, replaying the sweep. Detail screens and one-off cards keep the default `true`.
+⚠️ **`animatesOnAppear: false` in lazy containers** (`AmountRow`'s limit ring, `ProgressRingTile`, the `MetricCard` feed) — `onAppear` re-fires each time a lazy row re-materialises during scroll, replaying the sweep. Detail screens and one-off cards keep the default `true`.
 
 **`ProgressRing` color model** — a static full-circle "trajectory" `AngularGradient` (green ≤45% → warning by 80% → destructive at 100%; over-budget = warning→red) revealed by the animated `trim`. The tip color tracks the fill level continuously with zero interpolation code — do NOT reintroduce threshold-snapped solid colors; gradient stops are progress fractions and must NOT be tied to the animated display value (stops aren't animatable).
 
