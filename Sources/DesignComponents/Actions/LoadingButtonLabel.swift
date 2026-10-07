@@ -4,7 +4,7 @@
 //
 //  Button label that swaps its title for a spinner while an action runs, keeping the
 //  button's width so nothing jumps. (Material / Polaris / Fluent "loading" button state.)
-//  Pair with `.primaryButton(disabled:)` so the button cannot be tapped twice.
+//  Pair with `.dsButton(disabled:)` so the button cannot be tapped twice.
 //
 
 import SwiftUI
@@ -18,10 +18,11 @@ import DesignSupport
 ///     LoadingButtonLabel("Save", isLoading: isSaving)
 ///         .frame(maxWidth: .infinity)
 /// }
-/// .primaryButton(disabled: isSaving)
+/// .dsButton(disabled: isSaving)
 /// ```
 ///
 /// VoiceOver keeps the title and adds the loading state (key `skeleton.loading`).
+@available(*, deprecated, message: "Use DSButton(title, systemImage:, isLoading:, fullWidth:), which keeps the width and blocks taps while loading.")
 public struct LoadingButtonLabel: View {
     let title: String
     let systemImage: String?

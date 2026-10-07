@@ -3,7 +3,7 @@
 //  Tenra
 //
 //  Voice recording glow overlay wrapper.
-//  Uses SiriGlowView (MeshGradient-based) for the visual effect.
+//  Uses SiriGlow (MeshGradient-based) for the visual effect.
 //
 
 import SwiftUI
@@ -13,14 +13,14 @@ import DesignSupport
 /// Apple Intelligence–style edge glow overlay.
 /// Designed as a full-screen `.overlay()` — passes through all touches.
 /// Fades in on appear for smooth transition.
-public struct SiriWaveRecordingView: View {
+public struct SiriWave: View {
 
     @State private var isVisible = false
 
     public init() {}
 
     public var body: some View {
-        SiriGlowView()
+        SiriGlow()
             .opacity(isVisible ? 1 : 0)
             .allowsHitTesting(false)
             .onAppear {
@@ -33,3 +33,7 @@ public struct SiriWaveRecordingView: View {
 
 // MARK: - Preview
 
+// MARK: - Names before 2.0
+
+@available(*, deprecated, renamed: "SiriWave")
+public typealias SiriWaveRecordingView = SiriWave

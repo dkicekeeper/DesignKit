@@ -94,7 +94,7 @@ public struct ScheduleRowSkeleton: View {
 
     public var body: some View {
         HStack(alignment: .top, spacing: AppSpacing.md) {
-            SkeletonView.circle(AppIconSize.lg)
+            Skeleton.circle(AppIconSize.lg)
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 SkeletonText(AppTypography.bodyEmphasis, width: 120)
                 SkeletonText(AppTypography.bodySmall, width: 90)

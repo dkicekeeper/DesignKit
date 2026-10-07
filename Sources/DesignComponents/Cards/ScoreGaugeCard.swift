@@ -107,7 +107,7 @@ public struct ScoreGaugeCardSkeleton: View {
                         .hidden()
                         .padding(.horizontal, AppSpacing.md)
                         .padding(.vertical, AppSpacing.xs)
-                        .background(SkeletonView.fill, in: Capsule())
+                        .background(Skeleton.fill, in: Capsule())
                 }
             }
             SkeletonText(AppTypography.bodyEmphasis, width: 180)

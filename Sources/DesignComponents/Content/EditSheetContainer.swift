@@ -98,7 +98,7 @@ public struct EditSheetContainer<Content: View>: View {
                 Image(systemName: "checkmark")
             }
             .disabled(isSaveDisabled)
-            .primaryButton()
+            .dsButton()
             .accessibilityLabel(String(localized: "button.save"))
         }
     }

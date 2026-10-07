@@ -57,7 +57,7 @@ public struct CurrencyList: View {
 
                 // Empty only while searching: an empty query lists every currency.
                 if filteredCurrencies.isEmpty {
-                    EmptyStateView(
+                    EmptyState(
                         icon: "magnifyingglass",
                         title: String(localized: "currency.noResults.title", defaultValue: "No currencies found"),
                         description: String(localized: "currency.noResults.description", defaultValue: "Try a different name or code.")

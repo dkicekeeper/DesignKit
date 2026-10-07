@@ -23,19 +23,19 @@ import DesignSupport
 /// ```
 ///
 /// Padding: none, like a row that lives in a `List` (design-system §10).
-public struct PersonRow<Avatar: View, Trailing: View>: View {
+public struct PersonRow<AvatarContent: View, Trailing: View>: View {
     let name: String
     let subtitle: String?
-    let avatar: Avatar
+    let avatar: AvatarContent
     let trailing: Trailing
 
     /// - Parameters:
     ///   - subtitle: Under the name, in the secondary colour (the @username).
-    ///   - avatar: The person's picture, `AppIconSize.Tile.xs` (40) across.
+    ///   - avatar: The person's picture, `AppIconSize.xxl` (40) across.
     public init(
         name: String,
         subtitle: String? = nil,
-        avatar: Avatar,
+        avatar: AvatarContent,
         @ViewBuilder trailing: () -> Trailing = { EmptyView() }
     ) {
         self.name = name
@@ -65,14 +65,14 @@ public struct PersonRow<Avatar: View, Trailing: View>: View {
     }
 }
 
-public extension PersonRow where Avatar == AvatarView {
+public extension PersonRow where AvatarContent == Avatar {
     /// With the name's initials for the avatar.
     init(
         name: String,
         subtitle: String? = nil,
         @ViewBuilder trailing: () -> Trailing = { EmptyView() }
     ) {
-        self.init(name: name, subtitle: subtitle, avatar: AvatarView(name: name), trailing: trailing)
+        self.init(name: name, subtitle: subtitle, avatar: Avatar(name: name), trailing: trailing)
     }
 }
 
@@ -88,7 +88,7 @@ public struct PersonRowSkeleton: View {
 
     public var body: some View {
         HStack(spacing: AppSpacing.md) {
-            SkeletonView.circle(AppIconSize.Tile.xs)
+            Skeleton.circle(AppIconSize.xxl)
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
                 SkeletonText(AppTypography.bodyEmphasis, width: 140)
                 if showsSubtitle {

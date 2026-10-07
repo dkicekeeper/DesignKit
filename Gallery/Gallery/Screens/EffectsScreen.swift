@@ -12,8 +12,8 @@ import DesignComponents
 struct EffectsScreen: View {
     var body: some View {
         ShowcasePage(title: "Effects") {
-            SiriWaveRecordingViewPage()
-            SiriGlowViewPage()
+            SiriWavePage()
+            SiriGlowPage()
             GradientOrbsBackgroundPage()
             AccentGlowPage()
             BorderBeamPage()
@@ -21,17 +21,17 @@ struct EffectsScreen: View {
     }
 }
 
-private struct SiriWaveRecordingViewPage: View {
+private struct SiriWavePage: View {
     @State private var height = 220.0
 
     var body: some View {
         ComponentPage(
-            name: "SiriWaveRecordingView",
+            name: "SiriWave",
             summary: "The voice input wave while recording, on a dark backdrop like the app's recording screen.",
             apps: [.tenra],
             canvas: .dark(minHeight: 260)
         ) {
-            SiriWaveRecordingView()
+            SiriWave()
                 .frame(maxWidth: .infinity)
                 .frame(height: height)
         } controls: {
@@ -40,10 +40,10 @@ private struct SiriWaveRecordingViewPage: View {
     }
 }
 
-private struct SiriGlowViewPage: View {
+private struct SiriGlowPage: View {
     var body: some View {
         ComponentPage(
-            name: "SiriGlowView",
+            name: "SiriGlow",
             summary: "An Apple-Intelligence edge glow around a surface while the app is listening or thinking.",
             apps: [.tenra],
             canvas: .dark(minHeight: 300)
@@ -51,7 +51,7 @@ private struct SiriGlowViewPage: View {
             ZStack {
                 RoundedRectangle(cornerRadius: AppRadius.xl)
                     .fill(Color(white: 0.12))
-                SiriGlowView()
+                SiriGlow()
                     .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl))
                 Text("Listening…")
                     .font(AppTypography.h4)

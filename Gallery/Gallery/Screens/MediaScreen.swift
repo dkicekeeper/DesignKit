@@ -14,11 +14,11 @@ import DesignComponents
 struct MediaScreen: View {
     var body: some View {
         ShowcasePage(title: "Media & Identity") {
-            IconViewPage()
-            AvatarViewPage()
+            IconPage()
+            AvatarPage()
             AvatarGroupPage()
             HeroSymbolPage()
-            PackedCircleIconsViewPage()
+            PackedCircleIconsPage()
             AchievementMedalPage()
             AchievementTilePage()
             AchievementProgressRowPage()
@@ -27,7 +27,7 @@ struct MediaScreen: View {
     }
 }
 
-private struct IconViewPage: View {
+private struct IconPage: View {
     @State private var source = 0
     @State private var shape = 0
     @State private var tint = 0
@@ -65,18 +65,18 @@ private struct IconViewPage: View {
 
     var body: some View {
         ComponentPage(
-            name: "IconView",
+            name: "Icon",
             summary: "Every icon: an SF Symbol or a brand logo (loaded by the app's DesignKitLogoLoader), in a shape, a size, a tint, on glass or not.",
             apps: [.tenra, .dalada],
             notes: [
-                "A brand logo is IconView(source: .brandService(\"netflix.com\")); BrandLogoView is its engine, deprecated as a view of its own since 1.13.0.",
-                "Sizes: AppIconSize (glyphs) and AppIconSize.Tile (icons with a backing).",
+                "A brand logo is Icon(source: .brandService(\"netflix.com\")); BrandLogoView, its view of its own, was removed in 2.0.0.",
+                "Sizes: AppIconSize (glyphs, xs 12 to xxl 40) and AppIconSize.Tile (icons with a backing, sm 44 to xxxl 80).",
             ]
         ) {
             if state == .loading {
-                IconViewSkeleton(style: style)
+                IconSkeleton(style: style)
             } else {
-                IconView(source: iconSource, style: style)
+                Icon(source: iconSource, style: style)
             }
         } controls: {
             StateControl(state: $state)
@@ -89,23 +89,23 @@ private struct IconViewPage: View {
     }
 }
 
-private struct AvatarViewPage: View {
+private struct AvatarPage: View {
     @State private var name = "Aida Nurlanovna"
-    @State private var size = Double(AppIconSize.Tile.xs)
+    @State private var size = Double(AppIconSize.xxl)
     @State private var hasPhoto = false
     @State private var state: SpecimenState = .content
 
     var body: some View {
         ComponentPage(
-            name: "AvatarView",
+            name: "Avatar",
             summary: "A round avatar: the photo when there is one, otherwise the initials on a pale tint.",
             since: "0.4.0",
             apps: [.dalada]
         ) {
             if state == .loading {
-                AvatarViewSkeleton(size: size)
+                AvatarSkeleton(size: size)
             } else {
-                AvatarView(name: name, image: hasPhoto ? Image(systemName: "photo.artframe") : nil, size: size)
+                Avatar(name: name, image: hasPhoto ? Image(systemName: "photo.artframe") : nil, size: size)
             }
         } controls: {
             StateControl(state: $state)
@@ -169,7 +169,7 @@ private struct HeroSymbolPage: View {
     }
 }
 
-private struct PackedCircleIconsViewPage: View {
+private struct PackedCircleIconsPage: View {
     @State private var maxVisible = 5
     @State private var width = 120.0
     @State private var state: SpecimenState = .content
@@ -184,14 +184,14 @@ private struct PackedCircleIconsViewPage: View {
 
     var body: some View {
         ComponentPage(
-            name: "PackedCircleIconsView",
+            name: "PackedCircleIcons",
             summary: "Icons packed as circles sized by their amounts: the accounts of a home card.",
             apps: [.tenra]
         ) {
             if state == .loading {
-                PackedCircleIconsViewSkeleton(containerWidth: width)
+                PackedCircleIconsSkeleton(containerWidth: width)
             } else {
-                PackedCircleIconsView(items: items, maxVisible: maxVisible, containerWidth: width)
+                PackedCircleIcons(items: items, maxVisible: maxVisible, containerWidth: width)
             }
         } controls: {
             StateControl(state: $state)

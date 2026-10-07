@@ -112,9 +112,9 @@ public struct EditableHero: View {
             showsIconPicker = true
         } label: {
             if let iconTint {
-                IconView(source: icon ?? .sfSymbol("star.fill"), style: .glassHero(tint: .monochrome(iconTint)))
+                Icon(source: icon ?? .sfSymbol("star.fill"), style: .glassHero(tint: .monochrome(iconTint)))
             } else {
-                IconView(source: icon, style: .glassHero())
+                Icon(source: icon, style: .glassHero())
             }
         }
         .buttonStyle(.plain)

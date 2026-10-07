@@ -119,7 +119,7 @@ private struct StaggeredEntrancePage: View {
                 ForEach(0..<6, id: \.self) { index in
                     Circle()
                         .fill(CategoryColors.hexColor(for: "icon\(index)"))
-                        .frame(width: AppIconSize.Tile.xs, height: AppIconSize.Tile.xs)
+                        .frame(width: AppIconSize.xxl, height: AppIconSize.xxl)
                         .overlay(Image(systemName: "person.fill").foregroundStyle(.white))
                         .overlay(Circle().strokeBorder(AppColors.bgBase, lineWidth: 2))
                         .staggeredEntrance(delay: Double(index) * AppAnimation.facepileStagger)

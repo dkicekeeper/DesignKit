@@ -49,7 +49,7 @@ public struct FinanceCard<Hero: View, Trailing: View>: View {
                     .foregroundStyle(AppColors.Text.primary)
 
                 if isEmpty {
-                    EmptyStateView(title: emptyTitle, style: .compact)
+                    EmptyState(title: emptyTitle, style: .compact)
                         .transition(.opacity)
                 } else {
                     VStack(alignment: .leading, spacing: AppSpacing.sm) {
@@ -123,7 +123,7 @@ public struct RedactableAmount: View {
 // MARK: - Skeleton
 
 /// Placeholder of a `FinanceCard`: the same card, the title, the hero amount and subtitle,
-/// and the packed circles of icons on the trailing edge (`PackedCircleIconsViewSkeleton`).
+/// and the packed circles of icons on the trailing edge (`PackedCircleIconsSkeleton`).
 public struct FinanceCardSkeleton: View {
     let showsTrailing: Bool
 
@@ -144,7 +144,7 @@ public struct FinanceCardSkeleton: View {
             .frame(maxWidth: .infinity, alignment: .leading)
 
             if showsTrailing {
-                PackedCircleIconsViewSkeleton()
+                PackedCircleIconsSkeleton()
             }
         }
         .shimmer()

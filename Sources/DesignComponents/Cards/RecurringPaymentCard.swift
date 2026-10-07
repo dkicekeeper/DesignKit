@@ -29,7 +29,7 @@ public struct RecurringPaymentCard: View {
     let status: EntityStatus?
 
     /// - Parameters:
-    ///   - baseCurrency: Adds the amount converted to this currency (`ConvertedAmountView`,
+    ///   - baseCurrency: Adds the amount converted to this currency (`ConvertedAmount`,
     ///     through `DesignKitCurrencyConverter`) when it differs from `currency`.
     ///   - caption: A line at the bottom ("Next charge on 12 Oct").
     ///   - status: A mark on the trailing edge; `nil` hides it.
@@ -53,7 +53,7 @@ public struct RecurringPaymentCard: View {
 
     public var body: some View {
         HStack(spacing: AppSpacing.md) {
-            IconView(
+            Icon(
                 source: iconSource,
                 size: AppIconSize.Tile.sm
             )
@@ -71,7 +71,7 @@ public struct RecurringPaymentCard: View {
                 )
 
                 if let baseCurrency, !baseCurrency.isEmpty, currency != baseCurrency {
-                    ConvertedAmountView(
+                    ConvertedAmount(
                         amount: amount,
                         fromCurrency: currency,
                         toCurrency: baseCurrency,
@@ -109,7 +109,7 @@ public struct RecurringPaymentCardSkeleton: View {
 
     public var body: some View {
         HStack(spacing: AppSpacing.md) {
-            IconViewSkeleton(size: AppIconSize.Tile.sm)
+            IconSkeleton(size: AppIconSize.Tile.sm)
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 SkeletonText(AppTypography.bodyEmphasis, width: 120)
                 SkeletonText(AppTypography.body, width: 90)

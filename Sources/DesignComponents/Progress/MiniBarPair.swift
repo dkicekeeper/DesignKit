@@ -147,7 +147,7 @@ public struct MiniBarPairSkeleton: View {
             topLeadingRadius: MiniBarPair.cornerRadius,
             topTrailingRadius: MiniBarPair.cornerRadius
         )
-        .fill(SkeletonView.fill)
+        .fill(Skeleton.fill)
         .frame(width: barWidth, height: height)
     }
 }

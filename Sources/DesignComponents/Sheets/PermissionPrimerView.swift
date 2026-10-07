@@ -2,35 +2,17 @@
 //  PermissionPrimerView.swift
 //  DesignKit
 //
-//  Our explanation before the system permission alert (HIG "Requesting permission"): why the
-//  app needs it, then "Allow" (shows the system alert) or "Not now". One layout for both apps
-//  since 0.7.0: it replaced Tenra's NotificationPermissionView layout and Dalada's
-//  NotificationPrimerView. Presentation (sheet, detent, snoozing "Not now") stays in the app.
+//  The permission primer of 0.7.0–1.x. Since 2.0.0 PromptSheet is the one sheet of its kind;
+//  this wrapper keeps the primer's behaviour (no self-dismiss, no detent) for old callers.
 //
 
 import SwiftUI
 import DesignTokens
 import DesignSupport
 
-/// Symbol, title, explanation, and two buttons. Fits a `.medium` sheet.
-///
-/// ```swift
-/// .sheet(isPresented: $showsPrimer) {
-///     PermissionPrimerView(
-///         systemImage: "bell.badge",
-///         title: String(localized: "push.primer.title"),
-///         message: String(localized: "push.primer.body"),
-///         allowTitle: String(localized: "push.primer.allow"),
-///         laterTitle: String(localized: "push.primer.later"),
-///         onAllow: { await PushRegistrar.shared.requestPermission(); showsPrimer = false },
-///         onLater: { showsPrimer = false }
-///     )
-///     .presentationDetents([.medium])
-/// }
-/// ```
-///
-/// The view does not dismiss itself: close it in `onAllow` / `onLater`. While `onAllow` runs
-/// (the system alert is up) the Allow button shows a spinner and both buttons are disabled.
+/// The permission primer: since 2.0.0 a `PromptSheet` that does not close itself or set its
+/// detent, as the primer did.
+@available(*, deprecated, message: "Use PromptSheet(systemImage:title:message:primaryTitle:secondaryTitle:detent: nil, dismissesOnAnswer: false, onPrimary:onSecondary:).")
 public struct PermissionPrimerView: View {
     let systemImage: String
     let title: String
@@ -39,8 +21,6 @@ public struct PermissionPrimerView: View {
     let laterTitle: String
     let onAllow: () async -> Void
     let onLater: () -> Void
-
-    @State private var isRequesting = false
 
     public init(
         systemImage: String,
@@ -61,51 +41,16 @@ public struct PermissionPrimerView: View {
     }
 
     public var body: some View {
-        VStack(spacing: AppSpacing.lg) {
-            HeroSymbol(systemImage: systemImage, size: 104)
-                .padding(.top, AppSpacing.xxl)
-
-            VStack(spacing: AppSpacing.sm) {
-                Text(verbatim: title)
-                    .font(AppTypography.h3)
-                    .foregroundStyle(AppColors.Text.primary)
-                    .multilineTextAlignment(.center)
-                    .accessibilityAddTraits(.isHeader)
-                Text(verbatim: message)
-                    .font(AppTypography.body)
-                    .foregroundStyle(AppColors.Text.secondary)
-                    .multilineTextAlignment(.center)
-            }
-            .fixedSize(horizontal: false, vertical: true)
-
-            Spacer(minLength: 0)
-
-            VStack(spacing: AppSpacing.sm) {
-                Button {
-                    HapticManager.light()
-                    isRequesting = true
-                    Task {
-                        await onAllow()
-                        isRequesting = false
-                    }
-                } label: {
-                    LoadingButtonLabel(allowTitle, isLoading: isRequesting)
-                        .frame(maxWidth: .infinity)
-                }
-                .primaryButton(disabled: isRequesting)
-
-                Button {
-                    HapticManager.light()
-                    onLater()
-                } label: {
-                    Text(verbatim: laterTitle)
-                        .frame(maxWidth: .infinity)
-                }
-                .secondaryButton()
-                .disabled(isRequesting)
-            }
-        }
-        .screenPadding()
-        .padding(.bottom, AppSpacing.lg)
+        PromptSheet(
+            systemImage: systemImage,
+            title: title,
+            message: message,
+            primaryTitle: allowTitle,
+            secondaryTitle: laterTitle,
+            detent: nil,
+            dismissesOnAnswer: false,
+            onPrimary: onAllow,
+            onSecondary: onLater
+        )
     }
 }

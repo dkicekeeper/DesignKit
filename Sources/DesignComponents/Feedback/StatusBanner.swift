@@ -142,7 +142,7 @@ public struct StatusBannerSkeleton: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, AppSpacing.md)
         .padding(.vertical, style == .standard ? AppSpacing.md : AppSpacing.sm)
-        .background(SkeletonView.fill, in: RoundedRectangle(cornerRadius: AppRadius.md))
+        .background(Skeleton.fill, in: RoundedRectangle(cornerRadius: AppRadius.md))
         .shimmer()
         .skeletonLoadingLabel()
     }

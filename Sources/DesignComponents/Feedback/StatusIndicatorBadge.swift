@@ -100,7 +100,7 @@ public struct StatusIndicatorBadgeSkeleton: View {
         Image(systemName: "circle.fill")
             .font(font)
             .hidden()
-            .background(SkeletonView.fill, in: Circle())
+            .background(Skeleton.fill, in: Circle())
             .shimmer()
             .skeletonLoadingLabel()
     }

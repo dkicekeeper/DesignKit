@@ -88,7 +88,7 @@ public struct OnboardingPageContainer<Content: View>: View {
                 Text(primaryButtonTitle)
                     .frame(maxWidth: .infinity)
             }
-            .primaryButton()
+            .dsButton()
             .disabled(!primaryButtonEnabled)
             .screenPadding()
         }

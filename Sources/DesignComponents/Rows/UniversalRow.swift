@@ -2,12 +2,12 @@
 //  UniversalRow.swift
 //  Tenra
 //
-//  Universal row component with IconView integration and Design System compliance
+//  Universal row component with Icon integration and Design System compliance
 //  Created: 2026-02-16
 //
 //  Architecture:
 //  - Generic ViewBuilders for content and trailing elements
-//  - IconView integration for leading icons
+//  - Icon integration for leading icons
 //  - Presets for common use cases (settings, selectable, info)
 //  - Modifiers for interactive behavior (navigation, action, selectable)
 //
@@ -62,7 +62,7 @@ import DesignSupport
 // MARK: - Universal Row Component
 
 /// Universal row component for consistent UI patterns across the app
-/// Integrates with IconView for leading icons and supports flexible content
+/// Integrates with Icon for leading icons and supports flexible content
 public struct UniversalRow<Content: View, Trailing: View>: View {
 
     // MARK: - Properties
@@ -99,9 +99,9 @@ public struct UniversalRow<Content: View, Trailing: View>: View {
     public var body: some View {
         let stack = VStack(alignment: .leading, spacing: hint != nil ? AppSpacing.xs : 0) {
             HStack(spacing: config.spacing) {
-                // Leading icon via IconView
+                // Leading icon via Icon
                 if let iconConfig = leadingIcon {
-                    IconView(
+                    Icon(
                         source: iconConfig.source,
                         style: iconConfig.style
                     )
@@ -204,7 +204,7 @@ public struct IconConfig {
     }
 
     /// Auto-select style based on source type
-    /// Mirrors IconView convenience init: sfSymbol→categoryIcon, brandService→serviceLogo
+    /// Mirrors Icon convenience init: sfSymbol→categoryIcon, brandService→serviceLogo
     /// - Parameters:
     ///   - source: IconSource
     ///   - size: Icon size (default: AppIconSize.xl)
@@ -513,7 +513,7 @@ public struct UniversalRowSkeleton: View {
     public var body: some View {
         HStack(spacing: config.spacing) {
             if let iconStyle {
-                IconViewSkeleton(style: iconStyle)
+                IconSkeleton(style: iconStyle)
             }
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 SkeletonText(titleFont, width: 140)
@@ -540,9 +540,9 @@ public struct UniversalRowSkeleton: View {
         case .chevron:
             DisclosureChevron()
         case .toggle:
-            SkeletonView.capsule(height: 31, width: 51)
+            Skeleton.capsule(height: 31, width: 51)
         case .capsule:
-            SkeletonView.capsule(height: 34, width: 110)
+            Skeleton.capsule(height: 34, width: 110)
         }
     }
 }

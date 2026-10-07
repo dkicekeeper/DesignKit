@@ -92,7 +92,7 @@ public extension View {
 /// Triggers once on first appearance. Respects Reduce Motion accessibility setting.
 ///
 /// ```swift
-/// IconView(source: account.iconSource, style: iconStyle)
+/// Icon(source: account.iconSource, style: iconStyle)
 ///     .staggeredEntrance(delay: Double(index) * AppAnimation.facepileStagger)
 /// ```
 public struct StaggeredEntranceModifier: ViewModifier {

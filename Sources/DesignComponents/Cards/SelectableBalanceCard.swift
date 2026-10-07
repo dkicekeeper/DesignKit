@@ -50,7 +50,7 @@ public struct SelectableBalanceCard: View {
     public var body: some View {
         Button(action: action) {
             HStack(spacing: AppSpacing.md) {
-                IconView(source: iconSource, size: AppIconSize.Tile.sm)
+                Icon(source: iconSource, size: AppIconSize.Tile.sm)
 
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text(title)
@@ -90,7 +90,7 @@ public struct SelectableBalanceCardSkeleton: View {
 
     public var body: some View {
         HStack(spacing: AppSpacing.md) {
-            IconViewSkeleton(size: AppIconSize.Tile.sm)
+            IconSkeleton(size: AppIconSize.Tile.sm)
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 SkeletonText(AppTypography.body, width: 100)
                 SkeletonText(AppTypography.body, width: 120)

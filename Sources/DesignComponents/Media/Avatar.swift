@@ -1,5 +1,5 @@
 //
-//  AvatarView.swift
+//  Avatar.swift
 //  DesignKit
 //
 //  Round avatar: a photo when there is one, otherwise the name's initials on a tint.
@@ -13,14 +13,14 @@ import DesignSupport
 /// Round person avatar.
 ///
 /// ```swift
-/// AvatarView(name: "Ayan Seitkali")                 // "AS" on a 15 % accent tint
-/// AvatarView(name: profile.displayName ?? profile.username, size: 64)
-/// AvatarView(name: "Ayan", image: Image(uiImage: photo))
+/// Avatar(name: "Ayan Seitkali")                 // "AS" on a 15 % accent tint
+/// Avatar(name: profile.displayName ?? profile.username, size: 64)
+/// Avatar(name: "Ayan", image: Image(uiImage: photo))
 /// ```
 ///
 /// Initials are the first letters of the first two words, upper-cased; an empty name shows "?".
 /// The avatar is decorative for VoiceOver: the row next to it carries the name.
-public struct AvatarView: View {
+public struct Avatar: View {
     let name: String?
     let image: Image?
     let size: CGFloat
@@ -29,7 +29,7 @@ public struct AvatarView: View {
     public init(
         name: String?,
         image: Image? = nil,
-        size: CGFloat = AppIconSize.Tile.xs,
+        size: CGFloat = AppIconSize.xxl,
         tint: Color = AppColors.accent
     ) {
         self.name = name
@@ -69,16 +69,24 @@ public struct AvatarView: View {
 
 // MARK: - Skeleton
 
-/// Placeholder of an `AvatarView`: a circle of its size.
-public struct AvatarViewSkeleton: View {
+/// Placeholder of an `Avatar`: a circle of its size.
+public struct AvatarSkeleton: View {
     let size: CGFloat
 
-    public init(size: CGFloat = AppIconSize.Tile.xs) {
+    public init(size: CGFloat = AppIconSize.xxl) {
         self.size = size
     }
 
     public var body: some View {
-        SkeletonView.circle(size)
+        Skeleton.circle(size)
             .skeletonLoadingLabel()
     }
 }
+
+// MARK: - Names before 2.0
+
+@available(*, deprecated, renamed: "AvatarSkeleton")
+public typealias AvatarViewSkeleton = AvatarSkeleton
+
+@available(*, deprecated, renamed: "Avatar")
+public typealias AvatarView = Avatar

@@ -7,6 +7,7 @@ import SwiftUI
 import DesignTokens
 import DesignSupport
 
+@available(*, deprecated, message: "Use DSButton(title, role: .destructive, shape: .capsule, fullWidth: true) where the screen places it.")
 public struct BulkDeleteButton: View {
     let count: Int
     let action: () -> Void

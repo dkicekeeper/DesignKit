@@ -85,6 +85,8 @@ public struct HeroBarPair: View {
                     valueAnnotation(previous, index: 0, tint: AppColors.Text.secondary)
                 }
                 .onTapGesture { select(0) }
+                // The selected bar's tooltip stays over the other bar.
+                .zIndex(selectedBar == 0 ? 1 : 0)
 
                 // "Now" — glass + colour glow; dashed translucent when projected.
                 bar(
@@ -130,22 +132,21 @@ public struct HeroBarPair: View {
         selectedBar = selectedBar == index ? nil : index
     }
 
-    /// Amount pill floating above the tapped bar. Overlaid on the bar's frame
-    /// so it never shifts the layout.
+    /// The amount in a `Tooltip` whose tail touches the tapped bar's top (2.0.0; a pale pill
+    /// 30 pt above it before, which showed the content behind it). Overlaid on the bar's
+    /// frame so it never shifts the layout.
     @ViewBuilder
     private func valueAnnotation(_ value: Double, index: Int, tint: Color) -> some View {
         if selectedBar == index {
-            Text(amountsHidden
-                 ? Formatting.hiddenAmount(currency: currency)
-                 : Formatting.formatCurrencySmart(value, currency: currency))
-                .font(AppTypography.numbers(AppTypography.bodySmall.bold()))
-                .foregroundStyle(tint)
-                .padding(.horizontal, AppSpacing.sm)
-                .padding(.vertical, AppSpacing.xs)
-                .background(AppColors.pale(tint), in: Capsule())
-                .fixedSize()
-                .offset(y: -30)
-                .transition(.opacity)
+            Tooltip {
+                Text(amountsHidden
+                     ? Formatting.hiddenAmount(currency: currency)
+                     : Formatting.formatCurrencySmart(value, currency: currency))
+                    .font(AppTypography.numbers(AppTypography.bodySmall.bold()))
+                    .foregroundStyle(tint)
+            }
+            .tooltipAnchor(.top)
+            .transition(.opacity)
         }
     }
 
@@ -179,12 +180,12 @@ public struct HeroBarPairSkeleton: View {
     public var body: some View {
         VStack(spacing: 0) {
             HStack(alignment: .bottom, spacing: AppSpacing.xxl) {
-                SkeletonView(height: maxBarHeight * 0.7, width: barWidth, cornerRadius: HeroBarPair.cornerRadius)
-                SkeletonView(height: maxBarHeight, width: barWidth, cornerRadius: HeroBarPair.cornerRadius)
+                Skeleton(height: maxBarHeight * 0.7, width: barWidth, cornerRadius: HeroBarPair.cornerRadius)
+                Skeleton(height: maxBarHeight, width: barWidth, cornerRadius: HeroBarPair.cornerRadius)
             }
             .frame(height: maxBarHeight, alignment: .bottom)
 
-            SkeletonView(height: 1, width: barWidth * 2 + AppSpacing.xxl + AppSpacing.xl * 2, cornerRadius: 0.5)
+            Skeleton(height: 1, width: barWidth * 2 + AppSpacing.xxl + AppSpacing.xl * 2, cornerRadius: 0.5)
                 .padding(.top, AppSpacing.xs)
         }
         .shimmer()

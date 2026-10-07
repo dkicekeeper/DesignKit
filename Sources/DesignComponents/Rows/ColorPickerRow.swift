@@ -42,7 +42,7 @@ public struct ColorPickerRow: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             // Title
             if !title.isEmpty {
-                SectionHeaderView(
+                SectionHeader(
                     String(title),
                     style: .default
                 )
@@ -133,7 +133,7 @@ public struct ColorPickerRowSkeleton: View {
             SkeletonText(AppTypography.bodyEmphasis, width: 100)
             HStack(spacing: AppSpacing.sm) {
                 ForEach(0..<swatches, id: \.self) { _ in
-                    SkeletonView.circle(AppIconSize.Tile.sm)
+                    Skeleton.circle(AppIconSize.Tile.sm)
                 }
             }
             .padding(.horizontal, AppSpacing.sm)

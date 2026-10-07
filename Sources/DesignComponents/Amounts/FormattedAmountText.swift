@@ -302,7 +302,7 @@ public struct FormattedAmountText: View {
 // MARK: - Skeleton
 
 /// Placeholder of an amount: `FormattedAmountText`, and the views that draw one
-/// (`FormattedAmountView`, `ConvertedAmountView`, `SpentBudgetText`, `RedactableAmount`).
+/// (`FormattedAmountView`, `ConvertedAmount`, `SpentBudgetText`, `RedactableAmount`).
 /// A line of the amount's style, as tall as its text.
 public struct FormattedAmountTextSkeleton: View {
     let font: Font

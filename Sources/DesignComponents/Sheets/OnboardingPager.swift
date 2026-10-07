@@ -25,7 +25,7 @@ import DesignSupport
 ///     }
 /// } actions: { page in
 ///     Button { next() } label: { Text("Next").frame(maxWidth: .infinity) }
-///         .primaryButton()
+///         .dsButton()
 /// }
 /// ```
 public struct OnboardingPager<Page: Hashable, Content: View, Actions: View>: View {

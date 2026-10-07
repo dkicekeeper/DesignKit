@@ -19,9 +19,9 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.md) {
                     HStack(spacing: AppSpacing.sm) {
-                        BadgeView("New")
-                        BadgeView("Ban", systemImage: "nosign", color: AppColors.destructive)
-                        BadgeView("Filled", color: AppColors.success, style: .filled)
+                        Badge("New")
+                        Badge("Ban", systemImage: "nosign", color: AppColors.destructive)
+                        Badge("Filled", color: AppColors.success, style: .filled)
                     }
                     HStack(spacing: AppSpacing.md) {
                         TrendBadge(direction: .up, changePercent: 12.5)
@@ -44,14 +44,14 @@ extension ComponentSnapshots {
                         StatTile(title: "Catches", value: "7", valueColor: AppColors.success)
                     }
                     HStack(spacing: AppSpacing.md) {
-                        AvatarView(name: "Ayan Seitkali")
-                        AvatarView(name: "Dana", size: 56, tint: AppColors.success)
-                        AvatarView(name: nil)
+                        Avatar(name: "Ayan Seitkali")
+                        Avatar(name: "Dana", size: 56, tint: AppColors.success)
+                        Avatar(name: nil)
                         AvatarGroup(names: ["Ayan", "Dana", "Marat", "Aru", "Timur", "Saule"], size: 32)
                     }
                     HStack(spacing: AppSpacing.lg) {
-                        RatingView(rating: 4.3)
-                        RatingView(rating: 2.5, size: 20)
+                        Rating(rating: 4.3)
+                        Rating(rating: 2.5, size: 20)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
@@ -95,7 +95,7 @@ extension ComponentSnapshots {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(item.color)
                 } accessory: { period in
-                    BadgeView(period.kind == .week ? "Week" : "Month")
+                    Badge(period.kind == .week ? "Week" : "Month")
                 }
             )
         }
@@ -109,7 +109,7 @@ extension ComponentSnapshots {
                     )
                     FlowLayout {
                         ForEach(["Lake", "Free camping", "Fire allowed", "No motorboats", "Pike", "Road: 4x4", "Toilets"], id: \.self) { tag in
-                            BadgeView(tag)
+                            Badge(tag)
                         }
                     }
                     HStack(spacing: AppSpacing.lg) {

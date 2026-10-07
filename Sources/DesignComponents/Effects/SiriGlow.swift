@@ -1,5 +1,5 @@
 //
-//  SiriGlowView.swift
+//  SiriGlow.swift
 //  Tenra
 //
 //  Apple Intelligence–style edge glow using MeshGradient.
@@ -15,7 +15,7 @@ import SwiftUI
 import DesignTokens
 import DesignSupport
 
-public struct SiriGlowView: View {
+public struct SiriGlow: View {
 
     /// Throttled redraw cadence. 30 fps is indistinguishable from 60 fps for
     /// the slow ambient motion this view shows.
@@ -152,3 +152,7 @@ public struct SiriGlowView: View {
     }
 }
 
+// MARK: - Names before 2.0
+
+@available(*, deprecated, renamed: "SiriGlow")
+public typealias SiriGlowView = SiriGlow

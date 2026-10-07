@@ -120,7 +120,7 @@ private struct MonthCalendarPage: View {
                 } accessory: { period in
                     let count = SampleTrip.samples.filter { trip in trip.days.contains { period.interval.contains($0) } }.count
                     if count > 0 {
-                        BadgeView("\(count) trips", color: AppColors.accent)
+                        Badge("\(count) trips", color: AppColors.accent)
                     }
                 }
             }
@@ -149,7 +149,7 @@ private struct FlowLayoutPage: View {
         ) {
             FlowLayout(spacing: spacing, lineSpacing: spacing) {
                 ForEach(tags.prefix(count), id: \.self) {
-                    BadgeView($0, color: AppColors.accent)
+                    Badge($0, color: AppColors.accent)
                 }
             }
         } controls: {
@@ -171,11 +171,23 @@ private struct FormSectionPage: View {
             summary: "A titled group of form rows on a material card, with a footer.",
             apps: [.tenra],
             canvas: .fill,
-            notes: ["Material, not glass: native menus in it morph from it otherwise."]
+            notes: [
+                "Material, not glass: native menus in it morph from it otherwise.",
+                "The section adds no padding: its rows pad themselves (docs/design-system.md §10). A field goes in a row's trailing slot, UniversalRow(config: .standard), with a Divider between rows.",
+            ]
         ) {
             FormSection(header: showsHeader ? "Transaction" : nil, footer: showsFooter ? "Shown on the transaction detail." : nil) {
-                FormTextField(text: $title, placeholder: "Title", style: .inline)
-                FormTextField(text: $note, placeholder: "Note (optional)", style: .inline)
+                UniversalRow(config: .standard) {
+                    Text("Title").font(AppTypography.body)
+                } trailing: {
+                    FormTextField(text: $title, placeholder: "Title", style: .inline)
+                }
+                Divider().padding(.leading, AppSpacing.lg)
+                UniversalRow(config: .standard) {
+                    Text("Note").font(AppTypography.body)
+                } trailing: {
+                    FormTextField(text: $note, placeholder: "Optional", style: .inline)
+                }
             }
         } controls: {
             ToggleControl("Header", isOn: $showsHeader)
@@ -194,10 +206,7 @@ private struct EditSheetContainerPage: View {
             summary: "The shell of an edit sheet: navigation bar with Cancel and Save, a form inside.",
             apps: [.tenra]
         ) {
-            Button { isPresented = true } label: {
-                Text("Open the sheet").frame(maxWidth: .infinity)
-            }
-            .appButton(.secondary)
+            DSButton("Open the sheet", appearance: .secondary, fullWidth: true) { isPresented = true }
             .sheet(isPresented: $isPresented) {
                 EditSheetContainer(
                     title: "Edit account",

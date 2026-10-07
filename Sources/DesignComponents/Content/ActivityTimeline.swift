@@ -134,7 +134,7 @@ public struct ActivityTimelineSkeleton: View {
             ForEach(0..<count, id: \.self) { index in
                 let isLast = index == count - 1
                 HStack(alignment: .top, spacing: AppSpacing.md) {
-                    SkeletonView.circle(TimelineMetrics.markerSize)
+                    Skeleton.circle(TimelineMetrics.markerSize)
                     VStack(alignment: .leading, spacing: AppSpacing.xs) {
                         SkeletonText(AppTypography.bodyEmphasis, width: 140)
                         SkeletonText(AppTypography.caption, width: 90)
@@ -146,7 +146,7 @@ public struct ActivityTimelineSkeleton: View {
                 .background(alignment: .topLeading) {
                     if !isLast {
                         Rectangle()
-                            .fill(SkeletonView.fill)
+                            .fill(Skeleton.fill)
                             .frame(width: TimelineMetrics.lineWidth)
                             .frame(maxHeight: .infinity)
                             .padding(.top, TimelineMetrics.markerSize)

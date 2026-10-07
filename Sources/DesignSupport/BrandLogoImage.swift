@@ -1,34 +1,17 @@
 //
-//  BrandLogoView.swift
-//  Tenra
+//  BrandLogoImage.swift
+//  DesignKit
 //
-//  SwiftUI component for displaying brand logos via provider chain
+//  The brand-logo engine of `Icon(source: .brandService(name))`. The public BrandLogoView
+//  (deprecated in 1.13.0) is gone in 2.0.0: `Icon(source: .brandService(name), style:
+//  .roundedSquare(size: size))` is its look.
 //
 
 import SwiftUI
 import DesignTokens
 
-/// A brand logo by name. Deprecated as a public view since 1.13.0: it is the engine of
-/// `IconView(source: .brandService(name))`, which adds the icon style (shape, size, glass) and
-/// the skeleton; call that instead. `style: .roundedSquare(size: size)` keeps this view's look
-/// (a corner of 20% of the size).
-@available(*, deprecated, message: "Use IconView(source: .brandService(name), style: .roundedSquare(size: size)): the same look, with the icon style and skeleton.")
-public struct BrandLogoView: View {
-    let brandName: String?
-    let size: CGFloat
-
-    public init(brandName: String?, size: CGFloat = AppIconSize.xl) {
-        self.brandName = brandName
-        self.size = size
-    }
-
-    public var body: some View {
-        BrandLogoImage(brandName: brandName, size: size)
-    }
-}
-
 /// Loads a brand logo through the host's `DesignKitLogoLoader` and draws it with a rounded
-/// corner, a spinner while it loads and a card symbol when there is none. Used by `IconView`.
+/// corner, a spinner while it loads and a card symbol when there is none. Used by `Icon`.
 /// `.task(id:)` cancels a load when the name changes.
 struct BrandLogoImage: View {
     let brandName: String?

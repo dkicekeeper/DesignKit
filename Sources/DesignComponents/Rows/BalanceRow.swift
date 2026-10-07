@@ -86,7 +86,7 @@ public struct BalanceRow: View {
 
     public var body: some View {
         HStack(spacing: AppSpacing.md) {
-            IconView(source: iconSource, size: AppIconSize.Tile.sm)
+            Icon(source: iconSource, size: AppIconSize.Tile.sm)
                 .matchedTransitionSourceIfPresent(
                     id: transitionSourceID,
                     namespace: transitionNamespace
@@ -172,7 +172,7 @@ public struct BalanceRowSkeleton: View {
 
     public var body: some View {
         HStack(spacing: AppSpacing.md) {
-            IconViewSkeleton(size: AppIconSize.Tile.sm)
+            IconSkeleton(size: AppIconSize.Tile.sm)
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 SkeletonText(AppTypography.h4, width: 130)
                 SkeletonText(AppTypography.bodySmall, width: 90)

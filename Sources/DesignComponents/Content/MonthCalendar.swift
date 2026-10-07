@@ -361,14 +361,14 @@ public struct MonthCalendarSkeleton: View {
 
             LazyVGrid(columns: columns, spacing: 0) {
                 ForEach(0..<7, id: \.self) { _ in
-                    SkeletonView(height: 14, width: 24)
+                    Skeleton(height: 14, width: 24)
                         .frame(height: 20)
                 }
             }
 
             LazyVGrid(columns: columns, spacing: AppSpacing.xs) {
                 ForEach(0..<(weeks * 7), id: \.self) { _ in
-                    SkeletonView.circle(48)
+                    Skeleton.circle(48)
                         .frame(height: CalendarMetrics.cellHeight, alignment: .top)
                 }
             }

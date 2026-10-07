@@ -235,7 +235,7 @@ public struct OrbChart: View {
     @ViewBuilder
     private var centerIconView: some View {
         if showsCenterIcon, let centerIcon {
-            IconView(
+            Icon(
                 source: centerIcon,
                 style: .circle(size: AppIconSize.Tile.xxxl, tint: .monochrome(.white), backgroundColor: nil)
             )
@@ -461,7 +461,7 @@ public struct OrbChartSkeleton: View {
         GeometryReader { geo in
             // The orb is 52% of the slot's shorter side (see OrbChart).
             let diameter = min(geo.size.width, geo.size.height) * 0.52
-            SkeletonView.circle(diameter)
+            Skeleton.circle(diameter)
                 .frame(width: geo.size.width, height: geo.size.height)
         }
         .frame(height: size)

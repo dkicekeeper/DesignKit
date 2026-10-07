@@ -178,7 +178,7 @@ public struct LinearProgressBarSkeleton: View {
     }
 
     public var body: some View {
-        SkeletonView(height: height, cornerRadius: AppRadius.xs)
+        Skeleton(height: height, cornerRadius: AppRadius.xs)
             .skeletonLoadingLabel()
     }
 }

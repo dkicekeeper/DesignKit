@@ -139,7 +139,7 @@ public struct InsightEntityRowSkeleton: View {
 
     public var body: some View {
         HStack(spacing: RowConfiguration.info.spacing) {
-            IconViewSkeleton(size: AppIconSize.Tile.sm)
+            IconSkeleton(size: AppIconSize.Tile.sm)
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 SkeletonText(AppTypography.body, width: 110)
                 SkeletonText(AppTypography.bodySmall, width: 70)

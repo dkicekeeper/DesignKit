@@ -1,9 +1,9 @@
 //
-//  IconViewSkeleton.swift
+//  IconSkeleton.swift
 //  DesignKit
 //
-//  Placeholder of an `IconView` (a brand logo too): the icon's size and shape, grey.
-//  `IconView` lives in DesignSupport; its skeleton needs the skeleton primitives, so it lives
+//  Placeholder of an `Icon` (a brand logo too): the icon's size and shape, grey.
+//  `Icon` lives in DesignSupport; its skeleton needs the skeleton primitives, so it lives
 //  here.
 //
 
@@ -14,10 +14,10 @@ import DesignSupport
 /// An icon that is still loading: a circle, the style's rounded square or a square.
 ///
 /// ```swift
-/// IconViewSkeleton()                                   // like IconView(source:) — a 44 pt circle
-/// IconViewSkeleton(style: .roundedSquare(size: 40))    // the corner of that style
+/// IconSkeleton()                                   // like Icon(source:) — a 44 pt circle
+/// IconSkeleton(style: .roundedSquare(size: 40))    // the corner of that style
 /// ```
-public struct IconViewSkeleton: View {
+public struct IconSkeleton: View {
     let style: IconStyle
 
     /// The shape and size of an icon drawn with `style`.
@@ -25,13 +25,13 @@ public struct IconViewSkeleton: View {
         self.style = style
     }
 
-    /// Like `IconView(source:size:)`: a circle.
+    /// Like `Icon(source:size:)`: a circle.
     public init(size: CGFloat = AppIconSize.Tile.sm) {
         self.style = .circle(size: size)
     }
 
     public var body: some View {
-        SkeletonView(height: style.size, width: style.size, cornerRadius: cornerRadius)
+        Skeleton(height: style.size, width: style.size, cornerRadius: cornerRadius)
             .skeletonLoadingLabel()
     }
 
@@ -43,3 +43,8 @@ public struct IconViewSkeleton: View {
         }
     }
 }
+
+// MARK: - Names before 2.0
+
+@available(*, deprecated, renamed: "IconSkeleton")
+public typealias IconViewSkeleton = IconSkeleton

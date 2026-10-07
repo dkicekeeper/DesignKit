@@ -107,7 +107,7 @@ public struct MiniDonutSkeleton: View {
                 x: center.x - strokeRadius, y: center.y - strokeRadius,
                 width: strokeRadius * 2, height: strokeRadius * 2
             ))
-            context.stroke(ring, with: .color(SkeletonView.fill), lineWidth: outerRadius - innerRadius)
+            context.stroke(ring, with: .color(Skeleton.fill), lineWidth: outerRadius - innerRadius)
         }
         .shimmer()
         .skeletonLoadingLabel()

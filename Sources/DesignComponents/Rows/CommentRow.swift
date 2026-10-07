@@ -27,12 +27,12 @@ import DesignSupport
 ///
 /// The text is selectable; pass an `AttributedString` to keep links and mentions. Padding:
 /// none, like a row that lives in a `List` (design-system §10).
-public struct CommentRow<Avatar: View, Trailing: View, Actions: View>: View {
+public struct CommentRow<AvatarContent: View, Trailing: View, Actions: View>: View {
     let author: String
     let date: Date
     let text: AttributedString
     let quote: MessageQuote?
-    let avatar: Avatar
+    let avatar: AvatarContent
     let menu: Trailing
     let actions: Actions
 
@@ -47,7 +47,7 @@ public struct CommentRow<Avatar: View, Trailing: View, Actions: View>: View {
         date: Date,
         text: AttributedString,
         quote: MessageQuote? = nil,
-        avatar: Avatar,
+        avatar: AvatarContent,
         @ViewBuilder menu: () -> Trailing = { EmptyView() },
         @ViewBuilder actions: () -> Actions = { EmptyView() }
     ) {
@@ -98,7 +98,7 @@ public struct CommentRow<Avatar: View, Trailing: View, Actions: View>: View {
     }
 }
 
-public extension CommentRow where Avatar == AvatarView {
+public extension CommentRow where AvatarContent == Avatar {
     /// With the author's initials for the avatar.
     init(
         author: String,
@@ -110,7 +110,7 @@ public extension CommentRow where Avatar == AvatarView {
     ) {
         self.init(
             author: author, date: date, text: text, quote: quote,
-            avatar: AvatarView(name: author, size: CommentRowMetrics.avatarSize),
+            avatar: Avatar(name: author, size: CommentRowMetrics.avatarSize),
             menu: menu, actions: actions
         )
     }
@@ -152,7 +152,7 @@ public struct CommentRowSkeleton: View {
 
     public var body: some View {
         HStack(alignment: .top, spacing: AppSpacing.md) {
-            SkeletonView.circle(CommentRowMetrics.avatarSize)
+            Skeleton.circle(CommentRowMetrics.avatarSize)
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 HStack(spacing: AppSpacing.xs) {
                     SkeletonText(AppTypography.bodyEmphasis, width: 100)

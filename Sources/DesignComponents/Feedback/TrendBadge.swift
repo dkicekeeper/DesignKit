@@ -153,15 +153,15 @@ public struct TrendBadgeSkeleton: View {
                     .frame(width: 56)
                     .padding(.horizontal, AppSpacing.sm)
                     .padding(.vertical, AppSpacing.xs)
-                    .background(SkeletonView.fill, in: Capsule())
+                    .background(Skeleton.fill, in: Capsule())
             case .inline:
                 HStack(spacing: AppSpacing.xs) {
-                    SkeletonView.circle(AppIconSize.sm)
+                    Skeleton.circle(AppIconSize.sm)
                     SkeletonText(AppTypography.bodyEmphasis, width: 40)
                 }
             case .changeIndicator:
                 VStack(spacing: AppSpacing.xs) {
-                    SkeletonView.circle(AppIconSize.sm)
+                    Skeleton.circle(AppIconSize.sm)
                     SkeletonText(AppTypography.bodyEmphasis, width: 40)
                 }
             }

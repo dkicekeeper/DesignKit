@@ -71,7 +71,7 @@ public struct ReviewCard<Trailing: View, Media: View, Actions: View>: View {
                     .font(AppTypography.bodyEmphasis)
                     .foregroundStyle(AppColors.Text.primary)
                     .lineLimit(1)
-                RatingView(rating: rating, size: ReviewCardMetrics.starSize)
+                Rating(rating: rating, size: ReviewCardMetrics.starSize)
                 Spacer(minLength: 0)
                 Text(verbatim: date.formatted(.relative(presentation: .named)))
                     .font(AppTypography.caption)
@@ -116,7 +116,7 @@ public struct ReviewCardSkeleton: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             HStack(spacing: AppSpacing.sm) {
                 SkeletonText(AppTypography.bodyEmphasis, width: 90)
-                RatingViewSkeleton(size: ReviewCardMetrics.starSize)
+                RatingSkeleton(size: ReviewCardMetrics.starSize)
                 Spacer(minLength: 0)
                 SkeletonText(AppTypography.caption, width: 48)
             }

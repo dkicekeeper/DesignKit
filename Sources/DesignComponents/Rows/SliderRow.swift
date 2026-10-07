@@ -115,7 +115,7 @@ public struct SliderRowSkeleton: View {
                 Spacer()
                 SkeletonText(AppTypography.bodySmall, width: 40)
             }
-            SkeletonView.capsule(height: SliderRowMetrics.trackHeight)
+            Skeleton.capsule(height: SliderRowMetrics.trackHeight)
                 .frame(height: SliderRowMetrics.sliderHeight)
             if showsHint {
                 SkeletonText(AppTypography.caption, width: 220)

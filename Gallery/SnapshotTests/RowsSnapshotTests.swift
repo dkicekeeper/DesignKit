@@ -93,9 +93,9 @@ extension ComponentSnapshots {
         @Test func headersAndSelection() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.md) {
-                    SectionHeaderView("Accounts", systemImage: "creditcard")
-                    SectionHeaderView("Compact header", style: .compact)
-                    SectionHeaderView("Large header", style: .large)
+                    SectionHeader("Accounts", systemImage: "creditcard")
+                    SectionHeader("Compact header", style: .compact)
+                    SectionHeader("Large header", style: .large)
                     HStack(spacing: AppSpacing.lg) {
                         SelectionIndicator(isSelected: true)
                         SelectionIndicator(isSelected: false)
@@ -115,15 +115,20 @@ extension ComponentSnapshots {
         }
 
         /// One header per snapshot: each is a glass card. The label is the app's own (Tenra passes
-        /// "Today", "Yesterday" or the formatted date).
+        /// "Today", "Yesterday" or the formatted date). `SectionHeader(style: .card)` since 2.0.0
+        /// (DateSectionHeaderView before, the same pixels).
         @Test func dateSectionHeaders() async {
             await assertComponentSnapshot(
-                DateSectionHeaderView(dateKey: "Yesterday", amount: 45_000, currency: "KZT"),
+                SectionHeader("Yesterday", style: .card) {
+                    FormattedAmountText(amount: 45_000, currency: "KZT", prefix: "-",
+                                        fontSize: AppTypography.bodySmall, fontWeight: .semibold,
+                                        color: AppColors.Text.tertiary)
+                },
                 named: "withTotal",
                 appearances: [.light, .dark, .largeText]
             )
             await assertComponentSnapshot(
-                DateSectionHeaderView(dateKey: "30 September"),
+                SectionHeader("30 September", style: .card),
                 named: "labelOnly"
             )
         }
@@ -132,13 +137,13 @@ extension ComponentSnapshots {
         @Test func sectionHeaderTrailing() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.md) {
-                    SectionHeaderView("Recent trips", systemImage: "map") {
+                    SectionHeader("Recent trips", systemImage: "map") {
                         Button("All") {}
                     }
-                    SectionHeaderView("Waiting to send", style: .compact) {
+                    SectionHeader("Waiting to send", style: .compact) {
                         Button("Send now") {}
                     }
-                    SectionHeaderView("Insights", systemImage: "sparkles", style: .large) {
+                    SectionHeader("Insights", systemImage: "sparkles", style: .large) {
                         Button("All") {}
                     }
                 }

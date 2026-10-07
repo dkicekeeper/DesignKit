@@ -191,7 +191,7 @@ public struct HeroMilestoneGaugeSkeleton: View {
     public var body: some View {
         HStack(spacing: HeroMilestoneGauge.segmentGap) {
             ForEach(0..<segments, id: \.self) { _ in
-                SkeletonView(height: segmentHeight, cornerRadius: HeroMilestoneGauge.cornerRadius)
+                Skeleton(height: segmentHeight, cornerRadius: HeroMilestoneGauge.cornerRadius)
             }
         }
         .frame(height: segmentHeight + HeroMilestoneGauge.tickOvershoot * 2)

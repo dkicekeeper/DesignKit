@@ -13,11 +13,9 @@ import DesignComponents
 struct ActionsScreen: View {
     var body: some View {
         ShowcasePage(title: "Actions") {
-            AppButtonPage()
+            DSButtonPage()
+            DSButtonStylePage()
             BounceStylePage()
-            LoadingButtonLabelPage()
-            EntityActionButtonPage()
-            BulkDeleteButtonPage()
             ReactionButtonPage()
             AmountVisibilityTogglePage()
             UniversalFilterButtonPage()
@@ -25,32 +23,123 @@ struct ActionsScreen: View {
     }
 }
 
-private struct AppButtonPage: View {
-    @State private var appearance: AppButtonAppearance = .primary
-    @State private var role: AppButtonRole = .normal
-    @State private var size: AppButtonSize = .large
-    @State private var fullWidth = true
-    @State private var disabled = false
-    @State private var loading = false
+private struct DSButtonPage: View {
     @State private var title = "Save"
+    @State private var showsIcon = true
+    @State private var placement: DSButton.IconPlacement = .leading
+    @State private var appearance: DSButton.Appearance = .primary
+    @State private var role: DSButton.Role = .normal
+    @State private var size: DSButton.Size = .large
+    @State private var shape: DSButton.Shape = .automatic
+    @State private var fullWidth = false
+    @State private var loading = false
+    @State private var disabled = false
 
     var body: some View {
         ComponentPage(
-            name: "appButton",
-            summary: "The button of the design system: appearance × role × size. primaryButton() and secondaryButton() are its shorthands.",
-            since: "1.7.0",
+            name: "DSButton",
+            summary: "The button of the design system: a title with an icon before, after or above it (or the icon alone), appearance × role × size, a loading state, full width or its own.",
+            since: "2.0.0",
             apps: [.tenra, .dalada],
             notes: [
-                ".primaryButton() = .appButton(), .secondaryButton() = .appButton(.secondary).",
-                "Destructive: .appButton(role: .destructive), never .primaryButton() (its accent tint overrides the role).",
-                "While an action runs: LoadingButtonLabel in the label and disabled: isLoading.",
+                "Loading keeps the button's width, shows a spinner and blocks taps: DSButton(\"Save\", isLoading: saving).",
+                "Icon on top draws a tile (the actions under a detail screen's hero; EntityActionButton before 2.0). Give it the width: a row of them in an HStack.",
+                "A delete-selected bar: DSButton(\"Delete (3)\", role: .destructive, shape: .capsule, fullWidth: true) (BulkDeleteButton before 2.0).",
+                "A press plays a light haptic, a warning one for a destructive button.",
+            ]
+        ) {
+            Group {
+                if placement == .top {
+                    HStack(spacing: AppSpacing.md) {
+                        button
+                        DSButton("Share", systemImage: "square.and.arrow.up", iconPlacement: .top,
+                                 appearance: appearance) {}
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    button
+                }
+            }
+            .frame(maxWidth: .infinity)
+        } controls: {
+            ChoiceControl("Icon", selection: $placement, options: [
+                ("Leading", .leading), ("Trailing", .trailing), ("Top", .top), ("Only", .only),
+            ])
+            ToggleControl("Show icon", isOn: $showsIcon)
+            ChoiceControl("Appearance", selection: $appearance, options: [
+                ("Primary", .primary), ("Secondary", .secondary), ("Flat", .flat),
+            ])
+            ChoiceControl("Role", selection: $role, options: [
+                ("Normal", .normal), ("Destructive", .destructive), ("Neutral", .neutral),
+            ])
+            ChoiceControl("Size", selection: $size, options: [
+                ("Large", .large), ("Medium", .medium), ("Small", .small),
+            ])
+            ChoiceControl("Shape", selection: $shape, options: [
+                ("Automatic", .automatic), ("Capsule", .capsule), ("Rounded", .roundedRectangle),
+            ])
+            ToggleControl("Full width", isOn: $fullWidth)
+            ToggleControl("Loading", isOn: $loading)
+            ToggleControl("Disabled", isOn: $disabled)
+            TextControl("Title", text: $title)
+        }
+    }
+
+    private var button: some View {
+        DSButton(
+            title,
+            systemImage: showsIcon || placement == .only ? symbol : nil,
+            iconPlacement: placement,
+            appearance: appearance,
+            role: role,
+            size: size,
+            shape: shape,
+            fullWidth: fullWidth,
+            isLoading: loading,
+            isDisabled: disabled
+        ) {
+            loading = true
+            Task {
+                try? await Task.sleep(for: .seconds(2))
+                loading = false
+            }
+        }
+    }
+
+    private var symbol: String {
+        switch placement {
+        case .trailing: "arrow.right"
+        case .only: "xmark"
+        default: role == .destructive ? "trash" : "checkmark"
+        }
+    }
+}
+
+private struct DSButtonStylePage: View {
+    @State private var appearance: DSButton.Appearance = .primary
+    @State private var role: DSButton.Role = .normal
+    @State private var size: DSButton.Size = .large
+    @State private var disabled = false
+
+    var body: some View {
+        ComponentPage(
+            name: ".dsButton",
+            summary: "DSButton's style for a Button whose label you build yourself: appearance × role × size.",
+            since: "2.0.0",
+            apps: [.tenra, .dalada],
+            notes: [
+                "appButton(_:role:size:disabled:) before 2.0; primaryButton() = .dsButton(), secondaryButton() = .dsButton(.secondary).",
+                "Prefer DSButton: it adds the icon placement, loading, full width and haptics.",
             ]
         ) {
             Button {} label: {
-                LoadingButtonLabel(title, systemImage: nil, isLoading: loading)
-                    .frame(maxWidth: fullWidth ? .infinity : nil)
+                VStack(spacing: AppSpacing.xxs) {
+                    Text("Pay 12 500 ₸")
+                    Text("Kaspi Gold").font(AppTypography.caption)
+                }
+                .frame(maxWidth: .infinity)
             }
-            .appButton(appearance, role: role, size: size, disabled: disabled || loading)
+            .dsButton(appearance, role: role, size: size, disabled: disabled)
         } controls: {
             ChoiceControl("Appearance", selection: $appearance, options: [
                 ("Primary", .primary), ("Secondary", .secondary), ("Flat", .flat),
@@ -61,10 +150,7 @@ private struct AppButtonPage: View {
             ChoiceControl("Size", selection: $size, options: [
                 ("Large", .large), ("Medium", .medium), ("Small", .small),
             ])
-            ToggleControl("Full width", isOn: $fullWidth)
             ToggleControl("Disabled", isOn: $disabled)
-            ToggleControl("Loading", isOn: $loading)
-            TextControl("Title", text: $title)
         }
     }
 }
@@ -79,7 +165,7 @@ private struct BounceStylePage: View {
             apps: [.tenra],
             canvas: .fill,
             notes: [
-                "For cards and rows (Tenra: account cards, transaction rows, Finances tiles). A button uses appButton.",
+                "For cards and rows (Tenra: account cards, transaction rows, Finances tiles). A button is a DSButton.",
             ]
         ) {
             Button { taps += 1 } label: {
@@ -94,73 +180,6 @@ private struct BounceStylePage: View {
                 Text("\(taps)").font(AppTypography.bodySmall).monospacedDigit()
                     .foregroundStyle(AppColors.textSecondary)
             }
-        }
-    }
-}
-
-private struct LoadingButtonLabelPage: View {
-    @State private var isLoading = false
-    @State private var showsIcon = true
-
-    var body: some View {
-        ComponentPage(
-            name: "LoadingButtonLabel",
-            summary: "A button's label that turns into a spinner while its action runs, keeping the button's width.",
-            since: "0.6.0",
-            notes: ["Pass disabled: isLoading to the button so it cannot be tapped twice."]
-        ) {
-            Button {
-                isLoading = true
-                Task {
-                    try? await Task.sleep(for: .seconds(2))
-                    isLoading = false
-                }
-            } label: {
-                LoadingButtonLabel("Save", systemImage: showsIcon ? "checkmark" : nil, isLoading: isLoading)
-                    .frame(maxWidth: .infinity)
-            }
-            .appButton(disabled: isLoading)
-        } controls: {
-            ToggleControl("Loading", isOn: $isLoading)
-            ToggleControl("Icon", isOn: $showsIcon)
-        }
-    }
-}
-
-private struct EntityActionButtonPage: View {
-    @State private var destructive = false
-    @State private var showsIcon = true
-
-    var body: some View {
-        ComponentPage(
-            name: "EntityActionButton",
-            summary: "An action under a detail screen's hero: edit, archive, delete.",
-            apps: [.tenra]
-        ) {
-            EntityActionButton(
-                title: destructive ? "Delete" : "Edit",
-                systemImage: showsIcon ? (destructive ? "trash" : "pencil") : nil,
-                role: destructive ? .destructive : nil
-            ) {}
-        } controls: {
-            ToggleControl("Destructive", isOn: $destructive)
-            ToggleControl("Icon", isOn: $showsIcon)
-        }
-    }
-}
-
-private struct BulkDeleteButtonPage: View {
-    @State private var count = 3
-
-    var body: some View {
-        ComponentPage(
-            name: "BulkDeleteButton",
-            summary: "Deletes the items selected in a list's selection mode; shows how many.",
-            apps: [.tenra]
-        ) {
-            BulkDeleteButton(count: count) {}
-        } controls: {
-            StepperControl("Selected", value: $count, in: 0...99)
         }
     }
 }

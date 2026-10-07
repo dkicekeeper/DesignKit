@@ -163,7 +163,7 @@ public struct MiniHalfGaugeSkeleton: View {
             var track = Path()
             track.addArc(center: center, radius: radius,
                          startAngle: .degrees(180), endAngle: .degrees(360), clockwise: false)
-            context.stroke(track, with: .color(SkeletonView.fill),
+            context.stroke(track, with: .color(Skeleton.fill),
                            style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
         }
         .frame(height: height)

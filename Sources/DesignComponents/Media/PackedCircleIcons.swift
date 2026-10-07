@@ -1,5 +1,5 @@
 //
-//  PackedCircleIconsView.swift
+//  PackedCircleIcons.swift
 //  Tenra
 //
 //  Packed circle layout for subscription/loan icon display.
@@ -30,7 +30,7 @@ public struct PackedCircleItem: Identifiable {
 
 // MARK: - Main View
 
-public struct PackedCircleIconsView: View {
+public struct PackedCircleIcons: View {
     let items: [PackedCircleItem]
     var maxVisible: Int = 5
     var containerWidth: CGFloat = 120
@@ -130,11 +130,11 @@ private struct PackedCircleIcon: View {
 
     @State private var hasAppeared = false
 
-    /// Adaptive padding for packed-circle SF symbols. IconView's default curve
+    /// Adaptive padding for packed-circle SF symbols. Icon's default curve
     /// gives ~10% on the 28-44pt bracket, which at our small packed diameters
     /// reads as no padding at all (especially with the 2pt outer stroke). We
     /// bump the curve so SF symbols always have visible breathing room inside
-    /// their circle background, matching the spirit of IconView's padding rules.
+    /// their circle background, matching the spirit of Icon's padding rules.
     private var sfSymbolPadding: CGFloat {
         switch diameter {
         case ..<32:   return diameter * 0.18
@@ -146,22 +146,24 @@ private struct PackedCircleIcon: View {
     private var iconStyle: IconStyle {
         switch iconSource {
         case .sfSymbol:
+            // The symbol on a pale disc of its own colour, like every icon backing (2.0.0;
+            // a grey disc before).
             let tint: IconTint = tintOverride.map { .monochrome($0) } ?? .accentMonochrome
             return .circle(
                 size: diameter,
                 tint: tint,
-                backgroundColor: AppColors.Background.neutral1,
+                backgroundColor: AppColors.pale(tintOverride ?? AppColors.accent),
                 padding: sfSymbolPadding
             )
         case .brandService, .none:
-            // Brand logos render edge-to-edge by IconView convention — they
+            // Brand logos render edge-to-edge by Icon convention — they
             // already include their own internal padding/whitespace.
             return .circle(size: diameter, tint: .original)
         }
     }
 
     public var body: some View {
-        IconView(source: iconSource, style: iconStyle)
+        Icon(source: iconSource, style: iconStyle)
             .overlay(Circle().strokeBorder(.background, lineWidth: borderWidth))
             // Entrance animates scale + opacity only — a staggered pop-in, no slide.
             .scaleEffect(hasAppeared ? 1 : AppAnimation.facepileHiddenScale)
@@ -224,9 +226,9 @@ private struct PackedOverflowBadge: View {
 
 // MARK: - Skeleton
 
-/// Placeholder of a `PackedCircleIconsView`: a few circles of falling sizes packed in the
+/// Placeholder of a `PackedCircleIcons`: a few circles of falling sizes packed in the
 /// same box.
-public struct PackedCircleIconsViewSkeleton: View {
+public struct PackedCircleIconsSkeleton: View {
     let containerWidth: CGFloat
 
     public init(containerWidth: CGFloat = 120) {
@@ -240,11 +242,11 @@ public struct PackedCircleIconsViewSkeleton: View {
         let medium = big * 0.7
         let small = big * 0.5
         ZStack {
-            SkeletonView.circle(big)
+            Skeleton.circle(big)
                 .offset(x: -medium * 0.35, y: -small * 0.15)
-            SkeletonView.circle(medium)
+            Skeleton.circle(medium)
                 .offset(x: big * 0.45, y: -small * 0.35)
-            SkeletonView.circle(small)
+            Skeleton.circle(small)
                 .offset(x: big * 0.35, y: medium * 0.5)
         }
         .frame(width: containerWidth, height: height)
@@ -252,3 +254,11 @@ public struct PackedCircleIconsViewSkeleton: View {
         .skeletonLoadingLabel()
     }
 }
+
+// MARK: - Names before 2.0
+
+@available(*, deprecated, renamed: "PackedCircleIconsSkeleton")
+public typealias PackedCircleIconsViewSkeleton = PackedCircleIconsSkeleton
+
+@available(*, deprecated, renamed: "PackedCircleIcons")
+public typealias PackedCircleIconsView = PackedCircleIcons

@@ -61,7 +61,7 @@ public struct IconPicker: View {
             }
             .safeAreaBar(edge: .top) {
                 if showsLogos {
-                    SegmentedPickerView(
+                    SegmentedPicker(
                         title: "",
                         selection: $mode,
                         options: Mode.allCases.map { (label: $0.title, value: $0) }
@@ -80,7 +80,7 @@ public struct IconPicker: View {
                     } label: {
                         Image(systemName: "checkmark")
                     }
-                    .primaryButton()
+                    .dsButton()
                 }
             }
         }
@@ -111,7 +111,7 @@ private struct IconPickerSymbolsTab: View {
                     LazyVStack(alignment: .leading, spacing: AppSpacing.xxl) {
                         ForEach(sections, id: \.title) { section in
                             VStack(alignment: .leading, spacing: AppSpacing.lg) {
-                                SectionHeaderView(section.title, style: .compact)
+                                SectionHeader(section.title, style: .compact)
                                 grid(section.symbols)
                             }
                         }
@@ -145,7 +145,7 @@ private struct IconPickerSymbolsTab: View {
                     selection = .sfSymbol(symbol)
                     dismiss()
                 } label: {
-                    IconView(
+                    Icon(
                         source: .sfSymbol(symbol),
                         style: .circle(
                             size: AppIconSize.Tile.md,
@@ -205,7 +205,7 @@ private struct IconPickerLogosTab: View {
 
     private func sectionView(_ section: DesignKitLogoCatalog.Section) -> some View {
         VStack(alignment: .leading, spacing: AppSpacing.lg) {
-            SectionHeaderView(section.title, style: .compact)
+            SectionHeader(section.title, style: .compact)
 
             LazyVGrid(
                 columns: Array(repeating: GridItem(.flexible(), spacing: AppSpacing.lg), count: 5),
@@ -214,7 +214,7 @@ private struct IconPickerLogosTab: View {
                 ForEach(section.entries) { entry in
                     let isSelected = selection == .brandService(entry.domain)
                     Button { pick(entry.domain) } label: {
-                        IconView(source: .brandService(entry.domain), size: AppIconSize.Tile.md)
+                        Icon(source: .brandService(entry.domain), size: AppIconSize.Tile.md)
                             .frame(width: AppIconSize.Tile.xl, height: AppIconSize.Tile.xl)
                             .background(isSelected ? AppColors.pale(AppColors.accent) : AppColors.Background.neutral1)
                             .clipShape(.rect(cornerRadius: AppRadius.lg))
@@ -270,7 +270,7 @@ private struct IconPickerLogosTab: View {
         let isSelected = selection == .brandService(domain)
         return Button { pick(domain) } label: {
             HStack(spacing: AppSpacing.md) {
-                IconView(source: .brandService(domain), size: AppIconSize.Tile.sm)
+                Icon(source: .brandService(domain), size: AppIconSize.Tile.sm)
 
                 Text(verbatim: label)
                     .font(AppTypography.body)

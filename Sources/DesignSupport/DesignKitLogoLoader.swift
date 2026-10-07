@@ -4,7 +4,7 @@
 //
 //  Brand-logo loading is an app concern (which provider chain, caching, network).
 //  DesignKit ships no networking — host apps inject a loader. When none is set,
-//  `IconView(source: .brandService(name))` shows its fallback icon.
+//  `Icon(source: .brandService(name))` shows its fallback icon.
 //
 
 import UIKit

@@ -226,7 +226,7 @@ public struct ThumbnailCardSkeleton: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.xs) {
-            SkeletonView(height: ThumbnailMetrics.cardImageHeight, width: width, cornerRadius: AppRadius.md)
+            Skeleton(height: ThumbnailMetrics.cardImageHeight, width: width, cornerRadius: AppRadius.md)
             SkeletonText(AppTypography.bodyEmphasis, width: width * 0.7)
             SkeletonText(AppTypography.caption, width: width, lines: 2)
         }
@@ -242,7 +242,7 @@ public struct ThumbnailRowSkeleton: View {
 
     public var body: some View {
         HStack(alignment: .top, spacing: AppSpacing.md) {
-            SkeletonView(
+            Skeleton(
                 height: ThumbnailMetrics.rowImageSize,
                 width: ThumbnailMetrics.rowImageSize,
                 cornerRadius: AppRadius.md

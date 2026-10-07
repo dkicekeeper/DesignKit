@@ -102,7 +102,7 @@ struct ColorsScreen: View {
             ShowcaseSection(title: "Financial", subtitle: "Transaction-type tokens") {
                 tokenList(financial)
             }
-            ShowcaseSection(title: "Category palette", subtitle: "Deterministic hash → color · AppColors.pale(_:)") {
+            ShowcaseSection(title: "Category palette", subtitle: "CategoryColors · 30 picker colours, the first 14 also hashed") {
                 paletteDemo
             }
         }
@@ -279,17 +279,49 @@ struct ColorsScreen: View {
         }
     }
 
+    /// The 30 colours a user picks from (`CategoryColors.pickerPalette`, `ColorPickerRow`'s
+    /// default). The first 14, marked "#", are the hash palette too: the colour of a name that
+    /// has none stored (`CategoryColors.hexColor(for:)`: an insight's item, a letter avatar,
+    /// a category before the user picks one). Under them, a few names and the colour they hash to.
     private var paletteDemo: some View {
+        let hashed = CategoryColors.paletteColors.count
         let names = ["Food", "Travel", "Bills", "Health", "Shopping", "Salary", "Gifts", "Home"]
-        return LazyVGrid(columns: [GridItem(.adaptive(minimum: 76), spacing: AppSpacing.sm)], spacing: AppSpacing.sm) {
-            ForEach(names, id: \.self) { name in
-                let color = CategoryColors.hexColor(for: name)
-                Text(name)
-                    .font(AppTypography.caption.weight(.medium))
-                    .foregroundStyle(color)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, AppSpacing.sm)
-                    .background(AppColors.pale(color), in: RoundedRectangle(cornerRadius: AppRadius.md))
+        return VStack(alignment: .leading, spacing: AppSpacing.lg) {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: AppSpacing.sm), count: 6), spacing: AppSpacing.sm) {
+                ForEach(Array(CategoryColors.pickerPalette.enumerated()), id: \.offset) { index, hex in
+                    VStack(spacing: AppSpacing.xxs) {
+                        Circle()
+                            .fill(Color(hex: hex))
+                            .frame(width: 36, height: 36)
+                            .overlay {
+                                if index < hashed {
+                                    Text(verbatim: "#")
+                                        .font(AppTypography.caption.weight(.bold))
+                                        .foregroundStyle(AppColors.Text.primaryOnDark)
+                                }
+                            }
+                        Text(verbatim: hex)
+                            .font(AppTypography.caption2.monospaced())
+                            .foregroundStyle(AppColors.Text.tertiary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                    }
+                }
+            }
+            Text("# = also in the hash palette (\(hashed) of \(CategoryColors.pickerPalette.count)). Its size and order are frozen: a new colour goes to the picker only.")
+                .font(AppTypography.caption)
+                .foregroundStyle(AppColors.Text.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 76), spacing: AppSpacing.sm)], spacing: AppSpacing.sm) {
+                ForEach(names, id: \.self) { name in
+                    let color = CategoryColors.hexColor(for: name)
+                    Text(name)
+                        .font(AppTypography.caption.weight(.medium))
+                        .foregroundStyle(color)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, AppSpacing.sm)
+                        .background(AppColors.pale(color), in: RoundedRectangle(cornerRadius: AppRadius.md))
+                }
             }
         }
     }

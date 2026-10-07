@@ -66,7 +66,7 @@ public struct ProportionBarSkeleton: View {
     }
 
     public var body: some View {
-        SkeletonView(height: height, cornerRadius: AppRadius.xl)
+        Skeleton(height: height, cornerRadius: AppRadius.xl)
             .skeletonLoadingLabel()
     }
 }

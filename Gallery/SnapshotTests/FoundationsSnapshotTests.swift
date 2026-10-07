@@ -38,13 +38,13 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 VStack(spacing: AppSpacing.md) {
                     Button {} label: { Text(verbatim: "Primary").frame(maxWidth: .infinity) }
-                        .primaryButton()
+                        .dsButton()
                     Button {} label: { Text(verbatim: "Primary, disabled").frame(maxWidth: .infinity) }
-                        .primaryButton(disabled: true)
+                        .dsButton(disabled: true)
                     Button {} label: { Text(verbatim: "Secondary").frame(maxWidth: .infinity) }
-                        .secondaryButton()
-                    // No LoadingButtonLabel(isLoading: true): its spinner turns on a clock, so no
-                    // two captures match (docs/snapshots.md, "Not covered on purpose").
+                        .dsButton(.secondary)
+                    // No DSButton(isLoading: true): its spinner turns on a clock, so no two
+                    // captures match (docs/snapshots.md, "Not covered on purpose").
                 },
                 appearances: [.light, .dark, .largeText]
             )
@@ -53,16 +53,16 @@ extension ComponentSnapshots {
         @Test func buttonMatrix() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.md) {
-                    ForEach([AppButtonRole.normal, .destructive, .neutral], id: \.self) { role in
+                    ForEach([DSButtonRole.normal, .destructive, .neutral], id: \.self) { role in
                         HStack(spacing: AppSpacing.sm) {
-                            Button {} label: { Text(verbatim: "Primary") }.appButton(.primary, role: role, size: .medium)
-                            Button {} label: { Text(verbatim: "Secondary") }.appButton(.secondary, role: role, size: .medium)
-                            Button {} label: { Text(verbatim: "Flat") }.appButton(.flat, role: role, size: .medium)
+                            Button {} label: { Text(verbatim: "Primary") }.dsButton(.primary, role: role, size: .medium)
+                            Button {} label: { Text(verbatim: "Secondary") }.dsButton(.secondary, role: role, size: .medium)
+                            Button {} label: { Text(verbatim: "Flat") }.dsButton(.flat, role: role, size: .medium)
                         }
                     }
                     HStack(spacing: AppSpacing.sm) {
-                        Button {} label: { Text(verbatim: "Small") }.appButton(size: .small)
-                        Button {} label: { Text(verbatim: "Disabled") }.appButton(size: .medium, disabled: true)
+                        Button {} label: { Text(verbatim: "Small") }.dsButton(size: .small)
+                        Button {} label: { Text(verbatim: "Disabled") }.dsButton(size: .medium, disabled: true)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
@@ -139,11 +139,11 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.md) {
                     Button {} label: { Text(verbatim: "Start trip").frame(maxWidth: .infinity) }
-                        .primaryButton()
+                        .dsButton()
                     HStack(spacing: AppSpacing.md) {
-                        BadgeView("Verified", systemImage: "checkmark.seal")
+                        Badge("Verified", systemImage: "checkmark.seal")
                         SelectionIndicator(isSelected: true)
-                        AvatarView(name: "Ayan Seitkali", size: 32)
+                        Avatar(name: "Ayan Seitkali", size: 32)
                         HeroSymbol(systemImage: "map", size: 48)
                     }
                     LinearProgressBar(value: 0.6, animatesOnAppear: false)

@@ -213,7 +213,7 @@ public struct IconStyle: Equatable, Hashable {
     }
 
     /// Крупный логотип для карточек счетов (круг)
-    public static func roundedLogoLarge(size: CGFloat = AppIconSize.Tile.xs) -> IconStyle {
+    public static func roundedLogoLarge(size: CGFloat = AppIconSize.xxl) -> IconStyle {
         .circle(
             size: size,
             tint: .original
@@ -230,7 +230,7 @@ public struct IconStyle: Equatable, Hashable {
     }
 
     /// Крупная иконка сервиса для карточек подписок (круг)
-    public static func serviceLogoLarge(size: CGFloat = AppIconSize.Tile.xs) -> IconStyle {
+    public static func serviceLogoLarge(size: CGFloat = AppIconSize.xxl) -> IconStyle {
         .circle(
             size: size,
             tint: .original
@@ -284,7 +284,7 @@ public struct IconStyle: Equatable, Hashable {
     }
 
     /// Стеклянная иконка сервиса (круг)
-    public static func glassService(size: CGFloat = AppIconSize.Tile.xs) -> IconStyle {
+    public static func glassService(size: CGFloat = AppIconSize.xxl) -> IconStyle {
         .circle(
             size: size,
             tint: .original,
@@ -304,7 +304,7 @@ public struct IconStyle: Equatable, Hashable {
 
         if case .circle = shape,
            case .original = tint,
-           (size == AppIconSize.xl || size == AppIconSize.Tile.xs) {
+           (size == AppIconSize.xl || size == AppIconSize.xxl) {
             return String(localized: "iconStyle.preset.serviceLogo")
         }
 

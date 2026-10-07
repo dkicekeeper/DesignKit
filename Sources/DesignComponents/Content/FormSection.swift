@@ -10,8 +10,21 @@ import SwiftUI
 import DesignTokens
 import DesignSupport
 
-/// Form section container with optional header and footer
-/// Provides consistent styling for form groups with automatic dividers
+/// Form section container with optional header and footer.
+///
+/// The card adds no padding: its rows pad themselves (`UniversalRow(config: .standard)`,
+/// `MenuPickerRow`, `DatePickerRow`, …; docs/design-system.md §10), and the caller puts a
+/// `Divider()` between them. A bare field goes in a row's trailing slot:
+///
+/// ```swift
+/// FormSection(header: "Transaction") {
+///     UniversalRow(config: .standard) { Text("Title") } trailing: {
+///         FormTextField(text: $title, placeholder: "Title", style: .inline)
+///     }
+///     Divider().padding(.leading, AppSpacing.lg)
+///     DatePickerRow(icon: "calendar", title: "Date", selection: $date)
+/// }
+/// ```
 public struct FormSection<Content: View>: View {
     let header: String?
     let footer: String?
@@ -40,7 +53,7 @@ public struct FormSection<Content: View>: View {
             // Header
             if let header = header {
                 HStack {
-                    SectionHeaderView(header, style: .default)
+                    SectionHeader(header, style: .default)
                     Spacer()
                 }
             }

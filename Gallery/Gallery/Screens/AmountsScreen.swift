@@ -21,10 +21,9 @@ struct AmountsScreen: View {
             CurrencyAmountInputPage()
             CurrencyPickerMenuPage()
             CurrencyListPage()
-            FormattedAmountViewPage()
-            ConvertedAmountViewPage()
+            ConvertedAmountPage()
             SpentBudgetTextPage()
-            AmountPercentageViewPage()
+            AmountPercentagePage()
             RedactableAmountPage()
         }
     }
@@ -219,37 +218,17 @@ private struct CurrencyListPage: View {
     }
 }
 
-private struct FormattedAmountViewPage: View {
-    @State private var amount = 1_234_567.89
-    @State private var negative = false
-
-    var body: some View {
-        ComponentPage(
-            name: "FormattedAmountView",
-            summary: "A hero amount: the whole part large, the decimals smaller.",
-            apps: [.tenra]
-        ) {
-            FormattedAmountView(amount: negative ? -amount : amount, currency: "KZT")
-        } controls: {
-            SliderControl("Amount", value: $amount, in: 0...5_000_000, step: 0.01) {
-                $0.formatted(.number.precision(.fractionLength(2)))
-            }
-            ToggleControl("Negative", isOn: $negative)
-        }
-    }
-}
-
-private struct ConvertedAmountViewPage: View {
+private struct ConvertedAmountPage: View {
     @State private var from = "USD"
 
     var body: some View {
         ComponentPage(
-            name: "ConvertedAmountView",
+            name: "ConvertedAmount",
             summary: "≈ an amount in another currency, converted by the app's DesignKitCurrencyConverter.",
             apps: [.tenra],
             notes: ["The Gallery sets a sample converter; without one the view shows nothing."]
         ) {
-            ConvertedAmountView(amount: 100, fromCurrency: from, toCurrency: "KZT",
+            ConvertedAmount(amount: 100, fromCurrency: from, toCurrency: "KZT",
                                 fontSize: AppTypography.bodySmall, color: AppColors.textSecondary)
         } controls: {
             ChoiceControl("From", selection: $from, options: [("USD", "USD"), ("EUR", "EUR"), ("RUB", "RUB")])
@@ -275,16 +254,16 @@ private struct SpentBudgetTextPage: View {
     }
 }
 
-private struct AmountPercentageViewPage: View {
+private struct AmountPercentagePage: View {
     @State private var percentage = 42.0
 
     var body: some View {
         ComponentPage(
-            name: "AmountPercentageView",
+            name: "AmountPercentage",
             summary: "An amount with its share under it: the trailing side of a breakdown row.",
             apps: [.tenra]
         ) {
-            AmountPercentageView(amount: 42_000, currency: "KZT", percentage: percentage)
+            AmountPercentage(amount: 42_000, currency: "KZT", percentage: percentage)
         } controls: {
             SliderControl("Share", value: $percentage, in: 0...100, step: 1) { "\(Int($0))%" }
         }

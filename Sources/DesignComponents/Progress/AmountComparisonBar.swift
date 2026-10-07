@@ -87,7 +87,7 @@ public struct AmountComparisonBarSkeleton: View {
 
     public var body: some View {
         VStack(spacing: AppSpacing.sm) {
-            SkeletonView(height: AppSpacing.md, cornerRadius: AppRadius.xl)
+            Skeleton(height: AppSpacing.md, cornerRadius: AppRadius.xl)
             HStack {
                 SkeletonText(AppTypography.h4, width: 110)
                 Spacer()

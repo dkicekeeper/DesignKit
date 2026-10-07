@@ -1,5 +1,5 @@
 //
-//  BadgeView.swift
+//  Badge.swift
 //  DesignKit
 //
 //  Small capsule label for a status, a tag or a count ("Pending", "Closed", "3").
@@ -16,12 +16,12 @@ import DesignSupport
 /// - `.filled` — white text on a solid colour (counters that need attention).
 ///
 /// ```swift
-/// BadgeView("Closed", color: AppColors.destructive)
-/// BadgeView("3", systemImage: "person.badge.plus", color: AppColors.destructive, style: .filled)
+/// Badge("Closed", color: AppColors.destructive)
+/// Badge("3", systemImage: "person.badge.plus", color: AppColors.destructive, style: .filled)
 /// ```
 ///
 /// For an icon-only lifecycle status use `StatusIndicatorBadge`; for a trend use `TrendBadge`.
-public struct BadgeView: View {
+public struct Badge: View {
     public enum Style: Hashable, Sendable {
         case tinted
         case filled
@@ -71,8 +71,8 @@ public struct BadgeView: View {
 
 // MARK: - Skeleton
 
-/// Placeholder of a `BadgeView`: its capsule, as tall as a badge.
-public struct BadgeViewSkeleton: View {
+/// Placeholder of a `Badge`: its capsule, as tall as a badge.
+public struct BadgeSkeleton: View {
     let width: CGFloat
 
     public init(width: CGFloat = 64) {
@@ -86,8 +86,16 @@ public struct BadgeViewSkeleton: View {
             .hidden()
             .frame(width: width)
             .padding(.vertical, AppSpacing.xxs)
-            .background(SkeletonView.fill, in: Capsule())
+            .background(Skeleton.fill, in: Capsule())
             .shimmer()
             .skeletonLoadingLabel()
     }
 }
+
+// MARK: - Names before 2.0
+
+@available(*, deprecated, renamed: "BadgeSkeleton")
+public typealias BadgeViewSkeleton = BadgeSkeleton
+
+@available(*, deprecated, renamed: "Badge")
+public typealias BadgeView = Badge

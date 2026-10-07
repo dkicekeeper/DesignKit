@@ -54,7 +54,7 @@ public struct HeroSymbolSkeleton: View {
     }
 
     public var body: some View {
-        SkeletonView.circle(size)
+        Skeleton.circle(size)
             .skeletonLoadingLabel()
     }
 }

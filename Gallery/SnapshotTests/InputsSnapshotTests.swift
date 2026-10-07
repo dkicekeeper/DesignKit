@@ -19,7 +19,7 @@ extension ComponentSnapshots {
         @Test func pickers() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {
-                    SegmentedPickerView(
+                    SegmentedPicker(
                         title: "Period",
                         selection: .constant("month"),
                         options: [(label: "Week", value: "week"), (label: "Month", value: "month"), (label: "Year", value: "year")]
@@ -102,8 +102,11 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.md) {
                     AmountDigitDisplay(rawAmount: "1250.5")
-                    FormattedAmountView(amount: 1_234_567.89, currency: "KZT")
-                    FormattedAmountView(amount: 4_990, currency: "USD", prefix: "+", color: AppColors.income)
+                    // FormattedAmountView before 2.0: the same text in body semibold.
+                    FormattedAmountText(amount: 1_234_567.89, currency: "KZT",
+                                        fontSize: AppTypography.body, fontWeight: .semibold, color: AppColors.Text.primary)
+                    FormattedAmountText(amount: 4_990, currency: "USD", prefix: "+",
+                                        fontSize: AppTypography.body, fontWeight: .semibold, color: AppColors.income)
                     SpentBudgetText(spent: 185_000, budget: 250_000, currency: "KZT")
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
@@ -157,25 +160,52 @@ extension ComponentSnapshots {
                         PlusTabLabel(isExpanded: true)
                     }
                     .font(AppTypography.bodyEmphasis)
-                    BulkDeleteButton(count: 3) {}
+                    // BulkDeleteButton and EntityActionButton before 2.0.
+                    DSButton("Delete (3)", role: .destructive, shape: .capsule, fullWidth: true) {}
                     HStack(spacing: AppSpacing.sm) {
-                        EntityActionButton(title: "Edit", systemImage: "pencil") {}
-                        EntityActionButton(title: "Delete", systemImage: "trash", role: .destructive) {}
+                        DSButton("Edit", systemImage: "pencil", iconPlacement: .top) {}
+                        DSButton("Delete", systemImage: "trash", iconPlacement: .top, role: .destructive) {}
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             )
         }
 
+        /// DSButton (2.0.0): the icon before, after, alone; the three appearances with a role;
+        /// full width. No loading state: its spinner turns on a clock.
+        @Test func dsButtons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    HStack(spacing: AppSpacing.sm) {
+                        DSButton("Save", systemImage: "checkmark", size: .medium) {}
+                        DSButton("Next", systemImage: "arrow.right", iconPlacement: .trailing,
+                                 appearance: .secondary, size: .medium) {}
+                        DSButton("Close", systemImage: "xmark", iconPlacement: .only,
+                                 appearance: .secondary, size: .medium) {}
+                    }
+                    HStack(spacing: AppSpacing.sm) {
+                        DSButton("Delete", systemImage: "trash", role: .destructive, size: .small) {}
+                        DSButton("Cancel", appearance: .flat, role: .neutral, size: .small) {}
+                        DSButton("Disabled", size: .small, isDisabled: true) {}
+                    }
+                    DSButton("Start trip", fullWidth: true) {}
+                    DSButton("Share", systemImage: "square.and.arrow.up", appearance: .secondary,
+                             shape: .capsule, fullWidth: true) {}
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
         /// One row of glass buttons per snapshot.
         @Test func dateButtons() async {
             await assertComponentSnapshot(
-                DateButtonsView(selectedDate: .constant(Date()), onSave: { _ in }),
+                DateButtons(selectedDate: .constant(Date()), onSave: { _ in }),
                 named: "enabled",
                 appearances: [.light, .dark, .largeText]
             )
             await assertComponentSnapshot(
-                DateButtonsView(selectedDate: .constant(Date()), isDisabled: true, onSave: { _ in }),
+                DateButtons(selectedDate: .constant(Date()), isDisabled: true, onSave: { _ in }),
                 named: "disabled"
             )
         }
@@ -195,7 +225,7 @@ extension ComponentSnapshots {
 
         @Test func amountPercentageView() async {
             await assertComponentSnapshot(
-                AmountPercentageView(amount: 42_000, currency: "KZT", percentage: 42)
+                AmountPercentage(amount: 42_000, currency: "KZT", percentage: 42)
                     .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light, .largeText]
             )

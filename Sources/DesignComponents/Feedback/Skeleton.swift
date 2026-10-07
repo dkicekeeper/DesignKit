@@ -1,5 +1,5 @@
 //
-//  SkeletonView.swift
+//  Skeleton.swift
 //  DesignKit
 //
 //  Loading placeholders: grey shapes in the layout of the content that is coming, with a
@@ -23,13 +23,13 @@ import DesignSupport
 /// One placeholder shape.
 ///
 /// ```swift
-/// SkeletonView(height: 14, width: 120)                 // a line of text
-/// SkeletonView(height: 40, width: 40, cornerRadius: 20) // an avatar
-/// SkeletonView(height: 160)                            // an image, full width
+/// Skeleton(height: 14, width: 120)                 // a line of text
+/// Skeleton(height: 40, width: 40, cornerRadius: 20) // an avatar
+/// Skeleton(height: 160)                            // an image, full width
 /// ```
 ///
 /// The corner is `AppRadius.soft` unless the shape stands for something with its own corner.
-public struct SkeletonView: View {
+public struct Skeleton: View {
     let height: CGFloat
     let width: CGFloat?
     let cornerRadius: CGFloat
@@ -42,7 +42,7 @@ public struct SkeletonView: View {
 
     public var body: some View {
         RoundedRectangle(cornerRadius: cornerRadius)
-            .fill(SkeletonView.fill)
+            .fill(Skeleton.fill)
             .frame(width: width, height: height)
             .frame(maxWidth: width == nil ? .infinity : nil, alignment: .leading)
             .shimmer()
@@ -53,13 +53,13 @@ public struct SkeletonView: View {
     static let fill = AppColors.Background.neutral2
 
     /// A circle: an avatar, a round icon, a dot.
-    public static func circle(_ diameter: CGFloat) -> SkeletonView {
-        SkeletonView(height: diameter, width: diameter, cornerRadius: diameter / 2)
+    public static func circle(_ diameter: CGFloat) -> Skeleton {
+        Skeleton(height: diameter, width: diameter, cornerRadius: diameter / 2)
     }
 
     /// A capsule: a chip, a badge, a glass button. Full width without `width`.
-    public static func capsule(height: CGFloat, width: CGFloat? = nil) -> SkeletonView {
-        SkeletonView(height: height, width: width, cornerRadius: height / 2)
+    public static func capsule(height: CGFloat, width: CGFloat? = nil) -> Skeleton {
+        Skeleton(height: height, width: width, cornerRadius: height / 2)
     }
 }
 
@@ -105,7 +105,7 @@ public struct SkeletonText: View {
             .overlay(alignment: .leading) {
                 GeometryReader { proxy in
                     RoundedRectangle(cornerRadius: AppRadius.soft)
-                        .fill(SkeletonView.fill)
+                        .fill(Skeleton.fill)
                         .frame(width: proxy.size.width * (isLast ? 0.6 : 1), height: proxy.size.height * 0.7)
                         .frame(maxHeight: .infinity)
                 }
@@ -128,11 +128,11 @@ public struct SkeletonRow: View {
     public var body: some View {
         HStack(spacing: AppSpacing.md) {
             if showsIcon {
-                SkeletonView(height: AppIconSize.Tile.xs, width: AppIconSize.Tile.xs, cornerRadius: AppIconSize.Tile.xs / 2)
+                Skeleton(height: AppIconSize.xxl, width: AppIconSize.xxl, cornerRadius: AppIconSize.xxl / 2)
             }
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                SkeletonView(height: 14, width: 160)
-                SkeletonView(height: 12, width: 100)
+                Skeleton(height: 14, width: 160)
+                Skeleton(height: 12, width: 100)
             }
             Spacer(minLength: 0)
         }
@@ -166,7 +166,7 @@ public extension View {
         }
     }
 
-    /// For a stack of `SkeletonView` / `SkeletonRow` (whose shapes are hidden from VoiceOver):
+    /// For a stack of `Skeleton` / `SkeletonRow` (whose shapes are hidden from VoiceOver):
     /// one element that reads "Loading" (key `skeleton.loading`), so the screen is not silent.
     ///
     /// ```swift
@@ -246,3 +246,8 @@ private struct ShimmerModifier: ViewModifier {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }
 }
+
+// MARK: - Names before 2.0
+
+@available(*, deprecated, renamed: "Skeleton")
+public typealias SkeletonView = Skeleton

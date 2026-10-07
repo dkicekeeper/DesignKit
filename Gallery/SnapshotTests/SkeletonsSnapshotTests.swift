@@ -20,13 +20,13 @@ extension ComponentSnapshots {
         @Test func shapes() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.md) {
-                    SkeletonView(height: 48)
+                    Skeleton(height: 48)
                     SkeletonText(AppTypography.h3, width: 160)
                     SkeletonText(AppTypography.body, lines: 2)
                     HStack(spacing: AppSpacing.md) {
-                        SkeletonView.circle(AppIconSize.Tile.sm)
-                        IconViewSkeleton(style: .roundedSquare(size: AppIconSize.Tile.sm))
-                        SkeletonView.capsule(height: 32, width: 96)
+                        Skeleton.circle(AppIconSize.Tile.sm)
+                        IconSkeleton(style: .roundedSquare(size: AppIconSize.Tile.sm))
+                        Skeleton.capsule(height: 32, width: 96)
                     }
                     SkeletonRow()
                 }
@@ -51,7 +51,7 @@ extension ComponentSnapshots {
                 ("metricBottom", AnyView(MetricCardSkeleton(chartPlacement: .bottom))),
                 ("weightBreakdown", AnyView(WeightBreakdownCardSkeleton())),
                 ("calculation", AnyView(CalculationCardSkeleton())),
-                ("dateSectionHeader", AnyView(DateSectionHeaderViewSkeleton())),
+                ("dateSectionHeader", AnyView(SectionHeaderSkeleton(style: .card, showsTrailing: true))),
                 ("monthCalendar", AnyView(MonthCalendarSkeleton())),
             ]
             for (name, card) in cards {
@@ -191,7 +191,7 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.md) {
                     HStack(spacing: AppSpacing.md) {
-                        BadgeViewSkeleton()
+                        BadgeSkeleton()
                         TrendBadgeSkeleton()
                         TrendBadgeSkeleton(style: .inline)
                         StatusIndicatorBadgeSkeleton(font: AppTypography.h4)
@@ -200,14 +200,14 @@ extension ComponentSnapshots {
                     StatusBannerSkeleton(style: .compact)
                     RecommendationBoxSkeleton()
                     HStack(spacing: AppSpacing.lg) {
-                        AvatarViewSkeleton()
+                        AvatarSkeleton()
                         AvatarGroupSkeleton()
                         HeroSymbolSkeleton(size: 64)
                         StatTileSkeleton()
                     }
                     HStack(spacing: AppSpacing.lg) {
-                        PackedCircleIconsViewSkeleton()
-                        RatingViewSkeleton(size: 20)
+                        PackedCircleIconsSkeleton()
+                        RatingSkeleton(size: 20)
                     }
                     ChipPickerSkeleton(count: 3)
                     FormattedAmountTextSkeleton(font: AppTypography.h1, width: 200)
@@ -222,8 +222,8 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {
                     HeroSectionSkeleton(showsProgress: true)
-                    SectionHeaderViewSkeleton()
-                    SectionHeaderViewSkeleton(style: .large)
+                    SectionHeaderSkeleton()
+                    SectionHeaderSkeleton(style: .large)
                     ExpandableTextSkeleton()
                     ActivityTimelineSkeleton()
                 }
@@ -246,8 +246,8 @@ extension ComponentSnapshots {
         @Test func headerAndSliderSkeletons() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {
-                    SectionHeaderViewSkeleton(showsTrailing: true)
-                    SectionHeaderViewSkeleton(style: .large, showsTrailing: true)
+                    SectionHeaderSkeleton(showsTrailing: true)
+                    SectionHeaderSkeleton(style: .large, showsTrailing: true)
                     SliderRowSkeleton(showsHint: true)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),

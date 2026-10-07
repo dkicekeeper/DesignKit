@@ -150,11 +150,11 @@ public struct ChartSwitcherSkeleton: View {
         VStack(spacing: AppSpacing.sm) {
             HStack(spacing: AppSpacing.md) {
                 // The segmented picker (a capsule) and the two round zoom buttons.
-                SkeletonView.capsule(height: 32, width: 120)
+                Skeleton.capsule(height: 32, width: 120)
                 Spacer()
                 HStack(spacing: 0) {
-                    SkeletonView.circle(44)
-                    SkeletonView.circle(44)
+                    Skeleton.circle(44)
+                    Skeleton.circle(44)
                 }
             }
             .shimmer()
