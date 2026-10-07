@@ -124,7 +124,7 @@ public struct MessageBanner: View {
 
             Text(message)
                 .font(AppTypography.body)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
                 .lineLimit(3)
                 .fixedSize(horizontal: false, vertical: true)
                 // Smooth a message that changes in place (same banner identity) instead

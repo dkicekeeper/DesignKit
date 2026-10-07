@@ -72,7 +72,7 @@ public struct ReactionButton: View {
                     } icon: {
                         Image(systemName: isSelected ? selectedSystemImage : systemImage)
                     }
-                    .foregroundStyle(isSelected ? AppColors.accent : AppColors.textSecondary)
+                    .foregroundStyle(isSelected ? AppColors.accent : AppColors.Text.secondary)
                     .frame(minWidth: 44, minHeight: 44, alignment: .leading)
                     .contentShape(Rectangle())
                 }
@@ -85,7 +85,7 @@ public struct ReactionButton: View {
                 } icon: {
                     Image(systemName: systemImage)
                 }
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
                 .accessibilityLabel(Text(verbatim: accessibilityLabel))
             }
         }

@@ -69,20 +69,20 @@ public struct ReviewCard<Trailing: View, Media: View, Actions: View>: View {
             HStack(spacing: AppSpacing.sm) {
                 Text(verbatim: author)
                     .font(AppTypography.bodyEmphasis)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                     .lineLimit(1)
                 RatingView(rating: rating, size: ReviewCardMetrics.starSize)
                 Spacer(minLength: 0)
                 Text(verbatim: date.formatted(.relative(presentation: .named)))
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textTertiary)
+                    .foregroundStyle(AppColors.Text.tertiary)
                     .lineLimit(1)
                 menu
             }
             if let subtitle {
                 Text(verbatim: subtitle)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
             if let text, !text.isEmpty {
                 ExpandableText(text, lineLimit: 4, font: AppTypography.bodySmall)

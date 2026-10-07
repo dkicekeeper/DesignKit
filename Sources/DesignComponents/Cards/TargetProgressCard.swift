@@ -100,7 +100,7 @@ public struct TargetProgressCard: View {
             if let summary {
                 Text(summary)
                     .font(AppTypography.body)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
             valueRow
             LinearProgressBar(
@@ -111,7 +111,7 @@ public struct TargetProgressCard: View {
             if let explanation {
                 Text(explanation)
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
             if let recommendation {
@@ -134,17 +134,17 @@ public struct TargetProgressCard: View {
 
             Text(title)
                 .font(AppTypography.bodyEmphasis)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
 
             Spacer()
 
             if let badge {
                 Text(badge)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .padding(.horizontal, AppSpacing.sm)
                     .padding(.vertical, AppSpacing.xxs)
-                    .background(AppColors.pale(AppColors.textSecondary))
+                    .background(AppColors.pale(AppColors.Text.secondary))
                     .clipShape(Capsule())
             }
         }
@@ -157,10 +157,10 @@ public struct TargetProgressCard: View {
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
                 Text(currentLabel)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textTertiary)
+                    .foregroundStyle(AppColors.Text.tertiary)
                 Text(currentValue)
                     .font(AppTypography.h2.bold())
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
             }
 
             Spacer()
@@ -168,10 +168,10 @@ public struct TargetProgressCard: View {
             VStack(alignment: .trailing, spacing: AppSpacing.xxs) {
                 Text(targetLabel)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textTertiary)
+                    .foregroundStyle(AppColors.Text.tertiary)
                 Text(targetValue)
                     .font(AppTypography.body)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
         }
     }

@@ -88,7 +88,7 @@ public struct MiniHalfGauge: View {
             )
             context.stroke(
                 track,
-                with: .color(AppColors.textSecondary.opacity(0.18)),
+                with: .color(AppColors.Text.secondary.opacity(0.18)),
                 style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
             )
 
@@ -134,7 +134,7 @@ public struct MiniHalfGauge: View {
                     width: dotRadius * 2,
                     height: dotRadius * 2
                 )),
-                with: .color(AppColors.bgBase)
+                with: .color(AppColors.Background.base)
             )
         }
         .frame(height: height)

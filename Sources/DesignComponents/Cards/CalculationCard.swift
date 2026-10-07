@@ -95,7 +95,7 @@ public struct CalculationCard: View {
             if let explanation {
                 Text(explanation)
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
             if let recommendation {
@@ -115,7 +115,7 @@ public struct CalculationCard: View {
 
             Text(title)
                 .font(AppTypography.bodyEmphasis)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
 
             Spacer()
         }
@@ -125,10 +125,10 @@ public struct CalculationCard: View {
         VStack(alignment: .leading, spacing: AppSpacing.xs) {
             Text(heroLabel ?? "")
                 .font(AppTypography.body)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
             Text(value)
                 .font(AppTypography.h1.bold())
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
         }
         .padding(.vertical, AppSpacing.md)
     }
@@ -149,7 +149,7 @@ public struct CalculationCard: View {
         HStack(alignment: .firstTextBaseline) {
             Text(row.label)
                 .font(row.isEmphasised ? AppTypography.bodyEmphasis : AppTypography.body)
-                .foregroundStyle(row.isEmphasised ? AppColors.textPrimary : AppColors.textSecondary)
+                .foregroundStyle(row.isEmphasised ? AppColors.Text.primary : AppColors.Text.secondary)
             Spacer()
             switch row.value {
             case .amount(let amount, let currency):
@@ -158,13 +158,13 @@ public struct CalculationCard: View {
                     currency: currency,
                     fontSize: row.isEmphasised ? AppTypography.bodyEmphasis : AppTypography.body,
                     fontWeight: row.isEmphasised ? .bold : .semibold,
-                    color: row.isEmphasised ? color : AppColors.textPrimary
+                    color: row.isEmphasised ? color : AppColors.Text.primary
                 )
             case .text(let text):
                 Text(text)
                     .font(row.isEmphasised ? AppTypography.bodyEmphasis : AppTypography.body)
                     .fontWeight(row.isEmphasised ? .bold : .semibold)
-                    .foregroundStyle(row.isEmphasised ? color : AppColors.textPrimary)
+                    .foregroundStyle(row.isEmphasised ? color : AppColors.Text.primary)
                     .monospacedDigit()
             }
         }

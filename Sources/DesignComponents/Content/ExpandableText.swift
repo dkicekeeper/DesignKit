@@ -33,7 +33,7 @@ public struct ExpandableText: View {
         _ text: String,
         lineLimit: Int = 3,
         font: Font = AppTypography.body,
-        color: Color = AppColors.textPrimary
+        color: Color = AppColors.Text.primary
     ) {
         self.text = text
         self.lineLimit = max(1, lineLimit)

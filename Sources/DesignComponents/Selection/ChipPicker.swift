@@ -70,7 +70,7 @@ public struct ChipPicker<Option: Hashable>: View {
             if let title {
                 Text(verbatim: title)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: AppSpacing.sm) {

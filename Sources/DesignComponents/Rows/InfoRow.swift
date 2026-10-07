@@ -32,7 +32,7 @@ public struct InfoRowLayout<Value: View>: View {
         HStack(spacing: AppSpacing.md) {
             Text(label)
                 .font(AppTypography.body)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
                 .lineLimit(1)
                 .truncationMode(.tail)
             Spacer(minLength: AppSpacing.sm)
@@ -85,7 +85,7 @@ public struct InfoRow: View {
                         prefix: display.prefix,
                         fontSize: AppTypography.bodyEmphasis,
                         fontWeight: .semibold,
-                        color: AppColors.textPrimary
+                        color: AppColors.Text.primary
                     )
                 } else {
                     Text(value)

@@ -59,7 +59,7 @@ public struct OnboardingStepIndicator: View {
             .fill(
                 isCompleted
                     ? AppColors.accent.opacity(0.6)
-                    : AppColors.textSecondary.opacity(0.3)
+                    : AppColors.Text.secondary.opacity(0.3)
             )
             .frame(width: 10, height: 1.5)
     }
@@ -77,7 +77,7 @@ public struct OnboardingStepIndicator: View {
                     ? AnyShapeStyle(AppColors.accent.gradient)
                     : isCompleted
                         ? AnyShapeStyle(AppColors.accent.opacity(0.55))
-                        : AnyShapeStyle(AppColors.textSecondary.opacity(0.4))
+                        : AnyShapeStyle(AppColors.Text.secondary.opacity(0.4))
             )
             .scaleEffect(isActive ? 1.15 : 1)
             .frame(width: 24, height: 24)

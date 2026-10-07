@@ -123,7 +123,7 @@ public struct EditableHero: View {
 
     private var amountView: some View {
         VStack(spacing: AppSpacing.sm) {
-            AmountInput(amount: $amount, baseFontSize: 48, placeholderColor: AppColors.textTertiary)
+            AmountInput(amount: $amount, baseFontSize: 48, placeholderColor: AppColors.Text.tertiary)
                 .padding(.horizontal, AppSpacing.lg)
 
             if options.showsCurrency {

@@ -51,7 +51,7 @@ public struct AmountComparisonBar: View {
             } else {
                 // No data yet — keep the slot height stable with a muted track.
                 RoundedRectangle(cornerRadius: AppRadius.xl)
-                    .fill(AppColors.bgMuted)
+                    .fill(AppColors.Background.neutral2)
                     .frame(height: AppSpacing.md)
             }
 
@@ -62,7 +62,7 @@ public struct AmountComparisonBar: View {
                     currency: currency,
                     fontSize: AppTypography.h4,
                     fontWeight: .semibold,
-                    color: AppColors.textPrimary
+                    color: AppColors.Text.primary
                 )
 
                 Spacer()

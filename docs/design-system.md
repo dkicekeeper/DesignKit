@@ -116,7 +116,7 @@ Modifiers:
 
 **`AppColors.Border`** — `normal` (`.separator`), `opaque` (`.opaqueSeparator`), `selected` (accent), `darkModeOnly` (clear in light, white 10% in dark: a hairline around logos, avatars and images that would melt into black), `onDark` (white 10%), `onLight` (black 5%).
 
-**Flat names (1.x)** stay as aliases of the groups, with the same values: `bgBase` = `Background.base`, `bgCard` = `Background.neutral1`, `bgMuted` = `Background.neutral2`, `textPrimary` / `textSecondary` / `textTertiary` = `Text.*`, `destructive` = `Status.negative`, `success` = `Status.positive`, `warning` = `Status.warning`, `staticWhite` = `Text.primaryOnDark`, `planned` = `Status.info`. New code uses the groups; the components move over in later releases, where a move changes nothing visible or is called out.
+**Flat names (1.x)** stay as aliases of the groups, with the same values: `bgBase` = `Background.base`, `bgCard` = `Background.neutral1`, `bgMuted` = `Background.neutral2`, `textPrimary` / `textSecondary` / `textTertiary` = `Text.*`, `destructive` = `Status.negative`, `success` = `Status.positive`, `warning` = `Status.warning`, `staticWhite` = `Text.primaryOnDark`, `planned` = `Status.info`. New code uses the groups. Since 1.13.1 every component reads `Background.*` and `Text.*`; `accent`, `destructive`, `success`, `warning` and `staticWhite` stay as they are, they name a role rather than a level.
 
 | Token | Value | Use For |
 |-------|-------|---------|

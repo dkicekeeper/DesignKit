@@ -38,7 +38,7 @@ public struct ImportProgressSheet: View {
         VStack(spacing: AppSpacing.xl) {
             Text(String(localized: "progress.importing"))
                 .font(AppTypography.h4)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
 
             VStack(spacing: AppSpacing.sm) {
                 ProgressView(value: progress)
@@ -49,13 +49,13 @@ public struct ImportProgressSheet: View {
                 HStack {
                     Text("\(currentRow) / \(totalRows)")
                         .font(AppTypography.body)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
 
                     Spacer()
 
                     Text("\(Int(progress * 100))%")
                         .font(AppTypography.body)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
                         .fontWeight(.semibold)
                 }
             }

@@ -84,7 +84,7 @@ public struct CurrencyList: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text(title)
                 .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
                 .padding(.horizontal, AppSpacing.sm)
 
             // Lazy: about 150 currencies, built as they scroll in.
@@ -98,7 +98,7 @@ public struct CurrencyList: View {
                 }
             }
             .background(
-                AppColors.bgCard,
+                AppColors.Background.neutral1,
                 in: RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous)
             )
         }
@@ -113,15 +113,15 @@ public struct CurrencyList: View {
                 VStack(alignment: .leading, spacing: AppSpacing.xxs) {
                     Text(verbatim: currency.code)
                         .font(AppTypography.bodyEmphasis)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
                     Text(verbatim: currency.name)
                         .font(AppTypography.bodySmall)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                 }
                 Spacer()
                 Text(verbatim: currency.symbol)
                     .font(AppTypography.body)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                 if currency.code == selection {
                     Image(systemName: "checkmark")
                         .font(AppTypography.bodySmall)

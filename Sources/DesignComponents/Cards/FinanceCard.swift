@@ -46,7 +46,7 @@ public struct FinanceCard<Hero: View, Trailing: View>: View {
             VStack(alignment: .leading, spacing: AppSpacing.lg) {
                 Text(title)
                     .font(AppTypography.h3)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
 
                 if isEmpty {
                     EmptyStateView(title: emptyTitle, style: .compact)
@@ -56,7 +56,7 @@ public struct FinanceCard<Hero: View, Trailing: View>: View {
                         hero()
                         Text(subtitle)
                             .font(AppTypography.bodySmall)
-                            .foregroundStyle(AppColors.textPrimary)
+                            .foregroundStyle(AppColors.Text.primary)
                     }
                     .transition(.opacity)
                 }
@@ -106,7 +106,7 @@ public struct RedactableAmount: View {
                     currency: currency,
                     fontSize: fontSize,
                     fontWeight: .bold,
-                    color: AppColors.textPrimary
+                    color: AppColors.Text.primary
                 )
                 .transition(.opacity)
             }

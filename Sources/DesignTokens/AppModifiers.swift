@@ -19,7 +19,7 @@ public extension View {
     func filterChipStyle(isSelected: Bool = false) -> some View {
         self
             .font(AppTypography.bodySmall.weight(.medium))
-            .foregroundStyle(AppColors.textPrimary)
+            .foregroundStyle(AppColors.Text.primary)
             .padding(.horizontal, AppSpacing.lg)
             .padding(.vertical, AppSpacing.sm)
             .clipShape(.rect(cornerRadius: AppRadius.xl))

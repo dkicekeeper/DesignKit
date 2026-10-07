@@ -162,7 +162,7 @@ public struct HeroSparkline<Point: ChartPoint>: View {
 
             if series.showsZeroRule, domain.lowerBound < 0 {
                 RuleMark(y: .value("Zero", 0))
-                    .foregroundStyle(AppColors.textTertiary.opacity(0.5))
+                    .foregroundStyle(AppColors.Text.tertiary.opacity(0.5))
                     .lineStyle(StrokeStyle(lineWidth: 0.5, dash: [4, 4]))
             }
 
@@ -190,7 +190,7 @@ public struct HeroSparkline<Point: ChartPoint>: View {
                     Circle()
                         .strokeBorder(tint, lineWidth: 2)
                         .frame(width: 11, height: 11)
-                        .background(Circle().fill(AppColors.bgBase))
+                        .background(Circle().fill(AppColors.Background.base))
                 }
             }
 

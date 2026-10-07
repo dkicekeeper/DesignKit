@@ -67,7 +67,7 @@ public struct ComparisonCard: View {
         switch direction {
         case .up: return increaseIsGood ? AppColors.success : AppColors.destructive
         case .down: return increaseIsGood ? AppColors.destructive : AppColors.success
-        case .flat: return AppColors.textSecondary
+        case .flat: return AppColors.Text.secondary
         }
     }
 
@@ -90,13 +90,13 @@ public struct ComparisonCard: View {
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
                 Text(previousLabel)
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                 FormattedAmountText(
                     amount: previousAmount,
                     currency: currency,
                     fontSize: AppTypography.h3,
                     fontWeight: .semibold,
-                    color: AppColors.textSecondary
+                    color: AppColors.Text.secondary
                 )
             }
 
@@ -116,13 +116,13 @@ public struct ComparisonCard: View {
             VStack(alignment: .trailing, spacing: AppSpacing.xxs) {
                 Text(currentLabel)
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                 FormattedAmountText(
                     amount: currentAmount,
                     currency: currency,
                     fontSize: AppTypography.h3,
                     fontWeight: .bold,
-                    color: AppColors.textPrimary
+                    color: AppColors.Text.primary
                 )
             }
         }
@@ -134,26 +134,26 @@ public struct ComparisonCard: View {
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
                 Text(previousLabel)
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                 FormattedAmountText(
                     amount: previousAmount,
                     currency: currency,
                     fontSize: AppTypography.h3,
                     fontWeight: .semibold,
-                    color: AppColors.textSecondary
+                    color: AppColors.Text.secondary
                 )
             }
 
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
                 Text(currentLabel)
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                 FormattedAmountText(
                     amount: currentAmount,
                     currency: currency,
                     fontSize: AppTypography.h3,
                     fontWeight: .bold,
-                    color: AppColors.textPrimary
+                    color: AppColors.Text.primary
                 )
             }
 

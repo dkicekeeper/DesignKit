@@ -54,7 +54,7 @@ public struct StepTracker: View {
             if showsLabels {
                 Text(verbatim: steps[index])
                     .font(AppTypography.caption)
-                    .foregroundStyle(index == current ? AppColors.textPrimary : AppColors.textSecondary)
+                    .foregroundStyle(index == current ? AppColors.Text.primary : AppColors.Text.secondary)
                     .fontWeight(index == current ? .semibold : .regular)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
@@ -66,7 +66,7 @@ public struct StepTracker: View {
 
     private func connector(visible: Bool, done: Bool) -> some View {
         Rectangle()
-            .fill(visible ? (done ? AppColors.accent : AppColors.bgMuted) : .clear)
+            .fill(visible ? (done ? AppColors.accent : AppColors.Background.neutral2) : .clear)
             .frame(height: lineHeight)
             .frame(maxWidth: .infinity)
     }
@@ -80,16 +80,16 @@ public struct StepTracker: View {
                     .font(.system(size: circleSize * 0.45, weight: .bold))
                     .foregroundStyle(AppColors.staticWhite)
             } else if index == current {
-                Circle().fill(AppColors.bgCard)
+                Circle().fill(AppColors.Background.neutral1)
                 Circle().strokeBorder(AppColors.accent, lineWidth: 2)
                 Text(verbatim: "\(index + 1)")
                     .font(AppTypography.caption.weight(.semibold))
                     .foregroundStyle(AppColors.accent)
             } else {
-                Circle().fill(AppColors.bgMuted)
+                Circle().fill(AppColors.Background.neutral2)
                 Text(verbatim: "\(index + 1)")
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
         }
         .frame(width: circleSize, height: circleSize)

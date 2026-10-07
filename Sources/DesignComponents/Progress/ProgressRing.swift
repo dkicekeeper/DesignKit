@@ -155,7 +155,7 @@ public struct ProgressRing: View {
             if showsTrack {
                 Circle()
                     .stroke(
-                        AppColors.textSecondary.opacity(0.15),
+                        AppColors.Text.secondary.opacity(0.15),
                         style: StrokeStyle(lineWidth: lineWidth)
                     )
             }

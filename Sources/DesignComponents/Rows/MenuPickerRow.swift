@@ -52,7 +52,7 @@ public struct MenuPickerRow<T: Hashable>: View {
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text(title)
                         .font(AppTypography.body)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
                     menu
                 }
             } trailing: {
@@ -65,7 +65,7 @@ public struct MenuPickerRow<T: Hashable>: View {
             ) {
                 Text(title)
                     .font(AppTypography.body)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
             } trailing: {
                 menu
             }
@@ -84,11 +84,11 @@ public struct MenuPickerRow<T: Hashable>: View {
                 HStack(spacing: AppSpacing.xs) {
                     Text(selectedOption.label)
                         .font(AppTypography.body)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
                         .lineLimit(1)
                     Image(systemName: "chevron.up.chevron.down")
                         .font(.caption2.weight(.semibold))
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
                 }
             }
         }

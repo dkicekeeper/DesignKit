@@ -50,7 +50,7 @@ public struct SkeletonView: View {
     }
 
     /// The grey of every skeleton shape.
-    static let fill = AppColors.bgMuted
+    static let fill = AppColors.Background.neutral2
 
     /// A circle: an avatar, a round icon, a dot.
     public static func circle(_ diameter: CGFloat) -> SkeletonView {

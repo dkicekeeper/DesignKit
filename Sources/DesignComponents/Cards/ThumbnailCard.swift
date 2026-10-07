@@ -79,7 +79,7 @@ public struct ThumbnailCard<Picture: View, Details: View>: View {
             HStack(spacing: AppSpacing.xxs) {
                 Text(verbatim: title)
                     .font(AppTypography.bodyEmphasis)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                     .lineLimit(1)
                 if isVerified {
                     VerifiedSeal(label: verifiedLabel)
@@ -87,7 +87,7 @@ public struct ThumbnailCard<Picture: View, Details: View>: View {
             }
             details
                 .font(AppTypography.caption)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
         }
         .frame(width: width, alignment: .leading)
         .contentShape(Rectangle())
@@ -142,7 +142,7 @@ public struct ThumbnailRow<Picture: View, Details: View>: View {
                 HStack(spacing: AppSpacing.xxs) {
                     Text(verbatim: title)
                         .font(AppTypography.bodyEmphasis)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
                         .lineLimit(2)
                     if isVerified {
                         VerifiedSeal(label: verifiedLabel)
@@ -156,7 +156,7 @@ public struct ThumbnailRow<Picture: View, Details: View>: View {
                 }
                 details
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
             Spacer(minLength: 0)
         }

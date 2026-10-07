@@ -56,10 +56,10 @@ public struct CalculatorKeypad: View {
     // MARK: - Keys
 
     private func digit(_ value: String) -> some View {
-        keyButton(background: AppColors.bgCard) {
+        keyButton(background: AppColors.Background.neutral1) {
             model.tapDigit(Character(value))
         } label: {
-            Text(value).foregroundStyle(AppColors.textPrimary)
+            Text(value).foregroundStyle(AppColors.Text.primary)
         }
     }
 
@@ -73,17 +73,17 @@ public struct CalculatorKeypad: View {
     }
 
     private func separatorKey() -> some View {
-        keyButton(background: AppColors.bgCard) {
+        keyButton(background: AppColors.Background.neutral1) {
             model.tapSeparator()
         } label: {
-            Text(",").foregroundStyle(AppColors.textPrimary)
+            Text(",").foregroundStyle(AppColors.Text.primary)
         }
         .accessibilityLabel(Text(String(localized: "calculator.separator", defaultValue: "Decimal separator")))
     }
 
     private func backspaceKey() -> some View {
-        keyShape(background: AppColors.bgCard) {
-            Image(systemName: "delete.left").foregroundStyle(AppColors.textSecondary)
+        keyShape(background: AppColors.Background.neutral1) {
+            Image(systemName: "delete.left").foregroundStyle(AppColors.Text.secondary)
         }
         .scaleEffect(backspacePressed ? 0.96 : 1.0)
         .brightness(backspacePressed ? -0.05 : 0.0)

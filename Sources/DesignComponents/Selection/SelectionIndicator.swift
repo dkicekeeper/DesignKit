@@ -22,7 +22,7 @@ public struct SelectionIndicator: View {
     let tint: Color
 
     /// - Parameter tint: colour of the filled check (default accent; e.g. `AppColors.success`
-    ///   for a done checklist item, `AppColors.textTertiary` for a disabled, already-owned one).
+    ///   for a done checklist item, `AppColors.Text.tertiary` for a disabled, already-owned one).
     public init(
         isSelected: Bool,
         tint: Color = AppColors.accent
@@ -34,7 +34,7 @@ public struct SelectionIndicator: View {
     public var body: some View {
         Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
             .font(.title3)
-            .foregroundStyle(isSelected ? tint : AppColors.textSecondary)
+            .foregroundStyle(isSelected ? tint : AppColors.Text.secondary)
             .symbolEffect(.bounce, value: isSelected)
             // The row itself carries the label and the `.isSelected` trait.
             .accessibilityHidden(true)

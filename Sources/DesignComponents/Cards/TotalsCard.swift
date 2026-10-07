@@ -37,7 +37,7 @@ public struct TotalsCard: View {
             title: String,
             amount: Double,
             previous: Double? = nil,
-            color: Color = AppColors.textPrimary,
+            color: Color = AppColors.Text.primary,
             increaseIsGood: Bool = true
         ) {
             self.id = id ?? title
@@ -78,7 +78,7 @@ public struct TotalsCard: View {
             if let title {
                 Text(title)
                     .font(AppTypography.bodyEmphasis)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
             }
 
             if dynamicTypeSize.isAccessibilitySize {
@@ -108,7 +108,7 @@ public struct TotalsCard: View {
         HStack(alignment: .firstTextBaseline, spacing: AppSpacing.sm) {
             Text(item.title)
                 .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
                 .layoutPriority(1)
 
             Spacer(minLength: 0)
@@ -135,7 +135,7 @@ public struct TotalsCard: View {
         VStack(alignment: .leading, spacing: AppSpacing.xs) {
             Text(item.title)
                 .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
 
             // The full amount with its currency symbol, never a compact "1.2M".
             FormattedAmountText(

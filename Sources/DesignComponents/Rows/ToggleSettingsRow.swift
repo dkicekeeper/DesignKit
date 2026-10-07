@@ -50,7 +50,7 @@ public struct ToggleSettingsRow: View {
         ) {
             Text(title)
                 .font(AppTypography.body)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
                 .accessibilityHidden(true)
         } trailing: {
             Toggle(isOn: $isOn) {

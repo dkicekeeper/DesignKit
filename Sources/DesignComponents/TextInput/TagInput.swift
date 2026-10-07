@@ -106,7 +106,7 @@ public struct TagInput: View {
             } label: {
                 Image(systemName: "xmark.circle.fill")
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
             .buttonStyle(.plain)
             .accessibilityLabel(Text(String(
@@ -118,7 +118,7 @@ public struct TagInput: View {
         .padding(.trailing, AppSpacing.sm)
         .padding(.vertical, AppSpacing.xs)
         .background(AppColors.pale(AppColors.accent), in: Capsule())
-        .foregroundStyle(AppColors.textPrimary)
+        .foregroundStyle(AppColors.Text.primary)
         .transition(.scale(scale: 0.8).combined(with: .opacity))
     }
 

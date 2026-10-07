@@ -103,7 +103,7 @@ public struct ProgressRingRow: View {
                 } else if let placeholder {
                     Text(placeholder)
                         .font(AppTypography.bodySmall)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                 }
             }
         }
@@ -111,7 +111,7 @@ public struct ProgressRingRow: View {
 
     @ViewBuilder
     private func limitLine(_ progress: LimitProgress) -> some View {
-        let amountColor = progress.isOverLimit ? AppColors.destructive : AppColors.textSecondary
+        let amountColor = progress.isOverLimit ? AppColors.destructive : AppColors.Text.secondary
         if dynamicTypeSize.isAccessibilitySize {
             // Accessibility text sizes: on one line both amounts were cut to "185… / 250…".
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
@@ -155,7 +155,7 @@ public struct ProgressRingRow: View {
     private func percentageText(_ progress: LimitProgress) -> some View {
         Text(verbatim: "(\(Int(progress.percentage))%)")
             .font(AppTypography.bodySmall)
-            .foregroundStyle(AppColors.textSecondary)
+            .foregroundStyle(AppColors.Text.secondary)
     }
 }
 

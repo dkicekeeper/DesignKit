@@ -32,7 +32,7 @@ public struct StatTile: View {
         title: String,
         value: String,
         systemImage: String? = nil,
-        valueColor: Color = AppColors.textPrimary
+        valueColor: Color = AppColors.Text.primary
     ) {
         self.title = title
         self.value = value
@@ -44,7 +44,7 @@ public struct StatTile: View {
         VStack(alignment: .leading, spacing: AppSpacing.xxs) {
             caption
                 .font(AppTypography.caption)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
             Text(verbatim: value)
                 .font(AppTypography.h4)
                 .monospacedDigit()

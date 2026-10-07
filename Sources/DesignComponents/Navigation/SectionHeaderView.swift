@@ -54,13 +54,13 @@ public struct SectionHeaderView: View {
     private var defaultStyle: some View {
         Text(title)
             .font(AppTypography.bodyEmphasis)
-            .foregroundStyle(AppColors.textPrimary)
+            .foregroundStyle(AppColors.Text.primary)
     }
 
     private var compactStyle: some View {
         Text(title)
             .font(AppTypography.bodySmall)
-            .foregroundStyle(AppColors.textSecondary)
+            .foregroundStyle(AppColors.Text.secondary)
             .textCase(.uppercase)
             .frame(maxWidth: .infinity, alignment: .leading)
             .screenPadding()
@@ -74,7 +74,7 @@ public struct SectionHeaderView: View {
             }
             Text(title)
                 .font(AppTypography.h3)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .screenPadding()

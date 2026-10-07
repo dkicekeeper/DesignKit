@@ -112,7 +112,7 @@ public struct LinearProgressBar: View {
     public var body: some View {
         ZStack(alignment: .leading) {
             RoundedRectangle(cornerRadius: AppRadius.xs)
-                .fill(AppColors.bgMuted)
+                .fill(AppColors.Background.neutral2)
                 .frame(maxWidth: .infinity)
                 .frame(height: height)
 

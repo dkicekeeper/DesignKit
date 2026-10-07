@@ -79,12 +79,12 @@ public struct PromptSheet: View {
             VStack(spacing: AppSpacing.sm) {
                 Text(title)
                     .font(AppTypography.h3)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                     .multilineTextAlignment(.center)
 
                 Text(message)
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .multilineTextAlignment(.center)
             }
             .padding(.horizontal, AppSpacing.lg)
@@ -112,14 +112,14 @@ public struct PromptSheet: View {
                         .font(AppTypography.bodyEmphasis)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, AppSpacing.md)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                 }
             }
             .padding(.horizontal, AppSpacing.lg)
             .padding(.bottom, AppSpacing.lg)
         }
         .frame(maxWidth: .infinity)
-        .background(AppColors.bgBase.ignoresSafeArea())
+        .background(AppColors.Background.base.ignoresSafeArea())
         .presentationDetents([.height(height)])
         .presentationDragIndicator(.visible)
         .interactiveDismissDisabled(false)

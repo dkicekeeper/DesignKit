@@ -112,7 +112,7 @@ public struct MonthCalendar<Item: Identifiable, Marker: View, Accessory: View>: 
 
             Image(systemName: "chevron.down")
                 .font(AppTypography.bodySmall.weight(.semibold))
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
                 .rotationEffect(.degrees(isExpanded ? 180 : 0))
                 .animation(AppAnimation.contentSpring, value: isExpanded)
                 .accessibilityHidden(true)
@@ -130,7 +130,7 @@ public struct MonthCalendar<Item: Identifiable, Marker: View, Accessory: View>: 
     private var title: some View {
         Text(verbatim: titleText)
             .font(AppTypography.h4)
-            .foregroundStyle(AppColors.textPrimary)
+            .foregroundStyle(AppColors.Text.primary)
             .accessibilityAddTraits(.isHeader)
     }
 
@@ -150,7 +150,7 @@ public struct MonthCalendar<Item: Identifiable, Marker: View, Accessory: View>: 
                 Text(verbatim: symbol)
                     .font(AppTypography.body)
                     .fontWeight(.semibold)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .frame(height: 20)
             }
         }
@@ -226,7 +226,7 @@ public struct MonthCalendar<Item: Identifiable, Marker: View, Accessory: View>: 
         return VStack(spacing: AppSpacing.xs) {
             Text(verbatim: "\(calendar.component(.day, from: day))")
                 .font(isToday ? AppTypography.body.weight(.semibold) : AppTypography.body)
-                .foregroundStyle(isToday ? AppColors.accent : AppColors.textPrimary)
+                .foregroundStyle(isToday ? AppColors.accent : AppColors.Text.primary)
                 .frame(width: 48, height: 48)
                 .background(isToday ? AppColors.pale(AppColors.accent) : Color.clear)
                 .clipShape(Circle())
@@ -239,16 +239,16 @@ public struct MonthCalendar<Item: Identifiable, Marker: View, Accessory: View>: 
                     ForEach(items.prefix(maxMarkers)) { item in
                         marker(item)
                             .frame(width: AppIconSize.md, height: AppIconSize.md)
-                            .background(Circle().fill(AppColors.bgBase))
+                            .background(Circle().fill(AppColors.Background.base))
                             .clipShape(Circle())
                             .transition(.scale(scale: AppAnimation.facepileHiddenScale).combined(with: .opacity))
                     }
                     if items.count > maxMarkers {
                         Text(verbatim: "+\(items.count - maxMarkers)")
                             .font(.system(size: AppIconSize.sm, weight: .bold))
-                            .foregroundStyle(AppColors.textSecondary)
+                            .foregroundStyle(AppColors.Text.secondary)
                             .frame(width: AppIconSize.md, height: AppIconSize.md)
-                            .background(Circle().fill(AppColors.bgCard))
+                            .background(Circle().fill(AppColors.Background.neutral1))
                             .transition(.scale(scale: AppAnimation.facepileHiddenScale).combined(with: .opacity))
                     }
                 }

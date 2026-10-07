@@ -105,7 +105,7 @@ public struct CashFlowCard: View {
             HStack {
                 Text(title)
                     .font(AppTypography.h3)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                 Spacer()
             }
 
@@ -119,13 +119,13 @@ public struct CashFlowCard: View {
                 HStack {
                     Text(extra.label)
                         .font(AppTypography.body)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
                     Spacer()
                     FormattedAmountText(
                         amount: extra.amount,
                         currency: currency,
                         fontSize: AppTypography.body,
-                        color: AppColors.textPrimary
+                        color: AppColors.Text.primary
                     )
                 }
             }

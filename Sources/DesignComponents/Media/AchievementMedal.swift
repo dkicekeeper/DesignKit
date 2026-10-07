@@ -38,8 +38,8 @@ public struct AchievementMedal: View {
             source: .sfSymbol(systemImage),
             style: .circle(
                 size: size,
-                tint: .monochrome(isEarned ? AppColors.staticWhite : AppColors.textTertiary),
-                backgroundColor: isEarned ? color : AppColors.bgMuted,
+                tint: .monochrome(isEarned ? AppColors.staticWhite : AppColors.Text.tertiary),
+                backgroundColor: isEarned ? color : AppColors.Background.neutral2,
                 padding: size * 0.24
             )
         )
@@ -88,13 +88,13 @@ public struct AchievementTile: View {
             AchievementMedal(systemImage: systemImage, color: color, isEarned: isEarned, size: medalSize)
             Text(verbatim: title)
                 .font(AppTypography.caption)
-                .foregroundStyle(isEarned ? AppColors.textPrimary : AppColors.textSecondary)
+                .foregroundStyle(isEarned ? AppColors.Text.primary : AppColors.Text.secondary)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
             if let progressText, !isEarned {
                 Text(verbatim: progressText)
                     .font(AppTypography.caption2)
-                    .foregroundStyle(AppColors.textTertiary)
+                    .foregroundStyle(AppColors.Text.tertiary)
                     .monospacedDigit()
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
@@ -149,12 +149,12 @@ public struct AchievementProgressRow: View {
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 HStack {
                     Text(verbatim: label)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                     Text(verbatim: title)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
                     Spacer(minLength: 0)
                     Text(verbatim: progressText)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                         .monospacedDigit()
                 }
                 .font(AppTypography.bodySmall)

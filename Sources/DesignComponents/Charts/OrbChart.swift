@@ -61,7 +61,7 @@ public extension DonutSlice {
     static func foldingSlivers(
         _ slices: [DonutSlice],
         otherLabel: String = String(localized: "insights.other"),
-        otherColor: Color = AppColors.textTertiary
+        otherColor: Color = AppColors.Text.tertiary
     ) -> [DonutSlice] {
         var distinct = slices.filter { $0.percentage >= minVisiblePercentage }
         // Never collapse to an all-"Other" ring: if everything is a sliver, keep the largest.
@@ -332,7 +332,7 @@ public struct OrbChart: View {
                 labelText(for: index)
                     .font(AppTypography.caption)
                     .fontWeight(.semibold)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                     .opacity(entered ? 1 : 0)
                     .position(
                         x: center.x + labelRadius * sin(angle),

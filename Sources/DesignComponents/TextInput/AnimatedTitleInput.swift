@@ -26,12 +26,12 @@ public struct AnimatedTitleInput: View {
     @Binding var text: String
     let placeholder: String
     var font: Font = AppTypography.h2
-    var color: Color = AppColors.textPrimary
+    var color: Color = AppColors.Text.primary
     var alignment: TextAlignment = .center
     /// When `true`, the underlying TextField receives focus on first appear.
     var autoFocus: Bool = false
 
-    public init(text: Binding<String>, placeholder: String, font: Font = AppTypography.h2, color: Color = AppColors.textPrimary, alignment: TextAlignment = .center, autoFocus: Bool = false) {
+    public init(text: Binding<String>, placeholder: String, font: Font = AppTypography.h2, color: Color = AppColors.Text.primary, alignment: TextAlignment = .center, autoFocus: Bool = false) {
         self._text = text
         self.placeholder = placeholder
         self.font = font
@@ -58,7 +58,7 @@ public struct AnimatedTitleInput: View {
             if showPlaceholder {
                 Text(placeholder)
                     .font(font)
-                    .foregroundStyle(AppColors.textTertiary)
+                    .foregroundStyle(AppColors.Text.tertiary)
                     .multilineTextAlignment(alignment)
                     .allowsHitTesting(false)
                     .transition(.opacity.combined(with: .scale(scale: 0.97)))

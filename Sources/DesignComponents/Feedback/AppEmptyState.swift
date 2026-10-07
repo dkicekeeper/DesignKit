@@ -96,12 +96,12 @@ public struct EmptyStateView: View {
             VStack(spacing: AppSpacing.sm) {
                 Text(title)
                     .font(AppTypography.h3)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
 
                 if let description = description {
                     Text(description)
                         .font(AppTypography.body)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                         .multilineTextAlignment(.center)
                 }
             }
@@ -126,12 +126,12 @@ public struct EmptyStateView: View {
         VStack(spacing: AppSpacing.xs) {
             Text(title)
                 .font(AppTypography.body)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
 
             if let description = description {
                 Text(description)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textTertiary)
+                    .foregroundStyle(AppColors.Text.tertiary)
                     .multilineTextAlignment(.center)
             }
         }
@@ -160,7 +160,7 @@ public struct EmptyStateView: View {
                 if let description = description {
                     Text(description)
                         .font(AppTypography.body)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                         .multilineTextAlignment(.center)
                 }
             }

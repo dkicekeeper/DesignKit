@@ -63,7 +63,7 @@ public struct ScoreGaugeCard: View {
                 VStack(spacing: AppSpacing.xs) {
                     Text(verbatim: score.map { "\($0)" } ?? "—")
                         .font(AppTypography.h1.bold())
-                        .foregroundStyle(score != nil ? color : AppColors.textTertiary)
+                        .foregroundStyle(score != nil ? color : AppColors.Text.tertiary)
                         .materialize(delay: 0.35)
 
                     Text(grade)
@@ -79,7 +79,7 @@ public struct ScoreGaugeCard: View {
 
             Text(subtitle)
                 .font(AppTypography.bodyEmphasis)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)

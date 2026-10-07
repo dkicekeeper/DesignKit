@@ -63,7 +63,7 @@ public struct ProgressRingTile: View {
             VStack(spacing: AppSpacing.sm) {
                 Text(title)
                     .font(AppTypography.bodyEmphasis)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                     .lineLimit(1)
                 ZStack {
                     if let progress {
