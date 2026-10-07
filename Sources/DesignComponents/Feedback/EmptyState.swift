@@ -92,6 +92,8 @@ public struct EmptyState: View {
                 source: .sfSymbol(icon.isEmpty ? "tray" : icon),
                 style: .emptyState()
             )
+            // 2.3.0: SF Symbols 7 gradient, for depth.
+            .symbolColorRenderingMode(.gradient)
             // 2.2.0: the symbol draws itself on (SF Symbols Draw).
             .drawOnAppear(delay: 0.1)
 

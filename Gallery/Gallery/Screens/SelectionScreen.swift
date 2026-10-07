@@ -32,7 +32,10 @@ private struct SegmentedPickerPage: View {
             name: "SegmentedPicker",
             summary: "Two to four exclusive modes on Liquid Glass.",
             apps: [.tenra, .dalada],
-            canvas: .fill
+            canvas: .fill,
+            notes: [
+                "A selection haptic as the segment moves (2.3.0, HapticCue.select).",
+            ]
         ) {
             SegmentedPicker(
                 title: "Type",

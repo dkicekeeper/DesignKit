@@ -119,6 +119,8 @@ public struct BarChart<Point: ChartPoint>: View {
                 fullChart
                     .padding(.leading, AppSpacing.lg)
                     .frame(height: chartHeight)
+                    // 2.3.0: the bars rise in one after another, left to right.
+                    .chartDrawIn()
             }
             .chartAppear()
         }

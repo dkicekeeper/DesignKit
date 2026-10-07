@@ -280,7 +280,10 @@ private struct EmptyStatePage: View {
             name: "EmptyState",
             summary: "Nothing to show yet, or a failure: an icon, a title, a line of explanation and an action.",
             apps: [.tenra, .dalada],
-            canvas: .tall(minHeight: 280)
+            canvas: .tall(minHeight: 280),
+            notes: [
+                "The icon draws itself on (2.2.0) in an SF Symbols 7 gradient (2.3.0); the error icon wiggles once.",
+            ]
         ) {
             EmptyState(
                 icon: style == .error ? "wifi.slash" : "tray",

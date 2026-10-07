@@ -34,6 +34,8 @@ public struct SegmentedPicker<T: Hashable>: View {
             }
         }
         .pickerStyle(.segmented)
+        // 2.3.0: a selection tick as the segment moves.
+        .hapticCue(.select, trigger: selection)
     }
 }
 

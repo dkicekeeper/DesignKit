@@ -15,6 +15,7 @@ struct AmountsScreen: View {
     var body: some View {
         ShowcasePage(title: "Amounts & Currency") {
             FormattedAmountTextPage()
+            LiveAmountTextPage()
             AmountInputPage()
             AmountDigitDisplayPage()
             CalculatorPage()
@@ -291,3 +292,49 @@ private struct RedactableAmountPage: View {
 }
 
 #Preview { NavigationStack { AmountsScreen() } }
+
+/// An amount that rolls up on its first appearance and flashes the direction of a change (2.3.0).
+private struct LiveAmountTextPage: View {
+    @State private var amount = 1_284_500.0
+    @State private var replay = 0
+    @State private var rollsUp = true
+    @State private var flashes = true
+    @State private var hidden = false
+    @State private var state: SpecimenState = .content
+
+    var body: some View {
+        ComponentPage(
+            name: "LiveAmountText",
+            summary: "A hero amount that arrives and changes visibly: the digits roll up from zero when it first appears, and a change flashes green (up) or red (down) while the digits roll to the new value.",
+            since: "2.3.0",
+            notes: [
+                "Built on FormattedAmountText, whose digits already roll; no timers. Hidden amounts stay hidden.",
+                "Loading: LiveAmountTextSkeleton (the FormattedAmountText line). With SkeletonReveal the amount comes into focus, then rolls up.",
+                "Under Reduce Motion the amount is simply there and changes without a flash.",
+            ]
+        ) {
+            SkeletonReveal(isLoading: state == .loading) {
+                LiveAmountText(
+                    amount: amount,
+                    currency: "KZT",
+                    fontSize: AppTypography.h1,
+                    fontWeight: .bold,
+                    rollsUpOnAppear: rollsUp,
+                    flashesChanges: flashes
+                )
+                .amountsHidden(hidden)
+                .id(replay)
+            } skeleton: {
+                LiveAmountTextSkeleton(font: AppTypography.h1, width: 220)
+            }
+        } controls: {
+            StateControl(state: $state)
+            ActionControl("Income +45 000", systemImage: "arrow.up") { amount += 45_000 }
+            ActionControl("Expense −12 300", systemImage: "arrow.down") { amount -= 12_300 }
+            ActionControl("Replay the roll-up", systemImage: "arrow.counterclockwise") { replay += 1 }
+            ToggleControl("Rolls up on appear", isOn: $rollsUp)
+            ToggleControl("Flashes changes", isOn: $flashes)
+            ToggleControl("Hidden", isOn: $hidden)
+        }
+    }
+}

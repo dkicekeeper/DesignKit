@@ -59,25 +59,31 @@ private struct ProgressRingPage: View {
     @State private var progress = 0.45
     @State private var lineWidth = 5.0
     @State private var showsTrack = true
+    @State private var celebrates = false
     @State private var state: SpecimenState = .content
 
     var body: some View {
         ComponentPage(
             name: "ProgressRing",
             summary: "A ring of progress around something (a category coin); red once over.",
-            apps: [.tenra]
+            apps: [.tenra],
+            notes: [
+                "celebratesCompletion (2.3.0): a goal ring. Reaching 100 % draws a checkmark in, the ring glows once and the success haptic plays. Off for budgets.",
+            ]
         ) {
             if state == .loading {
                 ProgressRingSkeleton(size: AppIconSize.Tile.xxl, lineWidth: lineWidth)
             } else {
                 ProgressRing(progress: progress, size: AppIconSize.Tile.xxl, lineWidth: lineWidth,
-                             isOverBudget: progress > 1, showsTrack: showsTrack)
+                             isOverBudget: !celebrates && progress > 1, showsTrack: showsTrack,
+                             celebratesCompletion: celebrates)
             }
         } controls: {
             StateControl(state: $state)
             SliderControl("Progress", value: $progress, in: 0...1.5, step: 0.01) { "\(Int($0 * 100))%" }
             SliderControl("Line width", value: $lineWidth, in: 2...10, step: 1)
             ToggleControl("Track", isOn: $showsTrack)
+            ToggleControl("Celebrates completion (goal)", isOn: $celebrates)
         }
     }
 }

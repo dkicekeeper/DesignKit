@@ -41,6 +41,8 @@ public struct HeroSymbol: View {
         Image(systemName: systemImage)
             .font(.system(size: size * 3 / 7))
             .foregroundStyle(color)
+            // 2.3.0: SF Symbols 7 gradient: the tint lightens across the symbol, for depth.
+            .symbolColorRenderingMode(.gradient)
             .drawOnAppear(delay: HeroSymbolMetrics.drawDelay, isEnabled: drawsOnAppear)
             .frame(width: size, height: size)
             .background(AppColors.pale(color), in: Circle())

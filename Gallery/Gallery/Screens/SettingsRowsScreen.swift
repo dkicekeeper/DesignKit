@@ -245,7 +245,10 @@ private struct SliderRowPage: View {
             since: "1.15.0",
             apps: [.tenra],
             canvas: .fill,
-            notes: ["The app formats the value (per cent, metres, minutes) and passes it as valueText."]
+            notes: [
+                "The app formats the value (per cent, metres, minutes) and passes it as valueText.",
+                "Haptics (2.3.0): a tick on every step of a stepped slider; a smooth one ticks at either end.",
+            ]
         ) {
             InFormCard {
                 if state == .loading {

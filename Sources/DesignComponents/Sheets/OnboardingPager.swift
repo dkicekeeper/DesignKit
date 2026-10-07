@@ -37,6 +37,9 @@ public struct OnboardingPager<Page: Hashable, Content: View, Actions: View>: Vie
     let content: (Page) -> Content
     let actions: (Page) -> Actions
 
+    /// The pager's frame, for the pages' parallax (2.3.0).
+    @State private var pagerFrame: CGRect?
+
     /// - Parameters:
     ///   - skipTitle: top-trailing button; key `onboarding.cta.skip` (default "Skip").
     ///   - canSkip: pages that show Skip (e.g. not the permission pages). All by default.
@@ -80,6 +83,9 @@ public struct OnboardingPager<Page: Hashable, Content: View, Actions: View>: Vie
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
             .indexViewStyle(.page(backgroundDisplayMode: .always))
+            // Global, not a named space: the pages are hosted by the system's paging view.
+            .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { pagerFrame = $0 }
+            .environment(\.onboardingPagerFrame, pagerFrame)
 
             actions(selection)
                 .screenPadding()
@@ -119,6 +125,8 @@ public struct OnboardingPage<Accessory: View>: View {
         ScrollView {
             VStack(spacing: AppSpacing.lg) {
                 HeroSymbol(systemImage: systemImage)
+                    // 2.3.0: in an OnboardingPager the symbol lags behind the page as it swipes.
+                    .modifier(OnboardingParallaxModifier())
                     .padding(.top, AppSpacing.xl)
                 VStack(spacing: AppSpacing.sm) {
                     Text(verbatim: title)
@@ -142,5 +150,43 @@ public struct OnboardingPage<Accessory: View>: View {
 public extension OnboardingPage where Accessory == EmptyView {
     init(systemImage: String, title: String, message: String) {
         self.init(systemImage: systemImage, title: title, message: message) { EmptyView() }
+    }
+}
+
+// MARK: - Parallax (2.3.0)
+
+extension EnvironmentValues {
+    /// The global frame of the `OnboardingPager` around a page; `nil` outside one.
+    @Entry var onboardingPagerFrame: CGRect? = nil
+}
+
+enum OnboardingParallaxMetrics {
+    /// The symbol moves at 60 % of the page's speed.
+    static let lag: CGFloat = 0.4
+    /// A page swiped its full width away: the symbol shrinks by this and fades by `fade`.
+    static let shrink: CGFloat = 0.2
+    static let fade: Double = 0.5
+}
+
+/// Moves the view slower than its page while the pager swipes, shrinking and fading it a
+/// little, so the picture and the text part at different speeds. One `visualEffect`; nothing
+/// re-renders. Off under Reduce Motion and `.designKitMotion(false)`, and outside a pager.
+struct OnboardingParallaxModifier: ViewModifier {
+    @Environment(\.onboardingPagerFrame) private var pagerFrame
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.designKitMotion) private var designKitMotion
+
+    func body(content: Content) -> some View {
+        let pager = !reduceMotion && designKitMotion ? pagerFrame : nil
+        content
+            .visualEffect { view, proxy in
+                // How far the page has moved from the centre of the pager.
+                let shift = pager.map { proxy.frame(in: .global).midX - $0.midX } ?? 0
+                let progress = min(abs(shift) / max(pager?.width ?? 1, 1), 1)
+                return view
+                    .offset(x: -shift * OnboardingParallaxMetrics.lag)
+                    .scaleEffect(1 - progress * OnboardingParallaxMetrics.shrink)
+                    .opacity(1 - Double(progress) * OnboardingParallaxMetrics.fade)
+            }
     }
 }

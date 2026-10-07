@@ -99,6 +99,8 @@ text, not keys. A new key goes there as well.
 | `insights.chart.bar` | ChartZoomControls | — |
 | `insights.chart.line` | ChartZoomControls | — |
 | `insights.other` | OrbChart | — |
+| `menu.close` | GlassActionMenu (VoiceOver on the open menu's button) | `Close` |
+| `menu.open` | GlassActionMenu (VoiceOver on the closed button) | `Actions` |
 | `notification.permission.allow` | NotificationPermissionPrompt | — |
 | `notification.permission.description` | NotificationPermissionPrompt | — |
 | `notification.permission.skip` | NotificationPermissionPrompt | — |

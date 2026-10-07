@@ -36,7 +36,7 @@
 | Module | Contents |
 |---|---|
 | `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, inline field styles), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
-| `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `Icon` (a brand logo is `Icon(source: .brandService(name))`; `BrandLogoView` was removed in 2.0.0), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `HapticManager`, `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
+| `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `Icon` (a brand logo is `Icon(source: .brandService(name))`; `BrandLogoView` was removed in 2.0.0), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `HapticManager`, `HapticCue` (haptics by meaning, 2.3.0), `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
 | `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons") |
 
 **Names (2.0.0).** A component is named for what it is, without `View` or `App`: `SectionHeader`,
@@ -236,6 +236,13 @@ motion, transitions and effects are in [motion.md](motion.md):
 
 `MotionBudget` holds the timing budgets (feedback 0.25 s, entrance 0.35 s, stagger 0.04 s ≤ 0.3 s);
 `.designKitMotion(false)` stills DesignKit's motion below a view.
+
+**2.3.0** adds motion for data and moments, all in [motion.md](motion.md): `LiveAmountText`
+(roll-up and change flash), `.chartDrawIn` (built into `LineChart`, `BarChart`,
+`HeroSparkline`), `.completionMoment` and `ProgressRing(celebratesCompletion:)`,
+`SkeletonReveal` / `.skeletonReveal`, `HapticCue`, `.scrollHero`, the onboarding parallax,
+`GlassActionMenu` (Liquid Glass morph) and the Metal `.ripple`. SF Symbol heroes draw in a
+gradient of their tint.
 
 The 1.x tokens, still used by the components that have them:
 
@@ -844,6 +851,19 @@ Several at once (0.6.0): pass a `Binding<Set<Option>>`; optional `systemImage:` 
 ChipPicker(options: PlaceType.allCases, selection: $types, systemImage: { $0.systemImage }) { $0.title }
 ```
 
+#### `GlassActionMenu` *(2.3.0)*
+A floating Liquid Glass button that flows open into a column (or row) of glass actions and
+melts them back in; the morph is the system's (`glassEffectID` in one `GlassEffectContainer`).
+An action closes the menu after it runs. VoiceOver: each action's title; the button reads
+"Actions" / "Close" (keys `menu.open`, `menu.close`).
+
+```swift
+GlassActionMenu(items: [
+    .init("Scan a receipt", systemImage: "doc.viewfinder") { scan() },
+    .init("Expense", systemImage: "minus") { addExpense() },
+])
+```
+
 #### `DSButton` *(2.0.0)*
 The button of the design system (§2, Buttons): a title with an icon, appearance × role × size,
 a shape, full width or the label's own, a loading state that keeps the width and blocks taps.
@@ -999,6 +1019,17 @@ if let accounts {
 }
 ```
 
+To end loading softly (2.3.0), `SkeletonReveal` swaps the two with the content coming into focus
+from a light blur (a cross-fade under Reduce Motion):
+
+```swift
+SkeletonReveal(isLoading: balance == nil) {
+    BalanceCard(…)
+} skeleton: {
+    BalanceCardSkeleton()
+}
+```
+
 **The corner rule.** A skeleton keeps its component's container and corner as they are: a card skeleton is the same glass card (`cardStyle`, the card's radius), a pale box (`RecommendationBox`, `StatusBanner`) keeps `AppRadius.md`, a chip keeps the chip's `AppRadius.xl`, a badge, pill or switch is a capsule, an icon keeps its `IconStyle` shape (`IconSkeleton(style:)`), a progress track keeps its corner (`AppRadius.xs` for `LinearProgressBar`, the round caps of rings and gauges, the segment corners of milestone gauges and bar pairs). A shape whose component has no corner of its own (a line of text, an amount, a chart's plot area, a star) takes the soft corner, `AppRadius.soft` (12 pt; a line of text gets fully round ends). `Skeleton` and `SkeletonText` use it by default since 1.10.0 (before: `AppRadius.xs`).
 
 **Shimmer.** One band sweeps a whole skeleton (a shimmer inside another one is off). `.skeletonShimmer(false)` stops it under a view (snapshot tests do this); Reduce Motion stops it too. Each skeleton is one VoiceOver element that reads "Loading" (`skeleton.loading`).
@@ -1075,7 +1106,8 @@ Tenra's `notification.permission.*` texts; the app sets its detent.
 
 #### `OnboardingPager` / `OnboardingPage` *(0.7.0)*
 First-launch introduction: swipeable pages with dots, Skip at the top, the page's buttons at
-the bottom. The app owns the pages enum and `selection`.
+the bottom. The app owns the pages enum and `selection`. Since 2.3.0 each page's `HeroSymbol`
+lags behind its page as it swipes (parallax; off under Reduce Motion).
 
 ```swift
 OnboardingPager(pages: Intro.allCases, selection: $page,
@@ -1172,7 +1204,9 @@ A short question or a permission request in a sheet: `HeroSymbol` (104 pt disc),
 ### Display Components
 
 #### `FormattedAmountText`
-Currency amount with smart decimal hiding and numeric transition.
+Currency amount with smart decimal hiding and numeric transition. For a hero amount that should
+arrive and change visibly, `LiveAmountText` (2.3.0) wraps it: the digits roll up from zero on
+first appearance and a change flashes green or red (skeleton: `LiveAmountTextSkeleton`).
 
 ```swift
 FormattedAmountText(
@@ -1242,6 +1276,10 @@ Circular progress arc for budget consumption.
 ```swift
 ProgressRing(progress: 0.75, size: AppIconSize.Tile.lg, isOverBudget: false)
 ```
+
+A goal ring (2.3.0): `celebratesCompletion: true` draws a checkmark in at 100 % and plays the
+completion moment (a glow and the success haptic) when it gets there. Off for budgets, where
+100 % is not good news.
 
 #### `LinearProgressBar(value:)` *(0.4.0)*
 The budget bar's plain form for any progress (downloads, checklists, a followed route):

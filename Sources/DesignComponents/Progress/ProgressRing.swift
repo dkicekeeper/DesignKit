@@ -89,6 +89,10 @@ public struct ProgressRing: View {
     /// percentage would otherwise float as a disconnected arc (insight cards).
     var showsTrack: Bool = false
 
+    /// A goal ring: at 100 % a checkmark draws itself in the centre and the completion moment
+    /// plays (2.3.0). Off for budgets, where 100 % is not good news.
+    var celebratesCompletion: Bool = false
+
     @State private var displayProgress: Double = 0
     /// Reduce-Motion-aware (nil under Reduce Motion → instant jump, no sweep).
     private var fillAnimation: Animation? { AppAnimation.progressFillAnimation }
@@ -131,7 +135,8 @@ public struct ProgressRing: View {
         overrideColor: Color? = nil,
         accessibilityLabel: String? = nil,
         animatesOnAppear: Bool = true,
-        showsTrack: Bool = false
+        showsTrack: Bool = false,
+        celebratesCompletion: Bool = false
     ) {
         self.progress = progress
         self.size = size
@@ -141,7 +146,14 @@ public struct ProgressRing: View {
         self.accessibilityLabel = accessibilityLabel
         self.animatesOnAppear = animatesOnAppear
         self.showsTrack = showsTrack
+        self.celebratesCompletion = celebratesCompletion
     }
+
+    /// A goal ring (not a budget): at 100 % a checkmark draws itself in the centre and the
+    /// completion moment plays (2.3.0). For a ring with nothing inside it.
+    private var isCelebratedComplete: Bool { celebratesCompletion && progress >= 1 }
+
+    private var completionTint: Color { overrideColor ?? AppColors.success }
 
     public var body: some View {
         // Round caps protrude half a lineWidth BEYOND the trimmed path ends. An
@@ -180,12 +192,23 @@ public struct ProgressRing: View {
                 withAnimation(fillAnimation) { displayProgress = newValue }
             }
 
+        let ring = arc
+            .overlay {
+                if isCelebratedComplete {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: size * 0.38, weight: .bold))
+                        .foregroundStyle(completionTint)
+                        .drawOnAppear()
+                }
+            }
+            .completionMoment(isComplete: isCelebratedComplete, tint: completionTint, in: Circle())
+
         if let label = accessibilityLabel {
-            arc
+            ring
                 .accessibilityLabel(label)
                 .accessibilityAddTraits(.updatesFrequently)
         } else {
-            arc
+            ring
                 .accessibilityHidden(true) // decorative — the row label carries semantic meaning
         }
     }

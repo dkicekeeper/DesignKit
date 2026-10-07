@@ -17,6 +17,7 @@ struct ActionsScreen: View {
             DSButtonStylePage()
             BounceStylePage()
             ReactionButtonPage()
+            GlassActionMenuPage()
             AmountVisibilityTogglePage()
             UniversalFilterButtonPage()
         }
@@ -275,3 +276,42 @@ private struct UniversalFilterButtonPage: View {
 }
 
 #Preview { NavigationStack { ActionsScreen() } }
+
+/// A Liquid Glass button that flows open into its actions (2.3.0).
+private struct GlassActionMenuPage: View {
+    @State private var direction: GlassActionMenu.Direction = .up
+    @State private var last = "None yet"
+
+    var body: some View {
+        ComponentPage(
+            name: "GlassActionMenu",
+            summary: "A floating glass button that flows open into its actions and melts them back in, the way iOS 26's toolbars morph. For the add button of a screen.",
+            since: "2.3.0",
+            canvas: .tall(minHeight: 340),
+            notes: [
+                "The morph is the system's: each glass shape has a glassEffectID in one GlassEffectContainer. Nothing of ours runs per frame.",
+                "An action runs, then the menu closes. VoiceOver reads each action's title; the button reads \"Actions\" / \"Close\" (keys menu.open, menu.close).",
+                "Under Reduce Motion the actions fade in and out.",
+            ]
+        ) {
+            ZStack(alignment: .bottomTrailing) {
+                AuroraBackground(intensity: 0.6)
+                    .clipShape(.rect(cornerRadius: AppRadius.xl))
+                Text("Last action: \(last)")
+                    .font(AppTypography.bodySmall)
+                    .foregroundStyle(AppColors.Text.secondary)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .padding(AppSpacing.lg)
+                GlassActionMenu(items: [
+                    .init("Scan a receipt", systemImage: "doc.viewfinder") { last = "Scan a receipt" },
+                    .init("Transfer", systemImage: "arrow.left.arrow.right") { last = "Transfer" },
+                    .init("Expense", systemImage: "minus") { last = "Expense" },
+                ], direction: direction)
+                .padding(AppSpacing.lg)
+            }
+            .frame(height: 320)
+        } controls: {
+            ChoiceControl("Direction", selection: $direction, options: [("Up", .up), ("Leading", .leading)])
+        }
+    }
+}

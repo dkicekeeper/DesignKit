@@ -66,7 +66,7 @@ jobs:
             -scheme "$SCHEME" \
             -destination "id=$DEVICE_ID" \
             -derivedDataPath build \
-            2>&1 | tee test.log | grep -aE "Test case .* failed|error:|\*\* TEST (SUCCEEDED|FAILED)|Test run with" || true
+            2>&1 | tee test.log | grep -aE "Test case .* failed|recorded an issue|error:|\*\* TEST (SUCCEEDED|FAILED)|Test run with" || true
           grep -aq "\*\* TEST SUCCEEDED \*\*" test.log
 
       - name: Build Gallery

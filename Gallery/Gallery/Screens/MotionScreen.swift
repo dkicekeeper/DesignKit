@@ -3,12 +3,14 @@
 //  DesignKit Gallery
 //
 //  Motion: the springs by purpose (2.2.0) and the older tokens, each played on a ball you can
-//  replay; SF Symbol motion, the transitions, text reveal, scroll reveal, and the motion
-//  modifiers (staggered entrance, chart appear, content reveal, blur-slide).
+//  replay; SF Symbol motion, the transitions, text reveal, scroll reveal; chart draw-in,
+//  skeleton reveal, the scroll hero and haptic cues (2.3.0); and the motion modifiers
+//  (staggered entrance, chart appear, content reveal, blur-slide).
 //
 
 import SwiftUI
 import DesignTokens
+import DesignSupport
 import DesignComponents
 
 struct MotionScreen: View {
@@ -19,6 +21,10 @@ struct MotionScreen: View {
             MotionTransitionsPage()
             TextRevealPage()
             ScrollRevealPage()
+            ChartDrawInPage()
+            SkeletonRevealPage()
+            ScrollHeroPage()
+            HapticCuesPage()
             SpringsPage()
             DurationsPage()
             StaggeredEntrancePage()
@@ -450,3 +456,156 @@ private struct BlurSlidePage: View {
 }
 
 #Preview { NavigationStack { MotionScreen() } }
+
+/// Charts drawn in from left to right (2.3.0).
+private struct ChartDrawInPage: View {
+    @State private var replay = 0
+    @State private var kind = 0
+
+    var body: some View {
+        ComponentPage(
+            name: ".chartDrawIn",
+            summary: "A chart drawn in from its leading edge as it first appears: the line is traced, the bars rise one after another. LineChart, BarChart and HeroSparkline do it on their own.",
+            since: "2.3.0",
+            apps: [.tenra, .dalada],
+            notes: [
+                "One mask whose width animates once, with a soft front edge; the chart's marks and data are untouched.",
+                "For your own chart: Chart { … }.chartDrawIn(). Under Reduce Motion the chart is simply there.",
+            ]
+        ) {
+            Group {
+                if kind == 0 {
+                    LineChart(dataPoints: GallerySamples.months, series: [GallerySamples.income, GallerySamples.expenses],
+                              valueFormat: .currency("KZT"), todayText: "Today")
+                } else {
+                    BarChart(dataPoints: GallerySamples.months, series: GallerySamples.distance,
+                             valueFormat: .custom({ "\($0.formatted(.number.precision(.fractionLength(0)))) km" }),
+                             todayText: "Today")
+                }
+            }
+            .id("\(kind)-\(replay)")
+        } controls: {
+            ChoiceControl("Chart", selection: $kind, options: [("Line", 0), ("Bars", 1)])
+            ActionControl("Replay") { replay += 1 }
+        }
+    }
+}
+
+/// The skeleton turning into the content (2.3.0).
+private struct SkeletonRevealPage: View {
+    @State private var isLoading = true
+
+    var body: some View {
+        ComponentPage(
+            name: "SkeletonReveal",
+            summary: "Loading ends softly: the skeleton fades out while the content comes into focus from a light blur in the same place, instead of a jump.",
+            since: "2.3.0",
+            canvas: .fill,
+            notes: [
+                "SkeletonReveal(isLoading:) { content } skeleton: { <Name>Skeleton() }. Give both the same size; a component and its skeleton already have it.",
+                "As a transition on its own: .transition(.skeletonReveal). FinanceCard reveals its amount this way.",
+                "Under Reduce Motion the two cross-fade without the blur.",
+            ]
+        ) {
+            SkeletonReveal(isLoading: isLoading) {
+                BalanceCard(iconSource: .sfSymbol("creditcard.fill"), title: "Kaspi Gold",
+                            amount: 1_250_000, currency: "KZT")
+            } skeleton: {
+                BalanceCardSkeleton()
+            }
+        } controls: {
+            ToggleControl("Loading", isOn: $isLoading)
+        }
+    }
+}
+
+/// A hero that stretches on pull and drifts away on scroll (2.3.0).
+private struct ScrollHeroPage: View {
+    @State private var parallax = Double(ScrollHeroMetrics.parallax)
+    @State private var fades = true
+
+    var body: some View {
+        ComponentPage(
+            name: ".scrollHero",
+            summary: "The image or header at the top of a detail screen lives with the scroll: pulled down it stretches to fill the gap, scrolled away it drifts slower than the content and fades. Scroll and pull inside the canvas.",
+            since: "2.3.0",
+            canvas: .tall(minHeight: 380),
+            notes: [
+                "For the first view in a vertical ScrollView. One visualEffect; nothing re-renders while scrolling.",
+                "Under Reduce Motion there is no parallax; the stretch stays, because it follows the finger.",
+            ]
+        ) {
+            ScrollView {
+                VStack(spacing: AppSpacing.lg) {
+                    ZStack(alignment: .bottomLeading) {
+                        AuroraBackground(intensity: 0.9)
+                        Text("Weekend at the lake")
+                            .font(AppTypography.h3)
+                            .foregroundStyle(.white)
+                            .padding(AppSpacing.lg)
+                    }
+                    .frame(height: 200)
+                    .clipped()
+                    .scrollHero(parallax: parallax, fades: fades)
+
+                    ForEach(0..<8, id: \.self) { index in
+                        AmountRow(
+                            "Stop \(index + 1)",
+                            subtitle: "Day \(index / 3 + 1)",
+                            leading: .tinted(.sfSymbol("mappin"), CategoryColors.color(for: "stop\(index)")),
+                            value: .amount(Double(2_500 * (index + 1)), caption: nil),
+                            currency: "KZT"
+                        )
+                        .padding(.horizontal, AppSpacing.lg)
+                    }
+                }
+            }
+            .frame(height: 360)
+            .clipShape(.rect(cornerRadius: AppRadius.xl))
+        } controls: {
+            SliderControl("Parallax", value: $parallax, in: 0...0.8, step: 0.05)
+            ToggleControl("Fades", isOn: $fades)
+        }
+    }
+}
+
+/// Haptics named by meaning (2.3.0).
+private struct HapticCuesPage: View {
+    @State private var segment = 0
+    @State private var steps = 3.0
+    @State private var level = 0.5
+
+    private let cues: [(HapticCue, String, String)] = [
+        (.tap, "tap", "A light press that does something small"),
+        (.select, "select", "A choice moved: a segment, a chip"),
+        (.tick, "tick", "A step or a detent passed"),
+        (.confirm, "confirm", "It worked"),
+        (.warn, "warn", "Careful"),
+        (.fail, "fail", "It did not work"),
+        (.celebrate, "celebrate", "Success, then two rising taps: a goal reached"),
+    ]
+
+    var body: some View {
+        ComponentPage(
+            name: "HapticCue",
+            summary: "Haptics named by what they mean, to play with the motion that says the same thing: a selection with the segment that moves, a tick with each step, the celebration pattern with the confetti. Try it on a device.",
+            since: "2.3.0",
+            apps: [.tenra, .dalada],
+            notes: [
+                ".hapticCue(.select, trigger: selection) in a view; HapticManager.play(.confirm) in an action.",
+                "Built in: SegmentedPicker (select), SliderRow (a tick per step, or at either end), .celebration (celebrate), .completionMoment (confirm).",
+                "Haptics are not motion: Reduce Motion leaves them on; the system's haptics switch turns them off.",
+            ]
+        ) {
+            VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                SegmentedPicker(title: "Period", selection: $segment, options: [("Week", 0), ("Month", 1), ("Year", 2)])
+                SliderRow("Stepped", value: $steps, in: 0...10, step: 1, valueText: "\(Int(steps))")
+                SliderRow("Smooth (ticks at the ends)", value: $level, in: 0...1, valueText: "\(Int((level * 100).rounded()))%")
+            }
+        } controls: {
+            ForEach(cues, id: \.1) { cue, name, detail in
+                ActionControl(".\(name): \(detail)", systemImage: "hand.tap") { HapticManager.play(cue) }
+            }
+        }
+    }
+}

@@ -108,6 +108,8 @@ public struct TargetProgressCard: View {
                 isOverBudget: false,
                 color: barColor
             )
+            // 2.3.0: reaching the target makes the bar glow, with the success haptic.
+            .completionMoment(isComplete: progress >= 1, tint: barColor, in: RoundedRectangle(cornerRadius: AppRadius.xs))
             if let explanation {
                 Text(explanation)
                     .font(AppTypography.bodySmall)

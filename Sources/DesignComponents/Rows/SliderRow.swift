@@ -65,6 +65,9 @@ public struct SliderRow: View {
 
             slider
                 .tint(AppColors.accent)
+                // 2.3.0: a tick on every step of a stepped slider, and at either end of a smooth one.
+                .hapticCue(.tick, trigger: value) { _, _ in step != nil }
+                .hapticCue(.tick, trigger: isAtEnd) { _, atEnd in step == nil && atEnd }
                 .accessibilityLabel(Text(title))
                 .accessibilityValue(Text(valueText))
 
@@ -77,6 +80,8 @@ public struct SliderRow: View {
         }
         .padding(.vertical, AppSpacing.xs)
     }
+
+    private var isAtEnd: Bool { value <= range.lowerBound || value >= range.upperBound }
 
     @ViewBuilder
     private var titleLabel: some View {
