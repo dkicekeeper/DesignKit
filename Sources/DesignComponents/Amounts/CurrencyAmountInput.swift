@@ -3,10 +3,11 @@
 //  DesignKit
 //
 //  The amount at the top of an add or edit sheet: the large animated amount (typed, or the
-//  calculator's display), "≈ 1 234 ₸" in the base currency when another currency is chosen,
-//  the currency chip, and the validation error. Ported from Tenra's AmountInputView: the
-//  conversion goes through DesignKitCurrencyConverter (convertSync, then convert), and the
-//  currencies to offer and the customize action are parameters.
+//  calculator's display), "≈ 1 234 ₸" when the amount is in another currency, the currency
+//  chip, and the validation error. Ported from Tenra's AmountInputView: the conversion goes
+//  through DesignKitCurrencyConverter (convertSync, then convert), and the currencies to
+//  offer, the customize action and the currency of the "≈" line are parameters. Which
+//  currency the line shows and which result it may show: CurrencyEquivalent.swift.
 //
 
 import SwiftUI
@@ -20,19 +21,24 @@ import DesignSupport
 ///     amount: $amountText,
 ///     currency: $currency,
 ///     baseCurrency: "KZT",
+///     equivalentCurrency: account.currency,   // optional: "≈" in the account's currency
 ///     currencies: ["KZT", "USD", "EUR"],
 ///     errorMessage: error
 /// )
 /// ```
 ///
-/// The converted line appears when the chosen currency is not `baseCurrency` and the amount is
-/// above zero; it needs the host's converter (`DesignKitCurrencyConverter`) and shows a small
-/// spinner until a rate comes. Typing waits 0.3 s before converting; a currency change converts
-/// at once.
+/// The "≈" line appears when the amount is above zero and in another currency than the
+/// line's: `equivalentCurrency`, or `baseCurrency` when that is nil (the default) or the
+/// amount is already in `equivalentCurrency`. It needs the host's converter
+/// (`DesignKitCurrencyConverter`), shows a small spinner until a rate comes, and disappears
+/// when there is no rate. Typing waits 0.3 s before converting; new currencies convert at
+/// once. One conversion runs at a time and the latest input wins: a slower, older one never
+/// overwrites it.
 public struct CurrencyAmountInput: View {
     @Binding var amount: String
     @Binding var currency: String
     let baseCurrency: String
+    let equivalentCurrency: String?
     let currencies: [String]
     let errorMessage: String?
     let calculatorModel: CalculatorInputModel?
@@ -40,9 +46,13 @@ public struct CurrencyAmountInput: View {
     let onAmountChange: ((String) -> Void)?
     let onCustomizeCurrencies: (() -> Void)?
 
-    @State private var convertedAmount: Double?
+    @State private var equivalent = CurrencyEquivalentState()
 
     /// - Parameters:
+    ///   - equivalentCurrency: The currency of the "≈" line, such as the currency of the account
+    ///     the amount goes to (1.14.0). An amount already in it shows its `baseCurrency` value
+    ///     instead, and no line when it is in `baseCurrency` too. `nil` (the default) is
+    ///     `baseCurrency`: the line shows the base-currency value, as before 1.14.0.
     ///   - currencies: What the currency chip offers (`CurrencyPickerMenu`).
     ///   - calculatorModel: When set, the amount is entered with the in-app calculator keypad:
     ///     the large display reads the model (the host owns it, places the keypad and mirrors
@@ -53,6 +63,7 @@ public struct CurrencyAmountInput: View {
         amount: Binding<String>,
         currency: Binding<String>,
         baseCurrency: String,
+        equivalentCurrency: String? = nil,
         currencies: [String],
         errorMessage: String? = nil,
         calculatorModel: CalculatorInputModel? = nil,
@@ -63,6 +74,7 @@ public struct CurrencyAmountInput: View {
         self._amount = amount
         self._currency = currency
         self.baseCurrency = baseCurrency
+        self.equivalentCurrency = equivalentCurrency
         self.currencies = currencies
         self.errorMessage = errorMessage
         self.calculatorModel = calculatorModel
@@ -72,6 +84,8 @@ public struct CurrencyAmountInput: View {
     }
 
     public var body: some View {
+        let request = equivalentRequest
+        let display = equivalent.display(for: request, instant: Self.instantConversion)
         VStack(spacing: AppSpacing.md) {
             if let calculatorModel {
                 CalculatorAmountDisplay(model: calculatorModel, onTap: onCalculatorTap)
@@ -86,9 +100,9 @@ public struct CurrencyAmountInput: View {
                 )
             }
 
-            // Converted amount in the base currency
-            convertedAmountView
-                .animation(AppAnimation.gentleSpring, value: shouldShowConversion)
+            // Converted amount: "≈ 1 234 ₸"
+            convertedAmountView(display)
+                .animation(AppAnimation.gentleSpring, value: display.isVisible)
 
             // Currency chip (centred)
             CurrencyPickerMenu(selection: $currency, currencies: currencies, onCustomize: onCustomizeCurrencies)
@@ -101,37 +115,32 @@ public struct CurrencyAmountInput: View {
                     .multilineTextAlignment(.center)
             }
         }
-        // Typing: convert once it pauses.
-        .task(id: amount) {
-            try? await Task.sleep(for: .milliseconds(300))
-            guard !Task.isCancelled else { return }
-            await updateConvertedAmount()
-        }
-        // A new currency: convert at once.
-        .onChange(of: currency) { _, _ in
-            Task { await updateConvertedAmount() }
+        // One conversion at a time, keyed on what it converts: a new amount or new currencies
+        // cancel the running one, and a result that comes back after that is dropped.
+        .task(id: request) {
+            await updateConvertedAmount(for: request)
         }
     }
 
     // MARK: - Converted amount
 
     @ViewBuilder
-    private var convertedAmountView: some View {
-        if shouldShowConversion {
+    private func convertedAmountView(_ display: CurrencyEquivalentDisplay) -> some View {
+        if display.isVisible {
             HStack(spacing: AppSpacing.xs) {
                 Text(String(localized: "currency.conversion.approximate", defaultValue: "≈"))
                     .font(AppTypography.h4)
                     .foregroundStyle(AppColors.Text.secondary)
 
-                if let convertedAmount {
-                    Text(Self.groupedDigits(convertedAmount))
+                if let converted = display.convertedValue {
+                    Text(Self.groupedDigits(converted.amount))
                         .font(AppTypography.h4)
                         .fontWeight(.medium)
                         .foregroundStyle(AppColors.Text.secondary)
                         .contentTransition(.numericText())
-                        .animation(AppAnimation.gentleSpring, value: convertedAmount)
+                        .animation(AppAnimation.gentleSpring, value: converted.amount)
 
-                    Text(verbatim: Formatting.currencySymbol(for: baseCurrency))
+                    Text(verbatim: Formatting.currencySymbol(for: converted.currency))
                         .font(AppTypography.h4)
                         .fontWeight(.medium)
                         .foregroundStyle(AppColors.Text.secondary)
@@ -145,10 +154,20 @@ public struct CurrencyAmountInput: View {
         }
     }
 
-    private var shouldShowConversion: Bool {
-        guard currency != baseCurrency else { return false }
-        guard let value = Self.parse(amount), value > 0 else { return false }
-        return true
+    /// What the line converts for the inputs as they are now; nil when there is no line.
+    private var equivalentRequest: CurrencyEquivalentRequest? {
+        CurrencyEquivalentRequest(
+            amount: Self.parse(amount),
+            currency: currency,
+            equivalentCurrency: equivalentCurrency,
+            baseCurrency: baseCurrency
+        )
+    }
+
+    /// The value from cached rates (`convertSync`), so new currencies show their value at
+    /// once instead of a spinner; nil without a cached rate or that hook.
+    private nonisolated static func instantConversion(_ request: CurrencyEquivalentRequest) -> Double? {
+        DesignKitCurrencyConverter.convertSync?(request.amount, request.from, request.to)
     }
 
     private static func parse(_ text: String) -> Double? {
@@ -184,14 +203,20 @@ public struct CurrencyAmountInput: View {
         return result
     }
 
+    /// Converts `request` (nil: no line, which clears the last result). The result is kept
+    /// only if no newer conversion began meanwhile; no rate (nil) hides the line instead of
+    /// leaving the previous number on it.
     @MainActor
-    private func updateConvertedAmount() async {
-        guard currency != baseCurrency, let value = Self.parse(amount), value > 0 else {
-            convertedAmount = nil
-            return
+    private func updateConvertedAmount(for request: CurrencyEquivalentRequest?) async {
+        guard let ticket = equivalent.begin(request) else { return }
+        if ticket.waitsForTyping {
+            // Typing: convert once it pauses.
+            try? await Task.sleep(for: .milliseconds(300))
+            guard !Task.isCancelled else { return }
         }
-        if let converted = await DesignKitCurrencyConverter.converted(value, from: currency, to: baseCurrency) {
-            convertedAmount = converted
-        }
+        let value = await DesignKitCurrencyConverter.converted(
+            ticket.request.amount, from: ticket.request.from, to: ticket.request.to
+        )
+        equivalent.finish(ticket, value: value)
     }
 }

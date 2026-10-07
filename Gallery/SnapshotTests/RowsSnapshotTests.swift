@@ -128,7 +128,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// The action at the end of the line (1.14.0), in each style.
+        /// The action at the end of the line (1.15.0), in each style.
         @Test func sectionHeaderTrailing() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.md) {

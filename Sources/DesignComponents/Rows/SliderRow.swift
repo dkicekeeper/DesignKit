@@ -4,7 +4,7 @@
 //
 //  A settings row with a slider: the title (with an optional symbol), the current value on the
 //  trailing edge, the slider under them, an optional hint. (HIG: sliders in a list; Material:
-//  Slider with a label and value.) Ported from Tenra's background-intensity row (1.14.0);
+//  Slider with a label and value.) Ported from Tenra's background-intensity row (1.15.0);
 //  what the value means and how it is formatted stay in the app.
 //
 

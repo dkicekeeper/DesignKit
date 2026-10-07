@@ -39,7 +39,7 @@ private struct SectionHeaderViewPage: View {
             canvas: .fill,
             notes: [
                 "The icon shows in the large style only.",
-                "The action (1.14.0) is any view: a NavigationLink “All”, a button, a spinner. It takes bodySmall and sits inside the style's padding.",
+                "The action (1.15.0) is any view: a NavigationLink “All”, a button, a spinner. It takes bodySmall and sits inside the style's padding.",
             ]
         ) {
             if state == .loading {

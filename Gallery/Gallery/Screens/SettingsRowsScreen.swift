@@ -242,7 +242,7 @@ private struct SliderRowPage: View {
         ComponentPage(
             name: "SliderRow",
             summary: "A setting set with a slider: the title, the current value on the right, the slider, an optional hint.",
-            since: "1.14.0",
+            since: "1.15.0",
             apps: [.tenra],
             canvas: .fill,
             notes: ["The app formats the value (per cent, metres, minutes) and passes it as valueText."]

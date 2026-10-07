@@ -52,7 +52,7 @@ DesignKit ships no networking, persistence or FX. A host app wires these once, i
 | `DesignKitFonts.registerIfNeeded()` | — | Call once; registers the bundled Inter variable fonts. |
 | `DesignKitLogoLoader.loader` | `nil` → fallback icon | Brand-logo images for `IconSource.brandService` (`IconView`, `heroAccentGlow`). |
 | `DesignKitCurrencyConverter.convert` | `nil` → nothing rendered | FX for `ConvertedAmountView` / `HeroSection(showBaseConversion:)` / `CurrencyAmountInput`. |
-| `DesignKitCurrencyConverter.convertSync` *(1.10.0)* | `nil` → `convert` is asked | Instant conversion from cached rates, so `CurrencyAmountInput` shows "≈ …" while the user types. |
+| `DesignKitCurrencyConverter.convertSync` *(1.10.0)* | `nil` → `convert` is asked | Instant conversion from cached rates, so `CurrencyAmountInput` shows "≈ …" while the user types, and at once when the currencies change (1.14.0). |
 | `DesignKitLogoCatalog.sections` / `.search` / `.domainSuffixes` *(1.10.0)* | no sections → no logos tab; `["com"]` | The brands `IconPicker` offers (titled sections of domain + name), its search, and the domains tried for a typed name (Tenra: `["com", "kz"]`). |
 | Localization keys | raw key shown | Components resolve `String(localized:)` in the **host app's** main bundle. The full key list is in [localization-keys.md](localization-keys.md). |
 
@@ -116,7 +116,7 @@ Modifiers:
 
 **`AppColors.Border`** — `normal` (`.separator`), `opaque` (`.opaqueSeparator`), `selected` (accent), `darkModeOnly` (clear in light, white 10% in dark: a hairline around logos, avatars and images that would melt into black), `onDark` (white 10%), `onLight` (black 5%).
 
-**Flat names (1.x)** stay as aliases of the groups, with the same values: `bgBase` = `Background.base`, `bgCard` = `Background.neutral1`, `bgMuted` = `Background.neutral2`, `textPrimary` / `textSecondary` / `textTertiary` = `Text.*`, `destructive` = `Status.negative`, `success` = `Status.positive`, `warning` = `Status.warning`, `staticWhite` = `Text.primaryOnDark`, `planned` = `Status.info`. New code uses the groups. Since 1.14.0 every component reads `Background.*` and `Text.*`; `accent`, `destructive`, `success`, `warning` and `staticWhite` stay as they are, they name a role rather than a level.
+**Flat names (1.x)** stay as aliases of the groups, with the same values: `bgBase` = `Background.base`, `bgCard` = `Background.neutral1`, `bgMuted` = `Background.neutral2`, `textPrimary` / `textSecondary` / `textTertiary` = `Text.*`, `destructive` = `Status.negative`, `success` = `Status.positive`, `warning` = `Status.warning`, `staticWhite` = `Text.primaryOnDark`, `planned` = `Status.info`. New code uses the groups. Since 1.15.0 every component reads `Background.*` and `Text.*`; `accent`, `destructive`, `success`, `warning` and `staticWhite` stay as they are, they name a role rather than a level.
 
 | Token | Value | Use For |
 |-------|-------|---------|
@@ -729,7 +729,20 @@ CurrencyPickerMenu(selection: $currency, currencies: ["KZT", "USD", "EUR"]) { sh
 ```
 
 #### `CurrencyAmountInput` *(1.10.0)*
-The amount at the top of an add sheet: the 56 pt `AmountInput` (or `CalculatorAmountDisplay` with a `calculatorModel`), "≈ 1 234 ₸" in `baseCurrency` when another currency is chosen (`DesignKitCurrencyConverter`: `convertSync`, then `convert`; a spinner until a rate comes; typing waits 0.3 s), the `CurrencyPickerMenu`, and the error in red. Tenra: `AmountInputView` is an adapter.
+The amount at the top of an add sheet: the 56 pt `AmountInput` (or `CalculatorAmountDisplay` with a `calculatorModel`), the "≈ 1 234 ₸" line when the amount is in another currency, the `CurrencyPickerMenu`, and the error in red. Tenra: `AmountInputView` is an adapter.
+
+```swift
+CurrencyAmountInput(amount: $amountText, currency: $currency, baseCurrency: "KZT",
+                    equivalentCurrency: account.currency,   // optional (1.14.0)
+                    currencies: ["KZT", "USD", "EUR"], errorMessage: error)
+```
+
+The "≈" line (1.14.0):
+- **Its currency.** `equivalentCurrency`, such as the currency of the account the amount goes to; `baseCurrency` when the amount is already in it; no line when the amount is in both. Without `equivalentCurrency` (the default) the line is in `baseCurrency`, as before. With the account's currency this is the rule of Tenra's saved transaction rows: USD typed for a EUR card shows "≈ €" (before, "≈ ₸" while typing and "≈ €" once saved), EUR typed for it "≈ ₸".
+- **Converting.** Through `DesignKitCurrencyConverter` (`convertSync`, then `convert`). Typing waits for a 0.3 s pause and keeps the previous value until the new one comes, so the number changes in place. A new line or new currencies convert at once: with `convertSync` the value shows in the same frame, otherwise a spinner until a rate comes; a value for the previous currencies is never shown. One conversion runs at a time and the latest input wins: a slower, older conversion that comes back later is dropped (before, it could overwrite the newer value).
+- **No rate.** The line disappears, rather than keep the previous, now wrong number (before, it kept it, and spun forever without a converter).
+
+The logic is `CurrencyEquivalent.swift` (internal), unit-tested in `CurrencyEquivalentTests`.
 
 #### `CurrencyList` *(1.10.0)*
 Every `CurrencyInfo` currency to pick from: "Popular", then all, in cards (a `ScrollView`, so the screen's background shows through), each row code, name and symbol, the chosen one checked, with a search in the navigation bar's drawer. `CurrencyList(selection: code) { code in … }`; the screen around it is the caller's. Tenra: `CurrencyListContent` (Settings, onboarding) is an adapter.
@@ -775,7 +788,7 @@ ToggleSettingsRow(icon: "location", title: "Share location", hint: "Friends see 
 
 VoiceOver focuses the switch (title as label, `hint` as hint).
 
-#### `SliderRow` *(1.14.0)*
+#### `SliderRow` *(1.15.0)*
 A setting set with a slider: the title (body, with an optional symbol), the value on the trailing
 edge (bodySmall, secondary, tabular digits), the slider in the accent, an optional hint (caption).
 The app formats the value. Pads only vertically, like a row; put it in a form card.
@@ -884,7 +897,7 @@ if let accounts {
 | `LimitProgressCard`, `TargetProgressCard`, `PayoffProgressCard`, `ScoreCard`, `ScoreGaugeCard`, `MetricCard`, `WeightBreakdownCard`, `CalculationCard`, `ProgressRingTile`, `ProgressRingTileGrid` | `…Skeleton` (`MetricCardSkeleton(chartPlacement:)`, `WeightBreakdownCardSkeleton(segments:)`, `CalculationCardSkeleton(rows:showsHero:)`) |
 | `UniversalRow` | `UniversalRowSkeleton(config:iconStyle:titleFont:showsSubtitle:trailing:)` |
 | `NavigationSettingsRow`, `ToggleSettingsRow`, `ActionSettingsRow`, `MenuPickerRow`, `DatePickerRow`, `CheckmarkRow` | `UniversalRowSkeleton.navigationSettings`, `.toggleSettings`, `.actionSettings`, `.menuPicker`, `.datePicker`, `.checkmark(iconStyle:)` |
-| `SliderRow` (1.14.0) | `SliderRowSkeleton(showsHint:)` |
+| `SliderRow` (1.15.0) | `SliderRowSkeleton(showsHint:)` |
 | `BalanceRow`, `ProgressRingRow`, `BreakdownRow`, `InsightEntityRow`, `NetAmountRow`, `ScheduleRow`, `InfoRow`, `ColorPickerRow` | `…Skeleton` |
 | `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `OrbChart` | `…Skeleton` |
 | `LinearProgressBar`, `ProportionBar`, `MiniProportionBar`, `AmountComparisonBar`, `HeroProportionBar`, `ProgressRing`, `MiniDonut`, `MiniHalfGauge`, `HeroHalfGauge`, `MiniMilestoneGauge`, `HeroMilestoneGauge`, `MiniBarPair`, `HeroBarPair` | `…Skeleton`, with the component's size parameters |
@@ -1060,7 +1073,7 @@ HStack {
 ```
 
 #### `SectionHeaderView`
-Section header text with three styles, and an optional action at the end of the line (1.14.0).
+Section header text with three styles, and an optional action at the end of the line (1.15.0).
 
 ```swift
 SectionHeaderView("Transactions")                                      // .default: bodyEmphasis

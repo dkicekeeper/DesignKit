@@ -15,7 +15,7 @@ import DesignSupport
 /// - `.compact`: Small uppercase label (bodySmall, secondary color, with horizontal padding). Used in filters, pickers.
 /// - `.large`: Page-level section title (h3, primary color, optional icon, with horizontal padding). Used in insights.
 ///
-/// An action at the end of the line ("All", a button, a spinner) goes in `trailing` (1.14.0):
+/// An action at the end of the line ("All", a button, a spinner) goes in `trailing` (1.15.0):
 ///
 /// ```swift
 /// SectionHeaderView("Trips", systemImage: "map") {
@@ -77,7 +77,7 @@ public struct SectionHeaderView: View {
     // MARK: - Style Variants
 
     // With an action, the title and the action share one line in an HStack with the system's
-    // spacing: the layout the apps built by hand before 1.14.0, so adopting it moves nothing.
+    // spacing: the layout the apps built by hand before 1.15.0, so adopting it moves nothing.
 
     @ViewBuilder
     private var defaultStyle: some View {

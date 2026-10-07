@@ -17,7 +17,7 @@ appearances it lists:
 | File | Components |
 |---|---|
 | `FoundationsSnapshotTests` | typography scale, `AppTypography.numbers` (proportional vs tabular), primary / secondary buttons (enabled, disabled), the `appButton` matrix, `.fadeTruncation()`, `cardStyle`, filter chips, Dalada's accent through `DesignKitTheme.accent` |
-| `RowsSnapshotTests` | `CheckmarkRow`, `UniversalRow`, `ActionSettingsRow`, `ToggleSettingsRow`, `InfoRow`, `SectionHeaderView` (with an action, 1.14.0), `SelectionIndicator`, `ColorPickerRow`, `DateSectionHeaderView`, `SliderRow` |
+| `RowsSnapshotTests` | `CheckmarkRow`, `UniversalRow`, `ActionSettingsRow`, `ToggleSettingsRow`, `InfoRow`, `SectionHeaderView` (with an action, 1.15.0), `SelectionIndicator`, `ColorPickerRow`, `DateSectionHeaderView`, `SliderRow` |
 | `FormsSnapshotTests` | `EditableHero` (amount, no currency chip), `FormSection`, `DatePickerRow`, `MenuPickerRow`, `SettingsSectionHeaderView`, `HeroSection` |
 | `IconsSnapshotTests` | `IconView` (category, circle, rounded square, glass hero, placeholder, brand fallback), `BrandLogoView`, `PackedCircleIconsView` |
 | `CardsSnapshotTests` | `FinanceCard`, `RedactableAmount`, `EmptyCardView`, `InsightsStatCard`, `InsightEntityRow`, `UniversalCarousel`, `UniversalFilterButton` |
@@ -44,9 +44,10 @@ Not covered on purpose:
   does not let a test set it; `accessibilityReduceMotion` is read-only). `.skeleton(isLoading:)`
   is not: its shapes are the system's redaction;
 - full-screen pickers with a search in the navigation bar: `IconPicker`, `CurrencyList`;
-- `ConvertedAmountView` (and `RecurringPaymentCard`'s converted line): it draws nothing until
-  the host app's converter answers, and in a snapshot run it had not answered when the picture
-  was taken (October 2026), so the snapshot showed an empty line;
+- `ConvertedAmountView`, `RecurringPaymentCard`'s converted line and `CurrencyAmountInput`'s
+  "≈" line (its snapshot is in the base currency, so without the line): they draw nothing until
+  the host app's currency converter answers, and in a snapshot run it had not answered when the
+  picture was taken (October 2026), so a `ConvertedAmountView` snapshot showed an empty line;
 - containers whose look is the system's (`EditSheetContainer` is a `Form` in a navigation bar)
   or that fill the screen (`OnboardingPageContainer`, `OnboardingPager`, and
   `NotificationPermissionView`, which is `PermissionPrimerView` with Tenra's wording);

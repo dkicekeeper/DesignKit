@@ -15,12 +15,16 @@ struct GalleryApp: App {
     init() {
         // Make the bundled Inter font resolve before any view renders.
         DesignKitFonts.registerIfNeeded()
-        // Fixed demo rates, so ConvertedAmountView has something to show. Apps wire real FX.
-        DesignKitCurrencyConverter.convert = { amount, from, to in
+        // Fixed demo rates, so ConvertedAmountView and CurrencyAmountInput have something to
+        // show. Apps wire real FX; like Tenra, both hooks: convertSync is the cached-rate path
+        // that shows CurrencyAmountInput's "≈" line at once.
+        let demoRates: @Sendable (Double, String, String) -> Double? = { amount, from, to in
             let tengePerUnit: [String: Double] = ["KZT": 1, "USD": 480, "EUR": 520, "RUB": 5.2]
             guard let fromRate = tengePerUnit[from], let toRate = tengePerUnit[to] else { return nil }
             return amount * fromRate / toRate
         }
+        DesignKitCurrencyConverter.convert = { amount, from, to in demoRates(amount, from, to) }
+        DesignKitCurrencyConverter.convertSync = demoRates
         // A few brands, so the icon picker has a logos tab. Apps list their own.
         DesignKitLogoCatalog.sections = {
             [
