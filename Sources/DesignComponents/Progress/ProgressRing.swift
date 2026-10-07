@@ -207,7 +207,7 @@ public struct ProgressRingSkeleton: View {
 
     public var body: some View {
         Circle()
-            .stroke(SkeletonView.fill, lineWidth: lineWidth)
+            .stroke(Skeleton.fill, lineWidth: lineWidth)
             .frame(width: size, height: size)
             .shimmer()
             .skeletonLoadingLabel()

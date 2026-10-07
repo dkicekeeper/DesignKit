@@ -3,7 +3,8 @@
 //  DesignKit
 //
 //  One part of a breakdown: a tinted icon, a name with an optional detail line, and the part's
-//  amount over its share. Ported from Tenra's CategoryBreakdownRow (with AmountPercentageView);
+//  amount over its share. Ported from Tenra's CategoryBreakdownRow (its trailing stack is
+//  Amounts/AmountPercentage.swift);
 //  the mapping from Tenra's breakdown item and its category names stays in Tenra as an adapter.
 //
 //  Navigation is left to the caller: wrap the row in a `NavigationLink` and pass
@@ -13,29 +14,6 @@
 import SwiftUI
 import DesignTokens
 import DesignSupport
-
-/// Trailing "amount over percentage" stack of breakdown rows.
-public struct AmountPercentageView: View {
-    let amount: Double
-    let currency: String
-    let percentage: Double
-
-    /// - Parameter percentage: 0…100, shown with one decimal ("42.0%").
-    public init(amount: Double, currency: String, percentage: Double) {
-        self.amount = amount
-        self.currency = currency
-        self.percentage = percentage
-    }
-
-    public var body: some View {
-        VStack(alignment: .trailing, spacing: AppSpacing.xs) {
-            FormattedAmountText(amount: amount, currency: currency, color: AppColors.Text.primary)
-            Text(String(format: "%.1f%%", percentage))
-                .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.Text.secondary)
-        }
-    }
-}
 
 /// "🍴 Food / Groceries, Cafés ……… 85 000 ₸ / 42.0%".
 ///
@@ -142,7 +120,7 @@ public struct BreakdownRow: View {
             }
         } trailing: {
             HStack(spacing: AppSpacing.md) {
-                AmountPercentageView(amount: amount, currency: currency, percentage: percentage)
+                AmountPercentage(amount: amount, currency: currency, percentage: percentage)
                 if showsChevron {
                     DisclosureChevron()
                 }
@@ -163,7 +141,7 @@ public struct BreakdownRowSkeleton: View {
 
     public var body: some View {
         HStack(spacing: RowConfiguration.info.spacing) {
-            IconViewSkeleton(size: AppIconSize.Tile.sm)
+            IconSkeleton(size: AppIconSize.Tile.sm)
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 SkeletonText(AppTypography.body, width: 110)
                 SkeletonText(AppTypography.bodySmall, width: 70)

@@ -173,7 +173,7 @@ extension ComponentSnapshots {
                     remaining: 1_200_000, total: 3_000_000, currency: "KZT", progress: 0.6,
                     phase: .inProgress(nextDate: "12 Nov 2026", remainingCaption: "18 left")
                 ) {
-                    BadgeView("Credit", color: AppColors.expense)
+                    Badge("Credit", color: AppColors.expense)
                 },
                 named: "inProgress"
             )

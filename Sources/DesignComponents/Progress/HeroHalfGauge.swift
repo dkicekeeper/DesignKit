@@ -188,7 +188,7 @@ public struct HeroHalfGaugeSkeleton: View {
             .inset(by: lineWidth / 2)
             .trim(from: 0, to: 0.5)
             .rotation(.degrees(180))
-            .stroke(SkeletonView.fill, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+            .stroke(Skeleton.fill, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
             .frame(width: diameter, height: diameter)
             .frame(
                 width: diameter + HeroHalfGauge.tickOvershoot * 2,

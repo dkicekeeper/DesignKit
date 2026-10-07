@@ -20,7 +20,7 @@ text, not keys. A new key goes there as well.
 | `amount.hidden` | FormattedAmountText under `.amountsHidden()` (VoiceOver) | `Hidden amount` |
 | `amount.hide` | AmountVisibilityToggle (VoiceOver, amounts shown) | `Hide amounts` |
 | `amount.show` | AmountVisibilityToggle (VoiceOver, amounts hidden) | `Show amounts` |
-| `bulk.deleteCount` | BulkDeleteButton | — |
+| `bulk.deleteCount` | BulkDeleteButton (deprecated 2.0.0; the app passes it to `DSButton`) | — |
 | `button.cancel` | EditSheetContainer, ImportProgressSheet | — |
 | `button.copy` | AnimatedInputComponents | — |
 | `button.paste` | AnimatedInputComponents | — |
@@ -40,10 +40,10 @@ text, not keys. A new key goes there as well.
 | `checklist.complete` | ChecklistSummaryRow (VoiceOver on the seal; `completeLabel` replaces it) | `Complete` |
 | `checklist.empty` | ChecklistSummaryRow (no items; `emptyText` replaces it) | `No items yet` |
 | `checklist.progress %lld %lld` | ChecklistSummaryRow (under the bar; `progressText` replaces it) | `%lld of %lld` |
-| `common.cancel` | DateButtonsView | — |
+| `common.cancel` | DateButtons | — |
 | `common.changeIcon` | EditableHero (VoiceOver on the icon) | `Change icon` |
 | `common.color` | ColorPickerRow | — |
-| `common.select` | DateButtonsView | — |
+| `common.select` | DateButtons | — |
 | `common.startDate` | DatePickerRow | — |
 | `composer.cancelQuote` | MessageComposer (VoiceOver on the quote's ×) | `Remove quote` |
 | `composer.send` | MessageComposer (VoiceOver on the send button) | `Send` |
@@ -55,10 +55,10 @@ text, not keys. A new key goes there as well.
 | `currency.popular` | CurrencyList | `Popular` |
 | `currency.searchPrompt` | CurrencyList | `Search currency` |
 | `currency.title` | EditableHero (the pushed currency list's title) | `Currency` |
-| `date.choose` | DateButtonsView | — |
-| `date.selectDate` | DateButtonsView | — |
-| `date.today` | DateButtonsView | — |
-| `date.yesterday` | DateButtonsView | — |
+| `date.choose` | DateButtons | — |
+| `date.selectDate` | DateButtons | — |
+| `date.today` | DateButtons | — |
+| `date.yesterday` | DateButtons | — |
 | `iconPicker.brandDomainHint` | IconPicker (logo search) | `Enter brand domain (e.g. netflix.com)` |
 | `iconPicker.entertainment` | IconCatalog group title (`IconCatalogGroup.localizedTitle`) | `Entertainment` |
 | `iconPicker.foodAndDrinks` | IconCatalog group title (`IconCatalogGroup.localizedTitle`) | `Food & Drinks` |
@@ -99,16 +99,16 @@ text, not keys. A new key goes there as well.
 | `insights.chart.bar` | ChartZoomControls | — |
 | `insights.chart.line` | ChartZoomControls | — |
 | `insights.other` | OrbChart | — |
-| `notification.permission.allow` | NotificationPermissionView | — |
-| `notification.permission.description` | NotificationPermissionView | — |
-| `notification.permission.skip` | NotificationPermissionView | — |
-| `notification.permission.title` | NotificationPermissionView | — |
+| `notification.permission.allow` | NotificationPermissionPrompt | — |
+| `notification.permission.description` | NotificationPermissionPrompt | — |
+| `notification.permission.skip` | NotificationPermissionPrompt | — |
+| `notification.permission.title` | NotificationPermissionPrompt | — |
 | `onboarding.cta.skip` | OnboardingPageContainer; OnboardingPager (default `skipTitle`) | `Skip` (OnboardingPager) |
 | `onboarding.stepIndicator.label` | OnboardingStepIndicator | — |
 | `progress.importing` | ImportProgressSheet | — |
 | `rating.pick %lld %lld` | RatingPicker (VoiceOver: "4 out of 5") | — |
-| `rating.value %@ %lld` | RatingView (VoiceOver: "Rated 4.3 out of 5") | — |
-| `skeleton.loading` | `.skeleton(isLoading:)`, `.skeletonLoadingLabel()`, every component skeleton (`…Skeleton`, 1.10.0), `RedactableAmount` while loading, LoadingButtonLabel, `CashFlowCard`'s default `loadingLabel` (VoiceOver) | `Loading` |
+| `rating.value %@ %lld` | Rating (VoiceOver: "Rated 4.3 out of 5") | — |
+| `skeleton.loading` | `.skeleton(isLoading:)`, `.skeletonLoadingLabel()`, every component skeleton (`…Skeleton`, 1.10.0), `RedactableAmount` while loading, `DSButton` while loading, `CashFlowCard`'s default `loadingLabel` (VoiceOver) | `Loading` |
 | `status.active` | StatusIndicatorBadge | — |
 | `status.archived` | StatusIndicatorBadge | — |
 | `status.paused` | StatusIndicatorBadge | — |

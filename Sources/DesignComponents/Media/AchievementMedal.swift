@@ -34,7 +34,7 @@ public struct AchievementMedal: View {
     }
 
     public var body: some View {
-        IconView(
+        Icon(
             source: .sfSymbol(systemImage),
             style: .circle(
                 size: size,
@@ -183,7 +183,7 @@ public struct AchievementMedalSkeleton: View {
     }
 
     public var body: some View {
-        SkeletonView.circle(size)
+        Skeleton.circle(size)
             .skeletonLoadingLabel()
     }
 }
@@ -198,7 +198,7 @@ public struct AchievementTileSkeleton: View {
 
     public var body: some View {
         VStack(spacing: AppSpacing.xs) {
-            SkeletonView.circle(medalSize)
+            Skeleton.circle(medalSize)
             SkeletonText(AppTypography.caption, width: medalSize)
         }
         .frame(maxWidth: .infinity)
@@ -213,7 +213,7 @@ public struct AchievementProgressRowSkeleton: View {
 
     public var body: some View {
         HStack(spacing: AppSpacing.md) {
-            SkeletonView.circle(AppIconSize.xl)
+            Skeleton.circle(AppIconSize.xl)
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 SkeletonText(AppTypography.bodySmall, width: 200)
                 LinearProgressBarSkeleton(height: AchievementMetrics.barHeight)

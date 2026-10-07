@@ -63,7 +63,7 @@ public struct RecommendationBoxSkeleton: View {
         .hidden()
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(AppSpacing.md)
-        .background(SkeletonView.fill, in: RoundedRectangle(cornerRadius: AppRadius.md))
+        .background(Skeleton.fill, in: RoundedRectangle(cornerRadius: AppRadius.md))
         .shimmer()
         .skeletonLoadingLabel()
     }

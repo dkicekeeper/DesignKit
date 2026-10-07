@@ -145,7 +145,7 @@ public struct BarChart<Point: ChartPoint>: View {
     }
 
     private var emptyState: some View {
-        EmptyStateView(
+        EmptyState(
             icon: "chart.bar",
             title: emptyTitle,
             description: emptyMessage,
@@ -246,7 +246,7 @@ public struct BarChartSkeleton: View {
             Color.clear.frame(height: ChartMetrics.bannerHeight)
             HStack(alignment: .bottom, spacing: AppSpacing.sm) {
                 ForEach(0..<bars, id: \.self) { index in
-                    SkeletonView(
+                    Skeleton(
                         height: ChartMetrics.plotHeight * Self.shares[index % Self.shares.count],
                         cornerRadius: AppRadius.xs
                     )

@@ -1,8 +1,8 @@
 //
-//  RatingView.swift
+//  Rating.swift
 //  DesignKit
 //
-//  Star rating: read-only display with half stars (`RatingView`) and a tap-to-rate
+//  Star rating: read-only display with half stars (`Rating`) and a tap-to-rate
 //  input (`RatingPicker`). From Dalada's StarsView / StarPicker (place reviews).
 //
 
@@ -13,12 +13,12 @@ import DesignSupport
 /// Read-only star rating with half stars: 3.4 → ★★★⯨☆.
 ///
 /// ```swift
-/// RatingView(rating: 4.3)
-/// RatingView(rating: place.averageRating, size: 12)
+/// Rating(rating: 4.3)
+/// Rating(rating: place.averageRating, size: 12)
 /// ```
 ///
 /// VoiceOver reads `rating.value %@ %lld` ("Rated 4.3 out of 5") — see localization-keys.md.
-public struct RatingView: View {
+public struct Rating: View {
     let rating: Double
     let maximum: Int
     let size: CGFloat
@@ -110,8 +110,8 @@ public struct RatingPicker: View {
 
 // MARK: - Skeleton
 
-/// Placeholder of a `RatingView`: a soft square in place of each star.
-public struct RatingViewSkeleton: View {
+/// Placeholder of a `Rating`: a soft square in place of each star.
+public struct RatingSkeleton: View {
     let maximum: Int
     let size: CGFloat
 
@@ -123,10 +123,18 @@ public struct RatingViewSkeleton: View {
     public var body: some View {
         HStack(spacing: 2) {
             ForEach(0..<maximum, id: \.self) { _ in
-                SkeletonView(height: size, width: size)
+                Skeleton(height: size, width: size)
             }
         }
         .shimmer()
         .skeletonLoadingLabel()
     }
 }
+
+// MARK: - Names before 2.0
+
+@available(*, deprecated, renamed: "RatingSkeleton")
+public typealias RatingViewSkeleton = RatingSkeleton
+
+@available(*, deprecated, renamed: "Rating")
+public typealias RatingView = Rating

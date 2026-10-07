@@ -3,7 +3,7 @@
 //  Tenra
 //
 //  Simplified date picker row - inline style only
-//  For button-based selection, use DateButtonsView directly
+//  For button-based selection, use DateButtons directly
 //
 
 import SwiftUI
@@ -11,7 +11,7 @@ import DesignTokens
 import DesignSupport
 
 /// Date picker row with inline style
-/// For button-based selection (Yesterday/Today/Calendar), use DateButtonsView directly
+/// For button-based selection (Yesterday/Today/Calendar), use DateButtons directly
 public struct DatePickerRow: View {
     let icon: String?
     let title: String

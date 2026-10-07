@@ -256,7 +256,7 @@ public struct HeroSparklineSkeleton: View {
     public var body: some View {
         VStack(spacing: AppSpacing.lg) {
             Color.clear.frame(height: ChartMetrics.bannerHeight)
-            SkeletonView(height: ChartMetrics.heroPlotHeight)
+            Skeleton(height: ChartMetrics.heroPlotHeight)
                 .padding(.horizontal, AppSpacing.lg)
         }
         .skeletonLoadingLabel()

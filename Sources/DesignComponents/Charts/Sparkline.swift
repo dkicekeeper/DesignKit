@@ -221,7 +221,7 @@ public struct SparklineSkeleton: View {
     }
 
     public var body: some View {
-        SkeletonView(height: height)
+        Skeleton(height: height)
             .skeletonLoadingLabel()
     }
 }

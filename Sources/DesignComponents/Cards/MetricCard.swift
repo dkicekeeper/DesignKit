@@ -247,7 +247,7 @@ public struct MetricCardSkeleton: View {
             .padding(.trailing, chartPlacement == .trailing ? miniChartWidth + AppSpacing.sm : 0)
 
             if chartPlacement == .bottom {
-                SkeletonView(height: miniChartHeight)
+                Skeleton(height: miniChartHeight)
             }
         }
         .shimmer()
@@ -255,7 +255,7 @@ public struct MetricCardSkeleton: View {
         .cardStyle()
         .overlay(alignment: .trailing) {
             if chartPlacement == .trailing {
-                SkeletonView(height: miniChartHeight * 0.6, width: miniChartWidth)
+                Skeleton(height: miniChartHeight * 0.6, width: miniChartWidth)
                     .padding(.trailing, AppSpacing.lg)
             }
         }

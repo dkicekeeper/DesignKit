@@ -13,7 +13,7 @@ import DesignTokens
 ///
 /// ```swift
 /// FlowLayout {
-///     ForEach(tags, id: \.self) { BadgeView($0) }
+///     ForEach(tags, id: \.self) { Badge($0) }
 /// }
 /// ```
 ///

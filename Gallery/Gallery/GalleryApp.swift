@@ -15,7 +15,7 @@ struct GalleryApp: App {
     init() {
         // Make the bundled Inter font resolve before any view renders.
         DesignKitFonts.registerIfNeeded()
-        // Fixed demo rates, so ConvertedAmountView and CurrencyAmountInput have something to
+        // Fixed demo rates, so ConvertedAmount and CurrencyAmountInput have something to
         // show. Apps wire real FX; like Tenra, both hooks: convertSync is the cached-rate path
         // that shows CurrencyAmountInput's "≈" line at once.
         let demoRates: @Sendable (Double, String, String) -> Double? = { amount, from, to in

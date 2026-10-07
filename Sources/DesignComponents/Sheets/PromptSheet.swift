@@ -2,22 +2,19 @@
 //  PromptSheet.swift
 //  DesignKit
 //
-//  A short question in a small sheet: a symbol, a title, a message, a filled primary button
-//  and a plain secondary one; either answer closes the sheet. Ported from Tenra's
-//  RatingSurveyView (the "Enjoying Tenra?" pre-prompt); the rating service, the feedback
-//  e-mail and the copy stay in Tenra as an adapter.
-//
-//  1.5.0 moved Tenra's system fonts to AppTypography (owner's decision): the title is h3,
-//  the message bodySmall, the buttons bodyEmphasis. The 14 pt button radius is Tenra's as it
-//  ships.
+//  A short question or request in a sheet: a symbol on a disc, a title, a message, the main
+//  answer and a second one (HIG "Requesting permission", a rating pre-prompt). 2.0.0 made it
+//  the one sheet of its kind: PermissionPrimerView (the permission primer of both apps since
+//  0.7.0) was the same layout with an async "Allow", so the primer's layout, DSButtons and
+//  loading state are PromptSheet's now, with a larger title (h2) and message (body).
+//  What the answers do, the copy and the presentation stay in the app.
 //
 
 import SwiftUI
 import DesignTokens
+import DesignSupport
 
-/// "✨ / Enjoying the app? / … / [Love it!] / Not really", presented with `.sheet`.
-///
-/// The sheet sets its own detent (`height`, 340 pt by default) and shows the drag indicator.
+/// Symbol, title, message and two buttons.
 ///
 /// ```swift
 /// .sheet(isPresented: $showsSurvey) {
@@ -31,32 +28,40 @@ import DesignTokens
 ///         onSecondary: { openFeedbackMail() }
 ///     )
 /// }
+///
+/// // A permission primer: "Allow" shows the system alert, the sheet closes after it.
+/// PromptSheet(systemImage: "bell.badge", title: …, message: …,
+///             primaryTitle: "Turn on", secondaryTitle: "Not now",
+///             onPrimary: { await requestPermission() }, onSecondary: {})
 /// ```
+///
+/// While `onPrimary` runs (a system alert is up, a request is on its way) the main button
+/// shows a spinner and both buttons are disabled. With `dismissesOnAnswer` (the default) the
+/// sheet closes after either answer; without it, the app closes it. `detent` sets the sheet's
+/// height (`.medium` by default); pass `nil` when the app presents it its own way.
 public struct PromptSheet: View {
     let systemImage: String
     let title: String
     let message: String
     let primaryTitle: String
     let secondaryTitle: String
-    let height: CGFloat
-    let onPrimary: () -> Void
+    let detent: PresentationDetent?
+    let dismissesOnAnswer: Bool
+    let onPrimary: () async -> Void
     let onSecondary: () -> Void
 
+    @State private var isWorking = false
     @Environment(\.dismiss) private var dismiss
 
-    /// - Parameters:
-    ///   - systemImage: A 44 pt (`AppIconSize.Tile.sm`) symbol in the accent colour at the top.
-    ///   - height: The sheet's detent.
-    ///   - onPrimary: Runs, then the sheet closes.
-    ///   - onSecondary: Runs, then the sheet closes.
     public init(
         systemImage: String,
         title: String,
         message: String,
         primaryTitle: String,
         secondaryTitle: String,
-        height: CGFloat = 340,
-        onPrimary: @escaping () -> Void,
+        detent: PresentationDetent? = .medium,
+        dismissesOnAnswer: Bool = true,
+        onPrimary: @escaping () async -> Void,
         onSecondary: @escaping () -> Void
     ) {
         self.systemImage = systemImage
@@ -64,64 +69,98 @@ public struct PromptSheet: View {
         self.message = message
         self.primaryTitle = primaryTitle
         self.secondaryTitle = secondaryTitle
-        self.height = height
+        self.detent = detent
+        self.dismissesOnAnswer = dismissesOnAnswer
         self.onPrimary = onPrimary
         self.onSecondary = onSecondary
     }
 
+    /// The pre-2.0 sheet of a fixed height that closes after either answer.
+    @available(*, deprecated, message: "Use init(systemImage:title:message:primaryTitle:secondaryTitle:detent:dismissesOnAnswer:onPrimary:onSecondary:); the sheet is .medium by default.")
+    public init(
+        systemImage: String,
+        title: String,
+        message: String,
+        primaryTitle: String,
+        secondaryTitle: String,
+        height: CGFloat,
+        onPrimary: @escaping () -> Void,
+        onSecondary: @escaping () -> Void
+    ) {
+        self.init(
+            systemImage: systemImage,
+            title: title,
+            message: message,
+            primaryTitle: primaryTitle,
+            secondaryTitle: secondaryTitle,
+            detent: .height(height),
+            onPrimary: onPrimary,
+            onSecondary: onSecondary
+        )
+    }
+
     public var body: some View {
+        content
+            .modifier(PromptSheetDetent(detent: detent))
+    }
+
+    private var content: some View {
         VStack(spacing: AppSpacing.lg) {
-            Image(systemName: systemImage)
-                .font(.system(size: AppIconSize.Tile.sm))
-                .foregroundStyle(AppColors.accent)
-                .padding(.top, AppSpacing.xl)
+            HeroSymbol(systemImage: systemImage, size: PromptSheetMetrics.symbolSize)
+                .padding(.top, AppSpacing.xxl)
 
             VStack(spacing: AppSpacing.sm) {
-                Text(title)
-                    .font(AppTypography.h3)
+                Text(verbatim: title)
+                    .font(AppTypography.h2)
                     .foregroundStyle(AppColors.Text.primary)
                     .multilineTextAlignment(.center)
-
-                Text(message)
-                    .font(AppTypography.bodySmall)
+                    .accessibilityAddTraits(.isHeader)
+                Text(verbatim: message)
+                    .font(AppTypography.body)
                     .foregroundStyle(AppColors.Text.secondary)
                     .multilineTextAlignment(.center)
             }
-            .padding(.horizontal, AppSpacing.lg)
+            .fixedSize(horizontal: false, vertical: true)
 
             Spacer(minLength: 0)
 
             VStack(spacing: AppSpacing.sm) {
-                Button {
-                    onPrimary()
-                    dismiss()
-                } label: {
-                    Text(primaryTitle)
-                        .font(AppTypography.bodyEmphasis)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, AppSpacing.md)
-                        .background(AppColors.accent, in: RoundedRectangle(cornerRadius: 14))
-                        .foregroundStyle(AppColors.staticWhite)
+                DSButton(primaryTitle, fullWidth: true, isLoading: isWorking) {
+                    isWorking = true
+                    Task {
+                        await onPrimary()
+                        isWorking = false
+                        if dismissesOnAnswer { dismiss() }
+                    }
                 }
-
-                Button {
+                DSButton(secondaryTitle, appearance: .secondary, fullWidth: true, isDisabled: isWorking) {
                     onSecondary()
-                    dismiss()
-                } label: {
-                    Text(secondaryTitle)
-                        .font(AppTypography.bodyEmphasis)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, AppSpacing.md)
-                        .foregroundStyle(AppColors.Text.secondary)
+                    if dismissesOnAnswer { dismiss() }
                 }
             }
-            .padding(.horizontal, AppSpacing.lg)
-            .padding(.bottom, AppSpacing.lg)
         }
         .frame(maxWidth: .infinity)
-        .background(AppColors.Background.base.ignoresSafeArea())
-        .presentationDetents([.height(height)])
-        .presentationDragIndicator(.visible)
-        .interactiveDismissDisabled(false)
+        .screenPadding()
+        .padding(.bottom, AppSpacing.lg)
+    }
+}
+
+enum PromptSheetMetrics {
+    /// The symbol's disc.
+    static let symbolSize: CGFloat = 104
+}
+
+private struct PromptSheetDetent: ViewModifier {
+    let detent: PresentationDetent?
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if let detent {
+            content
+                .presentationDetents([detent])
+                .presentationDragIndicator(.visible)
+        } else {
+            content
+        }
     }
 }

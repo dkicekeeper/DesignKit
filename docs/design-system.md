@@ -35,9 +35,16 @@
 
 | Module | Contents |
 |---|---|
-| `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation`, `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, inline field styles), `AppButton` (`primaryButton`, `secondaryButton`, `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
-| `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `IconView`, `BrandLogoView` (deprecated 1.13.0: `IconView(source: .brandService(name), style: .roundedSquare(size:))` is the same look), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `HapticManager`, `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
+| `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation`, `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, inline field styles), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
+| `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `Icon` (a brand logo is `Icon(source: .brandService(name))`; `BrandLogoView` was removed in 2.0.0), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `HapticManager`, `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
 | `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons") |
+
+**Names (2.0.0).** A component is named for what it is, without `View` or `App`: `SectionHeader`,
+`EmptyState`, `Avatar`, `Badge`, `Icon`, `DSButton`. The names before 2.0 are deprecated
+typealiases, so old code builds with a fix-it; [migration-2.0.md](migration-2.0.md) lists them.
+The tokens keep their prefix (`AppColors`, `AppSpacing`, `AppIconSize`, …): a token namespace
+is not a view, and `Color` / `Font` would clash with SwiftUI. The button is `DSButton` because
+`Button` is SwiftUI's.
 
 Coverage against Apple HIG, Material 3, Fluent 2, Carbon, Polaris and Atlassian, and the next
 candidates: [benchmark.md](benchmark.md).
@@ -50,15 +57,15 @@ DesignKit ships no networking, persistence or FX. A host app wires these once, i
 |---|---|---|
 | `DesignKitTheme.accent` | `.indigo` | Brand accent behind `AppColors.accent`. Also set the asset-catalog `AccentColor` to the same colour (system chrome never reads `AppColors`). |
 | `DesignKitFonts.registerIfNeeded()` | — | Call once; registers the bundled Inter variable fonts. |
-| `DesignKitLogoLoader.loader` | `nil` → fallback icon | Brand-logo images for `IconSource.brandService` (`IconView`, `heroAccentGlow`). |
-| `DesignKitCurrencyConverter.convert` | `nil` → nothing rendered | FX for `ConvertedAmountView` / `HeroSection(showBaseConversion:)` / `CurrencyAmountInput`. |
+| `DesignKitLogoLoader.loader` | `nil` → fallback icon | Brand-logo images for `IconSource.brandService` (`Icon`, `heroAccentGlow`). |
+| `DesignKitCurrencyConverter.convert` | `nil` → nothing rendered | FX for `ConvertedAmount` / `HeroSection(showBaseConversion:)` / `CurrencyAmountInput`. |
 | `DesignKitCurrencyConverter.convertSync` *(1.10.0)* | `nil` → `convert` is asked | Instant conversion from cached rates, so `CurrencyAmountInput` shows "≈ …" while the user types, and at once when the currencies change (1.14.0). |
 | `DesignKitLogoCatalog.sections` / `.search` / `.domainSuffixes` *(1.10.0)* | no sections → no logos tab; `["com"]` | The brands `IconPicker` offers (titled sections of domain + name), its search, and the domains tried for a typed name (Tenra: `["com", "kz"]`). |
 | Localization keys | raw key shown | Components resolve `String(localized:)` in the **host app's** main bundle. The full key list is in [localization-keys.md](localization-keys.md). |
 
 ### 0.2 Charts in DesignKit
 
-**Trend charts (0.5.0)** over the generic `ChartPoint` / `ChartSeries` model: `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `ChartSelectionBanner`, `ChartValuePoint`, `ChartValueFormat`. `OrbChart` (+ `DonutSlice`, `DonutSlice.foldingSlivers`, `DonutSlice.opacityStepped`), `MiniDonut`, `ProportionBar`, `LinearProgressBar`, `ProgressRing` (+ `LimitProgress`, 1.5.0), `AmountComparisonBar`, `MiniProportionBar` / `HeroProportionBar`, `MiniHalfGauge` / `HeroHalfGauge`, `MiniMilestoneGauge` / `HeroMilestoneGauge`, `MiniBarPair` / `HeroBarPair`, `HeroChartEffects` (`chartGlow`, `materialize`, `glassBar`), `ChartZoomControls` + `ChartStyle`, `SiriGlowView`, `SiriWaveRecordingView`. See [charts.md](charts.md).
+**Trend charts (0.5.0)** over the generic `ChartPoint` / `ChartSeries` model: `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `ChartSelectionBanner`, `ChartValuePoint`, `ChartValueFormat`. `OrbChart` (+ `DonutSlice`, `DonutSlice.foldingSlivers`, `DonutSlice.opacityStepped`), `MiniDonut`, `ProportionBar`, `LinearProgressBar`, `ProgressRing` (+ `LimitProgress`, 1.5.0), `AmountComparisonBar`, `MiniProportionBar` / `HeroProportionBar`, `MiniHalfGauge` / `HeroHalfGauge`, `MiniMilestoneGauge` / `HeroMilestoneGauge`, `MiniBarPair` / `HeroBarPair`, `HeroChartEffects` (`chartGlow`, `materialize`, `glassBar`), `ChartZoomControls` + `ChartStyle`, `SiriGlow`, `SiriWave`. See [charts.md](charts.md).
 
 **Removed in 1.0** (retired from Tenra 2026-07, deprecated in DesignKit until then): `BudgetProgressBar` → `LinearProgressBar`, `BudgetProgressCircle` → `ProgressRing`, `ExpenseIncomeProgressBar` → `AmountComparisonBar`, `DonutChart` + `ChartDisplayMode` → `OrbChart` / `MiniDonut`.
 
@@ -70,8 +77,8 @@ generic input or a host hook (see [CLAUDE.md](../CLAUDE.md) → *Porting a compo
 - **Tenra models** (`Transaction`, `Account`, `CustomCategory`, `RecurringSeries`, loans, deposits): `TransactionCard`, `BudgetSettingsSection`, `EntityDetailScaffold`, `GroupedTransactionList`, `CategoryStyleHelper` / `CategoryStyleCache`, `TransactionDisplayHelper`, `CategoryDisplay`.
 - **`PeriodDataPoint` adapters** (Tenra): `PeriodDataPoint: ChartPoint`, `PeriodChartSeries` → `ChartSeries`, and convenience inits keeping the old call sites (`granularity:`, `currency:`). `PeriodBreakdownRow` and `ChartAxisHelpers`' period labels stay app-side.
 - **Tenra services**: `DateFormatters`, `FastDateParser`. (`EditableHeroSection`, `IconPickerView`, `CurrencySelectorView`, `AmountInputView` and `CurrencyListContent` became `EditableHero`, `IconPicker`, `CurrencyPickerMenu`, `CurrencyAmountInput` and `CurrencyList` in 1.10.0, behind the `DesignKitLogoCatalog` and `convertSync` hooks.)
-- **Screens over Tenra models**: the account, category and time filter sheets (built from `CheckmarkRow`), the home sections (`FinanceCard` + `PackedCircleIconsView`).
-- **Domain convenience inits / adapters**: `MenuPickerRow where T == RecurringFrequency / LoanType / ReminderOption`, `StatusIndicatorBadge`'s `RecurringSeries.entityStatus`, `DonutSlice.from([CategoryBreakdownItem])`, Tenra's `InsightTrendBadge` (`InsightTrend` → `TrendBadge`), Tenra's adapters under the old names of the components ported in 1.1.0–1.5.0 (`AccountRow` → `BalanceRow`, `CategoryRow` → `ProgressRingRow`, `CategoryChip` → `ProgressRingTile`, `BudgetProgressRow` → `LimitProgressCard`, …), Dalada's `RuleStatusBadge` (`RuleStatus` → `BadgeView`).
+- **Screens over Tenra models**: the account, category and time filter sheets (built from `CheckmarkRow`), the home sections (`FinanceCard` + `PackedCircleIcons`).
+- **Domain convenience inits / adapters**: `MenuPickerRow where T == RecurringFrequency / LoanType / ReminderOption`, `StatusIndicatorBadge`'s `RecurringSeries.entityStatus`, `DonutSlice.from([CategoryBreakdownItem])`, Tenra's `InsightTrendBadge` (`InsightTrend` → `TrendBadge`), Tenra's adapters under the old names of the components ported in 1.1.0–1.5.0 (`AccountRow` → `BalanceRow`, `CategoryRow` → `ProgressRingRow`, `CategoryChip` → `ProgressRingTile`, `BudgetProgressRow` → `LimitProgressCard`, …), Dalada's `RuleStatusBadge` (`RuleStatus` → `Badge`).
 
 ---
 
@@ -85,7 +92,7 @@ All tokens live in `Sources/DesignTokens/`. Never use raw values — always refe
 
 Modifiers:
 - **`OnDark` / `OnLight`**: the same value in both themes, for content on photos, gradients and coloured headers (a trip photo in Dalada, `GradientOrbsBackground`, an accent hero).
-- **`Pale`**: a tinted container behind status text, badges and icons. `AppColors.pale(_:)` makes one from any colour (a category colour too): 12% in light, 24% in dark. Since 1.8.0 every tinted container in DesignKit uses it, so they are equally strong everywhere: `BadgeView` (tinted), `TrendBadge` (pill), `RecommendationBox`, `HeroSymbol`, `AvatarView` (initials), the round icons of `LimitProgressCard`, `BreakdownRow` and `ProgressRingRow`, `ActivityTimeline` markers, the `ScoreGaugeCard` grade and `TargetProgressCard` badge, `HeroBarPair`'s amount pill, `MonthCalendar`'s today, `TagInput` chips and the calculator's operator keys. Progress tracks and chart fills are not containers and keep their own opacity.
+- **`Pale`**: a tinted container behind status text, badges and icons. `AppColors.pale(_:)` makes one from any colour (a category colour too): 12% in light, 24% in dark. Since 1.8.0 every tinted container in DesignKit uses it, so they are equally strong everywhere: `Badge` (tinted), `TrendBadge` (pill), `RecommendationBox`, `HeroSymbol`, `Avatar` (initials), the round icons of `LimitProgressCard`, `BreakdownRow` and `ProgressRingRow`, `ActivityTimeline` markers, the `ScoreGaugeCard` grade and `TargetProgressCard` badge, `MonthCalendar`'s today, `TagInput` chips and the calculator's operator keys. Progress tracks and chart fills are not containers and keep their own opacity.
 - **Opaque** (`Border.opaque`): no transparency, for outlines that overlap.
 
 **`AppColors.Text`** — text and icons
@@ -162,7 +169,9 @@ For full circles use `.infinity` inline (rare — only avatars/icon backgrounds 
 ### Icon Sizes (`AppIconSize`)
 
 Two scales, named like `AppSpacing` (1.13.0): **glyphs** stand on their own, **tiles** carry
-their own backing (a circle or rounded square, an avatar, a coin).
+their own backing (a circle or rounded square, an avatar, a coin). A tile starts at 44 pt:
+below it the backing leaves the symbol no room for `Icon`'s padding, so 40 pt is a glyph
+(2.0.0).
 
 | Glyph | Value | Use For |
 |-------|-------|---------|
@@ -171,20 +180,21 @@ their own backing (a circle or rounded square, an avatar, a coin).
 | `md` | 20 | Toolbar, settings rows |
 | `lg` | 24 | Emphasized list icons, form-row leading icons |
 | `xl` | 32 | Large glyphs, bank logos in rows |
+| `xxl` | 40 | An avatar, a logo in a row (`Tile.xs` before 2.0) |
 
 | Tile (`AppIconSize.Tile`) | Value | Use For |
 |-------|-------|---------|
-| `xs` | 40 | Avatars, small icon tiles |
-| `sm` | 44 | The icon tile of a content row (`IconView`'s default) |
+| `sm` | 44 | The smallest tile: the icon of a content row (`Icon`'s default) |
 | `md` | 48 | Empty-state icons |
 | `lg` | 52 | Category coins in rows |
 | `xl` | 64 | Category coins in grids, profile avatars |
 | `xxl` | 72 | A ring around an `xl` tile (8 pt stroke) |
 | `xxxl` | 80 | Hero icons, large action buttons (voice input) |
 
-Deprecated in 1.13.0 (same values, renamed): `avatar` → `Tile.xs`, `xxl` → `Tile.sm`,
-`xxxl` → `Tile.md`, `categoryIcon` → `Tile.lg`, `mega` → `Tile.xl`, `budgetRing` →
-`Tile.xxl`, `ultra` → `Tile.xxxl`. Xcode's fix-it renames them.
+2.0.0: `Tile.xs` (40) is deprecated, renamed `AppIconSize.xxl`. The names deprecated in 1.13.0
+are gone: `avatar` (40, now `xxl`), the old `xxl` (44, `Tile.sm`) and `xxxl` (48, `Tile.md`),
+`categoryIcon` (`Tile.lg`), `mega` (`Tile.xl`), `budgetRing` (`Tile.xxl`), `ultra`
+(`Tile.xxxl`).
 
 ### Container Sizes
 
@@ -199,7 +209,7 @@ All use Inter variable font with Dynamic Type scaling:
 | `h1` | 34 | bold | Screen titles |
 | `h2` | 28 | semibold | Detail view balances |
 | `h3` | 24 | semibold | Section titles (Insights) |
-| `h4` | 20 | semibold | Card headers, `EmptyStateView` titles |
+| `h4` | 20 | semibold | Card headers, `EmptyState` titles |
 | `bodyEmphasis` | 18 | semibold | Row names, button labels, section subheaders |
 | `body` | 18 | regular | Default text |
 | `bodySmall` | 16 | regular | Secondary text, subtitles |
@@ -258,22 +268,36 @@ For dynamic-size amount inputs use `Font.custom(AppTypography.fontFamily, …)` 
 
 **`.fadeTruncation(fadeLength:)`** *(1.7.0)*: one line that fades out over 24 pt at its trailing edge instead of ending in "…", only when it does not fit. For names in carousels and tiles. RTL-aware.
 
-### Button Styles (`AppButton`)
+### Buttons (`DSButton`, `.dsButton`) *(2.0.0)*
 
-**One API, two shorthands.** `.appButton(_:role:size:disabled:)` *(1.7.0)* is the button of the
-design system; `.primaryButton()` and `.secondaryButton()` are its two most common cases,
-kept as shorthands (the apps use them in 70 places).
+**One button.** `DSButton` (§3, Input components) is the button of the design system: a title
+with an icon before, after or above it (or the icon alone), appearance × role × size, a shape,
+full width, a loading state, haptics. `.dsButton(_:role:size:disabled:)` is its style, for a
+`Button` whose label is built by hand (two lines, an amount). Before 2.0 the style was
+`.appButton` with the shorthands `.primaryButton()` / `.secondaryButton()`, and loading,
+deleting the selection and the detail-screen tiles were separate views (`LoadingButtonLabel`,
+`BulkDeleteButton`, `EntityActionButton`); all are deprecated in favour of these two.
 
-| Call | Same as | Visual | Usage |
-|------|---------|--------|-------|
-| `.appButton(_:role:size:disabled:)` | — | appearance `.primary` (`.glassProminent`) / `.secondary` (`.glass`) / `.flat` (`.borderless`) × role `.normal` (accent; none on secondary) / `.destructive` (`Status.negative`) / `.neutral` (`Text.primary`) × size `.large` / `.medium` / `.small` (control sizes) | Every button. Loading: `LoadingButtonLabel` in the label + `disabled: isLoading` |
-| `.primaryButton(disabled:)` | `.appButton(disabled:)` | `.glassProminent` + accent + `.large` | The main action. Full width: `.frame(maxWidth: .infinity)` on the label |
-| `.secondaryButton()` | `.appButton(.secondary)` | `.glass` + `.large` | Cancel, Back, secondary actions |
-| `.buttonStyle(.bounce)` | — | Scale 0.96 and a slight darkening on press | Not a button look: a tappable **card or row** (Tenra's account cards, transaction rows, Finances tiles) |
+| Call | Visual | Usage |
+|------|--------|-------|
+| `DSButton(_:systemImage:iconPlacement:appearance:role:size:shape:fullWidth:isLoading:isDisabled:action:)` | appearance `.primary` (`.glassProminent`) / `.secondary` (`.glass`) / `.flat` (`.borderless`) × role `.normal` (accent; none on secondary) / `.destructive` (`Status.negative`) / `.neutral` (`Text.primary`) × size `.large` / `.medium` / `.small` (control sizes); icon `.leading` / `.trailing` / `.top` (a tile) / `.only`; shape `.automatic` / `.capsule` / `.roundedRectangle` | Every button |
+| `.dsButton(_:role:size:disabled:)` | the same styles | A `Button` with a label of its own |
+| `.buttonStyle(.bounce)` | Scale 0.96 and a slight darkening on press | Not a button look: a tappable **card or row** (Tenra's account cards, transaction rows, Finances tiles) |
 
-⚠️ **For destructive buttons, do NOT use `.primaryButton()`** — it forces `.tint(AppColors.accent)` which silently overrides `role: .destructive` (button looks accent-colored instead of red). Since 1.7.0 use `.appButton(role: .destructive)`; before it, the native styles directly: `.buttonStyle(.glassProminent).tint(AppColors.destructive).controlSize(.large)` with `Button(role: .destructive, ...)`. See [BulkDeleteButton.swift](../Sources/DesignComponents/Actions/BulkDeleteButton.swift) and [EntityActionButton.swift](../Sources/DesignComponents/Actions/EntityActionButton.swift).
+| Before 2.0 | 2.0 |
+|---|---|
+| `Button { } label: { Text("Save").frame(maxWidth: .infinity) }.primaryButton()` | `DSButton("Save", fullWidth: true) { }` |
+| `.secondaryButton()` | `.dsButton(.secondary)` or `DSButton(…, appearance: .secondary)` |
+| `.appButton(a, role: r, size: s, disabled: d)` | `.dsButton(a, role: r, size: s, disabled: d)` |
+| `LoadingButtonLabel("Save", isLoading: saving)` in a label + `disabled: saving` | `DSButton("Save", isLoading: saving) { }` |
+| `BulkDeleteButton(count: n) { }` | `DSButton(String(format: String(localized: "bulk.deleteCount"), n), role: .destructive, shape: .capsule, fullWidth: true) { }` with the screen's own padding |
+| `EntityActionButton(title: "Edit", systemImage: "pencil") { }` | `DSButton("Edit", systemImage: "pencil", iconPlacement: .top) { }` |
 
-**Group adjacent glass elements in `GlassEffectContainer`** (glass can't sample other glass → inconsistent rendering otherwise). Use it for rows of `.glass`/`.glassProminent` buttons or clusters of `.glassEffect()` views; set its `spacing:` to match the stack spacing. Used ungated in app code (app target = iOS 26). Precedents: `EntityDetailScaffold` action bar, `DateButtonsView`, `ChartZoomControls`. Leaf components that still support pre-iOS-26 (`CategoryChip`, `SegmentedPickerView`) gate glass with `#available(iOS 26)` + `.ultraThinMaterial` fallback.
+The role is applied by the style, never overridden by a tint: `DSButton(role: .destructive)` is
+red in every appearance. (Before 1.7.0 `.primaryButton()` forced the accent tint over a
+destructive role.)
+
+**Group adjacent glass elements in `GlassEffectContainer`** (glass can't sample other glass → inconsistent rendering otherwise). Use it for rows of `.glass`/`.glassProminent` buttons or clusters of `.glassEffect()` views; set its `spacing:` to match the stack spacing. Used ungated in app code (app target = iOS 26). Precedents: `EntityDetailScaffold` action bar, `DateButtons`, `ChartZoomControls`. Leaf components that still support pre-iOS-26 (`CategoryChip`) gate glass with `#available(iOS 26)` + `.ultraThinMaterial` fallback. `SegmentedPicker` is the system control alone since 2.0.0: an interactive glass layer over it took the touch, so a quick tap did not move the selection.
 
 ---
 
@@ -408,10 +432,10 @@ Every row in `Views/Components/Rows/` follows these token rules. New rows MUST c
 | **Title — detail / breakdown rows** | `AppTypography.body` (18) or `bodyEmphasis` (18 semibold) | Insights detail rows. Use the `bodyEmphasis` **token** — never `body` + `.fontWeight(.semibold)` |
 | **Subtitle / secondary line** | `AppTypography.bodySmall` (16) / `AppColors.textSecondary` | One token for all secondary subtitles |
 | **Trailing amount** | `FormattedAmountText` (default body/semibold) | Never hand-format money |
-| **Horizontal inset** | per-row `.screenPadding()` | Rows declare `hPad 0` (UniversalRow `.info`) and own their inset at the call site, so the full width — incl. padding — is tappable inside `NavigationLink`. Lists do NOT wrap the whole `VStack` (would double-pad self-padding `SectionHeaderView(.large)`) |
+| **Horizontal inset** | per-row `.screenPadding()` | Rows declare `hPad 0` (UniversalRow `.info`) and own their inset at the call site, so the full width — incl. padding — is tappable inside `NavigationLink`. Lists do NOT wrap the whole `VStack` (would double-pad self-padding `SectionHeader(.large)`) |
 | **Navigation chevron (outside `List`)** | `DisclosureChevron` | `chevron.forward` (RTL-aware) + tertiary. Never hand-roll `chevron.right` |
 
-**Shared row sub-components:** `AmountPercentageView` (amount + %), `SpentBudgetText` (spent / budget), `DisclosureChevron`, `NetAmountRow`, `LimitProgressCard`. Reuse before building a new row.
+**Shared row sub-components:** `AmountPercentage` (amount + %), `SpentBudgetText` (spent / budget), `DisclosureChevron`, `NetAmountRow`, `LimitProgressCard`. Reuse before building a new row.
 
 #### `InfoRow`
 Read-only label + value. Wrapper for `UniversalRow(config: .info)`.
@@ -446,10 +470,10 @@ A label with a net amount (destructive when negative) and "+inflow −outflow" u
 A schedule entry: a checked circle when `isDone` (the row is dimmed with `futureTransactionStyle` when not), title + date subtitle, the amount and an optional detail line under it (`detailColor`, `AppColors.expense` by default). Vertical padding of the `.info` preset (8; none before 1.4.0). Tenra: `AmortizationScheduleRow` (payment number, date format, interest) is an adapter.
 
 #### `BreakdownRow` *(1.2.0)*
-One part of a breakdown on `UniversalRow(.info)`: a 44 pt circle icon tinted with `color`, the title and an optional one-line subtitle, `AmountPercentageView` (the amount over "42.0%") and, with `showsChevron: true`, a `DisclosureChevron` (wrap the row in a `NavigationLink`). `AmountPercentageView` is public for other rows. Tenra: `CategoryBreakdownRow` (category name, subcategories) is an adapter.
+One part of a breakdown on `UniversalRow(.info)`: a 44 pt circle icon tinted with `color`, the title and an optional one-line subtitle, `AmountPercentage` (the amount over "42.0%") and, with `showsChevron: true`, a `DisclosureChevron` (wrap the row in a `NavigationLink`). `AmountPercentage` is public for other rows. Tenra: `CategoryBreakdownRow` (category name, subcategories) is an adapter.
 
 #### `BalanceRow` *(1.5.0)*
-A named balance in a `List`: `IconView` (44 pt, the zoom-transition source with `transitionSourceID` / `transitionNamespace`), the name (h4), the amount (bodySmall, secondary), an optional `Detail` caption line ("Posting: 30 Oct  ·  " followed by an amount in `AppColors.planned`) and an optional secondary `trailingSystemImage` (a lock). At accessibility text sizes the detail's amount goes under its text, which drops a trailing "·". No padding: the list's row insets place it; the tap (`Button` + `.plain`) and `.swipeActions` stay at the call site. Tenra: `AccountRow` (account, deposit interest copy, delete) is an adapter.
+A named balance in a `List`: `Icon` (44 pt, the zoom-transition source with `transitionSourceID` / `transitionNamespace`), the name (h4), the amount (bodySmall, secondary), an optional `Detail` caption line ("Posting: 30 Oct  ·  " followed by an amount in `AppColors.planned`) and an optional secondary `trailingSystemImage` (a lock). At accessibility text sizes the detail's amount goes under its text, which drops a trailing "·". No padding: the list's row insets place it; the tap (`Button` + `.plain`) and `.swipeActions` stay at the call site. Tenra: `AccountRow` (account, deposit interest copy, delete) is an adapter.
 
 #### `ProgressRingRow` *(1.5.0)*
 A row whose icon wears a progress ring: a 44 pt circle icon tinted with `color` inside a 3 pt `ProgressRing` (`LimitProgress`; no ring when `nil`), the name (h4), then `SpentBudgetText` (semibold, destructive when over) and "(74%)", or `placeholder` ("No budget set") without a limit; at accessibility text sizes the spent amount, "/ limit" and the share go on three lines. A `List` row like `BalanceRow`: no padding, tap and swipe at the call site. Tenra: `CategoryRow` (category, budget, the over-budget haptic) is an adapter.
@@ -503,7 +527,7 @@ UniversalRow(leadingIcon: .sfSymbol("note.text"), title: "Note") {
 - Wrap the inline field in an `HStack` with a suffix `Text("%")` / `Text("KZT")` — bake the unit into the row's title ("Rate (year)", "Term (month)", "Amount, KZT"). Keeps the row stable when typing.
 - Roll a second TextField wrapper. There's exactly one component — `FormTextField`.
 
-Use in: subscription/deposit/loan form sections. NOT for transaction dates (use `DateButtonsView`).
+Use in: subscription/deposit/loan form sections. NOT for transaction dates (use `DateButtons`).
 
 #### `BudgetSettingsSection` *(app-side, Tenra)*
 Pre-built budget config card: amount + period + reset day.
@@ -533,17 +557,20 @@ FinanceCard(
 ) {
     RedactableAmount(amount: total, currency: base, isLoading: loading) // or FormattedAmountText / count Text
 } trailing: {
-    PackedCircleIconsView(items: ...)
+    PackedCircleIcons(items: ...)
 }
 ```
 
 - **`RedactableAmount`** — hero amount that shows a redacted placeholder while an async (FX) total computes, then cross-fades. Use for cards whose total needs conversion (accounts, deposits, subscriptions).
 - Don't reintroduce the inline `HStack(.top, md) → VStack(.leading, lg) → title → if isEmpty …` shell in a new finance card — wrap `FinanceCard`.
+- **`PackedCircleIcons`**: circles sized by amount, packed without overlap. A symbol sits on a
+  pale disc of its item's `tint` (the accent without one), like every icon backing (2.0.0; a grey
+  disc before); a brand logo fills its circle.
 
 #### `RecommendationBox`
 Tinted "lightbulb + advice" callout (icon + text on `color.opacity(0.10)`, `AppRadius.md`). Shared by `CalculationCard` and `TargetProgressCard`. Use for any card-bottom recommendation line.
 
-#### `EmptyCardView`
+#### `EmptyCard`
 Distinct from `FinanceCard`'s inline empty state: a standalone, optionally-tappable empty card (section title + compact empty message) for empty home sections that act as an "add first item" CTA.
 
 #### `TotalsCard` *(1.1.0)*
@@ -562,7 +589,7 @@ How a whole splits into weighted parts: title, explanation, a quieter caption, o
 Two amounts, before (leading, secondary, semibold) and now (trailing, bold), with a `TrendBadge(.changeIndicator)` between them. A change within ±`flatThreshold` percent (2 by default) reads as flat; `increaseIsGood: false` turns a rise red and a fall green. Tenra: `PeriodComparisonCard` (`isExpenseContext`) is an adapter.
 
 #### `CashFlowCard` *(1.2.0)*
-Money in against money out: the title (h3), `AmountComparisonBar` and an optional extra line (`Totals.extra`, e.g. "Planned"). `isEmpty` shows `EmptyCardView` with the same title; `totals == nil` shows a skeleton in the card's shape (`loadingLabel` for VoiceOver, key `skeleton.loading` by default). The three states cross-fade with `AppAnimation.gentleSpring`. Tenra: `TransactionsSummaryCard` (home screen) is an adapter.
+Money in against money out: the title (h3), `AmountComparisonBar` and an optional extra line (`Totals.extra`, e.g. "Planned"). `isEmpty` shows `EmptyCard` with the same title; `totals == nil` shows a skeleton in the card's shape (`loadingLabel` for VoiceOver, key `skeleton.loading` by default). The three states cross-fade with `AppAnimation.gentleSpring`. Tenra: `TransactionsSummaryCard` (home screen) is an adapter.
 
 #### `ScoreGaugeCard` *(1.2.0)*
 A score as a hero: `HeroHalfGauge` (220 pt, 16 pt line, `zoneTicks`) with the score (h1 bold) and a grade capsule inside, both with `materialize`, and a centred subtitle below. `score == nil` leaves the gauge empty and shows "—". Tenra: `HealthScoreHeroCard` (grade colour, grade-band copy) is an adapter.
@@ -574,13 +601,13 @@ A score in the insight feed: title, grade and "72 / 100" on the left, a 120 pt `
 One metric against a target: icon, title and a grey capsule badge ("Weight 30%"), a summary line, "Current" (h2 bold) next to "Target", a `LinearProgressBar` (red below a third, amber below two thirds, green above, unless `progressColor` is set), an explanation and a `RecommendationBox`. `isMuted` dims the card to 60%. Tenra: `HealthComponentCard` (the health-score parts) is an adapter.
 
 #### `RecurringPaymentCard` *(1.2.0)*
-A recurring payment: `IconView` (44 pt), the name, the amount, the amount in `baseCurrency` when it differs (`ConvertedAmountView`, so the host's `DesignKitCurrencyConverter`), a caption ("Next charge on 12 Oct") and a `StatusIndicatorBadge`. Tenra: `SubscriptionCard` (recurring series, next-charge date) is an adapter.
+A recurring payment: `Icon` (44 pt), the name, the amount, the amount in `baseCurrency` when it differs (`ConvertedAmount`, so the host's `DesignKitCurrencyConverter`), a caption ("Next charge on 12 Oct") and a `StatusIndicatorBadge`. Tenra: `SubscriptionCard` (recurring series, next-charge date) is an adapter.
 
 #### `PayoffProgressCard` *(1.2.0)*
 Something being paid off: icon, name (h4) and subtitle with an `accessory` view on the right (a type badge), "left ……… total" over an income-tinted `ProgressView`, and a footer: `.inProgress(nextDate:remainingCaption:)` (calendar mark + date, "18 left") or `.done(caption:)` (check mark + "Closed 15 Jun 2026"). Tenra: `LoanCard` is an adapter; its `LoanTypeBadge` stays in Tenra and goes in the accessory.
 
 #### `BalanceCard` *(1.5.0)*
-A named balance sized for a carousel: `IconView` (44 pt), the name (h4) and the amount (bodySmall semibold), `AppSpacing.sm` apart, padded `lg` on `cardStyle`. Navigation, `glassEffectID` and `matchedTransitionSource` go on it at the call site. Tenra: `AccountCard` (accounts carousel) is an adapter.
+A named balance sized for a carousel: `Icon` (44 pt), the name (h4) and the amount (bodySmall semibold), `AppSpacing.sm` apart, padded `lg` on `cardStyle`. Navigation, `glassEffectID` and `matchedTransitionSource` go on it at the call site. Tenra: `AccountCard` (accounts carousel) is an adapter.
 
 #### `MetricCard` *(1.5.0)*
 One metric in a feed: a one-line title (secondary), a statement of up to three lines (bodyEmphasis), the value (`.amount` through `FormattedAmountText` or pre-formatted `.text`, h2 bold) with an optional unit and a `TrendBadge(.pill)` that drops under the value when both do not fit (`ViewThatFits`). An optional chart: `.trailing` overlays it at 120 × 120 pt on the trailing edge and the text keeps 128 pt clear; `.bottom` puts it full width under the text. Without a chart the text takes the full width. `Value`, `Trend` and `ChartPlacement` are typealiases of the top-level `MetricCardValue`, `MetricCardTrend` and `MetricCardChartPlacement`, so one value can feed cards with different charts. `ScoreCard` shares the mini-chart footprint. Tenra: `InsightsCardView` (the insight model and which mini chart each insight gets) is an adapter.
@@ -589,22 +616,22 @@ One metric in a feed: a one-line title (secondary), a statement of up to three l
 
 ### Icon Components
 
-#### `IconView`
+#### `Icon`
 **The single rendering engine for all entity icons.**
 
 ```swift
 // Auto-style (convenience)
-IconView(source: .sfSymbol("star.fill"), size: AppIconSize.xl)
+Icon(source: .sfSymbol("star.fill"), size: AppIconSize.xl)
 
 // Explicit style
-IconView(source: .bankLogo(.kaspi), style: .bankLogo(size: AppIconSize.xl))
+Icon(source: .bankLogo(.kaspi), style: .bankLogo(size: AppIconSize.xl))
 ```
 
-**When to use `IconView`:** Entity/category icons with styled backgrounds — accounts, categories, subscriptions, brand logos.
+**When to use `Icon`:** Entity/category icons with styled backgrounds — accounts, categories, subscriptions, brand logos.
 
 **When to use `Image(systemName:)` directly:** Semantic UI indicators — chevron, checkmark, xmark, toolbar actions, inline arrows.
 
-**Accessibility:** `IconView.body` has `accessibilityHidden(true)` — it is always decorative within its parent row/card. The parent element owns the accessibility label. Do not override this unless `IconView` is the sole content of an interactive element with no other text.
+**Accessibility:** `Icon.body` has `accessibilityHidden(true)` — it is always decorative within its parent row/card. The parent element owns the accessibility label. Do not override this unless `Icon` is the sole content of an interactive element with no other text.
 
 **Icon picker catalog** *(app-side, Tenra)*: `IconPickerView`'s Icons tab shows `IconCatalog` (`Tenra/Utils/IconCatalog.swift`):
 ~550 SF Symbols in 18 groups plus a "frequently used" row, with system `.searchable` search. The data file
@@ -711,7 +738,7 @@ AnimatedTitleInput(text: $name, placeholder: "Account Name", font: AppTypography
 
 Use in: `EditableHeroSection` title fields only.
 
-#### `DateButtonsView`
+#### `DateButtons`
 Yesterday / Today / Calendar picker for transaction forms.
 
 ```swift
@@ -759,7 +786,7 @@ One or none from a horizontally scrolling row of chips; tapping the selected chi
 ChipPicker("Weather", options: Weather.allCases, selection: $draft.weather) { $0.title }
 ```
 
-Chips use `filterChipStyle(isSelected:)`. A fixed 2–4 way switch → `SegmentedPickerView`; a
+Chips use `filterChipStyle(isSelected:)`. A fixed 2–4 way switch → `SegmentedPicker`; a
 filter that opens a menu → `UniversalFilterButton`.
 
 Several at once (0.6.0): pass a `Binding<Set<Option>>`; optional `systemImage:` per chip.
@@ -768,15 +795,30 @@ Several at once (0.6.0): pass a `Binding<Set<Option>>`; optional `systemImage:` 
 ChipPicker(options: PlaceType.allCases, selection: $types, systemImage: { $0.systemImage }) { $0.title }
 ```
 
-#### `LoadingButtonLabel` *(0.6.0)*
-Button label that swaps its title for a spinner while an action runs, keeping the width.
+#### `DSButton` *(2.0.0)*
+The button of the design system (§2, Buttons): a title with an icon, appearance × role × size,
+a shape, full width or the label's own, a loading state that keeps the width and blocks taps.
+A press plays a light haptic (a warning one for `.destructive`).
 
 ```swift
-Button { Task { await save() } } label: {
-    LoadingButtonLabel("Save", isLoading: isSaving).frame(maxWidth: .infinity)
+DSButton("Save", fullWidth: true, isLoading: isSaving) { Task { await save() } }
+DSButton("Delete", systemImage: "trash", role: .destructive) { delete() }
+DSButton("Next", systemImage: "arrow.right", iconPlacement: .trailing, appearance: .secondary) { next() }
+DSButton("Close", systemImage: "xmark", iconPlacement: .only, appearance: .secondary) { close() }
+
+// Actions under a detail screen's hero: tiles that share the row.
+HStack(spacing: AppSpacing.md) {
+    DSButton("Edit", systemImage: "pencil", iconPlacement: .top) { edit() }
+    DSButton("Delete", systemImage: "trash", iconPlacement: .top, role: .destructive) { delete() }
 }
-.primaryButton(disabled: isSaving)
 ```
+
+- `iconPlacement: .top` draws a tile: the symbol (24 pt) over a two-line `bodySmall` medium
+  title, padded `md` / `sm`, a rounded rectangle (`AppRadius.lg`) that fills the width it is
+  given (EntityActionButton before 2.0, the same pixels).
+- `.only` shows the symbol alone; the title is its VoiceOver label.
+- The label takes the font around it, like a SwiftUI `Button`.
+- Replaces `LoadingButtonLabel`, `BulkDeleteButton` and `EntityActionButton` (deprecated).
 
 #### `ToggleSettingsRow` *(0.6.0)*
 The settings row with a switch, next to `NavigationSettingsRow` and `ActionSettingsRow`.
@@ -807,13 +849,13 @@ Check circle for multi-select and checklist rows; the row carries the label and 
 for a done checklist item, `textTertiary` for one that is already owned and disabled.
 
 #### `SelectableBalanceCard` *(1.5.0)*
-One option of a "pick a balance" list: a full-width card with `IconView` (44 pt), the name (body, secondary) and the amount (body semibold), outlined in `AppColors.accent` (2 pt, `gentleSpring`) when `isSelected`, `.bounce` on press, `.isSelected` trait. Tenra: `AccountRadioButton` (balance from its store) is an adapter.
+One option of a "pick a balance" list: a full-width card with `Icon` (44 pt), the name (body, secondary) and the amount (body semibold), outlined in `AppColors.accent` (2 pt, `gentleSpring`) when `isSelected`, `.bounce` on press, `.isSelected` trait. Tenra: `AccountRadioButton` (balance from its store) is an adapter.
 
 #### `ProgressRingTile` *(1.5.0)*
 A picker-grid tile: the name (bodyEmphasis, one line) over a 64 pt Liquid Glass circle with the symbol (h2) in `color`, the glass tinted with `color` at 30% when `isSelected`, and an optional 4 pt `ProgressRing` (72 pt) around it. As tall with a ring as without, so grid rows line up. VoiceOver label and hint at the call site. Tenra: `CategoryChip` (category style lookup) is an adapter.
 
 #### `ProgressRingTileGrid` *(1.10.0)*
-`ProgressRingTile`s in a `LazyVGrid` (rows 32 pt apart, columns 16), each with its amount under it (bodySmall, primary) and, when there is one, its limit under that (secondary). Columns: as many 108–180 pt columns as fit (four on an iPhone), or exactly `columns`. Items are `ProgressRingTileGridItem(id:title:systemImage:color:progress:amount:limit:accessibilityLabel:accessibilityHint:)`; the id is the tile's zoom-transition source in `transitionNamespace`; `onTap` gets the item. The empty state is the caller's (`EmptyCardView`). Tenra: `CategoryGridView` (categories, budgets, the empty card) is an adapter. Skeleton: `ProgressRingTileGridSkeleton(count:columns:)`.
+`ProgressRingTile`s in a `LazyVGrid` (rows 32 pt apart, columns 16), each with its amount under it (bodySmall, primary) and, when there is one, its limit under that (secondary). Columns: as many 108–180 pt columns as fit (four on an iPhone), or exactly `columns`. Items are `ProgressRingTileGridItem(id:title:systemImage:color:progress:amount:limit:accessibilityLabel:accessibilityHint:)`; the id is the tile's zoom-transition source in `transitionNamespace`; `onTap` gets the item. The empty state is the caller's (`EmptyCard`). Tenra: `CategoryGridView` (categories, budgets, the empty card) is an adapter. Skeleton: `ProgressRingTileGridSkeleton(count:columns:)`.
 
 ### Feedback & Status Components
 
@@ -824,6 +866,27 @@ A notice that stays in the layout, built like `RecommendationBox` (icon, wrappin
 StatusBanner("Card expires on 30 Nov", status: .warning)
 StatusBanner("Statement is ready", status: .info) { showStatement() }
 ```
+
+#### `Tooltip` *(2.0.0)*
+A short value or hint in an opaque bubble (`Background.elevation3`, a soft shadow,
+`AppRadius.md`) with a tail pointing at its target: the amount over a tapped bar
+(`HeroBarPair`), a one-line explanation over a control.
+
+```swift
+bar
+    .overlay(alignment: .top) {
+        if isSelected {
+            Tooltip(amountText).tooltipAnchor(.top)          // the tail touches the bar's top
+        }
+    }
+    .zIndex(isSelected ? 1 : 0)                              // over the neighbouring bars
+
+Tooltip("Last month", arrowEdge: .top).tooltipAnchor(.bottom) // below its target
+Tooltip { Text(amount).font(AppTypography.numbers(AppTypography.bodySmall.bold())).foregroundStyle(tint) }
+```
+
+Opaque so it reads over whatever it covers; in an overlay so it never moves the layout. No
+skeleton: it shows a value already on screen, on a tap.
 
 #### `MessageBanner`
 Transient animated feedback banner.
@@ -887,7 +950,7 @@ if let accounts {
 }
 ```
 
-**The corner rule.** A skeleton keeps its component's container and corner as they are: a card skeleton is the same glass card (`cardStyle`, the card's radius), a pale box (`RecommendationBox`, `StatusBanner`) keeps `AppRadius.md`, a chip keeps the chip's `AppRadius.xl`, a badge, pill or switch is a capsule, an icon keeps its `IconStyle` shape (`IconViewSkeleton(style:)`), a progress track keeps its corner (`AppRadius.xs` for `LinearProgressBar`, the round caps of rings and gauges, the segment corners of milestone gauges and bar pairs). A shape whose component has no corner of its own (a line of text, an amount, a chart's plot area, a star) takes the soft corner, `AppRadius.soft` (12 pt; a line of text gets fully round ends). `SkeletonView` and `SkeletonText` use it by default since 1.10.0 (before: `AppRadius.xs`).
+**The corner rule.** A skeleton keeps its component's container and corner as they are: a card skeleton is the same glass card (`cardStyle`, the card's radius), a pale box (`RecommendationBox`, `StatusBanner`) keeps `AppRadius.md`, a chip keeps the chip's `AppRadius.xl`, a badge, pill or switch is a capsule, an icon keeps its `IconStyle` shape (`IconSkeleton(style:)`), a progress track keeps its corner (`AppRadius.xs` for `LinearProgressBar`, the round caps of rings and gauges, the segment corners of milestone gauges and bar pairs). A shape whose component has no corner of its own (a line of text, an amount, a chart's plot area, a star) takes the soft corner, `AppRadius.soft` (12 pt; a line of text gets fully round ends). `Skeleton` and `SkeletonText` use it by default since 1.10.0 (before: `AppRadius.xs`).
 
 **Shimmer.** One band sweeps a whole skeleton (a shimmer inside another one is off). `.skeletonShimmer(false)` stops it under a view (snapshot tests do this); Reduce Motion stops it too. Each skeleton is one VoiceOver element that reads "Loading" (`skeleton.loading`).
 
@@ -901,26 +964,26 @@ if let accounts {
 | `BalanceRow`, `ProgressRingRow`, `BreakdownRow`, `InsightEntityRow`, `NetAmountRow`, `ScheduleRow`, `InfoRow`, `ColorPickerRow` | `…Skeleton` |
 | `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `OrbChart` | `…Skeleton` |
 | `LinearProgressBar`, `ProportionBar`, `MiniProportionBar`, `AmountComparisonBar`, `HeroProportionBar`, `ProgressRing`, `MiniDonut`, `MiniHalfGauge`, `HeroHalfGauge`, `MiniMilestoneGauge`, `HeroMilestoneGauge`, `MiniBarPair`, `HeroBarPair` | `…Skeleton`, with the component's size parameters |
-| `IconView` | `IconViewSkeleton(style:)` / `IconViewSkeleton(size:)` |
-| `AvatarView`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIconsView`, `BadgeView`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `RatingView`, `ChipPicker` | `…Skeleton` |
-| `FormattedAmountText`, `FormattedAmountView`, `ConvertedAmountView`, `SpentBudgetText`, `AmountPercentageView` | `FormattedAmountTextSkeleton(font:width:)`; `RedactableAmount(isLoading: true)` draws one itself |
-| `HeroSection`, `SectionHeaderView`, `SettingsSectionHeaderView`, `DateSectionHeaderView` | `HeroSectionSkeleton`, `SectionHeaderViewSkeleton(style:showsTrailing:)` (`.compact` for the settings header), `DateSectionHeaderViewSkeleton` |
+| `Icon` | `IconSkeleton(style:)` / `IconSkeleton(size:)` |
+| `Avatar`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIcons`, `Badge`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `Rating`, `ChipPicker` | `…Skeleton` |
+| `FormattedAmountText`, `ConvertedAmount`, `SpentBudgetText`, `AmountPercentage` | `FormattedAmountTextSkeleton(font:width:)`; `RedactableAmount(isLoading: true)` draws one itself |
+| `HeroSection`, `SectionHeader` (every style) | `HeroSectionSkeleton`, `SectionHeaderSkeleton(style:showsTrailing:)` |
 | `ExpandableText`, `ActivityTimeline`, `MonthCalendar` | `…Skeleton` |
 | `PersonRow`, `CommentRow`, `ThreadCard`, `ReviewCard`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.12.0) | `…Skeleton` (`StatsStripSkeleton(count:)`, `AchievementTileSkeleton(medalSize:)`, `ThumbnailCardSkeleton(width:)`, `PersonRowSkeleton(showsSubtitle:)`) |
 
-**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPickerView`, `DateButtonsView`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `BulkDeleteButton`, `EntityActionButton`, `LoadingButtonLabel`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`); messages and flows that appear once something is known (`EmptyStateView`, `EmptyCardView`, `MessageBanner`, `InlineStatusText`, `PromptSheet`, `PermissionPrimerView`, `NotificationPermissionView`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`GradientOrbsBackground`, `SiriGlowView`, `SiriWaveRecordingView`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
+**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`GradientOrbsBackground`, `SiriGlow`, `SiriWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
 
 #### `SkeletonText` *(1.7.0)*
-A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `SkeletonView`. For a component, use its skeleton (above); `.skeleton(isLoading:)` redacts a real view in place, with the system's placeholder shapes.
+A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `Skeleton`. For a component, use its skeleton (above); `.skeleton(isLoading:)` redacts a real view in place, with the system's placeholder shapes.
 
-#### `SkeletonView` / `SkeletonRow` / `.skeleton(isLoading:)` *(0.6.0)*
+#### `Skeleton` / `SkeletonRow` / `.skeleton(isLoading:)` *(0.6.0)*
 Loading placeholders instead of a spinner: grey shapes in the layout of the content that is
 coming, with a slow shimmer (static under Reduce Motion, via `AmbientMotionGate`).
 
 ```swift
 if isLoading { ForEach(0..<5) { _ in SkeletonRow() } }          // list rows
-SkeletonView(height: 160)                                       // an image, soft corner
-SkeletonView.circle(40); SkeletonView.capsule(height: 28, width: 80) // 1.10.0
+Skeleton(height: 160)                                       // an image, soft corner
+Skeleton.circle(40); Skeleton.capsule(height: 28, width: 80) // 1.10.0
 TripRow(trip: trip ?? .placeholder).skeleton(isLoading: trip == nil) // redact a real view
 ```
 
@@ -938,25 +1001,27 @@ StepTracker(steps: ["Place", "Catch", "Photos", "Review"], current: 1)   // 0-ba
 VoiceOver: "Step 2 of 4: Catch" (key `steps.position`). Tenra's 3-symbol onboarding keeps
 `OnboardingStepIndicator`.
 
-#### `PermissionPrimerView` *(0.7.0)*
-Our explanation before a system permission alert (HIG "Requesting permission"): `HeroSymbol`,
-title, message, Allow and Not now. Shared by both apps; fits a `.medium` sheet.
+#### Permission primers → `PromptSheet`
+Our explanation before a system permission alert (HIG "Requesting permission") is a
+`PromptSheet` (below) since 2.0.0: `onPrimary` is async and runs the system request while the
+main button shows a spinner. `PermissionPrimerView` (0.7.0) was the same layout and is a
+deprecated wrapper. Show it at the moment of first use (first check-in, first subscription),
+not at launch.
 
 ```swift
-PermissionPrimerView(
-    systemImage: "bell.badge",
-    title: String(localized: "push.primer.title"), message: String(localized: "push.primer.body"),
-    allowTitle: String(localized: "push.primer.allow"), laterTitle: String(localized: "push.primer.later"),
-    onAllow: { await requestPermission(); isPresented = false },
-    onLater: { isPresented = false }
-)
-.presentationDetents([.medium])
+.sheet(isPresented: $asksForPush) {
+    PromptSheet(
+        systemImage: "bell.badge",
+        title: String(localized: "push.primer.title"), message: String(localized: "push.primer.body"),
+        primaryTitle: String(localized: "push.primer.allow"), secondaryTitle: String(localized: "push.primer.later"),
+        onPrimary: { await requestPermission() },
+        onSecondary: {}
+    )
+}
 ```
 
-It does not dismiss itself. While `onAllow` runs the Allow button shows a spinner. Show it at
-the moment of first use (first check-in, first subscription), not at launch.
-`NotificationPermissionView` is the same view with Tenra's `notification.permission.*` texts
-that dismisses itself (since 0.7.0 it has this layout: symbol on a disc, glass buttons).
+`NotificationPermissionPrompt` (NotificationPermissionView before 2.0) is a `PromptSheet` with
+Tenra's `notification.permission.*` texts; the app sets its detent.
 
 #### `OnboardingPager` / `OnboardingPage` *(0.7.0)*
 First-launch introduction: swipeable pages with dots, Skip at the top, the page's buttons at
@@ -967,7 +1032,7 @@ OnboardingPager(pages: Intro.allCases, selection: $page,
                 canSkip: { $0 != .location }, onSkip: finish) { page in
     OnboardingPage(systemImage: page.symbol, title: page.title, message: page.text)
 } actions: { page in
-    Button { next() } label: { Text("Next").frame(maxWidth: .infinity) }.primaryButton()
+    DSButton("Next", fullWidth: true) { next() }
 }
 ```
 
@@ -984,12 +1049,12 @@ StatusIndicatorBadge(status: .active, font: AppTypography.h4)
 
 Cases: `.active` (green checkmark), `.paused` (orange pause), `.archived` (gray archive), `.pending` (blue clock).
 
-#### `BadgeView` *(0.4.0)*
+#### `Badge` *(0.4.0)*
 Capsule with short text and an optional SF Symbol: a status, a tag or a counter.
 
 ```swift
-BadgeView("Seasonal ban", color: AppColors.destructive)                       // .tinted: text on a 12 % tint
-BadgeView("3", systemImage: "person.badge.plus", color: AppColors.destructive, style: .filled)
+Badge("Seasonal ban", color: AppColors.destructive)                       // .tinted: text on a 12 % tint
+Badge("3", systemImage: "person.badge.plus", color: AppColors.destructive, style: .filled)
 ```
 
 Use `.tinted` for statuses and tags, `.filled` only for counters that need attention. Icon-only
@@ -1009,11 +1074,11 @@ Default colours: up = `AppColors.income`, down = `destructive`, flat = `textSeco
 `color:` where the direction's meaning flips (expenses). Tenra's `InsightTrendBadge` is an
 adapter over it (`InsightTrend` → direction + percent).
 
-#### `EmptyStateView`
+#### `EmptyState`
 Empty/error state display.
 
 ```swift
-EmptyStateView(
+EmptyState(
     icon: "tray",
     title: "No Transactions",
     description: "Add your first transaction to get started",
@@ -1029,8 +1094,28 @@ EmptyStateView(
 | `.compact` | Inside cards (home summary) |
 | `.error` | Load failures (with pulse icon + retry) |
 
-#### `PromptSheet` *(1.5.0)*
-A short question in a small sheet: a 44 pt symbol in the accent colour, the title and message centred, a filled accent primary button and a plain secondary one; either answer runs its closure and closes the sheet. Sets its own detent (`height`, 340 pt) and drag indicator. Type: title `h3`, message `bodySmall`, buttons `bodyEmphasis` (Tenra's sheet used system fonts until 1.5.0). Tenra: `RatingSurveyView` (rating service, feedback e-mail) is an adapter.
+#### `PromptSheet` *(1.5.0; 2.0.0 the one prompt and permission sheet)*
+A short question or a permission request in a sheet: `HeroSymbol` (104 pt disc), the title
+(`h2`) and message (`body`) centred, a full-width primary `DSButton` and a secondary one.
+
+```swift
+.sheet(isPresented: $showsSurvey) {
+    PromptSheet(
+        systemImage: "sparkles",
+        title: "Enjoying the app?", message: "Your answer helps us decide what to improve next.",
+        primaryTitle: "Love it!", secondaryTitle: "Not really",
+        onPrimary: { requestReview() }, onSecondary: { openFeedbackMail() }
+    )
+}
+```
+
+- `onPrimary` is async: while it runs, the main button shows a spinner and both are disabled.
+- `dismissesOnAnswer` (default `true`): the sheet closes after either answer; `false` leaves it to
+  the app (a primer that waits for the system alert's result).
+- `detent` (default `.medium`, with a drag indicator); `nil` when the app presents it its own way.
+- Before 2.0: a 340 pt sheet with an `h3` title, a `bodySmall` message and a 44 pt symbol
+  (`height:` init, deprecated). Tenra: `RatingSurveyView` is an adapter; Dalada's primers are
+  `PromptSheet(detent: nil, dismissesOnAnswer: false)`.
 
 ---
 
@@ -1054,7 +1139,7 @@ Use for: ALL display-only amounts — detail view balances, row subtitles, card 
 
 **Sign and unit (1.7.0).** `sign: .always` puts "+" before a positive amount and a true minus "−" (U+2212) before a negative one, for changes of money ("+5 000 ₸", "−1 200,50 ₸"); `.never` draws the absolute value; `.automatic` (default) is the 1.x behaviour. With a sign, `prefix` follows it. `currencyDisplay`: `.symbol` (default, "1 200 ₸"), `.code` ("49,90 USD", for foreign currencies or shared symbols), `.systemImage("star.fill")` (points, miles, bonuses), `.numberOnly` (a header names the currency). The compact forms ("1,2 млн") keep the chosen unit.
 
-**Hidden amounts (1.7.0).** `.amountsHidden(_:)` (DesignSupport; environment `amountsHidden`) hides every `FormattedAmountText` below it, and so every card, row and badge built on it: "•••• ₸" (the number and sign go, the unit stays), VoiceOver reads "Hidden amount" (`amount.hidden`). Since 1.8.0 also the legend amounts of `HeroProportionBar` and the tap pill of `HeroBarPair`. Amount inputs and chart axes are not hidden. An amount the app writes into its own text reads the environment value and shows `Formatting.hiddenAmount(currency:)` ("•••• ₸"):
+**Hidden amounts (1.7.0).** `.amountsHidden(_:)` (DesignSupport; environment `amountsHidden`) hides every `FormattedAmountText` below it, and so every card, row and badge built on it: "•••• ₸" (the number and sign go, the unit stays), VoiceOver reads "Hidden amount" (`amount.hidden`). Since 1.8.0 also the legend amounts of `HeroProportionBar` and the tap tooltip of `HeroBarPair`. Amount inputs and chart axes are not hidden. An amount the app writes into its own text reads the environment value and shows `Formatting.hiddenAmount(currency:)` ("•••• ₸"):
 
 ```swift
 @Environment(\.amountsHidden) private var amountsHidden
@@ -1072,15 +1157,22 @@ HStack {
 .amountsHidden(hidesAmounts)
 ```
 
-#### `SectionHeaderView`
-Section header text with three styles, and an optional action at the end of the line (1.15.0).
+#### `SectionHeader`
+Section header text in five styles, and an optional action at the end of the line (1.15.0).
+SectionHeaderView before 2.0; the list style was SettingsSectionHeaderView, the card style
+DateSectionHeaderView.
 
 ```swift
-SectionHeaderView("Transactions")                                      // .default: bodyEmphasis
-SectionHeaderView("Settings", style: .compact)                         // bodySmall, secondary, uppercase, screen padding
-SectionHeaderView("Spending", systemImage: "chart.bar", style: .large) // h3 + accent icon, screen padding
+SectionHeader("Transactions")                                      // .default: bodyEmphasis
+SectionHeader("Settings", style: .compact)                         // bodySmall, secondary, uppercase, screen padding
+SectionHeader("Spending", systemImage: "chart.bar", style: .large) // h3 + accent icon, screen padding
+SectionHeader("Notifications", style: .list)                       // .compact's label, no padding: a List / Form header
+SectionHeader("Yesterday", style: .card) {                         // .default's title on a padded glass card
+    FormattedAmountText(amount: 45_000, currency: "KZT", prefix: "-",
+                        fontSize: AppTypography.bodySmall, fontWeight: .semibold, color: AppColors.Text.tertiary)
+}
 
-SectionHeaderView("Trips", systemImage: "map") {                       // with an action
+SectionHeader("Trips", systemImage: "map") {                       // with an action
     NavigationLink("All") { TripsList() }
 }
 ```
@@ -1088,16 +1180,11 @@ SectionHeaderView("Trips", systemImage: "map") {                       // with a
 The icon shows in `.large` only. The action is any view (a `NavigationLink` "All", a button, a
 spinner); it takes `AppTypography.bodySmall` and sits at the end of the line, inside the style's
 padding. Title and action share an `HStack` with the system spacing and a `Spacer(minLength: 0)`,
-the layout Dalada built by hand before. Skeleton: `SectionHeaderViewSkeleton(style:showsTrailing:)`.
+the layout Dalada built by hand before. Skeleton: `SectionHeaderSkeleton(style:showsTrailing:)`.
 
-#### `DateSectionHeaderView`
-Transaction list date group header with optional daily total. The label is the app's own
-(Tenra passes "Today", "Yesterday" or the formatted date); the total shows when it is above zero,
-with a minus.
-
-```swift
-DateSectionHeaderView(dateKey: "Yesterday", amount: 45000.0, currency: "KZT")
-```
+`.card` is a transaction list's day header: the label is the app's own ("Today", "Yesterday",
+the date), the day's total is the action (DateSectionHeaderView showed it only when above zero,
+with a minus; the app decides that now).
 
 #### `ProgressRing`
 Circular progress arc for budget consumption.
@@ -1130,20 +1217,21 @@ StatTile(title: "Catches", value: "7", systemImage: "fish", valueColor: AppColor
 Use for counts, distances, durations. A money amount compared with the previous period →
 `InsightsStatCard`.
 
-#### `AvatarView` *(0.4.0)*
+#### `Avatar` *(0.4.0)*
 Round avatar: the photo when there is one, otherwise initials on a 15 % tint.
 
 ```swift
-AvatarView(name: profile.displayName ?? profile.username)          // AppIconSize.Tile.xs (40)
-AvatarView(name: "Ayan Seitkali", size: 64)                         // h3 initials above 48 pt
-AvatarView(name: name, image: Image(uiImage: photo))
+Avatar(name: profile.displayName ?? profile.username)          // AppIconSize.xxl (40)
+Avatar(name: "Ayan Seitkali", size: 64)                         // h3 initials above 48 pt
+Avatar(name: name, image: Image(uiImage: photo))
 ```
 
 Decorative for VoiceOver: put the name in the row next to it. Several faces in a cluster →
-`PackedCircleIconsView`.
+`PackedCircleIcons`.
 
 #### `AvatarGroup` *(0.6.0)*
-Overlapping avatars with "+N" for the rest; each has a ring in the background colour.
+Overlapping avatars with "+N" for the rest; each has a ring in the background colour and,
+since 2.0.0, an opaque disc under its pale initials, so the avatar behind does not show through.
 
 ```swift
 AvatarGroup(names: trip.members.map(\.displayName), accessibilityLabel: "Ayan, Dana and 4 more")
@@ -1171,7 +1259,7 @@ days things happen. From Tenra's subscription calendar; Dalada can show trips an
 @State private var byDay: [Date: [RecurringSeries]] = [:]
 
 MonthCalendar(range: range, itemsByDay: byDay, itemName: \.description) { sub in
-    IconView(source: sub.iconSource, size: AppIconSize.md)
+    Icon(source: sub.iconSource, size: AppIconSize.md)
 } accessory: { period in                                  // visible week or month
     if let total = totals[period] { FormattedAmountText(amount: total, currency: base, ...) }
 }
@@ -1240,19 +1328,19 @@ List { … }
 
 #### `FlowLayout` *(0.7.0)*
 A `Layout` that wraps subviews to new lines like words: tags, badges, chips that should not
-scroll. `FlowLayout(spacing:lineSpacing:) { ForEach(tags, id: \.self) { BadgeView($0) } }`.
+scroll. `FlowLayout(spacing:lineSpacing:) { ForEach(tags, id: \.self) { Badge($0) } }`.
 
 #### `HeroSymbol` *(0.7.0)*
 Large SF Symbol on a disc of its tint at 12%: the picture of `OnboardingPage` and
-`PermissionPrimerView`. `HeroSymbol(systemImage: "map", size: 96, tint: AppColors.success)`.
+`PromptSheet`. `HeroSymbol(systemImage: "map", size: 96, tint: AppColors.success)`.
 Decorative (hidden from VoiceOver).
 
-#### `RatingView` / `RatingPicker` *(0.4.0)*
-Star rating. `RatingView` displays with half stars (filled from .75, half from .25 of a star);
+#### `Rating` / `RatingPicker` *(0.4.0)*
+Star rating. `Rating` displays with half stars (filled from .75, half from .25 of a star);
 `RatingPicker` is the tap-to-rate input (whole stars, haptic on tap).
 
 ```swift
-RatingView(rating: summary.average, size: 12)
+Rating(rating: summary.average, size: 12)
 RatingPicker(rating: $draft.rating)
 ```
 
@@ -1273,7 +1361,7 @@ strings in. Gallery: their sections (Rows, Cards, Actions, Media); snapshots: `C
 #### `PersonRow`
 Avatar (40), name (bodyEmphasis), a caption line under it (the @username, a status) and a
 trailing slot. `PersonRow(name:subtitle:avatar:trailing:)` takes the app's avatar view;
-without `avatar` it draws the initials (`AvatarView`). A row that lives in a `List`: no padding. Dalada: friends, requests,
+without `avatar` it draws the initials (`Avatar`). A row that lives in a `List`: no padding. Dalada: friends, requests,
 search, the people a trip is shared with.
 
 #### `CommentRow` and `MessageQuote`
@@ -1300,7 +1388,7 @@ the author and the last activity on the right.
 `ThreadCard(title:preview:repliesCount:author:lastActivity:)`.
 
 #### `ReviewCard`
-A review (a card): author, `RatingView` (12 pt stars), the time and a menu slot; a caption line
+A review (a card): author, `Rating` (12 pt stars), the time and a menu slot; a caption line
 (when the place was visited); the text in an `ExpandableText` folded to four lines; a media
 slot (photos) and an actions row (12 apart). `ReviewCard(author:rating:date:subtitle:text:menu:media:actions:)`.
 
@@ -1376,7 +1464,7 @@ Animates view entrance with scale + opacity pop-in. Used for facepile icon stack
 
 ```swift
 ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-    IconView(source: item.iconSource, style: iconStyle)
+    Icon(source: item.iconSource, style: iconStyle)
         .staggeredEntrance(delay: Double(index) * AppAnimation.facepileStagger)
 }
 ```
@@ -1467,14 +1555,14 @@ Used by: `SubscriptionDetailView`, `DepositDetailView`, `LoanDetailView`
 ScrollView
 └── VStack(spacing: AppSpacing.lg)
     ├── Card 1: Header (.cardStyle())
-    │   └── IconView(.glassHero) + Title + Balance
+    │   └── Icon(.glassHero) + Title + Balance
     ├── Card 2: Info (.cardStyle())
     │   └── InfoRow list
     ├── Card 3: Stats (.cardStyle())
     │   └── InfoRow / custom rows
     ├── Actions Section
-    │   ├── Button { }.primaryButton()
-    │   └── Button { }.secondaryButton()
+    │   ├── DSButton("…", fullWidth: true) { }
+    │   └── DSButton("…", appearance: .secondary, fullWidth: true) { }
     └── .toolbar { Menu("...") { edit, delete, ... } }
 ```
 
@@ -1519,7 +1607,13 @@ List {
                 TransactionCard(transaction: tx, styleData: preComputed, ...)
             }
         } header: {
-            DateSectionHeaderView(dateKey: section.dateKey, amount: total, currency: cur)
+            SectionHeader(section.dateKey, style: .card) {
+                if total > 0 {
+                    FormattedAmountText(amount: total, currency: cur, prefix: "-",
+                                        fontSize: AppTypography.bodySmall, fontWeight: .semibold,
+                                        color: AppColors.Text.tertiary)
+                }
+            }
         }
     }
     // Infinite scroll trigger
@@ -1570,12 +1664,12 @@ Text input?
 └── A message sent at once (comment, reply) → MessageComposer
 
 Date input?
-├── Transaction (needs Yesterday/Today shortcuts) → DateButtonsView / .dateButtonsSafeArea()
+├── Transaction (needs Yesterday/Today shortcuts) → DateButtons / .dateButtonsSafeArea()
 └── Other (subscription start, deposit posting) → DatePickerRow
 
 Single-select picker?
 ├── Few options (2-5) in form → MenuPickerRow
-├── 2-4 exclusive modes → SegmentedPickerView
+├── 2-4 exclusive modes → SegmentedPicker
 └── Many options → NavigationLink to selection list
 
 Currency?
@@ -1632,7 +1726,7 @@ Card-style container?
 
 ```
 Entity icon with styled background?
-└── IconView(source:style:)
+└── Icon(source:style:)
     ├── Account → .bankLogo(size:) or .bankLogoLarge(size:)
     ├── Category → .categoryIcon(size:) or .categoryCoin(size:)
     ├── Subscription → .serviceLogo(size:) or .glassHero(size:)
@@ -1659,13 +1753,13 @@ Entity lifecycle status?
 └── StatusIndicatorBadge (.active/.paused/.archived/.pending)
 
 No data to show?
-└── EmptyStateView
+└── EmptyState
     ├── Full screen → .standard
     ├── Inside card → .compact
     └── Error/failure → .error
 
 Asking for a permission (notifications, location, camera)?
-└── PermissionPrimerView first, then the system alert from onAllow
+└── PromptSheet first, then the system alert from its async onPrimary
 ```
 
 ---
@@ -1891,7 +1985,7 @@ Cards with empty/loaded states must animate the transition:
 
 ```swift
 if items.isEmpty {
-    EmptyStateView(...).transition(.opacity)
+    EmptyState(...).transition(.opacity)
 } else {
     loadedContent.transition(.opacity)
 }
@@ -1917,7 +2011,7 @@ cost every frame it is on screen. Those views go through
 Reduce Motion **and**, on iOS 27, while `systemPrefersReducedResourceUsage` is true (the system
 asking apps to back off under thermal or power pressure).
 
-The gate hands its content a `Bool`; render a **static frame** when it is false (`SiriGlowView`
+The gate hands its content a `Bool`; render a **static frame** when it is false (`SiriGlow`
 freezes the mesh at `t = 0`) rather than removing the view, so nothing shifts in layout. Put new
 `TimelineView` decoration behind this gate instead of reading `accessibilityReduceMotion`
 directly — the iOS 27 signal then comes for free. (DesignKit compiles the iOS 27 branch only
@@ -1933,12 +2027,12 @@ with the iOS 27 SDK — Xcode 27; built with Xcode 26 the gate honours Reduce Mo
 
 | Kind of component | Inner padding | Horizontal inset | Examples |
 |---|---|---|---|
-| **Card**: has its own surface | Its own: `.padding(AppSpacing.lg)` before `.cardStyle()`, inside the component | — | `TotalsCard`, `LimitProgressCard`, `ComparisonCard`, `CashFlowCard`, `ScoreCard`, `FinanceCard`, `EmptyCardView`, `InsightsStatCard`, `DateSectionHeaderView` |
+| **Card**: has its own surface | Its own: `.padding(AppSpacing.lg)` before `.cardStyle()`, inside the component | — | `TotalsCard`, `LimitProgressCard`, `ComparisonCard`, `CashFlowCard`, `ScoreCard`, `FinanceCard`, `EmptyCard`, `InsightsStatCard`, `SectionHeader(style: .card)` |
 | **Compact surface** | Its own, smaller | — | `MessageBanner` (`md`), `ChartSelectionBanner` (`lg` × `sm`) |
 | **Row**: no surface, lives in a container | Vertical only, from its `RowConfiguration` preset | The container's: a card's `.cardContentPadding()`, `List` / `Form` insets, or `.screenPadding()` | `InfoRow`, `InsightEntityRow`, `BreakdownRow`, `NetAmountRow`, `ScheduleRow` (`.info`, 8) |
 | **List row**: lives only in a `List` | None: the `List`'s row insets give both | `List` | `BalanceRow`, `ProgressRingRow` |
 | **Row in a `FormSection`** | Vertical and horizontal (`.standard`: 12 × 16), since `FormSection`'s surface has none | — | `MenuPickerRow`, `DatePickerRow` |
-| **Primitive** | None: the parent places it | — | `BadgeView`, `TrendBadge`, `FormattedAmountText`, `LinearProgressBar`, charts |
+| **Primitive** | None: the parent places it | — | `Badge`, `TrendBadge`, `FormattedAmountText`, `LinearProgressBar`, charts |
 
 Outer spacing is never a component's: the screen insets with `.screenPadding()` and spaces cards with its stack's `spacing`.
 

@@ -181,7 +181,7 @@ public struct ChecklistRowSkeleton: View {
             // The indicator's own size, as a grey circle.
             SelectionIndicator(isSelected: false)
                 .hidden()
-                .overlay { Circle().fill(SkeletonView.fill) }
+                .overlay { Circle().fill(Skeleton.fill) }
             SkeletonText(AppTypography.body, width: 180)
             Spacer(minLength: 0)
         }

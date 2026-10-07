@@ -113,9 +113,9 @@ public struct ProgressRingTileSkeleton: View {
             SkeletonText(AppTypography.bodyEmphasis, width: 70)
             ZStack {
                 Circle()
-                    .stroke(SkeletonView.fill, lineWidth: 4)
+                    .stroke(Skeleton.fill, lineWidth: 4)
                     .frame(width: AppIconSize.Tile.xxl, height: AppIconSize.Tile.xxl)
-                SkeletonView.circle(AppIconSize.Tile.xl)
+                Skeleton.circle(AppIconSize.Tile.xl)
             }
             .frame(height: AppIconSize.Tile.xxl)
         }

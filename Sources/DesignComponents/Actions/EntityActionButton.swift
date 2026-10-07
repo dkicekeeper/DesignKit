@@ -15,6 +15,7 @@ import SwiftUI
 import DesignTokens
 import DesignSupport
 
+@available(*, deprecated, message: "Use DSButton(title, systemImage:, iconPlacement: .top, role:): the same tile.")
 public struct EntityActionButton: View {
     let title: String
     let systemImage: String?

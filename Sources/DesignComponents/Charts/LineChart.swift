@@ -154,7 +154,7 @@ public struct LineChart<Point: ChartPoint>: View {
     }
 
     private var emptyState: some View {
-        EmptyStateView(
+        EmptyState(
             icon: "chart.line.uptrend.xyaxis",
             title: emptyTitle,
             description: emptyMessage,
@@ -282,7 +282,7 @@ public struct LineChartSkeleton: View {
     public var body: some View {
         VStack(spacing: AppSpacing.lg) {
             Color.clear.frame(height: ChartMetrics.bannerHeight)
-            SkeletonView(height: ChartMetrics.plotHeight)
+            Skeleton(height: ChartMetrics.plotHeight)
                 .padding(.leading, AppSpacing.lg)
         }
         .skeletonLoadingLabel()

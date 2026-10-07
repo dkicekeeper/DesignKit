@@ -22,7 +22,7 @@ import DesignSupport
 /// ```
 ///
 /// Chips use `filterChipStyle(isSelected:)` and carry the `.isSelected` trait. A fixed
-/// 2–4 way switch → `SegmentedPickerView`; a filter that opens a menu → `UniversalFilterButton`.
+/// 2–4 way switch → `SegmentedPicker`; a filter that opens a menu → `UniversalFilterButton`.
 public struct ChipPicker<Option: Hashable>: View {
     private enum Selection {
         case single(Binding<Option?>)
@@ -152,7 +152,7 @@ public struct ChipPickerSkeleton: View {
                         .frame(width: index.isMultiple(of: 2) ? 56 : 72)
                         .padding(.horizontal, AppSpacing.lg)
                         .padding(.vertical, AppSpacing.sm)
-                        .background(SkeletonView.fill, in: RoundedRectangle(cornerRadius: AppRadius.xl))
+                        .background(Skeleton.fill, in: RoundedRectangle(cornerRadius: AppRadius.xl))
                 }
             }
             .padding(.vertical, AppSpacing.xxs)

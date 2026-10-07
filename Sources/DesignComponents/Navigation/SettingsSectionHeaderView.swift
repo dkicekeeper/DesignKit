@@ -12,6 +12,7 @@ import DesignSupport
 
 /// Props-based section header for Settings
 /// Single Responsibility: Display section header with consistent styling
+@available(*, deprecated, message: "Use SectionHeader(title, style: .list).")
 public struct SettingsSectionHeaderView: View {
     // MARK: - Props
 

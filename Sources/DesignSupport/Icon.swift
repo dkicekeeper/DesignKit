@@ -1,5 +1,5 @@
 //
-//  IconView.swift
+//  Icon.swift
 //  Tenra
 //
 //  Unified icon and logo display component with full Design System integration
@@ -16,17 +16,17 @@ import DesignTokens
 ///
 /// ## SF Symbol с пресетом
 /// ```swift
-/// IconView(source: .sfSymbol("star.fill"), style: .categoryIcon())
+/// Icon(source: .sfSymbol("star.fill"), style: .categoryIcon())
 /// ```
 ///
 /// ## Динамический логотип сервиса
 /// ```swift
-/// IconView(source: .brandService("netflix"), style: .serviceLogo())
+/// Icon(source: .brandService("netflix"), style: .serviceLogo())
 /// ```
 ///
 /// ## Полный контроль над стилем
 /// ```swift
-/// IconView(
+/// Icon(
 ///     source: .sfSymbol("heart.fill"),
 ///     style: .circle(
 ///         size: AppIconSize.xl,
@@ -35,7 +35,7 @@ import DesignTokens
 ///     )
 /// )
 /// ```
-public struct IconView: View {
+public struct Icon: View {
 
     // MARK: - Properties
 
@@ -309,3 +309,8 @@ public struct IconView: View {
         }
     }
 }
+
+// MARK: - Names before 2.0
+
+@available(*, deprecated, renamed: "Icon")
+public typealias IconView = Icon

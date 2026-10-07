@@ -191,7 +191,7 @@ public struct ComparisonCardSkeleton: View {
                     period(alignment: .leading)
                     Spacer()
                     VStack(spacing: AppSpacing.xs) {
-                        SkeletonView.circle(AppIconSize.sm)
+                        Skeleton.circle(AppIconSize.sm)
                         SkeletonText(AppTypography.bodyEmphasis, width: 40)
                     }
                     Spacer()

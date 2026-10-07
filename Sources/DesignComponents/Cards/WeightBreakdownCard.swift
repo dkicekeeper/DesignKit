@@ -164,11 +164,11 @@ public struct WeightBreakdownCardSkeleton: View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
             SkeletonText(AppTypography.bodyEmphasis, width: 140)
             SkeletonText(AppTypography.body, lines: 2)
-            SkeletonView(height: 14, cornerRadius: 7)
+            Skeleton(height: 14, cornerRadius: 7)
             VStack(spacing: AppSpacing.sm) {
                 ForEach(0..<segments, id: \.self) { _ in
                     HStack(spacing: AppSpacing.md) {
-                        SkeletonView.circle(AppIconSize.sm)
+                        Skeleton.circle(AppIconSize.sm)
                             .frame(width: 24)
                         SkeletonText(AppTypography.body, width: 100)
                         Spacer()

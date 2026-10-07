@@ -174,7 +174,8 @@ extension ComponentSnapshots {
                     onPrimary: {},
                     onSecondary: {}
                 )
-                .frame(height: 340)
+                // 2.0.0: h2 title, body message and DSButtons, so the sheet is taller.
+                .frame(height: 440)
             )
         }
     }

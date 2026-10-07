@@ -219,10 +219,10 @@ private struct ComponentHeader: View {
             if since != nil || !apps.isEmpty {
                 HStack(spacing: AppSpacing.xs) {
                     if let since {
-                        BadgeView("since \(since)", color: AppColors.Status.neutral)
+                        Badge("since \(since)", color: AppColors.Status.neutral)
                     }
                     ForEach(apps, id: \.self) { app in
-                        BadgeView(app.rawValue, color: AppColors.accent)
+                        Badge(app.rawValue, color: AppColors.accent)
                     }
                 }
             }

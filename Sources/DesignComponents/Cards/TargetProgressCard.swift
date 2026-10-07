@@ -187,7 +187,7 @@ public struct TargetProgressCardSkeleton: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
             HStack(spacing: AppSpacing.md) {
-                SkeletonView.circle(AppIconSize.md)
+                Skeleton.circle(AppIconSize.md)
                     .frame(width: 28)
                 SkeletonText(AppTypography.bodyEmphasis, width: 140)
                 Spacer()

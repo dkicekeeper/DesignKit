@@ -119,7 +119,7 @@ private struct PayoffProgressCardPage: View {
                         ? .done(caption: "Closed 15 Jun 2026")
                         : .inProgress(nextDate: "12 Nov 2026", remainingCaption: "18 left")
                 ) {
-                    BadgeView(progress >= 1 ? "Paid off" : "Credit",
+                    Badge(progress >= 1 ? "Paid off" : "Credit",
                               color: progress >= 1 ? AppColors.income : AppColors.expense)
                 }
             }

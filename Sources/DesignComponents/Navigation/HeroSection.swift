@@ -86,7 +86,7 @@ public struct HeroSection<Accessory: View>: View {
                             overrideColor: progress.color
                         )
                     }
-                    IconView(source: icon, style: .glassHero(tint: iconTint ?? .original))
+                    Icon(source: icon, style: .glassHero(tint: iconTint ?? .original))
                 }
                 .scaleEffect(iconScale)
                 .opacity(iconOpacity)
@@ -112,7 +112,7 @@ public struct HeroSection<Accessory: View>: View {
                     )
 
                     if showBaseConversion, !baseCurrency.isEmpty, primaryCurrency != baseCurrency {
-                        ConvertedAmountView(
+                        ConvertedAmount(
                             amount: primaryAmount,
                             fromCurrency: primaryCurrency,
                             toCurrency: baseCurrency,
@@ -215,10 +215,10 @@ public struct HeroSectionSkeleton: View {
                 ZStack {
                     if showsProgress {
                         Circle()
-                            .stroke(SkeletonView.fill, lineWidth: 4)
+                            .stroke(Skeleton.fill, lineWidth: 4)
                             .frame(width: HeroSectionMetrics.ringSize, height: HeroSectionMetrics.ringSize)
                     }
-                    SkeletonView.circle(AppIconSize.Tile.xxxl)
+                    Skeleton.circle(AppIconSize.Tile.xxxl)
                 }
             }
             VStack(spacing: AppSpacing.xs) {

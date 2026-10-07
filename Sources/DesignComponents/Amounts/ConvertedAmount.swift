@@ -1,5 +1,5 @@
 //
-//  ConvertedAmountView.swift
+//  ConvertedAmount.swift
 //  Tenra
 //
 //  Displays a converted amount in a target currency, loading asynchronously.
@@ -11,7 +11,7 @@ import DesignSupport
 
 /// Shows a currency-converted amount using the host app's `DesignKitCurrencyConverter`.
 /// Renders nothing while loading or if conversion fails.
-public struct ConvertedAmountView: View {
+public struct ConvertedAmount: View {
     let amount: Double
     let fromCurrency: String
     let toCurrency: String
@@ -50,3 +50,8 @@ public struct ConvertedAmountView: View {
         }
     }
 }
+
+// MARK: - Names before 2.0
+
+@available(*, deprecated, renamed: "ConvertedAmount")
+public typealias ConvertedAmountView = ConvertedAmount

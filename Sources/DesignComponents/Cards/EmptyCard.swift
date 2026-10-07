@@ -1,5 +1,5 @@
 //
-//  EmptyCardView.swift
+//  EmptyCard.swift
 //  Tenra
 //
 //  Universal card component for section empty states.
@@ -16,14 +16,14 @@ import DesignSupport
 /// Pass `action` to make the entire card tappable (adds account, category, etc.).
 ///
 /// ```swift
-/// EmptyCardView(
+/// EmptyCard(
 ///     sectionTitle: String(localized: "accounts.title"),
 ///     emptyTitle: String(localized: "emptyState.noAccounts"),
 ///     action: { showingAddAccount = true }
 /// )
 /// .screenPadding()
 /// ```
-public struct EmptyCardView: View {
+public struct EmptyCard: View {
 
     let sectionTitle: String
     let emptyTitle: String
@@ -59,7 +59,7 @@ public struct EmptyCardView: View {
                 .font(AppTypography.h3)
                 .foregroundStyle(AppColors.Text.primary)
 
-            EmptyStateView(
+            EmptyState(
                 title: emptyTitle,
                 style: .compact
             )
@@ -73,4 +73,7 @@ public struct EmptyCardView: View {
 
 // MARK: - Preview
 
+// MARK: - Names before 2.0
 
+@available(*, deprecated, renamed: "EmptyCard")
+public typealias EmptyCardView = EmptyCard

@@ -2,7 +2,7 @@
 //  FeedbackSnapshotTests.swift
 //  DesignKit Gallery snapshot tests
 //
-//  Empty states, banners, inline status, steps, permission primer, onboarding pieces.
+//  Empty states, banners, inline status, tooltips, steps, a permission prompt, onboarding pieces.
 //
 
 import SwiftUI
@@ -32,13 +32,13 @@ extension ComponentSnapshots {
         @Test func emptyStates() async {
             await assertComponentSnapshot(
                 VStack(spacing: AppSpacing.xl) {
-                    EmptyStateView(
+                    EmptyState(
                         icon: "tray",
                         title: "No transactions",
                         description: "Add the first one with the plus button."
                     )
-                    EmptyStateView(icon: "magnifyingglass", title: "Nothing found", style: .compact)
-                    EmptyStateView(
+                    EmptyState(icon: "magnifyingglass", title: "Nothing found", style: .compact)
+                    EmptyState(
                         icon: "wifi.slash",
                         title: "Could not load",
                         description: "Check the connection.",
@@ -84,16 +84,50 @@ extension ComponentSnapshots {
             )
         }
 
+        /// Tooltip (2.0.0) above and below its target, with text and with an amount.
+        @Test func tooltips() async {
+            await assertComponentSnapshot(
+                HStack(alignment: .center, spacing: AppSpacing.xxl) {
+                    RoundedRectangle(cornerRadius: AppRadius.md)
+                        .fill(AppColors.accent)
+                        .frame(width: 64, height: 48)
+                        .overlay(alignment: .top) {
+                            Tooltip {
+                                Text(verbatim: "1 250 000 ₸")
+                                    .font(AppTypography.numbers(AppTypography.bodySmall.bold()))
+                                    .foregroundStyle(AppColors.accent)
+                            }
+                            .tooltipAnchor(.top)
+                        }
+                    RoundedRectangle(cornerRadius: AppRadius.md)
+                        .fill(AppColors.Text.secondary.opacity(0.25))
+                        .frame(width: 64, height: 48)
+                        .overlay(alignment: .bottom) {
+                            Tooltip("Last month", arrowEdge: .top)
+                                .tooltipAnchor(.bottom)
+                        }
+                }
+                // The tooltips are overlays, outside the targets' frames: room for them at
+                // large text sizes too, or the picture cuts them.
+                .padding(.vertical, AppSpacing.xxxl * 3)
+                .frame(maxWidth: .infinity),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// A permission primer is a PromptSheet since 2.0.0 (PermissionPrimerView before).
         @Test func permissionPrimer() async {
             await assertComponentSnapshot(
-                PermissionPrimerView(
+                PromptSheet(
                     systemImage: "bell.badge",
                     title: "Don't miss replies",
                     message: "We'll tell you when a friend answers or a saved place gets new rules.",
-                    allowTitle: "Turn on",
-                    laterTitle: "Not now",
-                    onAllow: {},
-                    onLater: {}
+                    primaryTitle: "Turn on",
+                    secondaryTitle: "Not now",
+                    detent: nil,
+                    dismissesOnAnswer: false,
+                    onPrimary: {},
+                    onSecondary: {}
                 ),
                 appearances: [.light, .dark, .largeText]
             )

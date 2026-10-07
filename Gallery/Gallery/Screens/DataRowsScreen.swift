@@ -257,7 +257,7 @@ private struct PersonRowPage: View {
                     PersonRow(name: "Aida Nurlanovna", subtitle: showsSubtitle ? "@aida" : nil) {
                         switch trailing {
                         case 1: DisclosureChevron()
-                        case 2: Button("Accept") {}.appButton(size: .small)
+                        case 2: DSButton("Accept", size: .small) {}
                         default: EmptyView()
                         }
                     }

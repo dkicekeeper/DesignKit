@@ -29,10 +29,10 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
 
 | Компонент | HIG | M3 | Fluent | Carbon | Polaris | Atlassian | DesignKit |
 |---|---|---|---|---|---|---|---|
-| Кнопка (основная / второстепенная) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `primaryButton()`, `secondaryButton()` |
-| Кнопка в состоянии загрузки | — | — | — | ✓ | ✓ | ✓ | **+** `LoadingButtonLabel` |
-| Иконка-кнопка / FAB | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `EntityActionButton`, `PlusTabLabel` |
-| Сегменты / группа кнопок | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `SegmentedPickerView` |
+| Кнопка (основная / второстепенная) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `DSButton`, `.dsButton` (2.0.0) |
+| Кнопка в состоянии загрузки | — | — | — | ✓ | ✓ | ✓ | **+** `DSButton(isLoading:)` |
+| Иконка-кнопка / FAB | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `DSButton(iconPlacement: .only / .top)`, `PlusTabLabel` |
+| Сегменты / группа кнопок | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `SegmentedPicker` |
 | Меню, кнопка с меню | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ○ `Menu`; ✓ `UniversalFilterButton` |
 
 ### Ввод
@@ -45,9 +45,9 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
 | Строка с переключателем | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **+** `ToggleSettingsRow` |
 | Чипсы: выбор одного | — | ✓ | ✓ | ✓ | ✓ | ✓ | **+** `ChipPicker` |
 | Чипсы: фильтр из нескольких | — | ✓ | ✓ | ✓ | ✓ | ✓ | **+** `ChipPicker(selection: Set)` |
-| Дата / время | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `DatePickerRow`, `DateButtonsView` |
+| Дата / время | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `DatePickerRow`, `DateButtons` |
 | Слайдер, степпер | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ○ `Slider`, `Stepper` |
-| Рейтинг | ✓ | — | — | — | — | — | **+** `RatingView`, `RatingPicker` |
+| Рейтинг | ✓ | — | — | — | — | — | **+** `Rating`, `RatingPicker` |
 | Цвет | ✓ | — | — | — | — | — | ✓ `ColorPickerRow` |
 | Файл | ✓ | — | — | ✓ | ✓ | — | ✓ `DocumentPicker` |
 | Ввод суммы, калькулятор | — | — | — | — | — | — | ✓ `CalculatorKeypad`, `AmountInput` (специфика финансов) |
@@ -57,16 +57,16 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
 
 | Компонент | HIG | M3 | Fluent | Carbon | Polaris | Atlassian | DesignKit |
 |---|---|---|---|---|---|---|---|
-| Аватар | — | — | ✓ | — | ✓ | ✓ | **+** `AvatarView` |
-| Группа аватаров | — | — | ✓ | — | — | ✓ | **+** `AvatarGroup`; ✓ `PackedCircleIconsView` (облако) |
-| Бейдж / тег / лозенж | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **+** `BadgeView`, `TrendBadge`; ✓ `StatusIndicatorBadge` |
+| Аватар | — | — | ✓ | — | ✓ | ✓ | **+** `Avatar` |
+| Группа аватаров | — | — | ✓ | — | — | ✓ | **+** `AvatarGroup`; ✓ `PackedCircleIcons` (облако) |
+| Бейдж / тег / лозенж | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **+** `Badge`, `TrendBadge`; ✓ `StatusIndicatorBadge` |
 | Карточка | — | ✓ | ✓ | ✓ | ✓ | — | ✓ `cardStyle()`, `FinanceCard`, `InsightsStatCard` |
 | Показатель (KPI) | — | — | — | — | — | — | **+** `StatTile` (паттерн дашбордов; нужен Dalada) |
 | Строка списка | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `UniversalRow`, `InfoRow`, строки настроек |
-| Заголовок секции | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `SectionHeaderView`, `DateSectionHeaderView` |
+| Заголовок секции | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `SectionHeader` (пять стилей, с действием в конце строки) |
 | «Показать ещё» для текста | — | — | — | — | — | — | **+** `ExpandableText` (паттерн App Store; отзывы и статьи Dalada) |
 | Раскрывающийся блок | ✓ | ✓ | — | ✓ | ✓ | ✓ | ○ `DisclosureGroup` |
-| Пустое состояние / ошибка | — | — | — | ✓ | ✓ | ✓ | ✓ `EmptyStateView` (`.error` с «Повторить») |
+| Пустое состояние / ошибка | — | — | — | ✓ | ✓ | ✓ | ✓ `EmptyState` (`.error` с «Повторить») |
 | Карусель | — | ✓ | — | — | — | — | ✓ `UniversalCarousel` |
 | Графики | ✓ | — | — | ✓ | ✓ | — | ✓ `OrbChart`, датчики; **+** `LineChart`, `BarChart`, `ChartSwitcher`, `Sparkline`, `HeroSparkline` |
 | Календарь месяца с отметками | — | ✓ | ✓ | — | ✓ | ✓ | **+** `MonthCalendar` (0.7.0, из Tenra `SubscriptionCalendarView`) |
@@ -82,11 +82,11 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
 | Сообщение в потоке / баннер | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `InlineStatusText`, `RecommendationBox` |
 | Полоса и кольцо прогресса | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `LinearProgressBar` (**+** `value:`), `ProgressRing` |
 | Спиннер | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ○ `ProgressView()` |
-| Скелетон (заглушка загрузки) | — | — | ✓ | ✓ | ✓ | ✓ | **+** `SkeletonView`, `SkeletonRow`, `.skeleton(isLoading:)` |
+| Скелетон (заглушка загрузки) | — | — | ✓ | ✓ | ✓ | ✓ | **+** `Skeleton`, `SkeletonRow`, `.skeleton(isLoading:)` |
 | Шаги процесса | — | — | — | ✓ | — | ✓ | **+** `StepTracker` |
-| Подсказка / тултип / коучмарк | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ○ `TipKit` |
+| Подсказка / тултип / коучмарк | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `Tooltip` (2.0.0); ○ `TipKit` для коучмарков |
 | Диалог, шторка | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ○ системные; ✓ `EditSheetContainer` |
-| Запрос разрешения (до системного) | ✓ | — | — | — | — | — | **+** `PermissionPrimerView` (0.7.0, общий для обоих приложений) |
+| Запрос разрешения (до системного) | ✓ | — | — | — | — | — | **+** `PromptSheet` (праймер с 0.7.0, с 2.0.0 одна шторка с вопросом, общая для обоих приложений) |
 | Онбординг | ✓ | — | — | — | — | ✓ | **+** `OnboardingPager`, `OnboardingPage`, `HeroSymbol` (0.7.0); ✓ шаги Tenra |
 
 ### Навигация
@@ -193,6 +193,20 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
   смысловые цвета `AppColors.Background.*` и `AppColors.Text.*` вместо плоских `bgCard`,
   `textPrimary` и других (вид не меняется); ещё семь компонентов и два скелетона графиков под
   снапшот-тестами.
+- **2.0.0** — один компонент на одну вещь. `DSButton`: заголовок с иконкой слева, справа, сверху
+  (плитка) или одна иконка, вид × роль × размер, форма, во всю ширину, загрузка; стиль
+  `.dsButton` для своей подписи. Он заменяет `appButton`, `primaryButton`/`secondaryButton`,
+  `LoadingButtonLabel`, `BulkDeleteButton` и `EntityActionButton`. `SectionHeader` получил стили
+  `.list` (бывший `SettingsSectionHeaderView`) и `.card` (бывший `DateSectionHeaderView`);
+  `PromptSheet` стал и праймером разрешения (бывший `PermissionPrimerView`): асинхронное главное
+  действие с загрузкой, крупнее заголовок и текст. Имена компонентов без `View` и `App`
+  (`SectionHeader`, `EmptyState`, `Avatar`, `Badge`, `Icon`, …), старые остались устаревшими
+  синонимами; токены (`AppColors`, `AppSpacing`, …) сохранили префикс. 40 pt стали глифом
+  `AppIconSize.xxl`: плашка начинается с `Tile.sm` 44, меньше ей не хватает отступов. Удалены
+  имена размеров, устаревшие в 1.13.0, и `BrandLogoView`. Новый `Tooltip`: непрозрачная подсказка
+  с хвостиком, в нём сумма столбца `HeroBarPair`. Исправлено: `SegmentedPicker` реагирует на
+  короткое нажатие (стекло поверх больше не забирает касание), аватары `AvatarGroup` непрозрачны,
+  `PackedCircleIcons` рисует символ на бледной подложке его цвета. Переход: docs/migration-2.0.md.
 
 Для 1.6.0–1.7.0 смотрели и на дизайн-систему TUI Т-Банка (Figma): как референс устройства токенов
 и списка состояний, а не как образец внешнего вида. Вид остаётся своим: Liquid Glass, Inter,
@@ -217,3 +231,12 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
 4. **Один вид строки со слайдером** — `SliderRow` (1.15.0) повторяет строку Tenra; радиус зоны
    приватности в Dalada свёрстан иначе (жирный заголовок, значение основным цветом). Перевести его
    на `SliderRow` — изменение вида, решение владельца.
+5. **Одна строка с суммой** — `BalanceRow`, `BreakdownRow`, `InsightEntityRow` и `ProgressRingRow`
+   устроены одинаково: слева иконка (или кольцо), заголовок с подзаголовком, справа сумма с
+   подписью или долей, все на `UniversalRow(.info)`. Их можно свести к одной `AmountRow` со
+   слотом слева и видом подписи справа (подпись, доля, ничего), оставив старые имена тонкими
+   обёртками. Пиксели должны совпасть (их держат снапшоты); затрагивает списки Tenra, решение
+   владельца. Строки настроек (`NavigationSettingsRow`, `ToggleSettingsRow`, `ActionSettingsRow`,
+   `MenuPickerRow`, `DatePickerRow`, `CheckmarkRow`) уже тонкие обёртки `UniversalRow(.settings)`
+   по 60–100 строк, как отдельные `Toggle`, `Picker`, `DatePicker` и `NavigationLink` в SwiftUI;
+   сводить их в одну не нужно.

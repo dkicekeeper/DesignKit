@@ -13,28 +13,28 @@ import DesignComponents
 struct SelectionScreen: View {
     var body: some View {
         ShowcasePage(title: "Selection") {
-            SegmentedPickerViewPage()
+            SegmentedPickerPage()
             ChipPickerPage()
             RatingPage()
             SelectionIndicatorPage()
-            DateButtonsViewPage()
+            DateButtonsPage()
             IconPickerPage()
         }
     }
 }
 
-private struct SegmentedPickerViewPage: View {
+private struct SegmentedPickerPage: View {
     @State private var selection = 0
     @State private var count = 3
 
     var body: some View {
         ComponentPage(
-            name: "SegmentedPickerView",
+            name: "SegmentedPicker",
             summary: "Two to four exclusive modes on Liquid Glass.",
             apps: [.tenra, .dalada],
             canvas: .fill
         ) {
-            SegmentedPickerView(
+            SegmentedPicker(
                 title: "Type",
                 selection: $selection,
                 options: Array([("Expense", 0), ("Income", 1), ("Transfer", 2), ("Debt", 3)].prefix(count))
@@ -98,16 +98,16 @@ private struct RatingPage: View {
 
     var body: some View {
         ComponentPage(
-            name: "RatingView · RatingPicker",
-            summary: "Stars: RatingView shows a rating with half stars, RatingPicker is the tap-to-rate input.",
+            name: "Rating · RatingPicker",
+            summary: "Stars: Rating shows a rating with half stars, RatingPicker is the tap-to-rate input.",
             since: "0.4.0",
             apps: [.dalada]
         ) {
             VStack(spacing: AppSpacing.lg) {
                 if state == .loading {
-                    RatingViewSkeleton(size: 14)
+                    RatingSkeleton(size: 14)
                 } else {
-                    RatingView(rating: shown, size: 14)
+                    Rating(rating: shown, size: 14)
                 }
                 RatingPicker(rating: $rating, size: size)
             }
@@ -139,20 +139,20 @@ private struct SelectionIndicatorPage: View {
     }
 }
 
-private struct DateButtonsViewPage: View {
+private struct DateButtonsPage: View {
     @State private var date = Date()
     @State private var disabled = false
 
     var body: some View {
         ComponentPage(
-            name: "DateButtonsView",
+            name: "DateButtons",
             summary: "Yesterday · Today · a past date: the date of a new transaction, above the keyboard.",
             apps: [.tenra],
             canvas: .fill,
             notes: ["No future dates. .dateButtonsSafeArea() pins it above the keyboard."]
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                DateButtonsView(selectedDate: $date, isDisabled: disabled) { _ in }
+                DateButtons(selectedDate: $date, isDisabled: disabled) { _ in }
                 Text(date, format: .dateTime.day().month().year())
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.textSecondary)
@@ -177,7 +177,7 @@ private struct IconPickerPage: View {
             notes: ["The logos tab shows when the app sets DesignKitLogoCatalog and allowsLogos is on."]
         ) {
             Button { showsPicker = true } label: {
-                IconView(source: icon, style: .glassHero(size: AppIconSize.Tile.xl))
+                Icon(source: icon, style: .glassHero(size: AppIconSize.Tile.xl))
             }
             .buttonStyle(.plain)
             .sheet(isPresented: $showsPicker) {

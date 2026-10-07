@@ -12,6 +12,7 @@ import DesignSupport
 
 /// Date section header with optional amount display
 /// Used in HistoryView and transaction lists grouped by date
+@available(*, deprecated, message: "Use SectionHeader(label, style: .card) { the day's total }.")
 public struct DateSectionHeaderView: View {
     let dateKey: String
     let amount: Double?
@@ -29,7 +30,7 @@ public struct DateSectionHeaderView: View {
 
     public var body: some View {
         HStack {
-            SectionHeaderView(dateKey)
+            SectionHeader(dateKey)
 
             Spacer()
 
@@ -55,6 +56,7 @@ public struct DateSectionHeaderView: View {
 // MARK: - Skeleton
 
 /// Placeholder of a `DateSectionHeaderView`: the same card, the date and the day's total.
+@available(*, deprecated, message: "Use SectionHeaderSkeleton(style: .card, showsTrailing:).")
 public struct DateSectionHeaderViewSkeleton: View {
     public init() {}
 

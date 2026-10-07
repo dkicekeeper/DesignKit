@@ -12,11 +12,11 @@ import DesignSupport
 
 /// Universal filter button/menu component with consistent styling
 /// Supports two modes: simple button tap or menu with custom content
-public struct UniversalFilterButton<Icon: View, MenuContent: View>: View {
+public struct UniversalFilterButton<IconContent: View, MenuContent: View>: View {
     let title: String
     let isSelected: Bool
     let showChevron: Bool
-    let icon: () -> Icon
+    let icon: () -> IconContent
     let mode: FilterMode<MenuContent>
 
     public enum FilterMode<Content: View> {
@@ -32,7 +32,7 @@ public struct UniversalFilterButton<Icon: View, MenuContent: View>: View {
         isSelected: Bool = false,
         showChevron: Bool = true,
         onTap: @escaping () -> Void,
-        @ViewBuilder icon: @escaping () -> Icon = { EmptyView() }
+        @ViewBuilder icon: @escaping () -> IconContent = { EmptyView() }
     ) where MenuContent == EmptyView {
         self.title = title
         self.isSelected = isSelected
@@ -46,7 +46,7 @@ public struct UniversalFilterButton<Icon: View, MenuContent: View>: View {
         title: String,
         isSelected: Bool = false,
         showChevron: Bool = true,
-        @ViewBuilder icon: @escaping () -> Icon = { EmptyView() },
+        @ViewBuilder icon: @escaping () -> IconContent = { EmptyView() },
         @ViewBuilder menuContent: @escaping () -> MenuContent
     ) {
         self.title = title
@@ -63,7 +63,7 @@ public struct UniversalFilterButton<Icon: View, MenuContent: View>: View {
     private var label: some View {
         HStack(spacing: AppSpacing.sm) {
             // Optional icon
-            if !(Icon.self == EmptyView.self) {
+            if !(IconContent.self == EmptyView.self) {
                 icon()
                     .font(.system(size: AppIconSize.sm))
             }
@@ -107,7 +107,7 @@ public struct UniversalFilterButton<Icon: View, MenuContent: View>: View {
 
 // MARK: - Convenience Initializers
 
-public extension UniversalFilterButton where Icon == EmptyView {
+public extension UniversalFilterButton where IconContent == EmptyView {
     /// Text-only button (no icon)
     init(
         title: String,

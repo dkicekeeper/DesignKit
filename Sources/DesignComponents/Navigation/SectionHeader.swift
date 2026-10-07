@@ -1,28 +1,34 @@
 //
-//  SectionHeaderView.swift
+//  SectionHeader.swift
 //  Tenra
 //
-//  Unified section header component with consistent styling across the app
-//  Replaces: SettingsSectionHeaderView, inline headers, category headers
+//  The title over a section, in five styles, with an optional action at the end of the line.
+//  2.0.0: named SectionHeaderView before; SettingsSectionHeaderView became the `.list` style
+//  and DateSectionHeaderView the `.card` style.
 //
 
 import SwiftUI
 import DesignTokens
 import DesignSupport
 
-/// Unified section header component with 3 style variants
-/// - `.default`: Standard section header (bodyEmphasis, primary color). Used in forms, date groups, cards.
-/// - `.compact`: Small uppercase label (bodySmall, secondary color, with horizontal padding). Used in filters, pickers.
-/// - `.large`: Page-level section title (h3, primary color, optional icon, with horizontal padding). Used in insights.
+/// The title over a section:
+/// - `.default`: bodyEmphasis, primary colour. Forms, cards.
+/// - `.compact`: small uppercase, secondary colour, with the screen padding. Filters, pickers.
+/// - `.list`: the same label without padding, for a `List` / `Form` section header, where the
+///   system insets it (SettingsSectionHeaderView before 2.0).
+/// - `.large`: h3 with an accent symbol, with the screen padding. A screen's own sections.
+/// - `.card`: the default title on a glass card with its padding, the action (a day's total)
+///   on the trailing edge. A date's header in a transaction list (DateSectionHeaderView
+///   before 2.0).
 ///
 /// An action at the end of the line ("All", a button, a spinner) goes in `trailing` (1.15.0):
 ///
 /// ```swift
-/// SectionHeaderView("Trips", systemImage: "map") {
+/// SectionHeader("Trips", systemImage: "map") {
 ///     NavigationLink("All") { TripsList() }
 /// }
 /// ```
-public struct SectionHeaderView: View {
+public struct SectionHeader: View {
     let title: String
     /// Optional SF Symbol name shown to the left of the title (accent color).
     /// Currently used only with `.large` style.
@@ -40,6 +46,12 @@ public struct SectionHeaderView: View {
 
         /// Page-level section title with horizontal padding (h3, primary color, optional icon)
         case large
+
+        /// The compact label without padding: a `List` / `Form` section header (2.0.0)
+        case list
+
+        /// The default title on a glass card, padded (2.0.0)
+        case card
     }
 
     public init(_ title: String, systemImage: String? = nil, style: Style = .default) {
@@ -71,6 +83,10 @@ public struct SectionHeaderView: View {
             compactStyle
         case .large:
             largeStyle
+        case .list:
+            compactTitle
+        case .card:
+            cardHeader
         }
     }
 
@@ -121,6 +137,19 @@ public struct SectionHeaderView: View {
             .textCase(.uppercase)
     }
 
+    private var cardHeader: some View {
+        HStack {
+            defaultTitle
+            Spacer(minLength: 0)
+            if let trailing {
+                trailing.font(AppTypography.bodySmall)
+            }
+        }
+        .textCase(nil)
+        .padding(AppSpacing.lg)
+        .cardStyle()
+    }
+
     @ViewBuilder
     private var largeStyle: some View {
         if let trailing {
@@ -153,13 +182,13 @@ public struct SectionHeaderView: View {
 
 // MARK: - Skeleton
 
-/// Placeholder of a `SectionHeaderView` (and `SettingsSectionHeaderView`, `.compact`): a line
+/// Placeholder of a `SectionHeader` (and `SettingsSectionHeaderView`, `.compact`): a line
 /// of the style's text, with its padding; `showsTrailing` adds a short line for the action.
-public struct SectionHeaderViewSkeleton: View {
-    let style: SectionHeaderView.Style
+public struct SectionHeaderSkeleton: View {
+    let style: SectionHeader.Style
     let showsTrailing: Bool
 
-    public init(style: SectionHeaderView.Style = .default, showsTrailing: Bool = false) {
+    public init(style: SectionHeader.Style = .default, showsTrailing: Bool = false) {
         self.style = style
         self.showsTrailing = showsTrailing
     }
@@ -177,6 +206,19 @@ public struct SectionHeaderViewSkeleton: View {
                 line(SkeletonText(AppTypography.h3, width: 160))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .screenPadding()
+            case .list:
+                line(SkeletonText(AppTypography.bodySmall, width: 100))
+            case .card:
+                HStack {
+                    SkeletonText(AppTypography.bodyEmphasis, width: 100)
+                    Spacer()
+                    if showsTrailing {
+                        SkeletonText(AppTypography.bodySmall, width: 80)
+                    }
+                }
+                .shimmer()
+                .padding(AppSpacing.lg)
+                .cardStyle()
             }
         }
         .skeletonLoadingLabel()
@@ -195,3 +237,11 @@ public struct SectionHeaderViewSkeleton: View {
         }
     }
 }
+
+// MARK: - Names before 2.0
+
+@available(*, deprecated, renamed: "SectionHeaderSkeleton")
+public typealias SectionHeaderViewSkeleton = SectionHeaderSkeleton
+
+@available(*, deprecated, renamed: "SectionHeader")
+public typealias SectionHeaderView = SectionHeader

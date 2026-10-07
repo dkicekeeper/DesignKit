@@ -17,7 +17,7 @@ struct ContentCardsScreen: View {
             ReviewCardPage()
             ThumbnailCardPage()
             RecommendationBoxPage()
-            EmptyCardViewPage()
+            EmptyCardPage()
         }
     }
 }
@@ -160,17 +160,17 @@ private struct RecommendationBoxPage: View {
     }
 }
 
-private struct EmptyCardViewPage: View {
+private struct EmptyCardPage: View {
     @State private var hasAction = true
 
     var body: some View {
         ComponentPage(
-            name: "EmptyCardView",
+            name: "EmptyCard",
             summary: "A home section with nothing in it yet; a tap can add the first item.",
             apps: [.tenra],
             canvas: .fill
         ) {
-            EmptyCardView(sectionTitle: "Loans", emptyTitle: "No active loans", action: hasAction ? {} : nil)
+            EmptyCard(sectionTitle: "Loans", emptyTitle: "No active loans", action: hasAction ? {} : nil)
         } controls: {
             ToggleControl("Action", isOn: $hasAction)
         }

@@ -14,9 +14,7 @@ import DesignComponents
 struct NavigationScreen: View {
     var body: some View {
         ShowcasePage(title: "Headers & Navigation") {
-            SectionHeaderViewPage()
-            SettingsSectionHeaderViewPage()
-            DateSectionHeaderViewPage()
+            SectionHeaderPage()
             HeroSectionPage()
             UniversalCarouselPage()
             OnboardingStepIndicatorPage()
@@ -25,89 +23,61 @@ struct NavigationScreen: View {
     }
 }
 
-private struct SectionHeaderViewPage: View {
-    @State private var style: SectionHeaderView.Style = .default
+private struct SectionHeaderPage: View {
+    @State private var style: SectionHeader.Style = .default
     @State private var showsIcon = true
     @State private var trailing = 1
     @State private var state: SpecimenState = .content
 
     var body: some View {
         ComponentPage(
-            name: "SectionHeaderView",
-            summary: "The title over a section: default, compact (settings) or large (a screen's sections), with an optional action at the end of the line.",
+            name: "SectionHeader",
+            summary: "The title over a section in five styles: default, compact, large (a screen's sections), list (a List or Form section) and card (a day in a transaction list), with an optional action at the end of the line.",
             apps: [.tenra, .dalada],
             canvas: .fill,
             notes: [
                 "The icon shows in the large style only.",
-                "The action (1.15.0) is any view: a NavigationLink “All”, a button, a spinner. It takes bodySmall and sits inside the style's padding.",
+                "The action (1.15.0) is any view: a NavigationLink “All”, a button, a spinner, a day's total. It takes bodySmall and sits inside the style's padding.",
+                "2.0.0: SectionHeaderView before; SettingsSectionHeaderView is the list style, DateSectionHeaderView the card style with the day's total as the action.",
             ]
         ) {
             if state == .loading {
-                SectionHeaderViewSkeleton(style: style, showsTrailing: trailing != 0)
+                SectionHeaderSkeleton(style: style, showsTrailing: trailing != 0)
             } else {
                 switch trailing {
                 case 1:
-                    SectionHeaderView("Recent trips", systemImage: showsIcon ? "map" : nil, style: style) {
+                    SectionHeader(title, systemImage: showsIcon ? "map" : nil, style: style) {
                         NavigationLink("All") { Text("All trips").navigationTitle("Trips") }
                     }
                 case 2:
-                    SectionHeaderView("Waiting to send", systemImage: showsIcon ? "icloud.and.arrow.up" : nil, style: style) {
+                    SectionHeader(title, systemImage: showsIcon ? "icloud.and.arrow.up" : nil, style: style) {
                         ProgressView()
                     }
+                case 3:
+                    SectionHeader(title, systemImage: showsIcon ? "calendar" : nil, style: style) {
+                        FormattedAmountText(amount: 45_000, currency: "KZT", prefix: "-",
+                                            fontSize: AppTypography.bodySmall, fontWeight: .semibold,
+                                            color: AppColors.Text.tertiary)
+                    }
                 default:
-                    SectionHeaderView("Recent trips", systemImage: showsIcon ? "map" : nil, style: style)
+                    SectionHeader(title, systemImage: showsIcon ? "map" : nil, style: style)
                 }
             }
         } controls: {
             StateControl(state: $state)
-            ChoiceControl("Style", selection: $style, options: [("Default", .default), ("Compact", .compact), ("Large", .large)])
-            ChoiceControl("Action", selection: $trailing, options: [("None", 0), ("All", 1), ("Spinner", 2)])
+            ChoiceControl("Style", selection: $style, options: [
+                ("Default", .default), ("Compact", .compact), ("Large", .large), ("List", .list), ("Card", .card),
+            ])
+            ChoiceControl("Action", selection: $trailing, options: [("None", 0), ("All", 1), ("Spinner", 2), ("Total", 3)])
             ToggleControl("Icon", isOn: $showsIcon)
         }
     }
-}
 
-private struct SettingsSectionHeaderViewPage: View {
-    @State private var state: SpecimenState = .content
-
-    var body: some View {
-        ComponentPage(
-            name: "SettingsSectionHeaderView",
-            summary: "The small caption over a group of settings rows.",
-            apps: [.tenra],
-            canvas: .fill
-        ) {
-            if state == .loading {
-                SectionHeaderViewSkeleton(style: .compact)
-            } else {
-                SettingsSectionHeaderView(title: "Notifications")
-            }
-        } controls: {
-            StateControl(state: $state)
-        }
-    }
-}
-
-private struct DateSectionHeaderViewPage: View {
-    @State private var showsAmount = true
-    @State private var state: SpecimenState = .content
-
-    var body: some View {
-        ComponentPage(
-            name: "DateSectionHeaderView",
-            summary: "A day's header in a transaction list: the label the app gives (Today, Yesterday, the date) and the day's expenses.",
-            apps: [.tenra],
-            canvas: .fill
-        ) {
-            if state == .loading {
-                DateSectionHeaderViewSkeleton()
-            } else {
-                DateSectionHeaderView(dateKey: "Yesterday", amount: showsAmount ? 45_000 : nil,
-                                      currency: showsAmount ? "KZT" : nil)
-            }
-        } controls: {
-            StateControl(state: $state)
-            ToggleControl("Day total", isOn: $showsAmount)
+    private var title: String {
+        switch style {
+        case .list: "Notifications"
+        case .card: "Yesterday"
+        default: "Recent trips"
         }
     }
 }

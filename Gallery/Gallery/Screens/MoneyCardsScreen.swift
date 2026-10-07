@@ -108,8 +108,8 @@ private struct FinanceCardPage: View {
                     if showsTrailing {
                         HStack(spacing: -AppSpacing.sm) {
                             ForEach(0..<3, id: \.self) { index in
-                                IconView(source: .sfSymbol(["creditcard.fill", "banknote.fill", "wallet.bifold.fill"][index]),
-                                         style: .circle(size: AppIconSize.Tile.xs, tint: .monochrome(.white),
+                                Icon(source: .sfSymbol(["creditcard.fill", "banknote.fill", "wallet.bifold.fill"][index]),
+                                         style: .circle(size: AppIconSize.xxl, tint: .monochrome(.white),
                                                         backgroundColor: [AppColors.accent, AppColors.success, AppColors.warning][index]))
                                     .overlay(Circle().strokeBorder(AppColors.bgBase, lineWidth: 2))
                             }

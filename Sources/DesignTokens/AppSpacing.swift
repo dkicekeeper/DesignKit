@@ -70,16 +70,17 @@ public enum AppRadius {
 
 // MARK: - Icon Sizing System
 
-/// Icon sizes, two scales named like `AppSpacing` (1.13.0):
+/// Icon sizes, two scales named like `AppSpacing`:
 ///
-/// - **Glyphs** (`AppIconSize.xs` … `.xl`, 12–32): an SF Symbol or a small logo on its own, in
-///   text, a toolbar, a row.
-/// - **Tiles** (`AppIconSize.Tile.xs` … `.xxxl`, 40–80): an icon with its own backing — a
-///   circle or rounded square, an avatar, a category coin, a hero symbol.
+/// - **Glyphs** (`AppIconSize.xs` … `.xxl`, 12–40): an SF Symbol, a logo or an avatar on its
+///   own — in text, a toolbar, a row.
+/// - **Tiles** (`AppIconSize.Tile.sm` … `.xxxl`, 44–80): an icon with its own backing — a
+///   circle or rounded square with the icon's padding, a category coin, a hero symbol.
 ///
-/// The semantic names of 1.x (`avatar`, `categoryIcon`, `mega`, `budgetRing`, `ultra`) and the
-/// tile sizes that sat in the glyph scale (`xxl`, `xxxl`) are deprecated aliases of the same
-/// values.
+/// 2.0.0: 40 pt moved from the tiles (`Tile.xs`) to the glyphs (`xxl`): at 40 pt the icon's
+/// padding rules do not apply, so it is a glyph; the smallest tile is `Tile.sm`, 44 pt. The
+/// names deprecated in 1.13.0 (`avatar`, `categoryIcon`, `mega`, `budgetRing`, `ultra`, and the
+/// old `xxl` = 44 / `xxxl` = 48) are gone.
 public enum AppIconSize {
     /// 12 pt — a glyph at caption size (a status dot's symbol, a tiny mark).
     public static let xs: CGFloat = 12
@@ -96,12 +97,16 @@ public enum AppIconSize {
     /// 32 pt — large glyphs and logos.
     public static let xl: CGFloat = 32
 
-    /// Icons with their own backing (circle, rounded square), avatars, coins, heroes.
+    /// 40 pt — an avatar, a logo in a row (2.0.0; `Tile.xs` before).
+    public static let xxl: CGFloat = 40
+
+    /// Icons with their own backing (circle, rounded square), coins, heroes.
     public enum Tile {
-        /// 40 pt — an avatar, a small icon tile.
+        /// 40 pt — not a tile: too small for an icon's padding.
+        @available(*, deprecated, renamed: "AppIconSize.xxl", message: "40 pt is a glyph since 2.0.0: AppIconSize.xxl.")
         public static let xs: CGFloat = 40
 
-        /// 44 pt — the icon tile of a row (`IconView`'s default).
+        /// 44 pt — the smallest tile: the icon of a content row (`Icon`'s default).
         public static let sm: CGFloat = 44
 
         /// 48 pt — an empty state's icon.
@@ -119,25 +124,4 @@ public enum AppIconSize {
         /// 80 pt — a hero icon.
         public static let xxxl: CGFloat = 80
     }
-
-    @available(*, deprecated, renamed: "Tile.xs")
-    public static let avatar: CGFloat = Tile.xs
-
-    @available(*, deprecated, renamed: "Tile.sm")
-    public static let xxl: CGFloat = Tile.sm
-
-    @available(*, deprecated, renamed: "Tile.md")
-    public static let xxxl: CGFloat = Tile.md
-
-    @available(*, deprecated, renamed: "Tile.lg")
-    public static let categoryIcon: CGFloat = Tile.lg
-
-    @available(*, deprecated, renamed: "Tile.xl")
-    public static let mega: CGFloat = Tile.xl
-
-    @available(*, deprecated, renamed: "Tile.xxl")
-    public static let budgetRing: CGFloat = Tile.xxl
-
-    @available(*, deprecated, renamed: "Tile.xxxl")
-    public static let ultra: CGFloat = Tile.xxxl
 }

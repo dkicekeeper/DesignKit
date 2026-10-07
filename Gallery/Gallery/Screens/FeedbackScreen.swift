@@ -14,13 +14,14 @@ import DesignComponents
 struct FeedbackScreen: View {
     var body: some View {
         ShowcasePage(title: "Status & Feedback") {
-            BadgeViewPage()
+            BadgePage()
             TrendBadgePage()
             StatusIndicatorBadgePage()
             StatusBannerPage()
             MessageBannerPage()
             InlineStatusTextPage()
-            EmptyStateViewPage()
+            TooltipPage()
+            EmptyStatePage()
             StepTrackerPage()
             ImportProgressSheetPage()
             SkeletonPrimitivesPage()
@@ -28,7 +29,7 @@ struct FeedbackScreen: View {
     }
 }
 
-private struct BadgeViewPage: View {
+private struct BadgePage: View {
     @State private var filled = false
     @State private var showsIcon = true
     @State private var tone = 0
@@ -42,15 +43,15 @@ private struct BadgeViewPage: View {
 
     var body: some View {
         ComponentPage(
-            name: "BadgeView",
+            name: "Badge",
             summary: "A short label in a capsule: tinted (pale background, coloured text) or filled.",
             since: "0.4.0",
             apps: [.tenra, .dalada]
         ) {
             if state == .loading {
-                BadgeViewSkeleton(width: 96)
+                BadgeSkeleton(width: 96)
             } else {
-                BadgeView(text, systemImage: showsIcon ? "flame.fill" : nil, color: tones[tone].1,
+                Badge(text, systemImage: showsIcon ? "flame.fill" : nil, color: tones[tone].1,
                           style: filled ? .filled : .tinted)
             }
         } controls: {
@@ -189,19 +190,66 @@ private struct InlineStatusTextPage: View {
     }
 }
 
-private struct EmptyStateViewPage: View {
-    @State private var style: EmptyStateView.Style = .standard
+private struct TooltipPage: View {
+    @State private var text = "1 250 000 ₸"
+    @State private var below = false
+    @State private var amountStyle = true
+
+    var body: some View {
+        ComponentPage(
+            name: "Tooltip",
+            summary: "A short value or hint in an opaque bubble with a tail pointing at its target: the amount over a tapped bar.",
+            since: "2.0.0",
+            apps: [.tenra],
+            notes: [
+                "Put it in an overlay of its target with .tooltipAnchor(.top) (or .bottom with arrowEdge: .top), so it never moves the layout.",
+                "Give the target a higher zIndex than its neighbours while the tooltip shows.",
+                "It shows a value already on screen, on a tap, so it has no skeleton.",
+            ]
+        ) {
+            RoundedRectangle(cornerRadius: AppRadius.md)
+                .fill(AppColors.accent)
+                .frame(width: 64, height: 80)
+                .overlay(alignment: below ? .bottom : .top) {
+                    tooltip
+                        .tooltipAnchor(below ? .bottom : .top)
+                }
+                .padding(.vertical, AppSpacing.xxxl + AppSpacing.lg)
+                .frame(maxWidth: .infinity)
+        } controls: {
+            ChoiceControl("Tail", selection: $below, options: [("Bottom (above the target)", false), ("Top (below the target)", true)])
+            ToggleControl("Amount style", isOn: $amountStyle)
+            TextControl("Text", text: $text)
+        }
+    }
+
+    @ViewBuilder
+    private var tooltip: some View {
+        if amountStyle {
+            Tooltip(arrowEdge: below ? .top : .bottom) {
+                Text(text)
+                    .font(AppTypography.numbers(AppTypography.bodySmall.bold()))
+                    .foregroundStyle(AppColors.accent)
+            }
+        } else {
+            Tooltip(text, arrowEdge: below ? .top : .bottom)
+        }
+    }
+}
+
+private struct EmptyStatePage: View {
+    @State private var style: EmptyState.Style = .standard
     @State private var hasAction = true
     @State private var hasDescription = true
 
     var body: some View {
         ComponentPage(
-            name: "EmptyStateView",
+            name: "EmptyState",
             summary: "Nothing to show yet, or a failure: an icon, a title, a line of explanation and an action.",
             apps: [.tenra, .dalada],
             canvas: .tall(minHeight: 280)
         ) {
-            EmptyStateView(
+            EmptyState(
                 icon: style == .error ? "wifi.slash" : "tray",
                 title: style == .error ? "Couldn't load" : "No transactions yet",
                 description: hasDescription ? (style == .error ? "Check the connection and try again." : "Add the first one with +.") : nil,
@@ -270,13 +318,13 @@ private struct SkeletonPrimitivesPage: View {
             ]
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.md) {
-                SkeletonView(height: 48)
+                Skeleton(height: 48)
                 SkeletonText(AppTypography.h3, width: 160)
                 SkeletonText(AppTypography.body, lines: 2)
                 HStack(spacing: AppSpacing.md) {
-                    SkeletonView.circle(AppIconSize.Tile.sm)
-                    IconViewSkeleton(style: .roundedSquare(size: AppIconSize.Tile.sm))
-                    SkeletonView.capsule(height: 32, width: 96)
+                    Skeleton.circle(AppIconSize.Tile.sm)
+                    IconSkeleton(style: .roundedSquare(size: AppIconSize.Tile.sm))
+                    Skeleton.capsule(height: 32, width: 96)
                 }
                 SkeletonRow()
             }

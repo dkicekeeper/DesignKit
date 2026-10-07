@@ -12,7 +12,7 @@ import DesignTokens
 import DesignSupport
 
 /// "History" over an `AmountComparisonBar`, an optional "Planned 5 000 ₸" line under it.
-/// `isEmpty` shows `EmptyCardView`; `totals == nil` (and not empty) shows a skeleton.
+/// `isEmpty` shows `EmptyCard`; `totals == nil` (and not empty) shows a skeleton.
 ///
 /// ```swift
 /// CashFlowCard(
@@ -56,7 +56,7 @@ public struct CashFlowCard: View {
 
     /// - Parameters:
     ///   - totals: `nil` while loading.
-    ///   - isEmpty: Shows `EmptyCardView` with `title` and `emptyMessage` instead of the totals.
+    ///   - isEmpty: Shows `EmptyCard` with `title` and `emptyMessage` instead of the totals.
     ///   - loadingLabel: What VoiceOver reads for the skeleton.
     public init(
         title: String,
@@ -79,7 +79,7 @@ public struct CashFlowCard: View {
         // instead of replacing the view abruptly.
         ZStack {
             if isEmpty {
-                EmptyCardView(
+                EmptyCard(
                     sectionTitle: title,
                     emptyTitle: emptyMessage
                 )

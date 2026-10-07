@@ -14,8 +14,7 @@ struct SheetsScreen: View {
     var body: some View {
         ShowcasePage(title: "Sheets & Flows") {
             PromptSheetPage()
-            PermissionPrimerViewPage()
-            NotificationPermissionViewPage()
+            NotificationPermissionPromptPage()
             OnboardingPagerPage()
             OnboardingPagePage()
             OnboardingPageContainerPage()
@@ -30,86 +29,80 @@ private struct PresentButton: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
-            Label(title, systemImage: "rectangle.portrait.bottomhalf.inset.filled")
-                .frame(maxWidth: .infinity)
-        }
-        .appButton(.secondary)
+        DSButton(title, systemImage: "rectangle.portrait.bottomhalf.inset.filled",
+                 appearance: .secondary, fullWidth: true, action: action)
     }
 }
 
 private struct PromptSheetPage: View {
     @State private var isPresented = false
+    @State private var kind = 0
+    @State private var working = true
+
+    private struct Copy {
+        let symbol, title, message, primary, secondary: String
+    }
+
+    private let copies = [
+        Copy(symbol: "sparkles", title: "Enjoying the app?",
+             message: "Your answer helps us decide what to improve next.",
+             primary: "Love it!", secondary: "Not really"),
+        Copy(symbol: "bell.badge", title: "Don't miss replies",
+             message: "We'll tell you when a friend answers or a place you saved gets new rules.",
+             primary: "Turn on", secondary: "Not now"),
+    ]
 
     var body: some View {
+        let copy = copies[kind]
         ComponentPage(
             name: "PromptSheet",
-            summary: "A short question in a small sheet: a symbol, a title, a message, two answers.",
+            summary: "A short question or a permission request in a sheet: a symbol on a disc, a title, a message, the main answer and a second one.",
             since: "1.5.0",
-            apps: [.tenra]
+            apps: [.tenra, .dalada],
+            notes: [
+                "A permission primer is a PromptSheet (PermissionPrimerView before 2.0): onPrimary is async, the main button shows a spinner while it runs.",
+                "The sheet is .medium by default and closes after either answer; detent: nil and dismissesOnAnswer: false leave both to the app.",
+            ]
         ) {
             PresentButton(title: "Show the prompt") { isPresented = true }
                 .sheet(isPresented: $isPresented) {
                     PromptSheet(
-                        systemImage: "sparkles",
-                        title: "Enjoying the app?",
-                        message: "Your answer helps us decide what to improve next.",
-                        primaryTitle: "Love it!",
-                        secondaryTitle: "Not really",
-                        onPrimary: { isPresented = false },
-                        onSecondary: { isPresented = false }
-                    )
-                }
-        }
-    }
-}
-
-private struct PermissionPrimerViewPage: View {
-    @State private var isPresented = false
-
-    var body: some View {
-        ComponentPage(
-            name: "PermissionPrimerView",
-            summary: "Why the app needs a permission, before the system alert: a hero symbol, the reason, Allow and Later.",
-            since: "0.7.0",
-            apps: [.tenra, .dalada],
-            notes: ["Show it in a .medium sheet; Allow runs the system request."]
-        ) {
-            PresentButton(title: "Show the primer") { isPresented = true }
-                .sheet(isPresented: $isPresented) {
-                    PermissionPrimerView(
-                        systemImage: "bell.badge",
-                        title: "Don't miss replies",
-                        message: "We'll tell you when a friend answers or a place you saved gets new rules.",
-                        allowTitle: "Turn on",
-                        laterTitle: "Not now",
-                        onAllow: {
-                            try? await Task.sleep(for: .seconds(1))
-                            isPresented = false
+                        systemImage: copy.symbol,
+                        title: copy.title,
+                        message: copy.message,
+                        primaryTitle: copy.primary,
+                        secondaryTitle: copy.secondary,
+                        onPrimary: {
+                            if working { try? await Task.sleep(for: .seconds(1)) }
                         },
-                        onLater: { isPresented = false }
+                        onSecondary: {}
                     )
-                    .presentationDetents([.medium])
                 }
+        } controls: {
+            ChoiceControl("Copy", selection: $kind, options: [("Rating", 0), ("Permission", 1)])
+            ToggleControl("Main answer takes a second", isOn: $working)
         }
     }
 }
 
-private struct NotificationPermissionViewPage: View {
+private struct NotificationPermissionPromptPage: View {
     @State private var isPresented = false
 
     var body: some View {
         ComponentPage(
-            name: "NotificationPermissionView",
-            summary: "Tenra's notification primer: the same primer with the notification wording built in.",
-            apps: [.tenra]
+            name: "NotificationPermissionPrompt",
+            summary: "Tenra's notification primer: a PromptSheet with the notification wording built in.",
+            since: "2.0.0",
+            apps: [.tenra],
+            notes: ["NotificationPermissionView before 2.0."]
         ) {
             PresentButton(title: "Show it") { isPresented = true }
                 .sheet(isPresented: $isPresented) {
-                    NotificationPermissionView(
+                    NotificationPermissionPrompt(
                         onAllow: { isPresented = false },
                         onSkip: { isPresented = false }
                     )
+                    .presentationDetents([.medium])
                 }
         }
     }
@@ -148,7 +141,7 @@ private struct OnboardingPagePage: View {
                 OnboardingPage(systemImage: "mappin.and.ellipse", title: "Places",
                                message: "Lakes, rivers and camps with reviews from people who were there.") {
                     FlowLayout {
-                        ForEach(["Lake", "River", "Camp"], id: \.self) { BadgeView($0) }
+                        ForEach(["Lake", "River", "Camp"], id: \.self) { Badge($0) }
                     }
                 }
             } else {
@@ -182,7 +175,7 @@ private struct OnboardingPageContainerPage: View {
                     ) {
                         FlowLayout {
                             ForEach(["KZT", "USD", "EUR", "RUB"], id: \.self) {
-                                BadgeView($0, color: AppColors.accent)
+                                Badge($0, color: AppColors.accent)
                             }
                         }
                     }
@@ -234,7 +227,7 @@ private struct SampleOnboarding: View {
                 OnboardingPage(systemImage: "mappin.and.ellipse", title: "Places",
                                message: "Lakes, rivers and camps with reviews from people who were there.") {
                     FlowLayout {
-                        ForEach(["Lake", "River", "Camp"], id: \.self) { BadgeView($0) }
+                        ForEach(["Lake", "River", "Camp"], id: \.self) { Badge($0) }
                     }
                 }
             case .location:
@@ -245,16 +238,11 @@ private struct SampleOnboarding: View {
             }
         } actions: { page in
             VStack(spacing: AppSpacing.sm) {
-                Button {
+                DSButton(page == .location ? "Allow" : page == .done ? "Start" : "Next", fullWidth: true) {
                     next()
-                } label: {
-                    Text(page == .location ? "Allow" : page == .done ? "Start" : "Next")
-                        .frame(maxWidth: .infinity)
                 }
-                .appButton()
                 if page == .location {
-                    Button { next() } label: { Text("Later").frame(maxWidth: .infinity) }
-                        .appButton(.secondary)
+                    DSButton("Later", appearance: .secondary, fullWidth: true) { next() }
                 }
             }
         }

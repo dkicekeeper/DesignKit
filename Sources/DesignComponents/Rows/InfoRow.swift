@@ -113,7 +113,7 @@ public struct InfoRowSkeleton: View {
     public var body: some View {
         HStack(spacing: RowConfiguration.info.spacing) {
             if showsIcon {
-                SkeletonView.circle(AppIconSize.lg)
+                Skeleton.circle(AppIconSize.lg)
             }
             HStack(spacing: AppSpacing.md) {
                 SkeletonText(AppTypography.body, width: 100)

@@ -21,14 +21,14 @@ import DesignSupport
 /// Usage:
 /// ```swift
 /// // Empty state
-/// EmptyStateView(
+/// EmptyState(
 ///     icon: "doc.text.magnifyingglass",
 ///     title: "Нет операций",
 ///     description: "Добавьте первую операцию"
 /// )
 ///
 /// // Error state с retry
-/// EmptyStateView(
+/// EmptyState(
 ///     icon: "wifi.slash",
 ///     title: "Нет соединения",
 ///     description: "Проверьте интернет и попробуйте снова",
@@ -37,7 +37,7 @@ import DesignSupport
 ///     style: .error
 /// )
 /// ```
-public struct EmptyStateView: View {
+public struct EmptyState: View {
 
     /// Визуальный стиль empty / error state
     public enum Style {
@@ -88,7 +88,7 @@ public struct EmptyStateView: View {
 
     private var standardBody: some View {
         VStack(spacing: AppSpacing.lg) {
-            IconView(
+            Icon(
                 source: .sfSymbol(icon.isEmpty ? "tray" : icon),
                 style: .emptyState()
             )
@@ -111,7 +111,7 @@ public struct EmptyStateView: View {
                     Text(actionTitle)
                         .frame(maxWidth: .infinity)
                 }
-                .primaryButton()
+                .dsButton()
                 .padding(.top, AppSpacing.sm)
             }
         }
@@ -144,7 +144,7 @@ public struct EmptyStateView: View {
 
     private var errorBody: some View {
         VStack(spacing: AppSpacing.lg) {
-            IconView(
+            Icon(
                 source: .sfSymbol(icon.isEmpty ? "exclamationmark.triangle" : icon),
                 style: .circle(
                     size: AppIconSize.Tile.xxxl,
@@ -174,7 +174,7 @@ public struct EmptyStateView: View {
                     }
                     .frame(maxWidth: .infinity)
                 }
-                .primaryButton()
+                .dsButton()
                 .padding(.top, AppSpacing.sm)
             }
         }
@@ -188,4 +188,7 @@ public struct EmptyStateView: View {
 
 // MARK: - Preview
 
+// MARK: - Names before 2.0
 
+@available(*, deprecated, renamed: "EmptyState")
+public typealias EmptyStateView = EmptyState

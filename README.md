@@ -32,19 +32,20 @@ Three layered targets (each depends on the ones above it):
 Sources/
 ├── DesignTokens/      AppColors, CategoryColors, AppSpacing, AppRadius, AppIconSize,
 │                      AppTypography (+ bundled Inter), AppAnimation, AppModifiers,
-│                      AppButton, AmbientMotionGate, DesignKitTheme, DesignKitFonts
-├── DesignSupport/     IconSource, IconStyle, IconView, BrandLogoView, Formatting,
-│                      AmountFormatter, AmountDisplayConfiguration, HapticManager,
-│                      DominantColorExtractor, host hooks (logos, FX)
-└── DesignComponents/  Cards, Charts, Feedback, Forms, Headers, Icons, Input, Rows
+│                      DSButtonStyle (.dsButton), AmbientMotionGate, DesignKitTheme, DesignKitFonts
+├── DesignSupport/     IconSource, IconStyle, Icon, Formatting, AmountFormatter,
+│                      AmountDisplayConfiguration, HapticManager, DominantColorExtractor,
+│                      host hooks (logos, FX)
+└── DesignComponents/  by what a component does: Actions, TextInput, Selection, Amounts, Rows,
+                       Cards, Charts, Progress, Feedback, Navigation, Media, Content, Sheets, Effects
 ```
 
 Highlights of `DesignComponents`: `FinanceCard`, `InsightsStatCard`, `HeroSection`,
 `EditSheetContainer`, `FormSection`, `FormTextField`, `UniversalRow`, `InfoRow`, `MenuPickerRow`,
-`UniversalCarousel`, `UniversalFilterButton`, `MessageBanner`, `EmptyStateView`,
+`UniversalCarousel`, `UniversalFilterButton`, `MessageBanner`, `EmptyState`,
 `FormattedAmountText` (adaptive abbreviation), calculator keypad, `OrbChart`, `ProgressRing`,
 `LinearProgressBar`, Mini*/Hero* gauges and bar pairs, `AccentGlow`, `BlurSlideTransition`,
-`SiriGlowView`. Full inventory: [docs/design-system.md §0](docs/design-system.md).
+`SiriGlow`. Full inventory: [docs/design-system.md §0](docs/design-system.md).
 
 ## Using it in an app
 

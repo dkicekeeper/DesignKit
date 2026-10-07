@@ -22,9 +22,9 @@ extension ComponentSnapshots {
                 } trailing: {
                     HStack(spacing: -AppSpacing.sm) {
                         ForEach(CardsSample.accountIcons) { icon in
-                            IconView(
+                            Icon(
                                 source: .sfSymbol(icon.symbol),
-                                style: .circle(size: AppIconSize.Tile.xs, tint: .monochrome(.white), backgroundColor: icon.color)
+                                style: .circle(size: AppIconSize.xxl, tint: .monochrome(.white), backgroundColor: icon.color)
                             )
                             .overlay(Circle().strokeBorder(AppColors.bgBase, lineWidth: 2))
                         }
@@ -34,7 +34,7 @@ extension ComponentSnapshots {
                 appearances: [.light, .dark, .largeText]
             )
             await assertComponentSnapshot(
-                EmptyCardView(sectionTitle: "Loans", emptyTitle: "No active loans"),
+                EmptyCard(sectionTitle: "Loans", emptyTitle: "No active loans"),
                 named: "emptyCard",
                 appearances: [.light, .dark, .largeText]
             )

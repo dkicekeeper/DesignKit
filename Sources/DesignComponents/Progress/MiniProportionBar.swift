@@ -80,7 +80,7 @@ public struct MiniProportionBarSkeleton: View {
     }
 
     public var body: some View {
-        SkeletonView.capsule(height: barHeight)
+        Skeleton.capsule(height: barHeight)
             .frame(height: height)
             .skeletonLoadingLabel()
     }

@@ -4,7 +4,7 @@
 //
 //  Overlapping row of avatars with a "+N" bubble for the rest — who went on a trip, who
 //  shares an account. (Fluent Avatar group, Atlassian Avatar group, Polaris stack.) For a
-//  loose cluster of icons use PackedCircleIconsView.
+//  loose cluster of icons use PackedCircleIcons.
 //
 
 import SwiftUI
@@ -19,7 +19,8 @@ import DesignSupport
 ///             accessibilityLabel: "Ayan, Dana and 4 more")
 /// ```
 ///
-/// Each avatar gets a ring in the background colour so the overlap reads on any surface.
+/// Each avatar gets a ring in the background colour so the overlap reads on any surface, and
+/// an opaque disc under its pale tint (2.0.0) so the avatar under it does not show through.
 public struct AvatarGroup: View {
     let names: [String?]
     let maxVisible: Int
@@ -27,7 +28,7 @@ public struct AvatarGroup: View {
     let label: String?
 
     /// - Parameters:
-    ///   - names: one entry per person (initials come from `AvatarView.initials`).
+    ///   - names: one entry per person (initials come from `Avatar.initials`).
     ///   - maxVisible: avatars shown before the "+N" bubble.
     ///   - accessibilityLabel: what VoiceOver reads for the whole group; hidden when `nil`.
     public init(
@@ -49,7 +50,8 @@ public struct AvatarGroup: View {
     public var body: some View {
         HStack(spacing: -size / 3) {
             ForEach(Array(visible.enumerated()), id: \.offset) { index, name in
-                AvatarView(name: name, size: size)
+                Avatar(name: name, size: size)
+                    .background(AppColors.Background.base, in: Circle())
                     .overlay(Circle().stroke(AppColors.Background.base, lineWidth: ring))
                     .zIndex(Double(visible.count - index))
             }
@@ -84,7 +86,7 @@ public struct AvatarGroupSkeleton: View {
     public var body: some View {
         HStack(spacing: -size / 3) {
             ForEach(0..<count, id: \.self) { index in
-                SkeletonView.circle(size)
+                Skeleton.circle(size)
                     // The ring that separates the avatars.
                     .overlay(Circle().stroke(AppColors.Background.base, lineWidth: 2))
                     .zIndex(Double(count - index))

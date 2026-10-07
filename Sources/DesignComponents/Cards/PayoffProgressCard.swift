@@ -21,7 +21,7 @@ import DesignSupport
 ///     remaining: 1_200_000, total: 3_000_000, currency: "KZT", progress: 0.6,
 ///     phase: .inProgress(nextDate: "12 Nov 2026", remainingCaption: "18 left")
 /// ) {
-///     BadgeView("Credit")
+///     Badge("Credit")
 /// }
 /// ```
 public struct PayoffProgressCard<Accessory: View>: View {
@@ -74,7 +74,7 @@ public struct PayoffProgressCard<Accessory: View>: View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
             // Header: icon + name + subtitle + accessory
             HStack(alignment: .top) {
-                IconView(source: iconSource, size: AppIconSize.Tile.sm)
+                Icon(source: iconSource, size: AppIconSize.Tile.sm)
 
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text(title)
@@ -185,7 +185,7 @@ public struct PayoffProgressCardSkeleton: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
             HStack(alignment: .top) {
-                IconViewSkeleton(size: AppIconSize.Tile.sm)
+                IconSkeleton(size: AppIconSize.Tile.sm)
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     SkeletonText(AppTypography.h4, width: 140)
                     SkeletonText(AppTypography.bodySmall, width: 100)
@@ -199,7 +199,7 @@ public struct PayoffProgressCardSkeleton: View {
                     SkeletonText(AppTypography.body, width: 90)
                 }
                 // The system linear ProgressView's track: 4 pt, rounded ends.
-                SkeletonView.capsule(height: 4)
+                Skeleton.capsule(height: 4)
             }
             HStack {
                 SkeletonText(AppTypography.bodySmall, width: 110)

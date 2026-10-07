@@ -79,7 +79,7 @@ public struct ProgressRingRow: View {
                     )
                 }
 
-                IconView(
+                Icon(
                     source: iconSource,
                     style: .circle(
                         size: AppIconSize.Tile.sm,
@@ -170,9 +170,9 @@ public struct ProgressRingRowSkeleton: View {
         HStack(spacing: AppSpacing.md) {
             ZStack {
                 Circle()
-                    .stroke(SkeletonView.fill, lineWidth: 3)
+                    .stroke(Skeleton.fill, lineWidth: 3)
                     .frame(width: AppIconSize.Tile.lg, height: AppIconSize.Tile.lg)
-                IconViewSkeleton(size: AppIconSize.Tile.sm)
+                IconSkeleton(size: AppIconSize.Tile.sm)
             }
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 SkeletonText(AppTypography.h4, width: 120)

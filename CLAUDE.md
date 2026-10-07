@@ -35,7 +35,7 @@ push to `main` that touches `Sources/`, `Gallery/`, `Package.swift` or `VERSION`
 Sources/
 ├── DesignTokens/      leaf — colors, spacing, radius, icon sizes, typography (Inter), animation,
 │                      modifiers, button styles, AmbientMotionGate, DesignKitTheme, fonts
-├── DesignSupport/     → DesignTokens — icons (IconSource/IconStyle/IconView),
+├── DesignSupport/     → DesignTokens — icons (IconSource/IconStyle/Icon),
 │                      formatting, haptics, DominantColorExtractor, host hooks
 └── DesignComponents/  → DesignTokens + DesignSupport — by what a component does (1.13.0,
                        docs/gallery-structure.md): Actions, TextInput, Selection, Amounts,
@@ -60,7 +60,7 @@ consumers `import DesignTokens` / `DesignSupport` / `DesignComponents` as needed
 
 | App | How it depends | Notes |
 |---|---|---|
-| Dalada | `ios/Packages/DaladaKit/Package.swift`, `exact: "X.Y.Z"` | Swift 6, iOS 26; green accent via `DesignKitTheme.accent`; uses tokens, `cardStyle`, buttons, `EmptyStateView`, `SectionHeaderView`, `RecommendationBox`, `PlusTabLabel`, and since 1.12.0 `MessageComposer` and the community and progress components (people, comments, threads, reviews, reactions, achievements, checklists, stats, streak, thumbnails), with thin adapters over its models |
+| Dalada | `ios/Packages/DaladaKit/Package.swift`, `exact: "X.Y.Z"` | Swift 6, iOS 26; green accent via `DesignKitTheme.accent`; uses tokens, `cardStyle`, buttons, `EmptyState`, `SectionHeader`, `RecommendationBox`, `PlusTabLabel`, and since 1.12.0 `MessageComposer` and the community and progress components (people, comments, threads, reviews, reactions, achievements, checklists, stats, streak, thumbnails), with thin adapters over its models |
 | Tenra | `Tenra.xcodeproj` package reference, exact version | Reference look. `Tenra/Utils/DesignKitBridge.swift` re-exports the three modules, wires the host hooks and keeps the Tenra-model adapters (custom category colours, logo registry, breakdown → `DonutSlice`, the stat-card sparkline) |
 
 A consumer sees a DesignKit change when its pin moves. Each app's **DesignKit update** workflow
@@ -120,6 +120,10 @@ rather than importing an app type.
 1. Copy the file into the matching `Sources/DesignComponents/<Group>/` folder (the group by what
    the component does, docs/gallery-structure.md); drop `#Preview`
    blocks (the Gallery replaces them) and add `import DesignTokens` / `import DesignSupport`.
+   Name it for what it is, without `View` or `App` (`SectionHeader`, `Avatar`, `DSButton`;
+   2.0.0, docs/migration-2.0.md); tokens keep their `App` prefix (`AppColors`, `AppSpacing`).
+   A variant of an existing component is a parameter or a style of it, not a new view
+   (`DSButton(iconPlacement: .top)`, `SectionHeader(style: .card)`).
 2. `public` on the type, `body`, nested types used in the API, and protocol requirements
    (`id`, `body(content:)`, `==`). Write an explicit `public init` — memberwise inits are internal.
    Padding follows docs/design-system.md §10: a card pads itself, a row pads only vertically
@@ -181,5 +185,6 @@ rather than importing an app type.
 | Localized strings used by components | [docs/localization-keys.md](docs/localization-keys.md) |
 | Gallery TestFlight pipeline | [docs/testflight.md](docs/testflight.md) |
 | Snapshot tests: what is covered, recording references, the pinned Xcode | [docs/snapshots.md](docs/snapshots.md) |
+| Moving an app to 2.0 (renames, `DSButton`, icon sizes, visual changes) | [docs/migration-2.0.md](docs/migration-2.0.md) |
 | What exists vs Apple HIG / Material / Fluent / Carbon / Polaris / Atlassian, next candidates | [docs/benchmark.md](docs/benchmark.md) |
 | Where a component goes (Gallery sections, source folders), how its Gallery page is built | [docs/gallery-structure.md](docs/gallery-structure.md) |

@@ -16,7 +16,7 @@ DesignKit: в Gallery, в `docs/design-system.md` и в папках `Sources/De
 - Параметры компонента не переключаются: на странице один-два готовых примера.
 - Заголовок и описание стоят вплотную к компоненту и сливаются с ним.
 - В исходниках то же: `FormattedAmountText` и `SelectableBalanceCard` лежат в `Input/`,
-  `SiriGlowView` в `Charts/`, `PlusTabLabel` в `Feedback/`, `IconPicker` в `Icons/`.
+  `SiriGlow` в `Charts/`, `PlusTabLabel` в `Feedback/`, `IconPicker` в `Icons/`.
 
 ## Как устроены крупные системы
 
@@ -51,23 +51,23 @@ DesignKit: в Gallery, в `docs/design-system.md` и в папках `Sources/De
 
 | Раздел | Компоненты | Аналог |
 |---|---|---|
-| **Actions** | `appButton` (весь набор вида × роли × размера), `.bounce`, `LoadingButtonLabel`, `EntityActionButton`, `BulkDeleteButton`, `ReactionButton`, `AmountVisibilityToggle`, `UniversalFilterButton` | M3 Actions, HIG Menus and actions |
+| **Actions** | `DSButton` (иконка слева, справа, сверху или одна; вид × роль × размер, форма, загрузка), `.dsButton`, `.bounce`, `ReactionButton`, `AmountVisibilityToggle`, `UniversalFilterButton` | M3 Actions, HIG Menus and actions |
 | **Text Input** | `FormTextField`, `AnimatedTitleInput`, `MessageComposer`, `TagInput` | M3 Text inputs |
-| **Selection** | `SegmentedPickerView`, `ChipPicker`, `RatingPicker`, `SelectionIndicator`, `DateButtonsView`, `IconPicker` | M3 Selection, HIG Selection and input |
-| **Amounts & Currency** | `AmountInput`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `CurrencyList`, `FormattedAmountText`, `FormattedAmountView`, `ConvertedAmountView`, `SpentBudgetText`, `AmountPercentageView`, `RedactableAmount` | своя область DesignKit (у Polaris — Money) |
+| **Selection** | `SegmentedPicker`, `ChipPicker`, `RatingPicker`, `SelectionIndicator`, `DateButtons`, `IconPicker` | M3 Selection, HIG Selection and input |
+| **Amounts & Currency** | `AmountInput`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `CurrencyList`, `FormattedAmountText`, `ConvertedAmount`, `SpentBudgetText`, `AmountPercentage`, `RedactableAmount` | своя область DesignKit (у Polaris — Money) |
 | **Rows: Settings & Forms** | `UniversalRow`, `InfoRow`, `NavigationSettingsRow`, `ToggleSettingsRow`, `ActionSettingsRow`, `MenuPickerRow`, `SliderRow`, `DatePickerRow`, `ColorPickerRow`, `CheckmarkRow`, `DisclosureChevron` | M3 Lists |
 | **Rows: Data** | `BalanceRow`, `BreakdownRow`, `ProgressRingRow`, `InsightEntityRow`, `NetAmountRow`, `ScheduleRow`, `PersonRow`, `CommentRow`, `ChecklistRow`, `ChecklistSummaryRow`, `ThumbnailRow` | M3 Lists, Ant Data Display |
 | **Cards: Money** | `BalanceCard`, `SelectableBalanceCard`, `FinanceCard`, `CashFlowCard`, `TotalsCard`, `ComparisonCard`, `RecurringPaymentCard`, `CalculationCard`, `WeightBreakdownCard` | M3 Containment |
 | **Cards: Progress & Stats** | `LimitProgressCard`, `TargetProgressCard`, `PayoffProgressCard`, `ScoreCard`, `ScoreGaugeCard`, `MetricCard`, `InsightsStatCard`, `StatTile`, `StatsStrip`, `StreakCard`, `ProgressRingTile`, `ProgressRingTileGrid` | Ant Statistic, Data Display |
-| **Cards: Content** | `ThreadCard`, `ReviewCard`, `ThumbnailCard`, `RecommendationBox`, `EmptyCardView` | M3 Containment |
+| **Cards: Content** | `ThreadCard`, `ReviewCard`, `ThumbnailCard`, `RecommendationBox`, `EmptyCard` | M3 Containment |
 | **Charts** | `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `OrbChart`, `ChartSelectionBanner`, `ChartZoomControls` | HIG Content (Charts) |
 | **Progress & Gauges** | `LinearProgressBar`, `ProgressRing`, `ProportionBar`, `MiniProportionBar`, `HeroProportionBar`, `AmountComparisonBar`, `MiniDonut`, `MiniHalfGauge`, `HeroHalfGauge`, `MiniMilestoneGauge`, `HeroMilestoneGauge`, `MiniBarPair`, `HeroBarPair` | HIG Status (gauges, progress) |
-| **Status & Feedback** | `BadgeView`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `MessageBanner`, `InlineStatusText`, `EmptyStateView`, `StepTracker`, `ImportProgressSheet`, примитивы скелетонов (`SkeletonView`, `SkeletonText`, `SkeletonRow`) | M3 Communication, Atlassian Messaging + Loading |
-| **Headers & Navigation** | `SectionHeaderView`, `SettingsSectionHeaderView`, `DateSectionHeaderView`, `HeroSection`, `UniversalCarousel`, `OnboardingStepIndicator`, `PlusTabLabel` | M3 Navigation, HIG Navigation and search |
-| **Media & Identity** | `IconView` (символы, картинки, логотипы брендов), `AvatarView`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIconsView`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ThumbnailPlaceholder` | Atlassian Images and icons |
+| **Status & Feedback** | `Badge`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `EmptyState`, `StepTracker`, `ImportProgressSheet`, примитивы скелетонов (`Skeleton`, `SkeletonText`, `SkeletonRow`) | M3 Communication, Atlassian Messaging + Loading |
+| **Headers & Navigation** | `SectionHeader` (пять стилей, с 2.0.0 и `.list`, `.card`), `HeroSection`, `UniversalCarousel`, `OnboardingStepIndicator`, `PlusTabLabel` | M3 Navigation, HIG Navigation and search |
+| **Media & Identity** | `Icon` (символы, картинки, логотипы брендов), `Avatar`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIcons`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ThumbnailPlaceholder` | Atlassian Images and icons |
 | **Content & Layout** | `ExpandableText`, `ActivityTimeline`, `MonthCalendar`, `FlowLayout`, `FormSection`, `EditSheetContainer`, `EditableHero` | HIG Layout and organization |
-| **Sheets & Flows** | `PromptSheet`, `PermissionPrimerView`, `NotificationPermissionView`, `OnboardingPager`, `OnboardingPage`, `LoopOnboardingHero` | HIG Presentation, M3 Containment (sheets) |
-| **Effects** | `GradientOrbsBackground`, `SiriGlowView`, `SiriWaveRecordingView`, `.accentGlow`, `.borderBeam` / `.borderGlow` | — (своё: Liquid Glass, Siri) |
+| **Sheets & Flows** | `PromptSheet` (и праймер разрешения), `NotificationPermissionPrompt`, `OnboardingPager`, `OnboardingPage`, `LoopOnboardingHero` | HIG Presentation, M3 Containment (sheets) |
+| **Effects** | `GradientOrbsBackground`, `SiriGlow`, `SiriWave`, `.accentGlow`, `.borderBeam` / `.borderGlow` | — (своё: Liquid Glass, Siri) |
 
 Правило для нового компонента: раздел выбирается по тому, **что компонент делает**
 (действие, ввод, выбор, показ данных, статус, навигация), а если это строка или карточка — по

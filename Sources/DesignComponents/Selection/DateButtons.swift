@@ -1,5 +1,5 @@
 //
-//  DateButtonsView.swift
+//  DateButtons.swift
 //  Tenra
 //
 //  Created on 2024
@@ -9,8 +9,8 @@ import SwiftUI
 import DesignTokens
 import DesignSupport
 
-// MARK: - Main DateButtonsView
-public struct DateButtonsView: View {
+// MARK: - Main DateButtons
+public struct DateButtons: View {
     @Binding var selectedDate: Date
     var isDisabled: Bool = false
     let onSave: (Date) -> Void
@@ -164,7 +164,7 @@ private struct DateButtonsDatePickerSheet: View {
 
 // MARK: - View Extension для использования через safeAreaInset
 public extension View {
-    /// Добавляет DateButtonsView через safeAreaInset, чтобы компонент поднимался вместе с клавиатурой
+    /// Добавляет DateButtons через safeAreaInset, чтобы компонент поднимался вместе с клавиатурой
     /// Используется в формах с текстовыми полями (AccountActionView, EditTransactionView, QuickAddTransactionView)
     func dateButtonsSafeArea(
         selectedDate: Binding<Date>,
@@ -202,3 +202,7 @@ private struct DateButtonsContentWrapper: View {
     }
 }
 
+// MARK: - Names before 2.0
+
+@available(*, deprecated, renamed: "DateButtons")
+public typealias DateButtonsView = DateButtons

@@ -4,7 +4,7 @@
 //
 //  Currency conversion is an app concern (rate providers, caching, network).
 //  DesignKit ships no FX — host apps inject a converter. When none is set,
-//  `ConvertedAmountView` renders nothing (the same as a failed conversion).
+//  `ConvertedAmount` renders nothing (the same as a failed conversion).
 //
 
 import Foundation

@@ -119,7 +119,7 @@ public struct MiniMilestoneGaugeSkeleton: View {
     public var body: some View {
         HStack(spacing: MiniMilestoneGauge.segmentGap) {
             ForEach(0..<segments, id: \.self) { _ in
-                SkeletonView(height: MiniMilestoneGauge.segmentHeight, cornerRadius: MiniMilestoneGauge.cornerRadius)
+                Skeleton(height: MiniMilestoneGauge.segmentHeight, cornerRadius: MiniMilestoneGauge.cornerRadius)
             }
         }
         .frame(height: height)

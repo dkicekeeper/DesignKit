@@ -1,15 +1,18 @@
 //
-//  SegmentedPickerView.swift
+//  SegmentedPicker.swift
 //  Tenra
 //
-//  Reusable segmented picker component
+//  Reusable segmented picker component.
+//  2.0.0: the system control alone. An interactive glass layer over it (before 2.0) took the
+//  touch, so a quick tap did not move the selection; iOS 26 draws the control in Liquid Glass
+//  itself.
 //
 
 import SwiftUI
 import DesignTokens
 import DesignSupport
 
-public struct SegmentedPickerView<T: Hashable>: View {
+public struct SegmentedPicker<T: Hashable>: View {
     let title: String
     @Binding var selection: T
     let options: [(label: String, value: T)]
@@ -30,8 +33,11 @@ public struct SegmentedPickerView<T: Hashable>: View {
                 Text(option.label).tag(option.value)
             }
         }
-        .pickerStyle(SegmentedPickerStyle())
-        .glassEffect(.regular.interactive())
+        .pickerStyle(.segmented)
     }
 }
 
+// MARK: - Names before 2.0
+
+@available(*, deprecated, renamed: "SegmentedPicker")
+public typealias SegmentedPickerView<T: Hashable> = SegmentedPicker<T>
