@@ -48,7 +48,7 @@ Gallery/               showcase app (xcodegen; the .xcodeproj is not in git): Fo
                        skeleton), usage notes; ships to TestFlight (docs/testflight.md)
 Gallery/SnapshotTests/ snapshot tests hosted in the Gallery app; references in __Snapshots__
 scripts/               snapshot-tests.sh (CI and local runs of the snapshot tests)
-Shaders/               Metal sources (Ripple, EdgeGlow) + build.sh; CI compiles them into the .metallib
+Shaders/               Metal sources (Ripple, EdgeGlow, Grain) + build.sh; CI compiles them into the .metallib
                        files in Sources/DesignComponents/Resources/Shaders (.github/workflows/
                        shaders.yml), so apps need no Metal Toolchain (docs/motion.md §6)
 Tests/                 swift-testing unit tests (formatting, ExpressionEvaluator, calculator

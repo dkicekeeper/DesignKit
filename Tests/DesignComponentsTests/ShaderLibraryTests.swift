@@ -47,4 +47,10 @@ struct ShaderLibraryTests {
         )
         try await shader.compile(as: .colorEffect)
     }
+
+    @Test("Grain compiles as a colour effect")
+    func grainCompiles() async throws {
+        let library = try #require(DesignKitShaders.library)
+        try await library.Grain(.float(GrainMetrics.amount)).compile(as: .colorEffect)
+    }
 }

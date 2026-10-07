@@ -7,6 +7,9 @@
 //  look. Ported from Tenra's CategoryGradientBackground; the mapping from its top expense
 //  categories to colours stays in Tenra as an adapter.
 //
+//  Deprecated in 2.5.0: `AuroraBackground(_ spots:)` draws the same weighted pools of colour
+//  as one still mesh, with no blur, no screen blend and no offscreen pass.
+//
 
 import SwiftUI
 import DesignTokens
@@ -43,6 +46,7 @@ private enum OrbStyle {
 /// behind the heavy blur, yet forced a per-frame blur + `.screen` blend + `drawingGroup`
 /// re-rasterisation of a full-screen background. Rendered statically, the whole background
 /// composites once. Never embed inside `List` / `ForEach`.
+@available(*, deprecated, message: "Use AuroraBackground(_ spots:), the same weighted pools of colour as a still mesh with no blur: lighter under Liquid Glass. Orb(color:weight:) becomes AuroraBackground.Spot(color:weight:).")
 public struct GradientOrbsBackground: View {
     /// One orb.
     public struct Orb: Equatable {

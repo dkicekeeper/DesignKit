@@ -4,7 +4,8 @@
 //
 //  Effects: celebrations, sparkles, shine, attention pulse, the aurora, touch tilt (2.2.0);
 //  the completion moment and the Metal ripple (2.3.0); the voice wave, the edge glow and the
-//  thinking shimmer (2.4.0); background orbs, accent glows, the border beam.
+//  thinking shimmer (2.4.0); weighted aurora spots, the aurora accent glow and grain (2.5.0);
+//  background orbs (deprecated), the border beam.
 //
 
 import SwiftUI
@@ -26,6 +27,7 @@ struct EffectsScreen: View {
             EdgeGlowPage()
             ThinkingShimmerPage()
             GradientOrbsBackgroundPage()
+            GrainPage()
             AccentGlowPage()
             BorderBeamPage()
         }
@@ -139,27 +141,48 @@ private struct AttentionPulsePage: View {
 private struct AuroraBackgroundPage: View {
     @State private var intensity = 1.0
     @State private var palette = 0
+    @State private var mode = 0
+    @State private var count = 3
+    @State private var shuffle = 0
+    @State private var grain = true
+
+    private static let categoryColors: [Color] = [.orange, .blue, .pink, .green, .purple]
+
+    /// Weights for the spots; "Change the data" deals new ones, as a filter or a new month would.
+    private var spots: [AuroraBackground.Spot] {
+        let weights: [[Double]] = [[1, 0.6, 0.4, 0.25, 0.15], [1, 0.85, 0.2, 0.5, 0.3], [1, 0.3, 0.7, 0.15, 0.45]]
+        let set = weights[shuffle % weights.count]
+        return (0..<count).map { .init(color: Self.categoryColors[($0 + shuffle) % Self.categoryColors.count], weight: set[$0]) }
+    }
 
     var body: some View {
         ComponentPage(
             name: "AuroraBackground",
-            summary: "A slowly drifting mesh-gradient aurora behind a premium screen, a paywall, an onboarding.",
+            summary: "A slowly drifting mesh-gradient aurora behind a premium screen, a paywall, an onboarding; or, still, weighted pools of colour behind a home screen.",
             since: "2.2.0",
+            apps: [.tenra],
             canvas: .bleed,
             notes: [
                 "MeshGradient in one GPU pass, no blur, 30 fps only while AmbientMotionGate allows; otherwise one still frame.",
-                "By default the accent and its neighbours on the colour wheel (Dalada's is green).",
+                "Weighted spots (2.5.0): AuroraBackground([.init(color:weight:)]): each colour a soft pool sized and brightened by its weight, sampled into a 5×5 mesh. Replaces GradientOrbsBackground (deprecated): no blur, no screen blend, no offscreen pass.",
+                "Still by default with spots: under Liquid Glass a moving background makes every glass surface redraw each frame. A change of data flows into the new shape in 0.6 s.",
+                "A fine still grain (2.5.0) keeps the gradient from banding on a dark screen; grain: 0 turns it off.",
             ]
         ) {
             ZStack {
-                AuroraBackground(
-                    colors: palette == 0 ? nil : [.teal, .indigo, .purple, .pink, .blue],
-                    intensity: intensity
-                )
+                if mode == 0 {
+                    AuroraBackground(
+                        colors: palette == 0 ? nil : [.teal, .indigo, .purple, .pink, .blue],
+                        intensity: intensity,
+                        grain: grain ? GrainMetrics.amount : 0
+                    )
+                } else {
+                    AuroraBackground(spots, intensity: intensity, grain: grain ? GrainMetrics.amount : 0)
+                }
                 VStack(spacing: AppSpacing.sm) {
-                    Text("Tenra Pro")
+                    Text(mode == 0 ? "Tenra Pro" : "1 250 000 ₸")
                         .font(AppTypography.h2)
-                    Text("Every insight, every account")
+                    Text(mode == 0 ? "Every insight, every account" : "Spent this month")
                         .font(AppTypography.body)
                         .foregroundStyle(AppColors.Text.secondary)
                 }
@@ -168,8 +191,15 @@ private struct AuroraBackgroundPage: View {
             }
             .frame(height: 280)
         } controls: {
-            ChoiceControl("Colours", selection: $palette, options: [("Accent", 0), ("Custom", 1)])
+            ChoiceControl("Mode", selection: $mode, options: [("Drifting palette", 0), ("Weighted spots", 1)])
+            if mode == 0 {
+                ChoiceControl("Colours", selection: $palette, options: [("Accent", 0), ("Custom", 1)])
+            } else {
+                StepperControl("Spots", value: $count, in: 1...5)
+                ActionControl("Change the data", systemImage: "shuffle") { shuffle += 1 }
+            }
             SliderControl("Intensity", value: $intensity, in: 0.2...1, step: 0.1) { "\(Int($0 * 100))%" }
+            ToggleControl("Grain", isOn: $grain)
         }
     }
 }
@@ -321,47 +351,99 @@ private struct ThinkingShimmerPage: View {
     }
 }
 
+/// Deprecated in 2.5.0: shown next to its replacement.
 private struct GradientOrbsBackgroundPage: View {
     @State private var count = 3
 
-    private let orbs: [GradientOrbsBackground.Orb] = [
-        .init(color: AppColors.accent, weight: 0.5),
-        .init(color: AppColors.success, weight: 0.3),
-        .init(color: AppColors.warning, weight: 0.2),
-        .init(color: .purple, weight: 0.15),
+    private let orbs: [(Color, Double)] = [
+        (AppColors.accent, 0.5),
+        (AppColors.success, 0.3),
+        (AppColors.warning, 0.2),
+        (.purple, 0.15),
     ]
 
     var body: some View {
         ComponentPage(
             name: "GradientOrbsBackground",
-            summary: "Soft drifting colour orbs behind a hero, each sized by its weight.",
+            summary: "Deprecated in 2.5.0: AuroraBackground(_ spots:) draws the same weighted pools of colour as one still mesh, with no blur. Top: the orbs; bottom: the aurora.",
             since: "1.5.0",
             apps: [.tenra],
             canvas: .bleed
         ) {
-            GradientOrbsBackground(Array(orbs.prefix(count)))
-                .frame(height: 240)
+            VStack(spacing: 0) {
+                legacyOrbs
+                    .frame(height: 180)
+                AuroraBackground(Array(orbs.prefix(count)).map { .init(color: $0.0, weight: $0.1) })
+                    .frame(height: 180)
+            }
         } controls: {
             StepperControl("Orbs", value: $count, in: 1...4)
+        }
+    }
+
+    @available(*, deprecated)
+    private var legacyOrbs: some View {
+        GradientOrbsBackground(Array(orbs.prefix(count)).map { .init(color: $0.0, weight: $0.1) })
+    }
+}
+
+/// A fine still grain (2.5.0).
+private struct GrainPage: View {
+    @State private var amount = GrainMetrics.amount
+
+    var body: some View {
+        ComponentPage(
+            name: ".grain",
+            summary: "A fine, still grain over a surface: it breaks the banding a smooth gradient shows on a dark screen and gives a background a printed texture.",
+            since: "2.5.0",
+            canvas: .bleed,
+            notes: [
+                "One Metal colour effect, the same on every frame. AuroraBackground and the aurora accentGlow carry it.",
+                "0.04 is felt more than seen; raise it to see what it does.",
+            ]
+        ) {
+            HStack(spacing: 0) {
+                LinearGradient(colors: [Color(white: 0.05), AppColors.accent.opacity(0.6)], startPoint: .top, endPoint: .bottom)
+                LinearGradient(colors: [Color(white: 0.05), AppColors.accent.opacity(0.6)], startPoint: .top, endPoint: .bottom)
+                    .grain(amount)
+            }
+            .frame(height: 220)
+        } controls: {
+            SliderControl("Amount", value: $amount, in: 0...0.2, step: 0.01) { $0.formatted(.number.precision(.fractionLength(2))) }
         }
     }
 }
 
 private struct AccentGlowPage: View {
     @State private var edge = 0
+    @State private var style: AccentGlowStyle = .aurora
+    @State private var drifts = false
+    @State private var tint = 0
 
     var body: some View {
         ComponentPage(
             name: ".accentGlow",
             summary: "A wash of colour from one edge: onboarding backgrounds, a hero's light.",
             apps: [.tenra],
-            canvas: .bleed
+            canvas: .bleed,
+            notes: [
+                "style: .aurora (2.5.0, the default): a band of mesh-gradient light in the tint and its neighbours, fading inwards, with a fine grain. No blur, so lighter than .soft, the blurred circle of before.",
+                "drifts: the light moves slowly (onboardingAccentGlow does). Off for heroAccentGlow: under Liquid Glass a still background keeps the glass from redrawing.",
+            ]
         ) {
             Color.clear
-                .frame(height: 220)
-                .accentGlow(AppColors.accent, edge: edge == 0 ? .top : .bottom)
+                .frame(height: 260)
+                .accentGlow(
+                    [AppColors.accent, AppColors.success, .orange][tint],
+                    edge: edge == 0 ? .top : .bottom,
+                    style: style,
+                    drifts: drifts
+                )
         } controls: {
+            ChoiceControl("Style", selection: $style, options: [("Aurora", .aurora), ("Soft", .soft)])
             ChoiceControl("Edge", selection: $edge, options: [("Top", 0), ("Bottom", 1)])
+            ChoiceControl("Tint", selection: $tint, options: [("Accent", 0), ("Green", 1), ("Orange", 2)])
+            ToggleControl("Drifts", isOn: $drifts)
         }
     }
 }
