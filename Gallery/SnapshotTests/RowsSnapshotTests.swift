@@ -127,5 +127,39 @@ extension ComponentSnapshots {
                 named: "labelOnly"
             )
         }
+
+        /// The action at the end of the line (1.14.0), in each style.
+        @Test func sectionHeaderTrailing() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    SectionHeaderView("Recent trips", systemImage: "map") {
+                        Button("All") {}
+                    }
+                    SectionHeaderView("Waiting to send", style: .compact) {
+                        Button("Send now") {}
+                    }
+                    SectionHeaderView("Insights", systemImage: "sparkles", style: .large) {
+                        Button("All") {}
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        @Test func sliderRow() async {
+            await assertComponentSnapshot(
+                VStack(spacing: 0) {
+                    SliderRow("Colour intensity", systemImage: "circle.lefthalf.filled",
+                              value: .constant(0.6), in: 0.05...1, valueText: "60%")
+                    Divider()
+                    SliderRow("Radius", value: .constant(500), in: 100...2_000, step: 100, valueText: "500 m",
+                              hint: "Trips hide their track inside this circle")
+                }
+                .padding(.horizontal, AppSpacing.lg)
+                .formCardStyle(),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
     }
 }

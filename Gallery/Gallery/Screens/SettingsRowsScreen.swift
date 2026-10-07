@@ -19,6 +19,7 @@ struct SettingsRowsScreen: View {
             ToggleSettingsRowPage()
             ActionSettingsRowPage()
             MenuPickerRowPage()
+            SliderRowPage()
             DatePickerRowPage()
             ColorPickerRowPage()
             CheckmarkRowPage()
@@ -226,6 +227,46 @@ private struct MenuPickerRowPage: View {
             }
         } controls: {
             StateControl(state: $state)
+        }
+    }
+}
+
+private struct SliderRowPage: View {
+    @State private var value = 0.6
+    @State private var showsIcon = true
+    @State private var showsHint = false
+    @State private var stepped = false
+    @State private var state: SpecimenState = .content
+
+    var body: some View {
+        ComponentPage(
+            name: "SliderRow",
+            summary: "A setting set with a slider: the title, the current value on the right, the slider, an optional hint.",
+            since: "1.14.0",
+            apps: [.tenra],
+            canvas: .fill,
+            notes: ["The app formats the value (per cent, metres, minutes) and passes it as valueText."]
+        ) {
+            InFormCard {
+                if state == .loading {
+                    SliderRowSkeleton(showsHint: showsHint)
+                } else {
+                    SliderRow(
+                        "Colour intensity",
+                        systemImage: showsIcon ? "circle.lefthalf.filled" : nil,
+                        value: $value,
+                        in: 0.05...1,
+                        step: stepped ? 0.05 : nil,
+                        valueText: "\(Int((value * 100).rounded()))%",
+                        hint: showsHint ? "How strongly the home background shows through the cards." : nil
+                    )
+                }
+            }
+        } controls: {
+            StateControl(state: $state)
+            ToggleControl("Icon", isOn: $showsIcon)
+            ToggleControl("Hint", isOn: $showsHint)
+            ToggleControl("Steps of 5%", isOn: $stepped)
         }
     }
 }
