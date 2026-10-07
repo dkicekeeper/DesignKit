@@ -109,5 +109,12 @@ extension ComponentSnapshots {
                 .frame(height: 440)
             )
         }
+
+        @Test func importProgressSheet() async {
+            await assertComponentSnapshot(
+                ImportProgressSheet(currentRow: 100, totalRows: 250, progress: 0.4) {},
+                appearances: [.light, .dark, .largeText]
+            )
+        }
     }
 }

@@ -166,5 +166,44 @@ extension ComponentSnapshots {
                 .frame(maxWidth: .infinity, alignment: .leading)
             )
         }
+
+        /// One row of glass buttons per snapshot.
+        @Test func dateButtons() async {
+            await assertComponentSnapshot(
+                DateButtonsView(selectedDate: .constant(Date()), onSave: { _ in }),
+                named: "enabled",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                DateButtonsView(selectedDate: .constant(Date()), isDisabled: true, onSave: { _ in }),
+                named: "disabled"
+            )
+        }
+
+        @Test func animatedTitleInput() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.xl) {
+                    AnimatedTitleInput(text: .constant(""), placeholder: "Account name")
+                    AnimatedTitleInput(text: .constant("Kaspi Gold"), placeholder: "Account name")
+                    AnimatedTitleInput(text: .constant("Savings"), placeholder: "Name",
+                                       font: AppTypography.h3, alignment: .leading)
+                }
+                .frame(maxWidth: .infinity),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// ConvertedAmountView uses the Gallery's fixed demo rates (GalleryApp): 100 USD = 48 000 ₸.
+        @Test func amountShareAndConversion() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    AmountPercentageView(amount: 42_000, currency: "KZT", percentage: 42)
+                    ConvertedAmountView(amount: 100, fromCurrency: "USD", toCurrency: "KZT",
+                                        fontSize: AppTypography.bodySmall, color: AppColors.textSecondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .largeText]
+            )
+        }
     }
 }

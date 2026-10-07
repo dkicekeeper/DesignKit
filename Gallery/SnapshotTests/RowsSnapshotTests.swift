@@ -105,5 +105,27 @@ extension ComponentSnapshots {
                 .frame(maxWidth: .infinity, alignment: .leading)
             )
         }
+
+        @Test func colorPickerRow() async {
+            await assertComponentSnapshot(
+                ColorPickerRow(selectedColorHex: .constant(CategoryColors.pickerPalette[2]), title: "Color")
+                    .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// One header per snapshot: each is a glass card. The label is the app's own (Tenra passes
+        /// "Today", "Yesterday" or the formatted date).
+        @Test func dateSectionHeaders() async {
+            await assertComponentSnapshot(
+                DateSectionHeaderView(dateKey: "Yesterday", amount: 45_000, currency: "KZT"),
+                named: "withTotal",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                DateSectionHeaderView(dateKey: "30 September"),
+                named: "labelOnly"
+            )
+        }
     }
 }

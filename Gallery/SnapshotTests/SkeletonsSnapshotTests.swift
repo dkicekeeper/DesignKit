@@ -231,5 +231,16 @@ extension ComponentSnapshots {
                 appearances: [.light]
             )
         }
+
+        @Test func trendChartSkeletons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    LineChartSkeleton()
+                    HeroSparklineSkeleton()
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark]
+            )
+        }
     }
 }

@@ -78,14 +78,14 @@ private struct DateSectionHeaderViewPage: View {
     var body: some View {
         ComponentPage(
             name: "DateSectionHeaderView",
-            summary: "A day's header in a transaction list: Today, Yesterday or the date, with the day's total.",
+            summary: "A day's header in a transaction list: the label the app gives (Today, Yesterday, the date) and the day's expenses.",
             apps: [.tenra],
             canvas: .fill
         ) {
             if state == .loading {
                 DateSectionHeaderViewSkeleton()
             } else {
-                DateSectionHeaderView(dateKey: "2026-09-30", amount: showsAmount ? 45_000 : nil,
+                DateSectionHeaderView(dateKey: "Yesterday", amount: showsAmount ? 45_000 : nil,
                                       currency: showsAmount ? "KZT" : nil)
             }
         } controls: {
