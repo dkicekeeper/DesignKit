@@ -237,6 +237,10 @@ motion, transitions and effects are in [motion.md](motion.md):
 `MotionBudget` holds the timing budgets (feedback 0.25 s, entrance 0.35 s, stagger 0.04 s ≤ 0.3 s);
 `.designKitMotion(false)` stills DesignKit's motion below a view.
 
+**2.6.0** adds surfaces and moments: `.holographic()` (a foil that follows the finger),
+`.transition(.dissolve)` (a delete that breaks into dust), `ScrambleText` (a result that decodes
+itself) and `.spotlight` (a coach mark round one view). All in [motion.md](motion.md).
+
 **2.5.0** holds backgrounds still: `AuroraBackground(_ spots:)` (weighted pools of colour in
 one still mesh; replaces `GradientOrbsBackground`), `.accentGlow` drawn as an aurora band by
 default (`style: .soft` keeps the blurred circle), and `.grain()`. Why still: under Liquid

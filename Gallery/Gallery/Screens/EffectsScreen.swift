@@ -5,7 +5,7 @@
 //  Effects: celebrations, sparkles, shine, attention pulse, the aurora, touch tilt (2.2.0);
 //  the completion moment and the Metal ripple (2.3.0); the voice wave, the edge glow and the
 //  thinking shimmer (2.4.0); weighted aurora spots, the aurora accent glow and grain (2.5.0);
-//  background orbs (deprecated), the border beam.
+//  holographic foil and dissolve (2.6.0); background orbs (deprecated), the border beam.
 //
 
 import SwiftUI
@@ -23,6 +23,8 @@ struct EffectsScreen: View {
             AttentionPulsePage()
             AuroraBackgroundPage()
             InteractiveTiltPage()
+            HolographicPage()
+            DissolvePage()
             VoiceWavePage()
             EdgeGlowPage()
             ThinkingShimmerPage()
@@ -561,6 +563,93 @@ private struct RipplePage: View {
         } controls: {
             ChoiceControl("From", selection: $origin, options: [("Centre", 0), ("Top leading", 1), ("Bottom trailing", 2)])
             ActionControl("Ripple the card", systemImage: "drop") { ripples += 1 }
+        }
+    }
+}
+
+/// A holographic foil that follows the finger (2.6.0, Metal).
+private struct HolographicPage: View {
+    @State private var strength = HolographicMetrics.strength
+    @State private var tilts = true
+
+    var body: some View {
+        ComponentPage(
+            name: ".holographic",
+            summary: "A holographic foil: rainbow bands slide across the surface as your finger moves over it, with a sheen where the light falls. Drag over the medal and the card.",
+            since: "2.6.0",
+            apps: [.dalada],
+            notes: [
+                "Pairs with .interactiveTilt(in:), which tilts the same surface towards the finger.",
+                "One Metal colour effect, redrawn only while the finger moves or the light settles back.",
+            ]
+        ) {
+            HStack(spacing: AppSpacing.xl) {
+                medal
+                card
+            }
+            .frame(maxWidth: .infinity)
+        } controls: {
+            SliderControl("Strength", value: $strength, in: 0...1, step: 0.05) { "\(Int($0 * 100))%" }
+            ToggleControl("With interactiveTilt", isOn: $tilts)
+        }
+    }
+
+    @ViewBuilder
+    private var medal: some View {
+        let foil = AchievementMedal(systemImage: "mountain.2.fill", color: .orange, isEarned: true, size: 120)
+            .holographic(strength: strength)
+        if tilts { foil.interactiveTilt(in: Circle()) } else { foil }
+    }
+
+    @ViewBuilder
+    private var card: some View {
+        let foil = VStack(alignment: .leading, spacing: AppSpacing.xs) {
+            Text("Tenra Pro").font(AppTypography.bodyEmphasis)
+            Text("Member since 2026").font(AppTypography.caption).foregroundStyle(AppColors.Text.secondary)
+        }
+        .frame(width: 150, height: 96, alignment: .bottomLeading)
+        .padding(AppSpacing.md)
+        .background(LinearGradient(colors: [Color(white: 0.85), Color(white: 0.65)], startPoint: .topLeading, endPoint: .bottomTrailing), in: .rect(cornerRadius: AppRadius.lg))
+        .holographic(strength: strength)
+        if tilts { foil.interactiveTilt(in: RoundedRectangle(cornerRadius: AppRadius.lg)) } else { foil }
+    }
+}
+
+/// A view breaking into dust as it is removed (2.6.0, Metal).
+private struct DissolvePage: View {
+    @State private var items = ["Coffee · 1 200 ₸", "Taxi · 2 400 ₸", "Groceries · 8 900 ₸"]
+    @State private var removed = 0
+
+    var body: some View {
+        ComponentPage(
+            name: ".dissolve",
+            summary: "A view breaks into dust as it is removed: the edge of what remains glows and loose grains drift up. Inserted, the dust gathers. Keep it for deleting something the person owned.",
+            since: "2.6.0",
+            notes: [
+                "Remove with .transition(.dissolve) and an animation of about 0.6 s: withAnimation(.easeIn(duration: 0.6)) { … }.",
+                "One Metal layer effect, only while the transition plays; a fade under Reduce Motion.",
+            ]
+        ) {
+            VStack(spacing: AppSpacing.sm) {
+                ForEach(items, id: \.self) { item in
+                    Text(item)
+                        .font(AppTypography.body)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(AppSpacing.lg)
+                        .cardStyle()
+                        .transition(.dissolve)
+                }
+            }
+            .frame(minHeight: 200, alignment: .top)
+        } controls: {
+            ActionControl("Delete the first", systemImage: "trash") {
+                guard !items.isEmpty else { return }
+                withAnimation(.easeIn(duration: 0.6)) { _ = items.removeFirst() }
+            }
+            ActionControl("Add one back", systemImage: "plus") {
+                removed += 1
+                withAnimation(.easeOut(duration: 0.6)) { items.append("Lunch \(removed) · 3 500 ₸") }
+            }
         }
     }
 }

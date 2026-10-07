@@ -21,6 +21,7 @@ struct FeedbackScreen: View {
             MessageBannerPage()
             InlineStatusTextPage()
             TooltipPage()
+            SpotlightPage()
             TypingIndicatorPage()
             EmptyStatePage()
             StepTrackerPage()
@@ -372,3 +373,52 @@ private struct SkeletonPrimitivesPage: View {
 }
 
 #Preview { NavigationStack { FeedbackScreen() } }
+
+/// A coach mark: the screen dims except one view (2.6.0).
+private struct SpotlightPage: View {
+    private enum Step: Int, CaseIterable {
+        case balance, add, insights
+
+        var message: String {
+            switch self {
+            case .balance: "Your balance across every account."
+            case .add: "Add an expense or an income here."
+            case .insights: "See where the money went."
+            }
+        }
+    }
+
+    @State private var step: Step?
+
+    var body: some View {
+        ComponentPage(
+            name: ".spotlight",
+            summary: "A coach mark: everything dims except a cut-out round one view, with a message beside it. For a new feature or the steps of a tour on the real screen.",
+            since: "2.6.0",
+            canvas: .tall(minHeight: 340),
+            notes: [
+                "Mark views with .spotlightAnchor(id); put .spotlight($current, message:) on the screen. Another id moves the cut-out there on a spring; nil lifts it.",
+                "A tap anywhere calls onTap (the next step), or lifts it. VoiceOver reads the message; the escape gesture dismisses it.",
+            ]
+        ) {
+            VStack(spacing: AppSpacing.md) {
+                BalanceCard(iconSource: .sfSymbol("creditcard.fill"), title: "Kaspi Gold", amount: 1_250_000, currency: "KZT")
+                    .spotlightAnchor(Step.balance)
+                HStack(spacing: AppSpacing.md) {
+                    DSButton("Add", systemImage: "plus") {}
+                        .spotlightAnchor(Step.add)
+                    DSButton("Insights", systemImage: "chart.pie", appearance: .secondary) {}
+                        .spotlightAnchor(Step.insights)
+                }
+            }
+            .padding(AppSpacing.md)
+            .spotlight($step, message: { $0.message }) {
+                step = step.flatMap { Step(rawValue: $0.rawValue + 1) }
+            }
+        } controls: {
+            ActionControl(step == nil ? "Start the tour" : "End the tour", systemImage: "lightbulb") {
+                step = step == nil ? .balance : nil
+            }
+        }
+    }
+}
