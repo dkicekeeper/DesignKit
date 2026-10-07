@@ -2,7 +2,7 @@
 //  CurrencyEquivalentTests.swift
 //  DesignKit
 //
-//  The "≈" line of CurrencyAmountInput (1.12.0): which currency it shows (without
+//  The "≈" line of CurrencyAmountInput (1.14.0): which currency it shows (without
 //  `equivalentCurrency` the base currency, as before; with it the rule of Tenra's saved
 //  rows), that the latest input wins over a slower, older conversion, and that no rate
 //  clears the line instead of leaving the previous number on it.
@@ -34,7 +34,7 @@ struct CurrencyEquivalentTests {
 
     // MARK: - Which currency
 
-    @Test("Without equivalentCurrency the line shows the base currency, as before 1.12.0")
+    @Test("Without equivalentCurrency the line shows the base currency, as before 1.14.0")
     func defaultIsBaseCurrency() {
         #expect(target("USD", equivalent: nil) == "KZT")
         #expect(target("KZT", equivalent: nil) == nil)

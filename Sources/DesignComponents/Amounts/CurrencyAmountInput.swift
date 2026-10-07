@@ -50,9 +50,9 @@ public struct CurrencyAmountInput: View {
 
     /// - Parameters:
     ///   - equivalentCurrency: The currency of the "≈" line, such as the currency of the account
-    ///     the amount goes to (1.12.0). An amount already in it shows its `baseCurrency` value
+    ///     the amount goes to (1.14.0). An amount already in it shows its `baseCurrency` value
     ///     instead, and no line when it is in `baseCurrency` too. `nil` (the default) is
-    ///     `baseCurrency`: the line shows the base-currency value, as before 1.12.0.
+    ///     `baseCurrency`: the line shows the base-currency value, as before 1.14.0.
     ///   - currencies: What the currency chip offers (`CurrencyPickerMenu`).
     ///   - calculatorModel: When set, the amount is entered with the in-app calculator keypad:
     ///     the large display reads the model (the host owns it, places the keypad and mirrors

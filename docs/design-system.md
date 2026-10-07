@@ -52,7 +52,7 @@ DesignKit ships no networking, persistence or FX. A host app wires these once, i
 | `DesignKitFonts.registerIfNeeded()` | — | Call once; registers the bundled Inter variable fonts. |
 | `DesignKitLogoLoader.loader` | `nil` → fallback icon | Brand-logo images for `IconSource.brandService` (`IconView`, `heroAccentGlow`). |
 | `DesignKitCurrencyConverter.convert` | `nil` → nothing rendered | FX for `ConvertedAmountView` / `HeroSection(showBaseConversion:)` / `CurrencyAmountInput`. |
-| `DesignKitCurrencyConverter.convertSync` *(1.10.0)* | `nil` → `convert` is asked | Instant conversion from cached rates, so `CurrencyAmountInput` shows "≈ …" while the user types, and at once when the currencies change (1.12.0). |
+| `DesignKitCurrencyConverter.convertSync` *(1.10.0)* | `nil` → `convert` is asked | Instant conversion from cached rates, so `CurrencyAmountInput` shows "≈ …" while the user types, and at once when the currencies change (1.14.0). |
 | `DesignKitLogoCatalog.sections` / `.search` / `.domainSuffixes` *(1.10.0)* | no sections → no logos tab; `["com"]` | The brands `IconPicker` offers (titled sections of domain + name), its search, and the domains tried for a typed name (Tenra: `["com", "kz"]`). |
 | Localization keys | raw key shown | Components resolve `String(localized:)` in the **host app's** main bundle. The full key list is in [localization-keys.md](localization-keys.md). |
 
@@ -733,11 +733,11 @@ The amount at the top of an add sheet: the 56 pt `AmountInput` (or `CalculatorAm
 
 ```swift
 CurrencyAmountInput(amount: $amountText, currency: $currency, baseCurrency: "KZT",
-                    equivalentCurrency: account.currency,   // optional (1.12.0)
+                    equivalentCurrency: account.currency,   // optional (1.14.0)
                     currencies: ["KZT", "USD", "EUR"], errorMessage: error)
 ```
 
-The "≈" line (1.12.0):
+The "≈" line (1.14.0):
 - **Its currency.** `equivalentCurrency`, such as the currency of the account the amount goes to; `baseCurrency` when the amount is already in it; no line when the amount is in both. Without `equivalentCurrency` (the default) the line is in `baseCurrency`, as before. With the account's currency this is the rule of Tenra's saved transaction rows: USD typed for a EUR card shows "≈ €" (before, "≈ ₸" while typing and "≈ €" once saved), EUR typed for it "≈ ₸".
 - **Converting.** Through `DesignKitCurrencyConverter` (`convertSync`, then `convert`). Typing waits for a 0.3 s pause and keeps the previous value until the new one comes, so the number changes in place. A new line or new currencies convert at once: with `convertSync` the value shows in the same frame, otherwise a spinner until a rate comes; a value for the previous currencies is never shown. One conversion runs at a time and the latest input wins: a slower, older conversion that comes back later is dropped (before, it could overwrite the newer value).
 - **No rate.** The line disappears, rather than keep the previous, now wrong number (before, it kept it, and spun forever without a converter).
