@@ -129,6 +129,8 @@ public struct ChecklistSummaryRow: View {
                 if isComplete {
                     Image(systemName: "checkmark.seal.fill")
                         .foregroundStyle(AppColors.success)
+                        // 2.2.0: the seal draws itself on when the list is complete.
+                        .drawOnAppear()
                         .accessibilityLabel(Text(verbatim: completeLabel
                             ?? String(localized: "checklist.complete", defaultValue: "Complete")))
                 }

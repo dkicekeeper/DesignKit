@@ -135,6 +135,9 @@ enum ComponentRenderer {
             .environment(\.locale, Locale(identifier: "en_US"))
             // Skeletons stand still: the shimmer moves on a clock, so no two frames match.
             .skeletonShimmer(false)
+            // DesignKit's motion (symbol draw-ons, cues, loops, bursts) stands still too: each
+            // component is drawn in its final state (2.2.0).
+            .designKitMotion(false)
             .dynamicTypeSize(appearance.dynamicTypeSize)
             .transaction { transaction in
                 transaction.disablesAnimations = true

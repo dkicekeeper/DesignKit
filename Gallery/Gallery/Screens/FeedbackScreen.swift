@@ -21,6 +21,7 @@ struct FeedbackScreen: View {
             MessageBannerPage()
             InlineStatusTextPage()
             TooltipPage()
+            TypingIndicatorPage()
             EmptyStatePage()
             StepTrackerPage()
             ImportProgressSheetPage()
@@ -233,6 +234,38 @@ private struct TooltipPage: View {
             }
         } else {
             Tooltip(text, arrowEdge: below ? .top : .bottom)
+        }
+    }
+}
+
+private struct TypingIndicatorPage: View {
+    @State private var isTyping = true
+    @State private var tint = 0
+
+    var body: some View {
+        ComponentPage(
+            name: "TypingIndicator",
+            summary: "Three dots rising in a wave in a bubble: a reply is on its way, an assistant is thinking.",
+            since: "2.2.0",
+            apps: [.dalada],
+            canvas: .tall(minHeight: 120),
+            notes: [
+                "Insert it with .transition(.popIn) under the last message.",
+                "30 fps from the time, only while AmbientMotionGate allows; otherwise the dots stand still. VoiceOver: “Typing”.",
+            ]
+        ) {
+            ZStack {
+                if isTyping {
+                    TypingIndicator(tint: tint == 0 ? AppColors.Text.secondary : AppColors.accent)
+                        .transition(.popIn)
+                }
+            }
+            .frame(maxWidth: .infinity, minHeight: 60, alignment: .leading)
+        } controls: {
+            ActionControl(isTyping ? "Reply arrived" : "Start typing") {
+                withAnimation(AppAnimation.bouncy) { isTyping.toggle() }
+            }
+            ChoiceControl("Dots", selection: $tint, options: [("Secondary", 0), ("Accent", 1)])
         }
     }
 }

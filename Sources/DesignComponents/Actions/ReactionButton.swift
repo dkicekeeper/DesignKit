@@ -34,6 +34,9 @@ public struct ReactionButton: View {
     let accessibilityLabel: String
     let action: (() -> Void)?
 
+    /// Counts the times the reaction was added: each one bursts sparkles (2.2.0).
+    @State private var additions = 0
+
     /// - Parameters:
     ///   - title: Replaces the bare count next to the symbol ("Helpful · 3"); the count alone
     ///     shows only when it is above zero.
@@ -71,6 +74,11 @@ public struct ReactionButton: View {
                         }
                     } icon: {
                         Image(systemName: isSelected ? selectedSystemImage : systemImage)
+                            // 2.2.0: the fill grows in, the symbol bounces and sparkles
+                            // burst around it when the reaction is added.
+                            .symbolMagicReplace()
+                            .symbolEffect(.bounce, value: isSelected)
+                            .sparkleBurst(trigger: additions, tint: AppColors.accent)
                     }
                     .foregroundStyle(isSelected ? AppColors.accent : AppColors.Text.secondary)
                     .frame(minWidth: 44, minHeight: 44, alignment: .leading)
@@ -90,5 +98,9 @@ public struct ReactionButton: View {
             }
         }
         .font(AppTypography.bodySmall)
+        .animation(AppAnimation.snappy, value: isSelected)
+        .onChange(of: isSelected) { _, selected in
+            if selected { additions += 1 }
+        }
     }
 }

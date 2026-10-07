@@ -1144,6 +1144,17 @@
           }
         }
       }
+    },
+    "typing.indicator" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Typing"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
