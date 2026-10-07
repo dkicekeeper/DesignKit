@@ -20,6 +20,14 @@ static float roundedRectDistance(float2 p, float2 b, float r) {
     return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
 }
 
+/// Distance to the nearest edge as a smooth minimum of the four: no creases along the
+/// diagonals, as the exact distance has, so a wide light stays soft. Below 0 near a corner.
+static float softEdgeDistance(float2 position, float2 size, float k) {
+    float4 d = max(float4(position.x, size.x - position.x, position.y, size.y - position.y), 0.0);
+    float4 e = exp(-d / k);
+    return -k * log(e.x + e.y + e.z + e.w);
+}
+
 /// The palette around the rim: `x` in 0…1 goes once round, the last colour blending back
 /// into the first.
 static half3 rimColor(float x, device const half4 *colors, int count) {
@@ -46,9 +54,6 @@ half4 EdgeGlow(
     float2 center = size * 0.5;
     float2 p = position - center;
 
-    // How far inside the edge this pixel is.
-    float depth = max(-roundedRectDistance(p, center, min(cornerRadius, min(center.x, center.y))), 0.0);
-
     // Where on the rim it is, 0…1 clockwise; corrected for the aspect so a tall screen
     // spreads its colours evenly.
     float around = atan2(p.y * (size.x / max(size.y, 1.0)), p.x) / (2.0 * M_PI_F) + 0.5;
@@ -59,11 +64,14 @@ half4 EdgeGlow(
         + 0.30 * sin(angle * 3.0 + time * 1.1)
         + 0.20 * sin(angle * 5.0 - time * 0.7)
         + 0.15 * sin(angle * 2.0 + time * 1.7);
-    float width = max(thickness * wobble * (1.0 + level * 1.8), 1.0);
+    float width = max(thickness * wobble * (1.0 + level * 1.2), 1.0);
 
-    // A soft bloom and a hot rim.
-    float bloom = exp(-depth / width);
-    float rim = exp(-depth / max(width * 0.18, 0.5));
+    // A soft bloom that falls off fast inside, so the middle stays dark even on a small surface,
+    // and a hot rim along the exact rounded edge.
+    float soft = max(softEdgeDistance(position, size, width * 0.6), 0.0);
+    float bloom = exp(-pow(soft / width, 1.3));
+    float edgeDepth = max(-roundedRectDistance(p, center, min(cornerRadius, min(center.x, center.y))), 0.0);
+    float rim = exp(-edgeDepth / max(width * 0.18, 0.5));
     float intensity = clamp(bloom * (0.55 + 0.45 * level) + rim * 0.6, 0.0, 1.0);
 
     half3 rgb = rimColor(around + flow, colors, max(count, 1));
