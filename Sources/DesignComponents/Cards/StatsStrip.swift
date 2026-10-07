@@ -51,13 +51,13 @@ public struct StatsStrip: View {
                 VStack(spacing: AppSpacing.xxs) {
                     Text(verbatim: item.value)
                         .font(AppTypography.h4)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
                         .monospacedDigit()
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
                     Text(verbatim: item.title)
                         .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
                 }

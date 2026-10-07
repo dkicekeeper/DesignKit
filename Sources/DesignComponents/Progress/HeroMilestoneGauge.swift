@@ -74,7 +74,7 @@ public struct HeroMilestoneGauge: View {
             ZStack(alignment: .leading) {
                 // Muted base row.
                 segmentRow(segmentWidth: segmentWidth) { _ in
-                    AnyShapeStyle(AppColors.textSecondary.opacity(0.18))
+                    AnyShapeStyle(AppColors.Text.secondary.opacity(0.18))
                 }
 
                 // Filled run — glass + glow, revealed as a left-to-right wave.
@@ -168,7 +168,7 @@ public struct HeroMilestoneGauge: View {
         let boundary = min(max(target, 0), maxValue)
         let x = CGFloat(boundary) * (segmentWidth + Self.segmentGap) - Self.segmentGap / 2
         return Capsule()
-            .fill(AppColors.textSecondary.opacity(0.7))
+            .fill(AppColors.Text.secondary.opacity(0.7))
             .frame(width: 3, height: segmentHeight + Self.tickOvershoot * 2)
             .offset(x: x - 1.5)
     }

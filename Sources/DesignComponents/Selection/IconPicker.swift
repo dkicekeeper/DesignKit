@@ -149,11 +149,11 @@ private struct IconPickerSymbolsTab: View {
                         source: .sfSymbol(symbol),
                         style: .circle(
                             size: AppIconSize.Tile.md,
-                            tint: .monochrome(isSelected ? AppColors.staticWhite : AppColors.textPrimary)
+                            tint: .monochrome(isSelected ? AppColors.staticWhite : AppColors.Text.primary)
                         )
                     )
                     .frame(width: AppIconSize.Tile.xl, height: AppIconSize.Tile.xl)
-                    .background(isSelected ? AppColors.accent : AppColors.bgCard)
+                    .background(isSelected ? AppColors.accent : AppColors.Background.neutral1)
                     .clipShape(.rect(cornerRadius: AppRadius.lg))
                 }
                 .buttonStyle(.plain)
@@ -216,7 +216,7 @@ private struct IconPickerLogosTab: View {
                     Button { pick(entry.domain) } label: {
                         IconView(source: .brandService(entry.domain), size: AppIconSize.Tile.md)
                             .frame(width: AppIconSize.Tile.xl, height: AppIconSize.Tile.xl)
-                            .background(isSelected ? AppColors.pale(AppColors.accent) : AppColors.bgCard)
+                            .background(isSelected ? AppColors.pale(AppColors.accent) : AppColors.Background.neutral1)
                             .clipShape(.rect(cornerRadius: AppRadius.lg))
                             .overlay(
                                 RoundedRectangle(cornerRadius: AppRadius.lg)
@@ -247,7 +247,7 @@ private struct IconPickerLogosTab: View {
                     }
                 } header: {
                     Text(String(localized: "iconPicker.suggestions", defaultValue: "Suggestions"))
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
                 }
             }
 
@@ -257,11 +257,11 @@ private struct IconPickerLogosTab: View {
                 }
             } header: {
                 Text(String(localized: "iconPicker.onlineSearch", defaultValue: "Online"))
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
             } footer: {
                 Text(String(localized: "iconPicker.brandDomainHint", defaultValue: "Enter brand domain (e.g. netflix.com)"))
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
         }
     }
@@ -274,7 +274,7 @@ private struct IconPickerLogosTab: View {
 
                 Text(verbatim: label)
                     .font(AppTypography.body)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
 
                 Spacer()
 

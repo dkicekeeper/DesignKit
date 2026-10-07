@@ -116,7 +116,7 @@ Modifiers:
 
 **`AppColors.Border`** — `normal` (`.separator`), `opaque` (`.opaqueSeparator`), `selected` (accent), `darkModeOnly` (clear in light, white 10% in dark: a hairline around logos, avatars and images that would melt into black), `onDark` (white 10%), `onLight` (black 5%).
 
-**Flat names (1.x)** stay as aliases of the groups, with the same values: `bgBase` = `Background.base`, `bgCard` = `Background.neutral1`, `bgMuted` = `Background.neutral2`, `textPrimary` / `textSecondary` / `textTertiary` = `Text.*`, `destructive` = `Status.negative`, `success` = `Status.positive`, `warning` = `Status.warning`, `staticWhite` = `Text.primaryOnDark`, `planned` = `Status.info`. New code uses the groups; the components move over in later releases, where a move changes nothing visible or is called out.
+**Flat names (1.x)** stay as aliases of the groups, with the same values: `bgBase` = `Background.base`, `bgCard` = `Background.neutral1`, `bgMuted` = `Background.neutral2`, `textPrimary` / `textSecondary` / `textTertiary` = `Text.*`, `destructive` = `Status.negative`, `success` = `Status.positive`, `warning` = `Status.warning`, `staticWhite` = `Text.primaryOnDark`, `planned` = `Status.info`. New code uses the groups. Since 1.15.0 every component reads `Background.*` and `Text.*`; `accent`, `destructive`, `success`, `warning` and `staticWhite` stay as they are, they name a role rather than a level.
 
 | Token | Value | Use For |
 |-------|-------|---------|
@@ -788,6 +788,19 @@ ToggleSettingsRow(icon: "location", title: "Share location", hint: "Friends see 
 
 VoiceOver focuses the switch (title as label, `hint` as hint).
 
+#### `SliderRow` *(1.15.0)*
+A setting set with a slider: the title (body, with an optional symbol), the value on the trailing
+edge (bodySmall, secondary, tabular digits), the slider in the accent, an optional hint (caption).
+The app formats the value. Pads only vertically, like a row; put it in a form card.
+
+```swift
+SliderRow("Colour intensity", systemImage: "circle.lefthalf.filled",
+          value: $opacity, in: 0.05...1, valueText: "\(Int((opacity * 100).rounded()))%")
+```
+
+VoiceOver reads the slider with the title as its label and `valueText` as its value. Skeleton:
+`SliderRowSkeleton(showsHint:)`. Tenra's background-intensity row is its adapter.
+
 #### `SelectionIndicator(isSelected:tint:)`
 Check circle for multi-select and checklist rows; the row carries the label and the
 `.isSelected` trait. `tint` (0.4.0, default accent) colours the filled check: `AppColors.success`
@@ -884,13 +897,14 @@ if let accounts {
 | `LimitProgressCard`, `TargetProgressCard`, `PayoffProgressCard`, `ScoreCard`, `ScoreGaugeCard`, `MetricCard`, `WeightBreakdownCard`, `CalculationCard`, `ProgressRingTile`, `ProgressRingTileGrid` | `…Skeleton` (`MetricCardSkeleton(chartPlacement:)`, `WeightBreakdownCardSkeleton(segments:)`, `CalculationCardSkeleton(rows:showsHero:)`) |
 | `UniversalRow` | `UniversalRowSkeleton(config:iconStyle:titleFont:showsSubtitle:trailing:)` |
 | `NavigationSettingsRow`, `ToggleSettingsRow`, `ActionSettingsRow`, `MenuPickerRow`, `DatePickerRow`, `CheckmarkRow` | `UniversalRowSkeleton.navigationSettings`, `.toggleSettings`, `.actionSettings`, `.menuPicker`, `.datePicker`, `.checkmark(iconStyle:)` |
+| `SliderRow` (1.15.0) | `SliderRowSkeleton(showsHint:)` |
 | `BalanceRow`, `ProgressRingRow`, `BreakdownRow`, `InsightEntityRow`, `NetAmountRow`, `ScheduleRow`, `InfoRow`, `ColorPickerRow` | `…Skeleton` |
 | `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `OrbChart` | `…Skeleton` |
 | `LinearProgressBar`, `ProportionBar`, `MiniProportionBar`, `AmountComparisonBar`, `HeroProportionBar`, `ProgressRing`, `MiniDonut`, `MiniHalfGauge`, `HeroHalfGauge`, `MiniMilestoneGauge`, `HeroMilestoneGauge`, `MiniBarPair`, `HeroBarPair` | `…Skeleton`, with the component's size parameters |
 | `IconView` | `IconViewSkeleton(style:)` / `IconViewSkeleton(size:)` |
 | `AvatarView`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIconsView`, `BadgeView`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `RatingView`, `ChipPicker` | `…Skeleton` |
 | `FormattedAmountText`, `FormattedAmountView`, `ConvertedAmountView`, `SpentBudgetText`, `AmountPercentageView` | `FormattedAmountTextSkeleton(font:width:)`; `RedactableAmount(isLoading: true)` draws one itself |
-| `HeroSection`, `SectionHeaderView`, `SettingsSectionHeaderView`, `DateSectionHeaderView` | `HeroSectionSkeleton`, `SectionHeaderViewSkeleton(style:)` (`.compact` for the settings header), `DateSectionHeaderViewSkeleton` |
+| `HeroSection`, `SectionHeaderView`, `SettingsSectionHeaderView`, `DateSectionHeaderView` | `HeroSectionSkeleton`, `SectionHeaderViewSkeleton(style:showsTrailing:)` (`.compact` for the settings header), `DateSectionHeaderViewSkeleton` |
 | `ExpandableText`, `ActivityTimeline`, `MonthCalendar` | `…Skeleton` |
 | `PersonRow`, `CommentRow`, `ThreadCard`, `ReviewCard`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.12.0) | `…Skeleton` (`StatsStripSkeleton(count:)`, `AchievementTileSkeleton(medalSize:)`, `ThumbnailCardSkeleton(width:)`, `PersonRowSkeleton(showsSubtitle:)`) |
 
@@ -1059,20 +1073,30 @@ HStack {
 ```
 
 #### `SectionHeaderView`
-Section header text with four styles.
+Section header text with three styles, and an optional action at the end of the line (1.15.0).
 
 ```swift
-SectionHeaderView("Transactions", style: .default)       // bodyEmphasis
-SectionHeaderView("March 10", style: .emphasized)         // bodySmall semibold
-SectionHeaderView("SETTINGS", style: .compact)            // caption uppercase
-SectionHeaderView("Spending", systemImage: "chart.bar", style: .insights) // h3 + icon
+SectionHeaderView("Transactions")                                      // .default: bodyEmphasis
+SectionHeaderView("Settings", style: .compact)                         // bodySmall, secondary, uppercase, screen padding
+SectionHeaderView("Spending", systemImage: "chart.bar", style: .large) // h3 + accent icon, screen padding
+
+SectionHeaderView("Trips", systemImage: "map") {                       // with an action
+    NavigationLink("All") { TripsList() }
+}
 ```
 
+The icon shows in `.large` only. The action is any view (a `NavigationLink` "All", a button, a
+spinner); it takes `AppTypography.bodySmall` and sits at the end of the line, inside the style's
+padding. Title and action share an `HStack` with the system spacing and a `Spacer(minLength: 0)`,
+the layout Dalada built by hand before. Skeleton: `SectionHeaderViewSkeleton(style:showsTrailing:)`.
+
 #### `DateSectionHeaderView`
-Transaction list date group header with optional daily total.
+Transaction list date group header with optional daily total. The label is the app's own
+(Tenra passes "Today", "Yesterday" or the formatted date); the total shows when it is above zero,
+with a minus.
 
 ```swift
-DateSectionHeaderView(dateKey: "2026-03-10", amount: 45000.0, currency: "KZT")
+DateSectionHeaderView(dateKey: "Yesterday", amount: 45000.0, currency: "KZT")
 ```
 
 #### `ProgressRing`

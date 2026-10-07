@@ -50,12 +50,12 @@ public struct PersonRow<Avatar: View, Trailing: View>: View {
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
                 Text(verbatim: name)
                     .font(AppTypography.bodyEmphasis)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                     .lineLimit(1)
                 if let subtitle {
                     Text(verbatim: subtitle)
                         .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                 }
             }
             Spacer(minLength: 0)

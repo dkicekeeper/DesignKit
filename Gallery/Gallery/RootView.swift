@@ -52,7 +52,7 @@ struct RootView: View {
                     Text("Input & Actions")
                 }
                 Section {
-                    row("Rows: Settings & Forms", "list.bullet.rectangle.fill", .gray, count: 10) { SettingsRowsScreen() }
+                    row("Rows: Settings & Forms", "list.bullet.rectangle.fill", .gray, count: 11) { SettingsRowsScreen() }
                     row("Rows: Data", "list.bullet", .cyan, count: 11) { DataRowsScreen() }
                     row("Cards: Money", "creditcard.fill", .green, count: 9) { MoneyCardsScreen() }
                     row("Cards: Progress & Stats", "chart.bar.doc.horizontal.fill", .orange, count: 12) { ProgressCardsScreen() }

@@ -150,7 +150,7 @@ private struct PackedCircleIcon: View {
             return .circle(
                 size: diameter,
                 tint: tint,
-                backgroundColor: AppColors.bgCard,
+                backgroundColor: AppColors.Background.neutral1,
                 padding: sfSymbolPadding
             )
         case .brandService, .none:

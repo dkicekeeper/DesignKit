@@ -152,7 +152,7 @@ public struct Sparkline: View {
                     zeroPath.addLine(to: CGPoint(x: inset + plotWidth, y: zeroY))
                     context.stroke(
                         zeroPath,
-                        with: .color(AppColors.textSecondary.opacity(0.35)),
+                        with: .color(AppColors.Text.secondary.opacity(0.35)),
                         style: StrokeStyle(lineWidth: 1, dash: [2, 3])
                     )
                 }

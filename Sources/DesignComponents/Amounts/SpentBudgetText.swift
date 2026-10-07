@@ -19,10 +19,10 @@ public struct SpentBudgetText: View {
     let currency: String
     var font: Font = AppTypography.bodySmall
     var fontWeight: Font.Weight = .regular
-    var amountColor: Color = AppColors.textSecondary
-    var separatorColor: Color = AppColors.textSecondary
+    var amountColor: Color = AppColors.Text.secondary
+    var separatorColor: Color = AppColors.Text.secondary
 
-    public init(spent: Double, budget: Double, currency: String, font: Font = AppTypography.bodySmall, fontWeight: Font.Weight = .regular, amountColor: Color = AppColors.textSecondary, separatorColor: Color = AppColors.textSecondary) {
+    public init(spent: Double, budget: Double, currency: String, font: Font = AppTypography.bodySmall, fontWeight: Font.Weight = .regular, amountColor: Color = AppColors.Text.secondary, separatorColor: Color = AppColors.Text.secondary) {
         self.spent = spent
         self.budget = budget
         self.currency = currency

@@ -231,5 +231,28 @@ extension ComponentSnapshots {
                 appearances: [.light]
             )
         }
+
+        @Test func trendChartSkeletons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    LineChartSkeleton()
+                    HeroSparklineSkeleton()
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark]
+            )
+        }
+
+        @Test func headerAndSliderSkeletons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    SectionHeaderViewSkeleton(showsTrailing: true)
+                    SectionHeaderViewSkeleton(style: .large, showsTrailing: true)
+                    SliderRowSkeleton(showsHint: true)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark]
+            )
+        }
     }
 }

@@ -76,11 +76,11 @@ public struct LimitProgressCard: View {
                 )
                 Text(title)
                     .font(AppTypography.bodyEmphasis)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                 Spacer()
                 Text(String(format: "%.0f%%", percentage))
                     .font(AppTypography.body)
-                    .foregroundStyle(isOverLimit ? AppColors.destructive : AppColors.textPrimary)
+                    .foregroundStyle(isOverLimit ? AppColors.destructive : AppColors.Text.primary)
             }
 
             LinearProgressBar(
@@ -95,13 +95,13 @@ public struct LimitProgressCard: View {
                     budget: limit,
                     currency: currency,
                     font: AppTypography.caption,
-                    separatorColor: AppColors.textTertiary
+                    separatorColor: AppColors.Text.tertiary
                 )
                 Spacer()
                 if let caption {
                     Text(caption)
                         .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.textTertiary)
+                        .foregroundStyle(AppColors.Text.tertiary)
                 }
             }
         }

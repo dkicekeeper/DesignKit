@@ -60,7 +60,7 @@ public struct FormSection<Content: View>: View {
             if let footer = footer {
                 Text(footer)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .padding(.horizontal, AppSpacing.lg)
                     .padding(.top, AppSpacing.xs)
             }

@@ -113,12 +113,12 @@ public struct MetricCard<ChartContent: View>: View {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 Text(title)
                     .font(AppTypography.body)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .lineLimit(1)
 
                 Text(subtitle)
                     .font(AppTypography.bodyEmphasis)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                     .lineLimit(3)
 
                 metricRow
@@ -175,19 +175,19 @@ public struct MetricCard<ChartContent: View>: View {
                     currency: currency,
                     fontSize: AppTypography.h2,
                     fontWeight: .bold,
-                    color: AppColors.textPrimary
+                    color: AppColors.Text.primary
                 )
             case .text(let text):
                 Text(text)
                     .font(AppTypography.h2)
                     .fontWeight(.bold)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
             }
 
             if let unit {
                 Text(unit)
                     .font(AppTypography.bodyEmphasis)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
         }
         .lineLimit(1)

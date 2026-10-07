@@ -118,7 +118,7 @@ public struct FormTextField: View {
                 if let help = helpText, errorMessage == nil {
                     Text(help)
                         .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                         .transition(.opacity)
                 }
             }
@@ -192,7 +192,7 @@ public struct FormTextField: View {
             .keyboardType(keyboardType)
             .focused(focusBinding)
             .font(AppTypography.body)
-            .foregroundStyle(AppColors.textPrimary)
+            .foregroundStyle(AppColors.Text.primary)
             .multilineTextAlignment(.trailing)
     }
 
@@ -203,7 +203,7 @@ public struct FormTextField: View {
             .lineLimit(min...max)
             .focused(focusBinding)
             .font(AppTypography.body)
-            .foregroundStyle(AppColors.textPrimary)
+            .foregroundStyle(AppColors.Text.primary)
             .multilineTextAlignment(.trailing)
     }
 
@@ -211,13 +211,13 @@ public struct FormTextField: View {
 
     private var backgroundForState: Color {
         if isDisabled {
-            return AppColors.bgCard.opacity(0.3)
+            return AppColors.Background.neutral1.opacity(0.3)
         } else if errorMessage != nil {
             return AppColors.destructive.opacity(0.05)
         } else if isFieldFocused {
             return AppColors.accent.opacity(0.04)
         } else {
-            return AppColors.bgCard.opacity(0.5)
+            return AppColors.Background.neutral1.opacity(0.5)
         }
     }
 

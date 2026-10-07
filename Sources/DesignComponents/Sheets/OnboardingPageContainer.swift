@@ -54,7 +54,7 @@ public struct OnboardingPageContainer<Content: View>: View {
                             Image(systemName: "xmark")
                         }
                         .accessibilityLabel(String(localized: "onboarding.cta.skip"))
-                        .tint(AppColors.textSecondary)
+                        .tint(AppColors.Text.secondary)
                     }
                 }
             }
@@ -72,12 +72,12 @@ public struct OnboardingPageContainer<Content: View>: View {
             VStack(alignment: .center, spacing: AppSpacing.sm) {
                 Text(title)
                     .font(AppTypography.h3)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                     .multilineTextAlignment(.center)
                 if let subtitle {
                     Text(subtitle)
                         .font(AppTypography.body)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                         .multilineTextAlignment(.center)
                 }
             }
@@ -100,7 +100,7 @@ public struct OnboardingPageContainer<Content: View>: View {
             // collide with the scroll content above. Material alone (без opaque
             // overlay) пропускает свечение снизу.
             Rectangle()
-                .fill(AppColors.bgBase)
+                .fill(AppColors.Background.base)
                 .mask(
                     LinearGradient(
                         stops: [

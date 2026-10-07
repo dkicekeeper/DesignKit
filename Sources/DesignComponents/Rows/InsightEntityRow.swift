@@ -21,7 +21,7 @@ public struct InsightEntityRow<Subtitle: View>: View {
     let title: String
     let amount: Double
     let currency: String
-    var amountColor: Color = AppColors.textPrimary
+    var amountColor: Color = AppColors.Text.primary
     var amountCaption: String? = nil
     @ViewBuilder let subtitle: () -> Subtitle
 
@@ -32,7 +32,7 @@ public struct InsightEntityRow<Subtitle: View>: View {
         title: String,
         amount: Double,
         currency: String,
-        amountColor: Color = AppColors.textPrimary,
+        amountColor: Color = AppColors.Text.primary,
         amountCaption: String? = nil,
         @ViewBuilder subtitle: @escaping () -> Subtitle
     ) {
@@ -56,7 +56,7 @@ public struct InsightEntityRow<Subtitle: View>: View {
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text(title)
                         .font(AppTypography.body)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
                     subtitle()
                     amountStack(alignment: .leading)
                 }
@@ -71,7 +71,7 @@ public struct InsightEntityRow<Subtitle: View>: View {
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text(title)
                         .font(AppTypography.body)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
                     subtitle()
                 }
             } trailing: {
@@ -92,7 +92,7 @@ public struct InsightEntityRow<Subtitle: View>: View {
             if let amountCaption {
                 Text(amountCaption)
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
         }
     }
@@ -107,7 +107,7 @@ public extension InsightEntityRow where Subtitle == Text {
         subtitle: String,
         amount: Double,
         currency: String,
-        amountColor: Color = AppColors.textPrimary,
+        amountColor: Color = AppColors.Text.primary,
         amountCaption: String? = nil
     ) {
         self.init(
@@ -120,7 +120,7 @@ public extension InsightEntityRow where Subtitle == Text {
         ) {
             Text(subtitle)
                 .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
         }
     }
 }

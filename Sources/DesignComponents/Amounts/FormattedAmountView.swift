@@ -18,7 +18,7 @@ public struct FormattedAmountView: View {
     let prefix: String
     let color: Color
 
-    public init(amount: Double, currency: String, prefix: String = "", color: Color = AppColors.textPrimary) {
+    public init(amount: Double, currency: String, prefix: String = "", color: Color = AppColors.Text.primary) {
         self.amount = amount
         self.currency = currency
         self.prefix = prefix

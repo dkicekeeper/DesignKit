@@ -40,7 +40,7 @@ public struct NetAmountRow: View {
         net: Double,
         currency: String,
         singleValue: Double? = nil,
-        singleColor: Color = AppColors.textPrimary
+        singleColor: Color = AppColors.Text.primary
     ) {
         self.label = label
         self.inflow = inflow
@@ -57,7 +57,7 @@ public struct NetAmountRow: View {
                 HStack(alignment: .firstTextBaseline) {
                     Text(label)
                         .font(AppTypography.body)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
 
                     Spacer()
 
@@ -75,7 +75,7 @@ public struct NetAmountRow: View {
                             currency: currency,
                             fontSize: AppTypography.body,
                             fontWeight: .semibold,
-                            color: net >= 0 ? AppColors.textPrimary : AppColors.destructive
+                            color: net >= 0 ? AppColors.Text.primary : AppColors.destructive
                         )
                     }
                 }

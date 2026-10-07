@@ -30,7 +30,7 @@ public struct TrendBadge: View {
             switch self {
             case .up: return AppColors.income
             case .down: return AppColors.destructive
-            case .flat: return AppColors.textSecondary
+            case .flat: return AppColors.Text.secondary
             }
         }
 

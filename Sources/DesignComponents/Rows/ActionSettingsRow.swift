@@ -49,7 +49,7 @@ public struct ActionSettingsRow: View {
     }
 
     private var resolvedTitleColor: Color {
-        titleColor ?? (isDestructive ? AppColors.destructive : AppColors.textPrimary)
+        titleColor ?? (isDestructive ? AppColors.destructive : AppColors.Text.primary)
     }
 
     // MARK: - Body

@@ -80,19 +80,19 @@ public struct WeightBreakdownCard: View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
             Text(title)
                 .font(AppTypography.bodyEmphasis)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
 
             if let message {
                 Text(message)
                     .font(AppTypography.body)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
             if let caption {
                 Text(caption)
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textTertiary)
+                    .foregroundStyle(AppColors.Text.tertiary)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
@@ -109,7 +109,7 @@ public struct WeightBreakdownCard: View {
             if let footnote {
                 Text(footnote)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textTertiary)
+                    .foregroundStyle(AppColors.Text.tertiary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -138,13 +138,13 @@ public struct WeightBreakdownCard: View {
 
             Text(segment.title)
                 .font(AppTypography.body)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
 
             Spacer()
 
             Text(segment.weightLabel)
                 .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
         }
     }
 }

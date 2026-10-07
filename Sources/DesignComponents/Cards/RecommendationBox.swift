@@ -31,7 +31,7 @@ public struct RecommendationBox: View {
 
             Text(text)
                 .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(AppSpacing.md)

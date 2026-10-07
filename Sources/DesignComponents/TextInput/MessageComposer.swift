@@ -115,7 +115,7 @@ public struct MessageComposer: View {
                         .lineLimit(1...5)
                         .focused(focusBinding)
                         .font(AppTypography.body)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
                         .frame(minHeight: MessageComposerMetrics.buttonSize)
 
                     sendButton
@@ -141,7 +141,7 @@ public struct MessageComposer: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(isSendEnabled || isSending ? AppColors.accent : AppColors.bgMuted)
+                    .fill(isSendEnabled || isSending ? AppColors.accent : AppColors.Background.neutral2)
                 if isSending {
                     ProgressView()
                         .controlSize(.small)
@@ -149,7 +149,7 @@ public struct MessageComposer: View {
                 } else {
                     Image(systemName: "arrow.up")
                         .font(.system(size: AppIconSize.sm, weight: .bold))
-                        .foregroundStyle(isSendEnabled ? AppColors.staticWhite : AppColors.textTertiary)
+                        .foregroundStyle(isSendEnabled ? AppColors.staticWhite : AppColors.Text.tertiary)
                 }
             }
             .frame(width: MessageComposerMetrics.buttonSize, height: MessageComposerMetrics.buttonSize)
@@ -172,7 +172,7 @@ public struct MessageComposer: View {
                     .lineLimit(1)
                 Text(verbatim: quote.text)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .lineLimit(1)
             }
 
@@ -185,7 +185,7 @@ public struct MessageComposer: View {
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: AppIconSize.md))
-                        .foregroundStyle(AppColors.textTertiary)
+                        .foregroundStyle(AppColors.Text.tertiary)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(String(localized: "composer.cancelQuote", defaultValue: "Remove quote"))

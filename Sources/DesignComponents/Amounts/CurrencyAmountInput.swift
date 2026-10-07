@@ -93,7 +93,7 @@ public struct CurrencyAmountInput: View {
                 AmountInput(
                     amount: $amount,
                     baseFontSize: 56,
-                    color: errorMessage != nil ? AppColors.destructive : AppColors.textPrimary,
+                    color: errorMessage != nil ? AppColors.destructive : AppColors.Text.primary,
                     autoFocus: true,
                     showContextMenu: true,
                     onAmountChange: onAmountChange
@@ -130,20 +130,20 @@ public struct CurrencyAmountInput: View {
             HStack(spacing: AppSpacing.xs) {
                 Text(String(localized: "currency.conversion.approximate", defaultValue: "≈"))
                     .font(AppTypography.h4)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
 
                 if let converted = display.convertedValue {
                     Text(Self.groupedDigits(converted.amount))
                         .font(AppTypography.h4)
                         .fontWeight(.medium)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                         .contentTransition(.numericText())
                         .animation(AppAnimation.gentleSpring, value: converted.amount)
 
                     Text(verbatim: Formatting.currencySymbol(for: converted.currency))
                         .font(AppTypography.h4)
                         .fontWeight(.medium)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                         .contentTransition(.numericText())
                 } else {
                     ProgressView()

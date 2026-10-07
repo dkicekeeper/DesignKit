@@ -29,10 +29,10 @@ public struct AmountPercentageView: View {
 
     public var body: some View {
         VStack(alignment: .trailing, spacing: AppSpacing.xs) {
-            FormattedAmountText(amount: amount, currency: currency, color: AppColors.textPrimary)
+            FormattedAmountText(amount: amount, currency: currency, color: AppColors.Text.primary)
             Text(String(format: "%.1f%%", percentage))
                 .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
         }
     }
 }
@@ -106,17 +106,17 @@ public struct BreakdownRow: View {
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(title)
                     .font(AppTypography.body)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                 if let subtitle {
                     Text(subtitle)
                         .font(AppTypography.bodySmall)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                         .lineLimit(1)
                 }
-                FormattedAmountText(amount: amount, currency: currency, color: AppColors.textPrimary)
+                FormattedAmountText(amount: amount, currency: currency, color: AppColors.Text.primary)
                 Text(String(format: "%.1f%%", percentage))
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
         } trailing: {
             if showsChevron {
@@ -132,11 +132,11 @@ public struct BreakdownRow: View {
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(title)
                     .font(AppTypography.body)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                 if let subtitle {
                     Text(subtitle)
                         .font(AppTypography.bodySmall)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                         .lineLimit(1)
                 }
             }

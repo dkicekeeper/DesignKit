@@ -22,7 +22,7 @@ public struct InsightsStatCard<Trend: View>: View {
     let amount: Double
     let currency: String
     /// Value color (e.g. green income, red expenses, contextual net flow).
-    var color: Color = AppColors.textPrimary
+    var color: Color = AppColors.Text.primary
     /// Optional previous-bucket value for the delta badge. `nil` hides the badge.
     var previous: Double? = nil
     /// Whether an increase is good (income, net flow) or bad (expenses) — colours the delta.
@@ -33,7 +33,7 @@ public struct InsightsStatCard<Trend: View>: View {
         title: String,
         amount: Double,
         currency: String,
-        color: Color = AppColors.textPrimary,
+        color: Color = AppColors.Text.primary,
         previous: Double? = nil,
         upIsGood: Bool = true,
         @ViewBuilder trend: @escaping () -> Trend
@@ -51,7 +51,7 @@ public struct InsightsStatCard<Trend: View>: View {
         VStack(alignment: .leading, spacing: AppSpacing.xs) {
             Text(title)
                 .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
                 .lineLimit(1)
 
             FormattedAmountText(
@@ -102,7 +102,7 @@ public extension InsightsStatCard where Trend == EmptyView {
         title: String,
         amount: Double,
         currency: String,
-        color: Color = AppColors.textPrimary,
+        color: Color = AppColors.Text.primary,
         previous: Double? = nil,
         upIsGood: Bool = true
     ) {

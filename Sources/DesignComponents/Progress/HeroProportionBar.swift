@@ -121,20 +121,20 @@ public struct HeroProportionBar: View {
 
             Text(segment.label)
                 .font(selectedID == segment.id ? AppTypography.bodyEmphasis : AppTypography.body)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
                 .lineLimit(1)
 
             Spacer(minLength: AppSpacing.sm)
 
             Text("\(Int(segment.percentage.rounded()))%")
                 .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
 
             Text(amountsHidden
                  ? Formatting.hiddenAmount(currency: currency)
                  : Formatting.formatCurrencySmart(segment.amount, currency: currency))
                 .font(AppTypography.numbers(AppTypography.bodyEmphasis))
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
         }
         .opacity(opacity(for: segment.id))
         .contentShape(Rectangle())

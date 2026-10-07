@@ -45,7 +45,7 @@ public struct NavigationSettingsRow<Destination: View>: View {
         ) {
             Text(title)
                 .font(AppTypography.body)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
         } trailing: {
             EmptyView() // NavigationLink автоматически добавит chevron
         }

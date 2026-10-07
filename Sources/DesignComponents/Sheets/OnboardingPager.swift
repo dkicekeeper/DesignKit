@@ -123,12 +123,12 @@ public struct OnboardingPage<Accessory: View>: View {
                 VStack(spacing: AppSpacing.sm) {
                     Text(verbatim: title)
                         .font(AppTypography.h3)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
                         .multilineTextAlignment(.center)
                         .accessibilityAddTraits(.isHeader)
                     Text(verbatim: message)
                         .font(AppTypography.body)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                         .multilineTextAlignment(.center)
                 }
                 accessory()

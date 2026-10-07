@@ -82,7 +82,7 @@ public struct PayoffProgressCard<Accessory: View>: View {
                     if let subtitle {
                         Text(subtitle)
                             .font(AppTypography.bodySmall)
-                            .foregroundStyle(AppColors.textSecondary)
+                            .foregroundStyle(AppColors.Text.secondary)
                     }
                 }
 
@@ -99,7 +99,7 @@ public struct PayoffProgressCard<Accessory: View>: View {
                         currency: currency,
                         fontSize: AppTypography.body,
                         fontWeight: .regular,
-                        color: AppColors.textSecondary
+                        color: AppColors.Text.secondary
                     )
                     Spacer()
                     FormattedAmountText(
@@ -107,7 +107,7 @@ public struct PayoffProgressCard<Accessory: View>: View {
                         currency: currency,
                         fontSize: AppTypography.body,
                         fontWeight: .regular,
-                        color: AppColors.textSecondary
+                        color: AppColors.Text.secondary
                     )
                 }
                 ProgressView(value: progress)
@@ -125,7 +125,7 @@ public struct PayoffProgressCard<Accessory: View>: View {
                             .foregroundStyle(AppColors.income)
                         Text(caption)
                             .font(AppTypography.bodySmall)
-                            .foregroundStyle(AppColors.textSecondary)
+                            .foregroundStyle(AppColors.Text.secondary)
                     }
                     Spacer()
                 case .inProgress(let nextDate, let remainingCaption):
@@ -133,10 +133,10 @@ public struct PayoffProgressCard<Accessory: View>: View {
                         HStack(spacing: AppSpacing.xs) {
                             Image(systemName: "calendar")
                                 .font(AppTypography.bodySmall)
-                                .foregroundStyle(AppColors.textSecondary)
+                                .foregroundStyle(AppColors.Text.secondary)
                             Text(nextDate)
                                 .font(AppTypography.bodySmall)
-                                .foregroundStyle(AppColors.textSecondary)
+                                .foregroundStyle(AppColors.Text.secondary)
                         }
                     }
 
@@ -145,7 +145,7 @@ public struct PayoffProgressCard<Accessory: View>: View {
                     if let remainingCaption {
                         Text(remainingCaption)
                             .font(AppTypography.bodySmall)
-                            .foregroundStyle(AppColors.textSecondary)
+                            .foregroundStyle(AppColors.Text.secondary)
                     }
                 }
             }

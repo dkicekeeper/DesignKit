@@ -52,25 +52,25 @@ public struct StreakCard: View {
         HStack(spacing: AppSpacing.md) {
             Image(systemName: systemImage)
                 .font(.system(size: AppIconSize.lg))
-                .foregroundStyle(isActive ? AppColors.accent : AppColors.textTertiary)
+                .foregroundStyle(isActive ? AppColors.accent : AppColors.Text.tertiary)
                 .frame(width: AppIconSize.Tile.xs)
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
                 Text(verbatim: title)
                     .font(AppTypography.bodyEmphasis)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                 Text(verbatim: subtitle)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
             Spacer(minLength: 0)
             VStack(alignment: .trailing, spacing: AppSpacing.xxs) {
                 Text(verbatim: value)
                     .font(AppTypography.bodyEmphasis)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                     .monospacedDigit()
                 Text(verbatim: valueCaption)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
         }
         .cardContentPadding()

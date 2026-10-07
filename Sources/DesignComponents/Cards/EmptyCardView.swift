@@ -57,7 +57,7 @@ public struct EmptyCardView: View {
         VStack(alignment: .leading, spacing: AppSpacing.lg) {
             Text(sectionTitle)
                 .font(AppTypography.h3)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
 
             EmptyStateView(
                 title: emptyTitle,

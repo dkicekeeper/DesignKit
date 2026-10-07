@@ -79,10 +79,10 @@ public struct HeroBarPair: View {
                 bar(
                     height: barHeight(previous),
                     delay: entranceDelay + 0.05,
-                    fill: AnyShapeStyle(AppColors.textSecondary.opacity(0.25))
+                    fill: AnyShapeStyle(AppColors.Text.secondary.opacity(0.25))
                 )
                 .overlay(alignment: .top) {
-                    valueAnnotation(previous, index: 0, tint: AppColors.textSecondary)
+                    valueAnnotation(previous, index: 0, tint: AppColors.Text.secondary)
                 }
                 .onTapGesture { select(0) }
 
@@ -117,7 +117,7 @@ public struct HeroBarPair: View {
 
             // Baseline hairline grounding both bars.
             RoundedRectangle(cornerRadius: 0.5)
-                .fill(AppColors.textSecondary.opacity(0.2))
+                .fill(AppColors.Text.secondary.opacity(0.2))
                 .frame(width: barWidth * 2 + AppSpacing.xxl + AppSpacing.xl * 2, height: 1)
                 .padding(.top, AppSpacing.xs)
         }

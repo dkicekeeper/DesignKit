@@ -41,12 +41,12 @@ public struct ScoreCard: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text(title)
                 .font(AppTypography.body)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
                 .lineLimit(1)
 
             Text(grade)
                 .font(AppTypography.bodyEmphasis)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
                 .lineLimit(2)
 
             HStack(alignment: .firstTextBaseline, spacing: AppSpacing.sm) {
@@ -57,7 +57,7 @@ public struct ScoreCard: View {
 
                 Text(verbatim: "/ \(maxScore)")
                     .font(AppTypography.bodyEmphasis)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
             .lineLimit(1)
         }

@@ -30,7 +30,7 @@ public struct BlinkingCursor: View {
 
     public var body: some View {
         Rectangle()
-            .fill(AppColors.textPrimary)
+            .fill(AppColors.Text.primary)
             .frame(width: 2, height: height)
             .opacity(opacity)
             .onAppear {
@@ -61,11 +61,11 @@ public struct BlinkingCursor: View {
 public struct AmountDigitDisplay: View {
     let rawAmount: String
     var baseFontSize: CGFloat = 56
-    var color: Color = AppColors.textPrimary
+    var color: Color = AppColors.Text.primary
     var isFocused: Bool = false
     var cursorHeight: CGFloat = 36
 
-    public init(rawAmount: String, baseFontSize: CGFloat = 56, color: Color = AppColors.textPrimary, isFocused: Bool = false, cursorHeight: CGFloat = 36) {
+    public init(rawAmount: String, baseFontSize: CGFloat = 56, color: Color = AppColors.Text.primary, isFocused: Bool = false, cursorHeight: CGFloat = 36) {
         self.rawAmount = rawAmount
         self.baseFontSize = baseFontSize
         self.color = color
@@ -161,12 +161,12 @@ public struct AmountDigitDisplay: View {
 /// AmountInput(amount: $amount, autoFocus: true, showContextMenu: true)
 ///
 /// // Hero section (custom size, placeholder color)
-/// AmountInput(amount: $balance, baseFontSize: 48, placeholderColor: AppColors.textTertiary)
+/// AmountInput(amount: $balance, baseFontSize: 48, placeholderColor: AppColors.Text.tertiary)
 /// ```
 public struct AmountInput: View {
     @Binding var amount: String
     var baseFontSize: CGFloat = 56
-    var color: Color = AppColors.textPrimary
+    var color: Color = AppColors.Text.primary
     /// Color when amount is empty/zero. When nil, uses `color`.
     var placeholderColor: Color? = nil
     var cursorHeight: CGFloat = 36
@@ -174,7 +174,7 @@ public struct AmountInput: View {
     var showContextMenu: Bool = false
     var onAmountChange: ((String) -> Void)? = nil
 
-    public init(amount: Binding<String>, baseFontSize: CGFloat = 56, color: Color = AppColors.textPrimary, placeholderColor: Color? = nil, cursorHeight: CGFloat = 36, autoFocus: Bool = false, showContextMenu: Bool = false, onAmountChange: ((String) -> Void)? = nil) {
+    public init(amount: Binding<String>, baseFontSize: CGFloat = 56, color: Color = AppColors.Text.primary, placeholderColor: Color? = nil, cursorHeight: CGFloat = 36, autoFocus: Bool = false, showContextMenu: Bool = false, onAmountChange: ((String) -> Void)? = nil) {
         self._amount = amount
         self.baseFontSize = baseFontSize
         self.color = color

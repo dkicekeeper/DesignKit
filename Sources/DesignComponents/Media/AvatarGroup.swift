@@ -50,17 +50,17 @@ public struct AvatarGroup: View {
         HStack(spacing: -size / 3) {
             ForEach(Array(visible.enumerated()), id: \.offset) { index, name in
                 AvatarView(name: name, size: size)
-                    .overlay(Circle().stroke(AppColors.bgBase, lineWidth: ring))
+                    .overlay(Circle().stroke(AppColors.Background.base, lineWidth: ring))
                     .zIndex(Double(visible.count - index))
             }
             if overflow > 0 {
                 Text(verbatim: "+\(overflow)")
                     .font(size > 40 ? AppTypography.bodyEmphasis : AppTypography.caption)
                     .monospacedDigit()
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .frame(width: size, height: size)
-                    .background(AppColors.bgMuted, in: Circle())
-                    .overlay(Circle().stroke(AppColors.bgBase, lineWidth: ring))
+                    .background(AppColors.Background.neutral2, in: Circle())
+                    .overlay(Circle().stroke(AppColors.Background.base, lineWidth: ring))
             }
         }
         .accessibilityElement(children: .ignore)
@@ -86,7 +86,7 @@ public struct AvatarGroupSkeleton: View {
             ForEach(0..<count, id: \.self) { index in
                 SkeletonView.circle(size)
                     // The ring that separates the avatars.
-                    .overlay(Circle().stroke(AppColors.bgBase, lineWidth: 2))
+                    .overlay(Circle().stroke(AppColors.Background.base, lineWidth: 2))
                     .zIndex(Double(count - index))
             }
         }

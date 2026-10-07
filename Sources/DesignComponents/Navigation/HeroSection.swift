@@ -23,7 +23,7 @@ public struct HeroSection<Accessory: View>: View {
     let title: String
     let primaryAmount: Double?
     let primaryCurrency: String
-    /// Colour for the primary amount; defaults to `AppColors.textSecondary`.
+    /// Colour for the primary amount; defaults to `AppColors.Text.secondary`.
     let primaryAmountColor: Color?
     /// Non-currency metric fallback (percent, count, composed strings) rendered
     /// in the amount slot's style when there is no `primaryAmount`/currency pair.
@@ -108,7 +108,7 @@ public struct HeroSection<Accessory: View>: View {
                         amount: primaryAmount,
                         currency: primaryCurrency,
                         fontSize: AppTypography.h3,
-                        color: primaryAmountColor ?? AppColors.textSecondary
+                        color: primaryAmountColor ?? AppColors.Text.secondary
                     )
 
                     if showBaseConversion, !baseCurrency.isEmpty, primaryCurrency != baseCurrency {
@@ -117,7 +117,7 @@ public struct HeroSection<Accessory: View>: View {
                             fromCurrency: primaryCurrency,
                             toCurrency: baseCurrency,
                             fontSize: AppTypography.h3,
-                            color: AppColors.textSecondary.opacity(0.7)
+                            color: AppColors.Text.secondary.opacity(0.7)
                         )
                     }
                 } else if let primaryText {
@@ -125,7 +125,7 @@ public struct HeroSection<Accessory: View>: View {
                     // same visual slot/style as the amount.
                     Text(primaryText)
                         .font(AppTypography.h3)
-                        .foregroundStyle(primaryAmountColor ?? AppColors.textSecondary)
+                        .foregroundStyle(primaryAmountColor ?? AppColors.Text.secondary)
                         .multilineTextAlignment(.center)
                 }
 
@@ -135,7 +135,7 @@ public struct HeroSection<Accessory: View>: View {
                 if let subtitle {
                     Text(subtitle)
                         .font(AppTypography.body)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                         .padding(.top, AppSpacing.xs)
                 }
 
@@ -146,7 +146,7 @@ public struct HeroSection<Accessory: View>: View {
                         Text("\(Int((progress.fraction * 100).rounded()))%")
                     }
                     .font(AppTypography.body)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .padding(.top, AppSpacing.xs)
                 }
             }

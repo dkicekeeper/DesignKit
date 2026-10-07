@@ -105,5 +105,61 @@ extension ComponentSnapshots {
                 .frame(maxWidth: .infinity, alignment: .leading)
             )
         }
+
+        @Test func colorPickerRow() async {
+            await assertComponentSnapshot(
+                ColorPickerRow(selectedColorHex: .constant(CategoryColors.pickerPalette[2]), title: "Color")
+                    .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// One header per snapshot: each is a glass card. The label is the app's own (Tenra passes
+        /// "Today", "Yesterday" or the formatted date).
+        @Test func dateSectionHeaders() async {
+            await assertComponentSnapshot(
+                DateSectionHeaderView(dateKey: "Yesterday", amount: 45_000, currency: "KZT"),
+                named: "withTotal",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                DateSectionHeaderView(dateKey: "30 September"),
+                named: "labelOnly"
+            )
+        }
+
+        /// The action at the end of the line (1.15.0), in each style.
+        @Test func sectionHeaderTrailing() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    SectionHeaderView("Recent trips", systemImage: "map") {
+                        Button("All") {}
+                    }
+                    SectionHeaderView("Waiting to send", style: .compact) {
+                        Button("Send now") {}
+                    }
+                    SectionHeaderView("Insights", systemImage: "sparkles", style: .large) {
+                        Button("All") {}
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        @Test func sliderRow() async {
+            await assertComponentSnapshot(
+                VStack(spacing: 0) {
+                    SliderRow("Colour intensity", systemImage: "circle.lefthalf.filled",
+                              value: .constant(0.6), in: 0.05...1, valueText: "60%")
+                    Divider()
+                    SliderRow("Radius", value: .constant(500), in: 100...2_000, step: 100, valueText: "500 m",
+                              hint: "Trips hide their track inside this circle")
+                }
+                .padding(.horizontal, AppSpacing.lg)
+                .formCardStyle(),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
     }
 }

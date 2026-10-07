@@ -120,7 +120,7 @@ public struct UniversalRow<Content: View, Trailing: View>: View {
             if let hint {
                 Text(hint)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.leading, hintLeadingPad)
                     .padding(.bottom, AppSpacing.xxs)
@@ -168,11 +168,11 @@ public struct IconConfig {
     /// SF Symbol with color
     /// - Parameters:
     ///   - name: SF Symbol name
-    ///   - color: Tint color (default: textPrimary)
+    ///   - color: Tint color (default: AppColors.Text.primary)
     ///   - size: Icon size (default: AppIconSize.md)
     public static func sfSymbol(
         _ name: String,
-        color: Color = AppColors.textPrimary,
+        color: Color = AppColors.Text.primary,
         size: CGFloat = AppIconSize.md
     ) -> IconConfig {
         IconConfig(
@@ -377,7 +377,7 @@ public extension UniversalRow where Content == Text, Trailing == EmptyView {
         leadingIcon: IconConfig? = nil,
         hint: String? = nil,
         title: String,
-        titleColor: Color = AppColors.textPrimary
+        titleColor: Color = AppColors.Text.primary
     ) {
         self.config = config
         self.leadingIcon = leadingIcon
@@ -393,7 +393,7 @@ public extension UniversalRow where Content == Text, Trailing == EmptyView {
 
 public extension UniversalRow where Content == Text {
     /// Initializer with a string `title` (auto-styled as `AppTypography.body` +
-    /// `AppColors.textPrimary`) and a custom `trailing` view. Removes the boilerplate
+    /// `AppColors.Text.primary`) and a custom `trailing` view. Removes the boilerplate
     /// of building the leading `Text { … }.font(…).foregroundStyle(…)` at every call
     /// site — see `LoanEditView`, `SubscriptionEditView`, etc., where the same three
     /// modifiers were duplicated on every row's content closure.
@@ -405,7 +405,7 @@ public extension UniversalRow where Content == Text {
         leadingIcon: IconConfig? = nil,
         hint: String? = nil,
         title: String,
-        titleColor: Color = AppColors.textPrimary,
+        titleColor: Color = AppColors.Text.primary,
         @ViewBuilder trailing: @escaping () -> Trailing
     ) {
         self.config = config

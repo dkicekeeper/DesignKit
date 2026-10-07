@@ -60,7 +60,7 @@ public struct CheckmarkRow: View {
 
                     Text(value)
                         .font(AppTypography.h4)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                 }
             }
         } trailing: {

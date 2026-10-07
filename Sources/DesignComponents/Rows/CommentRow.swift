@@ -67,12 +67,12 @@ public struct CommentRow<Avatar: View, Trailing: View, Actions: View>: View {
                 HStack(spacing: AppSpacing.xs) {
                     Text(verbatim: author)
                         .font(AppTypography.bodyEmphasis)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
                         .lineLimit(1)
                     Spacer(minLength: 0)
                     Text(verbatim: date.formatted(.relative(presentation: .named)))
                         .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.textTertiary)
+                        .foregroundStyle(AppColors.Text.tertiary)
                         .lineLimit(1)
                     menu
                 }
@@ -83,7 +83,7 @@ public struct CommentRow<Avatar: View, Trailing: View, Actions: View>: View {
 
                 Text(text)
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                     .textSelection(.enabled)
 
                 if Actions.self != EmptyView.self {
@@ -123,15 +123,15 @@ struct QuoteBlock: View {
     var body: some View {
         HStack(spacing: AppSpacing.sm) {
             Rectangle()
-                .fill(AppColors.textTertiary)
+                .fill(AppColors.Text.tertiary)
                 .frame(width: 3)
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
                 Text(verbatim: quote.title)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                 Text(verbatim: quote.text)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .lineLimit(3)
             }
         }

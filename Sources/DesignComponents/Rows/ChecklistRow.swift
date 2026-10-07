@@ -56,12 +56,12 @@ public struct ChecklistRow: View {
                 Text(verbatim: title)
                     .font(AppTypography.body)
                     .strikethrough(isChecked)
-                    .foregroundStyle(isChecked ? AppColors.textSecondary : AppColors.textPrimary)
+                    .foregroundStyle(isChecked ? AppColors.Text.secondary : AppColors.Text.primary)
                 Spacer(minLength: 0)
                 if let accessorySystemImage {
                     Image(systemName: accessorySystemImage)
                         .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.textTertiary)
+                        .foregroundStyle(AppColors.Text.tertiary)
                         .accessibilityLabel(Text(verbatim: accessoryLabel ?? ""))
                         .accessibilityHidden(accessoryLabel == nil)
                 }
@@ -124,7 +124,7 @@ public struct ChecklistSummaryRow: View {
             HStack(spacing: AppSpacing.xs) {
                 Text(verbatim: title)
                     .font(AppTypography.bodyEmphasis)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                 Spacer(minLength: 0)
                 if isComplete {
                     Image(systemName: "checkmark.seal.fill")
@@ -136,12 +136,12 @@ public struct ChecklistSummaryRow: View {
             if let subtitle {
                 Label(subtitle, systemImage: subtitleSystemImage)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
             if total == 0 {
                 Text(verbatim: emptyText ?? String(localized: "checklist.empty", defaultValue: "No items yet"))
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             } else {
                 LinearProgressBar(
                     value: progress,
@@ -151,7 +151,7 @@ public struct ChecklistSummaryRow: View {
                 )
                 Text(verbatim: progressText ?? Self.defaultProgressText(checked: checked, total: total))
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
         }
         .padding(.vertical, AppSpacing.xxs)

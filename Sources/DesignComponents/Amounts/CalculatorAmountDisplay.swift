@@ -35,7 +35,7 @@ public struct CalculatorAmountDisplay: View {
             if model.hasOperator {
                 Text(displayExpression)
                     .font(AppTypography.body)
-                    .foregroundStyle(AppColors.textTertiary)
+                    .foregroundStyle(AppColors.Text.tertiary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
                     .transition(.opacity)

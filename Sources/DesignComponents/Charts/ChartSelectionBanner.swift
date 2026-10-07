@@ -48,7 +48,7 @@ public struct ChartSelectionBanner: View {
         VStack(alignment: .leading, spacing: AppSpacing.xs) {
             Text(Self.capitalizedFirstLetter(title))
                 .font(AppTypography.bodyEmphasis)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
 
             HStack(spacing: AppSpacing.md) {
                 ForEach(entries.indices, id: \.self) { i in

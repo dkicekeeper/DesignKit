@@ -219,7 +219,7 @@ public struct LineChart<Point: ChartPoint>: View {
 
             if showZeroRule {
                 RuleMark(y: .value("Zero", 0))
-                    .foregroundStyle(AppColors.textTertiary.opacity(0.5))
+                    .foregroundStyle(AppColors.Text.tertiary.opacity(0.5))
                     .lineStyle(StrokeStyle(lineWidth: 0.5, dash: [4, 4]))
             }
 

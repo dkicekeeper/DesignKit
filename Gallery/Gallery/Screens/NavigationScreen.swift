@@ -28,23 +28,40 @@ struct NavigationScreen: View {
 private struct SectionHeaderViewPage: View {
     @State private var style: SectionHeaderView.Style = .default
     @State private var showsIcon = true
+    @State private var trailing = 1
     @State private var state: SpecimenState = .content
 
     var body: some View {
         ComponentPage(
             name: "SectionHeaderView",
-            summary: "The title over a section: default, compact (settings) or large (a screen's sections).",
+            summary: "The title over a section: default, compact (settings) or large (a screen's sections), with an optional action at the end of the line.",
             apps: [.tenra, .dalada],
-            canvas: .fill
+            canvas: .fill,
+            notes: [
+                "The icon shows in the large style only.",
+                "The action (1.15.0) is any view: a NavigationLink “All”, a button, a spinner. It takes bodySmall and sits inside the style's padding.",
+            ]
         ) {
             if state == .loading {
-                SectionHeaderViewSkeleton(style: style)
+                SectionHeaderViewSkeleton(style: style, showsTrailing: trailing != 0)
             } else {
-                SectionHeaderView("Recent trips", systemImage: showsIcon ? "map" : nil, style: style)
+                switch trailing {
+                case 1:
+                    SectionHeaderView("Recent trips", systemImage: showsIcon ? "map" : nil, style: style) {
+                        NavigationLink("All") { Text("All trips").navigationTitle("Trips") }
+                    }
+                case 2:
+                    SectionHeaderView("Waiting to send", systemImage: showsIcon ? "icloud.and.arrow.up" : nil, style: style) {
+                        ProgressView()
+                    }
+                default:
+                    SectionHeaderView("Recent trips", systemImage: showsIcon ? "map" : nil, style: style)
+                }
             }
         } controls: {
             StateControl(state: $state)
             ChoiceControl("Style", selection: $style, options: [("Default", .default), ("Compact", .compact), ("Large", .large)])
+            ChoiceControl("Action", selection: $trailing, options: [("None", 0), ("All", 1), ("Spinner", 2)])
             ToggleControl("Icon", isOn: $showsIcon)
         }
     }
@@ -78,14 +95,14 @@ private struct DateSectionHeaderViewPage: View {
     var body: some View {
         ComponentPage(
             name: "DateSectionHeaderView",
-            summary: "A day's header in a transaction list: Today, Yesterday or the date, with the day's total.",
+            summary: "A day's header in a transaction list: the label the app gives (Today, Yesterday, the date) and the day's expenses.",
             apps: [.tenra],
             canvas: .fill
         ) {
             if state == .loading {
                 DateSectionHeaderViewSkeleton()
             } else {
-                DateSectionHeaderView(dateKey: "2026-09-30", amount: showsAmount ? 45_000 : nil,
+                DateSectionHeaderView(dateKey: "Yesterday", amount: showsAmount ? 45_000 : nil,
                                       currency: showsAmount ? "KZT" : nil)
             }
         } controls: {

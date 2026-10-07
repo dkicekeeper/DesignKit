@@ -72,12 +72,12 @@ public enum IconTint: Equatable, Hashable {
 
     /// Primary text color для иконок
     public static var primaryMonochrome: IconTint {
-        .monochrome(AppColors.textPrimary)
+        .monochrome(AppColors.Text.primary)
     }
 
     /// Secondary text color для иконок
     public static var secondaryMonochrome: IconTint {
-        .monochrome(AppColors.textSecondary)
+        .monochrome(AppColors.Text.secondary)
     }
 
     /// Success color (для income категорий)
@@ -184,9 +184,9 @@ public struct IconStyle: Equatable, Hashable {
 
     /// Стандартная иконка категории (круг, accent цвет)
     /// Используется в: CategoryRow, CategoryChip, CategorySelectorView
-    /// - Parameter backgroundColor: опциональный фон контейнера. Для SF Symbols по умолчанию `AppColors.bgCard`,
+    /// - Parameter backgroundColor: опциональный фон контейнера. Для SF Symbols по умолчанию `AppColors.Background.neutral1`,
     ///   для категорий пробрасывается `category.color.opacity(0.15)`.
-    public static func categoryIcon(size: CGFloat = AppIconSize.lg, backgroundColor: Color? = AppColors.bgCard) -> IconStyle {
+    public static func categoryIcon(size: CGFloat = AppIconSize.lg, backgroundColor: Color? = AppColors.Background.neutral1) -> IconStyle {
         .circle(
             size: size,
             tint: .accentMonochrome,
@@ -199,7 +199,7 @@ public struct IconStyle: Equatable, Hashable {
         .circle(
             size: size,
             tint: .accentMonochrome,
-            backgroundColor: AppColors.bgCard
+            backgroundColor: AppColors.Background.neutral1
         )
     }
 
@@ -243,7 +243,7 @@ public struct IconStyle: Equatable, Hashable {
         .circle(
             size: size,
             tint: .secondaryMonochrome,
-            backgroundColor: AppColors.bgCard
+            backgroundColor: AppColors.Background.neutral1
         )
     }
 
@@ -310,7 +310,7 @@ public struct IconStyle: Equatable, Hashable {
 
         if backgroundColor != nil,
            case .monochrome(let color) = tint,
-           color == AppColors.textSecondary {
+           color == AppColors.Text.secondary {
             return String(localized: "iconStyle.preset.placeholder")
         }
 

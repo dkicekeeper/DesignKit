@@ -88,14 +88,14 @@ public struct MiniBarPair: View {
             baseline.addLine(to: CGPoint(x: currentX + barWidth + 6, y: baselineY))
             context.stroke(
                 baseline,
-                with: .color(AppColors.textSecondary.opacity(0.2)),
+                with: .color(AppColors.Text.secondary.opacity(0.2)),
                 style: StrokeStyle(lineWidth: 1)
             )
 
             // "Was" — muted gray, never tinted (the past is context, not signal).
             context.fill(
                 barPath(x: previousX, value: previous),
-                with: .color(AppColors.textSecondary.opacity(0.35))
+                with: .color(AppColors.Text.secondary.opacity(0.35))
             )
 
             // "Now" — solid fact, or translucent + dashed outline when projected.

@@ -31,7 +31,7 @@ import DesignTokens
 ///     style: .circle(
 ///         size: AppIconSize.xl,
 ///         tint: .monochrome(.red),
-///         backgroundColor: AppColors.bgCard
+///         backgroundColor: AppColors.Background.neutral1
 ///     )
 /// )
 /// ```
@@ -203,7 +203,7 @@ public struct IconView: View {
         Image(systemName: "photo")
             .resizable()
             .aspectRatio(contentMode: .fit)
-            .foregroundStyle(AppColors.textSecondary)
+            .foregroundStyle(AppColors.Text.secondary)
     }
 
     // MARK: - Container View

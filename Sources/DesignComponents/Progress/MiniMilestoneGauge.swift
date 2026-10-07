@@ -65,7 +65,7 @@ public struct MiniMilestoneGauge: View {
                 let shape = Path(roundedRect: rect, cornerRadius: Self.cornerRadius)
 
                 // Muted base for every segment.
-                context.fill(shape, with: .color(AppColors.textSecondary.opacity(0.18)))
+                context.fill(shape, with: .color(AppColors.Text.secondary.opacity(0.18)))
 
                 // Fill: whole segments solid, the in-progress one partially —
                 // clip the partial fill to the segment's rounded shape.
@@ -95,7 +95,7 @@ public struct MiniMilestoneGauge: View {
             )
             context.fill(
                 Path(roundedRect: tickRect, cornerRadius: 1.25),
-                with: .color(AppColors.textSecondary.opacity(0.7))
+                with: .color(AppColors.Text.secondary.opacity(0.7))
             )
         }
         .frame(height: height)

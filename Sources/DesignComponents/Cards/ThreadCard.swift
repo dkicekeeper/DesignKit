@@ -41,12 +41,12 @@ public struct ThreadCard: View {
         VStack(alignment: .leading, spacing: AppSpacing.xs) {
             Text(verbatim: title)
                 .font(AppTypography.bodyEmphasis)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
                 .lineLimit(2)
             if let preview, !preview.isEmpty {
                 Text(verbatim: preview)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .lineLimit(2)
             }
             HStack(spacing: AppSpacing.sm) {
@@ -62,7 +62,7 @@ public struct ThreadCard: View {
                     .lineLimit(1)
             }
             .font(AppTypography.caption)
-            .foregroundStyle(AppColors.textTertiary)
+            .foregroundStyle(AppColors.Text.tertiary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .cardContentPadding()

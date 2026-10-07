@@ -81,7 +81,7 @@ public struct HeroHalfGauge: View {
             // Track — the full scale.
             halfArc(from: 0, to: 0.5)
                 .stroke(
-                    AppColors.textSecondary.opacity(0.15),
+                    AppColors.Text.secondary.opacity(0.15),
                     style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
                 )
 
@@ -159,7 +159,7 @@ public struct HeroHalfGauge: View {
             Circle()
                 .fill(color)
             Circle()
-                .fill(AppColors.bgBase)
+                .fill(AppColors.Background.base)
                 .frame(width: markerDiameter / 1.6, height: markerDiameter / 1.6)
         }
         .frame(width: markerDiameter, height: markerDiameter)

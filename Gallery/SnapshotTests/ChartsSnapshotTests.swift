@@ -148,6 +148,24 @@ extension ComponentSnapshots {
                 .frame(maxWidth: .infinity)
             )
         }
+
+        /// One banner per snapshot: each is a glass card.
+        @Test func chartSelectionBanner() async {
+            await assertComponentSnapshot(
+                ChartSelectionBanner(title: "January 2026", entries: [
+                    .init(value: 480_000, color: AppColors.success),
+                    .init(value: 275_000, color: AppColors.destructive),
+                ], format: .currency("KZT")),
+                named: "twoValues",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                ChartSelectionBanner(title: "Week 12", entries: [
+                    .init(value: 42.5, color: AppColors.accent, showsDot: false),
+                ], format: .custom({ String(format: "%.1f km", $0) })),
+                named: "oneValue"
+            )
+        }
     }
 }
 
