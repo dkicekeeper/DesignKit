@@ -97,5 +97,47 @@ extension ComponentSnapshots {
                 appearances: [.light, .dark, .largeText]
             )
         }
+
+        /// 2.4.0: the voice wave at a fixed level, still: ribbons, the orb, ribbons thinking.
+        @Test func voiceWave() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.lg) {
+                    VoiceWave(level: 0.7).frame(height: 120)
+                    HStack(spacing: AppSpacing.lg) {
+                        VoiceWave(level: 0.7, style: .orb).frame(width: 140, height: 140)
+                        VoiceWave(level: 0.7, phase: .thinking, style: .orb).frame(width: 140, height: 140)
+                    }
+                    VoiceWave(level: 0.7, phase: .thinking).frame(height: 60)
+                }
+                .padding(AppSpacing.lg)
+                .background(Color(white: 0.08), in: .rect(cornerRadius: AppRadius.xl)),
+                appearances: [.light, .dark]
+            )
+        }
+
+        /// 2.4.0: the edge glow at a fixed level, still (a Metal colour effect).
+        @Test func edgeGlow() async {
+            await assertComponentSnapshot(
+                ZStack {
+                    RoundedRectangle(cornerRadius: AppRadius.xl).fill(Color(white: 0.08))
+                    EdgeGlow(level: 0.6, cornerRadius: AppRadius.xl)
+                }
+                .frame(height: 220)
+                .clipShape(.rect(cornerRadius: AppRadius.xl)),
+                appearances: [.light, .dark]
+            )
+        }
+
+        /// 2.4.0: without motion the text is drawn in the still aurora gradient.
+        @Test func thinkingShimmer() async {
+            await assertComponentSnapshot(
+                Text("Analysing your spending…")
+                    .font(AppTypography.h4)
+                    .foregroundStyle(AppColors.Text.secondary)
+                    .thinkingShimmer()
+                    .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
     }
 }

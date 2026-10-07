@@ -46,6 +46,9 @@ targets:
         # multitasking). Same setting as Dalada.
         INFOPLIST_KEY_UIRequiresFullScreen: YES
         INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
+        # The voice effects' pages (VoiceWave, EdgeGlow) can follow the microphone's level; nothing
+        # is recorded or kept.
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: "Lets the voice effects follow your voice. Nothing is recorded or kept."
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         TARGETED_DEVICE_FAMILY: "1"
         SWIFT_VERSION: "5.0"
