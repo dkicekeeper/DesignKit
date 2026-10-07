@@ -16,41 +16,43 @@ appearances it lists:
 
 | File | Components |
 |---|---|
-| `FoundationsSnapshotTests` | typography scale, `AppTypography.numbers` (proportional vs tabular), primary / secondary buttons (enabled, disabled), the `appButton` matrix, `.fadeTruncation()`, `cardStyle`, filter chips, Dalada's accent through `DesignKitTheme.accent` |
-| `RowsSnapshotTests` | `CheckmarkRow`, `UniversalRow`, `ActionSettingsRow`, `ToggleSettingsRow`, `InfoRow`, `SectionHeaderView` (with an action, 1.15.0), `SelectionIndicator`, `ColorPickerRow`, `DateSectionHeaderView`, `SliderRow` |
-| `FormsSnapshotTests` | `EditableHero` (amount, no currency chip), `FormSection`, `DatePickerRow`, `MenuPickerRow`, `SettingsSectionHeaderView`, `HeroSection` |
-| `IconsSnapshotTests` | `IconView` (category, circle, rounded square, glass hero, placeholder, brand fallback), `BrandLogoView`, `PackedCircleIconsView` |
-| `CardsSnapshotTests` | `FinanceCard`, `RedactableAmount`, `EmptyCardView`, `InsightsStatCard`, `InsightEntityRow`, `UniversalCarousel`, `UniversalFilterButton` |
-| `FeedbackSnapshotTests` | `StatusBanner` (5 statuses, compact, with an action), `EmptyStateView` (3 styles), `MessageBanner`, `InlineStatusText`, `RecommendationBox`, `StepTracker`, `OnboardingStepIndicator`, `PermissionPrimerView`, `OnboardingPage`, `ImportProgressSheet` |
-| `DisplaySnapshotTests` | `BadgeView`, `TrendBadge`, `StatusIndicatorBadge`, `StatTile`, `AvatarView`, `AvatarGroup`, `RatingView`, `ActivityTimeline`, `MonthCalendar`, `ExpandableText`, `FlowLayout`, `HeroSymbol` |
+| `FoundationsSnapshotTests` | typography scale, `AppTypography.numbers` (proportional vs tabular), primary / secondary buttons (enabled, disabled), the `.dsButton` matrix, `.fadeTruncation()`, `cardStyle`, filter chips, Dalada's accent through `DesignKitTheme.accent` |
+| `RowsSnapshotTests` | `CheckmarkRow`, `UniversalRow`, `ActionSettingsRow`, `ToggleSettingsRow`, `InfoRow`, `SectionHeader` (with an action, 1.15.0), `SelectionIndicator`, `ColorPickerRow`, `SectionHeader(style: .card)` (a day's header), `SliderRow` |
+| `FormsSnapshotTests` | `EditableHero` (amount, no currency chip), `FormSection`, `DatePickerRow`, `MenuPickerRow`, `SectionHeader(style: .list)`, `HeroSection` |
+| `IconsSnapshotTests` | `Icon` (category, circle, rounded square, glass hero, placeholder, brand fallback, a brand logo), `PackedCircleIcons` |
+| `CardsSnapshotTests` | `FinanceCard`, `RedactableAmount`, `EmptyCard`, `InsightsStatCard`, `InsightEntityRow`, `UniversalCarousel`, `UniversalFilterButton` |
+| `FeedbackSnapshotTests` | `StatusBanner` (5 statuses, compact, with an action), `EmptyState` (3 styles), `MessageBanner`, `InlineStatusText`, `RecommendationBox`, `StepTracker`, `OnboardingStepIndicator`, `Tooltip` (2.0.0), `PromptSheet` as a permission primer, `OnboardingPage`, `ImportProgressSheet` |
+| `DisplaySnapshotTests` | `Badge`, `TrendBadge`, `StatusIndicatorBadge`, `StatTile`, `Avatar`, `AvatarGroup`, `Rating`, `ActivityTimeline`, `MonthCalendar`, `ExpandableText`, `FlowLayout`, `HeroSymbol` |
 | `ColorsSnapshotTests` | every semantic colour token (`AppColors.Text`, `.Background`, `.Border`, `.Status`, `pale(_:)`): a swatch each, light and dark |
 | `ChartsSnapshotTests` | `LinearProgressBar`, `ProgressRing`, `AmountComparisonBar`, `FormattedAmountText`, `Sparkline`, `LineChart`, `BarChart`, `HeroSparkline`, `OrbChart`, `MiniDonut`, `ProportionBar`, `MiniProportionBar`, `HeroProportionBar`, `HeroHalfGauge`, `MiniHalfGauge`, `HeroMilestoneGauge`, `MiniMilestoneGauge`, `HeroBarPair`, `MiniBarPair`, `ChartSelectionBanner` |
-| `SummarySnapshotTests` | `TotalsCard`, `LimitProgressCard`, `WeightBreakdownCard`, `CalculationCard`, `NetAmountRow`, `ScheduleRow`, `ComparisonCard`, `CashFlowCard` (loaded, empty), `RecurringPaymentCard`, `PayoffProgressCard`, `BreakdownRow`, `AmountPercentageView` |
+| `SummarySnapshotTests` | `TotalsCard`, `LimitProgressCard`, `WeightBreakdownCard`, `CalculationCard`, `NetAmountRow`, `ScheduleRow`, `ComparisonCard`, `CashFlowCard` (loaded, empty), `RecurringPaymentCard`, `PayoffProgressCard`, `BreakdownRow`, `AmountPercentage` |
 | `ScoresSnapshotTests` | `ScoreGaugeCard`, `ScoreCard`, `TargetProgressCard` |
 | `BalancesSnapshotTests` | `BalanceCard`, `SelectableBalanceCard`, `BalanceRow`, `ProgressRingRow`, `ProgressRingTile`, `ProgressRingTileGrid`, `MetricCard` (mini chart, none, bottom chart), `GradientOrbsBackground`, `PromptSheet` |
 | `SkeletonsSnapshotTests` | every component skeleton (1.10.0): each card skeleton on its own, rows, charts, gauges and bars, badges, icons, amounts, headers, timeline, the community and progress components (1.12.0); the shimmer is stopped (`.skeletonShimmer(false)` in the renderer) |
 | `CommunitySnapshotTests` | `PersonRow`, `CommentRow` (with a quote and actions), `ThreadCard`, `ReviewCard`, `ReactionButton`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.12.0) |
-| `InputsSnapshotTests` | `FormattedAmountText` sign and unit, hidden amounts (`.amountsHidden`, `AmountVisibilityToggle`, the `HeroProportionBar` legend), `CurrencyPickerMenu` and `CurrencyAmountInput` (calculator display, error), `SegmentedPickerView`, `ChipPicker` (single / several), `RatingPicker`, `FormTextField`, `TagInput`, `MessageComposer` (empty, quote and error, disabled), `CalculatorKeypad`, `AmountDigitDisplay`, `FormattedAmountView`, `SpentBudgetText`, `PlusTabLabel`, `BulkDeleteButton`, `EntityActionButton`, `DateButtonsView`, `AnimatedTitleInput`, `AmountPercentageView` |
+| `InputsSnapshotTests` | `FormattedAmountText` sign and unit, hidden amounts (`.amountsHidden`, `AmountVisibilityToggle`, the `HeroProportionBar` legend), `CurrencyPickerMenu` and `CurrencyAmountInput` (calculator display, error), `SegmentedPicker`, `ChipPicker` (single / several), `RatingPicker`, `FormTextField`, `TagInput`, `MessageComposer` (empty, quote and error, disabled), `CalculatorKeypad`, `AmountDigitDisplay`, `FormattedAmountText` in body semibold, `SpentBudgetText`, `PlusTabLabel`, `DSButton` (2.0.0: icon placements, appearances and roles, full width, capsule, tiles), `DateButtons`, `AnimatedTitleInput`, `AmountPercentage` |
 
 Appearances (`SnapshotAppearance`): `light`, `dark`, and `largeText` (light at accessibility
 text size AX2, which catches truncation and clipping). References live in
 `Gallery/SnapshotTests/__Snapshots__/<File>/<test>.<appearance>.png`.
 
 Not covered on purpose:
-- views that animate continuously on a clock, so no two frames match: `SiriGlowView`,
-  `SiriWaveRecordingView`, `AccentGlow`, `.borderBeam()`, `LoopOnboardingHero`'s pulsing ring,
-  `BlinkingCursor`, and the spinner of `LoadingButtonLabel(isLoading: true)`. Skeletons are covered since 1.10.0: the renderer
+- views that animate continuously on a clock, so no two frames match: `SiriGlow`,
+  `SiriWave`, `AccentGlow`, `.borderBeam()`, `LoopOnboardingHero`'s pulsing ring,
+  `BlinkingCursor`, and the spinner of `DSButton(isLoading: true)`. Skeletons are covered since 1.10.0: the renderer
   stops their shimmer with `.skeletonShimmer(false)` (Reduce Motion would too, but SwiftUI
   does not let a test set it; `accessibilityReduceMotion` is read-only). `.skeleton(isLoading:)`
   is not: its shapes are the system's redaction;
 - full-screen pickers with a search in the navigation bar: `IconPicker`, `CurrencyList`;
-- `ConvertedAmountView`, `RecurringPaymentCard`'s converted line and `CurrencyAmountInput`'s
+- `ConvertedAmount`, `RecurringPaymentCard`'s converted line and `CurrencyAmountInput`'s
   "≈" line (its snapshot is in the base currency, so without the line): they draw nothing until
   the host app's currency converter answers, and in a snapshot run it had not answered when the
-  picture was taken (October 2026), so a `ConvertedAmountView` snapshot showed an empty line;
+  picture was taken (October 2026), so a `ConvertedAmount` snapshot showed an empty line;
 - containers whose look is the system's (`EditSheetContainer` is a `Form` in a navigation bar)
   or that fill the screen (`OnboardingPageContainer`, `OnboardingPager`, and
-  `NotificationPermissionView`, which is `PermissionPrimerView` with Tenra's wording);
+  `NotificationPermissionPrompt`, which is `PromptSheet` with Tenra's wording);
+- `HeroBarPair`'s tooltip: it shows on a tap, and the selection is the view's own state (the
+  `Tooltip` itself is covered);
 - screens that need app data.
 
 All of them have a specimen in the Gallery.

@@ -12,7 +12,7 @@ import DesignTokens
 import DesignSupport
 
 /// Обертка для обратной совместимости - делегирует в FormattedAmountText
-@available(*, deprecated, message: "Use FormattedAmountText(amount:currency:prefix:fontSize: AppTypography.body, fontWeight: .semibold, color:), which it is.")
+@available(*, deprecated, renamed: "FormattedAmountText", message: "FormattedAmountText(amount:currency:prefix:color:) is the same view: its defaults are body, semibold.")
 public struct FormattedAmountView: View {
     let amount: Double
     let currency: String
