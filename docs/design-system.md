@@ -36,7 +36,7 @@
 | Module | Contents |
 |---|---|
 | `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation`, `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, inline field styles), `AppButton` (`primaryButton`, `secondaryButton`, `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
-| `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `IconView`, `BrandLogoView`, `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `HapticManager`, `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
+| `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `IconView`, `BrandLogoView` (deprecated 1.13.0: `IconView(source: .brandService(name), style: .roundedSquare(size:))` is the same look), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `HapticManager`, `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
 | `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons") |
 
 Coverage against Apple HIG, Material 3, Fluent 2, Carbon, Polaris and Atlassian, and the next
@@ -50,7 +50,7 @@ DesignKit ships no networking, persistence or FX. A host app wires these once, i
 |---|---|---|
 | `DesignKitTheme.accent` | `.indigo` | Brand accent behind `AppColors.accent`. Also set the asset-catalog `AccentColor` to the same colour (system chrome never reads `AppColors`). |
 | `DesignKitFonts.registerIfNeeded()` | — | Call once; registers the bundled Inter variable fonts. |
-| `DesignKitLogoLoader.loader` | `nil` → fallback icon | Brand-logo images for `IconSource.brandService` (`BrandLogoView`, `IconView`, `heroAccentGlow`). |
+| `DesignKitLogoLoader.loader` | `nil` → fallback icon | Brand-logo images for `IconSource.brandService` (`IconView`, `heroAccentGlow`). |
 | `DesignKitCurrencyConverter.convert` | `nil` → nothing rendered | FX for `ConvertedAmountView` / `HeroSection(showBaseConversion:)` / `CurrencyAmountInput`. |
 | `DesignKitCurrencyConverter.convertSync` *(1.10.0)* | `nil` → `convert` is asked | Instant conversion from cached rates, so `CurrencyAmountInput` shows "≈ …" while the user types. |
 | `DesignKitLogoCatalog.sections` / `.search` / `.domainSuffixes` *(1.10.0)* | no sections → no logos tab; `["com"]` | The brands `IconPicker` offers (titled sections of domain + name), its search, and the domains tried for a typed name (Tenra: `["com", "kz"]`). |
@@ -161,19 +161,30 @@ For full circles use `.infinity` inline (rare — only avatars/icon backgrounds 
 
 ### Icon Sizes (`AppIconSize`)
 
-| Token | Value | Use For |
+Two scales, named like `AppSpacing` (1.13.0): **glyphs** stand on their own, **tiles** carry
+their own backing (a circle or rounded square, an avatar, a coin).
+
+| Glyph | Value | Use For |
 |-------|-------|---------|
+| `xs` | 12 | A glyph at caption size |
 | `sm` | 16 | Inline icons in text |
-| `md` | 20 | Toolbar, list default |
-| `lg` | 24 | Emphasized list icons, `UniversalRow` leading icons |
-| `xl` | 32 | Bank logos in rows |
-| `avatar` | 40 | Subscription icons in rows |
-| `xxl` | 44 | Category circles (QuickAdd) |
-| `xxxl` | 48 | Hero icons (empty states) |
-| `categoryIcon` | 52 | Category row icons |
-| `mega` | 64 | Category coins, large display icons |
-| `budgetRing` | 72 | Budget ring (coin + 8pt stroke space) |
-| `ultra` | 80 | Hero icons, large action buttons (voice input) |
+| `md` | 20 | Toolbar, settings rows |
+| `lg` | 24 | Emphasized list icons, form-row leading icons |
+| `xl` | 32 | Large glyphs, bank logos in rows |
+
+| Tile (`AppIconSize.Tile`) | Value | Use For |
+|-------|-------|---------|
+| `xs` | 40 | Avatars, small icon tiles |
+| `sm` | 44 | The icon tile of a content row (`IconView`'s default) |
+| `md` | 48 | Empty-state icons |
+| `lg` | 52 | Category coins in rows |
+| `xl` | 64 | Category coins in grids, profile avatars |
+| `xxl` | 72 | A ring around an `xl` tile (8 pt stroke) |
+| `xxxl` | 80 | Hero icons, large action buttons (voice input) |
+
+Deprecated in 1.13.0 (same values, renamed): `avatar` → `Tile.xs`, `xxl` → `Tile.sm`,
+`xxxl` → `Tile.md`, `categoryIcon` → `Tile.lg`, `mega` → `Tile.xl`, `budgetRing` →
+`Tile.xxl`, `ultra` → `Tile.xxxl`. Xcode's fix-it renames them.
 
 ### Container Sizes
 
@@ -249,14 +260,18 @@ For dynamic-size amount inputs use `Font.custom(AppTypography.fontFamily, …)` 
 
 ### Button Styles (`AppButton`)
 
-| Style | Visual | Usage |
-|-------|--------|-------|
-| `.primaryButton(disabled:)` | `.glassProminent` + `.tint(AppColors.accent)` + `.controlSize(.large)` | Primary CTA. Sizing follows label — wrap with `.frame(maxWidth: .infinity)` for full-width |
-| `.secondaryButton()` | `.glass` + `.controlSize(.large)` | Cancel, Back, secondary actions |
-| `.buttonStyle(.bounce)` | Scale 0.96 on press | Interactive card taps (non-glass) |
-| `.appButton(_:role:size:disabled:)` *(1.7.0)* | appearance `.primary` (`.glassProminent`) / `.secondary` (`.glass`) / `.flat` (`.borderless`) × role `.normal` (accent; none on secondary) / `.destructive` (`Status.negative`) / `.neutral` (`Text.primary`) × size `.large` / `.medium` / `.small` (control sizes) | The full matrix. `.appButton()` = `.primaryButton()`, `.appButton(.secondary)` = `.secondaryButton()`. Loading: `LoadingButtonLabel` in the label + `disabled: isLoading` |
+**One API, two shorthands.** `.appButton(_:role:size:disabled:)` *(1.7.0)* is the button of the
+design system; `.primaryButton()` and `.secondaryButton()` are its two most common cases,
+kept as shorthands (the apps use them in 70 places).
 
-⚠️ **For destructive buttons, do NOT use `.primaryButton()`** — it forces `.tint(AppColors.accent)` which silently overrides `role: .destructive` (button looks accent-colored instead of red). Since 1.7.0 use `.appButton(role: .destructive)`; before it, the native styles directly: `.buttonStyle(.glassProminent).tint(AppColors.destructive).controlSize(.large)` with `Button(role: .destructive, ...)`. See [BulkDeleteButton.swift](../Sources/DesignComponents/Input/BulkDeleteButton.swift) and [EntityActionButton.swift](../Sources/DesignComponents/Input/EntityActionButton.swift).
+| Call | Same as | Visual | Usage |
+|------|---------|--------|-------|
+| `.appButton(_:role:size:disabled:)` | — | appearance `.primary` (`.glassProminent`) / `.secondary` (`.glass`) / `.flat` (`.borderless`) × role `.normal` (accent; none on secondary) / `.destructive` (`Status.negative`) / `.neutral` (`Text.primary`) × size `.large` / `.medium` / `.small` (control sizes) | Every button. Loading: `LoadingButtonLabel` in the label + `disabled: isLoading` |
+| `.primaryButton(disabled:)` | `.appButton(disabled:)` | `.glassProminent` + accent + `.large` | The main action. Full width: `.frame(maxWidth: .infinity)` on the label |
+| `.secondaryButton()` | `.appButton(.secondary)` | `.glass` + `.large` | Cancel, Back, secondary actions |
+| `.buttonStyle(.bounce)` | — | Scale 0.96 and a slight darkening on press | Not a button look: a tappable **card or row** (Tenra's account cards, transaction rows, Finances tiles) |
+
+⚠️ **For destructive buttons, do NOT use `.primaryButton()`** — it forces `.tint(AppColors.accent)` which silently overrides `role: .destructive` (button looks accent-colored instead of red). Since 1.7.0 use `.appButton(role: .destructive)`; before it, the native styles directly: `.buttonStyle(.glassProminent).tint(AppColors.destructive).controlSize(.large)` with `Button(role: .destructive, ...)`. See [BulkDeleteButton.swift](../Sources/DesignComponents/Actions/BulkDeleteButton.swift) and [EntityActionButton.swift](../Sources/DesignComponents/Actions/EntityActionButton.swift).
 
 **Group adjacent glass elements in `GlassEffectContainer`** (glass can't sample other glass → inconsistent rendering otherwise). Use it for rows of `.glass`/`.glassProminent` buttons or clusters of `.glassEffect()` views; set its `spacing:` to match the stack spacing. Used ungated in app code (app target = iOS 26). Precedents: `EntityDetailScaffold` action bar, `DateButtonsView`, `ChartZoomControls`. Leaf components that still support pre-iOS-26 (`CategoryChip`, `SegmentedPickerView`) gate glass with `#available(iOS 26)` + `.ultraThinMaterial` fallback.
 
@@ -384,7 +399,7 @@ Every row in `Views/Components/Rows/` follows these token rules. New rows MUST c
 
 | Slot | Token | Notes |
 |------|-------|-------|
-| **Leading icon — content rows** | `AppIconSize.xxl` (44) | BalanceRow, ProgressRingRow, BreakdownRow, InsightEntityRow, LimitProgressCard |
+| **Leading icon — content rows** | `AppIconSize.Tile.sm` (44) | BalanceRow, ProgressRingRow, BreakdownRow, InsightEntityRow, LimitProgressCard |
 | **Leading icon — form rows** | `AppIconSize.lg` (24) | InfoRow, MenuPickerRow, DatePickerRow |
 | **Leading icon — settings rows** | `AppIconSize.md` (20) | ActionSettingsRow, NavigationSettingsRow |
 | **HStack spacing (icon ↔ content)** | `AppSpacing.md` (12) | All rows |
@@ -859,7 +874,7 @@ if let accounts {
 | `BalanceRow`, `ProgressRingRow`, `BreakdownRow`, `InsightEntityRow`, `NetAmountRow`, `ScheduleRow`, `InfoRow`, `ColorPickerRow` | `…Skeleton` |
 | `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `OrbChart` | `…Skeleton` |
 | `LinearProgressBar`, `ProportionBar`, `MiniProportionBar`, `AmountComparisonBar`, `HeroProportionBar`, `ProgressRing`, `MiniDonut`, `MiniHalfGauge`, `HeroHalfGauge`, `MiniMilestoneGauge`, `HeroMilestoneGauge`, `MiniBarPair`, `HeroBarPair` | `…Skeleton`, with the component's size parameters |
-| `IconView`, `BrandLogoView` | `IconViewSkeleton(style:)` / `IconViewSkeleton(size:)` |
+| `IconView` | `IconViewSkeleton(style:)` / `IconViewSkeleton(size:)` |
 | `AvatarView`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIconsView`, `BadgeView`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `RatingView`, `ChipPicker` | `…Skeleton` |
 | `FormattedAmountText`, `FormattedAmountView`, `ConvertedAmountView`, `SpentBudgetText`, `AmountPercentageView` | `FormattedAmountTextSkeleton(font:width:)`; `RedactableAmount(isLoading: true)` draws one itself |
 | `HeroSection`, `SectionHeaderView`, `SettingsSectionHeaderView`, `DateSectionHeaderView` | `HeroSectionSkeleton`, `SectionHeaderViewSkeleton(style:)` (`.compact` for the settings header), `DateSectionHeaderViewSkeleton` |
@@ -1051,7 +1066,7 @@ DateSectionHeaderView(dateKey: "2026-03-10", amount: 45000.0, currency: "KZT")
 Circular progress arc for budget consumption.
 
 ```swift
-ProgressRing(progress: 0.75, size: AppIconSize.categoryIcon, isOverBudget: false)
+ProgressRing(progress: 0.75, size: AppIconSize.Tile.lg, isOverBudget: false)
 ```
 
 #### `LinearProgressBar(value:)` *(0.4.0)*
@@ -1082,7 +1097,7 @@ Use for counts, distances, durations. A money amount compared with the previous 
 Round avatar: the photo when there is one, otherwise initials on a 15 % tint.
 
 ```swift
-AvatarView(name: profile.displayName ?? profile.username)          // AppIconSize.avatar (40)
+AvatarView(name: profile.displayName ?? profile.username)          // AppIconSize.Tile.xs (40)
 AvatarView(name: "Ayan Seitkali", size: 64)                         // h3 initials above 48 pt
 AvatarView(name: name, image: Image(uiImage: photo))
 ```
@@ -1216,7 +1231,7 @@ Up to three soft, heavily blurred colour orbs (`Orb(color:weight:)`, heaviest fi
 
 Ported from Dalada with neutral names. The app keeps what loads and acts (photos behind signed
 URLs, the reactions store, moderation, the achievement catalogue) and passes views and
-strings in. Gallery: "Community & Progress"; snapshots: `CommunitySnapshotTests`.
+strings in. Gallery: their sections (Rows, Cards, Actions, Media); snapshots: `CommunitySnapshotTests`.
 
 #### `PersonRow`
 Avatar (40), name (bodyEmphasis), a caption line under it (the @username, a status) and a
@@ -1921,7 +1936,7 @@ VStack, HStack, custom cards must add `.padding(AppSpacing.lg)` (or the equivale
 
 ## 11. AnimatedInputComponents Deep Dive
 
-`Sources/DesignComponents/Input/AnimatedInputComponents.swift` contains:
+`Sources/DesignComponents/Amounts/AnimatedInputComponents.swift` contains:
 
 | Component | Purpose |
 |-----------|---------|

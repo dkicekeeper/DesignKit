@@ -24,8 +24,8 @@ extension ComponentSnapshots {
                     SkeletonText(AppTypography.h3, width: 160)
                     SkeletonText(AppTypography.body, lines: 2)
                     HStack(spacing: AppSpacing.md) {
-                        SkeletonView.circle(AppIconSize.xxl)
-                        IconViewSkeleton(style: .roundedSquare(size: AppIconSize.xxl))
+                        SkeletonView.circle(AppIconSize.Tile.sm)
+                        IconViewSkeleton(style: .roundedSquare(size: AppIconSize.Tile.sm))
                         SkeletonView.capsule(height: 32, width: 96)
                     }
                     SkeletonRow()

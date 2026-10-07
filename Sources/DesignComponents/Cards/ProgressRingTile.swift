@@ -69,7 +69,7 @@ public struct ProgressRingTile: View {
                     if let progress {
                         ProgressRing(
                             progress: progress.percentage / 100,
-                            size: AppIconSize.budgetRing,
+                            size: AppIconSize.Tile.xxl,
                             lineWidth: 4,
                             isOverBudget: progress.isOverLimit,
                             animatesOnAppear: false // lazy grid — onAppear re-fires on scroll
@@ -79,7 +79,7 @@ public struct ProgressRingTile: View {
                     Image(systemName: systemImage)
                         .font(AppTypography.h2)
                         .foregroundStyle(color)
-                        .frame(width: AppIconSize.mega, height: AppIconSize.mega)
+                        .frame(width: AppIconSize.Tile.xl, height: AppIconSize.Tile.xl)
                         .glassEffect(
                             isSelected
                                 ? .regular.tint(color.opacity(0.3)).interactive()
@@ -93,7 +93,7 @@ public struct ProgressRingTile: View {
                 )
                 // Same height with or without the ring (72 vs 64 pt), so whatever sits under
                 // tiles without a ring lines up with their neighbours.
-                .frame(height: AppIconSize.budgetRing)
+                .frame(height: AppIconSize.Tile.xxl)
             }
         }
         .buttonStyle(.plain)
@@ -114,10 +114,10 @@ public struct ProgressRingTileSkeleton: View {
             ZStack {
                 Circle()
                     .stroke(SkeletonView.fill, lineWidth: 4)
-                    .frame(width: AppIconSize.budgetRing, height: AppIconSize.budgetRing)
-                SkeletonView.circle(AppIconSize.mega)
+                    .frame(width: AppIconSize.Tile.xxl, height: AppIconSize.Tile.xxl)
+                SkeletonView.circle(AppIconSize.Tile.xl)
             }
-            .frame(height: AppIconSize.budgetRing)
+            .frame(height: AppIconSize.Tile.xxl)
         }
         .shimmer()
         .skeletonLoadingLabel()

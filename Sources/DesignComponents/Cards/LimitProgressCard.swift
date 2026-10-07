@@ -69,7 +69,7 @@ public struct LimitProgressCard: View {
                 IconView(
                     source: iconSource,
                     style: .circle(
-                        size: AppIconSize.xxl,
+                        size: AppIconSize.Tile.sm,
                         tint: .monochrome(color),
                         backgroundColor: AppColors.pale(color)
                     )
@@ -120,7 +120,7 @@ public struct LimitProgressCardSkeleton: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             HStack {
-                IconViewSkeleton(size: AppIconSize.xxl)
+                IconViewSkeleton(size: AppIconSize.Tile.sm)
                 SkeletonText(AppTypography.bodyEmphasis, width: 120)
                 Spacer()
                 SkeletonText(AppTypography.body, width: 40)

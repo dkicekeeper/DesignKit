@@ -31,7 +31,7 @@ public struct PersonRow<Avatar: View, Trailing: View>: View {
 
     /// - Parameters:
     ///   - subtitle: Under the name, in the secondary colour (the @username).
-    ///   - avatar: The person's picture, `AppIconSize.avatar` (40) across.
+    ///   - avatar: The person's picture, `AppIconSize.Tile.xs` (40) across.
     public init(
         name: String,
         subtitle: String? = nil,
@@ -88,7 +88,7 @@ public struct PersonRowSkeleton: View {
 
     public var body: some View {
         HStack(spacing: AppSpacing.md) {
-            SkeletonView.circle(AppIconSize.avatar)
+            SkeletonView.circle(AppIconSize.Tile.xs)
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
                 SkeletonText(AppTypography.bodyEmphasis, width: 140)
                 if showsSubtitle {

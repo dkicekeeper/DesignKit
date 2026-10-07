@@ -147,7 +147,7 @@ public struct EmptyStateView: View {
             IconView(
                 source: .sfSymbol(icon.isEmpty ? "exclamationmark.triangle" : icon),
                 style: .circle(
-                    size: AppIconSize.ultra,
+                    size: AppIconSize.Tile.xxxl,
                     tint: .destructiveMonochrome
                 )
             )

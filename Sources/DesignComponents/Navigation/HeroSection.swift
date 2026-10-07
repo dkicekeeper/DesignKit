@@ -69,7 +69,7 @@ public struct HeroSection<Accessory: View>: View {
     }
 
     /// Diameter of the progress ring that wraps the hero icon.
-    /// Icon is `AppIconSize.ultra` (80pt); ring sits 6pt outside.
+    /// Icon is `AppIconSize.Tile.xxxl` (80pt); ring sits 6pt outside.
     /// (Computed, not `static let` — the type is generic, which bars stored statics.)
     private static var ringSize: CGFloat { HeroSectionMetrics.ringSize }
 
@@ -193,7 +193,7 @@ public extension HeroSection where Accessory == EmptyView {
 /// Sizes `HeroSection` and its skeleton share.
 enum HeroSectionMetrics {
     /// The progress ring around the hero icon.
-    static let ringSize: CGFloat = AppIconSize.ultra + 12
+    static let ringSize: CGFloat = AppIconSize.Tile.xxxl + 12
 }
 
 // MARK: - Skeleton
@@ -218,7 +218,7 @@ public struct HeroSectionSkeleton: View {
                             .stroke(SkeletonView.fill, lineWidth: 4)
                             .frame(width: HeroSectionMetrics.ringSize, height: HeroSectionMetrics.ringSize)
                     }
-                    SkeletonView.circle(AppIconSize.ultra)
+                    SkeletonView.circle(AppIconSize.Tile.xxxl)
                 }
             }
             VStack(spacing: AppSpacing.xs) {

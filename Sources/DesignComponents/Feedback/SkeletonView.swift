@@ -128,7 +128,7 @@ public struct SkeletonRow: View {
     public var body: some View {
         HStack(spacing: AppSpacing.md) {
             if showsIcon {
-                SkeletonView(height: AppIconSize.avatar, width: AppIconSize.avatar, cornerRadius: AppIconSize.avatar / 2)
+                SkeletonView(height: AppIconSize.Tile.xs, width: AppIconSize.Tile.xs, cornerRadius: AppIconSize.Tile.xs / 2)
             }
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 SkeletonView(height: 14, width: 160)

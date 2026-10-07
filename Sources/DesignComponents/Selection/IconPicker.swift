@@ -148,11 +148,11 @@ private struct IconPickerSymbolsTab: View {
                     IconView(
                         source: .sfSymbol(symbol),
                         style: .circle(
-                            size: AppIconSize.xxxl,
+                            size: AppIconSize.Tile.md,
                             tint: .monochrome(isSelected ? AppColors.staticWhite : AppColors.textPrimary)
                         )
                     )
-                    .frame(width: AppIconSize.mega, height: AppIconSize.mega)
+                    .frame(width: AppIconSize.Tile.xl, height: AppIconSize.Tile.xl)
                     .background(isSelected ? AppColors.accent : AppColors.bgCard)
                     .clipShape(.rect(cornerRadius: AppRadius.lg))
                 }
@@ -214,8 +214,8 @@ private struct IconPickerLogosTab: View {
                 ForEach(section.entries) { entry in
                     let isSelected = selection == .brandService(entry.domain)
                     Button { pick(entry.domain) } label: {
-                        IconView(source: .brandService(entry.domain), size: AppIconSize.xxxl)
-                            .frame(width: AppIconSize.mega, height: AppIconSize.mega)
+                        IconView(source: .brandService(entry.domain), size: AppIconSize.Tile.md)
+                            .frame(width: AppIconSize.Tile.xl, height: AppIconSize.Tile.xl)
                             .background(isSelected ? AppColors.pale(AppColors.accent) : AppColors.bgCard)
                             .clipShape(.rect(cornerRadius: AppRadius.lg))
                             .overlay(
@@ -270,7 +270,7 @@ private struct IconPickerLogosTab: View {
         let isSelected = selection == .brandService(domain)
         return Button { pick(domain) } label: {
             HStack(spacing: AppSpacing.md) {
-                IconView(source: .brandService(domain), size: AppIconSize.xxl)
+                IconView(source: .brandService(domain), size: AppIconSize.Tile.sm)
 
                 Text(verbatim: label)
                     .font(AppTypography.body)

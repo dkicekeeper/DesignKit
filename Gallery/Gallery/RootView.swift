@@ -33,29 +33,50 @@ struct RootView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Foundations") {
+                Section {
                     row("Colors", "paintpalette.fill", AppColors.accent) { ColorsScreen() }
                     row("Typography", "textformat", .pink) { TypographyScreen() }
                     row("Spacing & Radius", "ruler.fill", .orange) { SpacingScreen() }
                     row("Icon Sizes", "square.resize", .teal) { IconSizesScreen() }
-                }
-                Section("Elements") {
-                    row("Icons", "star.circle.fill", .indigo) { IconsScreen() }
-                    row("Buttons", "hand.tap.fill", .blue) { ButtonsScreen() }
-                    row("Cards & Surfaces", "rectangle.on.rectangle", .green) { CardsScreen() }
+                    row("Surfaces", "rectangle.on.rectangle", .green) { SurfacesScreen() }
                     row("Motion", "wand.and.rays", .purple) { MotionScreen() }
+                } header: {
+                    Text("Foundations")
                 }
-                Section("Components") {
-                    row("Components", "square.grid.2x2.fill", AppColors.accent) { ComponentsScreen() }
-                    row("Balances, Metrics & More", "creditcard.fill", .green) { BalancesScreen() }
-                    row("Badges, Stats & Rating", "star.leadinghalf.filled", .yellow) { DisplayScreen() }
-                    row("Loading, Steps & More", "rectangle.dashed", .gray) { PatternsScreen() }
-                    row("Skeletons", "text.below.photo", .gray) { SkeletonsScreen() }
-                    row("Onboarding, Calendar & More", "calendar", .orange) { FlowsScreen() }
-                    row("Community & Progress", "person.2.fill", .green) { CommunityScreen() }
-                    row("Forms & Settings", "list.bullet.rectangle.fill", .mint) { FormsScreen() }
-                    row("Inputs & Charts", "slider.horizontal.3", .pink) { InputsScreen() }
-                    row("Trend Charts", "chart.xyaxis.line", .teal) { TrendChartsScreen() }
+                Section {
+                    row("Actions", "hand.tap.fill", .blue, count: 8) { ActionsScreen() }
+                    row("Text Input", "character.cursor.ibeam", .indigo, count: 4) { TextInputScreen() }
+                    row("Selection", "checklist", .mint, count: 6) { SelectionScreen() }
+                    row("Amounts & Currency", "banknote.fill", .green, count: 12) { AmountsScreen() }
+                } header: {
+                    Text("Input & Actions")
+                }
+                Section {
+                    row("Rows: Settings & Forms", "list.bullet.rectangle.fill", .gray, count: 10) { SettingsRowsScreen() }
+                    row("Rows: Data", "list.bullet", .cyan, count: 11) { DataRowsScreen() }
+                    row("Cards: Money", "creditcard.fill", .green, count: 9) { MoneyCardsScreen() }
+                    row("Cards: Progress & Stats", "chart.bar.doc.horizontal.fill", .orange, count: 12) { ProgressCardsScreen() }
+                    row("Cards: Content", "text.bubble.fill", .pink, count: 5) { ContentCardsScreen() }
+                } header: {
+                    Text("Containers")
+                } footer: {
+                    Text("Rows and cards are split by what they show; each component has its own page with controls and states.")
+                }
+                Section {
+                    row("Charts", "chart.xyaxis.line", .teal, count: 8) { ChartsScreen() }
+                    row("Progress & Gauges", "gauge.with.dots.needle.67percent", .purple, count: 9) { ProgressScreen() }
+                    row("Status & Feedback", "exclamationmark.bubble.fill", .red, count: 10) { FeedbackScreen() }
+                } header: {
+                    Text("Data & Status")
+                }
+                Section {
+                    row("Headers & Navigation", "rectangle.topthird.inset.filled", .blue, count: 7) { NavigationScreen() }
+                    row("Media & Identity", "person.crop.circle.fill", .indigo, count: 9) { MediaScreen() }
+                    row("Content & Layout", "square.text.square.fill", .brown, count: 7) { ContentScreen() }
+                    row("Sheets & Flows", "rectangle.portrait.bottomhalf.inset.filled", .mint, count: 7) { SheetsScreen() }
+                    row("Effects", "sparkles", .purple, count: 5) { EffectsScreen() }
+                } header: {
+                    Text("Structure & Effects")
                 }
             }
             .navigationTitle("DesignKit")
@@ -101,18 +122,28 @@ struct RootView: View {
         _ title: String,
         _ symbol: String,
         _ tint: Color,
+        count: Int? = nil,
         @ViewBuilder destination: @escaping () -> Destination
     ) -> some View {
         NavigationLink {
             destination()
         } label: {
-            Label {
-                Text(title).font(AppTypography.bodyEmphasis)
-            } icon: {
-                Image(systemName: symbol)
-                    .foregroundStyle(.white)
-                    .frame(width: 30, height: 30)
-                    .background(tint, in: RoundedRectangle(cornerRadius: 7))
+            HStack {
+                Label {
+                    Text(title).font(AppTypography.bodyEmphasis)
+                } icon: {
+                    Image(systemName: symbol)
+                        .foregroundStyle(.white)
+                        .frame(width: 30, height: 30)
+                        .background(tint, in: RoundedRectangle(cornerRadius: 7))
+                }
+                Spacer()
+                if let count {
+                    Text("\(count)")
+                        .font(AppTypography.bodySmall)
+                        .foregroundStyle(AppColors.textSecondary)
+                        .monospacedDigit()
+                }
             }
         }
     }

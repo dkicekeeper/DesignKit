@@ -176,6 +176,13 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
   `AchievementMedal` / `AchievementTile` / `AchievementProgressRow`, `ChecklistRow` /
   `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard` / `ThumbnailRow`. Загрузка
   фото, реакции, модерация и каталог достижений остались в Dalada и приходят слотами и строками.
+- **1.13.0** — порядок, без новых компонентов и без изменения вида. Размеры иконок — две шкалы с
+  именами как у отступов: глифы `AppIconSize.xs…xl` и плашки `AppIconSize.Tile.xs…xxxl`
+  (`avatar`, `mega`, `ultra` и другие — устаревшие синонимы тех же значений). `BrandLogoView`
+  стал движком `IconView(source: .brandService)`. `primaryButton()`/`secondaryButton()` описаны
+  как сокращения `appButton`. Исходники и Gallery разложены по назначению компонента
+  (docs/gallery-structure.md, сравнение с HIG, Material 3, Atlassian, Ant); у каждого компонента
+  в Gallery своя страница с параметрами и состояниями, скелетон — состояние «Loading».
 
 Для 1.6.0–1.7.0 смотрели и на дизайн-систему TUI Т-Банка (Figma): как референс устройства токенов
 и списка состояний, а не как образец внешнего вида. Вид остаётся своим: Liquid Glass, Inter,

@@ -467,7 +467,7 @@ public struct UniversalRowSkeleton: View {
     ///   - showsSubtitle: A second, shorter line under the title.
     public init(
         config: RowConfiguration = .standard,
-        iconStyle: IconStyle? = .circle(size: AppIconSize.xxl),
+        iconStyle: IconStyle? = .circle(size: AppIconSize.Tile.sm),
         titleFont: Font = AppTypography.body,
         showsSubtitle: Bool = false,
         trailing: Trailing = .empty

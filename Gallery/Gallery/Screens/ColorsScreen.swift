@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import UIKit
 import DesignTokens
 
 struct ColorsScreen: View {
@@ -109,28 +110,62 @@ struct ColorsScreen: View {
 
     // MARK: Lists
 
+    /// Two columns of large swatches. Each swatch is split: the token in the light theme on the
+    /// left, in the dark theme on the right, with both hex values under the name.
     private func tokenList(_ tokens: [Token]) -> some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+        LazyVGrid(columns: [GridItem(.flexible(), spacing: AppSpacing.md), GridItem(.flexible(), spacing: AppSpacing.md)],
+                  alignment: .leading, spacing: AppSpacing.lg) {
             ForEach(tokens) { token in
-                HStack(spacing: AppSpacing.md) {
-                    RoundedRectangle(cornerRadius: AppRadius.xs)
-                        .fill(token.color)
-                        .frame(width: 44, height: 32)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: AppRadius.xs)
-                                .strokeBorder(AppColors.Border.normal)
-                        )
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text(token.name)
-                            .font(AppTypography.caption.weight(.medium))
-                            .foregroundStyle(AppColors.Text.primary)
-                        Text(token.use)
-                            .font(AppTypography.caption2)
-                            .foregroundStyle(AppColors.Text.secondary)
+                VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                    HStack(spacing: 0) {
+                        swatchHalf(token.color, scheme: .light)
+                        swatchHalf(token.color, scheme: .dark)
                     }
+                    .frame(height: 76)
+                    .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
+                            .strokeBorder(AppColors.Border.normal, lineWidth: 0.5)
+                    )
+                    Text(token.name)
+                        .font(AppTypography.bodySmall.weight(.semibold))
+                        .foregroundStyle(AppColors.Text.primary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                    Text(token.use)
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppColors.Text.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text("\(Self.hex(token.color, .light)) · \(Self.hex(token.color, .dark))")
+                        .font(AppTypography.caption2.monospaced())
+                        .foregroundStyle(AppColors.Text.tertiary)
                 }
             }
         }
+    }
+
+    /// One theme's half of a swatch, labelled ☀︎ or ☾ in its corner.
+    private func swatchHalf(_ color: Color, scheme: ColorScheme) -> some View {
+        Rectangle()
+            .fill(color)
+            .overlay(alignment: .bottomLeading) {
+                Image(systemName: scheme == .light ? "sun.max.fill" : "moon.fill")
+                    .font(AppTypography.caption2)
+                    .foregroundStyle(scheme == .light ? Color.black.opacity(0.35) : Color.white.opacity(0.5))
+                    .padding(AppSpacing.xs)
+            }
+            .background(scheme == .light ? Color.white : Color.black)
+            .environment(\.colorScheme, scheme)
+    }
+
+    /// The token's colour in a theme as #RRGGBB (with the alpha when it is translucent).
+    private static func hex(_ color: Color, _ scheme: ColorScheme) -> String {
+        let traits = UITraitCollection(userInterfaceStyle: scheme == .dark ? .dark : .light)
+        let resolved = UIColor(color).resolvedColor(with: traits)
+        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+        guard resolved.getRed(&red, green: &green, blue: &blue, alpha: &alpha) else { return "—" }
+        let rgb = String(format: "#%02X%02X%02X", Int(red * 255), Int(green * 255), Int(blue * 255))
+        return alpha < 0.999 ? "\(rgb) \(Int(alpha * 100))%" : rgb
     }
 
     // MARK: Demos

@@ -8,22 +8,36 @@
 import SwiftUI
 import DesignTokens
 
-/// Displays a brand logo loaded through the LogoService provider chain.
-/// No longer uses AsyncImage — relies entirely on the chain result.
-/// Uses .task(id:) for automatic cancellation on brandName change.
+/// A brand logo by name. Deprecated as a public view since 1.13.0: it is the engine of
+/// `IconView(source: .brandService(name))`, which adds the icon style (shape, size, glass) and
+/// the skeleton; call that instead. `style: .roundedSquare(size: size)` keeps this view's look
+/// (a corner of 20% of the size).
+@available(*, deprecated, message: "Use IconView(source: .brandService(name), style: .roundedSquare(size: size)): the same look, with the icon style and skeleton.")
 public struct BrandLogoView: View {
+    let brandName: String?
+    let size: CGFloat
+
+    public init(brandName: String?, size: CGFloat = AppIconSize.xl) {
+        self.brandName = brandName
+        self.size = size
+    }
+
+    public var body: some View {
+        BrandLogoImage(brandName: brandName, size: size)
+    }
+}
+
+/// Loads a brand logo through the host's `DesignKitLogoLoader` and draws it with a rounded
+/// corner, a spinner while it loads and a card symbol when there is none. Used by `IconView`.
+/// `.task(id:)` cancels a load when the name changes.
+struct BrandLogoImage: View {
     let brandName: String?
     let size: CGFloat
 
     @State private var logoImage: UIImage?
     @State private var isLoading = false
 
-    public init(brandName: String?, size: CGFloat = 32) {
-        self.brandName = brandName
-        self.size = size
-    }
-
-    public var body: some View {
+    var body: some View {
         Group {
             if let logoImage {
                 Image(uiImage: logoImage)

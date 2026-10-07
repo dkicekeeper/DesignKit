@@ -70,38 +70,74 @@ public enum AppRadius {
 
 // MARK: - Icon Sizing System
 
-/// Консистентная система размеров иконок
+/// Icon sizes, two scales named like `AppSpacing` (1.13.0):
+///
+/// - **Glyphs** (`AppIconSize.xs` … `.xl`, 12–32): an SF Symbol or a small logo on its own, in
+///   text, a toolbar, a row.
+/// - **Tiles** (`AppIconSize.Tile.xs` … `.xxxl`, 40–80): an icon with its own backing — a
+///   circle or rounded square, an avatar, a category coin, a hero symbol.
+///
+/// The semantic names of 1.x (`avatar`, `categoryIcon`, `mega`, `budgetRing`, `ultra`) and the
+/// tile sizes that sat in the glyph scale (`xxl`, `xxxl`) are deprecated aliases of the same
+/// values.
 public enum AppIconSize {
-    /// 16pt - Inline icons (в тексте, мелкие индикаторы)
+    /// 12 pt — a glyph at caption size (a status dot's symbol, a tiny mark).
+    public static let xs: CGFloat = 12
+
+    /// 16 pt — inline icons (in text, small indicators).
     public static let sm: CGFloat = 16
 
-    /// 20pt - Default icons (toolbar, списки)
+    /// 20 pt — default icons (toolbar, list rows).
     public static let md: CGFloat = 20
 
-    /// 24pt - Emphasized icons (category icons в списках)
+    /// 24 pt — emphasized icons.
     public static let lg: CGFloat = 24
 
-    /// 32pt - Large icons (bank logos)
+    /// 32 pt — large glyphs and logos.
     public static let xl: CGFloat = 32
 
-    /// 40pt - Medium avatar size (logo picker, subscription icons)
-    public static let avatar: CGFloat = 40
+    /// Icons with their own backing (circle, rounded square), avatars, coins, heroes.
+    public enum Tile {
+        /// 40 pt — an avatar, a small icon tile.
+        public static let xs: CGFloat = 40
 
-    /// 44pt - Extra large (category circles в QuickAdd)
-    public static let xxl: CGFloat = 44
+        /// 44 pt — the icon tile of a row (`IconView`'s default).
+        public static let sm: CGFloat = 44
 
-    /// 48pt - Hero icons (empty states)
-    public static let xxxl: CGFloat = 48
+        /// 48 pt — an empty state's icon.
+        public static let md: CGFloat = 48
 
-    /// 52pt - Category row icons
-    public static let categoryIcon: CGFloat = 52
+        /// 52 pt — a category coin.
+        public static let lg: CGFloat = 52
 
-    /// 64pt - Mega icons (category coins, large display elements)
-    public static let mega: CGFloat = 64
+        /// 64 pt — a large tile (category coin in a grid, a profile avatar).
+        public static let xl: CGFloat = 64
 
-    /// 72pt - Budget ring (coin + 8pt stroke space)
-    public static let budgetRing: CGFloat = 72
+        /// 72 pt — a ring around an `xl` tile (an 8 pt stroke).
+        public static let xxl: CGFloat = 72
 
-    /// 80pt - Ultra icons (hero sections, large action buttons)
-    public static let ultra: CGFloat = 80
+        /// 80 pt — a hero icon.
+        public static let xxxl: CGFloat = 80
+    }
+
+    @available(*, deprecated, renamed: "Tile.xs")
+    public static let avatar: CGFloat = Tile.xs
+
+    @available(*, deprecated, renamed: "Tile.sm")
+    public static let xxl: CGFloat = Tile.sm
+
+    @available(*, deprecated, renamed: "Tile.md")
+    public static let xxxl: CGFloat = Tile.md
+
+    @available(*, deprecated, renamed: "Tile.lg")
+    public static let categoryIcon: CGFloat = Tile.lg
+
+    @available(*, deprecated, renamed: "Tile.xl")
+    public static let mega: CGFloat = Tile.xl
+
+    @available(*, deprecated, renamed: "Tile.xxl")
+    public static let budgetRing: CGFloat = Tile.xxl
+
+    @available(*, deprecated, renamed: "Tile.xxxl")
+    public static let ultra: CGFloat = Tile.xxxl
 }

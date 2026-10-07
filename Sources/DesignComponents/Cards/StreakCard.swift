@@ -53,7 +53,7 @@ public struct StreakCard: View {
             Image(systemName: systemImage)
                 .font(.system(size: AppIconSize.lg))
                 .foregroundStyle(isActive ? AppColors.accent : AppColors.textTertiary)
-                .frame(width: AppIconSize.avatar)
+                .frame(width: AppIconSize.Tile.xs)
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
                 Text(verbatim: title)
                     .font(AppTypography.bodyEmphasis)
@@ -89,7 +89,7 @@ public struct StreakCardSkeleton: View {
     public var body: some View {
         HStack(spacing: AppSpacing.md) {
             SkeletonView(height: AppIconSize.lg, width: AppIconSize.lg)
-                .frame(width: AppIconSize.avatar)
+                .frame(width: AppIconSize.Tile.xs)
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
                 SkeletonText(AppTypography.bodyEmphasis, width: 140)
                 SkeletonText(AppTypography.caption, width: 200)

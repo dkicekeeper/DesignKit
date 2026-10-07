@@ -72,7 +72,7 @@ public struct ProgressRingRow: View {
                 if let progress {
                     ProgressRing(
                         progress: progress.percentage / 100,
-                        size: AppIconSize.categoryIcon,
+                        size: AppIconSize.Tile.lg,
                         lineWidth: 3,
                         isOverBudget: progress.isOverLimit,
                         animatesOnAppear: false // list row — onAppear re-fires on scroll
@@ -82,7 +82,7 @@ public struct ProgressRingRow: View {
                 IconView(
                     source: iconSource,
                     style: .circle(
-                        size: AppIconSize.xxl,
+                        size: AppIconSize.Tile.sm,
                         tint: .monochrome(color),
                         backgroundColor: AppColors.pale(color)
                     )
@@ -171,8 +171,8 @@ public struct ProgressRingRowSkeleton: View {
             ZStack {
                 Circle()
                     .stroke(SkeletonView.fill, lineWidth: 3)
-                    .frame(width: AppIconSize.categoryIcon, height: AppIconSize.categoryIcon)
-                IconViewSkeleton(size: AppIconSize.xxl)
+                    .frame(width: AppIconSize.Tile.lg, height: AppIconSize.Tile.lg)
+                IconViewSkeleton(size: AppIconSize.Tile.sm)
             }
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 SkeletonText(AppTypography.h4, width: 120)

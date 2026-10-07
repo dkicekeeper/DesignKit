@@ -55,7 +55,7 @@ public struct RecurringPaymentCard: View {
         HStack(spacing: AppSpacing.md) {
             IconView(
                 source: iconSource,
-                size: AppIconSize.xxl
+                size: AppIconSize.Tile.sm
             )
 
             // Info
@@ -109,7 +109,7 @@ public struct RecurringPaymentCardSkeleton: View {
 
     public var body: some View {
         HStack(spacing: AppSpacing.md) {
-            IconViewSkeleton(size: AppIconSize.xxl)
+            IconViewSkeleton(size: AppIconSize.Tile.sm)
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 SkeletonText(AppTypography.bodyEmphasis, width: 120)
                 SkeletonText(AppTypography.body, width: 90)

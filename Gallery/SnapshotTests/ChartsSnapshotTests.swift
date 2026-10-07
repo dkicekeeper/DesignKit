@@ -24,10 +24,10 @@ extension ComponentSnapshots {
                     LinearProgressBar(value: 0.35, animatesOnAppear: false)
                     LinearProgressBar(percentage: 112, isOverBudget: true, color: AppColors.warning, animatesOnAppear: false)
                     HStack(spacing: AppSpacing.lg) {
-                        ProgressRing(progress: 0.45, size: AppIconSize.budgetRing, lineWidth: 5, animatesOnAppear: false, showsTrack: true)
+                        ProgressRing(progress: 0.45, size: AppIconSize.Tile.xxl, lineWidth: 5, animatesOnAppear: false, showsTrack: true)
                         ProgressRing(
                             progress: 1.15,
-                            size: AppIconSize.budgetRing,
+                            size: AppIconSize.Tile.xxl,
                             lineWidth: 5,
                             isOverBudget: true,
                             animatesOnAppear: false,

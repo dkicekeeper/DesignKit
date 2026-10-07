@@ -141,7 +141,9 @@ public enum AppAnimation {
 
 // MARK: - Interactive Button Style
 
-/// Интерактивный стиль кнопки с эффектом увеличения и bounce (iOS 16+ style)
+/// Press feedback for something tappable that does not look like a button — a card, a row,
+/// a tile: it shrinks to 96% and darkens a little while pressed. `Button { … } label: { Card() }
+/// .buttonStyle(.bounce)`. For a button, `appButton`.
 public struct BounceButtonStyle: ButtonStyle {
     public init() {}
 
@@ -154,7 +156,7 @@ public struct BounceButtonStyle: ButtonStyle {
 }
 
 public extension ButtonStyle where Self == BounceButtonStyle {
-    /// Применяет iOS 16+ стиль с эффектом увеличения и bounce при нажатии
+    /// Press feedback for a tappable card or row (`BounceButtonStyle`).
     static var bounce: BounceButtonStyle {
         BounceButtonStyle()
     }

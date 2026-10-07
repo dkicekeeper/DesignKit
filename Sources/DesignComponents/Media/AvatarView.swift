@@ -29,7 +29,7 @@ public struct AvatarView: View {
     public init(
         name: String?,
         image: Image? = nil,
-        size: CGFloat = AppIconSize.avatar,
+        size: CGFloat = AppIconSize.Tile.xs,
         tint: Color = AppColors.accent
     ) {
         self.name = name
@@ -73,7 +73,7 @@ public struct AvatarView: View {
 public struct AvatarViewSkeleton: View {
     let size: CGFloat
 
-    public init(size: CGFloat = AppIconSize.avatar) {
+    public init(size: CGFloat = AppIconSize.Tile.xs) {
         self.size = size
     }
 
