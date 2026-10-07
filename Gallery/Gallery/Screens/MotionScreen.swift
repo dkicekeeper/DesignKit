@@ -118,7 +118,7 @@ private struct StaggeredEntrancePage: View {
             HStack(spacing: -AppSpacing.sm) {
                 ForEach(0..<6, id: \.self) { index in
                     Circle()
-                        .fill(CategoryColors.hexColor(for: "icon\(index)"))
+                        .fill(CategoryColors.color(for: "icon\(index)"))
                         .frame(width: AppIconSize.xxl, height: AppIconSize.xxl)
                         .overlay(Image(systemName: "person.fill").foregroundStyle(.white))
                         .overlay(Circle().strokeBorder(AppColors.bgBase, lineWidth: 2))

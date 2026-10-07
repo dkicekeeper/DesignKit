@@ -130,3 +130,19 @@ show each one.
 - `SectionHeader` styles `.list` and `.card`; `SectionHeaderSkeleton` for both.
 - `PromptSheet`'s async `onPrimary`, `detent` and `dismissesOnAnswer`.
 - `AppIconSize.xxl` (40 pt glyph).
+
+## 6. 2.1.0
+
+| Before 2.1 | 2.1 |
+|---|---|
+| `BalanceRow(iconSource:title:amount:currency:detail:trailingSystemImage:…)` | `AmountRow(title, leading: .icon(iconSource), value: .amount(amount, color: AppColors.Text.secondary), currency:, style: .list, detail:, accessory: .systemImage(name))` |
+| `ProgressRingRow(iconSource:color:title:progress:currency:placeholder:…)` | `AmountRow(title, leading: .tinted(iconSource, color), value: .limit(progress, placeholder:), currency:, style: .list)` |
+| `BreakdownRow(iconSource:color:title:subtitle:amount:currency:percentage:showsChevron:)` | `AmountRow(title, subtitle:, subtitleLineLimit: 1, leading: .tinted(iconSource, color), value: .share(amount, percentage:), currency:, accessory: .chevron)` |
+| `InsightEntityRow(iconSource:title:subtitle:amount:currency:amountColor:amountCaption:)` | `AmountRow(title, subtitle:, leading: .icon(iconSource), value: .amount(amount, color:, caption:), currency:)` (`.none` for a `nil` icon) |
+| `BalanceRowSkeleton(showsDetail:)`, `ProgressRingRowSkeleton()`, `BreakdownRowSkeleton()`, `InsightEntityRowSkeleton()` | `AmountRowSkeleton(style: .list, showsDetail:)`, `(style: .list, showsRing: true)`, `(style: .info)` |
+| `BalanceRow.Detail` | `AmountRow.Detail` |
+| `CategoryColors.hexColor(for:opacity:)` | `CategoryColors.color(for:opacity:)` |
+
+The old rows are deprecated wrappers that draw the same pixels, with one change: a limit row
+without a limit keeps the ring's room around its icon (52 pt), so it lines up with the rows that
+have one (its icon and name were 8 pt to the left, the row 8 pt shorter).

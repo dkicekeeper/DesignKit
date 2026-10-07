@@ -124,10 +124,10 @@ extension ComponentSnapshots {
         @Test func dataRowSkeletons() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                    BalanceRowSkeleton(showsDetail: true)
-                    ProgressRingRowSkeleton()
-                    BreakdownRowSkeleton()
-                    InsightEntityRowSkeleton()
+                    AmountRowSkeleton(style: .list, showsDetail: true)
+                    AmountRowSkeleton(style: .list, showsRing: true)
+                    AmountRowSkeleton(style: .info)
+                    AmountRowSkeleton(style: .info)
                     NetAmountRowSkeleton()
                     ScheduleRowSkeleton()
                     InfoRowSkeleton(showsIcon: true)

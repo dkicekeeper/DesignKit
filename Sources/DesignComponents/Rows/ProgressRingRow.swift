@@ -5,6 +5,8 @@
 //  A row whose icon wears a progress ring: the name, then "spent / limit (74%)", or a
 //  placeholder line when there is no limit. Ported from Tenra's CategoryRow; its category
 //  model, the tap, the swipe-to-delete and the over-budget haptic stay in Tenra as an adapter.
+//  2.1.0: an `AmountRow` with a `.limit` value in the list style; this name is deprecated. The
+//  icon keeps the ring's room with or without a limit, so a list of both lines up.
 //
 
 import SwiftUI
@@ -26,6 +28,7 @@ import DesignSupport
 /// ProgressRingRow(iconSource: .sfSymbol("car.fill"), color: .blue, title: "Transport",
 ///                 progress: nil, currency: "KZT", placeholder: "No budget set")
 /// ```
+@available(*, deprecated, message: "Use AmountRow(title, leading: .tinted(source, color), value: .limit(progress, placeholder:), currency:, style: .list).")
 public struct ProgressRingRow: View {
     let iconSource: IconSource?
     let color: Color
@@ -35,8 +38,6 @@ public struct ProgressRingRow: View {
     let placeholder: String?
     let transitionSourceID: String?
     let transitionNamespace: Namespace.ID?
-
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     /// - Parameters:
     ///   - color: Tints the icon and its circle.
@@ -66,121 +67,26 @@ public struct ProgressRingRow: View {
     }
 
     public var body: some View {
-        HStack(spacing: AppSpacing.md) {
-            // Icon with the limit's progress ring
-            ZStack {
-                if let progress {
-                    ProgressRing(
-                        progress: progress.percentage / 100,
-                        size: AppIconSize.Tile.lg,
-                        lineWidth: 3,
-                        isOverBudget: progress.isOverLimit,
-                        animatesOnAppear: false // list row — onAppear re-fires on scroll
-                    )
-                }
-
-                Icon(
-                    source: iconSource,
-                    style: .circle(
-                        size: AppIconSize.Tile.sm,
-                        tint: .monochrome(color),
-                        backgroundColor: AppColors.pale(color)
-                    )
-                )
-            }
-            .matchedTransitionSourceIfPresent(
-                id: transitionSourceID,
-                namespace: transitionNamespace
-            )
-
-            // Name and the limit
-            VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                Text(title)
-                    .font(AppTypography.h4)
-
-                if let progress {
-                    limitLine(progress)
-                } else if let placeholder {
-                    Text(placeholder)
-                        .font(AppTypography.bodySmall)
-                        .foregroundStyle(AppColors.Text.secondary)
-                }
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func limitLine(_ progress: LimitProgress) -> some View {
-        let amountColor = progress.isOverLimit ? AppColors.destructive : AppColors.Text.secondary
-        if dynamicTypeSize.isAccessibilitySize {
-            // Accessibility text sizes: on one line both amounts were cut to "185… / 250…".
-            VStack(alignment: .leading, spacing: AppSpacing.xxs) {
-                FormattedAmountText(
-                    amount: progress.spent,
-                    currency: currency,
-                    fontSize: AppTypography.bodySmall,
-                    fontWeight: .semibold,
-                    color: amountColor
-                )
-                HStack(spacing: 0) {
-                    Text(verbatim: "/ ")
-                        .font(AppTypography.bodySmall)
-                        .foregroundStyle(amountColor)
-                    FormattedAmountText(
-                        amount: progress.limit,
-                        currency: currency,
-                        fontSize: AppTypography.bodySmall,
-                        fontWeight: .semibold,
-                        color: amountColor
-                    )
-                }
-                percentageText(progress)
-            }
-        } else {
-            HStack(spacing: AppSpacing.xs) {
-                SpentBudgetText(
-                    spent: progress.spent,
-                    budget: progress.limit,
-                    currency: currency,
-                    fontWeight: .semibold,
-                    amountColor: amountColor,
-                    separatorColor: amountColor
-                )
-
-                percentageText(progress)
-            }
-        }
-    }
-
-    private func percentageText(_ progress: LimitProgress) -> some View {
-        Text(verbatim: "(\(Int(progress.percentage))%)")
-            .font(AppTypography.bodySmall)
-            .foregroundStyle(AppColors.Text.secondary)
+        AmountRow(
+            title,
+            leading: .tinted(iconSource, color),
+            value: .limit(progress, placeholder: placeholder),
+            currency: currency,
+            style: .list,
+            transitionSourceID: transitionSourceID,
+            transitionNamespace: transitionNamespace
+        )
     }
 }
 
 // MARK: - Skeleton
 
-/// Placeholder of a `ProgressRingRow`: the ring's track around the round icon, the title
-/// and the limit line.
+/// Placeholder of a `ProgressRingRow`: `AmountRowSkeleton(style: .list, showsRing: true)`.
+@available(*, deprecated, message: "Use AmountRowSkeleton(style: .list, showsRing: true).")
 public struct ProgressRingRowSkeleton: View {
     public init() {}
 
     public var body: some View {
-        HStack(spacing: AppSpacing.md) {
-            ZStack {
-                Circle()
-                    .stroke(Skeleton.fill, lineWidth: 3)
-                    .frame(width: AppIconSize.Tile.lg, height: AppIconSize.Tile.lg)
-                IconSkeleton(size: AppIconSize.Tile.sm)
-            }
-            VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                SkeletonText(AppTypography.h4, width: 120)
-                SkeletonText(AppTypography.bodySmall, width: 150)
-            }
-            Spacer(minLength: 0)
-        }
-        .shimmer()
-        .skeletonLoadingLabel()
+        AmountRowSkeleton(style: .list, showsRing: true)
     }
 }

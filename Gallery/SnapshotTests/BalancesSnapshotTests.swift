@@ -2,8 +2,8 @@
 //  BalancesSnapshotTests.swift
 //  DesignKit Gallery snapshot tests
 //
-//  Components ported from Tenra in 1.5.0: BalanceCard, SelectableBalanceCard, BalanceRow,
-//  ProgressRingRow, ProgressRingTile, MetricCard, GradientOrbsBackground, PromptSheet.
+//  Components ported from Tenra in 1.5.0: BalanceCard, SelectableBalanceCard, AmountRow (list:
+//  BalanceRow and ProgressRingRow before 2.1), ProgressRingTile, MetricCard, GradientOrbsBackground, PromptSheet.
 //
 
 import SwiftUI
@@ -37,19 +37,23 @@ extension ComponentSnapshots {
             )
         }
 
+        /// `AmountRow` in the list style with an amount (BalanceRow before 2.1, the same pixels).
         @Test func balanceRows() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {
-                    BalanceRow(iconSource: .sfSymbol("creditcard.fill"), title: "Kaspi Gold",
-                               amount: 1_284_500, currency: "KZT")
-                    BalanceRow(iconSource: .sfSymbol("banknote.fill"), title: "Deposit",
-                               amount: 2_000_000, currency: "KZT",
-                               detail: .init("Posting: 30 Oct  ·  ", amount: 12_400),
-                               trailingSystemImage: "lock.square.stack.fill")
-                    BalanceRow(iconSource: .sfSymbol("building.columns.fill"), title: "Term deposit",
-                               amount: 5_000_000, currency: "KZT",
-                               detail: .init("Next posting: 1 Nov"),
-                               trailingSystemImage: "lock.square.stack.fill")
+                    AmountRow("Kaspi Gold", leading: .icon(.sfSymbol("creditcard.fill")),
+                              value: .amount(1_284_500, color: AppColors.Text.secondary),
+                              currency: "KZT", style: .list)
+                    AmountRow("Deposit", leading: .icon(.sfSymbol("banknote.fill")),
+                              value: .amount(2_000_000, color: AppColors.Text.secondary),
+                              currency: "KZT", style: .list,
+                              detail: .init("Posting: 30 Oct  ·  ", amount: 12_400),
+                              accessory: .systemImage("lock.square.stack.fill"))
+                    AmountRow("Term deposit", leading: .icon(.sfSymbol("building.columns.fill")),
+                              value: .amount(5_000_000, color: AppColors.Text.secondary),
+                              currency: "KZT", style: .list,
+                              detail: .init("Next posting: 1 Nov"),
+                              accessory: .systemImage("lock.square.stack.fill"))
                 }
                 .cardContentPadding()
                 .cardStyle(),
@@ -57,15 +61,20 @@ extension ComponentSnapshots {
             )
         }
 
+        /// `AmountRow` limit rows (ProgressRingRow before 2.1). The row without a limit keeps the
+        /// ring's room, so its icon and name line up with the others (2.1.0).
         @Test func progressRingRows() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {
-                    ProgressRingRow(iconSource: .sfSymbol("fork.knife"), color: .orange, title: "Food",
-                                    progress: LimitProgress(spent: 185_000, limit: 250_000), currency: "KZT")
-                    ProgressRingRow(iconSource: .sfSymbol("bag.fill"), color: AppColors.accent, title: "Shopping",
-                                    progress: LimitProgress(spent: 132_000, limit: 100_000), currency: "KZT")
-                    ProgressRingRow(iconSource: .sfSymbol("car.fill"), color: .blue, title: "Transport",
-                                    progress: nil, currency: "KZT", placeholder: "No budget set")
+                    AmountRow("Food", leading: .tinted(.sfSymbol("fork.knife"), .orange),
+                              value: .limit(LimitProgress(spent: 185_000, limit: 250_000)),
+                              currency: "KZT", style: .list)
+                    AmountRow("Shopping", leading: .tinted(.sfSymbol("bag.fill"), AppColors.accent),
+                              value: .limit(LimitProgress(spent: 132_000, limit: 100_000)),
+                              currency: "KZT", style: .list)
+                    AmountRow("Transport", leading: .tinted(.sfSymbol("car.fill"), .blue),
+                              value: .limit(nil, placeholder: "No budget set"),
+                              currency: "KZT", style: .list)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .cardContentPadding()

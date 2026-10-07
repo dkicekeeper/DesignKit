@@ -5,6 +5,7 @@
 //  Shared "icon + name + subtitle + trailing amount" row for Insights detail
 //  lists. Replaces three near-identical ad-hoc builders in InsightDetailView
 //  (recurring payments, wealth accounts, dormant accounts). Built on UniversalRow.
+//  2.1.0: an `AmountRow` with an `.amount` value; this name is deprecated.
 //
 
 import SwiftUI
@@ -16,6 +17,7 @@ import DesignSupport
 ///
 /// Use the `subtitle: String` convenience for plain-text subtitles; use the
 /// `@ViewBuilder` initializer for dynamic subtitles (e.g. a relative date).
+@available(*, deprecated, message: "Use AmountRow(title, subtitle:, leading: .icon(source), value: .amount(amount, color:, caption:), currency:).")
 public struct InsightEntityRow<Subtitle: View>: View {
     let iconSource: IconSource?
     let title: String
@@ -24,8 +26,6 @@ public struct InsightEntityRow<Subtitle: View>: View {
     var amountColor: Color = AppColors.Text.primary
     var amountCaption: String? = nil
     @ViewBuilder let subtitle: () -> Subtitle
-
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     public init(
         iconSource: IconSource?,
@@ -46,60 +46,19 @@ public struct InsightEntityRow<Subtitle: View>: View {
     }
 
     public var body: some View {
-        if dynamicTypeSize.isAccessibilitySize {
-            // Accessibility text sizes: the amount moves under the title, which then has the
-            // row's full width and does not break mid-word.
-            UniversalRow(
-                config: .info,
-                leadingIcon: iconSource.map { .auto(source: $0, size: AppIconSize.Tile.sm) }
-            ) {
-                VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                    Text(title)
-                        .font(AppTypography.body)
-                        .foregroundStyle(AppColors.Text.primary)
-                    subtitle()
-                    amountStack(alignment: .leading)
-                }
-            } trailing: {
-                EmptyView()
-            }
-        } else {
-            UniversalRow(
-                config: .info,
-                leadingIcon: iconSource.map { .auto(source: $0, size: AppIconSize.Tile.sm) }
-            ) {
-                VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                    Text(title)
-                        .font(AppTypography.body)
-                        .foregroundStyle(AppColors.Text.primary)
-                    subtitle()
-                }
-            } trailing: {
-                amountStack(alignment: .trailing)
-            }
-        }
-    }
-
-    private func amountStack(alignment: HorizontalAlignment) -> some View {
-        VStack(alignment: alignment, spacing: AppSpacing.xs) {
-            FormattedAmountText(
-                amount: amount,
-                currency: currency,
-                fontSize: AppTypography.body,
-                fontWeight: .semibold,
-                color: amountColor
-            )
-            if let amountCaption {
-                Text(amountCaption)
-                    .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.Text.secondary)
-            }
-        }
+        AmountRow(
+            title,
+            leading: iconSource.map(AmountRow.Leading.icon) ?? AmountRow.Leading.none,
+            value: .amount(amount, color: amountColor, caption: amountCaption),
+            currency: currency,
+            subtitle: subtitle
+        )
     }
 }
 
 // MARK: - Plain-text subtitle convenience
 
+@available(*, deprecated)
 public extension InsightEntityRow where Subtitle == Text {
     init(
         iconSource: IconSource?,
@@ -125,38 +84,14 @@ public extension InsightEntityRow where Subtitle == Text {
     }
 }
 
-// MARK: - Previews
-
 // MARK: - Skeleton
 
-/// Placeholder of a `InsightEntityRow`: the round icon, the title and subtitle, and the amount with its
-/// caption on the trailing edge; the amount goes under the title at accessibility text sizes,
-/// like the row.
+/// Placeholder of an `InsightEntityRow`: `AmountRowSkeleton(style: .info)`.
+@available(*, deprecated, message: "Use AmountRowSkeleton(style: .info).")
 public struct InsightEntityRowSkeleton: View {
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-
     public init() {}
 
     public var body: some View {
-        HStack(spacing: RowConfiguration.info.spacing) {
-            IconSkeleton(size: AppIconSize.Tile.sm)
-            VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                SkeletonText(AppTypography.body, width: 110)
-                SkeletonText(AppTypography.bodySmall, width: 70)
-                if dynamicTypeSize.isAccessibilitySize {
-                    SkeletonText(AppTypography.body, width: 90)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            if !dynamicTypeSize.isAccessibilitySize {
-                VStack(alignment: .trailing, spacing: AppSpacing.xs) {
-                    SkeletonText(AppTypography.body, width: 90)
-                    SkeletonText(AppTypography.bodySmall, width: 40)
-                }
-            }
-        }
-        .shimmer()
-        .padding(.vertical, RowConfiguration.info.verticalPadding)
-        .skeletonLoadingLabel()
+        AmountRowSkeleton(style: .info)
     }
 }

@@ -78,7 +78,7 @@ generic input or a host hook (see [CLAUDE.md](../CLAUDE.md) → *Porting a compo
 - **`PeriodDataPoint` adapters** (Tenra): `PeriodDataPoint: ChartPoint`, `PeriodChartSeries` → `ChartSeries`, and convenience inits keeping the old call sites (`granularity:`, `currency:`). `PeriodBreakdownRow` and `ChartAxisHelpers`' period labels stay app-side.
 - **Tenra services**: `DateFormatters`, `FastDateParser`. (`EditableHeroSection`, `IconPickerView`, `CurrencySelectorView`, `AmountInputView` and `CurrencyListContent` became `EditableHero`, `IconPicker`, `CurrencyPickerMenu`, `CurrencyAmountInput` and `CurrencyList` in 1.10.0, behind the `DesignKitLogoCatalog` and `convertSync` hooks.)
 - **Screens over Tenra models**: the account, category and time filter sheets (built from `CheckmarkRow`), the home sections (`FinanceCard` + `PackedCircleIcons`).
-- **Domain convenience inits / adapters**: `MenuPickerRow where T == RecurringFrequency / LoanType / ReminderOption`, `StatusIndicatorBadge`'s `RecurringSeries.entityStatus`, `DonutSlice.from([CategoryBreakdownItem])`, Tenra's `InsightTrendBadge` (`InsightTrend` → `TrendBadge`), Tenra's adapters under the old names of the components ported in 1.1.0–1.5.0 (`AccountRow` → `BalanceRow`, `CategoryRow` → `ProgressRingRow`, `CategoryChip` → `ProgressRingTile`, `BudgetProgressRow` → `LimitProgressCard`, …), Dalada's `RuleStatusBadge` (`RuleStatus` → `Badge`).
+- **Domain convenience inits / adapters**: `MenuPickerRow where T == RecurringFrequency / LoanType / ReminderOption`, `StatusIndicatorBadge`'s `RecurringSeries.entityStatus`, `DonutSlice.from([CategoryBreakdownItem])`, Tenra's `InsightTrendBadge` (`InsightTrend` → `TrendBadge`), Tenra's adapters under the old names of the components ported in 1.1.0–1.5.0 (`AccountRow` and `CategoryRow` → `AmountRow` since 2.1.0, `CategoryChip` → `ProgressRingTile`, `BudgetProgressRow` → `LimitProgressCard`, …), Dalada's `RuleStatusBadge` (`RuleStatus` → `Badge`).
 
 ---
 
@@ -92,7 +92,7 @@ All tokens live in `Sources/DesignTokens/`. Never use raw values — always refe
 
 Modifiers:
 - **`OnDark` / `OnLight`**: the same value in both themes, for content on photos, gradients and coloured headers (a trip photo in Dalada, `GradientOrbsBackground`, an accent hero).
-- **`Pale`**: a tinted container behind status text, badges and icons. `AppColors.pale(_:)` makes one from any colour (a category colour too): 12% in light, 24% in dark. Since 1.8.0 every tinted container in DesignKit uses it, so they are equally strong everywhere: `Badge` (tinted), `TrendBadge` (pill), `RecommendationBox`, `HeroSymbol`, `Avatar` (initials), the round icons of `LimitProgressCard`, `BreakdownRow` and `ProgressRingRow`, `ActivityTimeline` markers, the `ScoreGaugeCard` grade and `TargetProgressCard` badge, `MonthCalendar`'s today, `TagInput` chips and the calculator's operator keys. Progress tracks and chart fills are not containers and keep their own opacity.
+- **`Pale`**: a tinted container behind status text, badges and icons. `AppColors.pale(_:)` makes one from any colour (a category colour too): 12% in light, 24% in dark. Since 1.8.0 every tinted container in DesignKit uses it, so they are equally strong everywhere: `Badge` (tinted), `TrendBadge` (pill), `RecommendationBox`, `HeroSymbol`, `Avatar` (initials), the round icons of `LimitProgressCard` and `AmountRow`'s tinted icon, `ActivityTimeline` markers, the `ScoreGaugeCard` grade and `TargetProgressCard` badge, `MonthCalendar`'s today, `TagInput` chips and the calculator's operator keys. Progress tracks and chart fills are not containers and keep their own opacity.
 - **Opaque** (`Border.opaque`): no transparency, for outlines that overlap.
 
 **`AppColors.Text`** — text and icons
@@ -135,7 +135,7 @@ Modifiers:
 
 For archived/inactive UI use `Color(.systemGray)` directly — there is no dedicated token.
 
-**Category colors:** `CategoryColors.hexColor(for:opacity:)` — 14-color hex palette hashed by name; `CategoryColors.paletteColors` (1.10.0) is the palette itself, for an app's own name-coloured visuals (Tenra's letter avatars). DesignKit has no custom-category override; Tenra keeps its `customCategories:` / store-backed overloads app-side. The slot is `CategoryColors.paletteIndex(for:)`, an FNV-1a hash of the name: the same on every launch and device (since 0.7.0; before that it used `String.hashValue`, which Swift seeds per process, so the colour changed between launches). `CategoryColors.pickerPalette` (1.11.0) is what a user can pick (`ColorPickerRow`'s default): the 14 hash colours first, then 16 deeper and neutral shades (30 `#rrggbb` strings). The hash palette itself stays at 14: `paletteIndex` is `hash % count`, so growing it would re-colour every category and avatar that relies on the name; new colours go to the picker only.
+**Category colors:** `CategoryColors.color(for:opacity:)` (`hexColor(for:)` before 2.1.0: it returns a colour, not a hex) — the 14-colour palette hashed by name; `CategoryColors.paletteColors` (1.10.0) is the palette itself, for an app's own name-coloured visuals (Tenra's letter avatars). DesignKit has no custom-category override; Tenra keeps its `customCategories:` / store-backed overloads app-side. The slot is `CategoryColors.paletteIndex(for:)`, an FNV-1a hash of the name: the same on every launch and device (since 0.7.0; before that it used `String.hashValue`, which Swift seeds per process, so the colour changed between launches). `CategoryColors.pickerPalette` (1.11.0) is what a user can pick (`ColorPickerRow`'s default): the 14 hash colours first, then 16 deeper and neutral shades (30 `#rrggbb` strings). The hash palette itself stays at 14: `paletteIndex` is `hash % count`, so growing it would re-colour every category and avatar that relies on the name; new colours go to the picker only.
 
 ### Spacing (`AppSpacing`)
 
@@ -220,7 +220,7 @@ For dynamic-size amount inputs use `Font.custom(AppTypography.fontFamily, …)` 
 
 **Numbers (1.8.0).** `AppTypography.numbers(_:)` is any of the styles above with tabular figures (every digit equally wide): amounts in a column line up and a number that changes (`.numericText()`) keeps its width. `FormattedAmountText`, `AmountDigitDisplay` (the amount input), `TrendBadge` percentages, `ChartSelectionBanner` readouts and the chart legend and pill amounts use it; `StatTile`, `CalculationCard` and `AvatarGroup` already used `.monospacedDigit()`. Use it for any other figure that changes or stacks: `Text(count, format: .number).font(AppTypography.numbers(AppTypography.h3))`.
 
-**Accessibility text sizes (AX1–AX5).** Side-by-side layouts stack when `dynamicTypeSize.isAccessibilitySize` (Apple's HIG rule): a row of columns or a "title …… value" row does not truncate values or break words mid-word, it puts them one under another. Standard sizes keep the side-by-side layout untouched — branch on `isAccessibilitySize`, don't rework the regular layout. Since 1.3.0: `ComparisonCard` (before, now, change), `TotalsCard` (one total per line), `InsightEntityRow` and `BreakdownRow` (the amount under the title), `MenuPickerRow` (the value under the title); since 1.5.1 `BalanceRow` (a detail's amount under its text) and `ProgressRingRow` (spent, "/ limit" and the share on three lines). Snapshot tests check AX2 (`largeText`).
+**Accessibility text sizes (AX1–AX5).** Side-by-side layouts stack when `dynamicTypeSize.isAccessibilitySize` (Apple's HIG rule): a row of columns or a "title …… value" row does not truncate values or break words mid-word, it puts them one under another. Standard sizes keep the side-by-side layout untouched — branch on `isAccessibilitySize`, don't rework the regular layout. Since 1.3.0: `ComparisonCard` (before, now, change), `TotalsCard` (one total per line), `AmountRow`'s info style (the amount under the title), `MenuPickerRow` (the value under the title); since 1.5.1 `AmountRow`'s list style (a detail's amount under its text; spent, "/ limit" and the share on three lines). Snapshot tests check AX2 (`largeText`).
 
 ### Animations (`AppAnimation`)
 
@@ -423,12 +423,12 @@ Every row in `Views/Components/Rows/` follows these token rules. New rows MUST c
 
 | Slot | Token | Notes |
 |------|-------|-------|
-| **Leading icon — content rows** | `AppIconSize.Tile.sm` (44) | BalanceRow, ProgressRingRow, BreakdownRow, InsightEntityRow, LimitProgressCard |
+| **Leading icon — content rows** | `AppIconSize.Tile.sm` (44); a limit row keeps the ring's `Tile.lg` (52) slot with or without a limit | AmountRow, LimitProgressCard |
 | **Leading icon — form rows** | `AppIconSize.lg` (24) | InfoRow, MenuPickerRow, DatePickerRow |
 | **Leading icon — settings rows** | `AppIconSize.md` (20) | ActionSettingsRow, NavigationSettingsRow |
 | **HStack spacing (icon ↔ content)** | `AppSpacing.md` (12) | All rows |
 | **Inner VStack (title ↔ subtitle)** | `AppSpacing.xs` (4) | Never `xxs` |
-| **Title — management lists** | `AppTypography.h4` (20 semibold) | BalanceRow, ProgressRingRow (larger touch lists) |
+| **Title — management lists** | `AppTypography.h4` (20 semibold) | AmountRow `.list` (larger touch lists) |
 | **Title — detail / breakdown rows** | `AppTypography.body` (18) or `bodyEmphasis` (18 semibold) | Insights detail rows. Use the `bodyEmphasis` **token** — never `body` + `.fontWeight(.semibold)` |
 | **Subtitle / secondary line** | `AppTypography.bodySmall` (16) / `AppColors.textSecondary` | One token for all secondary subtitles |
 | **Trailing amount** | `FormattedAmountText` (default body/semibold) | Never hand-format money |
@@ -469,14 +469,48 @@ A label with a net amount (destructive when negative) and "+inflow −outflow" u
 #### `ScheduleRow` *(1.1.0)*
 A schedule entry: a checked circle when `isDone` (the row is dimmed with `futureTransactionStyle` when not), title + date subtitle, the amount and an optional detail line under it (`detailColor`, `AppColors.expense` by default). Vertical padding of the `.info` preset (8; none before 1.4.0). Tenra: `AmortizationScheduleRow` (payment number, date format, interest) is an adapter.
 
-#### `BreakdownRow` *(1.2.0)*
-One part of a breakdown on `UniversalRow(.info)`: a 44 pt circle icon tinted with `color`, the title and an optional one-line subtitle, `AmountPercentage` (the amount over "42.0%") and, with `showsChevron: true`, a `DisclosureChevron` (wrap the row in a `NavigationLink`). `AmountPercentage` is public for other rows. Tenra: `CategoryBreakdownRow` (category name, subcategories) is an adapter.
+#### `AmountRow` *(2.1.0)*
+A row about money: an icon, a name, and an amount, a share or a limit. It merges four rows that
+were built the same way; their names are deprecated wrappers drawing the same pixels.
 
-#### `BalanceRow` *(1.5.0)*
-A named balance in a `List`: `Icon` (44 pt, the zoom-transition source with `transitionSourceID` / `transitionNamespace`), the name (h4), the amount (bodySmall, secondary), an optional `Detail` caption line ("Posting: 30 Oct  ·  " followed by an amount in `AppColors.planned`) and an optional secondary `trailingSystemImage` (a lock). At accessibility text sizes the detail's amount goes under its text, which drops a trailing "·". No padding: the list's row insets place it; the tap (`Button` + `.plain`) and `.swipeActions` stay at the call site. Tenra: `AccountRow` (account, deposit interest copy, delete) is an adapter.
+| Style | Look | Before 2.1 |
+|---|---|---|
+| `.list` | A `List` row, no padding (the list's insets place it). The name in `h4`, the value under it; the icon is the zoom-transition source with `transitionSourceID` / `transitionNamespace` | `BalanceRow` (`.amount`), `ProgressRingRow` (`.limit`) |
+| `.info` | `UniversalRow(.info)` padding, the name in `body`, a `bodySmall` subtitle, the value on the trailing edge (`body` semibold over a caption); at accessibility sizes the value goes under the name | `BreakdownRow` (`.share`), `InsightEntityRow` (`.amount` with a caption) |
 
-#### `ProgressRingRow` *(1.5.0)*
-A row whose icon wears a progress ring: a 44 pt circle icon tinted with `color` inside a 3 pt `ProgressRing` (`LimitProgress`; no ring when `nil`), the name (h4), then `SpentBudgetText` (semibold, destructive when over) and "(74%)", or `placeholder` ("No budget set") without a limit; at accessibility text sizes the spent amount, "/ limit" and the share go on three lines. A `List` row like `BalanceRow`: no padding, tap and swipe at the call site. Tenra: `CategoryRow` (category, budget, the over-budget haptic) is an adapter.
+```swift
+// An account                                   (BalanceRow)
+AmountRow(account.name, leading: .icon(account.iconSource),
+          value: .amount(balance, color: AppColors.Text.secondary), currency: code, style: .list,
+          detail: .init("Posting: 30 Oct  ·  ", amount: 12_400), accessory: .systemImage("lock.square.stack.fill"))
+// A category and its budget                     (ProgressRingRow)
+AmountRow(category.name, leading: .tinted(category.icon, category.color),
+          value: .limit(progress, placeholder: "No budget set"), currency: code, style: .list)
+// A part of a breakdown                         (BreakdownRow)
+AmountRow("Food", subtitle: "Groceries, Cafés", subtitleLineLimit: 1,
+          leading: .tinted(.sfSymbol("fork.knife"), color), value: .share(85_000, percentage: 42),
+          currency: code, accessory: .chevron)
+// An insight's item, a subtitle of its own      (InsightEntityRow)
+AmountRow(account.name, leading: .icon(account.iconSource), value: .amount(balance, color: AppColors.Text.secondary),
+          currency: code) { Text(lastActivity, style: .relative) }
+```
+
+- `leading`: `.icon(source)` (`Icon`'s own style for the source, 44 pt; `nil` is the placeholder),
+  `.tinted(source, color)` (the symbol on a pale disc of its colour), `.none`.
+- `value`: `.amount(amount, color:, caption:)`, `.share(amount, percentage:)` ("42.0%"),
+  `.limit(progress, placeholder:)`: in the list style "spent / limit (74%)" (`SpentBudgetText`,
+  semibold, destructive over the limit; three lines at accessibility sizes) and a 3 pt
+  `ProgressRing` around the icon, or the placeholder without a limit.
+- **A limit row keeps the ring's room** (`Tile.lg`, 52 pt) around its icon whether a limit is set or
+  not (2.1.0): a list of categories with and without a budget lines up. Before, a row without a
+  ring had its icon and name 8 pt to the left and was 8 pt shorter.
+- `detail`: a caption line under the value (text, then an amount in `AppColors.planned`); at
+  accessibility sizes the amount goes under its text, which drops a trailing "·".
+- `accessory`: `.chevron` (in a `NavigationLink`), `.systemImage(name)` (a secondary mark, a lock).
+- The tap (`Button` + `.plain`, or a `NavigationLink`) and `.swipeActions` stay at the call site.
+- Skeleton: `AmountRowSkeleton(style:showsRing:showsDetail:)`.
+- Tenra: `AccountRow`, `CategoryRow` (the over-budget haptic), `CategoryBreakdownRow` and the
+  insight lists are adapters. `AmountPercentage` (the amount over its share) stays public.
 
 #### `DatePickerRow`
 Inline `DatePicker` inside `UniversalRow`.
@@ -944,9 +978,9 @@ Every component that shows data has a skeleton, named after it (`BalanceCard` �
 
 ```swift
 if let accounts {
-    ForEach(accounts) { BalanceRow(…) }
+    ForEach(accounts) { AmountRow(…, style: .list) }
 } else {
-    ForEach(0..<3, id: \.self) { _ in BalanceRowSkeleton() }
+    ForEach(0..<3, id: \.self) { _ in AmountRowSkeleton(style: .list) }
 }
 ```
 
@@ -961,7 +995,8 @@ if let accounts {
 | `UniversalRow` | `UniversalRowSkeleton(config:iconStyle:titleFont:showsSubtitle:trailing:)` |
 | `NavigationSettingsRow`, `ToggleSettingsRow`, `ActionSettingsRow`, `MenuPickerRow`, `DatePickerRow`, `CheckmarkRow` | `UniversalRowSkeleton.navigationSettings`, `.toggleSettings`, `.actionSettings`, `.menuPicker`, `.datePicker`, `.checkmark(iconStyle:)` |
 | `SliderRow` (1.15.0) | `SliderRowSkeleton(showsHint:)` |
-| `BalanceRow`, `ProgressRingRow`, `BreakdownRow`, `InsightEntityRow`, `NetAmountRow`, `ScheduleRow`, `InfoRow`, `ColorPickerRow` | `…Skeleton` |
+| `AmountRow` (2.1.0) | `AmountRowSkeleton(style:showsRing:showsDetail:)` |
+| `NetAmountRow`, `ScheduleRow`, `InfoRow`, `ColorPickerRow` | `…Skeleton` |
 | `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `OrbChart` | `…Skeleton` |
 | `LinearProgressBar`, `ProportionBar`, `MiniProportionBar`, `AmountComparisonBar`, `HeroProportionBar`, `ProgressRing`, `MiniDonut`, `MiniHalfGauge`, `HeroHalfGauge`, `MiniMilestoneGauge`, `HeroMilestoneGauge`, `MiniBarPair`, `HeroBarPair` | `…Skeleton`, with the component's size parameters |
 | `Icon` | `IconSkeleton(style:)` / `IconSkeleton(size:)` |
@@ -1696,10 +1731,13 @@ Transaction list row?
 └── TransactionCard (NOT UniversalRow)
 
 Balance list row (accounts, wallets)?
-└── BalanceRow (custom, NOT UniversalRow)
+└── AmountRow(style: .list, value: .amount) (NOT UniversalRow)
 
 Row with a limit (budget ring around the icon)?
-└── ProgressRingRow (custom, NOT UniversalRow)
+└── AmountRow(style: .list, value: .limit) (NOT UniversalRow)
+
+A part of a whole, an insight's item (amount on the trailing edge)?
+└── AmountRow(value: .share / .amount), the info style on UniversalRow(.info)
 ```
 
 ### "Which container?"
@@ -2029,8 +2067,8 @@ with the iOS 27 SDK — Xcode 27; built with Xcode 26 the gate honours Reduce Mo
 |---|---|---|---|
 | **Card**: has its own surface | Its own: `.padding(AppSpacing.lg)` before `.cardStyle()`, inside the component | — | `TotalsCard`, `LimitProgressCard`, `ComparisonCard`, `CashFlowCard`, `ScoreCard`, `FinanceCard`, `EmptyCard`, `InsightsStatCard`, `SectionHeader(style: .card)` |
 | **Compact surface** | Its own, smaller | — | `MessageBanner` (`md`), `ChartSelectionBanner` (`lg` × `sm`) |
-| **Row**: no surface, lives in a container | Vertical only, from its `RowConfiguration` preset | The container's: a card's `.cardContentPadding()`, `List` / `Form` insets, or `.screenPadding()` | `InfoRow`, `InsightEntityRow`, `BreakdownRow`, `NetAmountRow`, `ScheduleRow` (`.info`, 8) |
-| **List row**: lives only in a `List` | None: the `List`'s row insets give both | `List` | `BalanceRow`, `ProgressRingRow` |
+| **Row**: no surface, lives in a container | Vertical only, from its `RowConfiguration` preset | The container's: a card's `.cardContentPadding()`, `List` / `Form` insets, or `.screenPadding()` | `InfoRow`, `AmountRow` (info style), `NetAmountRow`, `ScheduleRow` (`.info`, 8) |
+| **List row**: lives only in a `List` | None: the `List`'s row insets give both | `List` | `AmountRow(style: .list)` |
 | **Row in a `FormSection`** | Vertical and horizontal (`.standard`: 12 × 16), since `FormSection`'s surface has none | — | `MenuPickerRow`, `DatePickerRow` |
 | **Primitive** | None: the parent places it | — | `Badge`, `TrendBadge`, `FormattedAmountText`, `LinearProgressBar`, charts |
 

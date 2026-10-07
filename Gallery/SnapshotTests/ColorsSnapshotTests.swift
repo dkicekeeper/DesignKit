@@ -69,7 +69,7 @@ extension ComponentSnapshots {
                     ("warningPale", AppColors.Status.warningPale),
                     ("neutralPale", AppColors.Status.neutralPale),
                     ("pale(accent)", AppColors.pale(AppColors.accent)),
-                    ("pale(category)", AppColors.pale(CategoryColors.hexColor(for: "Food"))),
+                    ("pale(category)", AppColors.pale(CategoryColors.color(for: "Food"))),
                 ]),
                 named: "status"
             )
