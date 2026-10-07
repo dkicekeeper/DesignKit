@@ -92,10 +92,12 @@ func assertComponentSnapshot<V: View>(
     }
 }
 
-/// `true` when the run compares with the references (`SNAPSHOT_TESTING_RECORD` unset or
-/// `never`); a recording run draws each snapshot once.
+/// `true` when the run compares with the references: always but `SNAPSHOT_TESTING_RECORD=all`,
+/// which draws each snapshot once and writes it. `failed` and `missing` compare too, and only
+/// write what still differs after the second render: without that, a render that lost the
+/// glass shading (above) was written over a good reference, and the next run wrote it back.
 private let isComparingSnapshots =
-    (ProcessInfo.processInfo.environment["SNAPSHOT_TESTING_RECORD"] ?? "never") == "never"
+    (ProcessInfo.processInfo.environment["SNAPSHOT_TESTING_RECORD"] ?? "never") != "all"
 
 @MainActor
 enum ComponentRenderer {

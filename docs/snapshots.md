@@ -130,7 +130,10 @@ References are recorded on CI, not on a laptop, so they match what CI compares w
 2. Run the **CI** workflow manually on that branch (Actions → CI → Run workflow, or the API)
    with `record_snapshots`:
    - `missing`: only tests that have no reference yet (a new test or appearance);
-   - `failed`: only references that differ (after an intentional visual change);
+   - `failed`: only references that differ (after an intentional visual change); like a
+     normal run it draws a differing snapshot a second time and writes it only if it still
+     differs (2.4.0), so a render that lost the glass shading is not written over a good
+     reference;
    - `all`: every reference (after moving the Xcode pin).
 3. The snapshot job commits the PNGs to the branch (`test(snapshots): record references`).
    That push does not start CI, so run CI on the branch again with `record_snapshots: never`,
