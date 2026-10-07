@@ -151,6 +151,8 @@ public struct ChecklistSummaryRow: View {
                     height: ChecklistMetrics.barHeight,
                     animatesOnAppear: false
                 )
+                // 2.3.0: checking the last item makes the bar glow, with the success haptic.
+                .completionMoment(isComplete: isComplete, in: RoundedRectangle(cornerRadius: AppRadius.xs))
                 Text(verbatim: progressText ?? Self.defaultProgressText(checked: checked, total: total))
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.Text.secondary)

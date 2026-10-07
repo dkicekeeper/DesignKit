@@ -116,7 +116,10 @@ private struct OnboardingPagerPage: View {
             name: "OnboardingPager",
             summary: "Onboarding pages with dots, Skip where allowed and each page's own buttons.",
             since: "0.7.0",
-            apps: [.dalada]
+            apps: [.dalada],
+            notes: [
+                "Parallax (2.3.0): as a page swipes, its HeroSymbol moves slower than the text and shrinks and fades a little. Off under Reduce Motion.",
+            ]
         ) {
             PresentButton(title: "Show onboarding") { isPresented = true }
                 .fullScreenCover(isPresented: $isPresented) {

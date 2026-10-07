@@ -128,6 +128,8 @@ public struct LineChart<Point: ChartPoint>: View {
                 fullChart
                     .padding(.leading, AppSpacing.lg)
                     .frame(height: chartHeight)
+                    // 2.3.0: the line is traced in from the left.
+                    .chartDrawIn()
             }
             .chartAppear()
         }

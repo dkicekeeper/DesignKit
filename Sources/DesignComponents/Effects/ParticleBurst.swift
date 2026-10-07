@@ -104,8 +104,9 @@ struct ParticleBurstModifier<Trigger: Equatable>: ViewModifier {
                         .accessibilityHidden(true)
                 }
             }
+            // 2.3.0: the celebration pattern (success, then two rising taps) with the confetti.
+            .hapticCue(.celebrate, trigger: trigger) { _, _ in playsHaptic }
             .onChange(of: trigger) {
-                if playsHaptic { HapticManager.success() }
                 guard !reduceMotion, designKitMotion else { return }
                 count += 1
                 let id = count

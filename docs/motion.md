@@ -2,8 +2,8 @@
 
 DesignKit's motion is meant to be rich but light: every movement says something, ends before the
 eye starts waiting, costs as little as the system allows, and stands still when the person or the
-device asks. This page is the rule book and the catalogue (2.2.0). The Gallery's **Motion** and
-**Effects** sections play every item.
+device asks. This page is the rule book and the catalogue (2.2.0, 2.3.0). The Gallery's
+**Motion** and **Effects** sections play every item.
 
 ## 1. Principles
 
@@ -19,8 +19,9 @@ device asks. This page is the rule book and the catalogue (2.2.0). The Gallery's
    custom drawing only for what the system does not do.
 5. **Stillness is a feature.** Under Reduce Motion movement turns into a dissolve; loops stop
    while the system asks apps to save resources; `.designKitMotion(false)` stills a subtree.
-6. **Pair with haptics, not sound.** A celebration plays the success haptic, a destructive
-   `DSButton` the warning one. The haptic stays when the motion is off.
+6. **Pair with haptics, not sound.** The touch and the picture say the same thing at the same
+   moment: a selection tick as the segment moves, the celebration pattern with the confetti
+   (`HapticCue`, §7). The haptic stays when the motion is off.
 
 ## 2. Springs by purpose
 
@@ -60,6 +61,8 @@ layers, and it never touches layout. DesignKit names them by meaning:
 | `.symbolPulse(.working, isActive:)` | Variable colour, iterative (loop) | work in progress: syncing, searching |
 | `.symbolMagicReplace()` | Magic Replace | `AmountVisibilityToggle` (eye ↔ eye.slash), `SelectionIndicator`, `ReactionButton` (outline ↔ fill) |
 | `.contentTransition(.symbolEffect(.replace))` | Replace | `TrendBadge`'s arrow |
+| `.symbolColorRenderingMode(.gradient)` (no motion, 2.3.0) | SF Symbols 7 gradient of the tint, for depth | `HeroSymbol`, `EmptyState`'s icon |
+| `ProgressRing(celebratesCompletion: true)` (2.3.0) | a checkmark draws itself in at 100 % | goal rings |
 
 Loops go through `AmbientMotionGate`; all of them stop under Reduce Motion and
 `.designKitMotion(false)`, drawing the symbol still in its final state.
@@ -71,6 +74,7 @@ Loops go through `AmbientMotionGate`; all of them stop under Reduce Motion and
 | `.popIn` | grows from 92 % + fade | fade | a chip, a badge, a toast, a tooltip, `TypingIndicator` |
 | `.riseIn` | rises 12 pt, sharpens from a 4 pt blur + fade | fade | a card, a section, a banner |
 | `.textReveal` | glyph by glyph: rise, sharpen, fade | whole-text fade | text that arrives: an insight, an answer |
+| `.skeletonReveal` / `SkeletonReveal(isLoading:)` (2.3.0) | comes into focus from an 8 pt blur, 98 % → 100 % + fade, while the skeleton fades out | cross-fade | content replacing its skeleton; `FinanceCard`'s amount |
 | `.blurSlideHero` / `.blurSlideWord` | slide + blur (1.x) | — | a block of text replacing another; streaming words |
 | zoom navigation (`matchedTransitionSourceIfPresent`) | system | system | a row or card opening its detail |
 
@@ -91,10 +95,51 @@ Insert with a spring: `withAnimation(AppAnimation.bouncy) { isShown = true }`.
 | `TypingIndicator` | three dots in a wave | 30 fps while allowed | a reply on its way, an assistant thinking |
 | `.borderBeam` / `.borderGlow`, `SiriGlow`, `SiriWave`, `GradientOrbsBackground`, `.accentGlow` (1.x) | ambient light | see their docs | "working on it", AI and voice states, hero backgrounds |
 
-## 7. Reduce Motion, resources and tests
+**2.3.0: data, completion and depth**
 
-- **Reduce Motion**: movement goes, fades stay (`.popIn`, `.riseIn`, `.textReveal`), bursts and
-  shine do not play (haptics do), symbol effects draw the final state, loops stop.
+| Effect | What | Cost | Use |
+|---|---|---|---|
+| `LiveAmountText` | the digits roll up from zero on first appearance; a change flashes green (up) or red (down) for 0.7 s | `numericText` of `FormattedAmountText`; one short sleep ends the flash | a hero balance, a total that just updated |
+| `.chartDrawIn(delay:)` | the chart is revealed from its leading edge once, with a soft front edge | one mask, 0.9 s | built into `LineChart`, `BarChart`, `HeroSparkline`; any Swift Chart |
+| `.completionMoment(isComplete:tint:in:)` | when `isComplete` turns true: a glow of the shape flares and fades, the success haptic plays | one blurred shape for 0.8 s | `ProgressRing(celebratesCompletion:)`, `ChecklistSummaryRow`'s and `TargetProgressCard`'s bars; any goal |
+| `GlassActionMenu` | a floating glass button flows open into its actions (Liquid Glass morph, `glassEffectID`) | the system's | the add button of a screen |
+| `.scrollHero(parallax:fades:)` | stretches when pulled down; drifts slower and fades as it scrolls away | one `visualEffect`, no re-render | the image or header at the top of a detail screen |
+| onboarding parallax | in an `OnboardingPager` each page's `HeroSymbol` lags behind as it swipes, shrinking and fading a little | one `visualEffect` | built in |
+| `.ripple(trigger:at:)` / `.rippleOnTap()` | a ripple through the view itself, like water | a Metal layer effect, only while it plays (1.6 s) | a moment that deserves it: a goal reached, a big confirmation. The heaviest effect here: never on every button |
+
+**Ripple and its shaders.** The shader source is `Shaders/Ripple.metal` (after Apple's WWDC24
+sample). The package does not compile it: Xcode 26's Metal Toolchain is an optional ~700 MB
+download, missing on some CI runners, and every app would need it. Instead
+`.github/workflows/shaders.yml` runs `Shaders/build.sh` on a branch where a shader changed and
+commits two libraries to `Sources/DesignComponents/Resources/Shaders`:
+`DesignKitShaders-iphoneos.metallib` and `DesignKitShaders-iphonesimulator.metallib`.
+`ShaderLibraryTests` checks that the library is in the bundle and that the GPU accepts each
+shader. To add a shader: put the `.metal` file in `Shaders/`, push, wait for the workflow's
+commit, pull.
+
+## 7. Haptics (`HapticCue`, 2.3.0)
+
+| Cue | Feedback | Built into |
+|---|---|---|
+| `.tap` | light impact | |
+| `.select` | selection | `SegmentedPicker` (with `ChipPicker`, `Rating`, `IconPicker`, which play it already) |
+| `.tick` | rigid impact, 0.7 | `SliderRow`: every step of a stepped slider, either end of a smooth one |
+| `.confirm` | success | `.completionMoment` |
+| `.warn` | warning | |
+| `.fail` | error | |
+| `.celebrate` | success, then two rising taps (0.18 s, 0.32 s) | `.celebration` |
+
+`.hapticCue(.select, trigger: selection)` plays with a change of state, `HapticManager.play(.confirm)`
+from an action. Haptics are not motion: Reduce Motion and `.designKitMotion(false)` leave them
+on; the system's own switch turns them off.
+
+## 8. Reduce Motion, resources and tests
+
+- **Reduce Motion**: movement goes, fades stay (`.popIn`, `.riseIn`, `.textReveal`,
+  `.skeletonReveal`), bursts, shine, glows and ripples do not play (haptics do), symbol effects
+  draw the final state, loops stop, amounts show their value without rolling or flashing,
+  charts are there at once, parallax stops (`.scrollHero` keeps its stretch: it follows the
+  finger).
 - **Ambient loops** (`AuroraBackground`, `TypingIndicator`, `.symbolPulse`, the 1.x beams and
   glows) run inside `AmbientMotionGate`: off under Reduce Motion and, on iOS 27, while the system
   prefers reduced resource usage. They draw one still frame instead, with the same layout.
@@ -102,12 +147,15 @@ Insert with a spring: `withAnimation(AppAnimation.bouncy) { isShown = true }`.
   an app can offer it as "reduce effects".
 - **Snapshots** therefore show every component in its final, still state.
 
-## 8. Performance rules
+## 9. Performance rules
 
 - Prefer system effects (symbol effects, content transitions, `scrollTransition`) to custom ones.
 - A one-shot effect exists only while it plays; nothing waits in the background.
 - Compute paths from the time (`TimelineView` + `Canvas`), not from per-frame state.
 - Loops at 30 fps unless they track a finger; never a display-rate timer for decoration.
 - No animated blur radius on large areas; a blur is for small, short-lived layers (a glyph, a
-  4 pt rise).
+  4 pt rise, one card coming into focus for 0.45 s). Never a whole screen, never in a loop.
+- A Metal shader runs only while its effect plays (`layerEffect(isEnabled:)`), and ships
+  compiled (§6, "Ripple and its shaders").
+- Scroll-driven effects read geometry in `visualEffect`, never into `@State` per frame.
 - `drawingGroup()` only for many overlapping layers drawn every frame.

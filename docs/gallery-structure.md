@@ -46,16 +46,17 @@ DesignKit: в Gallery, в `docs/design-system.md` и в папках `Sources/De
 Основы (6): **Colors**, **Typography**, **Spacing & Radius**, **Icon Sizes**, **Surfaces**
 (`cardStyle`, `formCardStyle`, `filterChipStyle`, стекло), **Motion** (пружины по назначению,
 длительности, анимации SF Symbols, переходы `.popIn` / `.riseIn`, проявление текста, появление при
-прокрутке, появление контента, `AmbientMotionGate`; docs/motion.md).
+прокрутке, появление контента, `AmbientMotionGate`; с 2.3.0 прорисовка графиков `.chartDrawIn`,
+`SkeletonReveal`, `.scrollHero`, хаптики `HapticCue`; docs/motion.md).
 
 Компоненты (17 разделов, 4–13 страниц в каждом):
 
 | Раздел | Компоненты | Аналог |
 |---|---|---|
-| **Actions** | `DSButton` (иконка слева, справа, сверху или одна; вид × роль × размер, форма, загрузка), `.dsButton`, `.bounce`, `ReactionButton`, `AmountVisibilityToggle`, `UniversalFilterButton` | M3 Actions, HIG Menus and actions |
+| **Actions** | `DSButton` (иконка слева, справа, сверху или одна; вид × роль × размер, форма, загрузка), `.dsButton`, `.bounce`, `ReactionButton`, `GlassActionMenu` (2.3.0), `AmountVisibilityToggle`, `UniversalFilterButton` | M3 Actions, HIG Menus and actions |
 | **Text Input** | `FormTextField`, `AnimatedTitleInput`, `MessageComposer`, `TagInput` | M3 Text inputs |
 | **Selection** | `SegmentedPicker`, `ChipPicker`, `RatingPicker`, `SelectionIndicator`, `DateButtons`, `IconPicker` | M3 Selection, HIG Selection and input |
-| **Amounts & Currency** | `AmountInput`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `CurrencyList`, `FormattedAmountText`, `ConvertedAmount`, `SpentBudgetText`, `AmountPercentage`, `RedactableAmount` | своя область DesignKit (у Polaris — Money) |
+| **Amounts & Currency** | `AmountInput`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `CurrencyList`, `FormattedAmountText`, `LiveAmountText` (2.3.0), `ConvertedAmount`, `SpentBudgetText`, `AmountPercentage`, `RedactableAmount` | своя область DesignKit (у Polaris — Money) |
 | **Rows: Settings & Forms** | `UniversalRow`, `InfoRow`, `NavigationSettingsRow`, `ToggleSettingsRow`, `ActionSettingsRow`, `MenuPickerRow`, `SliderRow`, `DatePickerRow`, `ColorPickerRow`, `CheckmarkRow`, `DisclosureChevron` | M3 Lists |
 | **Rows: Data** | `AmountRow` (с 2.1.0 вместо `BalanceRow`, `BreakdownRow`, `ProgressRingRow`, `InsightEntityRow`), `NetAmountRow`, `ScheduleRow`, `PersonRow`, `CommentRow`, `ChecklistRow`, `ChecklistSummaryRow`, `ThumbnailRow` | M3 Lists, Ant Data Display |
 | **Cards: Money** | `BalanceCard`, `SelectableBalanceCard`, `FinanceCard`, `CashFlowCard`, `TotalsCard`, `ComparisonCard`, `RecurringPaymentCard`, `CalculationCard`, `WeightBreakdownCard` | M3 Containment |
@@ -68,7 +69,7 @@ DesignKit: в Gallery, в `docs/design-system.md` и в папках `Sources/De
 | **Media & Identity** | `Icon` (символы, картинки, логотипы брендов), `Avatar`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIcons`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ThumbnailPlaceholder` | Atlassian Images and icons |
 | **Content & Layout** | `ExpandableText`, `ActivityTimeline`, `MonthCalendar`, `FlowLayout`, `FormSection`, `EditSheetContainer`, `EditableHero` | HIG Layout and organization |
 | **Sheets & Flows** | `PromptSheet` (и праймер разрешения), `NotificationPermissionPrompt`, `OnboardingPager`, `OnboardingPage`, `LoopOnboardingHero` | HIG Presentation, M3 Containment (sheets) |
-| **Effects** | `.celebration`, `.sparkleBurst`, `.shine`, `.attentionPulse`, `AuroraBackground`, `.interactiveTilt` (2.2.0), `GradientOrbsBackground`, `SiriGlow`, `SiriWave`, `.accentGlow`, `.borderBeam` / `.borderGlow` | — (своё: Liquid Glass, Siri) |
+| **Effects** | `.celebration`, `.sparkleBurst`, `.shine`, `.attentionPulse`, `AuroraBackground`, `.interactiveTilt` (2.2.0), `.completionMoment`, `.ripple` / `.rippleOnTap` (2.3.0), `GradientOrbsBackground`, `SiriGlow`, `SiriWave`, `.accentGlow`, `.borderBeam` / `.borderGlow` | — (своё: Liquid Glass, Siri) |
 
 Правило для нового компонента: раздел выбирается по тому, **что компонент делает**
 (действие, ввод, выбор, показ данных, статус, навигация), а если это строка или карточка — по

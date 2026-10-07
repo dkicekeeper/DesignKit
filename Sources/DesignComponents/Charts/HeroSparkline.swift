@@ -100,6 +100,8 @@ public struct HeroSparkline<Point: ChartPoint>: View {
                     .padding(.leading, AppSpacing.lg)
                     .padding(.trailing, AppSpacing.lg)
                     .frame(height: chartHeight)
+                    // 2.3.0: the line is traced in from the left.
+                    .chartDrawIn(delay: entranceDelay)
             }
             .chartAppear(delay: entranceDelay)
         }

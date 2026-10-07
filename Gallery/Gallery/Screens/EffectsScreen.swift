@@ -3,7 +3,8 @@
 //  DesignKit Gallery
 //
 //  Effects: celebrations, sparkles, shine, attention pulse, the aurora, touch tilt (2.2.0);
-//  the Siri wave and glow, background orbs, accent glows, the border beam.
+//  the completion moment and the Metal ripple (2.3.0); the Siri wave and glow, background
+//  orbs, accent glows, the border beam.
 //
 
 import SwiftUI
@@ -14,6 +15,8 @@ struct EffectsScreen: View {
     var body: some View {
         ShowcasePage(title: "Effects") {
             CelebrationPage()
+            CompletionMomentPage()
+            RipplePage()
             SparkleBurstPage()
             ShinePage()
             AttentionPulsePage()
@@ -301,3 +304,85 @@ private struct BorderBeamPage: View {
 }
 
 #Preview { NavigationStack { EffectsScreen() } }
+
+/// The moment something is done (2.3.0).
+private struct CompletionMomentPage: View {
+    @State private var progress = 0.8
+    @State private var checked = 4
+
+    var body: some View {
+        ComponentPage(
+            name: ".completionMoment",
+            summary: "When something is done, a soft glow of its shape flares and fades behind it and the success haptic plays. Only the change plays it: a view that appears complete stays quiet.",
+            since: "2.3.0",
+            apps: [.tenra, .dalada],
+            notes: [
+                "Built in: ProgressRing(celebratesCompletion: true) also draws a checkmark in; ChecklistSummaryRow's bar and TargetProgressCard's bar glow when they reach the end.",
+                "On your own view: .completionMoment(isComplete: goal.progress >= 1, in: RoundedRectangle(cornerRadius: AppRadius.xl)).",
+                "For a bigger moment add .celebration(trigger:). Under Reduce Motion there is no glow; the haptic stays.",
+            ]
+        ) {
+            VStack(spacing: AppSpacing.xl) {
+                ProgressRing(progress: progress, size: AppIconSize.Tile.xxl, lineWidth: 6,
+                             showsTrack: true, celebratesCompletion: true)
+                ChecklistSummaryRow(title: "Weekend at the lake", checked: checked, total: 5)
+                    .padding(.horizontal, AppSpacing.lg)
+                    .cardStyle()
+            }
+            .frame(maxWidth: .infinity)
+        } controls: {
+            SliderControl("Goal", value: $progress, in: 0...1, step: 0.05) { "\(Int($0 * 100))%" }
+            ActionControl("Complete the goal", systemImage: "checkmark") {
+                withAnimation(AppAnimation.smooth) { progress = progress >= 1 ? 0.8 : 1 }
+            }
+            ActionControl(checked >= 5 ? "Uncheck an item" : "Check the last item", systemImage: "checklist") {
+                checked = checked >= 5 ? 4 : 5
+            }
+        }
+    }
+}
+
+/// A ripple through the view itself (2.3.0, Metal).
+private struct RipplePage: View {
+    @State private var ripples = 0
+    @State private var origin = 0
+
+    private var unitOrigin: UnitPoint {
+        switch origin {
+        case 1: .topLeading
+        case 2: .bottomTrailing
+        default: .center
+        }
+    }
+
+    var body: some View {
+        ComponentPage(
+            name: ".ripple · .rippleOnTap",
+            summary: "A ripple spreads through the view itself, as if its surface were water: the most striking effect here and the heaviest. Keep it for a moment that deserves it. Tap the card.",
+            since: "2.3.0",
+            notes: [
+                ".ripple(trigger:at:) plays from a point each time the trigger changes; .rippleOnTap() from wherever the view is tapped (its buttons still work).",
+                "A Metal layer effect that runs only while the ripple plays (1.6 s). The shaders ship compiled, so apps need no Metal Toolchain.",
+                "Under Reduce Motion it does not play.",
+            ]
+        ) {
+            VStack(spacing: AppSpacing.lg) {
+                BalanceCard(iconSource: .sfSymbol("creditcard.fill"), title: "Kaspi Gold",
+                            amount: 1_250_000, currency: "KZT")
+                    .ripple(trigger: ripples, at: unitOrigin)
+                AuroraBackground(intensity: 0.8)
+                    .frame(height: 140)
+                    .clipShape(.rect(cornerRadius: AppRadius.xl))
+                    .overlay {
+                        Text("Tap anywhere")
+                            .font(AppTypography.bodyEmphasis)
+                            .foregroundStyle(.white)
+                    }
+                    .rippleOnTap()
+            }
+        } controls: {
+            ChoiceControl("From", selection: $origin, options: [("Centre", 0), ("Top leading", 1), ("Bottom trailing", 2)])
+            ActionControl("Ripple the card", systemImage: "drop") { ripples += 1 }
+        }
+    }
+}

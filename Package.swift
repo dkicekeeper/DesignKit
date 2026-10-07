@@ -23,10 +23,12 @@ let package = Package(
             name: "DesignSupport",
             dependencies: ["DesignTokens"]
         ),
-        // Pure presentation components built on Tokens + Support.
+        // Pure presentation components built on Tokens + Support. The Metal shaders ship
+        // compiled (Shaders/build.sh), so consumers need no Metal Toolchain.
         .target(
             name: "DesignComponents",
-            dependencies: ["DesignTokens", "DesignSupport"]
+            dependencies: ["DesignTokens", "DesignSupport"],
+            resources: [.copy("Resources/Shaders")]
         ),
 
         // Unit tests (swift-testing) for the logic behind the views: formatting, the

@@ -108,7 +108,7 @@ public struct RedactableAmount: View {
                     fontWeight: .bold,
                     color: AppColors.Text.primary
                 )
-                .transition(.opacity)
+                .transition(.skeletonReveal)
             }
         }
         .animation(AppAnimation.gentleSpring, value: isLoading)
