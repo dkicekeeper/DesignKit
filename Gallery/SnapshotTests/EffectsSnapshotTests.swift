@@ -2,12 +2,13 @@
 //  EffectsSnapshotTests.swift
 //  DesignKit Gallery snapshot tests
 //
-//  The motion components of 2.2.0 to 2.5.0 in their still state (the harness sets
+//  The motion components of 2.2.0 to 2.6.0 in their still state (the harness sets
 //  `.designKitMotion(false)`): the aurora's first frame, the typing indicator at rest, symbols
 //  that would draw themselves on, shown drawn; a goal ring at 100 %, the closed glass menu, a
 //  live amount at its value; the voice wave, the edge glow and the thinking shimmer at a fixed
-//  level; weighted aurora spots and the aurora accent glow. Bursts, shine, pulses, tilt, glows
-//  and ripples draw nothing until triggered, so they have no picture.
+//  level; weighted aurora spots and the aurora accent glow; the foil at rest, decoded text and a
+//  spotlight. Bursts, shine, pulses, tilt, glows, ripples and dissolves draw nothing until
+//  triggered, so they have no picture.
 //
 
 import SwiftUI
@@ -164,6 +165,47 @@ extension ComponentSnapshots {
                     Color.clear.frame(height: 160).accentGlow(.orange, edge: .bottom)
                         .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl))
                 },
+                appearances: [.light, .dark]
+            )
+        }
+
+        /// 2.6.0: the foil at rest, a medal and a card.
+        @Test func holographic() async {
+            await assertComponentSnapshot(
+                HStack(spacing: AppSpacing.xl) {
+                    AchievementMedal(systemImage: "mountain.2.fill", color: .orange, isEarned: true, size: 100)
+                        .holographic()
+                    RoundedRectangle(cornerRadius: AppRadius.lg)
+                        .fill(Color(white: 0.75))
+                        .frame(width: 150, height: 96)
+                        .holographic()
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark]
+            )
+        }
+
+        /// 2.6.0: without motion the text is there at once.
+        @Test func scrambleText() async {
+            await assertComponentSnapshot(
+                ScrambleText("78 / 100")
+                    .font(AppTypography.h1)
+                    .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// 2.6.0: a spotlight on the second of two cards, its message below.
+        @Test func spotlight() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.md) {
+                    Text("Balance").frame(maxWidth: .infinity).padding(AppSpacing.lg).cardStyle()
+                    Text("Add").frame(maxWidth: .infinity).padding(AppSpacing.lg).cardStyle()
+                        .spotlightAnchor("add")
+                    Color.clear.frame(height: 90)
+                }
+                .padding(AppSpacing.md)
+                .spotlight(.constant(Optional("add")), message: { _ in "Add an expense or an income here." }),
                 appearances: [.light, .dark]
             )
         }

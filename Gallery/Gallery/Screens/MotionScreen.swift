@@ -20,6 +20,7 @@ struct MotionScreen: View {
             SymbolMotionPage()
             MotionTransitionsPage()
             TextRevealPage()
+            ScrambleTextPage()
             ScrollRevealPage()
             ChartDrawInPage()
             SkeletonRevealPage()
@@ -606,6 +607,34 @@ private struct HapticCuesPage: View {
             ForEach(cues, id: \.1) { cue, name, detail in
                 ActionControl(".\(name): \(detail)", systemImage: "hand.tap") { HapticManager.play(cue) }
             }
+        }
+    }
+}
+
+/// Text that decodes itself (2.6.0).
+private struct ScrambleTextPage: View {
+    @State private var score = 78
+
+    var body: some View {
+        ComponentPage(
+            name: "ScrambleText",
+            summary: "Text that decodes itself: each character flickers through random ones of its kind and settles, left to right. For a result just worked out: an analysis total, a code, a score.",
+            since: "2.6.0",
+            notes: [
+                "The final text sets the width, so nothing around it moves; VoiceOver reads the final text.",
+                "30 fps only while it decodes (0.7 s); under Reduce Motion the text simply appears.",
+            ]
+        ) {
+            VStack(spacing: AppSpacing.sm) {
+                ScrambleText("\(score) / 100")
+                    .font(AppTypography.h1)
+                ScrambleText("CODE-\(score * 37)")
+                    .font(AppTypography.body.monospaced())
+                    .foregroundStyle(AppColors.Text.secondary)
+            }
+            .frame(maxWidth: .infinity)
+        } controls: {
+            ActionControl("New result", systemImage: "arrow.clockwise") { score = Int.random(in: 40...99) }
         }
     }
 }

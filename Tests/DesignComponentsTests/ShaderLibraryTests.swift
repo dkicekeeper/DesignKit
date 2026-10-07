@@ -53,4 +53,26 @@ struct ShaderLibraryTests {
         let library = try #require(DesignKitShaders.library)
         try await library.Grain(.float(GrainMetrics.amount)).compile(as: .colorEffect)
     }
+
+    @Test("Holographic compiles as a colour effect")
+    func holographicCompiles() async throws {
+        let library = try #require(DesignKitShaders.library)
+        let shader = library.Holographic(
+            .float2(CGSize(width: 120, height: 120)),
+            .float2(CGPoint.zero),
+            .float(HolographicMetrics.strength)
+        )
+        try await shader.compile(as: .colorEffect)
+    }
+
+    @Test("Dissolve compiles as a layer effect")
+    func dissolveCompiles() async throws {
+        let library = try #require(DesignKitShaders.library)
+        let shader = library.Dissolve(
+            .float2(CGSize(width: 320, height: 64)),
+            .float(0.5),
+            .color(.orange)
+        )
+        try await shader.compile(as: .layerEffect)
+    }
 }

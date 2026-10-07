@@ -95,6 +95,15 @@ Insert with a spring: `withAnimation(AppAnimation.bouncy) { isShown = true }`.
 | `TypingIndicator` | three dots in a wave | 30 fps while allowed | a reply on its way, an assistant thinking |
 | `.borderGlow` (1.x) | a static halo round a card | see its docs | "working on it" |
 
+**2.6.0: surfaces and moments**
+
+| Effect | What | Cost | Use |
+|---|---|---|---|
+| `.holographic(strength:)` | a holographic foil: rainbow bands slide as the finger moves, a sheen where the light falls | one Metal colour effect, redrawn only while the finger moves | a medal, a premium card; with `.interactiveTilt` |
+| `.transition(.dissolve)` | the view breaks into dust as it is removed, its edge glowing; inserted, the dust gathers | one Metal layer effect, only during the transition | deleting something the person owned |
+| `ScrambleText(_:)` | each character flickers through random ones of its kind and settles, left to right | 30 fps for 0.7 s, then paused | a result just worked out: a total, a code, a score |
+| `.spotlightAnchor(_:)` + `.spotlight(_:message:)` | the screen dims except a cut-out round one view, with a `Tooltip` beside it; the cut-out moves on a spring | one shape, animated only when it moves | a new feature, the steps of a tour |
+
 **2.5.0: still light for backgrounds**
 
 | Effect | What | Cost | Use |
@@ -134,7 +143,8 @@ breathe on their own.
 | `.ripple(trigger:at:)` / `.rippleOnTap()` | a ripple through the view itself, like water | a Metal layer effect, only while it plays (1.6 s) | a moment that deserves it: a goal reached, a big confirmation. The heaviest effect here: never on every button |
 
 **Ripple and its shaders.** The shader sources are `Shaders/Ripple.metal` (after Apple's WWDC24
-sample) `Shaders/EdgeGlow.metal` (2.4.0) and `Shaders/Grain.metal` (2.5.0). The package does not compile it: Xcode 26's Metal Toolchain is an optional ~700 MB
+sample) `Shaders/EdgeGlow.metal` (2.4.0), `Shaders/Grain.metal` (2.5.0), `Shaders/Holographic.metal`
+and `Shaders/Dissolve.metal` (2.6.0). The package does not compile it: Xcode 26's Metal Toolchain is an optional ~700 MB
 download, missing on some CI runners, and every app would need it. Instead
 `.github/workflows/shaders.yml` runs `Shaders/build.sh` on a branch where a shader changed and
 commits two libraries to `Sources/DesignComponents/Resources/Shaders`:
