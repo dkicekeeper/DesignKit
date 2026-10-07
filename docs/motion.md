@@ -93,7 +93,20 @@ Insert with a spring: `withAnimation(AppAnimation.bouncy) { isShown = true }`.
 | `.scrollReveal()` | settles in at the viewport's edges | `scrollTransition`, no state | the rows and cards of a `ScrollView` |
 | `.textRevealOnAppear()` | text written in glyph by glyph | one `TextRenderer` pass while it plays | an insight's summary, a result |
 | `TypingIndicator` | three dots in a wave | 30 fps while allowed | a reply on its way, an assistant thinking |
-| `.borderBeam` / `.borderGlow`, `SiriGlow`, `SiriWave`, `GradientOrbsBackground`, `.accentGlow` (1.x) | ambient light | see their docs | "working on it", AI and voice states, hero backgrounds |
+| `.borderGlow`, `GradientOrbsBackground`, `.accentGlow` (1.x) | ambient light | see their docs | "working on it", hero backgrounds |
+
+**2.4.0: the voice, and work in progress**
+
+| Effect | What | Cost | Use |
+|---|---|---|---|
+| `VoiceWave(level:phase:style:)` | `.ribbons`: four ribbons of aurora light rising with each syllable, each on its own beat; `.orb`: a liquid mesh-gradient sphere whose rim ripples and glow swells. `.thinking` settles it with a light running through | one Canvas, up to 60 fps, only on screen | the picture by the microphone while a person speaks |
+| `EdgeGlow(level:)` | light along the screen's edges: aurora colours flow round the rim; the voice widens, brightens and speeds it. Replaces `SiriGlow` / `SiriWave` (deprecated names) | one Metal colour effect, no blur, 30 fps | the screen while the app listens |
+| `.borderBeam(beams:)` | a comet runs along the border itself (one speed and length on every side), a bloom at its head, a fading tail, a faint spill on the edge | one Canvas, display rate while active | a card being worked on |
+| `.thinkingShimmer(isActive:)` | a band of aurora colour runs through text | one masked gradient, 30 fps | "Listening…", "Analysing…" |
+
+The voice level is the app's (its microphone's RMS, 0…1). `VoiceWave` and `EdgeGlow` smooth it
+themselves, fast up and slow down, so speech swells instead of flickering; without a level they
+breathe on their own.
 
 **2.3.0: data, completion and depth**
 
@@ -107,8 +120,8 @@ Insert with a spring: `withAnimation(AppAnimation.bouncy) { isShown = true }`.
 | onboarding parallax | in an `OnboardingPager` each page's `HeroSymbol` lags behind as it swipes, shrinking and fading a little | one `visualEffect` | built in |
 | `.ripple(trigger:at:)` / `.rippleOnTap()` | a ripple through the view itself, like water | a Metal layer effect, only while it plays (1.6 s) | a moment that deserves it: a goal reached, a big confirmation. The heaviest effect here: never on every button |
 
-**Ripple and its shaders.** The shader source is `Shaders/Ripple.metal` (after Apple's WWDC24
-sample). The package does not compile it: Xcode 26's Metal Toolchain is an optional ~700 MB
+**Ripple and its shaders.** The shader sources are `Shaders/Ripple.metal` (after Apple's WWDC24
+sample) and `Shaders/EdgeGlow.metal` (2.4.0). The package does not compile it: Xcode 26's Metal Toolchain is an optional ~700 MB
 download, missing on some CI runners, and every app would need it. Instead
 `.github/workflows/shaders.yml` runs `Shaders/build.sh` on a branch where a shader changed and
 commits two libraries to `Sources/DesignComponents/Resources/Shaders`:

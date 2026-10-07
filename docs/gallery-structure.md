@@ -69,7 +69,7 @@ DesignKit: в Gallery, в `docs/design-system.md` и в папках `Sources/De
 | **Media & Identity** | `Icon` (символы, картинки, логотипы брендов), `Avatar`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIcons`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ThumbnailPlaceholder` | Atlassian Images and icons |
 | **Content & Layout** | `ExpandableText`, `ActivityTimeline`, `MonthCalendar`, `FlowLayout`, `FormSection`, `EditSheetContainer`, `EditableHero` | HIG Layout and organization |
 | **Sheets & Flows** | `PromptSheet` (и праймер разрешения), `NotificationPermissionPrompt`, `OnboardingPager`, `OnboardingPage`, `LoopOnboardingHero` | HIG Presentation, M3 Containment (sheets) |
-| **Effects** | `.celebration`, `.sparkleBurst`, `.shine`, `.attentionPulse`, `AuroraBackground`, `.interactiveTilt` (2.2.0), `.completionMoment`, `.ripple` / `.rippleOnTap` (2.3.0), `GradientOrbsBackground`, `SiriGlow`, `SiriWave`, `.accentGlow`, `.borderBeam` / `.borderGlow` | — (своё: Liquid Glass, Siri) |
+| **Effects** | `.celebration`, `.sparkleBurst`, `.shine`, `.attentionPulse`, `AuroraBackground`, `.interactiveTilt` (2.2.0), `.completionMoment`, `.ripple` / `.rippleOnTap` (2.3.0), `VoiceWave`, `EdgeGlow` (вместо `SiriGlow`, `SiriWave`), `.thinkingShimmer` (2.4.0), `GradientOrbsBackground`, `.accentGlow`, `.borderBeam` / `.borderGlow` | — (своё: Liquid Glass, Siri) |
 
 Правило для нового компонента: раздел выбирается по тому, **что компонент делает**
 (действие, ввод, выбор, показ данных, статус, навигация), а если это строка или карточка — по

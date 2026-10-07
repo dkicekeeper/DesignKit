@@ -65,7 +65,7 @@ DesignKit ships no networking, persistence or FX. A host app wires these once, i
 
 ### 0.2 Charts in DesignKit
 
-**Trend charts (0.5.0)** over the generic `ChartPoint` / `ChartSeries` model: `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `ChartSelectionBanner`, `ChartValuePoint`, `ChartValueFormat`. `OrbChart` (+ `DonutSlice`, `DonutSlice.foldingSlivers`, `DonutSlice.opacityStepped`), `MiniDonut`, `ProportionBar`, `LinearProgressBar`, `ProgressRing` (+ `LimitProgress`, 1.5.0), `AmountComparisonBar`, `MiniProportionBar` / `HeroProportionBar`, `MiniHalfGauge` / `HeroHalfGauge`, `MiniMilestoneGauge` / `HeroMilestoneGauge`, `MiniBarPair` / `HeroBarPair`, `HeroChartEffects` (`chartGlow`, `materialize`, `glassBar`), `ChartZoomControls` + `ChartStyle`, `SiriGlow`, `SiriWave`. See [charts.md](charts.md).
+**Trend charts (0.5.0)** over the generic `ChartPoint` / `ChartSeries` model: `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `ChartSelectionBanner`, `ChartValuePoint`, `ChartValueFormat`. `OrbChart` (+ `DonutSlice`, `DonutSlice.foldingSlivers`, `DonutSlice.opacityStepped`), `MiniDonut`, `ProportionBar`, `LinearProgressBar`, `ProgressRing` (+ `LimitProgress`, 1.5.0), `AmountComparisonBar`, `MiniProportionBar` / `HeroProportionBar`, `MiniHalfGauge` / `HeroHalfGauge`, `MiniMilestoneGauge` / `HeroMilestoneGauge`, `MiniBarPair` / `HeroBarPair`, `HeroChartEffects` (`chartGlow`, `materialize`, `glassBar`), `ChartZoomControls` + `ChartStyle`. See [charts.md](charts.md). (`SiriGlow` and `SiriWave` became `EdgeGlow` in 2.4.0, next to `VoiceWave`: [motion.md](motion.md).)
 
 **Removed in 1.0** (retired from Tenra 2026-07, deprecated in DesignKit until then): `BudgetProgressBar` → `LinearProgressBar`, `BudgetProgressCircle` → `ProgressRing`, `ExpenseIncomeProgressBar` → `AmountComparisonBar`, `DonutChart` + `ChartDisplayMode` → `OrbChart` / `MiniDonut`.
 
@@ -237,6 +237,11 @@ motion, transitions and effects are in [motion.md](motion.md):
 `MotionBudget` holds the timing budgets (feedback 0.25 s, entrance 0.35 s, stagger 0.04 s ≤ 0.3 s);
 `.designKitMotion(false)` stills DesignKit's motion below a view.
 
+**2.4.0** makes the voice visible: `VoiceWave` (ribbons or an orb, listening or thinking) and
+`EdgeGlow(level:)` (a Metal edge light that replaces `SiriGlow` and `SiriWave`), a comet
+`.borderBeam` along the border, and `.thinkingShimmer` for text while the app works. All in
+[motion.md](motion.md).
+
 **2.3.0** adds motion for data and moments, all in [motion.md](motion.md): `LiveAmountText`
 (roll-up and change flash), `.chartDrawIn` (built into `LineChart`, `BarChart`,
 `HeroSparkline`), `.completionMoment` and `ProgressRing(celebratesCompletion:)`,
@@ -286,7 +291,7 @@ The 1.x tokens, still used by the components that have them:
 | `.chartAppear(delay:)` | Scale(0.94→1.0) + opacity entrance from bottom | Outermost chart container, scrollable list cards |
 | `.staggeredEntrance(delay:)` | Scale(0.5→1.0) + opacity pop-in with spring | Facepile icons, overlapping avatar stacks |
 | `.contentReveal(isReady:delay:)` | Opacity fade-in when ready | Staggered section reveals during initialization |
-| `.borderBeam(isActive:colors:cornerRadius:lineWidth:duration:)` | Animated glowing beam traveling around the border via rotating `AngularGradient`. Two-layer (sharp + blurred glow). `TimelineView`-driven; ticks only while `isActive == true`. Reduce-Motion aware | Highlighting cards during transient active states (voice recognition preview, focus, processing). Match `cornerRadius` to the underlying card |
+| `.borderBeam(isActive:colors:cornerRadius:lineWidth:duration:beams:)` | A comet of light running along the border itself (2.4.0): one speed and length on every side, a bloom at the head, a fading tail, a faint spill on the edge; one or two comets. `TimelineView`-driven; ticks only while `isActive == true`. Off under Reduce Motion and `.designKitMotion(false)` | Highlighting cards during transient active states (voice recognition preview, focus, processing). Match `cornerRadius` to the underlying card |
 
 **`.fadeTruncation(fadeLength:)`** *(1.7.0)*: one line that fades out over 24 pt at its trailing edge instead of ending in "…", only when it does not fit. For names in carousels and tiles. RTL-aware.
 
@@ -1052,7 +1057,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `ExpandableText`, `ActivityTimeline`, `MonthCalendar` | `…Skeleton` |
 | `PersonRow`, `CommentRow`, `ThreadCard`, `ReviewCard`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.12.0) | `…Skeleton` (`StatsStripSkeleton(count:)`, `AchievementTileSkeleton(medalSize:)`, `ThumbnailCardSkeleton(width:)`, `PersonRowSkeleton(showsSubtitle:)`) |
 
-**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`GradientOrbsBackground`, `SiriGlow`, `SiriWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
+**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`GradientOrbsBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
 
 #### `SkeletonText` *(1.7.0)*
 A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `Skeleton`. For a component, use its skeleton (above); `.skeleton(isLoading:)` redacts a real view in place, with the system's placeholder shapes.
@@ -2103,8 +2108,8 @@ cost every frame it is on screen. Those views go through
 Reduce Motion **and**, on iOS 27, while `systemPrefersReducedResourceUsage` is true (the system
 asking apps to back off under thermal or power pressure).
 
-The gate hands its content a `Bool`; render a **static frame** when it is false (`SiriGlow`
-freezes the mesh at `t = 0`) rather than removing the view, so nothing shifts in layout. Put new
+The gate hands its content a `Bool`; render a **static frame** when it is false (`EdgeGlow`
+freezes at `t = 0`) rather than removing the view, so nothing shifts in layout. Put new
 `TimelineView` decoration behind this gate instead of reading `accessibilityReduceMotion`
 directly — the iOS 27 signal then comes for free. (DesignKit compiles the iOS 27 branch only
 with the iOS 27 SDK — Xcode 27; built with Xcode 26 the gate honours Reduce Motion alone.)

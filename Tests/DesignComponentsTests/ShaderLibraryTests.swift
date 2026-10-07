@@ -32,4 +32,19 @@ struct ShaderLibraryTests {
         )
         try await shader.compile(as: .layerEffect)
     }
+
+    @Test("EdgeGlow compiles as a colour effect")
+    func edgeGlowCompiles() async throws {
+        let library = try #require(DesignKitShaders.library)
+        let shader = library.EdgeGlow(
+            .float2(CGSize(width: 390, height: 844)),
+            .float(EdgeGlowMetrics.screenCornerRadius),
+            .float(0),
+            .float(0.5),
+            .float(0),
+            .float(EdgeGlowMetrics.thickness),
+            .colorArray(VoiceWave.defaultColors)
+        )
+        try await shader.compile(as: .colorEffect)
+    }
 }

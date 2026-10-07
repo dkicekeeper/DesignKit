@@ -3,8 +3,8 @@
 //  DesignKit Gallery
 //
 //  Effects: celebrations, sparkles, shine, attention pulse, the aurora, touch tilt (2.2.0);
-//  the completion moment and the Metal ripple (2.3.0); the Siri wave and glow, background
-//  orbs, accent glows, the border beam.
+//  the completion moment and the Metal ripple (2.3.0); the voice wave, the edge glow and the
+//  thinking shimmer (2.4.0); background orbs, accent glows, the border beam.
 //
 
 import SwiftUI
@@ -22,8 +22,9 @@ struct EffectsScreen: View {
             AttentionPulsePage()
             AuroraBackgroundPage()
             InteractiveTiltPage()
-            SiriWavePage()
-            SiriGlowPage()
+            VoiceWavePage()
+            EdgeGlowPage()
+            ThinkingShimmerPage()
             GradientOrbsBackgroundPage()
             AccentGlowPage()
             BorderBeamPage()
@@ -191,44 +192,131 @@ private struct InteractiveTiltPage: View {
     }
 }
 
-private struct SiriWavePage: View {
-    @State private var height = 220.0
+/// The voice made visible (2.4.0): ribbons or an orb, listening or thinking.
+private struct VoiceWavePage: View {
+    @State private var style: VoiceWave.Style = .ribbons
+    @State private var phase: VoiceWave.Phase = .listening
+    @State private var source: VoiceSourceKind = .simulated
+    @State private var level = 0.5
+    @State private var microphone = GalleryMicrophone()
 
     var body: some View {
         ComponentPage(
-            name: "SiriWave",
-            summary: "The voice input wave while recording, on a dark backdrop like the app's recording screen.",
-            apps: [.tenra],
-            canvas: .dark(minHeight: 260)
+            name: "VoiceWave",
+            summary: "The voice made visible by the microphone: ribbons of aurora light that rise with each syllable, or a liquid orb that swells. Choose Microphone and speak.",
+            since: "2.4.0",
+            canvas: .dark(minHeight: 300),
+            notes: [
+                "level: 0…1 from the app's microphone (RMS). It is smoothed here: fast up, slow down, so speech swells instead of flickering.",
+                "phase: .listening follows the voice; .thinking settles it while the words are understood, with a light running through.",
+                "One Canvas at up to 60 fps, only on screen; still under Reduce Motion. Pair it with EdgeGlow(level:).",
+            ]
         ) {
-            SiriWave()
-                .frame(maxWidth: .infinity)
-                .frame(height: height)
+            VoiceLevelSource(kind: source, fixed: level, microphone: microphone) { level in
+                VoiceWave(level: level, phase: phase, style: style)
+                    .frame(height: style == .orb ? 240 : 140)
+                    .frame(maxWidth: .infinity)
+            }
         } controls: {
-            SliderControl("Height", value: $height, in: 120...320, step: 20) { "\(Int($0)) pt" }
+            ChoiceControl("Style", selection: $style, options: [("Ribbons", .ribbons), ("Orb", .orb)])
+            ChoiceControl("Phase", selection: $phase, options: [("Listening", .listening), ("Thinking", .thinking)])
+            ChoiceControl("Voice", selection: $source, options: [("Fixed", .fixed), ("Simulated", .simulated), ("Microphone", .microphone)])
+            if source == .fixed {
+                SliderControl("Level", value: $level, in: 0...1, step: 0.05)
+            }
+            if microphone.isDenied {
+                Text("Microphone access is off for DesignKit Gallery in Settings.")
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.Text.secondary)
+            }
         }
+        .onChange(of: source) { _, new in
+            if new == .microphone { Task { await microphone.start() } } else { microphone.stop() }
+        }
+        .onDisappear { microphone.stop() }
     }
 }
 
-private struct SiriGlowPage: View {
+/// Light along the edges while listening (2.4.0, Metal).
+private struct EdgeGlowPage: View {
+    @State private var source: VoiceSourceKind = .simulated
+    @State private var level = 0.4
+    @State private var thickness = Double(EdgeGlowMetrics.thickness)
+    @State private var microphone = GalleryMicrophone()
+
     var body: some View {
         ComponentPage(
-            name: "SiriGlow",
-            summary: "An Apple-Intelligence edge glow around a surface while the app is listening or thinking.",
+            name: "EdgeGlow",
+            summary: "Light along the edges of the screen while the app listens: aurora colours flow round the rim and the voice makes it wider, brighter and faster.",
+            since: "2.4.0",
             apps: [.tenra],
-            canvas: .dark(minHeight: 300)
+            canvas: .dark(minHeight: 340),
+            notes: [
+                "Replaces SiriGlow and SiriWave (deprecated names of it): the same full-screen overlay, now following the voice. EdgeGlow(level: voice.level).ignoresSafeArea().",
+                "One Metal colour effect, no blur: cheaper than the old blurred mesh. 30 fps while motion is allowed; still otherwise.",
+                "Without a level it breathes on its own. It fades in, passes touches through and is hidden from VoiceOver.",
+            ]
         ) {
             ZStack {
-                RoundedRectangle(cornerRadius: AppRadius.xl)
-                    .fill(Color(white: 0.12))
-                SiriGlow()
-                    .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl))
+                RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous)
+                    .fill(Color(white: 0.08))
+                VoiceLevelSource(kind: source, fixed: level, microphone: microphone) { level in
+                    EdgeGlow(level: level, cornerRadius: AppRadius.xl, thickness: CGFloat(thickness))
+                }
                 Text("Listening…")
                     .font(AppTypography.h4)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.white.opacity(0.7))
+                    .thinkingShimmer()
             }
-            .frame(height: 260)
+            .frame(height: 300)
+            .clipShape(.rect(cornerRadius: AppRadius.xl))
             .padding(AppSpacing.lg)
+        } controls: {
+            ChoiceControl("Voice", selection: $source, options: [("Fixed", .fixed), ("Simulated", .simulated), ("Microphone", .microphone)])
+            if source == .fixed {
+                SliderControl("Level", value: $level, in: 0...1, step: 0.05)
+            }
+            SliderControl("Thickness", value: $thickness, in: 12...48, step: 2) { "\(Int($0)) pt" }
+            if microphone.isDenied {
+                Text("Microphone access is off for DesignKit Gallery in Settings.")
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.Text.secondary)
+            }
+        }
+        .onChange(of: source) { _, new in
+            if new == .microphone { Task { await microphone.start() } } else { microphone.stop() }
+        }
+        .onDisappear { microphone.stop() }
+    }
+}
+
+/// A band of aurora colour running through text while the app works (2.4.0).
+private struct ThinkingShimmerPage: View {
+    @State private var isActive = true
+
+    var body: some View {
+        ComponentPage(
+            name: ".thinkingShimmer",
+            summary: "A band of aurora colour runs through the words while the app works on what was asked: “Listening…”, “Analysing…”, an insight on its way.",
+            since: "2.4.0",
+            notes: [
+                "A skeleton's shimmer says content is coming; this one says the app is working on your request.",
+                "One gradient masked by the text, 30 fps while active. Under Reduce Motion the text is drawn in the still aurora gradient.",
+            ]
+        ) {
+            VStack(alignment: .leading, spacing: AppSpacing.md) {
+                Text("Analysing your spending…")
+                    .font(AppTypography.h4)
+                    .foregroundStyle(AppColors.Text.secondary)
+                    .thinkingShimmer(isActive: isActive)
+                Text("Listening…")
+                    .font(AppTypography.body)
+                    .foregroundStyle(AppColors.Text.secondary)
+                    .thinkingShimmer(isActive: isActive)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } controls: {
+            ToggleControl("Active", isOn: $isActive)
         }
     }
 }
@@ -281,13 +369,19 @@ private struct AccentGlowPage: View {
 private struct BorderBeamPage: View {
     @State private var beam = true
     @State private var glow = true
+    @State private var beams = 1
+    @State private var duration = 3.0
 
     var body: some View {
         ComponentPage(
             name: ".borderBeam · .borderGlow",
-            summary: "A light running around a card's border and a soft glow: “working on it”, AI and live states.",
+            summary: "A comet of light running around a card's border and a soft glow: “working on it”, AI and live states.",
             apps: [.tenra],
-            canvas: .fill
+            canvas: .fill,
+            notes: [
+                "2.4.0: the comet runs along the border itself, so it keeps one speed and length on every side and corner. A bright head with a bloom, a fading tail, a faint spill on the edge it passes.",
+                "beams: 2 runs a second comet opposite the first. Display rate while active; nothing under Reduce Motion.",
+            ]
         ) {
             Text("Analysing your spending…")
                 .font(AppTypography.body)
@@ -295,10 +389,12 @@ private struct BorderBeamPage: View {
                 .padding(AppSpacing.xl)
                 .cardStyle()
                 .borderGlow(isActive: glow)
-                .borderBeam(isActive: beam)
+                .borderBeam(isActive: beam, duration: duration, beams: beams)
         } controls: {
             ToggleControl("Beam", isOn: $beam)
             ToggleControl("Glow", isOn: $glow)
+            StepperControl("Comets", value: $beams, in: 1...2)
+            SliderControl("Revolution", value: $duration, in: 1.5...6, step: 0.5) { "\($0.formatted(.number.precision(.fractionLength(1)))) s" }
         }
     }
 }

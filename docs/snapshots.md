@@ -31,7 +31,7 @@ appearances it lists:
 | `SkeletonsSnapshotTests` | every component skeleton (1.10.0): each card skeleton on its own, rows, charts, gauges and bars, badges, icons, amounts, headers, timeline, the community and progress components (1.12.0); the shimmer is stopped (`.skeletonShimmer(false)` in the renderer) |
 | `CommunitySnapshotTests` | `PersonRow`, `CommentRow` (with a quote and actions), `ThreadCard`, `ReviewCard`, `ReactionButton`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.12.0) |
 | `InputsSnapshotTests` | `FormattedAmountText` sign and unit, hidden amounts (`.amountsHidden`, `AmountVisibilityToggle`, the `HeroProportionBar` legend), `CurrencyPickerMenu` and `CurrencyAmountInput` (calculator display, error), `SegmentedPicker`, `ChipPicker` (single / several), `RatingPicker`, `FormTextField`, `TagInput`, `MessageComposer` (empty, quote and error, disabled), `CalculatorKeypad`, `AmountDigitDisplay`, `FormattedAmountText` in body semibold, `SpentBudgetText`, `PlusTabLabel`, `DSButton` (2.0.0: icon placements, appearances and roles, full width, capsule, tiles), `DateButtons`, `AnimatedTitleInput`, `AmountPercentage` |
-| `EffectsSnapshotTests` | 2.2.0 motion in its still state: `AuroraBackground` (first frame), `TypingIndicator`, symbols with draw-on / cue / pulse drawn complete; 2.3.0: a goal `ProgressRing` below and at 100 % (with its checkmark), the closed `GlassActionMenu`, `LiveAmountText` at its value |
+| `EffectsSnapshotTests` | 2.2.0 motion in its still state: `AuroraBackground` (first frame), `TypingIndicator`, symbols with draw-on / cue / pulse drawn complete; 2.3.0: a goal `ProgressRing` below and at 100 % (with its checkmark), the closed `GlassActionMenu`, `LiveAmountText` at its value; 2.4.0: `VoiceWave` (ribbons, orb, thinking) and `EdgeGlow` at a fixed level, `.thinkingShimmer` in its still gradient |
 
 Appearances (`SnapshotAppearance`): `light`, `dark`, and `largeText` (light at accessibility
 text size AX2, which catches truncation and clipping). References live in
@@ -42,8 +42,8 @@ Not covered on purpose:
   `.skeletonShimmer(false)`, so every component is drawn still in its final state; bursts
   (`.celebration`, `.sparkleBurst`), `.shine`, `.attentionPulse` and `.interactiveTilt` draw
   nothing until triggered and have no picture;
-- views that animate continuously on a clock, so no two frames match: `SiriGlow`,
-  `SiriWave`, `AccentGlow`, `.borderBeam()`, `LoopOnboardingHero`'s pulsing ring,
+- views that animate continuously on a clock, so no two frames match: `AccentGlow`,
+  `.borderBeam()` (drawn only with motion on), `LoopOnboardingHero`'s pulsing ring,
   `BlinkingCursor`, and the spinner of `DSButton(isLoading: true)`. Skeletons are covered since 1.10.0: the renderer
   stops their shimmer with `.skeletonShimmer(false)` (Reduce Motion would too, but SwiftUI
   does not let a test set it; `accessibilityReduceMotion` is read-only). `.skeleton(isLoading:)`
@@ -130,7 +130,10 @@ References are recorded on CI, not on a laptop, so they match what CI compares w
 2. Run the **CI** workflow manually on that branch (Actions → CI → Run workflow, or the API)
    with `record_snapshots`:
    - `missing`: only tests that have no reference yet (a new test or appearance);
-   - `failed`: only references that differ (after an intentional visual change);
+   - `failed`: only references that differ (after an intentional visual change); like a
+     normal run it draws a differing snapshot a second time and writes it only if it still
+     differs (2.4.0), so a render that lost the glass shading is not written over a good
+     reference;
    - `all`: every reference (after moving the Xcode pin).
 3. The snapshot job commits the PNGs to the branch (`test(snapshots): record references`).
    That push does not start CI, so run CI on the branch again with `record_snapshots: never`,
