@@ -193,15 +193,10 @@ extension ComponentSnapshots {
             )
         }
 
-        /// ConvertedAmountView uses the Gallery's fixed demo rates (GalleryApp): 100 USD = 48 000 ₸.
-        @Test func amountShareAndConversion() async {
+        @Test func amountPercentageView() async {
             await assertComponentSnapshot(
-                VStack(alignment: .leading, spacing: AppSpacing.lg) {
-                    AmountPercentageView(amount: 42_000, currency: "KZT", percentage: 42)
-                    ConvertedAmountView(amount: 100, fromCurrency: "USD", toCurrency: "KZT",
-                                        fontSize: AppTypography.bodySmall, color: AppColors.textSecondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading),
+                AmountPercentageView(amount: 42_000, currency: "KZT", percentage: 42)
+                    .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light, .largeText]
             )
         }

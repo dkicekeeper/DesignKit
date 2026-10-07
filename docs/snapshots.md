@@ -30,7 +30,7 @@ appearances it lists:
 | `BalancesSnapshotTests` | `BalanceCard`, `SelectableBalanceCard`, `BalanceRow`, `ProgressRingRow`, `ProgressRingTile`, `ProgressRingTileGrid`, `MetricCard` (mini chart, none, bottom chart), `GradientOrbsBackground`, `PromptSheet` |
 | `SkeletonsSnapshotTests` | every component skeleton (1.10.0): each card skeleton on its own, rows, charts, gauges and bars, badges, icons, amounts, headers, timeline, the community and progress components (1.12.0); the shimmer is stopped (`.skeletonShimmer(false)` in the renderer) |
 | `CommunitySnapshotTests` | `PersonRow`, `CommentRow` (with a quote and actions), `ThreadCard`, `ReviewCard`, `ReactionButton`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.12.0) |
-| `InputsSnapshotTests` | `FormattedAmountText` sign and unit, hidden amounts (`.amountsHidden`, `AmountVisibilityToggle`, the `HeroProportionBar` legend), `CurrencyPickerMenu` and `CurrencyAmountInput` (calculator display, error), `SegmentedPickerView`, `ChipPicker` (single / several), `RatingPicker`, `FormTextField`, `TagInput`, `MessageComposer` (empty, quote and error, disabled), `CalculatorKeypad`, `AmountDigitDisplay`, `FormattedAmountView`, `SpentBudgetText`, `PlusTabLabel`, `BulkDeleteButton`, `EntityActionButton`, `DateButtonsView`, `AnimatedTitleInput`, `AmountPercentageView`, `ConvertedAmountView` |
+| `InputsSnapshotTests` | `FormattedAmountText` sign and unit, hidden amounts (`.amountsHidden`, `AmountVisibilityToggle`, the `HeroProportionBar` legend), `CurrencyPickerMenu` and `CurrencyAmountInput` (calculator display, error), `SegmentedPickerView`, `ChipPicker` (single / several), `RatingPicker`, `FormTextField`, `TagInput`, `MessageComposer` (empty, quote and error, disabled), `CalculatorKeypad`, `AmountDigitDisplay`, `FormattedAmountView`, `SpentBudgetText`, `PlusTabLabel`, `BulkDeleteButton`, `EntityActionButton`, `DateButtonsView`, `AnimatedTitleInput`, `AmountPercentageView` |
 
 Appearances (`SnapshotAppearance`): `light`, `dark`, and `largeText` (light at accessibility
 text size AX2, which catches truncation and clipping). References live in
@@ -44,6 +44,9 @@ Not covered on purpose:
   does not let a test set it; `accessibilityReduceMotion` is read-only). `.skeleton(isLoading:)`
   is not: its shapes are the system's redaction;
 - full-screen pickers with a search in the navigation bar: `IconPicker`, `CurrencyList`;
+- `ConvertedAmountView` (and `RecurringPaymentCard`'s converted line): it draws nothing until
+  the host app's converter answers, and in a snapshot run it had not answered when the picture
+  was taken (October 2026), so the snapshot showed an empty line;
 - containers whose look is the system's (`EditSheetContainer` is a `Form` in a navigation bar)
   or that fill the screen (`OnboardingPageContainer`, `OnboardingPager`, and
   `NotificationPermissionView`, which is `PermissionPrimerView` with Tenra's wording);
