@@ -107,7 +107,9 @@ extension ComponentSnapshots {
                                 .tooltipAnchor(.bottom)
                         }
                 }
-                .padding(.vertical, AppSpacing.xxxl + AppSpacing.md)
+                // The tooltips are overlays, outside the targets' frames: room for them at
+                // large text sizes too, or the picture cuts them.
+                .padding(.vertical, AppSpacing.xxxl * 3)
                 .frame(maxWidth: .infinity),
                 appearances: [.light, .dark, .largeText]
             )
