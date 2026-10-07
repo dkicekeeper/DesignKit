@@ -21,6 +21,8 @@ import DesignSupport
 /// - 45 – 80 %  → blend `success` → `warning`
 /// - 80 – 100 % → blend `warning` → `destructive` (the red tip appears exactly at the limit)
 /// - `isOverBudget` → red-dominant gradient (`warning` start → `destructive`)
+/// - `celebratesCompletion` (a goal ring) or `overrideColor` → one hue with depth; a goal is
+///   green (`AppColors.success`), at any fill and past 100 % (2.3.1)
 ///
 /// Because the gradient is static and only `trim` animates, the entrance sweep and
 /// value changes recolor the tip for free — no color interpolation code.
@@ -89,8 +91,10 @@ public struct ProgressRing: View {
     /// percentage would otherwise float as a disconnected arc (insight cards).
     var showsTrack: Bool = false
 
-    /// A goal ring: at 100 % a checkmark draws itself in the centre and the completion moment
-    /// plays (2.3.0). Off for budgets, where 100 % is not good news.
+    /// A goal ring: green at any fill (a fuller ring is better news, never the budget's red;
+    /// 2.3.1), and at 100 % a checkmark draws itself in the centre and the completion moment
+    /// plays (2.3.0). Off for budgets, where 100 % is not good news. `overrideColor` still
+    /// picks another hue.
     var celebratesCompletion: Bool = false
 
     @State private var displayProgress: Double = 0
@@ -103,11 +107,12 @@ public struct ProgressRing: View {
     /// (gradient stops aren't animatable; the trim animation does the work).
     private var arcGradient: AngularGradient {
         let stops: [Gradient.Stop]
-        if let overrideColor {
-            // Caller owns the semantics (loan hero) — keep one hue, add depth.
+        if let hue = overrideColor ?? (celebratesCompletion ? AppColors.success : nil) {
+            // Caller owns the semantics (loan hero), or a goal ring where fuller is better:
+            // keep one hue, add depth.
             stops = [
-                .init(color: overrideColor.opacity(0.55), location: 0),
-                .init(color: overrideColor, location: 1)
+                .init(color: hue.opacity(0.55), location: 0),
+                .init(color: hue, location: 1)
             ]
         } else if isOverBudget || progress > 1.0 {
             // Over the limit — unmistakably red, with a warning-colored tail.

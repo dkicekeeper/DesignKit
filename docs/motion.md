@@ -62,7 +62,7 @@ layers, and it never touches layout. DesignKit names them by meaning:
 | `.symbolMagicReplace()` | Magic Replace | `AmountVisibilityToggle` (eye ↔ eye.slash), `SelectionIndicator`, `ReactionButton` (outline ↔ fill) |
 | `.contentTransition(.symbolEffect(.replace))` | Replace | `TrendBadge`'s arrow |
 | `.symbolColorRenderingMode(.gradient)` (no motion, 2.3.0) | SF Symbols 7 gradient of the tint, for depth | `HeroSymbol`, `EmptyState`'s icon |
-| `ProgressRing(celebratesCompletion: true)` (2.3.0) | a checkmark draws itself in at 100 % | goal rings |
+| `ProgressRing(celebratesCompletion: true)` (2.3.0) | a checkmark draws itself in at 100 %; the ring is green at any fill (2.3.1) | goal rings |
 
 Loops go through `AmbientMotionGate`; all of them stop under Reduce Motion and
 `.designKitMotion(false)`, drawing the symbol still in its final state.

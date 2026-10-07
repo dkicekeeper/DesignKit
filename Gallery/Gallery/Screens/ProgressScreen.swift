@@ -68,7 +68,7 @@ private struct ProgressRingPage: View {
             summary: "A ring of progress around something (a category coin); red once over.",
             apps: [.tenra],
             notes: [
-                "celebratesCompletion (2.3.0): a goal ring. Reaching 100 % draws a checkmark in, the ring glows once and the success haptic plays. Off for budgets.",
+                "celebratesCompletion (2.3.0): a goal ring, green at any fill (2.3.1). Reaching 100 % draws a checkmark in, the ring glows once and the success haptic plays. Off for budgets.",
             ]
         ) {
             if state == .loading {
