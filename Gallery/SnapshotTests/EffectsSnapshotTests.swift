@@ -2,11 +2,12 @@
 //  EffectsSnapshotTests.swift
 //  DesignKit Gallery snapshot tests
 //
-//  The motion components of 2.2.0 and 2.3.0 in their still state (the harness sets
+//  The motion components of 2.2.0 to 2.5.0 in their still state (the harness sets
 //  `.designKitMotion(false)`): the aurora's first frame, the typing indicator at rest, symbols
 //  that would draw themselves on, shown drawn; a goal ring at 100 %, the closed glass menu, a
-//  live amount at its value. Bursts, shine, pulses, tilt, glows and ripples draw nothing until
-//  triggered, so they have no picture.
+//  live amount at its value; the voice wave, the edge glow and the thinking shimmer at a fixed
+//  level; weighted aurora spots and the aurora accent glow. Bursts, shine, pulses, tilt, glows
+//  and ripples draw nothing until triggered, so they have no picture.
 //
 
 import SwiftUI
@@ -137,6 +138,33 @@ extension ComponentSnapshots {
                     .thinkingShimmer()
                     .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// 2.5.0: weighted spots, still: the home screen's background.
+        @Test func auroraSpots() async {
+            await assertComponentSnapshot(
+                AuroraBackground([
+                    .init(color: .orange, weight: 1),
+                    .init(color: .blue, weight: 0.6),
+                    .init(color: .pink, weight: 0.4),
+                ])
+                .frame(height: 260)
+                .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl)),
+                appearances: [.light, .dark]
+            )
+        }
+
+        /// 2.5.0: the aurora accent glow from the top and from the bottom, still.
+        @Test func accentGlowAurora() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.md) {
+                    Color.clear.frame(height: 160).accentGlow(AppColors.accent, edge: .top)
+                        .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl))
+                    Color.clear.frame(height: 160).accentGlow(.orange, edge: .bottom)
+                        .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl))
+                },
+                appearances: [.light, .dark]
             )
         }
     }

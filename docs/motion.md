@@ -93,7 +93,20 @@ Insert with a spring: `withAnimation(AppAnimation.bouncy) { isShown = true }`.
 | `.scrollReveal()` | settles in at the viewport's edges | `scrollTransition`, no state | the rows and cards of a `ScrollView` |
 | `.textRevealOnAppear()` | text written in glyph by glyph | one `TextRenderer` pass while it plays | an insight's summary, a result |
 | `TypingIndicator` | three dots in a wave | 30 fps while allowed | a reply on its way, an assistant thinking |
-| `.borderGlow`, `GradientOrbsBackground`, `.accentGlow` (1.x) | ambient light | see their docs | "working on it", hero backgrounds |
+| `.borderGlow` (1.x) | a static halo round a card | see its docs | "working on it" |
+
+**2.5.0: still light for backgrounds**
+
+| Effect | What | Cost | Use |
+|---|---|---|---|
+| `AuroraBackground(_ spots:)` | weighted pools of colour, each sized and brightened by its weight, sampled into a 5×5 mesh; still by default, flowing into a change of data in 0.6 s. Replaces `GradientOrbsBackground` (deprecated) | one mesh, no blur, drawn once | a home screen's background under Liquid Glass |
+| `.accentGlow(style: .aurora)` (the default) | a band of mesh light in the tint and its neighbours, fading inwards; `drifts:` moves it | one mesh, no blur (the `.soft` style blurred a circle by 120 pt) | heroes of detail screens, onboarding |
+| `.grain(_:)` | a fine, still grain against banding | one colour effect, the same every frame | built into `AuroraBackground` and the aurora glow |
+
+**Backgrounds under Liquid Glass hold still.** A glass surface recomputes its blur from what is
+behind it; a background that moves makes every glass card on the screen redraw each frame. So
+the backgrounds of everyday screens (`AuroraBackground(_ spots:)`, `heroAccentGlow`) are still,
+and drift is for screens seen briefly (onboarding, a paywall).
 
 **2.4.0: the voice, and work in progress**
 
@@ -121,7 +134,7 @@ breathe on their own.
 | `.ripple(trigger:at:)` / `.rippleOnTap()` | a ripple through the view itself, like water | a Metal layer effect, only while it plays (1.6 s) | a moment that deserves it: a goal reached, a big confirmation. The heaviest effect here: never on every button |
 
 **Ripple and its shaders.** The shader sources are `Shaders/Ripple.metal` (after Apple's WWDC24
-sample) and `Shaders/EdgeGlow.metal` (2.4.0). The package does not compile it: Xcode 26's Metal Toolchain is an optional ~700 MB
+sample) `Shaders/EdgeGlow.metal` (2.4.0) and `Shaders/Grain.metal` (2.5.0). The package does not compile it: Xcode 26's Metal Toolchain is an optional ~700 MB
 download, missing on some CI runners, and every app would need it. Instead
 `.github/workflows/shaders.yml` runs `Shaders/build.sh` on a branch where a shader changed and
 commits two libraries to `Sources/DesignComponents/Resources/Shaders`:
