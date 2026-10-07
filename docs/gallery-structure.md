@@ -44,8 +44,9 @@ DesignKit: в Gallery, в `docs/design-system.md` и в папках `Sources/De
 ## Новая раскладка
 
 Основы (6): **Colors**, **Typography**, **Spacing & Radius**, **Icon Sizes**, **Surfaces**
-(`cardStyle`, `formCardStyle`, `filterChipStyle`, стекло), **Motion** (кривые, длительности,
-появление контента, `AmbientMotionGate`).
+(`cardStyle`, `formCardStyle`, `filterChipStyle`, стекло), **Motion** (пружины по назначению,
+длительности, анимации SF Symbols, переходы `.popIn` / `.riseIn`, проявление текста, появление при
+прокрутке, появление контента, `AmbientMotionGate`; docs/motion.md).
 
 Компоненты (17 разделов, 4–13 страниц в каждом):
 
@@ -62,12 +63,12 @@ DesignKit: в Gallery, в `docs/design-system.md` и в папках `Sources/De
 | **Cards: Content** | `ThreadCard`, `ReviewCard`, `ThumbnailCard`, `RecommendationBox`, `EmptyCard` | M3 Containment |
 | **Charts** | `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `OrbChart`, `ChartSelectionBanner`, `ChartZoomControls` | HIG Content (Charts) |
 | **Progress & Gauges** | `LinearProgressBar`, `ProgressRing`, `ProportionBar`, `MiniProportionBar`, `HeroProportionBar`, `AmountComparisonBar`, `MiniDonut`, `MiniHalfGauge`, `HeroHalfGauge`, `MiniMilestoneGauge`, `HeroMilestoneGauge`, `MiniBarPair`, `HeroBarPair` | HIG Status (gauges, progress) |
-| **Status & Feedback** | `Badge`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `EmptyState`, `StepTracker`, `ImportProgressSheet`, примитивы скелетонов (`Skeleton`, `SkeletonText`, `SkeletonRow`) | M3 Communication, Atlassian Messaging + Loading |
+| **Status & Feedback** | `Badge`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `TypingIndicator`, `EmptyState`, `StepTracker`, `ImportProgressSheet`, примитивы скелетонов (`Skeleton`, `SkeletonText`, `SkeletonRow`) | M3 Communication, Atlassian Messaging + Loading |
 | **Headers & Navigation** | `SectionHeader` (пять стилей, с 2.0.0 и `.list`, `.card`), `HeroSection`, `UniversalCarousel`, `OnboardingStepIndicator`, `PlusTabLabel` | M3 Navigation, HIG Navigation and search |
 | **Media & Identity** | `Icon` (символы, картинки, логотипы брендов), `Avatar`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIcons`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ThumbnailPlaceholder` | Atlassian Images and icons |
 | **Content & Layout** | `ExpandableText`, `ActivityTimeline`, `MonthCalendar`, `FlowLayout`, `FormSection`, `EditSheetContainer`, `EditableHero` | HIG Layout and organization |
 | **Sheets & Flows** | `PromptSheet` (и праймер разрешения), `NotificationPermissionPrompt`, `OnboardingPager`, `OnboardingPage`, `LoopOnboardingHero` | HIG Presentation, M3 Containment (sheets) |
-| **Effects** | `GradientOrbsBackground`, `SiriGlow`, `SiriWave`, `.accentGlow`, `.borderBeam` / `.borderGlow` | — (своё: Liquid Glass, Siri) |
+| **Effects** | `.celebration`, `.sparkleBurst`, `.shine`, `.attentionPulse`, `AuroraBackground`, `.interactiveTilt` (2.2.0), `GradientOrbsBackground`, `SiriGlow`, `SiriWave`, `.accentGlow`, `.borderBeam` / `.borderGlow` | — (своё: Liquid Glass, Siri) |
 
 Правило для нового компонента: раздел выбирается по тому, **что компонент делает**
 (действие, ввод, выбор, показ данных, статус, навигация), а если это строка или карточка — по

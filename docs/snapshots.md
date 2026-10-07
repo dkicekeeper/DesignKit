@@ -21,7 +21,7 @@ appearances it lists:
 | `FormsSnapshotTests` | `EditableHero` (amount, no currency chip), `FormSection`, `DatePickerRow`, `MenuPickerRow`, `SectionHeader(style: .list)`, `HeroSection` |
 | `IconsSnapshotTests` | `Icon` (category, circle, rounded square, glass hero, placeholder, brand fallback, a brand logo), `PackedCircleIcons` |
 | `CardsSnapshotTests` | `FinanceCard`, `RedactableAmount`, `EmptyCard`, `InsightsStatCard`, `AmountRow` (an insight's item), `UniversalCarousel`, `UniversalFilterButton` |
-| `FeedbackSnapshotTests` | `StatusBanner` (5 statuses, compact, with an action), `EmptyState` (3 styles), `MessageBanner`, `InlineStatusText`, `RecommendationBox`, `StepTracker`, `OnboardingStepIndicator`, `Tooltip` (2.0.0), `PromptSheet` as a permission primer, `OnboardingPage`, `ImportProgressSheet` |
+| `FeedbackSnapshotTests` | `StatusBanner` (5 statuses, compact, with an action), `EmptyState` (3 styles), `MessageBanner`, `InlineStatusText`, `RecommendationBox`, `StepTracker`, `OnboardingStepIndicator`, `Tooltip` (2.0.0), `PromptSheet` as a permission primer, `OnboardingPage`, `ImportProgressSheet`, `TypingIndicator` (2.2.0, still) |
 | `DisplaySnapshotTests` | `Badge`, `TrendBadge`, `StatusIndicatorBadge`, `StatTile`, `Avatar`, `AvatarGroup`, `Rating`, `ActivityTimeline`, `MonthCalendar`, `ExpandableText`, `FlowLayout`, `HeroSymbol` |
 | `ColorsSnapshotTests` | every semantic colour token (`AppColors.Text`, `.Background`, `.Border`, `.Status`, `pale(_:)`): a swatch each, light and dark |
 | `ChartsSnapshotTests` | `LinearProgressBar`, `ProgressRing`, `AmountComparisonBar`, `FormattedAmountText`, `Sparkline`, `LineChart`, `BarChart`, `HeroSparkline`, `OrbChart`, `MiniDonut`, `ProportionBar`, `MiniProportionBar`, `HeroProportionBar`, `HeroHalfGauge`, `MiniHalfGauge`, `HeroMilestoneGauge`, `MiniMilestoneGauge`, `HeroBarPair`, `MiniBarPair`, `ChartSelectionBanner` |
@@ -31,12 +31,17 @@ appearances it lists:
 | `SkeletonsSnapshotTests` | every component skeleton (1.10.0): each card skeleton on its own, rows, charts, gauges and bars, badges, icons, amounts, headers, timeline, the community and progress components (1.12.0); the shimmer is stopped (`.skeletonShimmer(false)` in the renderer) |
 | `CommunitySnapshotTests` | `PersonRow`, `CommentRow` (with a quote and actions), `ThreadCard`, `ReviewCard`, `ReactionButton`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.12.0) |
 | `InputsSnapshotTests` | `FormattedAmountText` sign and unit, hidden amounts (`.amountsHidden`, `AmountVisibilityToggle`, the `HeroProportionBar` legend), `CurrencyPickerMenu` and `CurrencyAmountInput` (calculator display, error), `SegmentedPicker`, `ChipPicker` (single / several), `RatingPicker`, `FormTextField`, `TagInput`, `MessageComposer` (empty, quote and error, disabled), `CalculatorKeypad`, `AmountDigitDisplay`, `FormattedAmountText` in body semibold, `SpentBudgetText`, `PlusTabLabel`, `DSButton` (2.0.0: icon placements, appearances and roles, full width, capsule, tiles), `DateButtons`, `AnimatedTitleInput`, `AmountPercentage` |
+| `EffectsSnapshotTests` | 2.2.0 motion in its still state: `AuroraBackground` (first frame), `TypingIndicator`, symbols with draw-on / cue / pulse drawn complete |
 
 Appearances (`SnapshotAppearance`): `light`, `dark`, and `largeText` (light at accessibility
 text size AX2, which catches truncation and clipping). References live in
 `Gallery/SnapshotTests/__Snapshots__/<File>/<test>.<appearance>.png`.
 
 Not covered on purpose:
+- motion itself: the harness sets `.designKitMotion(false)` (2.2.0) next to
+  `.skeletonShimmer(false)`, so every component is drawn still in its final state; bursts
+  (`.celebration`, `.sparkleBurst`), `.shine`, `.attentionPulse` and `.interactiveTilt` draw
+  nothing until triggered and have no picture;
 - views that animate continuously on a clock, so no two frames match: `SiriGlow`,
   `SiriWave`, `AccentGlow`, `.borderBeam()`, `LoopOnboardingHero`'s pulsing ring,
   `BlinkingCursor`, and the spinner of `DSButton(isLoading: true)`. Skeletons are covered since 1.10.0: the renderer

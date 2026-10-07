@@ -92,6 +92,8 @@ public struct EmptyState: View {
                 source: .sfSymbol(icon.isEmpty ? "tray" : icon),
                 style: .emptyState()
             )
+            // 2.2.0: the symbol draws itself on (SF Symbols Draw).
+            .drawOnAppear(delay: 0.1)
 
             VStack(spacing: AppSpacing.sm) {
                 Text(title)
@@ -151,6 +153,8 @@ public struct EmptyState: View {
                     tint: .destructiveMonochrome
                 )
             )
+            // 2.2.0: a wiggle once it is shown: something went wrong.
+            .symbolCueOnAppear(.wiggle)
 
             VStack(spacing: AppSpacing.sm) {
                 Text(title)

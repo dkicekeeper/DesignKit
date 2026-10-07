@@ -31,7 +31,7 @@ import DesignSupport
 /// - `isLoading` swaps the label for a spinner in the same width and blocks taps.
 ///
 /// The label takes the font around it, like a SwiftUI `Button`. A press plays a light haptic,
-/// a warning one for `.destructive`.
+/// a warning one for `.destructive`, and bounces the symbol (2.2.0).
 public struct DSButton: View {
     public typealias Appearance = DSButtonAppearance
     public typealias Role = DSButtonRole
@@ -70,6 +70,9 @@ public struct DSButton: View {
     let isLoading: Bool
     let isDisabled: Bool
     let action: () -> Void
+
+    /// Counts presses: each one bounces the symbol (2.2.0).
+    @State private var presses = 0
 
     public init(
         _ title: String,
@@ -111,6 +114,7 @@ public struct DSButton: View {
         Button(role: buttonRole, action: tap) {
             ZStack {
                 content
+                    .symbolCue(.bounce, trigger: presses)
                     .opacity(isLoading ? 0 : 1)
                 if isLoading {
                     ProgressView()
@@ -164,6 +168,7 @@ public struct DSButton: View {
                 } else if let systemImage {
                     Image(systemName: systemImage)
                         .font(.system(size: AppIconSize.lg, weight: .semibold))
+                        .symbolCue(.bounce, trigger: presses)
                         .frame(width: AppIconSize.lg, height: AppIconSize.lg)
                 }
                 Text(verbatim: title)
@@ -189,6 +194,7 @@ public struct DSButton: View {
     }
 
     private func tap() {
+        presses += 1
         if role == .destructive {
             HapticManager.warning()
         } else {

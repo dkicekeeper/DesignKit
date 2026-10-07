@@ -79,6 +79,8 @@ public struct StepTracker: View {
                 Image(systemName: "checkmark")
                     .font(.system(size: circleSize * 0.45, weight: .bold))
                     .foregroundStyle(AppColors.staticWhite)
+                    // 2.2.0: a step done draws its checkmark on.
+                    .drawOnAppear()
             } else if index == current {
                 Circle().fill(AppColors.Background.neutral1)
                 Circle().strokeBorder(AppColors.accent, lineWidth: 2)

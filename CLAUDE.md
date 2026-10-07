@@ -181,6 +181,7 @@ rather than importing an app type.
 |---|---|
 | Tokens, modifiers, any component, amount formatting, animation rules | [docs/design-system.md](docs/design-system.md) |
 | Charts, progress, gauges, OrbChart, Swift Charts patterns | [docs/charts.md](docs/charts.md) |
+| Motion and effects: springs, budgets, SF Symbol motion, transitions, celebrations, Reduce Motion | [docs/motion.md](docs/motion.md) |
 | Package traps (public API, Xcode 26/27, bundles) and SwiftUI layout traps | [docs/gotchas.md](docs/gotchas.md) |
 | Localized strings used by components | [docs/localization-keys.md](docs/localization-keys.md) |
 | Gallery TestFlight pipeline | [docs/testflight.md](docs/testflight.md) |

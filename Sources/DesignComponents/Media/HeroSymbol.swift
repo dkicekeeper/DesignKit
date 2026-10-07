@@ -22,14 +22,18 @@ public struct HeroSymbol: View {
     let systemImage: String
     let size: CGFloat
     let tint: Color?
+    let drawsOnAppear: Bool
 
     /// - Parameters:
     ///   - size: diameter of the disc; the symbol is 3/7 of it.
     ///   - tint: symbol and disc colour, `AppColors.accent` by default.
-    public init(systemImage: String, size: CGFloat = 140, tint: Color? = nil) {
+    ///   - drawsOnAppear: The symbol draws itself on as the hero appears (2.2.0, SF Symbols
+    ///     Draw; symbols without draw data just appear). Still under Reduce Motion.
+    public init(systemImage: String, size: CGFloat = 140, tint: Color? = nil, drawsOnAppear: Bool = true) {
         self.systemImage = systemImage
         self.size = size
         self.tint = tint
+        self.drawsOnAppear = drawsOnAppear
     }
 
     public var body: some View {
@@ -37,10 +41,16 @@ public struct HeroSymbol: View {
         Image(systemName: systemImage)
             .font(.system(size: size * 3 / 7))
             .foregroundStyle(color)
+            .drawOnAppear(delay: HeroSymbolMetrics.drawDelay, isEnabled: drawsOnAppear)
             .frame(width: size, height: size)
             .background(AppColors.pale(color), in: Circle())
             .accessibilityHidden(true)
     }
+}
+
+enum HeroSymbolMetrics {
+    /// The disc shows first; the symbol draws in once the sheet or page has settled.
+    static let drawDelay: Double = 0.15
 }
 
 // MARK: - Skeleton

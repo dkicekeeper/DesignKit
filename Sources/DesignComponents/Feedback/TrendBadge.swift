@@ -80,6 +80,7 @@ public struct TrendBadge: View {
         if style == .changeIndicator {
             VStack(spacing: AppSpacing.xs) {
                 Image(systemName: direction.systemImage)
+                    .contentTransition(.symbolEffect(.replace))
                 if let percent = changePercent {
                     Text(Self.format(percent))
                         .font(AppTypography.numbers(AppTypography.bodyEmphasis))
@@ -90,6 +91,7 @@ public struct TrendBadge: View {
         } else {
             HStack(spacing: AppSpacing.xs) {
                 Image(systemName: direction.systemImage)
+                    .contentTransition(.symbolEffect(.replace))
                     .font(AppTypography.bodyEmphasis)
 
                 if let percent = changePercent {

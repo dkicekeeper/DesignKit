@@ -35,7 +35,7 @@
 
 | Module | Contents |
 |---|---|
-| `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation`, `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, inline field styles), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
+| `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, inline field styles), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
 | `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `Icon` (a brand logo is `Icon(source: .brandService(name))`; `BrandLogoView` was removed in 2.0.0), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `HapticManager`, `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
 | `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons") |
 
@@ -223,6 +223,21 @@ For dynamic-size amount inputs use `Font.custom(AppTypography.fontFamily, …)` 
 **Accessibility text sizes (AX1–AX5).** Side-by-side layouts stack when `dynamicTypeSize.isAccessibilitySize` (Apple's HIG rule): a row of columns or a "title …… value" row does not truncate values or break words mid-word, it puts them one under another. Standard sizes keep the side-by-side layout untouched — branch on `isAccessibilitySize`, don't rework the regular layout. Since 1.3.0: `ComparisonCard` (before, now, change), `TotalsCard` (one total per line), `AmountRow`'s info style (the amount under the title), `MenuPickerRow` (the value under the title); since 1.5.1 `AmountRow`'s list style (a detail's amount under its text; spent, "/ limit" and the share on three lines). Snapshot tests check AX2 (`largeText`).
 
 ### Animations (`AppAnimation`)
+
+**Springs by purpose (2.2.0)** — pick one by what the motion says; the rules, budgets, symbol
+motion, transitions and effects are in [motion.md](motion.md):
+
+| Token | Feels | Use For |
+|-------|-------|---------|
+| `snappy` | 0.25 s, no bounce | The answer to a touch: toggle, selection, chip, press |
+| `smooth` | 0.35 s, no overshoot | Content that changes or moves |
+| `bouncy` | 0.4 s, small overshoot | A playful confirmation: added, liked, done |
+| `expressive` | 0.55 s, bounce 0.3 | A moment that matters (rare) |
+
+`MotionBudget` holds the timing budgets (feedback 0.25 s, entrance 0.35 s, stagger 0.04 s ≤ 0.3 s);
+`.designKitMotion(false)` stills DesignKit's motion below a view.
+
+The 1.x tokens, still used by the components that have them:
 
 | Token | Type | Use For |
 |-------|------|---------|

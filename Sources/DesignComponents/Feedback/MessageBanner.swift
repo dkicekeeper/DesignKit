@@ -121,6 +121,9 @@ public struct MessageBanner: View {
                 .foregroundStyle(type.tintColor)
                 .scaleEffect(iconScale)
                 .animation(reduceMotion ? nil : BannerAnimation.icon, value: iconScale)
+                // 2.2.0: once the icon has popped in, a bounce for success, a wiggle for a
+                // problem.
+                .symbolCueOnAppear(type.symbolCue, delay: BannerAnimation.iconDelay + MotionBudget.feedback)
 
             Text(message)
                 .font(AppTypography.body)
@@ -184,3 +187,14 @@ public extension MessageBanner {
 }
 
 // MARK: - Preview
+
+extension MessageBanner.MessageType {
+    /// The icon's beat as the banner appears (2.2.0).
+    var symbolCue: SymbolCue? {
+        switch self {
+        case .success: .bounce
+        case .error, .warning: .wiggle
+        case .info: nil
+        }
+    }
+}

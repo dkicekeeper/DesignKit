@@ -35,7 +35,10 @@ public struct SelectionIndicator: View {
         Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
             .font(.title3)
             .foregroundStyle(isSelected ? tint : AppColors.Text.secondary)
+            // 2.2.0: Magic Replace grows the checkmark out of the circle.
+            .symbolMagicReplace()
             .symbolEffect(.bounce, value: isSelected)
+            .animation(AppAnimation.snappy, value: isSelected)
             // The row itself carries the label and the `.isSelected` trait.
             .accessibilityHidden(true)
     }

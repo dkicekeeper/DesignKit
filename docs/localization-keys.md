@@ -121,6 +121,7 @@ text, not keys. A new key goes there as well.
 | `text.more` | ExpandableText | `More` |
 | `thumbnail.saved` | ThumbnailCard, ThumbnailRow (VoiceOver on the bookmark; `savedLabel` replaces it) | `Saved` |
 | `thumbnail.verified` | ThumbnailCard, ThumbnailRow (VoiceOver on the seal; `verifiedLabel` replaces it) | `Verified` |
+| `typing.indicator` | TypingIndicator (VoiceOver; `accessibilityLabel` replaces it) | `Typing` |
 
 Regenerate the table after changing components:
 

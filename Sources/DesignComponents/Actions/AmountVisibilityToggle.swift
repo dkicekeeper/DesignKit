@@ -47,7 +47,8 @@ public struct AmountVisibilityToggle: View {
             Image(systemName: isHidden ? "eye.slash" : "eye")
                 .font(.system(size: size))
                 .foregroundStyle(color)
-                .contentTransition(.symbolEffect(.replace))
+                // 2.2.0: Magic Replace draws the slash on and off.
+                .symbolMagicReplace()
                 .frame(minWidth: 44, minHeight: 44)
                 .contentShape(Rectangle())
         }
