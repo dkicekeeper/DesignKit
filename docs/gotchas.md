@@ -55,11 +55,14 @@ Known traps and surprising behaviors when building UI with DesignKit.
 - **Prefer `.searchable(text:placement:.navigationBarDrawer(.always))` over custom TextField**: gives native Cancel for keyboard dismiss + scope/tokens support. Custom search bars in nav stacks typically need manual `@FocusState` + keyboard toolbar that `.searchable` handles for free.
 - **Extra toolbar items in `EditSheetContainer`**: container uses `.cancellationAction` (xmark) + `.confirmationAction` (Save). Child views nest `.toolbar { ToolbarItem(placement: .primaryAction) { ... } }` inside the content closure — iOS auto-places `.primaryAction` items LEFT of `.confirmationAction`. Do NOT use `.topBarTrailing` / `.navigationBarTrailing` — they land on the wrong side of Save.
 - **Layers in a Liquid Glass card blend with the layers under them.** Inside `cardStyle()`
-  (`.glassEffect`) shapes drawn over each other do not simply cover: a marker over an arc looked
-  translucent (darker in light mode, lighter in dark), a highlight over a coloured disc changed
-  its colour. Flatten a layered drawing with `.compositingGroup()` so the glass blends it as one
-  picture (`HeroHalfGauge`, `PackedCircleIcons`' marbles, 2.9.0). Text and single shapes are
-  fine as they are.
+  (`.glassEffect` on the content) shapes drawn over each other do not simply cover: the glass
+  darkens each layer into what is under it in light mode and lightens it in dark. A marker over
+  an arc looked translucent, an arc looked darker over its own glow; even two plain overlapping
+  circles change colour (measured on snapshots, 2.9.0). `.compositingGroup()` changes nothing.
+  `.drawingGroup()` makes the drawing one layer and gives back its exact colours (`HeroHalfGauge`
+  does it); pad it for a glow or shadow that reaches outside the frame, and keep platform views
+  (`ProgressView`, text fields) out of it: they draw as an error placeholder. Glass behind the
+  content (`.background { Color.clear.glassEffect(…) }`) also gives the exact colours.
 - **`.contentReveal(isReady:)` only hides via opacity** — it does NOT skip body evaluation, layout, or render. For genuinely deferred rendering of heavy sections (glass cards, PackedCircleIcons, large grids), gate them behind an `if` condition instead.
 - **iOS 26 TabView lazy-renders non-active tab content** — verified: `AnalyticsTab.body` and `SettingsTab.body` don't fire on launch when `.home` is selected. Don't worry about non-active tab init being on the launch critical path.
 - **`.frame(height:)` doesn't resize a segmented `Picker`** — `Picker(.segmented)` has fixed intrinsic height. Use `.controlSize(.large)` (~36pt) or `.controlSize(.extraLarge)` (~44pt) to match adjacent button heights.

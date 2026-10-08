@@ -349,9 +349,9 @@ private struct MarbleBody: View {
 }
 
 /// Wraps a circle's face into a glossy marble: the highlight and shading over it, a shadow of
-/// its colour under it, and a slow sway. The face is flattened first, so a Liquid Glass card
-/// blends the marble as one picture (layered separately, the glass lets each layer show
-/// through the next).
+/// its colour under it, and a slow sway. On a Liquid Glass card the glass blends the marble's
+/// layers with each other a little (darker in light mode, lighter in dark); a drawing group
+/// would undo that, but it cannot hold the spinner a logo shows while it loads.
 private struct GlossyMarble<Face: View>: View {
     let diameter: CGFloat
     let shadowColor: Color
@@ -363,7 +363,6 @@ private struct GlossyMarble<Face: View>: View {
             .frame(width: diameter, height: diameter)
             .overlay { MarbleGloss(diameter: diameter) }
             .clipShape(Circle())
-            .compositingGroup()
             .shadow(color: shadowColor.opacity(0.5), radius: max(4, diameter * 0.13), y: max(3, diameter * 0.11))
             .modifier(MarbleSway(diameter: diameter, delay: Double(index) * PackedCircleMetrics.swayPhase))
     }

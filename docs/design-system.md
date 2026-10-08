@@ -639,10 +639,9 @@ FinanceCard(
   highlight at the upper left, a rim light, the edge and the bottom in shade; under each, a shadow
   of its colour (a logo's main colour, `DominantColorExtractor`). The marbles burst out of the
   middle one after another with a little overshoot, then sway by up to 2 pt, each on its own
-  beat (an ambient loop: still under Reduce Motion and `.designKitMotion(false)`). Each marble is
-  flattened (`.compositingGroup()`) before its shadow, so a Liquid Glass card blends it as one
-  picture. `style: .flat` is the look before: a symbol on a pale disc of its tint, a logo edge to
-  edge with a thin ring of the background.
+  beat (an ambient loop: still under Reduce Motion and `.designKitMotion(false)`). `style: .flat`
+  is the look before: a symbol on a pale disc of its tint, a logo edge to edge with a thin ring of
+  the background.
 
 #### `RecommendationBox`
 Tinted "lightbulb + advice" callout (icon + text on `color.opacity(0.10)`, `AppRadius.md`). Shared by `CalculationCard` and `TargetProgressCard`. Use for any card-bottom recommendation line.
