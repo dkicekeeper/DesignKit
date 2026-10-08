@@ -27,7 +27,7 @@ import DesignSupport
 /// } caption: { photo in
 ///     Text(photo.author).font(AppTypography.bodyEmphasis)
 /// } actions: { photo in
-///     ModerationMenu(photo)
+///     photo.isOwn ? nil : ModerationMenu(photo)   // nil: no menu for this photo
 /// }
 /// ```
 ///
@@ -39,7 +39,7 @@ public struct PhotoViewer<Item: Identifiable, Photo: View, Caption: View, Action
     let hasActions: Bool
     let photo: (Item) -> Photo
     let caption: (Item) -> Caption
-    let actions: (Item) -> Actions
+    let actions: (Item) -> Actions?
 
     @Environment(\.dismiss) private var dismiss
     @State private var selection: Item.ID
@@ -47,14 +47,15 @@ public struct PhotoViewer<Item: Identifiable, Photo: View, Caption: View, Action
     /// - Parameters:
     ///   - selection: The photo shown first.
     ///   - caption: Under the photo, on a dark band, in white; "2 / 5" is added under it.
-    ///   - actions: A control in the top bar's trailing corner, for the photo on screen.
+    ///   - actions: A control in the top bar's trailing corner for the photo on screen (a menu
+    ///     to report it); `nil` leaves the corner empty for that photo.
     public init(
         _ items: [Item],
         selection: Item.ID,
         closeTitle: String = String(localized: "common.close", defaultValue: "Close"),
         @ViewBuilder photo: @escaping (Item) -> Photo,
         @ViewBuilder caption: @escaping (Item) -> Caption,
-        @ViewBuilder actions: @escaping (Item) -> Actions
+        actions: @escaping (Item) -> Actions?
     ) {
         self.init(items, selection: selection, closeTitle: closeTitle, hasCaption: true, hasActions: true,
                   photo: photo, caption: caption, actions: actions)
@@ -68,7 +69,7 @@ public struct PhotoViewer<Item: Identifiable, Photo: View, Caption: View, Action
         hasActions: Bool,
         photo: @escaping (Item) -> Photo,
         caption: @escaping (Item) -> Caption,
-        actions: @escaping (Item) -> Actions
+        actions: @escaping (Item) -> Actions?
     ) {
         self.items = items
         self.closeTitle = closeTitle
@@ -102,9 +103,9 @@ public struct PhotoViewer<Item: Identifiable, Photo: View, Caption: View, Action
                 ToolbarItem(placement: .cancellationAction) {
                     Button(closeTitle, systemImage: "xmark") { dismiss() }
                 }
-                if hasActions, let item = current {
+                if hasActions, let item = current, let control = actions(item) {
                     ToolbarItem(placement: .topBarTrailing) {
-                        actions(item)
+                        control
                     }
                 }
             }
@@ -137,7 +138,7 @@ public extension PhotoViewer where Caption == EmptyView, Actions == EmptyView {
         @ViewBuilder photo: @escaping (Item) -> Photo
     ) {
         self.init(items, selection: selection, closeTitle: closeTitle, hasCaption: false, hasActions: false,
-                  photo: photo, caption: { _ in EmptyView() }, actions: { _ in EmptyView() })
+                  photo: photo, caption: { _ in EmptyView() }, actions: { _ in nil })
     }
 }
 
@@ -151,7 +152,7 @@ public extension PhotoViewer where Actions == EmptyView {
         @ViewBuilder caption: @escaping (Item) -> Caption
     ) {
         self.init(items, selection: selection, closeTitle: closeTitle, hasCaption: true, hasActions: false,
-                  photo: photo, caption: caption, actions: { _ in EmptyView() })
+                  photo: photo, caption: caption, actions: { _ in nil })
     }
 }
 

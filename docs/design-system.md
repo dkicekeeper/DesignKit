@@ -1584,14 +1584,15 @@ Photos full screen: black, dark scheme, paged, ✕ to close (`common.close`). Zo
 port)*: pinch up to 4×, drag while zoomed (the drag is off at 1×, so a swipe turns the page),
 double-tap to 2.5× and back, VoiceOver's zoom gesture. `caption:` adds a dark band at the
 bottom (black 45%, white text) with "2 / 5" under it, and then the page dots go; `actions:` puts
-a control in the top bar (report, block). Present it with `.fullScreenCover`, pass the photo
+a control in the top bar (report, block), or none for a photo it returns `nil` for (your own). Present it with `.fullScreenCover`, pass the photo
 fitted (`.scaledToFit()`).
 
-#### `ShareCardFrame`, `ShareCardStat`, `ShareCardFormat`, `ShareCardStyle`
-A picture to share: `ShareCardFormat.story` (360 × 640) or `.post` (360 × 450), rendered at 3×
+#### `ShareCardFrame`, `ShareCardStat`, `ShareCard.Format`, `ShareCard.Style`
+A picture to share (`ShareCard` is a namespace, so an app's own `ShareCardFormat` does not
+clash): `ShareCard.Format.story` (360 × 640) or `.post` (360 × 450), rendered at 3×
 (1080 px). The frame lays the content out from the top, padded 28, in white, with the brand
 (22 pt heavy rounded) and the site (11 pt, 70%) at the bottom; behind, the photo under a dark
-gradient, or the style's gradient. `ShareCardStyle(top:bottom:accent:)` (`.standard`: graphite
+gradient, or the style's gradient. `ShareCard.Style(top:bottom:accent:)` (`.standard`: graphite
 with the accent) stays the same in light and dark: the picture leaves the app. `ShareCardStat`
 is a number (24 pt bold rounded) over its caption (12 pt, 70%). Fixed sizes on purpose: the
 card is an image, not a screen. Dalada: the trip, catch and place cards are its own content in

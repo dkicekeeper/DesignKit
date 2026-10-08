@@ -83,13 +83,13 @@ extension ComponentSnapshots {
 
         // An image, not a screen: the same in light and dark, so one appearance.
         @Test func shareCardFrame() async {
-            for format in ShareCardFormat.allCases {
+            for format in ShareCard.Format.allCases {
                 await assertComponentSnapshot(
                     ShareCardFrame(format: format, brand: "Dalada", site: "dalada.kz") {
                         VStack(alignment: .leading, spacing: 6) {
                             Label("Fishing", systemImage: "fish")
                                 .font(.system(size: 15, weight: .semibold))
-                                .foregroundStyle(ShareCardStyle.standard.accent)
+                                .foregroundStyle(ShareCard.Style.standard.accent)
                             Text("Kapchagay weekend")
                                 .font(.system(size: 30, weight: .bold))
                         }

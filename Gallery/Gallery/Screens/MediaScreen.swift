@@ -466,8 +466,9 @@ private struct PhotoViewerPage: View {
             PhotoViewer(photos, selection: selection) { GalleryPhotoView(photo: $0, fits: true) } caption: { photo in
                 Text(photo.caption).font(AppTypography.bodyEmphasis)
                 Text("Aida · 12 May 2026").font(AppTypography.caption).foregroundStyle(.white.opacity(0.8))
-            } actions: { _ in
-                Menu {
+            } actions: { photo in
+                // The first photo is "yours": no menu for it.
+                photo.id == 0 ? nil : Menu {
                     Button("Report", systemImage: "flag") {}
                 } label: {
                     Image(systemName: "ellipsis")
@@ -484,7 +485,7 @@ private struct PhotoViewerPage: View {
 }
 
 private struct ShareCardFramePage: View {
-    @State private var format: ShareCardFormat = .story
+    @State private var format: ShareCard.Format = .story
     @State private var hasPhoto = false
 
     var body: some View {
@@ -504,7 +505,7 @@ private struct ShareCardFramePage: View {
             .scaleEffect(0.6)
             .frame(width: format.width * 0.6, height: format.height * 0.6)
         } controls: {
-            ChoiceControl("Format", selection: $format, options: ShareCardFormat.allCases.map { ($0.title, $0) })
+            ChoiceControl("Format", selection: $format, options: ShareCard.Format.allCases.map { ($0.title, $0) })
             ToggleControl("Photo", isOn: $hasPhoto)
         }
     }
@@ -512,13 +513,13 @@ private struct ShareCardFramePage: View {
 
 /// A sample card's content: kicker, title, date, stats.
 struct GalleryShareCardContent: View {
-    let format: ShareCardFormat
+    let format: ShareCard.Format
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Label("Fishing", systemImage: "fish")
                 .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(ShareCardStyle.standard.accent)
+                .foregroundStyle(ShareCard.Style.standard.accent)
             Text("Kapchagay weekend")
                 .font(.system(size: format == .story ? 32 : 28, weight: .bold))
                 .lineLimit(2)

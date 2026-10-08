@@ -31,15 +31,15 @@ import DesignSupport
 public struct ShareCardSheet<Model, Card: View>: View {
     let title: String
     let previewTitle: String
-    let formats: [ShareCardFormat]
+    let formats: [ShareCard.Format]
     let load: @MainActor () async -> Model?
     let message: @MainActor (Model) -> String
-    let card: @MainActor (Model, ShareCardFormat) -> Card
+    let card: @MainActor (Model, ShareCard.Format) -> Card
 
     @Environment(\.dismiss) private var dismiss
     @State private var model: Model?
     @State private var isLoaded = false
-    @State private var format: ShareCardFormat
+    @State private var format: ShareCard.Format
     @State private var image: UIImage?
 
     /// - Parameters:
@@ -52,12 +52,12 @@ public struct ShareCardSheet<Model, Card: View>: View {
     public init(
         title: String = String(localized: "share.title", defaultValue: "Picture for Stories"),
         previewTitle: String,
-        formats: [ShareCardFormat] = ShareCardFormat.allCases,
+        formats: [ShareCard.Format] = ShareCard.Format.allCases,
         load: @escaping @MainActor () async -> Model?,
         message: @escaping @MainActor (Model) -> String,
-        @ViewBuilder card: @escaping @MainActor (Model, ShareCardFormat) -> Card
+        @ViewBuilder card: @escaping @MainActor (Model, ShareCard.Format) -> Card
     ) {
-        let offered = formats.isEmpty ? ShareCardFormat.allCases : formats
+        let offered = formats.isEmpty ? ShareCard.Format.allCases : formats
         self.title = title
         self.previewTitle = previewTitle
         self.formats = offered
@@ -139,7 +139,7 @@ public struct ShareCardSheet<Model, Card: View>: View {
                 .frame(width: format.width, height: format.height)
                 .environment(\.colorScheme, .dark)
         )
-        renderer.scale = ShareCardFormat.scale
+        renderer.scale = ShareCard.Format.scale
         image = renderer.uiImage
     }
 }

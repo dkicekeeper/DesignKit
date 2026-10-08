@@ -16,58 +16,62 @@ import SwiftUI
 import UIKit
 import DesignTokens
 
-/// The shapes of a share card: a Stories frame or a post.
-public enum ShareCardFormat: String, CaseIterable, Identifiable, Hashable, Sendable {
-    /// 9:16, for Stories.
-    case story
-    /// 4:5, for a post or a chat.
-    case post
+/// The pieces of a share card: its formats and its colours. (A namespace, so an app's own
+/// `ShareCardFormat` does not clash.)
+public enum ShareCard {
+    /// The shapes of a share card: a Stories frame or a post.
+    public enum Format: String, CaseIterable, Identifiable, Hashable, Sendable {
+        /// 9:16, for Stories.
+        case story
+        /// 4:5, for a post or a chat.
+        case post
 
-    public var id: String { rawValue }
+        public var id: String { rawValue }
 
-    /// "Stories", "Post".
-    public var title: String {
-        switch self {
-        case .story: String(localized: "share.format.story", defaultValue: "Stories")
-        case .post: String(localized: "share.format.post", defaultValue: "Post")
+        /// "Stories", "Post".
+        public var title: String {
+            switch self {
+            case .story: String(localized: "share.format.story", defaultValue: "Stories")
+            case .post: String(localized: "share.format.post", defaultValue: "Post")
+            }
         }
-    }
 
-    public var width: CGFloat { 360 }
+        public var width: CGFloat { 360 }
 
-    public var height: CGFloat {
-        switch self {
-        case .story: 640
-        case .post: 450
+        public var height: CGFloat {
+            switch self {
+            case .story: 640
+            case .post: 450
+            }
         }
+
+        /// The rendering scale: 360 points become 1080 pixels.
+        public static let scale: CGFloat = 3
     }
 
-    /// The rendering scale: 360 points become 1080 pixels.
-    public static let scale: CGFloat = 3
-}
+    /// The colours of a share card. They stay the same in light and dark mode: the picture leaves
+    /// the app.
+    public struct Style: Sendable {
+        /// The gradient behind a card with no photo, top to bottom.
+        public let top: Color
+        public let bottom: Color
+        /// The kicker over the title ("Fishing"), a track, an icon.
+        public let accent: Color
 
-/// The colours of a share card. They stay the same in light and dark mode: the picture leaves
-/// the app.
-public struct ShareCardStyle: Sendable {
-    /// The gradient behind a card with no photo, top to bottom.
-    public let top: Color
-    public let bottom: Color
-    /// The kicker over the title ("Fishing"), a track, an icon.
-    public let accent: Color
+        public init(top: Color, bottom: Color, accent: Color) {
+            self.top = top
+            self.bottom = bottom
+            self.accent = accent
+        }
 
-    public init(top: Color, bottom: Color, accent: Color) {
-        self.top = top
-        self.bottom = bottom
-        self.accent = accent
-    }
-
-    /// Graphite with the accent.
-    public static var standard: ShareCardStyle {
-        ShareCardStyle(
-            top: Color(red: 0.12, green: 0.13, blue: 0.16),
-            bottom: Color(red: 0.03, green: 0.03, blue: 0.04),
-            accent: AppColors.accent
-        )
+        /// Graphite with the accent.
+        public static var standard: Style {
+            Style(
+                top: Color(red: 0.12, green: 0.13, blue: 0.16),
+                bottom: Color(red: 0.03, green: 0.03, blue: 0.04),
+                accent: AppColors.accent
+            )
+        }
     }
 }
 
@@ -91,11 +95,11 @@ enum ShareCardMetrics {
 ///
 /// The content is white; lay it out with fixed point sizes, as the card is an image.
 public struct ShareCardFrame<Content: View>: View {
-    let format: ShareCardFormat
+    let format: ShareCard.Format
     let brand: String
     let site: String?
     let photo: UIImage?
-    let style: ShareCardStyle
+    let style: ShareCard.Style
     let content: Content
 
     /// - Parameters:
@@ -103,11 +107,11 @@ public struct ShareCardFrame<Content: View>: View {
     ///   - site: At the bottom right, small ("dalada.kz").
     ///   - photo: Fills the card under a dark gradient; without it, the style's gradient.
     public init(
-        format: ShareCardFormat,
+        format: ShareCard.Format,
         brand: String,
         site: String? = nil,
         photo: UIImage? = nil,
-        style: ShareCardStyle = .standard,
+        style: ShareCard.Style = .standard,
         @ViewBuilder content: () -> Content
     ) {
         self.format = format
@@ -198,9 +202,9 @@ public struct ShareCardStat: View {
 
 /// Placeholder of a share card's preview while its data loads: the card's shape, scaled to fit.
 public struct ShareCardSkeleton: View {
-    let format: ShareCardFormat
+    let format: ShareCard.Format
 
-    public init(format: ShareCardFormat = .story) {
+    public init(format: ShareCard.Format = .story) {
         self.format = format
     }
 

@@ -117,8 +117,8 @@ text, not keys. A new key goes there as well.
 | `rating.value %@ %lld` | Rating (VoiceOver: "Rated 4.3 out of 5") | — |
 | `share.failed` | ShareCardSheet (the data did not load) | `Couldn’t prepare the picture` |
 | `share.format` | ShareCardSheet (the format picker, VoiceOver) | `Format` |
-| `share.format.post` | ShareCardFormat.title | `Post` |
-| `share.format.story` | ShareCardFormat.title | `Stories` |
+| `share.format.post` | ShareCard.Format.title | `Post` |
+| `share.format.story` | ShareCard.Format.title | `Stories` |
 | `share.send` | ShareCardSheet (the share button) | `Share` |
 | `share.title` | ShareCardSheet (default `title`) | `Picture for Stories` |
 | `skeleton.loading` | `.skeleton(isLoading:)`, `.skeletonLoadingLabel()`, every component skeleton (`…Skeleton`, 1.10.0), `RedactableAmount` while loading, `DSButton` while loading, `CashFlowCard`'s default `loadingLabel` (VoiceOver) | `Loading` |
