@@ -24,6 +24,7 @@ struct MediaScreen: View {
             AchievementProgressRowPage()
             ThumbnailPlaceholderPage()
             PhotoTilePage()
+            RemotePhotoPage()
             PhotoStripPage()
             PhotoGridPage()
             PhotoCarouselPage()
@@ -366,6 +367,48 @@ private struct PhotoTilePage: View {
             StateControl(state: $state)
             ToggleControl("Photo", isOn: $hasPhoto)
             SliderControl("Size", value: $size, in: 64...160, step: 8)
+        }
+    }
+}
+
+private struct RemotePhotoPage: View {
+    @State private var attempt = 0
+    @State private var hasURL = true
+    @State private var state: SpecimenState = .content
+
+    var body: some View {
+        ComponentPage(
+            name: "RemotePhoto",
+            summary: "A photo the app loads by key and URL: a skeleton while it loads, then the photo, coming into focus in its place.",
+            since: "3.1.0",
+            apps: [.dalada],
+            notes: [
+                "The app loads it: DesignKitPhotoLoader.loader (its cache, its signed links) and .cached (a photo it already holds shows at once, with no skeleton). Without a loader it downloads the URL itself.",
+                "Fills the frame it is given and does not clip: put it in a PhotoTile, a grid cell, a card.",
+                "placeholderKey: a smaller version shown, with the shimmer over it, while this one loads (the thumbnail under the full photo).",
+                "No URL, or a failed load: the photo symbol.",
+            ]
+        ) {
+            HStack(spacing: AppSpacing.md) {
+                ForEach(0..<3, id: \.self) { index in
+                    PhotoTile {
+                        if state == .loading {
+                            RemotePhotoSkeleton()
+                        } else {
+                            RemotePhoto(
+                                key: GalleryPhotos.key(index, attempt: attempt),
+                                url: hasURL ? GalleryPhotos.url(index) : nil
+                            )
+                        }
+                    }
+                }
+            }
+            // A new attempt is a new photo: its task loads it again.
+            .id(attempt)
+        } controls: {
+            StateControl(state: $state)
+            ToggleControl("URL", isOn: $hasURL)
+            ActionControl("Load again", systemImage: "arrow.clockwise") { attempt += 1 }
         }
     }
 }

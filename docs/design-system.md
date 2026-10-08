@@ -36,7 +36,7 @@
 | Module | Contents |
 |---|---|
 | `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, inline field styles), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
-| `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `Icon` (a brand logo is `Icon(source: .brandService(name))`; `BrandLogoView` was removed in 2.0.0), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `HapticManager`, `HapticCue` (haptics by meaning, 2.3.0), `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
+| `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `Icon` (a brand logo is `Icon(source: .brandService(name))`; `BrandLogoView` was removed in 2.0.0), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `HapticManager`, `HapticCue` (haptics by meaning, 2.3.0), `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitPhotoLoader` (3.1.0), `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
 | `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons") |
 
 **Names (2.0.0).** A component is named for what it is, without `View` or `App`: `SectionHeader`,
@@ -59,6 +59,7 @@ DesignKit ships no networking, persistence or FX. A host app wires these once, i
 | `DesignKitTheme.accent` | `.indigo` | Brand accent behind `AppColors.accent`. Also set the asset-catalog `AccentColor` to the same colour (system chrome never reads `AppColors`). |
 | `DesignKitFonts.registerIfNeeded()` | — | Call once; registers the bundled Inter variable fonts. |
 | `DesignKitLogoLoader.loader` | `nil` → fallback icon | Brand-logo images for `IconSource.brandService` (`Icon`, `heroAccentGlow`). |
+| `DesignKitPhotoLoader.loader` / `.cached` *(3.1.0)* | `nil` → `RemotePhoto` downloads the URL itself and keeps nothing; nothing held | Photos `RemotePhoto` shows by key and URL: `loader` loads (the app's cache, then the network), `cached` returns a photo the app already holds, so it shows at once with no skeleton. `@MainActor`. Dalada: its `PhotoCache`, keyed by storage path. |
 | `DesignKitCurrencyConverter.convert` | `nil` → nothing rendered | FX for `ConvertedAmount` / `HeroSection(showBaseConversion:)` / `CurrencyAmountInput`. |
 | `DesignKitCurrencyConverter.convertSync` *(1.10.0)* | `nil` → `convert` is asked | Instant conversion from cached rates, so `CurrencyAmountInput` shows "≈ …" while the user types, and at once when the currencies change (1.14.0). |
 | `DesignKitLogoCatalog.sections` / `.search` / `.domainSuffixes` *(1.10.0)* | no sections → no logos tab; `["com"]` | The brands `IconPicker` offers (titled sections of domain + name), its search, and the domains tried for a typed name (Tenra: `["com", "kz"]`). |
@@ -904,6 +905,11 @@ filter that opens a menu → `UniversalFilterButton`.
 clears the selection (one or several). Dalada: the place-type filter. For chips that scroll
 under the screen edges, give the picker `.contentMargins(.horizontal, AppSpacing.lg, for: .scrollContent)`.
 
+`inset:` *(3.1.0)* is the same inside a card: the caption and the first chip start at the
+inset, the chips still scroll to the card's edge. In a `FormSection` pass the card's padding:
+`ChipPicker("Bite", options: …, selection: $bite, inset: AppSpacing.lg) { … }` (Dalada's
+check-in conditions, a place's info, the map layers).
+
 Several at once (0.6.0): pass a `Binding<Set<Option>>`; optional `systemImage:` per chip.
 
 ```swift
@@ -961,6 +967,23 @@ VoiceOver focuses the switch (title as label, `hint` as hint). The icon is optio
 3.0.0, and so is `ActionSettingsRow`'s, for rows in a form that carry no symbol. Both are `List`
 rows (`config: .settings`, no side padding); in a `FormSection` card pass `config: .standard`
 (3.0.0) so they pad like the rows around them.
+
+#### `ActionRowLabel` *(3.1.0)*
+The look of an action row as a label, for a control that is not a `Button`: the label of a
+`PhotosPicker`, a `ShareLink`, a `Link`. A symbol (`AppIconSize.lg`) and a title, both in `tint`
+(the accent) unless `titleColor` gives the title another colour; `config: .standard` by default
+(a `FormSection` card), `.settings` for a `List` row.
+
+```swift
+PhotosPicker(selection: $items, matching: .images) {
+    ActionRowLabel("Add photos", systemImage: "photo.on.rectangle.angled")
+}
+.buttonStyle(.plain)
+```
+
+Its init is `nonisolated`: `PhotosPicker` builds its label off the main actor, where the
+initialisers of DesignKit's rows cannot run (Swift 6 warns). `ActionSettingsRow` is the same
+row with its own button. No skeleton: it shows no data. Dalada: "Add photos" in its forms.
 
 #### `SliderRow` *(1.15.0)*
 A setting set with a slider: the title (body, with an optional symbol), the value on the trailing
@@ -1114,10 +1137,11 @@ SkeletonReveal(isLoading: balance == nil) {
 | `HeroSection`, `SectionHeader` (every style) | `HeroSectionSkeleton`, `SectionHeaderSkeleton(style:showsTrailing:)` |
 | `ExpandableText`, `ActivityTimeline`, `MonthCalendar` | `…Skeleton` |
 | `PersonRow`, `CommentRow`, `ThreadCard`, `ReviewCard`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.12.0) | `…Skeleton` (`StatsStripSkeleton(count:)`, `AchievementTileSkeleton(medalSize:)`, `ThumbnailCardSkeleton(width:)`, `PersonRowSkeleton(showsSubtitle:style:)`) |
+| `RemotePhoto` (3.1.0) | `RemotePhotoSkeleton()`: fills the frame; the container gives the corner |
 | `PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `ShareCardFrame` (and `ShareCardSheet` while it loads), `LiveSessionBar`, `DownloadRow`, `ArticleBody` (2.8.0) | `…Skeleton` (`PhotoTileSkeleton(size:cornerRadius:)`, `PhotoStripSkeleton(count:size:)`, `PhotoGridSkeleton(count:columns:style:)`, `ShareCardSkeleton(format:)`, `ArticleBodySkeleton(paragraphs:)`) |
 | `TransactionRow`, `OptionCard`, `StreamingText`, `SnapCardPicker` (2.9.0) | `…Skeleton` (`TransactionRowSkeleton(showsDetails:)`, `StreamingTextSkeleton(font:)`, `SnapCardPickerSkeleton { the card's skeleton }`) |
 
-**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
+**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); `ActionRowLabel` (3.1.0, a label); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
 
 #### `SkeletonText` *(1.7.0)*
 A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `Skeleton`. For a component, use its skeleton (above); `.skeleton(isLoading:)` redacts a real view in place, with the system's placeholder shapes.
@@ -1606,6 +1630,24 @@ A photo cropped to a square on `AppColors.bgMuted` (what shows while it loads), 
 tile; `PhotoTile(image: UIImage?)` takes a loaded image, or shows `PhotoPlaceholderSymbol`
 (the photo symbol, tertiary). `size: nil` fills the width and stays square (a grid cell); the
 default is 88 (`PhotoTileMetrics.size`). Dalada: a picked photo's preview in forms.
+
+#### `RemotePhoto` *(3.1.0)*
+A photo by key and URL, loaded by the app (`DesignKitPhotoLoader`): while it loads,
+`RemotePhotoSkeleton` (the skeleton grey with the shimmer) fills its frame, then the photo
+comes into focus in its place (`.skeletonReveal`). A photo the app already holds
+(`DesignKitPhotoLoader.cached`) shows at once. `placeholderKey:` shows a smaller version the app
+holds, with the shimmer over it, while this one loads (the thumbnail under the full photo in a
+viewer). No URL or a failed load: `PhotoPlaceholderSymbol`. It fills the frame and does not
+clip: the container (a `PhotoTile`, a grid cell) gives the shape.
+
+```swift
+PhotoTile { RemotePhoto(key: photo.thumbnailPath, url: urls[photo.thumbnailPath]) }
+RemotePhoto(key: photo.path, url: urls[photo.path], contentMode: .fit, placeholderKey: photo.thumbnailPath)
+```
+
+The key is what the app's cache knows the photo by (Dalada: the storage path; a signed URL
+changes with every load, the path does not). Dalada: every photo of a place, a report, a catch
+and a profile, in place of a spinner.
 
 #### `PhotoStrip`
 Photo tiles in a horizontal scroll, `AppSpacing.sm` apart: `onOpen:` makes each a button (a

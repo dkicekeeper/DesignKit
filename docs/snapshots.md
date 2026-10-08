@@ -139,7 +139,11 @@ References are recorded on CI, not on a laptop, so they match what CI compares w
    - `all`: every reference (after moving the Xcode pin).
 3. The snapshot job commits the PNGs to the branch (`test(snapshots): record references`).
    That push does not start CI, so run CI on the branch again with `record_snapshots: never`,
-   or push again. It must be green.
+   or push again. It must be green. A recording run validates nothing: it writes what it
+   draws, so only a `never` run (or the PR's run) says the references hold.
+   Pushing code while a recording runs is fine (3.1.0): the job rebases its PNG commit onto
+   the branch and pushes again, and stops with an error only if the same images changed on
+   the branch.
 4. Review the changed PNGs in the PR. They **are** the visual change. Call it out in the
    release notes, since it lands in both apps.
 

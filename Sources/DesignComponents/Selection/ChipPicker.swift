@@ -28,6 +28,13 @@ import DesignSupport
 /// ChipPicker(options: PlaceType.allCases, selection: $types, allTitle: "All") { $0.title }
 /// ```
 ///
+/// `inset` (3.1.0) keeps the caption and the first chip off the edge while the chips still scroll
+/// to it: a picker inside a `FormSection` card passes the card's padding.
+///
+/// ```swift
+/// FormSection { ChipPicker("Bite", options: …, selection: $bite, inset: AppSpacing.lg) { … } }
+/// ```
+///
 /// Chips use `filterChipStyle(isSelected:)` and carry the `.isSelected` trait. A fixed
 /// 2–4 way switch → `SegmentedPicker`; a filter that opens a menu → `UniversalFilterButton`.
 public struct ChipPicker<Option: Hashable>: View {
@@ -42,6 +49,7 @@ public struct ChipPicker<Option: Hashable>: View {
     let systemImage: ((Option) -> String?)?
     let label: (Option) -> String
     let allTitle: String?
+    let inset: CGFloat
 
     /// One or none: `selection` is `nil` when nothing is picked.
     public init(
@@ -50,6 +58,7 @@ public struct ChipPicker<Option: Hashable>: View {
         selection: Binding<Option?>,
         allTitle: String? = nil,
         systemImage: ((Option) -> String?)? = nil,
+        inset: CGFloat = 0,
         label: @escaping (Option) -> String
     ) {
         self.title = title
@@ -57,6 +66,7 @@ public struct ChipPicker<Option: Hashable>: View {
         self.selection = .single(selection)
         self.allTitle = allTitle
         self.systemImage = systemImage
+        self.inset = inset
         self.label = label
     }
 
@@ -67,6 +77,7 @@ public struct ChipPicker<Option: Hashable>: View {
         selection: Binding<Set<Option>>,
         allTitle: String? = nil,
         systemImage: ((Option) -> String?)? = nil,
+        inset: CGFloat = 0,
         label: @escaping (Option) -> String
     ) {
         self.title = title
@@ -74,6 +85,7 @@ public struct ChipPicker<Option: Hashable>: View {
         self.selection = .multiple(selection)
         self.allTitle = allTitle
         self.systemImage = systemImage
+        self.inset = inset
         self.label = label
     }
 
@@ -83,6 +95,7 @@ public struct ChipPicker<Option: Hashable>: View {
                 Text(verbatim: title)
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.Text.secondary)
+                    .padding(.horizontal, inset)
             }
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: AppSpacing.sm) {
@@ -113,6 +126,8 @@ public struct ChipPicker<Option: Hashable>: View {
                 }
                 .padding(.vertical, AppSpacing.xxs)
             }
+            // The first chip starts at the inset; the row still scrolls to the edge.
+            .modifier(ChipRowInset(inset: inset))
         }
         .padding(.vertical, AppSpacing.xs)
     }
@@ -161,6 +176,20 @@ public struct ChipPicker<Option: Hashable>: View {
             } else {
                 binding.wrappedValue.insert(option)
             }
+        }
+    }
+}
+
+/// The chips' scroll margin when the picker sits inside a card; nothing at all without an inset,
+/// so a picker in a list keeps the system's margins.
+private struct ChipRowInset: ViewModifier {
+    let inset: CGFloat
+
+    func body(content: Content) -> some View {
+        if inset > 0 {
+            content.contentMargins(.horizontal, inset, for: .scrollContent)
+        } else {
+            content
         }
     }
 }

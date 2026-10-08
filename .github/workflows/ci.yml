@@ -165,7 +165,14 @@ jobs:
         env:
           SNAPSHOT_TESTING_RECORD: ${{ env.RECORD }}
         # Recording reports every written image as a failure; the images are what we need.
-        run: scripts/snapshot-tests.sh || true
+        # A build that fails records nothing, and must not pass as "Nothing changed".
+        run: |
+          set -o pipefail
+          scripts/snapshot-tests.sh 2>&1 | tee "$RUNNER_TEMP/record.log" || true
+          if grep -qE "Testing cancelled because the build failed|\*\* BUILD FAILED \*\*" "$RUNNER_TEMP/record.log"; then
+            echo "::error::The Gallery did not build; nothing was recorded."
+            exit 1
+          fi
 
       # A push made with the workflow token does not start CI: re-run CI on the branch.
       - name: Commit references
@@ -181,7 +188,23 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "test(snapshots): record references ($RECORD)" \
             -m "Recorded by CI (record_snapshots: $RECORD) on $(xcodebuild -version | awk 'NR == 1')."
-          git push origin "HEAD:$GITHUB_REF_NAME"
+          # The branch may have moved while this run recorded (a push of code): put the
+          # references on top of it and push again. They touch only the PNGs, so the rebase is
+          # clean unless the same images changed on the branch too.
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:$GITHUB_REF_NAME"; then
+              exit 0
+            fi
+            echo "The branch moved; rebasing the references onto it (attempt $attempt)."
+            git fetch --depth=200 origin "$GITHUB_REF_NAME"
+            if ! git rebase FETCH_HEAD; then
+              git rebase --abort
+              echo "::error::The recorded references conflict with the branch. Re-run the recording."
+              exit 1
+            fi
+          done
+          echo "::error::Could not push the recorded references."
+          exit 1
 
   dalada:
     name: Dalada against this DesignKit

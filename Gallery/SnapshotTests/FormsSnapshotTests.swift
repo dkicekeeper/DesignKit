@@ -49,6 +49,32 @@ extension ComponentSnapshots {
             )
         }
 
+        /// Labels for controls that are not buttons (3.1.0): "Add photos" in the accent, a quiet one.
+        @Test func actionRowLabels() async {
+            await assertComponentSnapshot(
+                FormSection(header: "Photos") {
+                    ActionRowLabel("Add photos", systemImage: "photo.on.rectangle.angled")
+                    Divider().padding(.leading, AppSpacing.lg)
+                    ActionRowLabel("Add a photo", systemImage: "camera", titleColor: AppColors.Text.primary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// Chips inside a card (3.1.0): the caption and the first chip start at the card's padding.
+        @Test func chipPickerInCard() async {
+            await assertComponentSnapshot(
+                FormSection(header: "Conditions") {
+                    ChipPicker("Bite", options: ["None", "Weak", "Good", "Great"], selection: .constant("Good"),
+                               inset: AppSpacing.lg) { $0 }
+                        .padding(.vertical, AppSpacing.sm)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark]
+            )
+        }
+
         /// Fields that fill a FormSection row on their own (3.0.0): a name and a note.
         @Test func rowFields() async {
             await assertComponentSnapshot(

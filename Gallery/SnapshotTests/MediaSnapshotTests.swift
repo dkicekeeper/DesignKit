@@ -51,6 +51,25 @@ extension ComponentSnapshots {
             )
         }
 
+        /// Photos by address (3.1.0), through the Gallery's DesignKitPhotoLoader (GalleryPhotos):
+        /// one the app holds (shown at once), one still loading (its skeleton), one without a URL.
+        @Test func remotePhotos() async {
+            await assertComponentSnapshot(
+                HStack(spacing: AppSpacing.md) {
+                    PhotoTile {
+                        RemotePhoto(key: "gallery-photo-0", url: URL(string: "https://gallery.invalid/photo/0.jpg"))
+                    }
+                    PhotoTile {
+                        RemotePhoto(key: "gallery-photo-1-pending", url: URL(string: "https://gallery.invalid/photo/1.jpg"))
+                    }
+                    PhotoTile {
+                        RemotePhoto(key: "gallery-photo-2-missing", url: nil)
+                    }
+                },
+                appearances: [.light, .dark]
+            )
+        }
+
         @Test func photoStrip() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {

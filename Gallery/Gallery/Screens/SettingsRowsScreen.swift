@@ -18,6 +18,7 @@ struct SettingsRowsScreen: View {
             NavigationSettingsRowPage()
             ToggleSettingsRowPage()
             ActionSettingsRowPage()
+            ActionRowLabelPage()
             MenuPickerRowPage()
             NavigationPickerRowPage()
             StepperRowPage()
@@ -414,6 +415,7 @@ private struct CheckmarkRowPage: View {
     @State private var selection = "kaspi"
     @State private var showsIcons = true
     @State private var showsValues = true
+    @State private var inCard = false
     @State private var state: SpecimenState = .content
 
     private let accounts = [("kaspi", "Kaspi Gold", "1 250 000 ₸"), ("halyk", "Halyk", "320 000 ₸"), ("cash", "Cash", "45 000 ₸")]
@@ -434,7 +436,8 @@ private struct CheckmarkRowPage: View {
                         CheckmarkRow(account.1,
                                      icon: showsIcons ? .sfSymbol("creditcard.fill", color: AppColors.accent) : nil,
                                      value: showsValues ? account.2 : nil,
-                                     isSelected: selection == account.0) { selection = account.0 }
+                                     isSelected: selection == account.0,
+                                     config: inCard ? .standard : .settings) { selection = account.0 }
                     }
                 }
             }
@@ -442,6 +445,38 @@ private struct CheckmarkRowPage: View {
             StateControl(state: $state)
             ToggleControl("Icons", isOn: $showsIcons)
             ToggleControl("Values", isOn: $showsValues)
+            ToggleControl("Card padding (.standard, 3.0.0)", isOn: $inCard)
+        }
+    }
+}
+
+private struct ActionRowLabelPage: View {
+    @State private var showsSymbol = true
+    @State private var quiet = false
+
+    var body: some View {
+        ComponentPage(
+            name: "ActionRowLabel",
+            summary: "The look of an action row for a control that is not a Button: the label of a PhotosPicker, a ShareLink, a Link.",
+            since: "3.1.0",
+            apps: [.dalada],
+            canvas: .fill,
+            notes: [
+                "ActionSettingsRow is the same row with its own button; this one is only the label.",
+                "Its init is nonisolated: PhotosPicker builds its label off the main actor.",
+                "No skeleton: it shows no data.",
+            ]
+        ) {
+            InFormCard {
+                ActionRowLabel(
+                    "Add photos",
+                    systemImage: showsSymbol ? "photo.on.rectangle.angled" : nil,
+                    titleColor: quiet ? AppColors.Text.primary : nil
+                )
+            }
+        } controls: {
+            ToggleControl("Symbol", isOn: $showsSymbol)
+            ToggleControl("Quiet title", isOn: $quiet)
         }
     }
 }

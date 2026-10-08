@@ -221,7 +221,7 @@ public struct IconConfig {
 // MARK: - Row Configuration
 
 /// Configuration for UniversalRow layout and styling
-public struct RowConfiguration {
+public struct RowConfiguration: Sendable {
     public let spacing: CGFloat
     public let verticalPadding: CGFloat
     public let horizontalPadding: CGFloat
