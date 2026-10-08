@@ -349,6 +349,7 @@ destructive role.)
 ```swift
 EditSheetContainer(
     title: String,
+    saveTitle: String? = nil,    // 3.0.0: VoiceOver's name for the checkmark ("Publish"); Save
     isSaveDisabled: Bool,
     isSaving: Bool = false,      // 3.0.0: a spinner for Save, Cancel disabled
     wrapInForm: Bool = true,     // false for hero-style edit views
