@@ -91,6 +91,30 @@ extension ComponentSnapshots {
             )
         }
 
+        /// The skeletons of 2.8.0: photos, share card, downloads, articles, the session bar.
+        @Test func mediaSkeletons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    HStack(spacing: AppSpacing.md) {
+                        PhotoTileSkeleton()
+                        ShareCardSkeleton(format: .post).frame(width: 120)
+                    }
+                    PhotoStripSkeleton()
+                    PhotoGridSkeleton(count: 3)
+                    PhotoCarouselSkeleton()
+                    DownloadRowSkeleton()
+                    LiveSessionBarSkeleton()
+                    ArticleBodySkeleton(paragraphs: 1)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark]
+            )
+        }
+
+        @Test func personRowCardSkeleton() async {
+            await assertComponentSnapshot(PersonRowSkeleton(style: .card), appearances: [.light])
+        }
+
         /// Cards that stack at accessibility text sizes, like their components.
         @Test func stackingCardSkeletons() async {
             await assertComponentSnapshot(

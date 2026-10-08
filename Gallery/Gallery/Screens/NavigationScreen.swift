@@ -19,6 +19,7 @@ struct NavigationScreen: View {
             UniversalCarouselPage()
             OnboardingStepIndicatorPage()
             PlusTabLabelPage()
+            LiveSessionBarPage()
         }
     }
 }
@@ -183,6 +184,41 @@ private struct PlusTabLabelPage: View {
                 .onTapGesture { withAnimation(AppAnimation.contentSpring) { isExpanded.toggle() } }
         } controls: {
             ToggleControl("Expanded", isOn: $isExpanded)
+        }
+    }
+}
+
+private struct LiveSessionBarPage: View {
+    @State private var isPaused = false
+    @State private var showsDetail = true
+    @State private var startedAt = Date.now.addingTimeInterval(-754)
+    @State private var state: SpecimenState = .content
+
+    var body: some View {
+        ComponentPage(
+            name: "LiveSessionBar",
+            summary: "Something going on above the tabs: a pulsing recording dot (a pause sign when paused), the running time, a detail; a tap opens it.",
+            since: "2.8.0",
+            apps: [.dalada],
+            canvas: .fill,
+            notes: [
+                ".liveSessionAccessory(isEnabled:) puts it in the tab bar's bottom accessory (iOS 26.1). On iOS 26.0 nothing is shown: offer another way back (LiveSessionAccessory.isAvailable).",
+            ]
+        ) {
+            if state == .loading {
+                LiveSessionBarSkeleton()
+                    .padding(.vertical, AppSpacing.md)
+            } else {
+                LiveSessionBar(startedAt: startedAt, isPaused: isPaused, detail: showsDetail ? "3.2 km" : nil,
+                               accessibilityLabel: "Trip recording in progress") {}
+                    .padding(.vertical, AppSpacing.md)
+                    .glassEffect(.regular, in: Capsule())
+            }
+        } controls: {
+            StateControl(state: $state)
+            ToggleControl("Paused", isOn: $isPaused)
+            ToggleControl("Detail", isOn: $showsDetail)
+            ActionControl("Restart the clock") { startedAt = .now }
         }
     }
 }

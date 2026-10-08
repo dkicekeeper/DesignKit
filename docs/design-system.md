@@ -859,6 +859,10 @@ ChipPicker("Weather", options: Weather.allCases, selection: $draft.weather) { $0
 Chips use `filterChipStyle(isSelected:)`. A fixed 2–4 way switch → `SegmentedPicker`; a
 filter that opens a menu → `UniversalFilterButton`.
 
+`allTitle:` *(2.8.0)* puts an "All" chip in front, selected while nothing is picked; tapping it
+clears the selection (one or several). Dalada: the place-type filter. For chips that scroll
+under the screen edges, give the picker `.contentMargins(.horizontal, AppSpacing.lg, for: .scrollContent)`.
+
 Several at once (0.6.0): pass a `Binding<Set<Option>>`; optional `systemImage:` per chip.
 
 ```swift
@@ -1064,9 +1068,10 @@ SkeletonReveal(isLoading: balance == nil) {
 | `FormattedAmountText`, `ConvertedAmount`, `SpentBudgetText`, `AmountPercentage` | `FormattedAmountTextSkeleton(font:width:)`; `RedactableAmount(isLoading: true)` draws one itself |
 | `HeroSection`, `SectionHeader` (every style) | `HeroSectionSkeleton`, `SectionHeaderSkeleton(style:showsTrailing:)` |
 | `ExpandableText`, `ActivityTimeline`, `MonthCalendar` | `…Skeleton` |
-| `PersonRow`, `CommentRow`, `ThreadCard`, `ReviewCard`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.12.0) | `…Skeleton` (`StatsStripSkeleton(count:)`, `AchievementTileSkeleton(medalSize:)`, `ThumbnailCardSkeleton(width:)`, `PersonRowSkeleton(showsSubtitle:)`) |
+| `PersonRow`, `CommentRow`, `ThreadCard`, `ReviewCard`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.12.0) | `…Skeleton` (`StatsStripSkeleton(count:)`, `AchievementTileSkeleton(medalSize:)`, `ThumbnailCardSkeleton(width:)`, `PersonRowSkeleton(showsSubtitle:style:)`) |
+| `PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `ShareCardFrame` (and `ShareCardSheet` while it loads), `LiveSessionBar`, `DownloadRow`, `ArticleBody` (2.8.0) | `…Skeleton` (`PhotoTileSkeleton(size:cornerRadius:)`, `PhotoStripSkeleton(count:size:)`, `PhotoGridSkeleton(count:columns:style:)`, `ShareCardSkeleton(format:)`, `ArticleBodySkeleton(paragraphs:)`) |
 
-**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `GradientOrbsBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
+**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `GradientOrbsBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
 
 #### `SkeletonText` *(1.7.0)*
 A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `Skeleton`. For a component, use its skeleton (above); `.skeleton(isLoading:)` redacts a real view in place, with the system's placeholder shapes.
@@ -1467,6 +1472,11 @@ trailing slot. `PersonRow(name:subtitle:avatar:trailing:)` takes the app's avata
 without `avatar` it draws the initials (`Avatar`). A row that lives in a `List`: no padding. Dalada: friends, requests,
 search, the people a trip is shared with.
 
+`detail:` *(2.8.0)* adds a third line in the tertiary colour (the city). `style: .card` is the
+person at the top of their profile: the avatar 64 pt (`AppIconSize.Tile.xl`), the name in `h4`,
+the @username in bodySmall, `AppSpacing.lg` between avatar and text, in a card that pads itself
+(`cardContentPadding` + `cardStyle`). Dalada: `ProfileHeader` is an adapter.
+
 #### `CommentRow` and `MessageQuote`
 A comment or a reply: a 32 pt avatar, the author, the time ("10 minutes ago") on the right
 with a menu slot after it, the quoted message (`MessageQuote(title:text:)`: a grey bar, who,
@@ -1539,6 +1549,82 @@ bookmark (`isSaved`), and a details slot in caption secondary.
 - **Row:** for lists; a 64 pt picture on the left, the title on two lines.
 - VoiceOver: keys `thumbnail.verified` ("Verified"), `thumbnail.saved` ("Saved"), or
   `verifiedLabel` / `savedLabel`.
+
+### Media, Sharing & Offline *(2.8.0)*
+
+Ported from Dalada with neutral names; the app keeps loading (signed URLs, the photo cache, the
+recorder, the download manager) and passes views and strings in. Gallery: Media, Sheets,
+Navigation, Rows, Content; snapshots: `MediaSnapshotTests` (skeletons in `SkeletonsSnapshotTests`).
+
+#### `PhotoTile`
+A photo cropped to a square on `AppColors.bgMuted` (what shows while it loads), corners
+`AppRadius.md`. `PhotoTile(size:cornerRadius:) { image }` takes the app's image view filling the
+tile; `PhotoTile(image: UIImage?)` takes a loaded image, or shows `PhotoPlaceholderSymbol`
+(the photo symbol, tertiary). `size: nil` fills the width and stays square (a grid cell); the
+default is 88 (`PhotoTileMetrics.size`). Dalada: a picked photo's preview in forms.
+
+#### `PhotoStrip`
+Photo tiles in a horizontal scroll, `AppSpacing.sm` apart: `onOpen:` makes each a button (a
+report's photos, a place's header at `size: 150`); `onRemove:` puts a remove button (22 pt
+`xmark.circle.fill`, white on black 55%) on each tile's corner (photos picked for a form).
+VoiceOver: `photo.open`, `photo.remove`, or `openLabel` / `removeLabel`.
+
+#### `PhotoGrid`
+Square photo cells in columns (3 by default), lazy: put it in a `ScrollView`. `style: .rounded`
+(tiles `AppRadius.md`, `AppSpacing.xs` apart: a person's photos) or `.edgeToEdge` (square cells
+2 pt apart: a gallery). `onReachEnd` fires as the last cell appears (the next page); `label`
+gives each photo's VoiceOver name.
+
+#### `PhotoCarousel`
+A post's photos one at a time in a rounded 4:3 frame (`PhotoCarouselMetrics.aspectRatio`), paged
+with dots when there are several; `onOpen` opens the photo. A `TabView(.page)` on `bgMuted`.
+
+#### `PhotoViewer`
+Photos full screen: black, dark scheme, paged, ✕ to close (`common.close`). Zoom *(new in the
+port)*: pinch up to 4×, drag while zoomed (the drag is off at 1×, so a swipe turns the page),
+double-tap to 2.5× and back, VoiceOver's zoom gesture. `caption:` adds a dark band at the
+bottom (black 45%, white text) with "2 / 5" under it, and then the page dots go; `actions:` puts
+a control in the top bar (report, block). Present it with `.fullScreenCover`, pass the photo
+fitted (`.scaledToFit()`).
+
+#### `ShareCardFrame`, `ShareCardStat`, `ShareCardFormat`, `ShareCardStyle`
+A picture to share: `ShareCardFormat.story` (360 × 640) or `.post` (360 × 450), rendered at 3×
+(1080 px). The frame lays the content out from the top, padded 28, in white, with the brand
+(22 pt heavy rounded) and the site (11 pt, 70%) at the bottom; behind, the photo under a dark
+gradient, or the style's gradient. `ShareCardStyle(top:bottom:accent:)` (`.standard`: graphite
+with the accent) stays the same in light and dark: the picture leaves the app. `ShareCardStat`
+is a number (24 pt bold rounded) over its caption (12 pt, 70%). Fixed sizes on purpose: the
+card is an image, not a screen. Dalada: the trip, catch and place cards are its own content in
+the frame, with its teal style.
+
+#### `ShareCardSheet`
+`ShareCardSheet(previewTitle:formats:load:message:card:)`: a segmented format picker
+(`share.format`), the picture (drawn with `ImageRenderer` when the data arrives and when the
+format changes), and a full-width share button (`share.send`) that sends it with `message`.
+While `load` runs the preview is `ShareCardSkeleton`; `nil` shows `EmptyState(.error)` with
+`share.failed`. Title: `share.title`, or `title:`.
+
+#### `LiveSessionBar` and `.liveSessionAccessory`
+A session going on (a recording): a pulsing `record.circle` in the destructive colour, or
+`pause.circle.fill` in the warning colour when paused; the time since `startedAt`
+(`H:MM:SS`, once a second); a detail in the secondary colour; a chevron up. bodyEmphasis,
+padded `lg` horizontally. `.liveSessionAccessory(isEnabled:) { LiveSessionBar(…) }` shows it in
+the tab bar's bottom accessory on iOS 26.1+ (`LiveSessionAccessory.isAvailable`); on 26.0 give
+another way back. Dalada: `TripMiniPlayer` is an adapter.
+
+#### `DownloadRow`
+Something to download for offline use: the name (bodyEmphasis) and a caption line, then the
+action. `Status`: `.available` and `.paused` (caption; download button), `.downloading(p)` (a
+6 pt bar over the caption; pause button), `.downloaded` (accent check mark before the
+caption; no action), `.failed` (caption in the destructive colour; download button). The app
+writes the caption ("About 80 MB", "40% · 32 MB") and adds the swipe to delete. Vertical
+padding `xxs`. VoiceOver: `download.start` / `download.pause`, or the labels it passes.
+
+#### `ArticleBody`
+An article's blocks, `AppSpacing.md` apart: `.heading(_, level:)` (title3 semibold or headline,
+a header trait), `.paragraph`, `.bullets`, `.steps` (numbers in the accent), `.note` (an info
+symbol and bodySmall text in a card). Inline Markdown inside a block (**bold**, *italic*,
+links). The app parses its article format into blocks.
 
 ### Content Reveal (Loading Transitions)
 

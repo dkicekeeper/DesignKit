@@ -42,6 +42,7 @@ text, not keys. A new key goes there as well.
 | `checklist.progress %lld %lld` | ChecklistSummaryRow (under the bar; `progressText` replaces it) | `%lld of %lld` |
 | `common.cancel` | DateButtons | — |
 | `common.changeIcon` | EditableHero (VoiceOver on the icon) | `Change icon` |
+| `common.close` | PhotoViewer (default `closeTitle`), ShareCardSheet (the close button) | `Close` |
 | `common.color` | ColorPickerRow | — |
 | `common.select` | DateButtons | — |
 | `common.startDate` | DatePickerRow | — |
@@ -59,6 +60,8 @@ text, not keys. A new key goes there as well.
 | `date.selectDate` | DateButtons | — |
 | `date.today` | DateButtons | — |
 | `date.yesterday` | DateButtons | — |
+| `download.pause` | DownloadRow (default `pauseLabel`, VoiceOver) | `Pause` |
+| `download.start` | DownloadRow (default `downloadLabel`, VoiceOver) | `Download` |
 | `iconPicker.brandDomainHint` | IconPicker (logo search) | `Enter brand domain (e.g. netflix.com)` |
 | `iconPicker.entertainment` | IconCatalog group title (`IconCatalogGroup.localizedTitle`) | `Entertainment` |
 | `iconPicker.foodAndDrinks` | IconCatalog group title (`IconCatalogGroup.localizedTitle`) | `Food & Drinks` |
@@ -107,9 +110,17 @@ text, not keys. A new key goes there as well.
 | `notification.permission.title` | NotificationPermissionPrompt | — |
 | `onboarding.cta.skip` | OnboardingPageContainer; OnboardingPager (default `skipTitle`) | `Skip` (OnboardingPager) |
 | `onboarding.stepIndicator.label` | OnboardingStepIndicator | — |
+| `photo.open` | PhotoStrip, PhotoCarousel (default `openLabel`), PhotoGrid (VoiceOver without `label`) | `Open photo` |
+| `photo.remove` | PhotoStrip (default `removeLabel`, VoiceOver) | `Remove photo` |
 | `progress.importing` | ImportProgressSheet | — |
 | `rating.pick %lld %lld` | RatingPicker (VoiceOver: "4 out of 5") | — |
 | `rating.value %@ %lld` | Rating (VoiceOver: "Rated 4.3 out of 5") | — |
+| `share.failed` | ShareCardSheet (the data did not load) | `Couldn’t prepare the picture` |
+| `share.format` | ShareCardSheet (the format picker, VoiceOver) | `Format` |
+| `share.format.post` | ShareCardFormat.title | `Post` |
+| `share.format.story` | ShareCardFormat.title | `Stories` |
+| `share.send` | ShareCardSheet (the share button) | `Share` |
+| `share.title` | ShareCardSheet (default `title`) | `Picture for Stories` |
 | `skeleton.loading` | `.skeleton(isLoading:)`, `.skeletonLoadingLabel()`, every component skeleton (`…Skeleton`, 1.10.0), `RedactableAmount` while loading, `DSButton` while loading, `CashFlowCard`'s default `loadingLabel` (VoiceOver) | `Loading` |
 | `status.active` | StatusIndicatorBadge | — |
 | `status.archived` | StatusIndicatorBadge | — |

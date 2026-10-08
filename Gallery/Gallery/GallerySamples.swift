@@ -67,3 +67,47 @@ enum GallerySamples {
         }
     }()
 }
+
+// MARK: - Photos
+
+/// A stand-in photo: a gradient with a symbol, the same on every run (snapshots), so the photo
+/// components have something to show without bundled pictures.
+struct GalleryPhoto: Identifiable, Hashable {
+    let id: Int
+    let colors: [Color]
+    let symbol: String
+    let caption: String
+
+    static let samples: [GalleryPhoto] = [
+        GalleryPhoto(id: 0, colors: [.teal, .blue], symbol: "mountain.2.fill", caption: "Big Almaty Lake"),
+        GalleryPhoto(id: 1, colors: [.orange, .pink], symbol: "sun.horizon.fill", caption: "Kapchagay at dawn"),
+        GalleryPhoto(id: 2, colors: [.green, .mint], symbol: "tree.fill", caption: "Medeu trail"),
+        GalleryPhoto(id: 3, colors: [.indigo, .purple], symbol: "moon.stars.fill", caption: "Camp at night"),
+        GalleryPhoto(id: 4, colors: [.cyan, .teal], symbol: "fish.fill", caption: "First catch"),
+        GalleryPhoto(id: 5, colors: [.yellow, .orange], symbol: "tent.fill", caption: "Base camp"),
+    ]
+}
+
+/// A `GalleryPhoto` drawn as a picture: filling its frame (a tile), or a 4:3 picture fitted in it
+/// (the viewer).
+struct GalleryPhotoView: View {
+    let photo: GalleryPhoto
+    var fits = false
+
+    var body: some View {
+        if fits {
+            picture.aspectRatio(4.0 / 3.0, contentMode: .fit)
+        } else {
+            picture
+        }
+    }
+
+    private var picture: some View {
+        LinearGradient(colors: photo.colors, startPoint: .topLeading, endPoint: .bottomTrailing)
+            .overlay {
+                Image(systemName: photo.symbol)
+                    .font(.system(size: 28))
+                    .foregroundStyle(.white.opacity(0.85))
+            }
+    }
+}

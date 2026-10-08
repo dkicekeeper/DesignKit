@@ -23,6 +23,12 @@ struct MediaScreen: View {
             AchievementTilePage()
             AchievementProgressRowPage()
             ThumbnailPlaceholderPage()
+            PhotoTilePage()
+            PhotoStripPage()
+            PhotoGridPage()
+            PhotoCarouselPage()
+            PhotoViewerPage()
+            ShareCardFramePage()
         }
     }
 }
@@ -300,6 +306,243 @@ private struct ThumbnailPlaceholderPage: View {
             ChoiceControl("Tint", selection: $tint, options: [("Accent", 0), ("Orange", 1), ("Teal", 2)])
         }
     }
+}
+
+private struct PhotoTilePage: View {
+    @State private var hasPhoto = true
+    @State private var size = 88.0
+    @State private var state: SpecimenState = .content
+
+    var body: some View {
+        ComponentPage(
+            name: "PhotoTile",
+            summary: "A photo cropped to a square on the muted background, with rounded corners: the tile of photo rows and grids, a picked photo's preview.",
+            since: "2.8.0",
+            apps: [.dalada],
+            notes: [
+                "The app passes the image view (its loader, its cache); PhotoTile(image:) takes a UIImage and shows the photo symbol without one.",
+                "size: nil fills the width and stays square (a grid cell).",
+            ]
+        ) {
+            if state == .loading {
+                PhotoTileSkeleton(size: size)
+            } else if hasPhoto {
+                PhotoTile(size: size) { GalleryPhotoView(photo: GalleryPhoto.samples[0]) }
+            } else {
+                PhotoTile(image: nil, size: size)
+            }
+        } controls: {
+            StateControl(state: $state)
+            ToggleControl("Photo", isOn: $hasPhoto)
+            SliderControl("Size", value: $size, in: 64...160, step: 8)
+        }
+    }
+}
+
+private struct PhotoStripPage: View {
+    @State private var photos = GalleryPhoto.samples
+    @State private var removable = false
+    @State private var opened: GalleryPhoto?
+    @State private var state: SpecimenState = .content
+
+    var body: some View {
+        ComponentPage(
+            name: "PhotoStrip",
+            summary: "A row of photo tiles that scrolls sideways: a report's photos (a tap opens one), or the photos picked for a form, each with a remove button.",
+            since: "2.8.0",
+            apps: [.dalada],
+            canvas: .fill
+        ) {
+            if state == .loading {
+                PhotoStripSkeleton()
+            } else if removable {
+                PhotoStrip(photos, onRemove: { photo in
+                    withAnimation(AppAnimation.gentleSpring) { photos.removeAll { $0.id == photo.id } }
+                }) { GalleryPhotoView(photo: $0) }
+            } else {
+                PhotoStrip(photos, onOpen: { opened = $0 }) { GalleryPhotoView(photo: $0) }
+                    .fullScreenCover(item: $opened) { photo in
+                        PhotoViewer(photos, selection: photo.id) { GalleryPhotoView(photo: $0, fits: true) }
+                    }
+            }
+        } controls: {
+            StateControl(state: $state)
+            ToggleControl("Removable", isOn: $removable)
+            ActionControl("Restore photos") { photos = GalleryPhoto.samples }
+        }
+    }
+}
+
+private struct PhotoGridPage: View {
+    @State private var style: PhotoGridStyle = .rounded
+    @State private var opened: GalleryPhoto?
+    @State private var state: SpecimenState = .content
+
+    var body: some View {
+        ComponentPage(
+            name: "PhotoGrid",
+            summary: "Square photo cells in columns: a person's photos (rounded, small gaps) or a gallery (square cells, hairline gaps, the next page loaded as the last cell appears).",
+            since: "2.8.0",
+            apps: [.dalada],
+            canvas: .fill,
+            notes: ["Lazy: put it in a ScrollView. onReachEnd loads the next page."]
+        ) {
+            if state == .loading {
+                PhotoGridSkeleton(style: style)
+            } else {
+                PhotoGrid(GalleryPhoto.samples, style: style, onOpen: { opened = $0 },
+                          label: { $0.caption }) { GalleryPhotoView(photo: $0) }
+                    .fullScreenCover(item: $opened) { photo in
+                        PhotoViewer(GalleryPhoto.samples, selection: photo.id) { GalleryPhotoView(photo: $0, fits: true) }
+                    }
+            }
+        } controls: {
+            StateControl(state: $state)
+            ChoiceControl("Style", selection: $style, options: [("Rounded", .rounded), ("Edge to edge", .edgeToEdge)])
+        }
+    }
+}
+
+private struct PhotoCarouselPage: View {
+    @State private var count = 3.0
+    @State private var opened: GalleryPhoto?
+    @State private var state: SpecimenState = .content
+
+    var body: some View {
+        ComponentPage(
+            name: "PhotoCarousel",
+            summary: "The photos of a post, one at a time in a rounded 4:3 frame, swiped sideways with page dots; a tap opens the photo.",
+            since: "2.8.0",
+            apps: [.dalada],
+            canvas: .fill
+        ) {
+            let photos = Array(GalleryPhoto.samples.prefix(Int(count)))
+            if state == .loading {
+                PhotoCarouselSkeleton()
+            } else {
+                PhotoCarousel(photos, onOpen: { opened = $0 }) { GalleryPhotoView(photo: $0) }
+                    .fullScreenCover(item: $opened) { photo in
+                        PhotoViewer(photos, selection: photo.id) { GalleryPhotoView(photo: $0, fits: true) }
+                    }
+            }
+        } controls: {
+            StateControl(state: $state)
+            SliderControl("Photos", value: $count, in: 1...6, step: 1)
+        }
+    }
+}
+
+private struct PhotoViewerPage: View {
+    @State private var opened: GalleryPhoto?
+    @State private var showsCaption = true
+    @State private var showsMenu = true
+
+    var body: some View {
+        ComponentPage(
+            name: "PhotoViewer",
+            summary: "Photos full screen: swiped sideways, pinch or double-tap to zoom, drag the zoomed photo. An optional caption with \"2 / 5\" and a menu in the top bar.",
+            since: "2.8.0",
+            apps: [.dalada],
+            notes: [
+                "Present it with .fullScreenCover; it closes itself. Pass the photo fitted (.scaledToFit()): the viewer zooms it.",
+                "At 1× a drag turns the page; zoomed in, it moves the photo. VoiceOver zooms with its own gesture.",
+            ]
+        ) {
+            Button("Open the viewer") { opened = GalleryPhoto.samples[0] }
+                .dsButton(.secondary)
+                .fullScreenCover(item: $opened) { photo in
+                    viewer(selection: photo.id)
+                }
+        } controls: {
+            ToggleControl("Caption", isOn: $showsCaption)
+            ToggleControl("Menu", isOn: $showsMenu)
+        }
+    }
+
+    @ViewBuilder
+    private func viewer(selection: Int) -> some View {
+        let photos = GalleryPhoto.samples
+        if showsCaption && showsMenu {
+            PhotoViewer(photos, selection: selection) { GalleryPhotoView(photo: $0, fits: true) } caption: { photo in
+                Text(photo.caption).font(AppTypography.bodyEmphasis)
+                Text("Aida · 12 May 2026").font(AppTypography.caption).foregroundStyle(.white.opacity(0.8))
+            } actions: { _ in
+                Menu {
+                    Button("Report", systemImage: "flag") {}
+                } label: {
+                    Image(systemName: "ellipsis")
+                }
+            }
+        } else if showsCaption {
+            PhotoViewer(photos, selection: selection) { GalleryPhotoView(photo: $0, fits: true) } caption: { photo in
+                Text(photo.caption).font(AppTypography.bodyEmphasis)
+            }
+        } else {
+            PhotoViewer(photos, selection: selection) { GalleryPhotoView(photo: $0, fits: true) }
+        }
+    }
+}
+
+private struct ShareCardFramePage: View {
+    @State private var format: ShareCardFormat = .story
+    @State private var hasPhoto = false
+
+    var body: some View {
+        ComponentPage(
+            name: "ShareCardFrame",
+            summary: "A picture to share in Stories or a chat: a photo under a dark gradient (or a gradient alone), the content from the top, the brand and the site at the bottom.",
+            since: "2.8.0",
+            apps: [.dalada],
+            notes: [
+                "An image, not a screen: fixed point sizes (360 wide, rendered at 3× to 1080 px), the same colours in light and dark.",
+                "ShareCardSheet renders it, lets the person pick Stories or post, and shares it.",
+            ]
+        ) {
+            ShareCardFrame(format: format, brand: "Dalada", site: "dalada.kz", photo: hasPhoto ? GallerySharePhoto.image : nil) {
+                GalleryShareCardContent(format: format)
+            }
+            .scaleEffect(0.6)
+            .frame(width: format.width * 0.6, height: format.height * 0.6)
+        } controls: {
+            ChoiceControl("Format", selection: $format, options: ShareCardFormat.allCases.map { ($0.title, $0) })
+            ToggleControl("Photo", isOn: $hasPhoto)
+        }
+    }
+}
+
+/// A sample card's content: kicker, title, date, stats.
+struct GalleryShareCardContent: View {
+    let format: ShareCardFormat
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label("Fishing", systemImage: "fish")
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(ShareCardStyle.standard.accent)
+            Text("Kapchagay weekend")
+                .font(.system(size: format == .story ? 32 : 28, weight: .bold))
+                .lineLimit(2)
+            Text("12 May 2026")
+                .font(.system(size: 14))
+                .opacity(0.7)
+        }
+        Spacer(minLength: 0)
+        HStack(alignment: .top, spacing: 12) {
+            ShareCardStat(value: "12.4 km", title: "Distance")
+            ShareCardStat(value: "5 h 12 min", title: "Time")
+            ShareCardStat(value: "320 m", title: "Elevation")
+        }
+    }
+}
+
+/// A photo for the share card specimens, drawn once from a `GalleryPhoto`.
+@MainActor
+enum GallerySharePhoto {
+    static let image: UIImage? = {
+        let renderer = ImageRenderer(content: GalleryPhotoView(photo: GalleryPhoto.samples[1]).frame(width: 360, height: 640))
+        renderer.scale = 2
+        return renderer.uiImage
+    }()
 }
 
 #Preview { NavigationStack { MediaScreen() } }
