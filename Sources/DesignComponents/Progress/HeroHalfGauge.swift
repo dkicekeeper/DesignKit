@@ -106,6 +106,10 @@ public struct HeroHalfGauge: View {
                     .materialize(delay: entranceDelay + 0.55, animatesOnAppear: animatesOnAppear)
             }
         }
+        // One picture: in a Liquid Glass card (`cardStyle()`, as in `ScoreGaugeCard`) the glass
+        // blends each layer with the layers under it, so the markers looked translucent over
+        // the arc and the arc darker over its glow (2.9.0).
+        .compositingGroup()
         .frame(width: diameter, height: diameter)
         // The semicircle only occupies the square's top half (plus cap/tick
         // overshoot below the equator) — trim the layout to it.

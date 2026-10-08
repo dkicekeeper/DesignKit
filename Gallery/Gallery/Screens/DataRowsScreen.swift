@@ -24,6 +24,7 @@ struct DataRowsScreen: View {
             ChecklistSummaryRowPage()
             ThumbnailRowPage()
             DownloadRowPage()
+            TransactionRowPage()
         }
     }
 }
@@ -466,6 +467,93 @@ private struct DownloadRowPage: View {
             ])
             SliderControl("Progress", value: $progress, in: 0...1, step: 0.05)
         }
+    }
+}
+
+private struct TransactionRowPage: View {
+    @State private var kind = 0
+    @State private var showsEquivalent = false
+    @State private var isPending = false
+    @State private var showsBadge = false
+    @State private var state: SpecimenState = .content
+
+    private let kaspi = TransactionRow.Account(name: "Kaspi Gold", icon: .sfSymbol("creditcard.fill"))
+    private let deposit = TransactionRow.Account(name: "Halyk Deposit", icon: .sfSymbol("lock.fill"))
+
+    var body: some View {
+        ComponentPage(
+            name: "TransactionRow",
+            summary: "A money movement: its icon, the category and its details, the account and a note, the amount and its equivalent; a transfer from one account to another with both legs.",
+            since: "2.9.0",
+            apps: [.tenra],
+            canvas: .fill,
+            notes: [
+                "The app passes what to show (the category's colours, the account's logo, the amount lines); its model and maths stay in the app.",
+                "A deleted account keeps its name in italic, without a logo (TransactionRow.Account.deleted).",
+            ]
+        ) {
+            InCard {
+                if state == .loading {
+                    TransactionRowSkeleton()
+                } else {
+                    row
+                }
+            }
+        } controls: {
+            StateControl(state: $state)
+            ChoiceControl("Kind", selection: $kind, options: [("Expense", 0), ("Income", 1), ("Transfer", 2), ("Deleted account", 3)])
+            ToggleControl("Equivalent", isOn: $showsEquivalent)
+            ToggleControl("Future", isOn: $isPending)
+            ToggleControl("Recurring badge", isOn: $showsBadge)
+        }
+    }
+
+    @ViewBuilder
+    private var row: some View {
+        switch kind {
+        case 1:
+            TransactionRow(
+                .entry(title: "Salary", account: kaspi),
+                icon: .sfSymbol("banknote.fill"), iconTint: .monochrome(AppColors.income),
+                iconBackground: AppColors.pale(AppColors.income),
+                badgeSystemImage: showsBadge ? "arrow.clockwise" : nil,
+                amounts: [.init(450_000, currency: "KZT", prefix: "+", color: AppColors.income)],
+                isPending: isPending,
+                accessibilityLabel: "Salary, 450 000 tenge, Kaspi Gold"
+            )
+        case 2:
+            TransactionRow(
+                .transfer(from: kaspi, to: deposit),
+                icon: .sfSymbol("arrow.left.arrow.right"), iconTint: .monochrome(AppColors.transfer),
+                iconBackground: AppColors.pale(AppColors.transfer),
+                amounts: [
+                    .init(100_000, currency: "KZT", prefix: "-", color: AppColors.Text.primary),
+                    .init(100_000, currency: "KZT", prefix: "+", color: AppColors.income),
+                ],
+                isPending: isPending,
+                accessibilityLabel: "Transfer, 100 000 tenge, from Kaspi Gold to Halyk Deposit"
+            )
+        default:
+            TransactionRow(
+                .entry(title: "Groceries", details: "Vegetables, Bread",
+                       account: kind == 3 ? .deleted("Old card") : kaspi),
+                note: "Magnum",
+                icon: .sfSymbol("cart.fill"), iconTint: .monochrome(.orange), iconBackground: AppColors.pale(.orange),
+                badgeSystemImage: showsBadge ? "arrow.clockwise" : nil,
+                amounts: expenseAmounts,
+                isPending: isPending,
+                accessibilityLabel: "Groceries, 18 500 tenge, Kaspi Gold"
+            )
+        }
+    }
+
+    /// The amount, and its equivalent in the account's currency under it.
+    private var expenseAmounts: [TransactionRow.Amount] {
+        var lines = [TransactionRow.Amount(18_500, currency: "KZT", prefix: "-", color: AppColors.Text.primary)]
+        if showsEquivalent {
+            lines.append(TransactionRow.Amount(36.5, currency: "USD", color: AppColors.Text.primary))
+        }
+        return lines
     }
 }
 

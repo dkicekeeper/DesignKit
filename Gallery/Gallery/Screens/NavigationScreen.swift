@@ -20,6 +20,7 @@ struct NavigationScreen: View {
             OnboardingStepIndicatorPage()
             PlusTabLabelPage()
             LiveSessionBarPage()
+            PagerArrowsPage()
         }
     }
 }
@@ -219,6 +220,40 @@ private struct LiveSessionBarPage: View {
             ToggleControl("Paused", isOn: $isPaused)
             ToggleControl("Detail", isOn: $showsDetail)
             ActionControl("Restart the clock") { startedAt = .now }
+        }
+    }
+}
+
+private struct PagerArrowsPage: View {
+    @State private var index = 2
+    @State private var showsArrows = true
+
+    private let months = ["July", "August", "September", "October"]
+
+    var body: some View {
+        ComponentPage(
+            name: "PagerArrows",
+            summary: "Step through pages with arrows as well as a swipe: a chevron on each side of the content, greyed at either end.",
+            since: "2.9.0",
+            apps: [.tenra],
+            canvas: .fill,
+            notes: ["Put it over a paged TabView's content: the swipe animates itself, an arrow animates the page change."]
+        ) {
+            PagerArrows(index: $index, count: months.count, showsArrows: showsArrows) {
+                TabView(selection: $index) {
+                    ForEach(months.indices, id: \.self) { page in
+                        Text(months[page])
+                            .font(AppTypography.h3)
+                            .frame(maxWidth: .infinity, minHeight: 120)
+                            .tag(page)
+                    }
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .frame(height: 140)
+            }
+        } controls: {
+            ToggleControl("Arrows", isOn: $showsArrows)
+            StepperControl("Page", value: $index, in: 0...3)
         }
     }
 }

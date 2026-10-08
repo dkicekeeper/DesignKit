@@ -26,6 +26,7 @@ struct FeedbackScreen: View {
             EmptyStatePage()
             StepTrackerPage()
             ImportProgressSheetPage()
+            ProgressOverlayPage()
             SkeletonPrimitivesPage()
         }
     }
@@ -368,6 +369,40 @@ private struct SkeletonPrimitivesPage: View {
             .skeletonShimmer(shimmers)
         } controls: {
             ToggleControl("Shimmer", isOn: $shimmers)
+        }
+    }
+}
+
+private struct ProgressOverlayPage: View {
+    @State private var isPresented = false
+    @State private var showsMessage = true
+
+    var body: some View {
+        ComponentPage(
+            name: ".progressOverlay",
+            summary: "The screen waits for something it cannot do without: it dims, and a material panel shows a spinner, what is happening and what it means.",
+            since: "2.9.0",
+            apps: [.tenra],
+            canvas: .tall(minHeight: 260),
+            notes: ["For a restore, a migration, an import that must finish first. Disable the screen under it at the call site."]
+        ) {
+            VStack(spacing: AppSpacing.md) {
+                Text("Settings")
+                    .font(AppTypography.h3)
+                Button(isPresented ? "Finish" : "Restore a backup") { isPresented.toggle() }
+                    .dsButton(.secondary)
+                    .zIndex(3)
+            }
+            .frame(maxWidth: .infinity, minHeight: 220)
+            .progressOverlay(
+                isPresented: isPresented,
+                title: "Restoring the backup",
+                message: showsMessage ? "Your data will be back in a moment." : nil
+            )
+            .animation(AppAnimation.gentleSpring, value: isPresented)
+        } controls: {
+            ToggleControl("Shown", isOn: $isPresented)
+            ToggleControl("Message", isOn: $showsMessage)
         }
     }
 }

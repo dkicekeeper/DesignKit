@@ -95,6 +95,14 @@ Insert with a spring: `withAnimation(AppAnimation.bouncy) { isShown = true }`.
 | `TypingIndicator` | three dots in a wave | 30 fps while allowed | a reply on its way, an assistant thinking |
 | `.borderGlow` (1.x) | a static halo round a card | see its docs | "working on it" |
 
+**2.9.0: text that arrives, cards that cascade, marbles**
+
+| Effect | What | Cost | Use |
+|---|---|---|---|
+| `StreamingText(_:highlights:)` | words arrive one by one, each sliding in out of a blur (`.blurSlideWord`); a word that stays in place keeps its identity, so a refined transcript does not replay | one short transition per new word | a live transcript, text a model is writing |
+| `.cascadeIn(index:)` | cards that arrive together fade in and rise 12 pt, `index × 80 ms` apart (gentle spring); under Reduce Motion the same cadence without the rise | one transition per card | the cards a result brings (Tenra's voice input) |
+| `PackedCircleIcons` (`.glossy`) | the marbles burst out of the middle one after another with a little overshoot, then sway by up to 2 pt, each on its own beat | one spring per marble, then a repeating ease on an offset | the circles of a home card |
+
 **2.6.0: surfaces and moments**
 
 | Effect | What | Cost | Use |
@@ -177,7 +185,7 @@ on; the system's own switch turns them off.
   charts are there at once, parallax stops (`.scrollHero` keeps its stretch: it follows the
   finger).
 - **Ambient loops** (`AuroraBackground`, `TypingIndicator`, `.symbolPulse`, `LiveSessionBar`'s
-  recording dot, the 1.x beams and glows) run inside `AmbientMotionGate`: off under Reduce Motion and, on iOS 27, while the system
+  recording dot, `PackedCircleIcons`' swaying marbles, the 1.x beams and glows) run inside `AmbientMotionGate`: off under Reduce Motion and, on iOS 27, while the system
   prefers reduced resource usage. They draw one still frame instead, with the same layout.
 - **`.designKitMotion(false)`** stills all of DesignKit's motion below it: snapshot tests set it,
   an app can offer it as "reduce effects".

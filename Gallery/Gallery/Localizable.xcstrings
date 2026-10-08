@@ -45,6 +45,17 @@
         }
       }
     },
+    "button.apply" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply"
+          }
+        }
+      }
+    },
     "button.cancel" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1024,6 +1035,28 @@
         }
       }
     },
+    "pager.next" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        }
+      }
+    },
+    "pager.previous" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous"
+          }
+        }
+      }
+    },
     "photo.open" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1284,6 +1317,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Verified"
+          }
+        }
+      }
+    },
+    "timeFilter.customPeriod" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom period"
+          }
+        }
+      }
+    },
+    "timeFilter.from" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From"
+          }
+        }
+      }
+    },
+    "timeFilter.to" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To"
           }
         }
       }

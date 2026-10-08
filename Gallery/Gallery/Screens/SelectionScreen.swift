@@ -19,6 +19,8 @@ struct SelectionScreen: View {
             SelectionIndicatorPage()
             DateButtonsPage()
             IconPickerPage()
+            SnapCardPickerPage()
+            OptionCardPickerPage()
         }
     }
 }
@@ -192,6 +194,87 @@ private struct IconPickerPage: View {
         } controls: {
             ToggleControl("Logos tab", isOn: $allowsLogos)
             ActionControl("Open the picker", systemImage: "square.grid.3x3") { showsPicker = true }
+        }
+    }
+}
+
+private struct SnapCardPickerPage: View {
+    private struct Wallet: Identifiable {
+        let id: String
+        let name: String
+        let symbol: String
+        let balance: Double
+    }
+
+    @State private var selection: String? = "gold"
+    @State private var state: SpecimenState = .content
+
+    private let wallets = [
+        Wallet(id: "gold", name: "Kaspi Gold", symbol: "creditcard.fill", balance: 1_284_500),
+        Wallet(id: "cash", name: "Cash", symbol: "banknote.fill", balance: 42_000),
+        Wallet(id: "deposit", name: "Deposit", symbol: "lock.fill", balance: 2_500_000),
+    ]
+
+    var body: some View {
+        ComponentPage(
+            name: "SnapCardPicker",
+            summary: "Pick one by swiping cards: full-width cards that snap, the neighbours peeking in; the centred card is the selection, a tap selects too.",
+            since: "2.9.0",
+            apps: [.tenra],
+            canvas: .bleed,
+            notes: [
+                "The card is the app's (SelectableBalanceCard, a category card); the picker passes it isSelected and the action that selects it.",
+                "It aligns only once its container is measured, so a selection that arrives after it appears still scrolls into place.",
+            ]
+        ) {
+            if state == .loading {
+                SnapCardPickerSkeleton { SelectableBalanceCardSkeleton() }
+            } else {
+                SnapCardPicker(wallets, selection: $selection) { wallet, isSelected, select in
+                    SelectableBalanceCard(iconSource: .sfSymbol(wallet.symbol), title: wallet.name,
+                                          amount: wallet.balance, currency: "KZT",
+                                          isSelected: isSelected, action: select)
+                }
+            }
+        } controls: {
+            StateControl(state: $state)
+            ChoiceControl("Selection", selection: $selection, options: wallets.map { ($0.name, Optional($0.id)) })
+        }
+    }
+}
+
+private struct OptionCardPickerPage: View {
+    private enum Background: String, CaseIterable, Hashable {
+        case none = "None"
+        case gradient = "Gradient"
+        case photo = "Photo"
+    }
+
+    @State private var selection: Background = .gradient
+    @State private var state: SpecimenState = .content
+
+    var body: some View {
+        ComponentPage(
+            name: "OptionCardPicker · OptionCard",
+            summary: "Options as pictures: each a card with a preview of what it does and its name; the chosen one is outlined in the accent with a check.",
+            since: "2.9.0",
+            apps: [.tenra],
+            canvas: .fill,
+            notes: ["OptionCard alone for a list that mixes plain options with one that opens a picker (wrap that card in a PhotosPicker)."]
+        ) {
+            if state == .loading {
+                OptionCardSkeleton()
+            } else {
+                OptionCardPicker(Background.allCases, selection: $selection, title: { $0.rawValue }) { background in
+                    switch background {
+                    case .none: Rectangle().fill(AppColors.bgBase)
+                    case .gradient: AuroraBackground(motion: .still)
+                    case .photo: GalleryPhotoView(photo: GalleryPhoto.samples[0])
+                    }
+                }
+            }
+        } controls: {
+            StateControl(state: $state)
         }
     }
 }

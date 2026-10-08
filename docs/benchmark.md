@@ -259,6 +259,12 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
   (`ShareCardSheet`, `ShareCardFrame`, `ShareCard.Format` / `.Style`), `LiveSessionBar` в
   аксессуаре панели вкладок, `DownloadRow` для офлайн-загрузок, `ArticleBody`,
   `ChipPicker(allTitle:)`, `PersonRow(style: .card)`.
+- **2.9.0** — аудит, раунд 4, из Tenra: `TransactionRow` (строка операции и перевода),
+  `SnapCardPicker` (выбор карточкой в ряду с доводкой), `OptionCard` / `OptionCardPicker`,
+  `StreamingText` (текст по словам с подсветкой), `DateRangePickerSheet`, `.cascadeIn`,
+  `PagerArrows`, `.progressOverlay`, `FlowLayout(alignment:)`. Редизайн `PackedCircleIcons`:
+  глянцевые шарики (прежний вид — `.flat`). Шкала `HeroHalfGauge` в стеклянной карточке
+  рисуется одной картинкой: маркеры больше не просвечивают.
 
 Для 1.6.0–1.7.0 смотрели и на дизайн-систему TUI Т-Банка (Figma): как референс устройства токенов
 и списка состояний, а не как образец внешнего вида. Вид остаётся своим: Liquid Glass, Inter,

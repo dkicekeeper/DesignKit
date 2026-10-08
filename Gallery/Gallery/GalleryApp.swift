@@ -39,6 +39,9 @@ struct GalleryApp: App {
             ]
         }
         DesignKitLogoCatalog.domainSuffixes = ["com", "kz"]
+        // Invented brands with logos drawn on the fly (GalleryLogos), for PackedCircleIcons and
+        // Icon; any other name has none.
+        DesignKitLogoLoader.loader = { await GalleryLogos.load($0) }
     }
 
     var body: some Scene {
