@@ -132,6 +132,7 @@ private struct PayoffProgressCardPage: View {
 
 private struct ScoreCardPage: View {
     @State private var score = 72.0
+    @State private var decodes = false
     @State private var state: SpecimenState = .content
 
     private var grade: (String, Color) {
@@ -144,16 +145,18 @@ private struct ScoreCardPage: View {
             summary: "A score in a feed: grade and value with a mini gauge.",
             since: "1.2.0",
             apps: [.tenra],
-            canvas: .fill
+            canvas: .fill,
+            notes: ["decodesScore (2.7.0): the score decodes itself as it appears and when it changes. Leave it off in a lazy feed."]
         ) {
             if state == .loading {
                 ScoreCardSkeleton()
             } else {
-                ScoreCard(title: "Health score", grade: grade.0, score: Int(score), color: grade.1)
+                ScoreCard(title: "Health score", grade: grade.0, score: Int(score), color: grade.1, decodesScore: decodes)
             }
         } controls: {
             StateControl(state: $state)
             SliderControl("Score", value: $score, in: 0...100, step: 1)
+            ToggleControl("Decodes score", isOn: $decodes)
         }
     }
 }
@@ -161,6 +164,7 @@ private struct ScoreCardPage: View {
 private struct ScoreGaugeCardPage: View {
     @State private var score = 72.0
     @State private var hasData = true
+    @State private var decodes = false
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -169,7 +173,8 @@ private struct ScoreGaugeCardPage: View {
             summary: "A score as a hero half-gauge with zones; “not enough data” without a score.",
             since: "1.2.0",
             apps: [.tenra],
-            canvas: .fill
+            canvas: .fill,
+            notes: ["decodesScore (2.7.0): the score decodes itself as it appears and when it changes."]
         ) {
             if state == .loading {
                 ScoreGaugeCardSkeleton()
@@ -178,12 +183,14 @@ private struct ScoreGaugeCardPage: View {
                                grade: hasData ? (score >= 70 ? "Good" : score >= 40 ? "Fair" : "Low") : "Not enough data",
                                color: hasData ? (score >= 70 ? AppColors.success : score >= 40 ? AppColors.warning : AppColors.destructive)
                                    : AppColors.textSecondary,
-                               subtitle: hasData ? "You're on track" : "Add a month of income to see your score")
+                               subtitle: hasData ? "You're on track" : "Add a month of income to see your score",
+                               decodesScore: decodes)
             }
         } controls: {
             StateControl(state: $state)
             SliderControl("Score", value: $score, in: 0...100, step: 1)
             ToggleControl("Has data", isOn: $hasData)
+            ToggleControl("Decodes score", isOn: $decodes)
         }
     }
 }

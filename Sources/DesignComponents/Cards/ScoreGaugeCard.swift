@@ -25,19 +25,23 @@ public struct ScoreGaugeCard: View {
     let grade: String
     let color: Color
     let subtitle: String
+    let decodesScore: Bool
 
     /// - Parameters:
     ///   - score: `nil` when it cannot be computed: the gauge stays empty and the number reads "—".
     ///   - maxScore: The end of the scale.
     ///   - zoneTicks: Zone boundaries marked on the arc (e.g. `[40, 70]`).
     ///   - color: Tints the arc, the number and the grade capsule.
+    ///   - decodesScore: The number decodes itself as it appears and when it changes
+    ///     (`ScrambleText`, 2.7.0).
     public init(
         score: Int?,
         maxScore: Double = 100,
         zoneTicks: [Double] = [],
         grade: String,
         color: Color,
-        subtitle: String
+        subtitle: String,
+        decodesScore: Bool = false
     ) {
         self.score = score
         self.maxScore = maxScore
@@ -45,6 +49,7 @@ public struct ScoreGaugeCard: View {
         self.grade = grade
         self.color = color
         self.subtitle = subtitle
+        self.decodesScore = decodesScore
     }
 
     public var body: some View {
@@ -61,7 +66,7 @@ public struct ScoreGaugeCard: View {
 
                 // Score + grade sit inside the semicircle's interior.
                 VStack(spacing: AppSpacing.xs) {
-                    Text(verbatim: score.map { "\($0)" } ?? "—")
+                    scoreText
                         .font(AppTypography.h1.bold())
                         .foregroundStyle(score != nil ? color : AppColors.Text.tertiary)
                         .materialize(delay: 0.35)
@@ -85,6 +90,15 @@ public struct ScoreGaugeCard: View {
         .frame(maxWidth: .infinity)
         .padding(AppSpacing.lg)
         .cardStyle()
+    }
+
+    @ViewBuilder
+    private var scoreText: some View {
+        if decodesScore, let score {
+            ScrambleText("\(score)")
+        } else {
+            Text(verbatim: score.map { "\($0)" } ?? "—")
+        }
     }
 }
 

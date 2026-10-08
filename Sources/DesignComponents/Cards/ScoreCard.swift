@@ -22,6 +22,7 @@ public struct ScoreCard: View {
     let score: Int
     let maxScore: Int
     let color: Color
+    let decodesScore: Bool
 
     // Mini-chart footprint, the same as the insight feed cards'.
     static var miniChartWidth: CGFloat { 120 }
@@ -29,12 +30,15 @@ public struct ScoreCard: View {
 
     /// - Parameters:
     ///   - color: Tints the score and the gauge arc.
-    public init(title: String, grade: String, score: Int, maxScore: Int = 100, color: Color) {
+    ///   - decodesScore: The score decodes itself as it appears and when it changes
+    ///     (`ScrambleText`, 2.7.0). Leave it off in a lazy feed, where it would replay on scroll.
+    public init(title: String, grade: String, score: Int, maxScore: Int = 100, color: Color, decodesScore: Bool = false) {
         self.title = title
         self.grade = grade
         self.score = score
         self.maxScore = maxScore
         self.color = color
+        self.decodesScore = decodesScore
     }
 
     public var body: some View {
@@ -50,7 +54,7 @@ public struct ScoreCard: View {
                 .lineLimit(2)
 
             HStack(alignment: .firstTextBaseline, spacing: AppSpacing.sm) {
-                Text(verbatim: "\(score)")
+                scoreText
                     .font(AppTypography.h2)
                     .fontWeight(.bold)
                     .foregroundStyle(color)
@@ -74,6 +78,15 @@ public struct ScoreCard: View {
             .frame(width: Self.miniChartWidth, height: Self.miniChartHeight)
             .padding(.trailing, AppSpacing.lg)
             .allowsHitTesting(false)
+        }
+    }
+
+    @ViewBuilder
+    private var scoreText: some View {
+        if decodesScore {
+            ScrambleText("\(score)")
+        } else {
+            Text(verbatim: "\(score)")
         }
     }
 }

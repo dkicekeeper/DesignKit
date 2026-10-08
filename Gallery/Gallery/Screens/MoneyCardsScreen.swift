@@ -30,6 +30,7 @@ struct MoneyCardsScreen: View {
 private struct BalanceCardPage: View {
     @State private var amount = 1_250_000.0
     @State private var hidden = false
+    @State private var isLive = false
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -38,18 +39,24 @@ private struct BalanceCardPage: View {
             summary: "An account in a carousel: icon, name, balance on Liquid Glass.",
             since: "1.5.0",
             apps: [.tenra],
-            notes: ["Tappable: wrap in a Button with .buttonStyle(.bounce)."]
+            notes: [
+                "Tappable: wrap in a Button with .buttonStyle(.bounce).",
+                "isLive (2.7.0): the balance rolls up when the card appears and flashes green or red when it changes.",
+            ]
         ) {
             if state == .loading {
                 BalanceCardSkeleton()
             } else {
                 BalanceCard(iconSource: .sfSymbol("creditcard.fill"), title: "Kaspi Gold",
-                            amount: amount, currency: "KZT")
+                            amount: amount, currency: "KZT", isLive: isLive)
                     .amountsHidden(hidden)
+                    // A new card when the toggle flips, so turning it on rolls the balance up.
+                    .id(isLive)
             }
         } controls: {
             StateControl(state: $state)
             SliderControl("Balance", value: $amount, in: 0...5_000_000, step: 1_000)
+            ToggleControl("Live", isOn: $isLive)
             ToggleControl("Amounts hidden", isOn: $hidden)
         }
     }
