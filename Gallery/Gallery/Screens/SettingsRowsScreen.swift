@@ -19,6 +19,7 @@ struct SettingsRowsScreen: View {
             ToggleSettingsRowPage()
             ActionSettingsRowPage()
             MenuPickerRowPage()
+            NavigationPickerRowPage()
             StepperRowPage()
             SliderRowPage()
             DatePickerRowPage()
@@ -230,6 +231,49 @@ private struct MenuPickerRowPage: View {
             }
         } controls: {
             StateControl(state: $state)
+        }
+    }
+}
+
+private struct NavigationPickerRowPage: View {
+    @State private var species = "pike"
+    @State private var showsIcon = true
+    @State private var many = true
+    @State private var state: SpecimenState = .content
+
+    private let fewOptions: [(label: String, value: String)] = [
+        (label: "Pike", value: "pike"), (label: "Perch", value: "perch"), (label: "Carp", value: "carp"),
+    ]
+    private var manyOptions: [(label: String, value: String)] {
+        fewOptions + ["Asp", "Bream", "Catfish", "Chub", "Grayling", "Ide", "Roach", "Rudd", "Tench", "Trout", "Zander"]
+            .map { (label: $0, value: $0.lowercased()) }
+    }
+
+    var body: some View {
+        ComponentPage(
+            name: "NavigationPickerRow",
+            summary: "A choice from a long list: the row shows the chosen value; a tap pushes the list, with a search field past 12 options.",
+            since: "3.0.0",
+            apps: [.dalada],
+            canvas: .fill,
+            notes: ["Needs a NavigationStack around it (an EditSheetContainer has one). A few options: MenuPickerRow."]
+        ) {
+            NavigationStack {
+                InFormCard {
+                    if state == .loading {
+                        UniversalRowSkeleton.menuPicker
+                    } else {
+                        NavigationPickerRow(icon: showsIcon ? "fish" : nil, title: "Species",
+                                            selection: $species, options: many ? manyOptions : fewOptions)
+                    }
+                }
+                .toolbar(.hidden, for: .navigationBar)
+            }
+            .frame(height: 220)
+        } controls: {
+            StateControl(state: $state)
+            ToggleControl("Icon", isOn: $showsIcon)
+            ToggleControl("Many options (search)", isOn: $many)
         }
     }
 }

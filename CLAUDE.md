@@ -184,7 +184,8 @@ rather than importing an app type.
   the owner's choice) and its date parsing; Dalada keeps its sign-in card, map layers, weather
   and rules views.
 - DesignKit 3.0.0 (2026-10) removed every deprecated name (no app used one), drew `cardStyle()`'s
-  glass behind the content and added the form pieces Dalada's forms needed
+  glass behind the content and added the form pieces Dalada's forms needed (`StepperRow`,
+  `NavigationPickerRow`, `FormTextField(.row)`, `EditSheetContainer(isSaving:)`)
   ([docs/migration-3.0.md](docs/migration-3.0.md)).
 
 ## Reference Docs

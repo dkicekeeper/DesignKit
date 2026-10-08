@@ -502,6 +502,19 @@ MenuPickerRow(
 
 Use in: form sections for frequency, period, reminder, etc.
 
+#### `NavigationPickerRow` *(3.0.0)*
+A choice from a long list: the title (with an optional accent symbol), the chosen value
+(secondary) and a chevron; a tap pushes the list (`CheckmarkRow`s, a search field past
+`NavigationPickerMetrics.searchThreshold` options), and a choice goes back. Needs a
+`NavigationStack` around it (an `EditSheetContainer` has one). At accessibility sizes the value
+moves under the title. A few options: `MenuPickerRow`. Dalada: the fish species, the packing
+list to start from.
+
+```swift
+NavigationPickerRow(icon: "fish", title: "Species", selection: $speciesID,
+                    options: species.map { (label: $0.name, value: $0.id) })
+```
+
 #### `StepperRow` *(3.0.0)*
 A whole number in a form: the title (body, with an optional accent symbol), the value (body,
 secondary, tabular digits, rolling as it changes) and a system stepper on the trailing edge; at
@@ -803,13 +816,17 @@ Enhanced text field with error/help states.
 FormTextField(
     text: $name,
     placeholder: "Enter name",
-    style: .standard,         // or .multiline(min: 2, max: 6), .compact
+    style: .standard,         // or .multiline(min: 2, max: 6), .inline, .inlineMultiline,
+                              // .row, .rowMultiline(min:max:) (3.0.0)
     errorMessage: nameError,
     helpText: "Required field"
 )
 ```
 
-Use for: text inputs inside `FormSection`. NOT for amounts (use `AnimatedAmountInput`) or hero titles (use `AnimatedTitleInput`).
+Use for: text inputs inside `FormSection`. `.inline` sits in a row's trailing slot (right-aligned,
+no chrome); `.row` / `.rowMultiline` *(3.0.0)* fill a `FormSection` row on their own (a name, a
+note): leading-aligned, no chrome of their own, padded like a `.standard` row, with the error and
+help text under them. NOT for amounts (use `AnimatedAmountInput`) or hero titles (use `AnimatedTitleInput`).
 
 #### `AnimatedAmountInput` → `AmountInput`
 Hero-style large formatted amount with `.numericText()` transition.
@@ -1080,7 +1097,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `BalanceCard`, `SelectableBalanceCard`, `FinanceCard`, `CashFlowCard` (also its own loading state), `TotalsCard`, `ComparisonCard`, `InsightsStatCard`, `StatTile`, `RecurringPaymentCard`, `RecommendationBox` | `…Skeleton` (`TotalsCardSkeleton(count:showsTitle:amountFont:)`, `FinanceCardSkeleton(showsTrailing:)`, `RecommendationBoxSkeleton(lines:)`) |
 | `LimitProgressCard`, `TargetProgressCard`, `PayoffProgressCard`, `ScoreCard`, `ScoreGaugeCard`, `MetricCard`, `WeightBreakdownCard`, `CalculationCard`, `ProgressRingTile`, `ProgressRingTileGrid` | `…Skeleton` (`MetricCardSkeleton(chartPlacement:)`, `WeightBreakdownCardSkeleton(segments:)`, `CalculationCardSkeleton(rows:showsHero:)`) |
 | `UniversalRow` | `UniversalRowSkeleton(config:iconStyle:titleFont:showsSubtitle:trailing:)` |
-| `NavigationSettingsRow`, `ToggleSettingsRow`, `ActionSettingsRow`, `MenuPickerRow`, `DatePickerRow`, `CheckmarkRow`, `StepperRow` (3.0.0) | `UniversalRowSkeleton.navigationSettings`, `.toggleSettings`, `.actionSettings`, `.menuPicker`, `.datePicker`, `.checkmark(iconStyle:)`; a stepper row is `.menuPicker` (the same shape) |
+| `NavigationSettingsRow`, `ToggleSettingsRow`, `ActionSettingsRow`, `MenuPickerRow`, `DatePickerRow`, `CheckmarkRow`, `StepperRow`, `NavigationPickerRow` (3.0.0) | `UniversalRowSkeleton.navigationSettings`, `.toggleSettings`, `.actionSettings`, `.menuPicker`, `.datePicker`, `.checkmark(iconStyle:)`; a stepper row and a navigation picker row are `.menuPicker` (the same shape) |
 | `SliderRow` (1.15.0) | `SliderRowSkeleton(showsHint:)` |
 | `AmountRow` (2.1.0) | `AmountRowSkeleton(style:showsRing:showsDetail:)` |
 | `NetAmountRow`, `ScheduleRow`, `InfoRow`, `ColorPickerRow` | `…Skeleton` |

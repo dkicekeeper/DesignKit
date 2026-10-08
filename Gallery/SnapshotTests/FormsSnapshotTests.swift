@@ -49,6 +49,39 @@ extension ComponentSnapshots {
             )
         }
 
+        /// Fields that fill a FormSection row on their own (3.0.0): a name and a note.
+        @Test func rowFields() async {
+            await assertComponentSnapshot(
+                FormSection(header: "Trip") {
+                    FormTextField(text: .constant("Kapchagay weekend"), placeholder: "Name", style: .row)
+                    Divider().padding(.leading, AppSpacing.lg)
+                    FormTextField(text: .constant(""), placeholder: "Note", style: .rowMultiline(min: 2, max: 4))
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// A choice from a long list (3.0.0). A NavigationLink: drawn enabled only inside a
+        /// NavigationStack, so the stack is here, its bar hidden, at a fixed height.
+        @Test func navigationPickerRow() async {
+            await assertComponentSnapshot(
+                NavigationStack {
+                    FormSection(header: "Catch") {
+                        NavigationPickerRow(icon: "fish", title: "Species", selection: .constant("pike"),
+                                            options: [(label: "Pike", value: "pike"), (label: "Perch", value: "perch")])
+                        Divider().padding(.leading, AppSpacing.lg)
+                        NavigationPickerRow(title: "Packing list", selection: .constant("winter"),
+                                            options: [(label: "Winter fishing", value: "winter")])
+                    }
+                    .frame(maxHeight: .infinity, alignment: .top)
+                    .toolbar(.hidden, for: .navigationBar)
+                }
+                .frame(height: 170),
+                appearances: [.light, .dark]
+            )
+        }
+
         @Test func editableHero() async {
             await assertComponentSnapshot(
                 EditableHero(
