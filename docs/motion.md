@@ -101,7 +101,7 @@ Insert with a spring: `withAnimation(AppAnimation.bouncy) { isShown = true }`.
 |---|---|---|---|
 | `.holographic(strength:)` | a holographic foil: rainbow bands slide as the finger moves, a sheen where the light falls | one Metal colour effect, redrawn only while the finger moves | a medal, a premium card; with `.interactiveTilt` |
 | `.transition(.dissolve)` | the view breaks into dust as it is removed, its edge glowing; inserted, the dust gathers | one Metal layer effect, only during the transition | deleting something the person owned |
-| `ScrambleText(_:)` | each character flickers through random ones of its kind and settles, left to right | 30 fps for 0.7 s, then paused | a result just worked out: a total, a code, a score |
+| `ScrambleText(_:)` | each character flickers through random ones of its kind and settles, left to right | 30 fps for 0.7 s, then paused | a result just worked out: a total, a code, a score (`ScoreGaugeCard`/`ScoreCard(decodesScore:)`, 2.7.0) |
 | `.spotlightAnchor(_:)` + `.spotlight(_:message:)` | the screen dims except a cut-out round one view, with a `Tooltip` beside it; the cut-out moves on a spring | one shape, animated only when it moves | a new feature, the steps of a tour |
 
 **2.5.0: still light for backgrounds**
@@ -134,7 +134,7 @@ breathe on their own.
 
 | Effect | What | Cost | Use |
 |---|---|---|---|
-| `LiveAmountText` | the digits roll up from zero on first appearance; a change flashes green (up) or red (down) for 0.7 s | `numericText` of `FormattedAmountText`; one short sleep ends the flash | a hero balance, a total that just updated |
+| `LiveAmountText` | the digits roll up from zero on first appearance; a change flashes green (up) or red (down) for 0.7 s | `numericText` of `FormattedAmountText`; one short sleep ends the flash | a hero balance, a total that just updated (`BalanceCard(isLive:)`, 2.7.0) |
 | `.chartDrawIn(delay:)` | the chart is revealed from its leading edge once, with a soft front edge | one mask, 0.9 s | built into `LineChart`, `BarChart`, `HeroSparkline`; any Swift Chart |
 | `.completionMoment(isComplete:tint:in:)` | when `isComplete` turns true: a glow of the shape flares and fades, the success haptic plays | one blurred shape for 0.8 s | `ProgressRing(celebratesCompletion:)`, `ChecklistSummaryRow`'s and `TargetProgressCard`'s bars; any goal |
 | `GlassActionMenu` | a floating glass button flows open into its actions (Liquid Glass morph, `glassEffectID`) | the system's | the add button of a screen |

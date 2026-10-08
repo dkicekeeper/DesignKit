@@ -12,6 +12,9 @@ import DesignSupport
 
 /// "🏦 Kaspi Gold / 1 284 500 ₸" in a card, sized to its content (for a carousel).
 ///
+/// `isLive: true` (2.7.0) shows the amount as a `LiveAmountText`: it rolls up from zero when the
+/// card first appears and flashes green or red when the balance changes.
+///
 /// Navigation is left to the caller: wrap the card in a `NavigationLink` with
 /// `.buttonStyle(.bounce)`; a `glassEffectID` or `matchedTransitionSource` goes on the card.
 ///
@@ -27,12 +30,16 @@ public struct BalanceCard: View {
     let title: String
     let amount: Double
     let currency: String
+    let isLive: Bool
 
-    public init(iconSource: IconSource?, title: String, amount: Double, currency: String) {
+    /// - Parameter isLive: The amount rolls up on the card's first appearance and flashes the
+    ///   direction of a change (`LiveAmountText`).
+    public init(iconSource: IconSource?, title: String, amount: Double, currency: String, isLive: Bool = false) {
         self.iconSource = iconSource
         self.title = title
         self.amount = amount
         self.currency = currency
+        self.isLive = isLive
     }
 
     public var body: some View {
@@ -44,13 +51,23 @@ public struct BalanceCard: View {
                     .font(AppTypography.h4)
                     .foregroundStyle(.primary)
 
-                FormattedAmountText(
-                    amount: amount,
-                    currency: currency,
-                    fontSize: AppTypography.bodySmall,
-                    fontWeight: .semibold,
-                    color: .primary
-                )
+                if isLive {
+                    LiveAmountText(
+                        amount: amount,
+                        currency: currency,
+                        fontSize: AppTypography.bodySmall,
+                        fontWeight: .semibold,
+                        color: .primary
+                    )
+                } else {
+                    FormattedAmountText(
+                        amount: amount,
+                        currency: currency,
+                        fontSize: AppTypography.bodySmall,
+                        fontWeight: .semibold,
+                        color: .primary
+                    )
+                }
             }
         }
         .padding(AppSpacing.lg)
