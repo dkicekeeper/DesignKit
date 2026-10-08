@@ -19,6 +19,7 @@ struct SettingsRowsScreen: View {
             ToggleSettingsRowPage()
             ActionSettingsRowPage()
             MenuPickerRowPage()
+            StepperRowPage()
             SliderRowPage()
             DatePickerRowPage()
             ColorPickerRowPage()
@@ -151,6 +152,7 @@ private struct NavigationSettingsRowPage: View {
 private struct ToggleSettingsRowPage: View {
     @State private var isOn = true
     @State private var showsHint = true
+    @State private var showsIcon = true
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -165,7 +167,7 @@ private struct ToggleSettingsRowPage: View {
                 if state == .loading {
                     UniversalRowSkeleton.toggleSettings
                 } else {
-                    ToggleSettingsRow(icon: "moon.fill", title: "Quiet hours",
+                    ToggleSettingsRow(icon: showsIcon ? "moon.fill" : nil, title: "Quiet hours",
                                       hint: showsHint ? "No notifications from 22:00 to 8:00" : nil,
                                       isOn: $isOn)
                 }
@@ -174,6 +176,7 @@ private struct ToggleSettingsRowPage: View {
             StateControl(state: $state)
             ToggleControl("On", isOn: $isOn)
             ToggleControl("Hint", isOn: $showsHint)
+            ToggleControl("Icon (optional since 3.0.0)", isOn: $showsIcon)
         }
     }
 }
@@ -227,6 +230,38 @@ private struct MenuPickerRowPage: View {
             }
         } controls: {
             StateControl(state: $state)
+        }
+    }
+}
+
+private struct StepperRowPage: View {
+    @State private var count = 3
+    @State private var showsIcon = true
+    @State private var showsUnit = false
+    @State private var state: SpecimenState = .content
+
+    var body: some View {
+        ComponentPage(
+            name: "StepperRow",
+            summary: "A whole number in a form: the title, the value and − / + to change it, within a range.",
+            since: "3.0.0",
+            apps: [.dalada],
+            canvas: .fill
+        ) {
+            InFormCard {
+                if state == .loading {
+                    UniversalRowSkeleton.menuPicker
+                } else {
+                    StepperRow(icon: showsIcon ? "fish" : nil, title: "Fish caught", value: $count, in: 0...99) {
+                        showsUnit ? "\($0) pcs" : "\($0)"
+                    }
+                }
+            }
+        } controls: {
+            StateControl(state: $state)
+            StepperControl("Value", value: $count, in: 0...99)
+            ToggleControl("Icon", isOn: $showsIcon)
+            ToggleControl("Unit", isOn: $showsUnit)
         }
     }
 }

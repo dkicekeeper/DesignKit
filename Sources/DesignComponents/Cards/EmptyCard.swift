@@ -72,8 +72,3 @@ public struct EmptyCard: View {
 }
 
 // MARK: - Preview
-
-// MARK: - Names before 2.0
-
-@available(*, deprecated, renamed: "EmptyCard")
-public typealias EmptyCardView = EmptyCard

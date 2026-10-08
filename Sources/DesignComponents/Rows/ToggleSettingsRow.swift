@@ -11,10 +11,11 @@ import SwiftUI
 import DesignTokens
 import DesignSupport
 
-/// Icon + title (+ optional hint) + switch.
+/// Icon + title (+ optional hint) + switch. The icon is optional (3.0.0): a form row has none.
 ///
 /// ```swift
 /// ToggleSettingsRow(icon: "bell", title: "Reminders", isOn: $remindersOn)
+/// ToggleSettingsRow(title: "Released", isOn: $released)
 /// ToggleSettingsRow(icon: "location", title: "Share location",
 ///                   hint: "Friends see your trip on the map", isOn: $shares)
 /// ```
@@ -22,14 +23,14 @@ import DesignSupport
 /// VoiceOver focuses the switch itself (labelled with the title, hinted with `hint`), so a
 /// double tap toggles it; the visible title is not read twice.
 public struct ToggleSettingsRow: View {
-    let icon: String
+    let icon: String?
     let title: String
     let hint: String?
     let iconColor: Color
     @Binding var isOn: Bool
 
     public init(
-        icon: String,
+        icon: String? = nil,
         title: String,
         hint: String? = nil,
         iconColor: Color = AppColors.accent,
@@ -45,7 +46,7 @@ public struct ToggleSettingsRow: View {
     public var body: some View {
         UniversalRow(
             config: .settings,
-            leadingIcon: .sfSymbol(icon, color: iconColor, size: AppIconSize.md),
+            leadingIcon: icon.map { .sfSymbol($0, color: iconColor, size: AppIconSize.md) },
             hint: hint
         ) {
             Text(title)

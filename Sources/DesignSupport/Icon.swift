@@ -309,8 +309,3 @@ public struct Icon: View {
         }
     }
 }
-
-// MARK: - Names before 2.0
-
-@available(*, deprecated, renamed: "Icon")
-public typealias IconView = Icon

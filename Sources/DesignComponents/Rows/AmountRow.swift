@@ -5,7 +5,8 @@
 //  A row about money: an icon, a name, and an amount, a share or a limit (2.1.0). It merges four
 //  rows that were built the same way: BalanceRow (an account), ProgressRingRow (a category with
 //  its budget ring), BreakdownRow (a part of a breakdown) and InsightEntityRow (an item of an
-//  insight). Their layouts move here as they were; the old names are deprecated wrappers.
+//  insight). Their layouts moved here as they were; the old names were deprecated wrappers,
+//  removed in 3.0.0.
 //
 //  2.1.0 also fixes ProgressRingRow's staircase: a limit row keeps the ring's room around its
 //  icon with or without a limit, so a list of categories with and without a budget lines up.

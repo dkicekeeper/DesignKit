@@ -82,11 +82,3 @@ public struct AvatarSkeleton: View {
             .skeletonLoadingLabel()
     }
 }
-
-// MARK: - Names before 2.0
-
-@available(*, deprecated, renamed: "AvatarSkeleton")
-public typealias AvatarViewSkeleton = AvatarSkeleton
-
-@available(*, deprecated, renamed: "Avatar")
-public typealias AvatarView = Avatar

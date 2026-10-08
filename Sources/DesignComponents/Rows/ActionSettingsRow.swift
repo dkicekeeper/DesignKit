@@ -17,7 +17,7 @@ import DesignSupport
 public struct ActionSettingsRow: View {
     // MARK: - Props
 
-    let icon: String
+    let icon: String?
     let title: String
     let iconColor: Color?
     let titleColor: Color?
@@ -27,7 +27,7 @@ public struct ActionSettingsRow: View {
     // MARK: - Initializer
 
     public init(
-        icon: String,
+        icon: String? = nil,
         title: String,
         iconColor: Color? = nil,
         titleColor: Color? = nil,
@@ -57,7 +57,7 @@ public struct ActionSettingsRow: View {
     public var body: some View {
         UniversalRow(
             config: .settings,
-            leadingIcon: .sfSymbol(icon, color: resolvedIconColor, size: AppIconSize.md)
+            leadingIcon: icon.map { .sfSymbol($0, color: resolvedIconColor, size: AppIconSize.md) }
         ) {
             Text(title)
                 .font(AppTypography.body)

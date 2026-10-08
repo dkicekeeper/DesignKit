@@ -32,6 +32,9 @@ public struct EditSheetContainer<Content: View>: View {
     let title: String
     /// When `true`, the save (checkmark) button is disabled
     let isSaveDisabled: Bool
+    /// When `true`, a spinner stands in for the save button and cancel is disabled while the
+    /// save runs (3.0.0).
+    let isSaving: Bool
     /// When `true` (default), content is wrapped in `Form {}`.
     /// Pass `false` for hero-style views that supply their own `ScrollView`.
     let wrapInForm: Bool
@@ -45,6 +48,7 @@ public struct EditSheetContainer<Content: View>: View {
     public init(
         title: String,
         isSaveDisabled: Bool,
+        isSaving: Bool = false,
         wrapInForm: Bool = true,
         onSave: @escaping () -> Void,
         onCancel: @escaping () -> Void,
@@ -52,6 +56,7 @@ public struct EditSheetContainer<Content: View>: View {
     ) {
         self.title = title
         self.isSaveDisabled = isSaveDisabled
+        self.isSaving = isSaving
         self.wrapInForm = wrapInForm
         self.onSave = onSave
         self.onCancel = onCancel
@@ -86,20 +91,26 @@ public struct EditSheetContainer<Content: View>: View {
                 Image(systemName: "xmark")
             }
             .accessibilityLabel(String(localized: "button.cancel"))
+            .disabled(isSaving)
         }
         // `.confirmationAction` anchors the Save button to the far-right of the nav bar.
         // Child views can add extra items via `.primaryAction`, which iOS renders
         // to the LEFT of `.confirmationAction` — exactly the visual order we want.
         ToolbarItem(placement: .confirmationAction) {
-            Button {
-                HapticManager.light()
-                onSave()
-            } label: {
-                Image(systemName: "checkmark")
+            if isSaving {
+                ProgressView()
+                    .accessibilityLabel(String(localized: "button.save"))
+            } else {
+                Button {
+                    HapticManager.light()
+                    onSave()
+                } label: {
+                    Image(systemName: "checkmark")
+                }
+                .disabled(isSaveDisabled)
+                .dsButton()
+                .accessibilityLabel(String(localized: "button.save"))
             }
-            .disabled(isSaveDisabled)
-            .dsButton()
-            .accessibilityLabel(String(localized: "button.save"))
         }
     }
 }

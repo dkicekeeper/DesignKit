@@ -183,7 +183,9 @@ rather than importing an app type.
   sections, transaction lists, entity detail screens, the lock screen, `PremiumLockedView` by
   the owner's choice) and its date parsing; Dalada keeps its sign-in card, map layers, weather
   and rules views.
-- DesignKit 3.0 (later): remove the deprecated names once no app uses them.
+- DesignKit 3.0.0 (2026-10) removed every deprecated name (no app used one), drew `cardStyle()`'s
+  glass behind the content and added the form pieces Dalada's forms needed
+  ([docs/migration-3.0.md](docs/migration-3.0.md)).
 
 ## Reference Docs
 
@@ -197,5 +199,6 @@ rather than importing an app type.
 | Gallery TestFlight pipeline | [docs/testflight.md](docs/testflight.md) |
 | Snapshot tests: what is covered, recording references, the pinned Xcode | [docs/snapshots.md](docs/snapshots.md) |
 | Moving an app to 2.0 (renames, `DSButton`, icon sizes, visual changes) | [docs/migration-2.0.md](docs/migration-2.0.md) |
+| Moving an app to 3.0 (removed names and their replacements, card colours) | [docs/migration-3.0.md](docs/migration-3.0.md) |
 | What exists vs Apple HIG / Material / Fluent / Carbon / Polaris / Atlassian, next candidates | [docs/benchmark.md](docs/benchmark.md) |
 | Where a component goes (Gallery sections, source folders), how its Gallery page is built | [docs/gallery-structure.md](docs/gallery-structure.md) |

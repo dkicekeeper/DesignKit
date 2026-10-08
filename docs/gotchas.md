@@ -54,8 +54,10 @@ Known traps and surprising behaviors when building UI with DesignKit.
 - **ForEach identity — never use `UUID()`**: `UUID()` generates a new id every render → spurious animations, sheet dismiss/reopen. Use stable identifiers: name-based id, `"\(name)_\(type.rawValue)"` fallback.
 - **Prefer `.searchable(text:placement:.navigationBarDrawer(.always))` over custom TextField**: gives native Cancel for keyboard dismiss + scope/tokens support. Custom search bars in nav stacks typically need manual `@FocusState` + keyboard toolbar that `.searchable` handles for free.
 - **Extra toolbar items in `EditSheetContainer`**: container uses `.cancellationAction` (xmark) + `.confirmationAction` (Save). Child views nest `.toolbar { ToolbarItem(placement: .primaryAction) { ... } }` inside the content closure — iOS auto-places `.primaryAction` items LEFT of `.confirmationAction`. Do NOT use `.topBarTrailing` / `.navigationBarTrailing` — they land on the wrong side of Save.
-- **Layers in a Liquid Glass card blend with the layers under them.** Inside `cardStyle()`
-  (`.glassEffect` on the content) shapes drawn over each other do not simply cover: the glass
+- **Layers under a `.glassEffect` blend with the layers under them.** Since 3.0.0
+  `cardStyle()` draws its glass behind the content, so cards are safe; this still applies to
+  `.glassEffect` put on a view's content directly. Before 3.0.0, inside `cardStyle()` shapes
+  drawn over each other did not simply cover: the glass
   darkens each layer into what is under it in light mode and lightens it in dark. A marker over
   an arc looked translucent, an arc looked darker over its own glow; even two plain overlapping
   circles change colour (measured on snapshots, 2.9.0). `.compositingGroup()` changes nothing.

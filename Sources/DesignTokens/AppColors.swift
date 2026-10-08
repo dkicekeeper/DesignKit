@@ -141,11 +141,6 @@ public struct CategoryColors {
         palette[paletteIndex(for: name)].opacity(opacity)
     }
 
-    @available(*, deprecated, renamed: "color(for:opacity:)")
-    public nonisolated static func hexColor(for category: String, opacity: Double = 1.0) -> Color {
-        color(for: category, opacity: opacity)
-    }
-
     /// Palette slot for a category name: the same on every launch and every device.
     ///
     /// FNV-1a over the UTF-8 bytes. Until 0.7.0 this used `String.hashValue`, which Swift seeds

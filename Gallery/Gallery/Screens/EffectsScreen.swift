@@ -5,7 +5,7 @@
 //  Effects: celebrations, sparkles, shine, attention pulse, the aurora, touch tilt (2.2.0);
 //  the completion moment and the Metal ripple (2.3.0); the voice wave, the edge glow and the
 //  thinking shimmer (2.4.0); weighted aurora spots, the aurora accent glow and grain (2.5.0);
-//  holographic foil and dissolve (2.6.0); background orbs (deprecated), the border beam.
+//  holographic foil and dissolve (2.6.0); the border beam.
 //
 
 import SwiftUI
@@ -28,7 +28,6 @@ struct EffectsScreen: View {
             VoiceWavePage()
             EdgeGlowPage()
             ThinkingShimmerPage()
-            GradientOrbsBackgroundPage()
             GrainPage()
             AccentGlowPage()
             BorderBeamPage()
@@ -166,7 +165,7 @@ private struct AuroraBackgroundPage: View {
             canvas: .bleed,
             notes: [
                 "MeshGradient in one GPU pass, no blur, 30 fps only while AmbientMotionGate allows; otherwise one still frame.",
-                "Weighted spots (2.5.0): AuroraBackground([.init(color:weight:)]): each colour a soft pool sized and brightened by its weight, sampled into a 5×5 mesh. Replaces GradientOrbsBackground (deprecated): no blur, no screen blend, no offscreen pass.",
+                "Weighted spots (2.5.0): AuroraBackground([.init(color:weight:)]): each colour a soft pool sized and brightened by its weight, sampled into a 5×5 mesh. Replaced GradientOrbsBackground (removed in 3.0.0): no blur, no screen blend, no offscreen pass.",
                 "Still by default with spots: under Liquid Glass a moving background makes every glass surface redraw each frame. A change of data flows into the new shape in 0.6 s.",
                 "A fine still grain (2.5.0) keeps the gradient from banding on a dark screen; grain: 0 turns it off.",
             ]
@@ -284,7 +283,7 @@ private struct EdgeGlowPage: View {
             apps: [.tenra],
             canvas: .dark(minHeight: 340),
             notes: [
-                "Replaces SiriGlow and SiriWave (deprecated names of it): the same full-screen overlay, now following the voice. EdgeGlow(level: voice.level).ignoresSafeArea().",
+                "Replaces SiriGlow and SiriWave (removed in 3.0.0): the same full-screen overlay, now following the voice. EdgeGlow(level: voice.level).ignoresSafeArea().",
                 "One Metal colour effect, no blur: cheaper than the old blurred mesh. 30 fps while motion is allowed; still otherwise.",
                 "Without a level it breathes on its own. It fades in, passes touches through and is hidden from VoiceOver.",
             ]
@@ -350,42 +349,6 @@ private struct ThinkingShimmerPage: View {
         } controls: {
             ToggleControl("Active", isOn: $isActive)
         }
-    }
-}
-
-/// Deprecated in 2.5.0: shown next to its replacement.
-private struct GradientOrbsBackgroundPage: View {
-    @State private var count = 3
-
-    private let orbs: [(Color, Double)] = [
-        (AppColors.accent, 0.5),
-        (AppColors.success, 0.3),
-        (AppColors.warning, 0.2),
-        (.purple, 0.15),
-    ]
-
-    var body: some View {
-        ComponentPage(
-            name: "GradientOrbsBackground",
-            summary: "Deprecated in 2.5.0: AuroraBackground(_ spots:) draws the same weighted pools of colour as one still mesh, with no blur. Top: the orbs; bottom: the aurora.",
-            since: "1.5.0",
-            apps: [.tenra],
-            canvas: .bleed
-        ) {
-            VStack(spacing: 0) {
-                legacyOrbs
-                    .frame(height: 180)
-                AuroraBackground(Array(orbs.prefix(count)).map { .init(color: $0.0, weight: $0.1) })
-                    .frame(height: 180)
-            }
-        } controls: {
-            StepperControl("Orbs", value: $count, in: 1...4)
-        }
-    }
-
-    @available(*, deprecated)
-    private var legacyOrbs: some View {
-        GradientOrbsBackground(Array(orbs.prefix(count)).map { .init(color: $0.0, weight: $0.1) })
     }
 }
 

@@ -35,6 +35,20 @@ extension ComponentSnapshots {
             )
         }
 
+        /// The rows Dalada's forms needed (3.0.0): a stepper, a switch and an action without icons.
+        @Test func formRows3() async {
+            await assertComponentSnapshot(
+                FormSection(header: "Catch") {
+                    StepperRow(icon: "fish", title: "Fish caught", value: .constant(3), in: 0...99)
+                    StepperRow(title: "Spare hooks", value: .constant(12), in: 0...50) { "\($0) pcs" }
+                    ToggleSettingsRow(title: "Released", isOn: .constant(true))
+                    ActionSettingsRow(title: "Delete catch", isDestructive: true) {}
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
         @Test func editableHero() async {
             await assertComponentSnapshot(
                 EditableHero(
