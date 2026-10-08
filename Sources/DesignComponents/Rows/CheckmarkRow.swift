@@ -29,27 +29,32 @@ public struct CheckmarkRow: View {
     let icon: IconConfig?
     let value: String?
     let isSelected: Bool
+    let config: RowConfiguration
     let action: () -> Void
 
     /// - Parameters:
     ///   - icon: The leading icon; none by default.
     ///   - value: Text on the trailing side, before the checkmark (a balance, a count).
+    ///   - config: `.settings` (default) for a `List` row, which pads it; `.standard` in a
+    ///     `FormSection` card (3.0.0).
     public init(
         _ title: String,
         icon: IconConfig? = nil,
         value: String? = nil,
         isSelected: Bool,
+        config: RowConfiguration = .settings,
         action: @escaping () -> Void
     ) {
         self.title = title
         self.icon = icon
         self.value = value
         self.isSelected = isSelected
+        self.config = config
         self.action = action
     }
 
     public var body: some View {
-        UniversalRow(config: .settings, leadingIcon: icon) {
+        UniversalRow(config: config, leadingIcon: icon) {
             HStack(spacing: 0) {
                 Text(title)
                     .font(AppTypography.h4)

@@ -29,9 +29,9 @@ re-recorded in the 3.0.0 PR; the PNG diffs show the colour shift.
 - **`EditSheetContainer(isSaving:)`:** a spinner stands in for Save, and Cancel is disabled
   while the save runs. **`saveTitle:`** names the checkmark for VoiceOver when it does more
   than save ("Publish", "Send").
-- **`ToggleSettingsRow` and `ActionSettingsRow` in forms:** `icon` defaults to `nil` (a row in
-  a form that carries no symbol), and `config: .standard` pads them for a `FormSection` card
-  (`.settings`, the default, is a `List` row with no side padding).
+- **`ToggleSettingsRow`, `ActionSettingsRow` and `CheckmarkRow` in forms:** `icon` defaults to
+  `nil` (a row in a form that carries no symbol), and `config: .standard` pads them for a
+  `FormSection` card (`.settings`, the default, is a `List` row with no side padding).
 
 ## Removed names and their replacements
 

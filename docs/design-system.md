@@ -487,7 +487,7 @@ InfoRow(icon: "calendar", label: "Next Payment", value: "March 15, 2026")
 Use in: detail views for metadata display. NOT for editable fields.
 
 #### `CheckmarkRow` *(1.10.0)*
-A row of a choice list (a filter or picker sheet): `UniversalRow(.settings)` with an optional icon (`IconConfig`), the title in h4 medium, an optional trailing value (secondary h4, e.g. a balance), and the accent checkmark on the picked row. A tap plays the selection haptic and runs the action; VoiceOver hears a button, "Selected" on the picked one (`.selectableRow`). `CheckmarkRow("All accounts", isSelected: selection == nil) { selection = nil }`. Tenra: the rows of its account, category and time filters. Skeleton: `UniversalRowSkeleton.checkmark(iconStyle:)`.
+A row of a choice list (a filter or picker sheet): `UniversalRow(.settings)` with an optional icon (`IconConfig`), the title in h4 medium, an optional trailing value (secondary h4, e.g. a balance), and the accent checkmark on the picked row. A tap plays the selection haptic and runs the action; VoiceOver hears a button, "Selected" on the picked one (`.selectableRow`). `CheckmarkRow("All accounts", isSelected: selection == nil) { selection = nil }`. In a `FormSection` card pass `config: .standard` (3.0.0), which pads it as the card's other rows (Dalada's report reasons). Tenra: the rows of its account, category and time filters. Skeleton: `UniversalRowSkeleton.checkmark(iconStyle:)`.
 
 #### `MenuPickerRow`
 In-form single-select picker with dropdown menu.
