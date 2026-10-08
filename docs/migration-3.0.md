@@ -12,6 +12,7 @@ the pin. The visual change shows in every card.
 | What | Before | 3.0.0 |
 |---|---|---|
 | `cardStyle()` | `.glassEffect` applied to the card's content: the glass blended each layer of the content into the layers under it (darker in light mode, lighter in dark). A marker over an arc looked translucent, a label over its pale capsule changed colour, overlapping shapes shifted. | The glass is drawn behind the content (`.background { Color.clear.glassEffect(…) }`). The card itself (its background, edge, corners) is the same; the content inside keeps its exact colours, as it looks outside a card. |
+| Glass inside a card (`HeroBarPair`'s bars in a `MetricCard`, `ProgressRingTile`) | The card's glass, applied over the content, flattened a nested glass shape into a plain fill. | A nested glass shape keeps its own rim and sheen, as outside a card: `HeroBarPair`'s "now" bar reads as a glass bar with its glow. |
 | `TransactionRow` at accessibility text sizes | The amounts sat beside the text and took so much width that the title broke mid-word ("Groceri / es"). | The amounts go under the text, leading, as `AmountRow` and the other rows have done since 1.3.0. |
 
 Snapshots: every card whose content overlaps (rings, capsules, charts, marbles, gauges) is
