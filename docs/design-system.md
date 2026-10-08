@@ -955,7 +955,9 @@ ToggleSettingsRow(title: "Released", isOn: $released)   // 3.0.0: no icon, a for
 ```
 
 VoiceOver focuses the switch (title as label, `hint` as hint). The icon is optional since
-3.0.0, and so is `ActionSettingsRow`'s, for rows in a form that carry no symbol.
+3.0.0, and so is `ActionSettingsRow`'s, for rows in a form that carry no symbol. Both are `List`
+rows (`config: .settings`, no side padding); in a `FormSection` card pass `config: .standard`
+(3.0.0) so they pad like the rows around them.
 
 #### `SliderRow` *(1.15.0)*
 A setting set with a slider: the title (body, with an optional symbol), the value on the trailing

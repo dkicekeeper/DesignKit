@@ -27,8 +27,9 @@ re-recorded in the 3.0.0 PR; the PNG diffs show the colour shift.
   row on its own (a name, a note).
 - **`EditSheetContainer(isSaving:)`:** a spinner stands in for Save, and Cancel is disabled
   while the save runs.
-- **`ToggleSettingsRow` and `ActionSettingsRow` without an icon:** `icon` defaults to `nil`,
-  for a row in a form that carries no symbol.
+- **`ToggleSettingsRow` and `ActionSettingsRow` in forms:** `icon` defaults to `nil` (a row in
+  a form that carries no symbol), and `config: .standard` pads them for a `FormSection` card
+  (`.settings`, the default, is a `List` row with no side padding).
 
 ## Removed names and their replacements
 

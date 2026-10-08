@@ -12,6 +12,8 @@ import DesignTokens
 import DesignSupport
 
 /// Icon + title (+ optional hint) + switch. The icon is optional (3.0.0): a form row has none.
+/// `config` is `.settings` (a `List` row, no side padding); in a `FormSection` card pass
+/// `.standard`, which pads it like the rows around it (3.0.0).
 ///
 /// ```swift
 /// ToggleSettingsRow(icon: "bell", title: "Reminders", isOn: $remindersOn)
@@ -27,6 +29,7 @@ public struct ToggleSettingsRow: View {
     let title: String
     let hint: String?
     let iconColor: Color
+    let config: RowConfiguration
     @Binding var isOn: Bool
 
     public init(
@@ -34,18 +37,20 @@ public struct ToggleSettingsRow: View {
         title: String,
         hint: String? = nil,
         iconColor: Color = AppColors.accent,
+        config: RowConfiguration = .settings,
         isOn: Binding<Bool>
     ) {
         self.icon = icon
         self.title = title
         self.hint = hint
         self.iconColor = iconColor
+        self.config = config
         self._isOn = isOn
     }
 
     public var body: some View {
         UniversalRow(
-            config: .settings,
+            config: config,
             leadingIcon: icon.map { .sfSymbol($0, color: iconColor, size: AppIconSize.md) },
             hint: hint
         ) {

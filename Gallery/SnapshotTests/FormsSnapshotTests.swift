@@ -41,8 +41,8 @@ extension ComponentSnapshots {
                 FormSection(header: "Catch") {
                     StepperRow(icon: "fish", title: "Fish caught", value: .constant(3), in: 0...99)
                     StepperRow(title: "Spare hooks", value: .constant(12), in: 0...50) { "\($0) pcs" }
-                    ToggleSettingsRow(title: "Released", isOn: .constant(true))
-                    ActionSettingsRow(title: "Delete catch", isDestructive: true) {}
+                    ToggleSettingsRow(title: "Released", config: .standard, isOn: .constant(true))
+                    ActionSettingsRow(title: "Delete catch", isDestructive: true, config: .standard) {}
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light, .dark, .largeText]
