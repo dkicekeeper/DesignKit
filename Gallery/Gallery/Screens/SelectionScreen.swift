@@ -55,30 +55,33 @@ private struct ChipPickerPage: View {
     @State private var multiple = false
     @State private var showsIcons = true
     @State private var showsTitle = true
+    @State private var showsAll = false
     @State private var state: SpecimenState = .content
 
     var body: some View {
         ComponentPage(
             name: "ChipPicker",
-            summary: "Chips to pick one option, or several (a filter); with icons and a title.",
+            summary: "Chips to pick one option, or several (a filter); with icons, a title and an \"All\" chip.",
             since: "0.4.0",
             apps: [.dalada],
-            canvas: .fill
+            canvas: .fill,
+            notes: ["allTitle (2.8.0): an \"All\" chip in front, selected while nothing is picked; a tap clears the selection."]
         ) {
             if state == .loading {
                 ChipPickerSkeleton(count: 4, showsTitle: showsTitle)
             } else if multiple {
                 ChipPicker(showsTitle ? "Place" : nil, options: ["Lake", "River", "Camp", "Forest"],
-                           selection: $several, systemImage: placeIcon) { $0 }
+                           selection: $several, allTitle: showsAll ? "All" : nil, systemImage: placeIcon) { $0 }
             } else {
                 ChipPicker(showsTitle ? "Weather" : nil, options: ["Sunny", "Cloudy", "Rain", "Snow"],
-                           selection: $single, systemImage: weatherIcon) { $0 }
+                           selection: $single, allTitle: showsAll ? "Any" : nil, systemImage: weatherIcon) { $0 }
             }
         } controls: {
             StateControl(state: $state)
             ToggleControl("Several", isOn: $multiple)
             ToggleControl("Icons", isOn: $showsIcons)
             ToggleControl("Title", isOn: $showsTitle)
+            ToggleControl("\"All\" chip", isOn: $showsAll)
         }
     }
 

@@ -21,6 +21,13 @@ import DesignSupport
 ///            systemImage: { $0.systemImage }) { $0.title }
 /// ```
 ///
+/// `allTitle` (2.8.0) adds an "All" chip in front, selected while nothing is picked; tapping it
+/// clears the selection:
+///
+/// ```swift
+/// ChipPicker(options: PlaceType.allCases, selection: $types, allTitle: "All") { $0.title }
+/// ```
+///
 /// Chips use `filterChipStyle(isSelected:)` and carry the `.isSelected` trait. A fixed
 /// 2–4 way switch → `SegmentedPicker`; a filter that opens a menu → `UniversalFilterButton`.
 public struct ChipPicker<Option: Hashable>: View {
@@ -34,18 +41,21 @@ public struct ChipPicker<Option: Hashable>: View {
     private let selection: Selection
     let systemImage: ((Option) -> String?)?
     let label: (Option) -> String
+    let allTitle: String?
 
     /// One or none: `selection` is `nil` when nothing is picked.
     public init(
         _ title: String? = nil,
         options: [Option],
         selection: Binding<Option?>,
+        allTitle: String? = nil,
         systemImage: ((Option) -> String?)? = nil,
         label: @escaping (Option) -> String
     ) {
         self.title = title
         self.options = options
         self.selection = .single(selection)
+        self.allTitle = allTitle
         self.systemImage = systemImage
         self.label = label
     }
@@ -55,12 +65,14 @@ public struct ChipPicker<Option: Hashable>: View {
         _ title: String? = nil,
         options: [Option],
         selection: Binding<Set<Option>>,
+        allTitle: String? = nil,
         systemImage: ((Option) -> String?)? = nil,
         label: @escaping (Option) -> String
     ) {
         self.title = title
         self.options = options
         self.selection = .multiple(selection)
+        self.allTitle = allTitle
         self.systemImage = systemImage
         self.label = label
     }
@@ -74,6 +86,18 @@ public struct ChipPicker<Option: Hashable>: View {
             }
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: AppSpacing.sm) {
+                    if let allTitle {
+                        let selected = isEmpty
+                        Button {
+                            clear()
+                            HapticManager.selection()
+                        } label: {
+                            Text(verbatim: allTitle)
+                        }
+                        .buttonStyle(.plain)
+                        .filterChipStyle(isSelected: selected)
+                        .accessibilityAddTraits(selected ? .isSelected : [])
+                    }
                     ForEach(options, id: \.self) { option in
                         let selected = isSelected(option)
                         Button {
@@ -109,6 +133,21 @@ public struct ChipPicker<Option: Hashable>: View {
         switch selection {
         case .single(let binding): return binding.wrappedValue == option
         case .multiple(let binding): return binding.wrappedValue.contains(option)
+        }
+    }
+
+    /// Nothing picked: the "All" chip is on.
+    private var isEmpty: Bool {
+        switch selection {
+        case .single(let binding): return binding.wrappedValue == nil
+        case .multiple(let binding): return binding.wrappedValue.isEmpty
+        }
+    }
+
+    private func clear() {
+        switch selection {
+        case .single(let binding): binding.wrappedValue = nil
+        case .multiple(let binding): binding.wrappedValue = []
         }
     }
 

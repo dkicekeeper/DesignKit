@@ -19,6 +19,7 @@ struct SheetsScreen: View {
             OnboardingPagePage()
             OnboardingPageContainerPage()
             LoopOnboardingHeroPage()
+            ShareCardSheetPage()
         }
     }
 }
@@ -256,6 +257,40 @@ private struct SampleOnboarding: View {
         let all = Page.allCases
         guard let index = all.firstIndex(of: page), index + 1 < all.count else { return onFinish() }
         withAnimation { page = all[index + 1] }
+    }
+}
+
+private struct ShareCardSheetPage: View {
+    @State private var isPresented = false
+    @State private var fails = false
+
+    var body: some View {
+        ComponentPage(
+            name: "ShareCardSheet",
+            summary: "Turns something into a picture to share: pick Stories or post, see the picture, send it with the system share sheet.",
+            since: "2.8.0",
+            apps: [.dalada],
+            notes: [
+                "The data loads when the sheet opens (the card's skeleton meanwhile); the picture is drawn on the phone with ImageRenderer, 1080 px wide.",
+                "load returning nil shows the error state.",
+            ]
+        ) {
+            PresentButton(title: "Share a picture") { isPresented = true }
+                .sheet(isPresented: $isPresented) {
+                    ShareCardSheet(previewTitle: "Gallery") { () async -> String? in
+                        try? await Task.sleep(for: .seconds(1))
+                        return fails ? nil : "Kapchagay weekend"
+                    } message: { (title: String) in
+                        "\(title) https://example.com"
+                    } card: { _, format in
+                        ShareCardFrame(format: format, brand: "Gallery", site: "example.com") {
+                            GalleryShareCardContent(format: format)
+                        }
+                    }
+                }
+        } controls: {
+            ToggleControl("Loading fails", isOn: $fails)
+        }
     }
 }
 

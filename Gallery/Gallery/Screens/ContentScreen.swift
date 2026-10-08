@@ -21,6 +21,7 @@ struct ContentScreen: View {
             FormSectionPage()
             EditSheetContainerPage()
             EditableHeroPage()
+            ArticleBodyPage()
         }
     }
 }
@@ -284,6 +285,38 @@ private struct SampleEvent: Identifiable {
         SampleEvent(title: "Caught a pike, 2.1 kg", detail: "10:20 · released", symbol: "fish.fill", color: .teal),
         SampleEvent(title: "Back home", detail: "19:30", symbol: nil, color: .gray),
     ]
+}
+
+private struct ArticleBodyPage: View {
+    @State private var state: SpecimenState = .content
+
+    private let blocks: [ArticleBody.Block] = [
+        .heading("Before you go", level: 2),
+        .paragraph("Check the ice at the shore first: **10 cm** holds a person, *15 cm* a group."),
+        .bullets(["A spare pair of gloves", "Ice picks around the neck", "A charged phone"]),
+        .heading("On the ice", level: 3),
+        .steps(["Walk in single file", "Test ahead with a spud bar", "Turn back at dark patches"]),
+        .note("Fishing is closed from 1 April to 31 May on most lakes of the region."),
+    ]
+
+    var body: some View {
+        ComponentPage(
+            name: "ArticleBody",
+            summary: "The text of an article: headings, paragraphs, bulleted and numbered lists, notes in a card; bold, italic and links inside a line.",
+            since: "2.8.0",
+            apps: [.dalada],
+            canvas: .fill,
+            notes: ["The app parses its article format into blocks; inline Markdown inside a block is DesignKit's."]
+        ) {
+            if state == .loading {
+                ArticleBodySkeleton()
+            } else {
+                ArticleBody(blocks)
+            }
+        } controls: {
+            StateControl(state: $state)
+        }
+    }
 }
 
 #Preview { NavigationStack { ContentScreen() } }

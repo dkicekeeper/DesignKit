@@ -23,6 +23,7 @@ struct DataRowsScreen: View {
             ChecklistRowPage()
             ChecklistSummaryRowPage()
             ThumbnailRowPage()
+            DownloadRowPage()
         }
     }
 }
@@ -229,34 +230,47 @@ private struct ScheduleRowPage: View {
 
 private struct PersonRowPage: View {
     @State private var showsSubtitle = true
+    @State private var showsDetail = false
+    @State private var style: PersonRowStyle = .list
     @State private var trailing = 1
     @State private var state: SpecimenState = .content
 
     var body: some View {
         ComponentPage(
             name: "PersonRow",
-            summary: "A person in a list: avatar, name, a line under it, a trailing slot. The app passes its photo avatar.",
+            summary: "A person in a list: avatar, name, a line under it, a trailing slot. The app passes its photo avatar. The card style is the person at the top of their profile.",
             since: "1.12.0",
             apps: [.dalada],
-            canvas: .fill
+            canvas: .fill,
+            notes: ["style: .card (2.8.0): a 64 pt avatar, the name in h4, the @username and a third line (detail), in a card that pads itself."]
         ) {
-            InCard {
-                if state == .loading {
-                    PersonRowSkeleton(showsSubtitle: showsSubtitle)
-                } else {
-                    PersonRow(name: "Aida Nurlanovna", subtitle: showsSubtitle ? "@aida" : nil) {
-                        switch trailing {
-                        case 1: DisclosureChevron()
-                        case 2: DSButton("Accept", size: .small) {}
-                        default: EmptyView()
-                        }
-                    }
-                }
+            if style == .card {
+                specimen
+            } else {
+                InCard { specimen }
             }
         } controls: {
             StateControl(state: $state)
+            ChoiceControl("Style", selection: $style, options: [("List", .list), ("Card", .card)])
             ToggleControl("Subtitle", isOn: $showsSubtitle)
+            ToggleControl("Detail", isOn: $showsDetail)
             ChoiceControl("Trailing", selection: $trailing, options: [("None", 0), ("Chevron", 1), ("Button", 2)])
+        }
+    }
+
+    @ViewBuilder
+    private var specimen: some View {
+        if state == .loading {
+            PersonRowSkeleton(showsSubtitle: showsSubtitle, style: style)
+        } else {
+            PersonRow(name: "Aida Nurlanovna", subtitle: showsSubtitle ? "@aida" : nil,
+                      detail: showsDetail ? "Almaty" : nil, style: style) {
+                switch trailing {
+                case 1: DisclosureChevron()
+                case 2: DSButton("Accept", size: .small) {}
+                default: EmptyView()
+                }
+            }
         }
     }
 }
@@ -399,6 +413,58 @@ private struct ThumbnailRowPage: View {
             StateControl(state: $state)
             ToggleControl("Verified", isOn: $isVerified)
             ToggleControl("Saved", isOn: $isSaved)
+        }
+    }
+}
+
+private struct DownloadRowPage: View {
+    @State private var status = 1
+    @State private var progress = 0.4
+    @State private var state: SpecimenState = .content
+
+    private var rowStatus: DownloadRow.Status {
+        switch status {
+        case 0: .available
+        case 1: .downloading(progress)
+        case 2: .paused
+        case 3: .downloaded
+        default: .failed
+        }
+    }
+
+    private var caption: String {
+        switch status {
+        case 0: "About 80 MB"
+        case 1: "\(Int(progress * 100))% · \(Int(progress * 80)) MB"
+        case 2: "Paused at \(Int(progress * 100))%"
+        case 3: "Downloaded · 80 MB"
+        default: "No connection. Try again."
+        }
+    }
+
+    var body: some View {
+        ComponentPage(
+            name: "DownloadRow",
+            summary: "Something to download for offline use: its name, its size or progress, and the action that fits (download, pause, resume); a check mark once it is here.",
+            since: "2.8.0",
+            apps: [.dalada],
+            canvas: .fill,
+            notes: ["The app formats the caption (sizes, percent) and adds .swipeActions to delete."]
+        ) {
+            InCard {
+                if state == .loading {
+                    DownloadRowSkeleton()
+                } else {
+                    DownloadRow("Almaty region", status: rowStatus, caption: caption,
+                                onDownload: { status = 1 }, onPause: { status = 2 })
+                }
+            }
+        } controls: {
+            StateControl(state: $state)
+            ChoiceControl("Status", selection: $status, options: [
+                ("Available", 0), ("Downloading", 1), ("Paused", 2), ("Downloaded", 3), ("Failed", 4),
+            ])
+            SliderControl("Progress", value: $progress, in: 0...1, step: 0.05)
         }
     }
 }
