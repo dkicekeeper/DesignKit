@@ -2,8 +2,9 @@
 //  FinanceRowsSnapshotTests.swift
 //  DesignKit Gallery snapshot tests
 //
-//  Transaction rows, card pickers, streaming text, pager arrows and the progress overlay (2.9.0,
-//  from Tenra). The date range sheet has no snapshot: its calendars show the current month.
+//  Transaction rows, card pickers, streaming text and pager arrows (2.9.0, from Tenra). The date
+//  range sheet has no snapshot (its calendars show the current month), nor the progress overlay
+//  (its spinner turns on a clock, so no two frames match).
 //
 
 import SwiftUI
@@ -111,13 +112,6 @@ extension ComponentSnapshots {
                         .frame(maxWidth: .infinity, minHeight: 80)
                 },
                 appearances: [.light]
-            )
-        }
-
-        @Test func progressOverlay() async {
-            await assertComponentSnapshot(
-                ProgressOverlay(title: "Restoring the backup", message: "Your data will be back in a moment.")
-                    .frame(height: 260)
             )
         }
     }

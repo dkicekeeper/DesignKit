@@ -33,7 +33,7 @@ appearances it lists:
 | `InputsSnapshotTests` | `FormattedAmountText` sign and unit, hidden amounts (`.amountsHidden`, `AmountVisibilityToggle`, the `HeroProportionBar` legend), `CurrencyPickerMenu` and `CurrencyAmountInput` (calculator display, error), `SegmentedPicker`, `ChipPicker` (single / several), `RatingPicker`, `FormTextField`, `TagInput`, `MessageComposer` (empty, quote and error, disabled), `CalculatorKeypad`, `AmountDigitDisplay`, `FormattedAmountText` in body semibold, `SpentBudgetText`, `PlusTabLabel`, `DSButton` (2.0.0: icon placements, appearances and roles, full width, capsule, tiles), `DateButtons`, `AnimatedTitleInput`, `AmountPercentage` |
 | `EffectsSnapshotTests` | 2.2.0 motion in its still state: `AuroraBackground` (first frame), `TypingIndicator`, symbols with draw-on / cue / pulse drawn complete; 2.3.0: a goal `ProgressRing` below and at 100 % (with its checkmark), the closed `GlassActionMenu`, `LiveAmountText` at its value; 2.4.0: `VoiceWave` (ribbons, orb, thinking) and `EdgeGlow` at a fixed level, `.thinkingShimmer` in its still gradient; 2.5.0: weighted `AuroraBackground` spots and the aurora `.accentGlow`; 2.6.0: `.holographic` at rest, `ScrambleText`, a `.spotlight` |
 | `MediaSnapshotTests` | 2.8.0, from Dalada: `PhotoTile` (with and without a photo), `PhotoStrip` (open, remove), `PhotoGrid` (rounded, edge to edge), `PhotoCarousel`, `ShareCardFrame` (Stories, post; light only, it is an image), `DownloadRow` (all five states), `ArticleBody`, `LiveSessionBar` (running and paused, clock at 0:00:00), `PersonRow(style: .card)`, `ChipPicker` with an "All" chip |
-| `FinanceRowsSnapshotTests` | 2.9.0, from Tenra: `TransactionRow` (an entry; a pending one on a deleted account with a badge; a transfer), `OptionCard`, `SnapCardPicker`, `StreamingText` with highlights, `FlowLayout(alignment: .center)`, `PagerArrows`, `ProgressOverlay`. `DateRangePickerSheet` has none: its calendars show the current month |
+| `FinanceRowsSnapshotTests` | 2.9.0, from Tenra: `TransactionRow` (an entry; a pending one on a deleted account with a badge; a transfer), `OptionCard`, `SnapCardPicker`, `StreamingText` with highlights, `FlowLayout(alignment: .center)`, `PagerArrows` (`ProgressOverlay` has none: its spinner turns on a clock). `DateRangePickerSheet` has none: its calendars show the current month |
 
 Appearances (`SnapshotAppearance`): `light`, `dark`, and `largeText` (light at accessibility
 text size AX2, which catches truncation and clipping). References live in
@@ -46,7 +46,7 @@ Not covered on purpose:
   nothing until triggered and have no picture;
 - views that animate continuously on a clock, so no two frames match:
   `.borderBeam()` (drawn only with motion on), `LoopOnboardingHero`'s pulsing ring,
-  `BlinkingCursor`, and the spinner of `DSButton(isLoading: true)`. Skeletons are covered since 1.10.0: the renderer
+  `BlinkingCursor`, and the spinners of `DSButton(isLoading: true)` and `ProgressOverlay` (2.9.0). Skeletons are covered since 1.10.0: the renderer
   stops their shimmer with `.skeletonShimmer(false)` (Reduce Motion would too, but SwiftUI
   does not let a test set it; `accessibilityReduceMotion` is read-only). `.skeleton(isLoading:)`
   is not: its shapes are the system's redaction;
