@@ -63,7 +63,7 @@ extension ComponentSnapshots {
                         RemotePhoto(key: "gallery-photo-1-pending", url: URL(string: "https://gallery.invalid/photo/1.jpg"))
                     }
                     PhotoTile {
-                        RemotePhoto(key: "gallery-photo-2", url: nil)
+                        RemotePhoto(key: "gallery-photo-2-missing", url: nil)
                     }
                 },
                 appearances: [.light, .dark]
