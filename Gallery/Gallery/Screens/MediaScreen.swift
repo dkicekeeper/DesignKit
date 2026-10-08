@@ -466,13 +466,9 @@ private struct PhotoViewerPage: View {
             PhotoViewer(photos, selection: selection) { GalleryPhotoView(photo: $0, fits: true) } caption: { photo in
                 Text(photo.caption).font(AppTypography.bodyEmphasis)
                 Text("Aida · 12 May 2026").font(AppTypography.caption).foregroundStyle(.white.opacity(0.8))
-            } actions: { photo in
+            } actions: { (photo: GalleryPhoto) -> GalleryReportMenu? in
                 // The first photo is "yours": no menu for it.
-                photo.id == 0 ? nil : Menu {
-                    Button("Report", systemImage: "flag") {}
-                } label: {
-                    Image(systemName: "ellipsis")
-                }
+                photo.id == 0 ? nil : GalleryReportMenu()
             }
         } else if showsCaption {
             PhotoViewer(photos, selection: selection) { GalleryPhotoView(photo: $0, fits: true) } caption: { photo in
@@ -480,6 +476,17 @@ private struct PhotoViewerPage: View {
             }
         } else {
             PhotoViewer(photos, selection: selection) { GalleryPhotoView(photo: $0, fits: true) }
+        }
+    }
+}
+
+/// The viewer's menu for someone else's photo.
+private struct GalleryReportMenu: View {
+    var body: some View {
+        Menu {
+            Button("Report", systemImage: "flag") {}
+        } label: {
+            Image(systemName: "ellipsis")
         }
     }
 }

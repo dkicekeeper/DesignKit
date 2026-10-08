@@ -67,7 +67,7 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
 | «Показать ещё» для текста | — | — | — | — | — | — | **+** `ExpandableText` (паттерн App Store; отзывы и статьи Dalada) |
 | Раскрывающийся блок | ✓ | ✓ | — | ✓ | ✓ | ✓ | ○ `DisclosureGroup` |
 | Пустое состояние / ошибка | — | — | — | ✓ | ✓ | ✓ | ✓ `EmptyState` (`.error` с «Повторить») |
-| Карусель | — | ✓ | — | — | — | — | ✓ `UniversalCarousel` |
+| Карусель | — | ✓ | — | — | — | — | ✓ `UniversalCarousel`, `PhotoCarousel` (2.8.0) |
 | Графики | ✓ | — | — | ✓ | ✓ | — | ✓ `OrbChart`, датчики; **+** `LineChart`, `BarChart`, `ChartSwitcher`, `Sparkline`, `HeroSparkline` |
 | Календарь месяца с отметками | — | ✓ | ✓ | — | ✓ | ✓ | **+** `MonthCalendar` (0.7.0, из Tenra `SubscriptionCalendarView`) |
 | Таймлайн (лента событий) | — | — | — | — | — | — | **+** `ActivityTimeline` (0.7.0) |
@@ -252,6 +252,13 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
   пальца (вместе с `.interactiveTilt`). `.transition(.dissolve)`: удаление рассыпается в пыль.
   `ScrambleText`: результат «расшифровывается» по буквам. `.spotlight`: коучмарк, экран
   затемняется кроме вырезанного элемента, рядом `Tooltip`.
+- **2.7.0** — эффекты внутри карточек: `BalanceCard(isLive:)` (баланс докручивается и
+  вспыхивает при изменении), `ScoreGaugeCard` / `ScoreCard(decodesScore:)` (балл «расшифровывается»).
+- **2.8.0** — аудит, раунд 4, из Dalada: фото (`PhotoTile`, `PhotoStrip`, `PhotoGrid`,
+  `PhotoCarousel`, `PhotoViewer` с масштабом щипком и двойным тапом), картинки для Stories
+  (`ShareCardSheet`, `ShareCardFrame`, `ShareCard.Format` / `.Style`), `LiveSessionBar` в
+  аксессуаре панели вкладок, `DownloadRow` для офлайн-загрузок, `ArticleBody`,
+  `ChipPicker(allTitle:)`, `PersonRow(style: .card)`.
 
 Для 1.6.0–1.7.0 смотрели и на дизайн-систему TUI Т-Банка (Figma): как референс устройства токенов
 и списка состояний, а не как образец внешнего вида. Вид остаётся своим: Liquid Glass, Inter,
@@ -269,7 +276,9 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
    и `Text.*`.
 2. **Поиск с подсказками** (недавние запросы, подсказки под `.searchable`) — если оба приложения
    придут к одинаковому виду.
-3. **Фото по ссылке со скелетоном** — `RemotePhoto` Dalada (фото места, улова, отчёта): загрузка
+3. **Фото по ссылке со скелетоном** — с 2.8.0 в DesignKit всё, что показывает фото (`PhotoTile`,
+   `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `PhotoViewer`), а картинку отдаёт приложение. Осталась
+   сама загрузка — `RemotePhoto` Dalada (фото места, улова, отчёта): загрузка
    через кэш приложения, пока грузится — спиннер. В DesignKit понадобится хук загрузки (по образцу
    `DesignKitLogoLoader`), а спиннер сменится скелетоном: это изменение вида в Dalada, решение
    владельца.
