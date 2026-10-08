@@ -23,11 +23,11 @@ import UIKit
 public enum DesignKitPhotoLoader {
     /// Loads the photo for `key` from `url`: the app's cache first, then the network. Without a
     /// loader, `RemotePhoto` downloads `url` itself and keeps nothing.
-    public static var loader: ((_ key: String, _ url: URL) async -> UIImage?)?
+    public static var loader: (@MainActor (_ key: String, _ url: URL) async -> UIImage?)?
 
     /// The photo for `key` if the app already holds it, without waiting: a photo seen before
     /// shows at once, with no skeleton. Without it every photo starts from its skeleton.
-    public static var cached: ((_ key: String) -> UIImage?)?
+    public static var cached: (@MainActor (_ key: String) -> UIImage?)?
 
     /// Loads `url` with `URLSession` when the app gives no loader: a 200 response decoded into an
     /// image, prepared for display off the main thread.
