@@ -39,8 +39,8 @@ public enum DesignKitPhotoLoader {
         return await image.byPreparingForDisplay() ?? image
     }
 
-    /// The photo for `key`: the app's loader, or a plain download.
-    static func load(key: String, url: URL) async -> UIImage? {
+    /// The photo for `key`: the app's loader, or a plain download. What `RemotePhoto` calls.
+    public static func load(key: String, url: URL) async -> UIImage? {
         if let loader {
             return await loader(key, url)
         }
