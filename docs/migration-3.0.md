@@ -25,6 +25,7 @@ re-recorded in the 3.0.0 PR; the PNG diffs show the colour shift.
   a searchable list of checkmark rows (`Picker(.navigationLink)` in DesignKit's look).
 - **`FormTextField(style: .row)` / `.rowMultiline(min:max:)`:** a field that fills a `FormSection`
   row on its own (a name, a note).
+- **`DatePickerRow(minDate:)`:** a lower bound next to `maxDate` (a trip day from today on).
 - **`EditSheetContainer(isSaving:)`:** a spinner stands in for Save, and Cancel is disabled
   while the save runs.
 - **`ToggleSettingsRow` and `ActionSettingsRow` in forms:** `icon` defaults to `nil` (a row in

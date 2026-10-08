@@ -577,10 +577,12 @@ AmountRow(account.name, leading: .icon(account.iconSource), value: .amount(balan
   insight lists are adapters. `AmountPercentage` (the amount over its share) stays public.
 
 #### `DatePickerRow`
-Inline `DatePicker` inside `UniversalRow`.
+Inline `DatePicker` inside `UniversalRow`. `maxDate:` stops it after a date (a payment cannot be
+in the future), `minDate:` *(3.0.0)* before one (a trip day from today on).
 
 ```swift
 DatePickerRow(icon: "calendar", title: "Start Date", selection: $startDate)
+DatePickerRow(title: "Trip day", selection: $day, minDate: Calendar.current.startOfDay(for: .now))
 ```
 
 #### `FormTextField`
