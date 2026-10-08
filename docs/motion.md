@@ -176,8 +176,8 @@ on; the system's own switch turns them off.
   draw the final state, loops stop, amounts show their value without rolling or flashing,
   charts are there at once, parallax stops (`.scrollHero` keeps its stretch: it follows the
   finger).
-- **Ambient loops** (`AuroraBackground`, `TypingIndicator`, `.symbolPulse`, the 1.x beams and
-  glows) run inside `AmbientMotionGate`: off under Reduce Motion and, on iOS 27, while the system
+- **Ambient loops** (`AuroraBackground`, `TypingIndicator`, `.symbolPulse`, `LiveSessionBar`'s
+  recording dot, the 1.x beams and glows) run inside `AmbientMotionGate`: off under Reduce Motion and, on iOS 27, while the system
   prefers reduced resource usage. They draw one still frame instead, with the same layout.
 - **`.designKitMotion(false)`** stills all of DesignKit's motion below it: snapshot tests set it,
   an app can offer it as "reduce effects".

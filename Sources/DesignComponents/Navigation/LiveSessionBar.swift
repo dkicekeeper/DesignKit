@@ -30,6 +30,8 @@ public struct LiveSessionBar: View {
     let accessibilityLabel: String
     let onOpen: () -> Void
 
+    @Environment(\.designKitMotion) private var designKitMotion
+
     /// - Parameters:
     ///   - startedAt: When it started; the clock counts from it, once a second.
     ///   - isPaused: A pause sign instead of the pulsing recording dot.
@@ -53,9 +55,13 @@ public struct LiveSessionBar: View {
             onOpen()
         } label: {
             HStack(spacing: AppSpacing.md) {
-                Image(systemName: isPaused ? "pause.circle.fill" : "record.circle")
-                    .foregroundStyle(isPaused ? AppColors.warning : AppColors.destructive)
-                    .symbolEffect(.pulse, isActive: !isPaused)
+                // The pulse is a loop: Reduce Motion, the system's request to save resources
+                // and `.designKitMotion(false)` stop it, as they stop the other loops.
+                AmbientMotionGate { allowsAmbientMotion in
+                    Image(systemName: isPaused ? "pause.circle.fill" : "record.circle")
+                        .foregroundStyle(isPaused ? AppColors.warning : AppColors.destructive)
+                        .symbolEffect(.pulse, isActive: !isPaused && allowsAmbientMotion && designKitMotion)
+                }
                 TimelineView(.periodic(from: .now, by: 1)) { context in
                     Text(verbatim: Self.clock(context.date.timeIntervalSince(startedAt ?? context.date)))
                         .monospacedDigit()

@@ -1609,7 +1609,8 @@ While `load` runs the preview is `ShareCardSkeleton`; `nil` shows `EmptyState(.e
 A session going on (a recording): a pulsing `record.circle` in the destructive colour, or
 `pause.circle.fill` in the warning colour when paused; the time since `startedAt`
 (`H:MM:SS`, once a second); a detail in the secondary colour; a chevron up. bodyEmphasis,
-padded `lg` horizontally. `.liveSessionAccessory(isEnabled:) { LiveSessionBar(…) }` shows it in
+padded `lg` horizontally. The pulse is an ambient loop: it stops under Reduce Motion and
+`.designKitMotion(false)`. `.liveSessionAccessory(isEnabled:) { LiveSessionBar(…) }` shows it in
 the tab bar's bottom accessory on iOS 26.1+ (`LiveSessionAccessory.isAvailable`); on 26.0 give
 another way back. Dalada: `TripMiniPlayer` is an adapter.
 

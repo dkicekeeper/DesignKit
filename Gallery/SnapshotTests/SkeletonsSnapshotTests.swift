@@ -92,6 +92,7 @@ extension ComponentSnapshots {
         }
 
         /// The skeletons of 2.8.0: photos, share card, downloads, articles, the session bar.
+        /// In two pictures: in one, the window would be taller than the screen.
         @Test func mediaSkeletons() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {
@@ -101,12 +102,20 @@ extension ComponentSnapshots {
                     }
                     PhotoStripSkeleton()
                     PhotoGridSkeleton(count: 3)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                named: "photos",
+                appearances: [.light, .dark]
+            )
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
                     PhotoCarouselSkeleton()
                     DownloadRowSkeleton()
                     LiveSessionBarSkeleton()
                     ArticleBodySkeleton(paragraphs: 1)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
+                named: "rows",
                 appearances: [.light, .dark]
             )
         }
