@@ -20,6 +20,7 @@ struct SheetsScreen: View {
             OnboardingPageContainerPage()
             LoopOnboardingHeroPage()
             ShareCardSheetPage()
+            DateRangePickerSheetPage()
         }
     }
 }
@@ -290,6 +291,38 @@ private struct ShareCardSheetPage: View {
                 }
         } controls: {
             ToggleControl("Loading fails", isOn: $fails)
+        }
+    }
+}
+
+private struct DateRangePickerSheetPage: View {
+    @State private var isPresented = false
+    @State private var range: ClosedRange<Date> = {
+        let today = Calendar.current.startOfDay(for: .now)
+        return (Calendar.current.date(byAdding: .day, value: -6, to: today) ?? today)...today
+    }()
+
+    var body: some View {
+        ComponentPage(
+            name: "DateRangePickerSheet",
+            summary: "A period of days on two calendars, From and To; the start never passes the end. Cancel or Apply.",
+            since: "2.9.0",
+            apps: [.tenra],
+            notes: ["Apply hands the range to onApply; the app dismisses the sheet there."]
+        ) {
+            VStack(spacing: AppSpacing.md) {
+                Text("\(range.lowerBound.formatted(date: .abbreviated, time: .omitted)) – \(range.upperBound.formatted(date: .abbreviated, time: .omitted))")
+                    .font(AppTypography.bodyEmphasis)
+                PresentButton(title: "Pick a period") { isPresented = true }
+            }
+            .sheet(isPresented: $isPresented) {
+                DateRangePickerSheet(range: range) { picked in
+                    range = picked
+                    isPresented = false
+                }
+            }
+        } controls: {
+            EmptyView()
         }
     }
 }

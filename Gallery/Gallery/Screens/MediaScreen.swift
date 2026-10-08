@@ -182,6 +182,9 @@ private struct HeroSymbolPage: View {
 private struct PackedCircleIconsPage: View {
     @State private var maxVisible = 5
     @State private var width = 120.0
+    @State private var style = PackedCircleIconsStyle.glossy
+    @State private var showsLogos = false
+    @State private var inCard = true
     @State private var state: SpecimenState = .content
 
     private let items = [
@@ -192,21 +195,49 @@ private struct PackedCircleIconsPage: View {
         PackedCircleItem(id: "5", iconSource: .sfSymbol("building.columns.fill"), amount: 40_000, tint: .purple),
     ]
 
+    /// Invented brands (GalleryLogos); one has a white logo.
+    private let logos = [
+        PackedCircleItem(id: "1", iconSource: .brandService("Reelio"), amount: 4_990),
+        PackedCircleItem(id: "2", iconSource: .brandService("Leafnote"), amount: 2_490),
+        PackedCircleItem(id: "3", iconSource: .brandService("Tunewave"), amount: 1_990),
+        PackedCircleItem(id: "4", iconSource: .brandService("Cloudy"), amount: 990),
+        PackedCircleItem(id: "5", iconSource: .brandService("Reelio"), amount: 490),
+    ]
+
     var body: some View {
         ComponentPage(
             name: "PackedCircleIcons",
-            summary: "Icons packed as circles sized by their amounts: the accounts of a home card.",
+            summary: "Icons packed as circles sized by their amounts: the accounts of a home card. Glossy marbles since 2.9.0.",
             apps: [.tenra]
         ) {
-            if state == .loading {
-                PackedCircleIconsSkeleton(containerWidth: width)
+            if inCard {
+                // As on Tenra's home: the trailing side of a FinanceCard, on Liquid Glass.
+                FinanceCard(title: showsLogos ? "Subscriptions" : "Accounts", isEmpty: false, emptyTitle: "", subtitle: "\(maxVisible) shown") {
+                    Text(verbatim: showsLogos ? "18 470 ₸" : "2 040 000 ₸")
+                } trailing: {
+                    specimen
+                }
             } else {
-                PackedCircleIcons(items: items, maxVisible: maxVisible, containerWidth: width)
+                specimen
             }
         } controls: {
             StateControl(state: $state)
+            ChoiceControl("Style", selection: $style, options: [("Glossy", .glossy), ("Flat", .flat)])
+            ChoiceControl("Items", selection: $showsLogos, options: [("Symbols", false), ("Logos", true)])
+            ToggleControl("In a card", isOn: $inCard)
             StepperControl("Visible", value: $maxVisible, in: 1...5)
             SliderControl("Width", value: $width, in: 80...200, step: 10) { "\(Int($0)) pt" }
+        }
+    }
+
+    @ViewBuilder
+    private var specimen: some View {
+        if state == .loading {
+            PackedCircleIconsSkeleton(containerWidth: width)
+        } else {
+            PackedCircleIcons(items: showsLogos ? logos : items, maxVisible: maxVisible, containerWidth: width, style: style)
+                // A new style or set plays the entrance again.
+                .id("\(style)-\(showsLogos)")
         }
     }
 }

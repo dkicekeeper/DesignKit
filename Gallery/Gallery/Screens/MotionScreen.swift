@@ -20,6 +20,8 @@ struct MotionScreen: View {
             SymbolMotionPage()
             MotionTransitionsPage()
             TextRevealPage()
+            StreamingTextPage()
+            CascadeInPage()
             ScrambleTextPage()
             ScrollRevealPage()
             ChartDrawInPage()
@@ -452,6 +454,83 @@ private struct BlurSlidePage: View {
                 .animation(AppAnimation.gentleSpring, value: phase)
         } controls: {
             ActionControl("Next") { withAnimation(AppAnimation.gentleSpring) { phase = (phase + 1) % titles.count } }
+        }
+    }
+}
+
+private struct StreamingTextPage: View {
+    @State private var count = 3
+    @State private var highlights = true
+    @State private var state: SpecimenState = .content
+
+    private let words = ["Coffee", "2500", "tenge", "and", "taxi", "1800", "from", "Kaspi"]
+
+    private var text: String { words.prefix(count).joined(separator: " ") }
+
+    /// The amounts, tinted as a recogniser would its confident matches.
+    private var tints: [StreamingText.Highlight] {
+        guard highlights else { return [] }
+        let string = text as NSString
+        return ["2500", "1800"].compactMap { amount in
+            let range = string.range(of: amount)
+            return range.location == NSNotFound ? nil : .init(range: range, color: AppColors.success)
+        }
+    }
+
+    var body: some View {
+        ComponentPage(
+            name: "StreamingText",
+            summary: "Text that arrives word by word, as speech is recognised: each new word slides up out of a blur, the words already shown keep still, recognised words are tinted.",
+            since: "2.9.0",
+            apps: [.tenra],
+            canvas: .tall(minHeight: 160),
+            notes: [
+                "A word in the same place with the same text keeps its identity, so a recogniser's refinements do not replay the entrance.",
+                "highlights tint every word overlapping a range (UTF-16, as NSString and Speech count).",
+            ]
+        ) {
+            if state == .loading {
+                StreamingTextSkeleton()
+            } else {
+                StreamingText(text, highlights: tints)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        } controls: {
+            StateControl(state: $state)
+            StepperControl("Words", value: $count, in: 0...words.count)
+            ToggleControl("Highlights", isOn: $highlights)
+        }
+    }
+}
+
+private struct CascadeInPage: View {
+    @State private var replay = 0
+
+    var body: some View {
+        ComponentPage(
+            name: ".cascadeIn(index:)",
+            summary: "Cards that arrive together cascade in: each fades in and rises into place 80 ms after the one before.",
+            since: "2.9.0",
+            apps: [.tenra],
+            canvas: .tall(minHeight: 260),
+            notes: [
+                "Not .staggeredEntrance, which scales avatars in (a facepile).",
+                "Removal is the container's transition. Under Reduce Motion the cards fade in on the same cadence without rising.",
+            ]
+        ) {
+            VStack(spacing: AppSpacing.sm) {
+                ForEach(0..<3, id: \.self) { index in
+                    Text(["Coffee · 2 500 ₸", "Taxi · 1 800 ₸", "Lunch · 4 200 ₸"][index])
+                        .font(AppTypography.bodyEmphasis)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .cardContentPadding()
+                        .cardStyle()
+                        .cascadeIn(index: index)
+                }
+            }
+            .id(replay)
+        } controls: {
+            ActionControl("Replay") { replay += 1 }
         }
     }
 }

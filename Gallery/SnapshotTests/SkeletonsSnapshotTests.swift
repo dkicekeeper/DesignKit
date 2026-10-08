@@ -120,6 +120,24 @@ extension ComponentSnapshots {
             )
         }
 
+        /// The skeletons of 2.9.0: the transaction row, the option card, streaming text, the card picker.
+        @Test func financeRowSkeletons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    TransactionRowSkeleton()
+                    StreamingTextSkeleton(font: AppTypography.h3)
+                    OptionCardSkeleton()
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark]
+            )
+            await assertComponentSnapshot(
+                SnapCardPickerSkeleton { SelectableBalanceCardSkeleton() },
+                named: "snapCardPicker",
+                appearances: [.light]
+            )
+        }
+
         @Test func personRowCardSkeleton() async {
             await assertComponentSnapshot(PersonRowSkeleton(style: .card), appearances: [.light])
         }

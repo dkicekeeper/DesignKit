@@ -65,7 +65,7 @@ consumers `import DesignTokens` / `DesignSupport` / `DesignComponents` as needed
 | App | How it depends | Notes |
 |---|---|---|
 | Dalada | `ios/Packages/DaladaKit/Package.swift`, `exact: "X.Y.Z"` | Swift 6, iOS 26; green accent via `DesignKitTheme.accent`; uses tokens, `cardStyle`, buttons, `EmptyState`, `SectionHeader`, `RecommendationBox`, `PlusTabLabel`, since 1.12.0 `MessageComposer` and the community and progress components (people, comments, threads, reviews, reactions, achievements, checklists, stats, streak, thumbnails), since 2.7.0 effects (`.holographic`, `.interactiveTilt`, `.celebration`, `.completionMoment`, `.dissolve`, `AuroraBackground`), and since 2.8.0 its photos (`PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `PhotoViewer`), share pictures (`ShareCardSheet`, `ShareCardFrame`), `LiveSessionBar`, `DownloadRow`, `ArticleBody`, `ChipPicker(allTitle:)` and `PersonRow(style: .card)`, with thin adapters over its models (its `ShareCard.Style.dalada`, the photo loader) |
-| Tenra | `Tenra.xcodeproj` package reference, exact version | Reference look. `Tenra/Utils/DesignKitBridge.swift` re-exports the three modules, wires the host hooks and keeps the Tenra-model adapters (custom category colours, logo registry, breakdown → `DonutSlice`, the stat-card sparkline) |
+| Tenra | `Tenra.xcodeproj` package reference, exact version | Reference look. `Tenra/Utils/DesignKitBridge.swift` re-exports the three modules, wires the host hooks and keeps the Tenra-model adapters (custom category colours, logo registry, breakdown → `DonutSlice`, the stat-card sparkline). Since 2.9.0 its transaction rows (`TransactionRow` under `TransactionCardView`), account and category card pickers (`SnapCardPicker`), live transcript (`StreamingText`), custom period sheet (`DateRangePickerSheet`), background options (`OptionCard`), voice cards (`.cascadeIn`), period pagers (`PagerArrows`) and backup overlay (`.progressOverlay`) are DesignKit's too, as thin adapters over its models |
 
 A consumer sees a DesignKit change when its pin moves. Each app's **DesignKit update** workflow
 (`.github/workflows/designkit.yml` in the app) checks for a newer release tag daily, bumps the
@@ -178,7 +178,7 @@ rather than importing an app type.
 - Audit round 4 (2026-10, owner-approved) found the last generic views in the apps: Dalada's
   photos, share pictures, session bar, downloads, articles, "All" chips and profile card went
   into 2.8.0; Tenra's transaction row, card pickers, streaming transcript, date-range sheet,
-  option cards, card cascade, pager arrows and progress overlay go into 2.9.0. After that,
+  option cards, card cascade, pager arrows and progress overlay into 2.9.0. After that,
   nothing generic is known to be left. Tenra keeps screens over its models (filter sheets, home
   sections, transaction lists, entity detail screens, the lock screen, `PremiumLockedView` by
   the owner's choice) and its date parsing; Dalada keeps its sign-in card, map layers, weather

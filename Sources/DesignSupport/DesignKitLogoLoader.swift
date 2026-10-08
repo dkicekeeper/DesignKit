@@ -11,6 +11,7 @@ import UIKit
 
 public enum DesignKitLogoLoader {
     /// App-provided async loader: maps a brand name (e.g. "netflix.com") to an image.
-    /// Tenra wires this to its `LogoService`; the Gallery leaves it nil (fallback icon).
+    /// Tenra wires this to its `LogoService`; the Gallery draws a few invented brands
+    /// (`GalleryLogos`). Without a loader, `Icon` shows its fallback symbol.
     public static var loader: (@Sendable (String) async -> UIImage?)?
 }

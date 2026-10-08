@@ -633,9 +633,15 @@ FinanceCard(
 
 - **`RedactableAmount`** — hero amount that shows a redacted placeholder while an async (FX) total computes, then cross-fades. Use for cards whose total needs conversion (accounts, deposits, subscriptions).
 - Don't reintroduce the inline `HStack(.top, md) → VStack(.leading, lg) → title → if isEmpty …` shell in a new finance card — wrap `FinanceCard`.
-- **`PackedCircleIcons`**: circles sized by amount, packed without overlap. A symbol sits on a
-  pale disc of its item's `tint` (the accent without one), like every icon backing (2.0.0; a grey
-  disc before); a brand logo fills its circle.
+- **`PackedCircleIcons`**: circles sized by amount, packed without overlap. Since 2.9.0 they are
+  glossy marbles (`style: .glossy`, the default): a white symbol on a marble of its item's `tint`
+  (the accent without one); a brand logo fills its circle as the marble's skin. Over both, a
+  highlight at the upper left, a rim light, the edge and the bottom in shade; under each, a shadow
+  of its colour (a logo's main colour, `DominantColorExtractor`). The marbles burst out of the
+  middle one after another with a little overshoot, then sway by up to 2 pt, each on its own
+  beat (an ambient loop: still under Reduce Motion and `.designKitMotion(false)`). `style: .flat`
+  is the look before: a symbol on a pale disc of its tint, a logo edge to edge with a thin ring of
+  the background.
 
 #### `RecommendationBox`
 Tinted "lightbulb + advice" callout (icon + text on `color.opacity(0.10)`, `AppRadius.md`). Shared by `CalculationCard` and `TargetProgressCard`. Use for any card-bottom recommendation line.
@@ -1070,8 +1076,9 @@ SkeletonReveal(isLoading: balance == nil) {
 | `ExpandableText`, `ActivityTimeline`, `MonthCalendar` | `…Skeleton` |
 | `PersonRow`, `CommentRow`, `ThreadCard`, `ReviewCard`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.12.0) | `…Skeleton` (`StatsStripSkeleton(count:)`, `AchievementTileSkeleton(medalSize:)`, `ThumbnailCardSkeleton(width:)`, `PersonRowSkeleton(showsSubtitle:style:)`) |
 | `PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `ShareCardFrame` (and `ShareCardSheet` while it loads), `LiveSessionBar`, `DownloadRow`, `ArticleBody` (2.8.0) | `…Skeleton` (`PhotoTileSkeleton(size:cornerRadius:)`, `PhotoStripSkeleton(count:size:)`, `PhotoGridSkeleton(count:columns:style:)`, `ShareCardSkeleton(format:)`, `ArticleBodySkeleton(paragraphs:)`) |
+| `TransactionRow`, `OptionCard`, `StreamingText`, `SnapCardPicker` (2.9.0) | `…Skeleton` (`TransactionRowSkeleton(showsDetails:)`, `StreamingTextSkeleton(font:)`, `SnapCardPickerSkeleton { the card's skeleton }`) |
 
-**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `GradientOrbsBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
+**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `GradientOrbsBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
 
 #### `SkeletonText` *(1.7.0)*
 A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `Skeleton`. For a component, use its skeleton (above); `.skeleton(isLoading:)` redacts a real view in place, with the system's placeholder shapes.
@@ -1437,6 +1444,7 @@ List { … }
 #### `FlowLayout` *(0.7.0)*
 A `Layout` that wraps subviews to new lines like words: tags, badges, chips that should not
 scroll. `FlowLayout(spacing:lineSpacing:) { ForEach(tags, id: \.self) { Badge($0) } }`.
+`alignment:` *(2.9.0)* centres or right-aligns each row (`StreamingText` passes its own).
 
 #### `HeroSymbol` *(0.7.0)*
 Large SF Symbol on a disc of its tint at 12%: the picture of `OnboardingPage` and
@@ -1627,6 +1635,70 @@ An article's blocks, `AppSpacing.md` apart: `.heading(_, level:)` (title3 semibo
 a header trait), `.paragraph`, `.bullets`, `.steps` (numbers in the accent), `.note` (an info
 symbol and bodySmall text in a card). Inline Markdown inside a block (**bold**, *italic*,
 links). The app parses its article format into blocks.
+
+### Money Rows & Pickers *(2.9.0)*
+
+Ported from Tenra with neutral names; Tenra keeps its models (transactions, accounts, the time
+filter, the background modes) in thin adapters. Gallery: Rows, Selection, Motion, Navigation,
+Feedback, Sheets; snapshots: `FinanceRowsSnapshotTests` (skeletons in `SkeletonsSnapshotTests`).
+
+#### `TransactionRow`
+A money movement. The icon: 44 pt round (`Icon` `.circle`), a category symbol in its colour on
+its pale, or a merchant's logo (`.original`); `badgeSystemImage` puts a small symbol on its
+top-leading corner (a repeating payment still to come). The left side (`Subject`):
+`.entry(title:details:account:)` is the category (h4), a details line (subcategories,
+bodySmall) and the account (16 pt logo and name, secondary; `Account.deleted(name)` keeps the
+name in italic without a logo); `.transfer(from:to:)` puts the accounts themselves at the
+amount's size (body semibold), the target after a turn arrow. A `note` closes it (caption
+secondary). The trailing edge: `amounts`, top to bottom (`FormattedAmountText`): an entry's
+second line is its equivalent at 70%, a transfer's two lines are its legs. `isPending` dims a
+future one (`futureTransactionStyle`). Vertical padding `sm`; `transitionSourceID` /
+`transitionNamespace` make the icon a zoom source. Tenra: `TransactionCardView` is an adapter.
+
+#### `SnapCardPicker`
+Full-width cards in a snapping row (`containerRelativeFrame`, `.viewAligned`), `md` apart with
+`lg` of the neighbours showing; the centred card is the selection. A drag selects where it
+settles (only at `.idle`, not during an animated scroll), a tap calls the card's `select`. It
+writes the scroll position only after its container is measured, so a selection that arrives
+after it appears still scrolls into place; it re-aligns when the selection drops out of its
+items (a sibling picker filtered them). `SnapCardPicker(items, id:selection:) { item, isSelected, select in … }`.
+Tenra: `AccountSelectorView` (with `SelectableBalanceCard`) and `CategoryCardSelectorView`.
+
+#### `OptionCard`, `OptionCardPicker`
+An option as a picture: an 80 × 120 artwork (`AppRadius.lg`) with a check on it when chosen, the
+title beside it (accent when chosen), on the grouped-list card colour (`AppRadius.xl`), a 3 pt
+accent outline when chosen. `OptionCardPicker(options, selection:title:artwork:)` lays plain
+options out; `OptionCard` alone for a list that mixes them with one that opens a picker (Tenra's
+photo option sits in a `PhotosPicker`). Tenra: `HomeBackgroundPicker`.
+
+#### `StreamingText`
+Text that arrives word by word: words in a `FlowLayout` (`sm` apart, 6 pt between lines), each
+new one with `.blurSlideWord`. A word in the same place with the same text keeps its identity,
+so the recogniser's refinements do not replay the entrance. `highlights` tint every word that
+overlaps a range (UTF-16, as `NSString` and Speech count). VoiceOver reads the whole text.
+Tenra: `AnimatedTranscriptionText` (recognised entities by confidence → highlights).
+
+#### `DateRangePickerSheet`
+Two graphical calendars, From and To, `xl` apart with a divider; moving the start past the end
+moves the end along, and the other way round. Cancel (`common.cancel`) dismisses, Apply
+(`button.apply`) hands the range to `onApply`. Title `timeFilter.customPeriod`, labels
+`timeFilter.from` / `timeFilter.to`, or the parameters. Large detent. Tenra: the time filter's
+custom period.
+
+#### `.cascadeIn(index:)`
+Cards that arrive together: each fades in and rises 12 pt into place `index × 80 ms` after it
+appears (gentle spring); removal is the container's transition. Not `staggeredEntrance` (avatars
+scaling in). Reduce Motion: the same cadence, no rise. Tenra: the voice input's cards.
+
+#### `PagerArrows`
+A chevron on each side of the content, centred on it, screen-padded: accent, or tertiary and
+disabled at either end; an arrow steps the index with an ease (the swipe animates itself).
+VoiceOver: `pager.previous` / `pager.next`. Tenra: the insight period pagers.
+
+#### `.progressOverlay(isPresented:title:message:)`, `ProgressOverlay`
+The screen dims (black 45%) and an `.ultraThinMaterial` panel (`AppRadius.lg`) shows a large
+spinner in the accent, the title (bodyEmphasis) and a message (secondary). Disable the screen
+under it at the call site. Tenra: restoring a backup.
 
 ### Content Reveal (Loading Transitions)
 
@@ -1884,7 +1956,7 @@ Inside List (settings)?
     └── With toggle → trailing: { Toggle(...) }
 
 Transaction list row?
-└── TransactionCard (NOT UniversalRow)
+└── TransactionRow (2.9.0; NOT UniversalRow). Tenra: TransactionCard, its adapter over Transaction
 
 Balance list row (accounts, wallets)?
 └── AmountRow(style: .list, value: .amount) (NOT UniversalRow)

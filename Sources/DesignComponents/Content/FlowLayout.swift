@@ -17,14 +17,21 @@ import DesignTokens
 /// }
 /// ```
 ///
-/// Leading-aligned (right-to-left aware). A subview wider than the row gets the row's width.
+/// Leading-aligned by default (right-to-left aware); `alignment` (2.9.0) centres or right-aligns
+/// each row instead. A subview wider than the row gets the row's width.
 public struct FlowLayout: Layout {
     public var spacing: CGFloat
     public var lineSpacing: CGFloat
+    public var alignment: HorizontalAlignment
 
-    public init(spacing: CGFloat = AppSpacing.sm, lineSpacing: CGFloat = AppSpacing.sm) {
+    public init(
+        spacing: CGFloat = AppSpacing.sm,
+        lineSpacing: CGFloat = AppSpacing.sm,
+        alignment: HorizontalAlignment = .leading
+    ) {
         self.spacing = spacing
         self.lineSpacing = lineSpacing
+        self.alignment = alignment
     }
 
     public func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
@@ -37,7 +44,12 @@ public struct FlowLayout: Layout {
     public func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
         var y = bounds.minY
         for row in arrange(width: bounds.width, subviews: subviews) {
-            var x = bounds.minX
+            var x: CGFloat
+            switch alignment {
+            case .center: x = bounds.minX + (bounds.width - row.width) / 2
+            case .trailing: x = bounds.maxX - row.width
+            default: x = bounds.minX
+            }
             for item in row.items {
                 subviews[item.index].place(
                     at: CGPoint(x: x, y: y + (row.height - item.size.height) / 2),

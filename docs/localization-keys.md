@@ -21,6 +21,7 @@ text, not keys. A new key goes there as well.
 | `amount.hide` | AmountVisibilityToggle (VoiceOver, amounts shown) | `Hide amounts` |
 | `amount.show` | AmountVisibilityToggle (VoiceOver, amounts hidden) | `Show amounts` |
 | `bulk.deleteCount` | BulkDeleteButton (deprecated 2.0.0; the app passes it to `DSButton`) | — |
+| `button.apply` | DateRangePickerSheet (Apply) | `Apply` |
 | `button.cancel` | EditSheetContainer, ImportProgressSheet | — |
 | `button.copy` | AnimatedInputComponents | — |
 | `button.paste` | AnimatedInputComponents | — |
@@ -40,7 +41,7 @@ text, not keys. A new key goes there as well.
 | `checklist.complete` | ChecklistSummaryRow (VoiceOver on the seal; `completeLabel` replaces it) | `Complete` |
 | `checklist.empty` | ChecklistSummaryRow (no items; `emptyText` replaces it) | `No items yet` |
 | `checklist.progress %lld %lld` | ChecklistSummaryRow (under the bar; `progressText` replaces it) | `%lld of %lld` |
-| `common.cancel` | DateButtons | — |
+| `common.cancel` | DateButtons, DateRangePickerSheet (Cancel) | `Cancel` (DateRangePickerSheet) |
 | `common.changeIcon` | EditableHero (VoiceOver on the icon) | `Change icon` |
 | `common.close` | PhotoViewer (default `closeTitle`), ShareCardSheet (the close button) | `Close` |
 | `common.color` | ColorPickerRow | — |
@@ -110,6 +111,8 @@ text, not keys. A new key goes there as well.
 | `notification.permission.title` | NotificationPermissionPrompt | — |
 | `onboarding.cta.skip` | OnboardingPageContainer; OnboardingPager (default `skipTitle`) | `Skip` (OnboardingPager) |
 | `onboarding.stepIndicator.label` | OnboardingStepIndicator | — |
+| `pager.next` | PagerArrows (default `nextLabel`, VoiceOver) | `Next` |
+| `pager.previous` | PagerArrows (default `previousLabel`, VoiceOver) | `Previous` |
 | `photo.open` | PhotoStrip, PhotoCarousel (default `openLabel`), PhotoGrid (VoiceOver without `label`) | `Open photo` |
 | `photo.remove` | PhotoStrip (default `removeLabel`, VoiceOver) | `Remove photo` |
 | `progress.importing` | ImportProgressSheet | — |
@@ -134,6 +137,9 @@ text, not keys. A new key goes there as well.
 | `text.more` | ExpandableText | `More` |
 | `thumbnail.saved` | ThumbnailCard, ThumbnailRow (VoiceOver on the bookmark; `savedLabel` replaces it) | `Saved` |
 | `thumbnail.verified` | ThumbnailCard, ThumbnailRow (VoiceOver on the seal; `verifiedLabel` replaces it) | `Verified` |
+| `timeFilter.customPeriod` | DateRangePickerSheet (default `title`) | `Custom period` |
+| `timeFilter.from` | DateRangePickerSheet (default `fromTitle`) | `From` |
+| `timeFilter.to` | DateRangePickerSheet (default `toTitle`) | `To` |
 | `typing.indicator` | TypingIndicator (VoiceOver; `accessibilityLabel` replaces it) | `Typing` |
 
 Regenerate the table after changing components:

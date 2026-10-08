@@ -45,6 +45,8 @@ public struct HeroHalfGauge: View {
     private var fillAnimation: Animation? { AppAnimation.progressFillAnimation }
 
     static let tickOvershoot: CGFloat = 8
+    /// Room round the gauge for its glow inside the drawing group (the glow's blur and offset).
+    static let glowMargin: CGFloat = 64
 
     private var scale: Double {
         if let maxValue { return max(maxValue, .leastNonzeroMagnitude) }
@@ -107,6 +109,13 @@ public struct HeroHalfGauge: View {
             }
         }
         .frame(width: diameter, height: diameter)
+        // One picture (2.9.0). On a Liquid Glass card (`cardStyle()`, as in `ScoreGaugeCard`) the
+        // glass blends each layer of its content with the layers under it: the markers looked
+        // translucent over the arc, the arc darker over its glow. A drawing group is one layer;
+        // the margin keeps the glow inside it. (`.compositingGroup()` does not help.)
+        .padding(Self.glowMargin)
+        .drawingGroup()
+        .padding(-Self.glowMargin)
         // The semicircle only occupies the square's top half (plus cap/tick
         // overshoot below the equator) — trim the layout to it.
         .frame(

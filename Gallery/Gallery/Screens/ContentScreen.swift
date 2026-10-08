@@ -137,6 +137,7 @@ private struct MonthCalendarPage: View {
 private struct FlowLayoutPage: View {
     @State private var spacing = Double(AppSpacing.sm)
     @State private var count = 7
+    @State private var alignment = 0
 
     private let tags = ["Lake", "Free camping", "Fire allowed", "No motorboats", "Pike", "Road: 4x4", "Toilets", "Kids", "Shade"]
 
@@ -146,9 +147,10 @@ private struct FlowLayoutPage: View {
             summary: "A layout that wraps its views to new lines like words: tags, badges, chips.",
             since: "0.7.0",
             apps: [.dalada],
-            canvas: .fill
+            canvas: .fill,
+            notes: ["alignment (2.9.0): each row leading, centred or trailing."]
         ) {
-            FlowLayout(spacing: spacing, lineSpacing: spacing) {
+            FlowLayout(spacing: spacing, lineSpacing: spacing, alignment: [HorizontalAlignment.leading, .center, .trailing][alignment]) {
                 ForEach(tags.prefix(count), id: \.self) {
                     Badge($0, color: AppColors.accent)
                 }
@@ -156,6 +158,7 @@ private struct FlowLayoutPage: View {
         } controls: {
             SliderControl("Spacing", value: $spacing, in: 0...24, step: 2) { "\(Int($0)) pt" }
             StepperControl("Items", value: $count, in: 1...9)
+            ChoiceControl("Alignment", selection: $alignment, options: [("Leading", 0), ("Center", 1), ("Trailing", 2)])
         }
     }
 }
