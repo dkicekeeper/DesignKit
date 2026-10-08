@@ -69,7 +69,9 @@ public struct StepperRow: View {
         } trailing: {
             if !dynamicTypeSize.isAccessibilitySize {
                 HStack(spacing: AppSpacing.md) {
+                    // The value keeps its width: "12 pcs" stays on one line, the title gives way.
                     valueText
+                        .fixedSize()
                     stepper
                 }
             }
