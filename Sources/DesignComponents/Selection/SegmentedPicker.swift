@@ -38,8 +38,3 @@ public struct SegmentedPicker<T: Hashable>: View {
         .hapticCue(.select, trigger: selection)
     }
 }
-
-// MARK: - Names before 2.0
-
-@available(*, deprecated, renamed: "SegmentedPicker")
-public typealias SegmentedPickerView<T: Hashable> = SegmentedPicker<T>

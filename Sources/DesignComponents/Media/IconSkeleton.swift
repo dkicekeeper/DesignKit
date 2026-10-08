@@ -43,8 +43,3 @@ public struct IconSkeleton: View {
         }
     }
 }
-
-// MARK: - Names before 2.0
-
-@available(*, deprecated, renamed: "IconSkeleton")
-public typealias IconViewSkeleton = IconSkeleton

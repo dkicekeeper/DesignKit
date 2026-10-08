@@ -3,7 +3,7 @@
 //  DesignKit Gallery snapshot tests
 //
 //  Components ported from Tenra in 1.5.0: BalanceCard, SelectableBalanceCard, AmountRow (list:
-//  BalanceRow and ProgressRingRow before 2.1), ProgressRingTile, MetricCard, GradientOrbsBackground, PromptSheet.
+//  BalanceRow and ProgressRingRow before 2.1), ProgressRingTile, MetricCard, PromptSheet.
 //
 
 import SwiftUI
@@ -145,30 +145,6 @@ extension ComponentSnapshots {
                                 currency: "KZT", animatesOnAppear: false)
                 },
                 named: "bottomChart"
-            )
-        }
-
-        @Test func gradientOrbsBackground() async {
-            await assertComponentSnapshot(
-                ZStack {
-                    GradientOrbsBackground([
-                        .init(color: .orange, weight: 1.0),
-                        .init(color: AppColors.accent, weight: 0.6),
-                        .init(color: .pink, weight: 0.4),
-                    ])
-                    .clipShape(.rect(cornerRadius: AppRadius.xl))
-
-                    VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                        Text("This month").font(AppTypography.bodySmall).foregroundStyle(AppColors.textSecondary)
-                        FormattedAmountText(amount: 921_300, currency: "KZT",
-                                            fontSize: AppTypography.h2, fontWeight: .bold,
-                                            color: AppColors.textPrimary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(AppSpacing.lg)
-                    .cardStyle()
-                }
-                .frame(height: 200)
             )
         }
 

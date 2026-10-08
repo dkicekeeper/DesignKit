@@ -20,7 +20,7 @@ text, not keys. A new key goes there as well.
 | `amount.hidden` | FormattedAmountText under `.amountsHidden()` (VoiceOver) | `Hidden amount` |
 | `amount.hide` | AmountVisibilityToggle (VoiceOver, amounts shown) | `Hide amounts` |
 | `amount.show` | AmountVisibilityToggle (VoiceOver, amounts hidden) | `Show amounts` |
-| `bulk.deleteCount` | BulkDeleteButton (deprecated 2.0.0; the app passes it to `DSButton`) | — |
+| `bulk.deleteCount` | the apps' bulk-delete `DSButton` title (BulkDeleteButton's until 3.0.0 removed it) | — |
 | `button.apply` | DateRangePickerSheet (Apply) | `Apply` |
 | `button.cancel` | EditSheetContainer, ImportProgressSheet | — |
 | `button.copy` | AnimatedInputComponents | — |

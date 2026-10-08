@@ -32,8 +32,3 @@ public struct AmountPercentage: View {
         }
     }
 }
-
-// MARK: - Names before 2.0
-
-@available(*, deprecated, renamed: "AmountPercentage")
-public typealias AmountPercentageView = AmountPercentage

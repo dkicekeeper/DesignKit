@@ -237,11 +237,3 @@ public struct SectionHeaderSkeleton: View {
         }
     }
 }
-
-// MARK: - Names before 2.0
-
-@available(*, deprecated, renamed: "SectionHeaderSkeleton")
-public typealias SectionHeaderViewSkeleton = SectionHeaderSkeleton
-
-@available(*, deprecated, renamed: "SectionHeader")
-public typealias SectionHeaderView = SectionHeader

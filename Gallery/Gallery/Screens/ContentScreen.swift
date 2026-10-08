@@ -203,6 +203,7 @@ private struct FormSectionPage: View {
 private struct EditSheetContainerPage: View {
     @State private var isPresented = false
     @State private var name = "Kaspi Gold"
+    @State private var isSaving = false
 
     var body: some View {
         ComponentPage(
@@ -215,6 +216,7 @@ private struct EditSheetContainerPage: View {
                 EditSheetContainer(
                     title: "Edit account",
                     isSaveDisabled: name.isEmpty,
+                    isSaving: isSaving,
                     onSave: { isPresented = false },
                     onCancel: { isPresented = false }
                 ) {
@@ -223,6 +225,8 @@ private struct EditSheetContainerPage: View {
                     }
                 }
             }
+        } controls: {
+            ToggleControl("Saving (3.0.0): a spinner for Save", isOn: $isSaving)
         }
     }
 }

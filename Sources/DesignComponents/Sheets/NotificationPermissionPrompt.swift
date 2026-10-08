@@ -38,6 +38,3 @@ public struct NotificationPermissionPrompt: View {
         )
     }
 }
-
-@available(*, deprecated, renamed: "NotificationPermissionPrompt")
-public typealias NotificationPermissionView = NotificationPermissionPrompt

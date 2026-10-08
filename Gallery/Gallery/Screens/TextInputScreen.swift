@@ -32,6 +32,8 @@ private struct FormTextFieldPage: View {
         switch style {
         case 1: return .multiline(min: 2, max: 5)
         case 2: return .inline
+        case 3: return .row
+        case 4: return .rowMultiline(min: 2, max: 5)
         default: return .standard
         }
     }
@@ -39,12 +41,24 @@ private struct FormTextFieldPage: View {
     var body: some View {
         ComponentPage(
             name: "FormTextField",
-            summary: "A form field with focus, error, help and disabled states; inline styles sit in a row's trailing slot.",
+            summary: "A form field with focus, error, help and disabled states; inline styles sit in a row's trailing slot, row styles fill a FormSection row (3.0.0).",
             apps: [.tenra, .dalada],
             canvas: .fill,
             notes: ["Inline styles show no error or help text: put validation at the form level (InlineStatusText)."]
         ) {
-            if style == 2 {
+            if style >= 3 {
+                // Row styles fill a row of a FormSection on their own: the card is their chrome.
+                FormSection(header: "Place") {
+                    FormTextField(
+                        text: $text,
+                        placeholder: "Place name",
+                        style: fieldStyle,
+                        errorMessage: showsError ? "The name is too short" : nil,
+                        helpText: showsHelp ? "Shown on the map" : nil,
+                        isDisabled: disabled
+                    )
+                }
+            } else if style == 2 {
                 UniversalRow(config: .standard) {
                     Text("Name").font(AppTypography.body)
                 } trailing: {
@@ -61,7 +75,7 @@ private struct FormTextFieldPage: View {
                 )
             }
         } controls: {
-            ChoiceControl("Style", selection: $style, options: [("Standard", 0), ("Multiline", 1), ("Inline", 2)])
+            ChoiceControl("Style", selection: $style, options: [("Standard", 0), ("Multiline", 1), ("Inline", 2), ("Row", 3), ("Row, multiline", 4)])
             ToggleControl("Error", isOn: $showsError)
             ToggleControl("Help text", isOn: $showsHelp)
             ToggleControl("Disabled", isOn: $disabled)

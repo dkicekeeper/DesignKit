@@ -75,30 +75,6 @@ public struct PromptSheet: View {
         self.onSecondary = onSecondary
     }
 
-    /// The pre-2.0 sheet of a fixed height that closes after either answer.
-    @available(*, deprecated, message: "Use init(systemImage:title:message:primaryTitle:secondaryTitle:detent:dismissesOnAnswer:onPrimary:onSecondary:); the sheet is .medium by default.")
-    public init(
-        systemImage: String,
-        title: String,
-        message: String,
-        primaryTitle: String,
-        secondaryTitle: String,
-        height: CGFloat,
-        onPrimary: @escaping () -> Void,
-        onSecondary: @escaping () -> Void
-    ) {
-        self.init(
-            systemImage: systemImage,
-            title: title,
-            message: message,
-            primaryTitle: primaryTitle,
-            secondaryTitle: secondaryTitle,
-            detent: .height(height),
-            onPrimary: onPrimary,
-            onSecondary: onSecondary
-        )
-    }
-
     public var body: some View {
         content
             .modifier(PromptSheetDetent(detent: detent))

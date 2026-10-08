@@ -102,10 +102,6 @@ public enum AppIconSize {
 
     /// Icons with their own backing (circle, rounded square), coins, heroes.
     public enum Tile {
-        /// 40 pt — not a tile: too small for an icon's padding.
-        @available(*, deprecated, renamed: "AppIconSize.xxl", message: "40 pt is a glyph since 2.0.0: AppIconSize.xxl.")
-        public static let xs: CGFloat = 40
-
         /// 44 pt — the smallest tile: the icon of a content row (`Icon`'s default).
         public static let sm: CGFloat = 44
 

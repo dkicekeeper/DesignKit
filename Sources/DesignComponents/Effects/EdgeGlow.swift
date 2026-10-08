@@ -149,17 +149,3 @@ final class VoiceLevelDriver {
         return (time, level, flow)
     }
 }
-
-// MARK: - Names before 2.4
-
-@available(*, deprecated, renamed: "EdgeGlow", message: "Use EdgeGlow(level:), which also follows the voice.")
-public typealias SiriGlow = EdgeGlow
-
-@available(*, deprecated, renamed: "EdgeGlow", message: "Use EdgeGlow(level:), which fades in the same way and follows the voice.")
-public typealias SiriWave = EdgeGlow
-
-@available(*, deprecated, renamed: "EdgeGlow")
-public typealias SiriGlowView = EdgeGlow
-
-@available(*, deprecated, renamed: "EdgeGlow")
-public typealias SiriWaveRecordingView = EdgeGlow

@@ -93,7 +93,7 @@ private struct AmountRowPage: View {
             apps: [.tenra],
             canvas: .fill,
             notes: [
-                "2.1.0 merged BalanceRow (list, .amount), ProgressRingRow (list, .limit), BreakdownRow (info, .share) and InsightEntityRow (info, .amount); their names are deprecated wrappers.",
+                "2.1.0 merged BalanceRow (list, .amount), ProgressRingRow (list, .limit), BreakdownRow (info, .share) and InsightEntityRow (info, .amount); the old names were removed in 3.0.0.",
                 "A limit row keeps the ring's room around its icon with or without a limit, so a list of both lines up.",
                 "The info style stacks the value under the name at accessibility text sizes.",
             ]

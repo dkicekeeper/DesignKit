@@ -143,7 +143,7 @@ public enum AppAnimation {
 
 /// Press feedback for something tappable that does not look like a button — a card, a row,
 /// a tile: it shrinks to 96% and darkens a little while pressed. `Button { … } label: { Card() }
-/// .buttonStyle(.bounce)`. For a button, `appButton`.
+/// .buttonStyle(.bounce)`. For a button, `dsButton`.
 public struct BounceButtonStyle: ButtonStyle {
     public init() {}
 

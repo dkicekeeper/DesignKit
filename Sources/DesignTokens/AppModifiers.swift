@@ -40,11 +40,18 @@ public extension View {
     /// `Menu` triggers, use `formCardStyle()` instead — `glassEffect` is the morph
     /// source for iOS 26 menus, and a single-row section collapses the whole row into
     /// the popover at tap.
+    ///
+    /// 3.0.0: the glass is drawn behind the content, not applied to it. Applied to the content,
+    /// Liquid Glass blended each layer into the layers under it (darker in light mode, lighter
+    /// in dark): a marker over an arc looked translucent, a label over its pale capsule changed
+    /// colour. Behind it, the content keeps its exact colours; the card itself looks the same.
     func cardStyle(radius: CGFloat = AppRadius.xl) -> some View {
         self
             .contentShape(Rectangle())
             .clipShape(.rect(cornerRadius: radius))
-            .glassEffect(.regular, in: .rect(cornerRadius: radius))
+            .background {
+                Color.clear.glassEffect(.regular, in: .rect(cornerRadius: radius))
+            }
     }
 
     /// Card chrome for form-like containers that host interactive controls

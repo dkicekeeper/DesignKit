@@ -28,6 +28,9 @@ import DesignSupport
 ///   row's height stays compact and stable while typing. `errorMessage`/
 ///   `helpText` are intentionally hidden in inline mode; surface validation at
 ///   form level (`InlineStatusText`).
+/// - `.row` / `.rowMultiline` *(3.0.0)* — a bare, leading-aligned field that fills a
+///   `FormSection` row on its own (a name, a note): no chrome of its own (the section's card is
+///   the chrome), padded like a `.standard` row. `errorMessage`/`helpText` show under it.
 public struct FormTextField: View {
     @Binding var text: String
     let placeholder: String
@@ -66,6 +69,10 @@ public struct FormTextField: View {
         /// (notes, descriptions). `lineLimit(min...max)` bounds the vertical
         /// growth so the row doesn't snap to many lines on first focus.
         case inlineMultiline(min: Int, max: Int)
+        /// A bare, leading-aligned field filling a `FormSection` row (3.0.0): a name.
+        case row
+        /// A bare, leading-aligned multi-line field filling a `FormSection` row (3.0.0): a note.
+        case rowMultiline(min: Int, max: Int)
     }
 
     public init(
@@ -96,7 +103,7 @@ public struct FormTextField: View {
     private var isInline: Bool {
         switch style {
         case .inline, .inlineMultiline: return true
-        case .standard, .multiline: return false
+        case .standard, .multiline, .row, .rowMultiline: return false
         }
     }
 
@@ -165,6 +172,16 @@ public struct FormTextField: View {
 
         case .inlineMultiline(let min, let max):
             inlineMultilineField(min: min, max: max)
+
+        case .row:
+            standardField
+                .foregroundStyle(AppColors.Text.primary)
+                .modifier(FormTextFieldRowPadding())
+
+        case .rowMultiline(let min, let max):
+            multilineField(min: min, max: max)
+                .foregroundStyle(AppColors.Text.primary)
+                .modifier(FormTextFieldRowPadding())
         }
     }
 
@@ -252,8 +269,12 @@ public struct FormTextField: View {
 
 // MARK: - Previews
 
-
-
-
-
-
+/// The padding of a `.standard` `UniversalRow`, so a `.row` field lines up with the rows around
+/// it in a `FormSection`.
+private struct FormTextFieldRowPadding: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .padding(.vertical, RowConfiguration.standard.verticalPadding)
+            .padding(.horizontal, RowConfiguration.standard.horizontalPadding)
+    }
+}

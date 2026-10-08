@@ -349,9 +349,9 @@ private struct MarbleBody: View {
 }
 
 /// Wraps a circle's face into a glossy marble: the highlight and shading over it, a shadow of
-/// its colour under it, and a slow sway. On a Liquid Glass card the glass blends the marble's
-/// layers with each other a little (darker in light mode, lighter in dark); a drawing group
-/// would undo that, but it cannot hold the spinner a logo shows while it loads.
+/// its colour under it, and a slow sway. In a `cardStyle()` card it keeps its colours (the glass
+/// is behind the content since 3.0.0); under a `.glassEffect` applied to the content itself the
+/// glass would blend its layers, and a drawing group cannot hold a loading logo's spinner.
 private struct GlossyMarble<Face: View>: View {
     let diameter: CGFloat
     let shadowColor: Color
@@ -474,11 +474,3 @@ public struct PackedCircleIconsSkeleton: View {
         .skeletonLoadingLabel()
     }
 }
-
-// MARK: - Names before 2.0
-
-@available(*, deprecated, renamed: "PackedCircleIconsSkeleton")
-public typealias PackedCircleIconsViewSkeleton = PackedCircleIconsSkeleton
-
-@available(*, deprecated, renamed: "PackedCircleIcons")
-public typealias PackedCircleIconsView = PackedCircleIcons

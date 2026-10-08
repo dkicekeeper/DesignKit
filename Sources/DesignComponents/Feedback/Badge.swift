@@ -91,11 +91,3 @@ public struct BadgeSkeleton: View {
             .skeletonLoadingLabel()
     }
 }
-
-// MARK: - Names before 2.0
-
-@available(*, deprecated, renamed: "BadgeSkeleton")
-public typealias BadgeViewSkeleton = BadgeSkeleton
-
-@available(*, deprecated, renamed: "Badge")
-public typealias BadgeView = Badge

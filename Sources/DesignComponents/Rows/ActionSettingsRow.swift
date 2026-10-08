@@ -17,21 +17,23 @@ import DesignSupport
 public struct ActionSettingsRow: View {
     // MARK: - Props
 
-    let icon: String
+    let icon: String?
     let title: String
     let iconColor: Color?
     let titleColor: Color?
     let isDestructive: Bool
+    let config: RowConfiguration
     let action: () -> Void
 
     // MARK: - Initializer
 
     public init(
-        icon: String,
+        icon: String? = nil,
         title: String,
         iconColor: Color? = nil,
         titleColor: Color? = nil,
         isDestructive: Bool = false,
+        config: RowConfiguration = .settings,
         action: @escaping () -> Void
     ) {
         self.icon = icon
@@ -39,6 +41,7 @@ public struct ActionSettingsRow: View {
         self.iconColor = iconColor
         self.titleColor = titleColor
         self.isDestructive = isDestructive
+        self.config = config
         self.action = action
     }
 
@@ -56,8 +59,8 @@ public struct ActionSettingsRow: View {
 
     public var body: some View {
         UniversalRow(
-            config: .settings,
-            leadingIcon: .sfSymbol(icon, color: resolvedIconColor, size: AppIconSize.md)
+            config: config,
+            leadingIcon: icon.map { .sfSymbol($0, color: resolvedIconColor, size: AppIconSize.md) }
         ) {
             Text(title)
                 .font(AppTypography.body)

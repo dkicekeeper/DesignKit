@@ -96,6 +96,8 @@ public struct TransactionRow: View {
     let transitionSourceID: String?
     let transitionNamespace: Namespace.ID?
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     /// - Parameters:
     ///   - note: Under everything, in caption secondary (the description).
     ///   - icon, iconTint, iconBackground: The 44 pt round icon: a category symbol in its colour,
@@ -133,24 +135,29 @@ public struct TransactionRow: View {
     }
 
     public var body: some View {
-        HStack(spacing: AppSpacing.md) {
-            iconView
-                .matchedTransitionSourceIfPresent(id: transitionSourceID, namespace: transitionNamespace)
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                // At accessibility sizes the amounts go under the text, leading (3.0.0): beside
+                // it they left the title so little room that words broke in the middle.
+                HStack(alignment: .top, spacing: AppSpacing.md) {
+                    iconView
+                        .matchedTransitionSourceIfPresent(id: transitionSourceID, namespace: transitionNamespace)
+                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                        info
+                        amountLines(alignment: .leading)
+                    }
+                    Spacer(minLength: 0)
+                }
+            } else {
+                HStack(spacing: AppSpacing.md) {
+                    iconView
+                        .matchedTransitionSourceIfPresent(id: transitionSourceID, namespace: transitionNamespace)
 
-            info
+                    info
 
-            Spacer()
+                    Spacer()
 
-            VStack(alignment: .trailing, spacing: AppSpacing.xs) {
-                ForEach(Array(amounts.enumerated()), id: \.offset) { index, line in
-                    FormattedAmountText(
-                        amount: line.amount,
-                        currency: line.currency,
-                        prefix: line.prefix,
-                        // An entry's second line is its equivalent, a shade lighter; a
-                        // transfer's legs are both full colour.
-                        color: index > 0 && !isTransfer ? line.color.opacity(TransactionRowMetrics.equivalentOpacity) : line.color
-                    )
+                    amountLines(alignment: .trailing)
                 }
             }
         }
@@ -164,6 +171,22 @@ public struct TransactionRow: View {
     private var isTransfer: Bool {
         if case .transfer = subject { return true }
         return false
+    }
+
+    /// The amounts, top to bottom.
+    private func amountLines(alignment: HorizontalAlignment) -> some View {
+        VStack(alignment: alignment, spacing: AppSpacing.xs) {
+            ForEach(Array(amounts.enumerated()), id: \.offset) { index, line in
+                FormattedAmountText(
+                    amount: line.amount,
+                    currency: line.currency,
+                    prefix: line.prefix,
+                    // An entry's second line is its equivalent, a shade lighter; a
+                    // transfer's legs are both full colour.
+                    color: index > 0 && !isTransfer ? line.color.opacity(TransactionRowMetrics.equivalentOpacity) : line.color
+                )
+            }
+        }
     }
 
     // MARK: Icon

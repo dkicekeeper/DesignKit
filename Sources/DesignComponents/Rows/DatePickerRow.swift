@@ -17,6 +17,8 @@ public struct DatePickerRow: View {
     let title: String
     @Binding var selection: Date
     let displayedComponents: DatePickerComponents
+    /// When set, the picker cannot select a date before this (3.0.0: a trip day from today on).
+    let minDate: Date?
     /// When set, the picker cannot select a date after this (e.g. loan payments
     /// can't be future-dated — M-3).
     let maxDate: Date?
@@ -26,12 +28,14 @@ public struct DatePickerRow: View {
         title: String = String(localized: "common.startDate"),
         selection: Binding<Date>,
         displayedComponents: DatePickerComponents = .date,
+        minDate: Date? = nil,
         maxDate: Date? = nil
     ) {
         self.icon = icon
         self.title = title
         self._selection = selection
         self.displayedComponents = displayedComponents
+        self.minDate = minDate
         self.maxDate = maxDate
     }
 
@@ -40,7 +44,22 @@ public struct DatePickerRow: View {
             config: .standard,
             leadingIcon: icon.map { .sfSymbol($0, color: AppColors.accent, size: AppIconSize.lg) }
         ) {
-            if let maxDate {
+            if let minDate, let maxDate {
+                DatePicker(
+                    title,
+                    selection: $selection,
+                    in: minDate...max(minDate, maxDate),
+                    displayedComponents: displayedComponents
+                )
+            } else if let minDate {
+                // 3.0.0: a lower bound (a trip day from today on).
+                DatePicker(
+                    title,
+                    selection: $selection,
+                    in: minDate...,
+                    displayedComponents: displayedComponents
+                )
+            } else if let maxDate {
                 DatePicker(
                     title,
                     selection: $selection,

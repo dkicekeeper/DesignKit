@@ -50,8 +50,3 @@ public struct ConvertedAmount: View {
         }
     }
 }
-
-// MARK: - Names before 2.0
-
-@available(*, deprecated, renamed: "ConvertedAmount")
-public typealias ConvertedAmountView = ConvertedAmount

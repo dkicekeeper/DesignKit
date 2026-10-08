@@ -19,6 +19,8 @@ struct SettingsRowsScreen: View {
             ToggleSettingsRowPage()
             ActionSettingsRowPage()
             MenuPickerRowPage()
+            NavigationPickerRowPage()
+            StepperRowPage()
             SliderRowPage()
             DatePickerRowPage()
             ColorPickerRowPage()
@@ -151,6 +153,7 @@ private struct NavigationSettingsRowPage: View {
 private struct ToggleSettingsRowPage: View {
     @State private var isOn = true
     @State private var showsHint = true
+    @State private var showsIcon = true
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -165,7 +168,7 @@ private struct ToggleSettingsRowPage: View {
                 if state == .loading {
                     UniversalRowSkeleton.toggleSettings
                 } else {
-                    ToggleSettingsRow(icon: "moon.fill", title: "Quiet hours",
+                    ToggleSettingsRow(icon: showsIcon ? "moon.fill" : nil, title: "Quiet hours",
                                       hint: showsHint ? "No notifications from 22:00 to 8:00" : nil,
                                       isOn: $isOn)
                 }
@@ -174,6 +177,7 @@ private struct ToggleSettingsRowPage: View {
             StateControl(state: $state)
             ToggleControl("On", isOn: $isOn)
             ToggleControl("Hint", isOn: $showsHint)
+            ToggleControl("Icon (optional since 3.0.0)", isOn: $showsIcon)
         }
     }
 }
@@ -227,6 +231,81 @@ private struct MenuPickerRowPage: View {
             }
         } controls: {
             StateControl(state: $state)
+        }
+    }
+}
+
+private struct NavigationPickerRowPage: View {
+    @State private var species = "pike"
+    @State private var showsIcon = true
+    @State private var many = true
+    @State private var state: SpecimenState = .content
+
+    private let fewOptions: [(label: String, value: String)] = [
+        (label: "Pike", value: "pike"), (label: "Perch", value: "perch"), (label: "Carp", value: "carp"),
+    ]
+    private var manyOptions: [(label: String, value: String)] {
+        fewOptions + ["Asp", "Bream", "Catfish", "Chub", "Grayling", "Ide", "Roach", "Rudd", "Tench", "Trout", "Zander"]
+            .map { (label: $0, value: $0.lowercased()) }
+    }
+
+    var body: some View {
+        ComponentPage(
+            name: "NavigationPickerRow",
+            summary: "A choice from a long list: the row shows the chosen value; a tap pushes the list, with a search field past 12 options.",
+            since: "3.0.0",
+            apps: [.dalada],
+            canvas: .fill,
+            notes: ["Needs a NavigationStack around it (an EditSheetContainer has one). A few options: MenuPickerRow."]
+        ) {
+            NavigationStack {
+                InFormCard {
+                    if state == .loading {
+                        UniversalRowSkeleton.menuPicker
+                    } else {
+                        NavigationPickerRow(icon: showsIcon ? "fish" : nil, title: "Species",
+                                            selection: $species, options: many ? manyOptions : fewOptions)
+                    }
+                }
+                .toolbar(.hidden, for: .navigationBar)
+            }
+            .frame(height: 220)
+        } controls: {
+            StateControl(state: $state)
+            ToggleControl("Icon", isOn: $showsIcon)
+            ToggleControl("Many options (search)", isOn: $many)
+        }
+    }
+}
+
+private struct StepperRowPage: View {
+    @State private var count = 3
+    @State private var showsIcon = true
+    @State private var showsUnit = false
+    @State private var state: SpecimenState = .content
+
+    var body: some View {
+        ComponentPage(
+            name: "StepperRow",
+            summary: "A whole number in a form: the title, the value and − / + to change it, within a range.",
+            since: "3.0.0",
+            apps: [.dalada],
+            canvas: .fill
+        ) {
+            InFormCard {
+                if state == .loading {
+                    UniversalRowSkeleton.menuPicker
+                } else {
+                    StepperRow(icon: showsIcon ? "fish" : nil, title: "Fish caught", value: $count, in: 0...99) {
+                        showsUnit ? "\($0) pcs" : "\($0)"
+                    }
+                }
+            }
+        } controls: {
+            StateControl(state: $state)
+            StepperControl("Value", value: $count, in: 0...99)
+            ToggleControl("Icon", isOn: $showsIcon)
+            ToggleControl("Unit", isOn: $showsUnit)
         }
     }
 }

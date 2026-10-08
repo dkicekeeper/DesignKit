@@ -40,8 +40,9 @@
 | `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons") |
 
 **Names (2.0.0).** A component is named for what it is, without `View` or `App`: `SectionHeader`,
-`EmptyState`, `Avatar`, `Badge`, `Icon`, `DSButton`. The names before 2.0 are deprecated
-typealiases, so old code builds with a fix-it; [migration-2.0.md](migration-2.0.md) lists them.
+`EmptyState`, `Avatar`, `Badge`, `Icon`, `DSButton`. The names before 2.0 were deprecated
+typealiases until 3.0.0, which removed them ([migration-2.0.md](migration-2.0.md),
+[migration-3.0.md](migration-3.0.md)).
 The tokens keep their prefix (`AppColors`, `AppSpacing`, `AppIconSize`, …): a token namespace
 is not a view, and `Color` / `Font` would clash with SwiftUI. The button is `DSButton` because
 `Button` is SwiftUI's.
@@ -91,7 +92,7 @@ All tokens live in `Sources/DesignTokens/`. Never use raw values — always refe
 **Semantic colours v2 (1.6.0)**: tokens are grouped by what they colour and named *group / name / modifier* (`AppColors.Text.secondaryOnDark`, `AppColors.Status.warningPale`). Every token has a doc comment saying where it goes; the Gallery's Colors page shows them with their use.
 
 Modifiers:
-- **`OnDark` / `OnLight`**: the same value in both themes, for content on photos, gradients and coloured headers (a trip photo in Dalada, `GradientOrbsBackground`, an accent hero).
+- **`OnDark` / `OnLight`**: the same value in both themes, for content on photos, gradients and coloured headers (a trip photo in Dalada, `AuroraBackground`, an accent hero).
 - **`Pale`**: a tinted container behind status text, badges and icons. `AppColors.pale(_:)` makes one from any colour (a category colour too): 12% in light, 24% in dark. Since 1.8.0 every tinted container in DesignKit uses it, so they are equally strong everywhere: `Badge` (tinted), `TrendBadge` (pill), `RecommendationBox`, `HeroSymbol`, `Avatar` (initials), the round icons of `LimitProgressCard` and `AmountRow`'s tinted icon, `ActivityTimeline` markers, the `ScoreGaugeCard` grade and `TargetProgressCard` badge, `MonthCalendar`'s today, `TagInput` chips and the calculator's operator keys. Progress tracks and chart fills are not containers and keep their own opacity.
 - **Opaque** (`Border.opaque`): no transparency, for outlines that overlap.
 
@@ -191,8 +192,8 @@ below it the backing leaves the symbol no room for `Icon`'s padding, so 40 pt is
 | `xxl` | 72 | A ring around an `xl` tile (8 pt stroke) |
 | `xxxl` | 80 | Hero icons, large action buttons (voice input) |
 
-2.0.0: `Tile.xs` (40) is deprecated, renamed `AppIconSize.xxl`. The names deprecated in 1.13.0
-are gone: `avatar` (40, now `xxl`), the old `xxl` (44, `Tile.sm`) and `xxxl` (48, `Tile.md`),
+2.0.0: `Tile.xs` (40) became `AppIconSize.xxl` (the old name is gone since 3.0.0). The names
+deprecated in 1.13.0 are gone: `avatar` (40, now `xxl`), the old `xxl` (44, `Tile.sm`) and `xxxl` (48, `Tile.md`),
 `categoryIcon` (`Tile.lg`), `mega` (`Tile.xl`), `budgetRing` (`Tile.xxl`), `ultra`
 (`Tile.xxxl`).
 
@@ -279,7 +280,7 @@ The 1.x tokens, still used by the components that have them:
 
 **Reduce-motion-aware:** `fastAnimation` (replaces `easeInOut(fast)`), `adaptiveSpring` (overshoot spring used by `BounceButtonStyle`). Check `isReduceMotionEnabled` flag directly when rolling your own.
 
-**Component-local animation constants** live as `private enum` inside the component file (precedent: `BannerAnimation` in `MessageBanner.swift`, `OrbStyle.opacity/blur` in `GradientOrbsBackground.swift`). Don't pull single-component tunables back into `AppAnimation`.
+**Component-local animation constants** live as `private enum` inside the component file (precedent: `BannerAnimation` in `MessageBanner.swift`, `PackedCircleMetrics` in `PackedCircleIcons.swift`). Don't pull single-component tunables back into `AppAnimation`.
 
 **`BounceButtonStyle`:** `scaleEffect(0.96)` + `brightness(-0.05)` on press. Apply via `.buttonStyle(.bounce)`.
 
@@ -291,7 +292,7 @@ The 1.x tokens, still used by the components that have them:
 
 | Modifier | Effect | When to Use |
 |----------|--------|-------------|
-| `.cardStyle(radius:)` | Liquid Glass (iOS 26+) or `.ultraThinMaterial` card background. Default radius: `AppRadius.xl` (20pt) | **Display cards only.** Account/Loan/Health hero cards, list cards, detail-view cards — anything without interactive `Picker(.menu)` / `Menu` inside |
+| `.cardStyle(radius:)` | Liquid Glass (iOS 26+) or `.ultraThinMaterial` card background. Default radius: `AppRadius.xl` (20pt). Since 3.0.0 the glass is drawn behind the content, so the content keeps its exact colours (applied to the content, the glass blended its layers into each other) | **Display cards only.** Account/Loan/Health hero cards, list cards, detail-view cards — anything without interactive `Picker(.menu)` / `Menu` inside |
 | `.formCardStyle(radius:)` | `.ultraThinMaterial` card background on every iOS. Same shape/padding contract as `cardStyle`. | **Form-section cards.** `FormSection`, `BudgetSettingsSection` — any card that wraps `MenuPickerRow` / `Picker(.menu)` / `Menu`. iOS 26's `glassEffect` becomes the morph-source for menus, so single-row form sections would collapse the whole row into the popover at tap. `formCardStyle` uses Material to side-step that |
 | `.filterChipStyle(isSelected:)` | Glass chip styling with accent tint when selected. Animated selection transition | Filter buttons, `UniversalFilterButton` |
 | `.screenPadding()` | `.padding(.horizontal, AppSpacing.lg)` (16pt) | Screen-level horizontal insets |
@@ -312,7 +313,8 @@ full width, a loading state, haptics. `.dsButton(_:role:size:disabled:)` is its 
 `Button` whose label is built by hand (two lines, an amount). Before 2.0 the style was
 `.appButton` with the shorthands `.primaryButton()` / `.secondaryButton()`, and loading,
 deleting the selection and the detail-screen tiles were separate views (`LoadingButtonLabel`,
-`BulkDeleteButton`, `EntityActionButton`); all are deprecated in favour of these two.
+`BulkDeleteButton`, `EntityActionButton`); all were deprecated in favour of these two and
+removed in 3.0.0.
 
 | Call | Visual | Usage |
 |------|--------|-------|
@@ -347,7 +349,9 @@ destructive role.)
 ```swift
 EditSheetContainer(
     title: String,
+    saveTitle: String? = nil,    // 3.0.0: VoiceOver's name for the checkmark ("Publish"); Save
     isSaveDisabled: Bool,
+    isSaving: Bool = false,      // 3.0.0: a spinner for Save, Cancel disabled
     wrapInForm: Bool = true,     // false for hero-style edit views
     onSave: { },
     onCancel: { }
@@ -483,7 +487,7 @@ InfoRow(icon: "calendar", label: "Next Payment", value: "March 15, 2026")
 Use in: detail views for metadata display. NOT for editable fields.
 
 #### `CheckmarkRow` *(1.10.0)*
-A row of a choice list (a filter or picker sheet): `UniversalRow(.settings)` with an optional icon (`IconConfig`), the title in h4 medium, an optional trailing value (secondary h4, e.g. a balance), and the accent checkmark on the picked row. A tap plays the selection haptic and runs the action; VoiceOver hears a button, "Selected" on the picked one (`.selectableRow`). `CheckmarkRow("All accounts", isSelected: selection == nil) { selection = nil }`. Tenra: the rows of its account, category and time filters. Skeleton: `UniversalRowSkeleton.checkmark(iconStyle:)`.
+A row of a choice list (a filter or picker sheet): `UniversalRow(.settings)` with an optional icon (`IconConfig`), the title in h4 medium, an optional trailing value (secondary h4, e.g. a balance), and the accent checkmark on the picked row. A tap plays the selection haptic and runs the action; VoiceOver hears a button, "Selected" on the picked one (`.selectableRow`). `CheckmarkRow("All accounts", isSelected: selection == nil) { selection = nil }`. In a `FormSection` card pass `config: .standard` (3.0.0), which pads it as the card's other rows (Dalada's report reasons). Tenra: the rows of its account, category and time filters. Skeleton: `UniversalRowSkeleton.checkmark(iconStyle:)`.
 
 #### `MenuPickerRow`
 In-form single-select picker with dropdown menu.
@@ -499,6 +503,31 @@ MenuPickerRow(
 
 Use in: form sections for frequency, period, reminder, etc.
 
+#### `NavigationPickerRow` *(3.0.0)*
+A choice from a long list: the title (with an optional accent symbol), the chosen value
+(secondary) and a chevron; a tap pushes the list (`CheckmarkRow`s, a search field past
+`NavigationPickerMetrics.searchThreshold` options), and a choice goes back. Needs a
+`NavigationStack` around it (an `EditSheetContainer` has one). At accessibility sizes the value
+moves under the title. A few options: `MenuPickerRow`. Dalada: the fish species, the packing
+list to start from.
+
+```swift
+NavigationPickerRow(icon: "fish", title: "Species", selection: $speciesID,
+                    options: species.map { (label: $0.name, value: $0.id) })
+```
+
+#### `StepperRow` *(3.0.0)*
+A whole number in a form: the title (body, with an optional accent symbol), the value (body,
+secondary, tabular digits, rolling as it changes) and a system stepper on the trailing edge; at
+accessibility sizes the value and the stepper move under the title. `in:` bounds it, `step:`
+sets the increment, `format:` writes the value ("3 pcs") and is what VoiceOver reads. Each step
+plays the selection haptic. Dalada: the fish caught, the spare items of its gear.
+
+```swift
+StepperRow(icon: "fish", title: "Fish caught", value: $count, in: 0...99)
+StepperRow(title: "Spares", value: $spares, in: 0...20) { "\($0) pcs" }
+```
+
 #### `NetAmountRow` *(1.1.0)*
 A label with a net amount (destructive when negative) and "+inflow −outflow" under it, or one amount (`singleValue`, `singleColor`) with no second line. Vertical padding of the `.info` preset (8; `AppSpacing.md` before 1.4.0); separate rows with `Divider()`. Tenra: `PeriodBreakdownRow` (period lists of the insights) is an adapter.
 
@@ -507,7 +536,7 @@ A schedule entry: a checked circle when `isDone` (the row is dimmed with `future
 
 #### `AmountRow` *(2.1.0)*
 A row about money: an icon, a name, and an amount, a share or a limit. It merges four rows that
-were built the same way; their names are deprecated wrappers drawing the same pixels.
+were built the same way; their names were deprecated wrappers, removed in 3.0.0.
 
 | Style | Look | Before 2.1 |
 |---|---|---|
@@ -549,10 +578,12 @@ AmountRow(account.name, leading: .icon(account.iconSource), value: .amount(balan
   insight lists are adapters. `AmountPercentage` (the amount over its share) stays public.
 
 #### `DatePickerRow`
-Inline `DatePicker` inside `UniversalRow`.
+Inline `DatePicker` inside `UniversalRow`. `maxDate:` stops it after a date (a payment cannot be
+in the future), `minDate:` *(3.0.0)* before one (a trip day from today on).
 
 ```swift
 DatePickerRow(icon: "calendar", title: "Start Date", selection: $startDate)
+DatePickerRow(title: "Trip day", selection: $day, minDate: Calendar.current.startOfDay(for: .now))
 ```
 
 #### `FormTextField`
@@ -788,13 +819,17 @@ Enhanced text field with error/help states.
 FormTextField(
     text: $name,
     placeholder: "Enter name",
-    style: .standard,         // or .multiline(min: 2, max: 6), .compact
+    style: .standard,         // or .multiline(min: 2, max: 6), .inline, .inlineMultiline,
+                              // .row, .rowMultiline(min:max:) (3.0.0)
     errorMessage: nameError,
     helpText: "Required field"
 )
 ```
 
-Use for: text inputs inside `FormSection`. NOT for amounts (use `AnimatedAmountInput`) or hero titles (use `AnimatedTitleInput`).
+Use for: text inputs inside `FormSection`. `.inline` sits in a row's trailing slot (right-aligned,
+no chrome); `.row` / `.rowMultiline` *(3.0.0)* fill a `FormSection` row on their own (a name, a
+note): leading-aligned, no chrome of their own, padded like a `.standard` row, with the error and
+help text under them. NOT for amounts (use `AnimatedAmountInput`) or hero titles (use `AnimatedTitleInput`).
 
 #### `AnimatedAmountInput` → `AmountInput`
 Hero-style large formatted amount with `.numericText()` transition.
@@ -911,7 +946,7 @@ HStack(spacing: AppSpacing.md) {
   given (EntityActionButton before 2.0, the same pixels).
 - `.only` shows the symbol alone; the title is its VoiceOver label.
 - The label takes the font around it, like a SwiftUI `Button`.
-- Replaces `LoadingButtonLabel`, `BulkDeleteButton` and `EntityActionButton` (deprecated).
+- Replaced `LoadingButtonLabel`, `BulkDeleteButton` and `EntityActionButton` (removed in 3.0.0).
 
 #### `ToggleSettingsRow` *(0.6.0)*
 The settings row with a switch, next to `NavigationSettingsRow` and `ActionSettingsRow`.
@@ -919,9 +954,13 @@ The settings row with a switch, next to `NavigationSettingsRow` and `ActionSetti
 ```swift
 ToggleSettingsRow(icon: "bell", title: "Reminders", isOn: $remindersOn)
 ToggleSettingsRow(icon: "location", title: "Share location", hint: "Friends see your trip", isOn: $shares)
+ToggleSettingsRow(title: "Released", isOn: $released)   // 3.0.0: no icon, a form row
 ```
 
-VoiceOver focuses the switch (title as label, `hint` as hint).
+VoiceOver focuses the switch (title as label, `hint` as hint). The icon is optional since
+3.0.0, and so is `ActionSettingsRow`'s, for rows in a form that carry no symbol. Both are `List`
+rows (`config: .settings`, no side padding); in a `FormSection` card pass `config: .standard`
+(3.0.0) so they pad like the rows around them.
 
 #### `SliderRow` *(1.15.0)*
 A setting set with a slider: the title (body, with an optional symbol), the value on the trailing
@@ -1063,7 +1102,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `BalanceCard`, `SelectableBalanceCard`, `FinanceCard`, `CashFlowCard` (also its own loading state), `TotalsCard`, `ComparisonCard`, `InsightsStatCard`, `StatTile`, `RecurringPaymentCard`, `RecommendationBox` | `…Skeleton` (`TotalsCardSkeleton(count:showsTitle:amountFont:)`, `FinanceCardSkeleton(showsTrailing:)`, `RecommendationBoxSkeleton(lines:)`) |
 | `LimitProgressCard`, `TargetProgressCard`, `PayoffProgressCard`, `ScoreCard`, `ScoreGaugeCard`, `MetricCard`, `WeightBreakdownCard`, `CalculationCard`, `ProgressRingTile`, `ProgressRingTileGrid` | `…Skeleton` (`MetricCardSkeleton(chartPlacement:)`, `WeightBreakdownCardSkeleton(segments:)`, `CalculationCardSkeleton(rows:showsHero:)`) |
 | `UniversalRow` | `UniversalRowSkeleton(config:iconStyle:titleFont:showsSubtitle:trailing:)` |
-| `NavigationSettingsRow`, `ToggleSettingsRow`, `ActionSettingsRow`, `MenuPickerRow`, `DatePickerRow`, `CheckmarkRow` | `UniversalRowSkeleton.navigationSettings`, `.toggleSettings`, `.actionSettings`, `.menuPicker`, `.datePicker`, `.checkmark(iconStyle:)` |
+| `NavigationSettingsRow`, `ToggleSettingsRow`, `ActionSettingsRow`, `MenuPickerRow`, `DatePickerRow`, `CheckmarkRow`, `StepperRow`, `NavigationPickerRow` (3.0.0) | `UniversalRowSkeleton.navigationSettings`, `.toggleSettings`, `.actionSettings`, `.menuPicker`, `.datePicker`, `.checkmark(iconStyle:)`; a stepper row and a navigation picker row are `.menuPicker` (the same shape) |
 | `SliderRow` (1.15.0) | `SliderRowSkeleton(showsHint:)` |
 | `AmountRow` (2.1.0) | `AmountRowSkeleton(style:showsRing:showsDetail:)` |
 | `NetAmountRow`, `ScheduleRow`, `InfoRow`, `ColorPickerRow` | `…Skeleton` |
@@ -1078,7 +1117,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `ShareCardFrame` (and `ShareCardSheet` while it loads), `LiveSessionBar`, `DownloadRow`, `ArticleBody` (2.8.0) | `…Skeleton` (`PhotoTileSkeleton(size:cornerRadius:)`, `PhotoStripSkeleton(count:size:)`, `PhotoGridSkeleton(count:columns:style:)`, `ShareCardSkeleton(format:)`, `ArticleBodySkeleton(paragraphs:)`) |
 | `TransactionRow`, `OptionCard`, `StreamingText`, `SnapCardPicker` (2.9.0) | `…Skeleton` (`TransactionRowSkeleton(showsDetails:)`, `StreamingTextSkeleton(font:)`, `SnapCardPickerSkeleton { the card's skeleton }`) |
 
-**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `GradientOrbsBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
+**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
 
 #### `SkeletonText` *(1.7.0)*
 A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `Skeleton`. For a component, use its skeleton (above); `.skeleton(isLoading:)` redacts a real view in place, with the system's placeholder shapes.
@@ -1111,8 +1150,8 @@ VoiceOver: "Step 2 of 4: Catch" (key `steps.position`). Tenra's 3-symbol onboard
 #### Permission primers → `PromptSheet`
 Our explanation before a system permission alert (HIG "Requesting permission") is a
 `PromptSheet` (below) since 2.0.0: `onPrimary` is async and runs the system request while the
-main button shows a spinner. `PermissionPrimerView` (0.7.0) was the same layout and is a
-deprecated wrapper. Show it at the moment of first use (first check-in, first subscription),
+main button shows a spinner. `PermissionPrimerView` (0.7.0) was the same layout, a
+deprecated wrapper removed in 3.0.0. Show it at the moment of first use (first check-in, first subscription),
 not at launch.
 
 ```swift
@@ -1222,7 +1261,7 @@ A short question or a permission request in a sheet: `HeroSymbol` (104 pt disc),
   the app (a primer that waits for the system alert's result).
 - `detent` (default `.medium`, with a drag indicator); `nil` when the app presents it its own way.
 - Before 2.0: a 340 pt sheet with an `h3` title, a `bodySmall` message and a 44 pt symbol
-  (`height:` init, deprecated). Tenra: `RatingSurveyView` is an adapter; Dalada's primers are
+  (`height:` init, removed in 3.0.0). Tenra: `RatingSurveyView` is an adapter; Dalada's primers are
   `PromptSheet(detent: nil, dismissesOnAnswer: false)`.
 
 ---
@@ -1463,9 +1502,6 @@ RatingPicker(rating: $draft.rating)
 Default colour `AppColors.warning`, maximum 5. VoiceOver keys: `rating.value`, `rating.pick`
 ([localization-keys.md](localization-keys.md)).
 
-#### `GradientOrbsBackground` *(1.5.0)*
-Up to three soft, heavily blurred colour orbs (`Orb(color:weight:)`, heaviest first) at fixed positions; weight sets an orb's size and brightness, the first two blur deeper (44) than the third (28), blended `.screen` and rasterised once (`drawingGroup`). Static by design (animating it was the home screen's main jank). Put it behind a glass card, clipped to the card's shape; never inside `List` / `ForEach`. Tenra: `CategoryGradientBackground` (top expense categories → colours) is an adapter.
-
 ---
 
 ### Community & Progress Components *(1.12.0)*
@@ -1653,7 +1689,8 @@ amount's size (body semibold), the target after a turn arrow. A `note` closes it
 secondary). The trailing edge: `amounts`, top to bottom (`FormattedAmountText`): an entry's
 second line is its equivalent at 70%, a transfer's two lines are its legs. `isPending` dims a
 future one (`futureTransactionStyle`). Vertical padding `sm`; `transitionSourceID` /
-`transitionNamespace` make the icon a zoom source. Tenra: `TransactionCardView` is an adapter.
+`transitionNamespace` make the icon a zoom source. At accessibility text sizes (3.0.0) the amounts
+go under the text, leading, so the title keeps its width. Tenra: `TransactionCardView` is an adapter.
 
 #### `SnapCardPicker`
 Full-width cards in a snapping row (`containerRelativeFrame`, `.viewAligned`), `md` apart with

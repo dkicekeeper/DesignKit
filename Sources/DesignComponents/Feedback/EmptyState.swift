@@ -193,8 +193,3 @@ public struct EmptyState: View {
 }
 
 // MARK: - Preview
-
-// MARK: - Names before 2.0
-
-@available(*, deprecated, renamed: "EmptyState")
-public typealias EmptyStateView = EmptyState

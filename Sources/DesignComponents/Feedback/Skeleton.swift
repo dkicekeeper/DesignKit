@@ -246,8 +246,3 @@ private struct ShimmerModifier: ViewModifier {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }
 }
-
-// MARK: - Names before 2.0
-
-@available(*, deprecated, renamed: "Skeleton")
-public typealias SkeletonView = Skeleton

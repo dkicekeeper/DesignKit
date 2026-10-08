@@ -130,7 +130,7 @@ and drift is for screens seen briefly (onboarding, a paywall).
 | Effect | What | Cost | Use |
 |---|---|---|---|
 | `VoiceWave(level:phase:style:)` | `.ribbons`: four ribbons of aurora light rising with each syllable, each on its own beat; `.orb`: a liquid mesh-gradient sphere whose rim ripples and glow swells. `.thinking` settles it with a light running through | one Canvas, up to 60 fps, only on screen | the picture by the microphone while a person speaks |
-| `EdgeGlow(level:)` | light along the screen's edges: aurora colours flow round the rim; the voice widens, brightens and speeds it. Replaces `SiriGlow` / `SiriWave` (deprecated names) | one Metal colour effect, no blur, 30 fps | the screen while the app listens |
+| `EdgeGlow(level:)` | light along the screen's edges: aurora colours flow round the rim; the voice widens, brightens and speeds it. Replaced `SiriGlow` / `SiriWave` (removed in 3.0.0) | one Metal colour effect, no blur, 30 fps | the screen while the app listens |
 | `.borderBeam(beams:)` | a comet runs along the border itself (one speed and length on every side), a bloom at its head, a fading tail, a faint spill on the edge | one Canvas, display rate while active | a card being worked on |
 | `.thinkingShimmer(isActive:)` | a band of aurora colour runs through text | one masked gradient, 30 fps | "Listening…", "Analysing…" |
 
