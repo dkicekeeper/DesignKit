@@ -181,7 +181,23 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "test(snapshots): record references ($RECORD)" \
             -m "Recorded by CI (record_snapshots: $RECORD) on $(xcodebuild -version | awk 'NR == 1')."
-          git push origin "HEAD:$GITHUB_REF_NAME"
+          # The branch may have moved while this run recorded (a push of code): put the
+          # references on top of it and push again. They touch only the PNGs, so the rebase is
+          # clean unless the same images changed on the branch too.
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:$GITHUB_REF_NAME"; then
+              exit 0
+            fi
+            echo "The branch moved; rebasing the references onto it (attempt $attempt)."
+            git fetch --depth=200 origin "$GITHUB_REF_NAME"
+            if ! git rebase FETCH_HEAD; then
+              git rebase --abort
+              echo "::error::The recorded references conflict with the branch. Re-run the recording."
+              exit 1
+            fi
+          done
+          echo "::error::Could not push the recorded references."
+          exit 1
 
   dalada:
     name: Dalada against this DesignKit

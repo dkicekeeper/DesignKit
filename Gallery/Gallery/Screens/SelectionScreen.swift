@@ -58,6 +58,7 @@ private struct ChipPickerPage: View {
     @State private var showsIcons = true
     @State private var showsTitle = true
     @State private var showsAll = false
+    @State private var inCard = false
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -67,16 +68,17 @@ private struct ChipPickerPage: View {
             since: "0.4.0",
             apps: [.dalada],
             canvas: .fill,
-            notes: ["allTitle (2.8.0): an \"All\" chip in front, selected while nothing is picked; a tap clears the selection."]
+            notes: [
+                "allTitle (2.8.0): an \"All\" chip in front, selected while nothing is picked; a tap clears the selection.",
+                "inset (3.1.0): in a FormSection card pass the card's padding, AppSpacing.lg. The caption and the first chip start there; the chips still scroll to the card's edge.",
+            ]
         ) {
             if state == .loading {
                 ChipPickerSkeleton(count: 4, showsTitle: showsTitle)
-            } else if multiple {
-                ChipPicker(showsTitle ? "Place" : nil, options: ["Lake", "River", "Camp", "Forest"],
-                           selection: $several, allTitle: showsAll ? "All" : nil, systemImage: placeIcon) { $0 }
+            } else if inCard {
+                FormSection { picker.padding(.vertical, AppSpacing.sm) }
             } else {
-                ChipPicker(showsTitle ? "Weather" : nil, options: ["Sunny", "Cloudy", "Rain", "Snow"],
-                           selection: $single, allTitle: showsAll ? "Any" : nil, systemImage: weatherIcon) { $0 }
+                picker
             }
         } controls: {
             StateControl(state: $state)
@@ -84,6 +86,21 @@ private struct ChipPickerPage: View {
             ToggleControl("Icons", isOn: $showsIcons)
             ToggleControl("Title", isOn: $showsTitle)
             ToggleControl("\"All\" chip", isOn: $showsAll)
+            ToggleControl("In a card (inset, 3.1.0)", isOn: $inCard)
+        }
+    }
+
+    @ViewBuilder
+    private var picker: some View {
+        let inset = inCard ? AppSpacing.lg : 0
+        if multiple {
+            ChipPicker(showsTitle ? "Place" : nil, options: ["Lake", "River", "Camp", "Forest"],
+                       selection: $several, allTitle: showsAll ? "All" : nil, systemImage: placeIcon,
+                       inset: inset) { $0 }
+        } else {
+            ChipPicker(showsTitle ? "Weather" : nil, options: ["Sunny", "Cloudy", "Rain", "Snow"],
+                       selection: $single, allTitle: showsAll ? "Any" : nil, systemImage: weatherIcon,
+                       inset: inset) { $0 }
         }
     }
 

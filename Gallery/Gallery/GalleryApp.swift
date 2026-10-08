@@ -42,6 +42,9 @@ struct GalleryApp: App {
         // Invented brands with logos drawn on the fly (GalleryLogos), for PackedCircleIcons and
         // Icon; any other name has none.
         DesignKitLogoLoader.loader = { await GalleryLogos.load($0) }
+        // Stand-in photos for RemotePhoto (GalleryPhotos): held ones show at once, the others
+        // arrive after a moment, as from the network.
+        GalleryPhotos.install()
     }
 
     var body: some Scene {

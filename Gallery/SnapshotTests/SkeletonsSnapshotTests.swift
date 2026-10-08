@@ -93,6 +93,17 @@ extension ComponentSnapshots {
 
         /// The skeletons of 2.8.0: photos, share card, downloads, articles, the session bar.
         /// In two pictures: in one, the window would be taller than the screen.
+        /// A photo loading by address (3.1.0): the grey with the shimmer, in a tile's corner.
+        @Test func remotePhotoSkeleton() async {
+            await assertComponentSnapshot(
+                HStack(spacing: AppSpacing.md) {
+                    PhotoTile { RemotePhotoSkeleton() }
+                    PhotoTile(size: 120) { RemotePhotoSkeleton() }
+                },
+                appearances: [.light, .dark]
+            )
+        }
+
         @Test func mediaSkeletons() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {
