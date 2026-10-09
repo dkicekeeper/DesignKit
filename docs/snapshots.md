@@ -16,7 +16,7 @@ appearances it lists:
 
 | File | Components |
 |---|---|
-| `FoundationsSnapshotTests` | typography scale, `AppTypography.numbers` (proportional since 3.3.0) next to tabular figures, primary / secondary buttons (enabled, disabled), the `.dsButton` matrix, `.fadeTruncation()`, `cardStyle`, filter chips, Dalada's accent through `DesignKitTheme.accent` |
+| `FoundationsSnapshotTests` | typography scale, `AppTypography.numbers` (proportional since 3.4.0) next to tabular figures, primary / secondary buttons (enabled, disabled), the `.dsButton` matrix, `.fadeTruncation()`, `cardStyle`, filter chips, Dalada's accent through `DesignKitTheme.accent` |
 | `RowsSnapshotTests` | `CheckmarkRow`, `UniversalRow`, `ActionSettingsRow`, `ToggleSettingsRow`, `InfoRow`, `SectionHeader` (with an action, 1.15.0), `SelectionIndicator`, `ColorPickerRow`, `SectionHeader(style: .card)` (a day's header), `SliderRow` |
 | `FormsSnapshotTests` | `EditableHero` (amount, no currency chip), `FormSection`, `DatePickerRow`, `MenuPickerRow`, `SectionHeader(style: .list)`, `HeroSection`; 3.0.0: `StepperRow`, `ToggleSettingsRow` and `ActionSettingsRow` without icons, `FormTextField` `.row` / `.rowMultiline`, `NavigationPickerRow` (in a `NavigationStack`, light and dark) |
 | `IconsSnapshotTests` | `Icon` (category, circle, rounded square, glass hero, placeholder, brand fallback, a brand logo), `PackedCircleIcons` (glossy symbols; `.flat`; glossy logos with an overflow marble in a `FinanceCard`, from the Gallery's invented brands, 2.9.0; 3.3.0: `.fan` and `.orbit` with symbols and with logos in a `FinanceCard`) |

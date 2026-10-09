@@ -4,7 +4,7 @@
 //
 //  Ambient glow rising from a screen edge. Two styles:
 //  • `.aurora` (2.5.0, the default): a band of mesh-gradient light in shades of the tint
-//    (hues within ±12°, 3.3.0; ±60° before, which turned a red icon's glow orange and
+//    (hues within ±12°, 3.4.0; ±60° before, which turned a red icon's glow orange and
 //    purple), fading towards the middle of the screen, with a fine grain. No blur, so it
 //    costs less than the soft style; still unless `drifts`.
 //  • `.soft` (before 2.5): a gradient-filled circle offset mostly off-screen and heavily
@@ -188,7 +188,7 @@ enum AuroraGlowMetrics {
     /// How far an inner point drifts, when the glow drifts.
     static let drift: Double = 0.05
     /// The widest hue step from the tint, in degrees: a category's or a logo's colour stays
-    /// one colour in several shades (3.3.0; the full ±60° wheel mixed in distant hues).
+    /// one colour in several shades (3.4.0; the full ±60° wheel mixed in distant hues).
     static let hueSpread: Double = 12
 }
 

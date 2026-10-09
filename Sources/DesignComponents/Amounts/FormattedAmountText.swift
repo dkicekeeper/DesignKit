@@ -107,7 +107,7 @@ public struct FormattedAmountText: View {
     }
 
     /// The caller's style through `AppTypography.numbers`, the one place amounts' figures
-    /// are styled (proportional since 3.3.0).
+    /// are styled (proportional since 3.4.0).
     private var numberFont: Font { AppTypography.numbers(fontSize) }
 
     // MARK: - Sign and unit

@@ -73,7 +73,7 @@ extension ComponentSnapshots {
         @Test func numbers() async {
             await assertComponentSnapshot(
                 HStack(alignment: .top, spacing: AppSpacing.xl) {
-                    // `AppTypography.numbers` (proportional since 3.3.0), then tabular figures.
+                    // `AppTypography.numbers` (proportional since 3.4.0), then tabular figures.
                     ForEach([false, true], id: \.self) { tabular in
                         VStack(alignment: .trailing, spacing: AppSpacing.xs) {
                             ForEach(["1 111 111", "8 888 888", "407 150"], id: \.self) { amount in

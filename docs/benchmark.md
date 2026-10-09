@@ -270,7 +270,7 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
   `TransactionRow` на крупном шрифте ставит суммы под текст. Для форм Dalada: `StepperRow`,
   `EditSheetContainer(isSaving:)`, `NavigationPickerRow`, `FormTextField(.row)`, строки
   переключателя и действия без иконки.
-- **3.3.0** — суммы снова обычными (пропорциональными) цифрами: `AppTypography.numbers(_:)`
+- **3.4.0** — суммы снова обычными (пропорциональными) цифрами: `AppTypography.numbers(_:)`
   больше не делает их табличными (с 1.8.0 суммы выглядели моноширинными). Свечение героя
   `.accentGlow(.aurora)` в оттенках одного цвета: тон ±12° вместо ±60°, через
   `AuroraBackground.palette(around:spread:)`.

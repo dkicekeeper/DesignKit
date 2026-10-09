@@ -71,7 +71,7 @@ public enum AppTypography {
     /// input), trend percentages and chart readouts go through it, so their figures are styled
     /// in one place.
     ///
-    /// Proportional figures, Inter's own (3.3.0). From 1.8.0 to 3.2.0 this was tabular
+    /// Proportional figures, Inter's own (3.4.0). From 1.8.0 to 3.3.0 this was tabular
     /// (`.monospacedDigit()`): every digit as wide as the others, which made amounts read as
     /// a monospaced font; the owner asked for the amounts as they were before. A counter that
     /// must keep its width while it changes (`StatTile`, `StepperRow`, a clock) uses

@@ -170,7 +170,7 @@ public struct AuroraBackground: View {
 
     /// The accent and its neighbours on the colour wheel, lighter and deeper: hues up to
     /// `spread` degrees either side (±30°, ±60° by default). The hero glow passes a narrow
-    /// spread, so its light stays one colour in several shades (3.3.0).
+    /// spread, so its light stays one colour in several shades (3.4.0).
     public static func palette(around color: Color, spread: Double = 60) -> [Color] {
         var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
         UIColor(color).getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
