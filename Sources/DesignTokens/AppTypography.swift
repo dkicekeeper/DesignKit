@@ -67,16 +67,21 @@ public enum AppTypography {
 
     // MARK: Numbers
 
-    /// `font` with tabular figures: every digit as wide as the others, so amounts in a column
-    /// line up and a number that changes (`.numericText()`) does not jump. Amounts
-    /// (`FormattedAmountText`, the amount input), trend percentages and chart readouts use it;
-    /// use it for any other figure that changes or stacks.
+    /// The font of amounts and other figures: amounts (`FormattedAmountText`, the amount
+    /// input), trend percentages and chart readouts go through it, so their figures are styled
+    /// in one place.
+    ///
+    /// Proportional figures, Inter's own (3.4.0). From 1.8.0 to 3.3.0 this was tabular
+    /// (`.monospacedDigit()`): every digit as wide as the others, which made amounts read as
+    /// a monospaced font; the owner asked for the amounts as they were before. A counter that
+    /// must keep its width while it changes (`StatTile`, `StepperRow`, a clock) uses
+    /// `.monospacedDigit()` itself.
     ///
     /// ```swift
     /// Text(count, format: .number).font(AppTypography.numbers(AppTypography.h3))
     /// ```
     public static func numbers(_ font: Font) -> Font {
-        font.monospacedDigit()
+        font
     }
 
 }

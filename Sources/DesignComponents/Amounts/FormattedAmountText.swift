@@ -106,8 +106,8 @@ public struct FormattedAmountText: View {
         self.currencyDisplay = currencyDisplay
     }
 
-    /// The caller's style with tabular figures (`AppTypography.numbers`): digits keep one
-    /// width, so amounts in a column line up and a changing amount does not shift.
+    /// The caller's style through `AppTypography.numbers`, the one place amounts' figures
+    /// are styled (proportional since 3.4.0).
     private var numberFont: Font { AppTypography.numbers(fontSize) }
 
     // MARK: - Sign and unit

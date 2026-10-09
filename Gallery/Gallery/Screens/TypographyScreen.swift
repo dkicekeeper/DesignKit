@@ -35,10 +35,10 @@ struct TypographyScreen: View {
                     }
                 }
             }
-            ShowcaseSection(title: "Numbers", subtitle: "AppTypography.numbers(_:) · tabular figures") {
+            ShowcaseSection(title: "Numbers", subtitle: "AppTypography.numbers(_:) · proportional; .monospacedDigit() for counters") {
                 HStack(alignment: .top, spacing: AppSpacing.xl) {
-                    numberColumn("Proportional", font: AppTypography.h4)
-                    numberColumn("Tabular", font: AppTypography.numbers(AppTypography.h4))
+                    numberColumn("Amounts", font: AppTypography.numbers(AppTypography.h4))
+                    numberColumn("Counters", font: AppTypography.h4.monospacedDigit())
                 }
             }
             ShowcaseSection(title: ".fadeTruncation()", subtitle: "One line that fades out instead of \"…\"") {
@@ -59,7 +59,7 @@ struct TypographyScreen: View {
         }
     }
 
-    /// The same amounts in one style: tabular figures line them up on the right.
+    /// The same amounts in one style, aligned on the right.
     private func numberColumn(_ title: String, font: Font) -> some View {
         VStack(alignment: .trailing, spacing: AppSpacing.xs) {
             ForEach(["1 111 111", "8 888 888", "407 150"], id: \.self) { amount in

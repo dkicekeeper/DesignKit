@@ -119,7 +119,7 @@ Insert with a spring: `withAnimation(AppAnimation.bouncy) { isShown = true }`.
 | Effect | What | Cost | Use |
 |---|---|---|---|
 | `AuroraBackground(_ spots:)` | weighted pools of colour, each sized and brightened by its weight, sampled into a 5×5 mesh; still by default, flowing into a change of data in 0.6 s. Replaces `GradientOrbsBackground` (deprecated) | one mesh, no blur, drawn once | a home screen's background under Liquid Glass |
-| `.accentGlow(style: .aurora)` (the default) | a band of mesh light in the tint and its neighbours, fading inwards; `drifts:` moves it | one mesh, no blur (the `.soft` style blurred a circle by 120 pt) | heroes of detail screens, onboarding |
+| `.accentGlow(style: .aurora)` (the default) | a band of mesh light in shades of the tint (hues within ±12° since 3.4.0), fading inwards; `drifts:` moves it | one mesh, no blur (the `.soft` style blurred a circle by 120 pt) | heroes of detail screens, onboarding |
 | `.grain(_:)` | a fine, still grain against banding | one colour effect, the same every frame | built into `AuroraBackground` and the aurora glow |
 
 **Backgrounds under Liquid Glass hold still.** A glass surface recomputes its blur from what is

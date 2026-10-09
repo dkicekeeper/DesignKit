@@ -50,7 +50,7 @@ private struct FormattedAmountTextPage: View {
     var body: some View {
         ComponentPage(
             name: "FormattedAmountText",
-            summary: "An amount with its currency: grouped tabular digits, decimals hidden when zero, the sign and the unit as you choose. Every amount in DesignKit is one.",
+            summary: "An amount with its currency: grouped digits, decimals hidden when zero, the sign and the unit as you choose. Every amount in DesignKit is one.",
             apps: [.tenra, .dalada],
             notes: [
                 "Hidden amounts: .amountsHidden() above it turns it into •••• ₸.",

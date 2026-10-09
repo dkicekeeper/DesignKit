@@ -168,10 +168,14 @@ public struct AuroraBackground: View {
         ]
     }
 
-    /// The accent and its neighbours on the colour wheel (±30°, ±60°), lighter and deeper.
-    public static func palette(around color: Color) -> [Color] {
+    /// The accent and its neighbours on the colour wheel, lighter and deeper: hues up to
+    /// `spread` degrees either side (±30°, ±60° by default). The hero glow passes a narrow
+    /// spread, so its light stays one colour in several shades (3.4.0).
+    public static func palette(around color: Color, spread: Double = 60) -> [Color] {
         var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
         UIColor(color).getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+        let near = CGFloat(spread) / 2
+        let far = CGFloat(spread)
         func shifted(_ degrees: CGFloat, brightness b: CGFloat) -> Color {
             var h = hue + degrees / 360
             h -= floor(h)
@@ -179,13 +183,13 @@ public struct AuroraBackground: View {
         }
         return [
             shifted(0, brightness: brightness),
-            shifted(30, brightness: brightness * 1.1),
-            shifted(-30, brightness: brightness * 0.9),
-            shifted(60, brightness: brightness * 1.05),
+            shifted(near, brightness: brightness * 1.1),
+            shifted(-near, brightness: brightness * 0.9),
+            shifted(far, brightness: brightness * 1.05),
             shifted(0, brightness: brightness * 1.15),
-            shifted(-60, brightness: brightness),
-            shifted(30, brightness: brightness * 0.85),
-            shifted(-30, brightness: brightness * 1.1),
+            shifted(-far, brightness: brightness),
+            shifted(near, brightness: brightness * 0.85),
+            shifted(-near, brightness: brightness * 1.1),
             shifted(0, brightness: brightness * 0.95),
         ]
     }
