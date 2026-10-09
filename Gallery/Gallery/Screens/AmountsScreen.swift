@@ -12,21 +12,26 @@ import DesignSupport
 import DesignComponents
 
 struct AmountsScreen: View {
+    static let title = "Amounts & Currency"
+
     var body: some View {
-        ShowcasePage(title: "Amounts & Currency") {
-            FormattedAmountTextPage()
-            LiveAmountTextPage()
-            AmountInputPage()
-            AmountDigitDisplayPage()
-            CalculatorPage()
-            CurrencyAmountInputPage()
-            CurrencyPickerMenuPage()
-            CurrencyListPage()
-            ConvertedAmountPage()
-            SpentBudgetTextPage()
-            AmountPercentagePage()
-            RedactableAmountPage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per component; the home screen counts them (ShowcaseCount).
+    @ViewBuilder static var pages: some View {
+        FormattedAmountTextPage()
+        LiveAmountTextPage()
+        AmountInputPage()
+        AmountDigitDisplayPage()
+        CalculatorPage()
+        CurrencyAmountInputPage()
+        CurrencyPickerMenuPage()
+        CurrencyListPage()
+        ConvertedAmountPage()
+        SpentBudgetTextPage()
+        AmountPercentagePage()
+        RedactableAmountPage()
     }
 }
 

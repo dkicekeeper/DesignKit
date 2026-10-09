@@ -11,14 +11,19 @@ import DesignSupport
 import DesignComponents
 
 struct ContentCardsScreen: View {
+    static let title = "Cards: Content"
+
     var body: some View {
-        ShowcasePage(title: "Cards: Content") {
-            ThreadCardPage()
-            ReviewCardPage()
-            ThumbnailCardPage()
-            RecommendationBoxPage()
-            EmptyCardPage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per component; the home screen counts them (ShowcaseCount).
+    @ViewBuilder static var pages: some View {
+        ThreadCardPage()
+        ReviewCardPage()
+        ThumbnailCardPage()
+        RecommendationBoxPage()
+        EmptyCardPage()
     }
 }
 

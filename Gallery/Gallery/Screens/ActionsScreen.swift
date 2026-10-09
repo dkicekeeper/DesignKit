@@ -11,16 +11,21 @@ import DesignSupport
 import DesignComponents
 
 struct ActionsScreen: View {
+    static let title = "Actions"
+
     var body: some View {
-        ShowcasePage(title: "Actions") {
-            DSButtonPage()
-            DSButtonStylePage()
-            BounceStylePage()
-            ReactionButtonPage()
-            GlassActionMenuPage()
-            AmountVisibilityTogglePage()
-            UniversalFilterButtonPage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per component; the home screen counts them (ShowcaseCount).
+    @ViewBuilder static var pages: some View {
+        DSButtonPage()
+        DSButtonStylePage()
+        BounceStylePage()
+        ReactionButtonPage()
+        GlassActionMenuPage()
+        AmountVisibilityTogglePage()
+        UniversalFilterButtonPage()
     }
 }
 

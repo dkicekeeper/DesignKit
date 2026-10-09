@@ -11,17 +11,22 @@ import DesignSupport
 import DesignComponents
 
 struct SelectionScreen: View {
+    static let title = "Selection"
+
     var body: some View {
-        ShowcasePage(title: "Selection") {
-            SegmentedPickerPage()
-            ChipPickerPage()
-            RatingPage()
-            SelectionIndicatorPage()
-            DateButtonsPage()
-            IconPickerPage()
-            SnapCardPickerPage()
-            OptionCardPickerPage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per component; the home screen counts them (ShowcaseCount).
+    @ViewBuilder static var pages: some View {
+        SegmentedPickerPage()
+        ChipPickerPage()
+        RatingPage()
+        SelectionIndicatorPage()
+        DateButtonsPage()
+        IconPickerPage()
+        SnapCardPickerPage()
+        OptionCardPickerPage()
     }
 }
 

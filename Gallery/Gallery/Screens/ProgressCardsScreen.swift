@@ -12,21 +12,26 @@ import DesignSupport
 import DesignComponents
 
 struct ProgressCardsScreen: View {
+    static let title = "Cards: Progress & Stats"
+
     var body: some View {
-        ShowcasePage(title: "Cards: Progress & Stats") {
-            LimitProgressCardPage()
-            TargetProgressCardPage()
-            PayoffProgressCardPage()
-            ScoreCardPage()
-            ScoreGaugeCardPage()
-            MetricCardPage()
-            InsightsStatCardPage()
-            StatTilePage()
-            StatsStripPage()
-            StreakCardPage()
-            ProgressRingTilePage()
-            ProgressRingTileGridPage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per component; the home screen counts them (ShowcaseCount).
+    @ViewBuilder static var pages: some View {
+        LimitProgressCardPage()
+        TargetProgressCardPage()
+        PayoffProgressCardPage()
+        ScoreCardPage()
+        ScoreGaugeCardPage()
+        MetricCardPage()
+        InsightsStatCardPage()
+        StatTilePage()
+        StatsStripPage()
+        StreakCardPage()
+        ProgressRingTilePage()
+        ProgressRingTileGridPage()
     }
 }
 

@@ -102,6 +102,23 @@ private struct ShowcaseChips: View {
 extension ContainerValues {
     /// The chip title of a showcase page.
     @Entry var showcaseTitle: String = ""
+    /// Set by `ComponentPage`: the page shows one component, which the home screen counts.
+    @Entry var showcaseIsComponent: Bool = false
+}
+
+/// How many components a screen's pages show: the number on the home screen's row, counted
+/// from the pages themselves (each `ComponentPage`), so it never goes stale.
+struct ShowcaseCount<Pages: View>: View {
+    @ViewBuilder var pages: Pages
+
+    var body: some View {
+        Group(subviews: pages) { subviews in
+            Text("\(subviews.filter { $0.containerValues.showcaseIsComponent }.count)")
+                .font(AppTypography.bodySmall)
+                .foregroundStyle(AppColors.textSecondary)
+                .monospacedDigit()
+        }
+    }
 }
 
 // MARK: - Component page
@@ -128,8 +145,9 @@ enum CanvasStyle {
 
 /// One component on a page of its own:
 ///
-/// 1. **Header** — the name, what it is for, since which version, which apps use it; a rule
-///    under it keeps it apart from the component.
+/// 1. **Header** — the name, what it is for, its styles (the values of its `style:`
+///    parameter), since which version, which apps use it; a rule under it keeps it apart from
+///    the component.
 /// 2. **Preview** — the component on a canvas, in the current controls; the canvas can be
 ///    switched to light or dark.
 /// 3. **Controls** — its state (default, loading = its skeleton, empty, error, disabled) and
@@ -142,12 +160,15 @@ struct ComponentPage<Preview: View, Controls: View>: View {
     var apps: [ConsumerApp] = []
     var canvas: CanvasStyle = .standard
     var notes: [String] = []
+    /// The values of the component's `style:` parameter, in the API's own names; none when it
+    /// has no such parameter.
+    var styles: [String] = []
     @ViewBuilder var preview: Preview
     @ViewBuilder var controls: Controls
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.xl) {
-            ComponentHeader(name: name, summary: summary, since: since, apps: apps)
+            ComponentHeader(name: name, summary: summary, styles: styles, since: since, apps: apps)
             PreviewCanvas(style: canvas) { preview }
             if Controls.self != EmptyView.self {
                 PanelSection("Controls") {
@@ -175,6 +196,7 @@ struct ComponentPage<Preview: View, Controls: View>: View {
             }
         }
         .containerValue(\.showcaseTitle, name)
+        .containerValue(\.showcaseIsComponent, true)
     }
 }
 
@@ -186,6 +208,7 @@ extension ComponentPage where Controls == EmptyView {
         apps: [ConsumerApp] = [],
         canvas: CanvasStyle = .standard,
         notes: [String] = [],
+        styles: [String] = [],
         @ViewBuilder preview: () -> Preview
     ) {
         self.name = name
@@ -194,15 +217,18 @@ extension ComponentPage where Controls == EmptyView {
         self.apps = apps
         self.canvas = canvas
         self.notes = notes
+        self.styles = styles
         self.preview = preview()
         self.controls = EmptyView()
     }
 }
 
-/// The page header: the name in h2, the purpose under it, version and app badges, a rule.
+/// The page header: the name in h2, the purpose under it, its styles, version and app badges,
+/// a rule.
 private struct ComponentHeader: View {
     let name: String
     let summary: String
+    let styles: [String]
     let since: String?
     let apps: [ConsumerApp]
 
@@ -216,6 +242,17 @@ private struct ComponentHeader: View {
                 .font(AppTypography.body)
                 .foregroundStyle(AppColors.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
+            if !styles.isEmpty {
+                Label {
+                    Text(verbatim: "\(styles.count) styles: \(styles.joined(separator: " · "))")
+                        .font(AppTypography.bodySmall)
+                        .foregroundStyle(AppColors.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                } icon: {
+                    Image(systemName: "square.stack.3d.up")
+                        .foregroundStyle(AppColors.accent)
+                }
+            }
             if since != nil || !apps.isEmpty {
                 HStack(spacing: AppSpacing.xs) {
                     if let since {

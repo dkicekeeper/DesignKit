@@ -140,7 +140,8 @@ rather than importing an app type.
    grey shapes for its text, amounts, icons and charts, `AppRadius.soft` for a shape with no
    corner of its own. One `.shimmer()` on the content, `.skeletonLoadingLabel()` on the whole
    (docs/design-system.md, "Component skeletons").
-4. Add a Gallery page: a `ComponentPage` in its section's screen (`Gallery/Gallery/Screens/`, by
+4. Add a Gallery page: a `ComponentPage` (with `styles:`, the values of its `style:` parameter,
+   if it has one) in its section's screen's `pages` (`Gallery/Gallery/Screens/`, by
    what the component does), with a control for each parameter and a `StateControl` whose
    "Loading" shows its skeleton (plus Empty / Error / Disabled when it has them); a new screen
    needs `xcodegen generate`. Add a snapshot test in `Gallery/SnapshotTests` (the skeleton's in

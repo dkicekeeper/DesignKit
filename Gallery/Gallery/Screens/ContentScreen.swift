@@ -12,17 +12,22 @@ import DesignSupport
 import DesignComponents
 
 struct ContentScreen: View {
+    static let title = "Content & Layout"
+
     var body: some View {
-        ShowcasePage(title: "Content & Layout") {
-            ExpandableTextPage()
-            ActivityTimelinePage()
-            MonthCalendarPage()
-            FlowLayoutPage()
-            FormSectionPage()
-            EditSheetContainerPage()
-            EditableHeroPage()
-            ArticleBodyPage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per component; the home screen counts them (ShowcaseCount).
+    @ViewBuilder static var pages: some View {
+        ExpandableTextPage()
+        ActivityTimelinePage()
+        MonthCalendarPage()
+        FlowLayoutPage()
+        FormSectionPage()
+        EditSheetContainerPage()
+        EditableHeroPage()
+        ArticleBodyPage()
     }
 }
 
