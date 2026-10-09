@@ -102,6 +102,8 @@ Insert with a spring: `withAnimation(AppAnimation.bouncy) { isShown = true }`.
 | `StreamingText(_:highlights:)` | words arrive one by one, each sliding in out of a blur (`.blurSlideWord`); a word that stays in place keeps its identity, so a refined transcript does not replay | one short transition per new word | a live transcript, text a model is writing |
 | `.cascadeIn(index:)` | cards that arrive together fade in and rise 12 pt, `index × 80 ms` apart (gentle spring); under Reduce Motion the same cadence without the rise | one transition per card | the cards a result brings (Tenra's voice input) |
 | `PackedCircleIcons` (`.glossy`) | the marbles burst out of the middle one after another with a little overshoot, then sway by up to 2 pt, each on its own beat | one spring per marble, then a repeating ease on an offset | the circles of a home card |
+| `PackedCircleIcons` (`.fan`, 3.3.0) | the cards are dealt out of a deck into a fan, one after another; every 4.5 s a light runs across them from the left | one spring per card; a `.shine` per card every 4.5 s | a home card's items as a hand of cards |
+| `PackedCircleIcons` (`.orbit`, 3.3.0) | the marbles fly out of the middle onto a tilted orbit, which then turns once in 28 s; the far side smaller and darker, behind the middle marble | one spring per marble, then one linear repeating animation of an angle | a home card's items around the largest one |
 
 **2.6.0: surfaces and moments**
 
@@ -185,7 +187,8 @@ on; the system's own switch turns them off.
   charts are there at once, parallax stops (`.scrollHero` keeps its stretch: it follows the
   finger).
 - **Ambient loops** (`AuroraBackground`, `TypingIndicator`, `.symbolPulse`, `LiveSessionBar`'s
-  recording dot, `PackedCircleIcons`' swaying marbles, the 1.x beams and glows) run inside `AmbientMotionGate`: off under Reduce Motion and, on iOS 27, while the system
+  recording dot, `PackedCircleIcons`' swaying marbles, the light across its fan and its turning
+  orbit, the 1.x beams and glows) run inside `AmbientMotionGate`: off under Reduce Motion and, on iOS 27, while the system
   prefers reduced resource usage. They draw one still frame instead, with the same layout.
 - **`.designKitMotion(false)`** stills all of DesignKit's motion below it: snapshot tests set it,
   an app can offer it as "reduce effects".
