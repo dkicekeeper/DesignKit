@@ -3,9 +3,10 @@
 //  Tenra
 //
 //  Ambient glow rising from a screen edge. Two styles:
-//  • `.aurora` (2.5.0, the default): a band of mesh-gradient light in the tint and its
-//    neighbours on the colour wheel, fading towards the middle of the screen, with a fine
-//    grain. No blur, so it costs less than the soft style; still unless `drifts`.
+//  • `.aurora` (2.5.0, the default): a band of mesh-gradient light in shades of the tint
+//    (hues within ±12°, 3.3.0; ±60° before, which turned a red icon's glow orange and
+//    purple), fading towards the middle of the screen, with a fine grain. No blur, so it
+//    costs less than the soft style; still unless `drifts`.
 //  • `.soft` (before 2.5): a gradient-filled circle offset mostly off-screen and heavily
 //    blurred.
 //  Hit-testing disabled, hidden from VoiceOver.
@@ -69,7 +70,7 @@ public extension View {
 
 /// How an accent glow is drawn (2.5.0).
 public enum AccentGlowStyle: Hashable, Sendable {
-    /// A band of mesh-gradient light in the tint and its neighbours, with a fine grain.
+    /// A band of mesh-gradient light in shades of the tint, with a fine grain.
     case aurora
     /// A heavily blurred circle of the tint, as before 2.5.
     case soft
@@ -114,9 +115,9 @@ private struct AccentGlowBackground: View {
 
 // MARK: - Aurora glow (2.5.0)
 
-/// A band of aurora light along one edge: three columns in the tint and its neighbours on the
-/// colour wheel, four rows fading from the edge to clear. The rows bend a little, so the light
-/// reads as an aurora, not a stripe.
+/// A band of aurora light along one edge: three columns in shades of the tint (hues within
+/// `AuroraGlowMetrics.hueSpread`), four rows fading from the edge to clear. The rows bend a
+/// little, so the light reads as an aurora, not a stripe.
 private struct AuroraGlowBackground: View {
     let tint: Color
     let edge: VerticalEdge
@@ -147,7 +148,7 @@ private struct AuroraGlowBackground: View {
     }
 
     private func mesh(at time: Double) -> some View {
-        let palette = AuroraBackground.palette(around: tint)
+        let palette = AuroraBackground.palette(around: tint, spread: AuroraGlowMetrics.hueSpread)
         let columns = [palette[0], palette[1], palette[5]]
         // Opacity of each row from the edge inwards.
         let rows = AuroraGlowMetrics.rowOpacity
@@ -186,6 +187,9 @@ enum AuroraGlowMetrics {
     static let rowOpacity: [Double] = [0.7, 0.42, 0.14, 0]
     /// How far an inner point drifts, when the glow drifts.
     static let drift: Double = 0.05
+    /// The widest hue step from the tint, in degrees: a category's or a logo's colour stays
+    /// one colour in several shades (3.3.0; the full ±60° wheel mixed in distant hues).
+    static let hueSpread: Double = 12
 }
 
 // MARK: - Hero icon tint resolution
