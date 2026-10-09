@@ -19,7 +19,7 @@ extension ComponentSnapshots {
         @Test func formSection() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.md) {
-                    SectionHeader("Subscription", style: .list)
+                    SectionHeader("Subscription", style: .compact)
                     FormSection(header: "Payment", footer: "Charged on the 17th of every month") {
                         DatePickerRow(icon: "calendar", title: "Start date", selection: .constant(FormsSample.startDate))
                         MenuPickerRow(

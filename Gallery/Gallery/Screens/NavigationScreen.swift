@@ -28,56 +28,72 @@ struct NavigationScreen: View {
 private struct SectionHeaderPage: View {
     @State private var style: SectionHeader.Style = .default
     @State private var showsIcon = true
+    @State private var trailingSymbol = ""
+    @State private var tinted = false
     @State private var trailing = 1
     @State private var state: SpecimenState = .content
 
     var body: some View {
         ComponentPage(
             name: "SectionHeader",
-            summary: "The title over a section in five styles: default, compact, large (a screen's sections), list (a List or Form section) and card (a day in a transaction list), with an optional action at the end of the line.",
+            summary: "The title over a section in four styles: default, compact (a List or Form section, or a screen's with the screen padding), large (a screen's sections) and card (a day in a transaction list), with symbols around the title and an optional action at the end of the line.",
             apps: [.tenra, .dalada],
             canvas: .fill,
             notes: [
-                "The icon shows in the large style only.",
+                "Both symbols show in every style (3.2.0), in the title's font: the one before the title in the accent (the label's grey in compact), the one right after it in the tertiary grey. Tint colours both.",
+                "The symbol after the title says what the header does: chevron.forward for one that leads somewhere (wrap it in a NavigationLink), info.circle for one that explains.",
                 "The action (1.15.0) is any view: a NavigationLink “All”, a button, a spinner, a day's total. It takes bodySmall and sits inside the style's padding.",
-                "2.0.0: SectionHeaderView before; SettingsSectionHeaderView is the list style, DateSectionHeaderView the card style with the day's total as the action.",
+                "3.2.0: compact has no padding of its own, as list had, and list is deprecated (it is compact). On a screen, add .screenPadding().",
+                "2.0.0: SectionHeaderView before; SettingsSectionHeaderView is the compact style in a List, DateSectionHeaderView the card style with the day's total as the action.",
             ]
         ) {
             if state == .loading {
-                SectionHeaderSkeleton(style: style, showsTrailing: trailing != 0)
+                SectionHeaderSkeleton(style: style, showsTrailing: trailing != 0, showsIcon: showsIcon)
             } else {
                 switch trailing {
                 case 1:
-                    SectionHeader(title, systemImage: showsIcon ? "map" : nil, style: style) {
+                    header(leading: "map") {
                         NavigationLink("All") { Text("All trips").navigationTitle("Trips") }
                     }
                 case 2:
-                    SectionHeader(title, systemImage: showsIcon ? "icloud.and.arrow.up" : nil, style: style) {
+                    header(leading: "icloud.and.arrow.up") {
                         ProgressView()
                     }
                 case 3:
-                    SectionHeader(title, systemImage: showsIcon ? "calendar" : nil, style: style) {
+                    header(leading: "calendar") {
                         FormattedAmountText(amount: 45_000, currency: "KZT", prefix: "-",
                                             fontSize: AppTypography.bodySmall, fontWeight: .semibold,
                                             color: AppColors.Text.tertiary)
                     }
                 default:
-                    SectionHeader(title, systemImage: showsIcon ? "map" : nil, style: style)
+                    SectionHeader(title, systemImage: showsIcon ? "map" : nil,
+                                  trailingSystemImage: trailingSymbol.isEmpty ? nil : trailingSymbol,
+                                  tint: tinted ? AppColors.success : nil, style: style)
                 }
             }
         } controls: {
             StateControl(state: $state)
             ChoiceControl("Style", selection: $style, options: [
-                ("Default", .default), ("Compact", .compact), ("Large", .large), ("List", .list), ("Card", .card),
+                ("Default", .default), ("Compact", .compact), ("Large", .large), ("Card", .card),
             ])
             ChoiceControl("Action", selection: $trailing, options: [("None", 0), ("All", 1), ("Spinner", 2), ("Total", 3)])
-            ToggleControl("Icon", isOn: $showsIcon)
+            ToggleControl("Icon before the title", isOn: $showsIcon)
+            ChoiceControl("Icon after the title (3.2.0)", selection: $trailingSymbol, options: [
+                ("None", ""), ("Chevron", "chevron.forward"), ("Info", "info.circle"),
+            ])
+            ToggleControl("Tint (green)", isOn: $tinted)
         }
+    }
+
+    private func header<Trailing: View>(leading: String, @ViewBuilder trailing: () -> Trailing) -> SectionHeader {
+        SectionHeader(title, systemImage: showsIcon ? leading : nil,
+                      trailingSystemImage: trailingSymbol.isEmpty ? nil : trailingSymbol,
+                      tint: tinted ? AppColors.success : nil, style: style, trailing: trailing)
     }
 
     private var title: String {
         switch style {
-        case .list: "Notifications"
+        case .compact: "Notifications"
         case .card: "Yesterday"
         default: "Recent trips"
         }
