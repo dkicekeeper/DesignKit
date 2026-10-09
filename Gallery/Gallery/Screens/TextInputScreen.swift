@@ -11,13 +11,18 @@ import DesignSupport
 import DesignComponents
 
 struct TextInputScreen: View {
+    static let title = "Text Input"
+
     var body: some View {
-        ShowcasePage(title: "Text Input") {
-            FormTextFieldPage()
-            AnimatedTitleInputPage()
-            MessageComposerPage()
-            TagInputPage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per component; the home screen counts them (ShowcaseCount).
+    @ViewBuilder static var pages: some View {
+        FormTextFieldPage()
+        AnimatedTitleInputPage()
+        MessageComposerPage()
+        TagInputPage()
     }
 }
 
@@ -44,7 +49,8 @@ private struct FormTextFieldPage: View {
             summary: "A form field with focus, error, help and disabled states; inline styles sit in a row's trailing slot, row styles fill a FormSection row (3.0.0).",
             apps: [.tenra, .dalada],
             canvas: .fill,
-            notes: ["Inline styles show no error or help text: put validation at the form level (InlineStatusText)."]
+            notes: ["Inline styles show no error or help text: put validation at the form level (InlineStatusText)."],
+            styles: ["standard", "multiline", "inline", "inlineMultiline", "row", "rowMultiline"]
         ) {
             if style >= 3 {
                 // Row styles fill a row of a FormSection on their own: the card is their chrome.

@@ -11,17 +11,22 @@ import DesignSupport
 import DesignComponents
 
 struct SheetsScreen: View {
+    static let title = "Sheets & Flows"
+
     var body: some View {
-        ShowcasePage(title: "Sheets & Flows") {
-            PromptSheetPage()
-            NotificationPermissionPromptPage()
-            OnboardingPagerPage()
-            OnboardingPagePage()
-            OnboardingPageContainerPage()
-            LoopOnboardingHeroPage()
-            ShareCardSheetPage()
-            DateRangePickerSheetPage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per component; the home screen counts them (ShowcaseCount).
+    @ViewBuilder static var pages: some View {
+        PromptSheetPage()
+        NotificationPermissionPromptPage()
+        OnboardingPagerPage()
+        OnboardingPagePage()
+        OnboardingPageContainerPage()
+        LoopOnboardingHeroPage()
+        ShareCardSheetPage()
+        DateRangePickerSheetPage()
     }
 }
 

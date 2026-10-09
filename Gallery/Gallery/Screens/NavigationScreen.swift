@@ -12,16 +12,21 @@ import DesignSupport
 import DesignComponents
 
 struct NavigationScreen: View {
+    static let title = "Headers & Navigation"
+
     var body: some View {
-        ShowcasePage(title: "Headers & Navigation") {
-            SectionHeaderPage()
-            HeroSectionPage()
-            UniversalCarouselPage()
-            OnboardingStepIndicatorPage()
-            PlusTabLabelPage()
-            LiveSessionBarPage()
-            PagerArrowsPage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per component; the home screen counts them (ShowcaseCount).
+    @ViewBuilder static var pages: some View {
+        SectionHeaderPage()
+        HeroSectionPage()
+        UniversalCarouselPage()
+        OnboardingStepIndicatorPage()
+        PlusTabLabelPage()
+        LiveSessionBarPage()
+        PagerArrowsPage()
     }
 }
 
@@ -45,7 +50,8 @@ private struct SectionHeaderPage: View {
                 "The action (1.15.0) is any view: a NavigationLink “All”, a button, a spinner, a day's total. It takes bodySmall and sits inside the style's padding.",
                 "3.2.0: compact has no padding of its own, as list had, and list is deprecated (it is compact). On a screen, add .screenPadding().",
                 "2.0.0: SectionHeaderView before; SettingsSectionHeaderView is the compact style in a List, DateSectionHeaderView the card style with the day's total as the action.",
-            ]
+            ],
+            styles: ["default", "compact", "large", "card"]
         ) {
             if state == .loading {
                 SectionHeaderSkeleton(style: style, showsTrailing: trailing != 0, showsIcon: showsIcon)

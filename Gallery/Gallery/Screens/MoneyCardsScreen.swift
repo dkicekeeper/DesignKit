@@ -12,18 +12,23 @@ import DesignSupport
 import DesignComponents
 
 struct MoneyCardsScreen: View {
+    static let title = "Cards: Money"
+
     var body: some View {
-        ShowcasePage(title: "Cards: Money") {
-            BalanceCardPage()
-            SelectableBalanceCardPage()
-            FinanceCardPage()
-            CashFlowCardPage()
-            TotalsCardPage()
-            ComparisonCardPage()
-            RecurringPaymentCardPage()
-            CalculationCardPage()
-            WeightBreakdownCardPage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per component; the home screen counts them (ShowcaseCount).
+    @ViewBuilder static var pages: some View {
+        BalanceCardPage()
+        SelectableBalanceCardPage()
+        FinanceCardPage()
+        CashFlowCardPage()
+        TotalsCardPage()
+        ComparisonCardPage()
+        RecurringPaymentCardPage()
+        CalculationCardPage()
+        WeightBreakdownCardPage()
     }
 }
 

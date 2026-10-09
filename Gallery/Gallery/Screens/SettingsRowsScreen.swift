@@ -11,23 +11,28 @@ import DesignSupport
 import DesignComponents
 
 struct SettingsRowsScreen: View {
+    static let title = "Rows: Settings & Forms"
+
     var body: some View {
-        ShowcasePage(title: "Rows: Settings & Forms") {
-            UniversalRowPage()
-            InfoRowPage()
-            NavigationSettingsRowPage()
-            ToggleSettingsRowPage()
-            ActionSettingsRowPage()
-            ActionRowLabelPage()
-            MenuPickerRowPage()
-            NavigationPickerRowPage()
-            StepperRowPage()
-            SliderRowPage()
-            DatePickerRowPage()
-            ColorPickerRowPage()
-            CheckmarkRowPage()
-            DisclosureChevronPage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per component; the home screen counts them (ShowcaseCount).
+    @ViewBuilder static var pages: some View {
+        UniversalRowPage()
+        InfoRowPage()
+        NavigationSettingsRowPage()
+        ToggleSettingsRowPage()
+        ActionSettingsRowPage()
+        ActionRowLabelPage()
+        MenuPickerRowPage()
+        NavigationPickerRowPage()
+        StepperRowPage()
+        SliderRowPage()
+        DatePickerRowPage()
+        ColorPickerRowPage()
+        CheckmarkRowPage()
+        DisclosureChevronPage()
     }
 }
 

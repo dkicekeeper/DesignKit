@@ -12,20 +12,25 @@ import DesignSupport
 import DesignComponents
 
 struct DataRowsScreen: View {
+    static let title = "Rows: Data"
+
     var body: some View {
-        ShowcasePage(title: "Rows: Data") {
-            AmountRowPage()
-            AmountRowLimitListPage()
-            NetAmountRowPage()
-            ScheduleRowPage()
-            PersonRowPage()
-            CommentRowPage()
-            ChecklistRowPage()
-            ChecklistSummaryRowPage()
-            ThumbnailRowPage()
-            DownloadRowPage()
-            TransactionRowPage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per component; the home screen counts them (ShowcaseCount).
+    @ViewBuilder static var pages: some View {
+        AmountRowPage()
+        AmountRowLimitListPage()
+        NetAmountRowPage()
+        ScheduleRowPage()
+        PersonRowPage()
+        CommentRowPage()
+        ChecklistRowPage()
+        ChecklistSummaryRowPage()
+        ThumbnailRowPage()
+        DownloadRowPage()
+        TransactionRowPage()
     }
 }
 
@@ -96,7 +101,8 @@ private struct AmountRowPage: View {
                 "2.1.0 merged BalanceRow (list, .amount), ProgressRingRow (list, .limit), BreakdownRow (info, .share) and InsightEntityRow (info, .amount); the old names were removed in 3.0.0.",
                 "A limit row keeps the ring's room around its icon with or without a limit, so a list of both lines up.",
                 "The info style stacks the value under the name at accessibility text sizes.",
-            ]
+            ],
+            styles: ["info", "list"]
         ) {
             InCard {
                 if state == .loading {
@@ -243,7 +249,8 @@ private struct PersonRowPage: View {
             since: "1.12.0",
             apps: [.dalada],
             canvas: .fill,
-            notes: ["style: .card (2.8.0): a 64 pt avatar, the name in h4, the @username and a third line (detail), in a card that pads itself."]
+            notes: ["style: .card (2.8.0): a 64 pt avatar, the name in h4, the @username and a third line (detail), in a card that pads itself."],
+            styles: ["list", "card"]
         ) {
             if style == .card {
                 specimen

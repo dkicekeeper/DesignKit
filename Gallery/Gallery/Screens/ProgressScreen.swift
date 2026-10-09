@@ -12,18 +12,23 @@ import DesignSupport
 import DesignComponents
 
 struct ProgressScreen: View {
+    static let title = "Progress & Gauges"
+
     var body: some View {
-        ShowcasePage(title: "Progress & Gauges") {
-            LinearProgressBarPage()
-            ProgressRingPage()
-            ProportionBarPage()
-            AmountComparisonBarPage()
-            MiniDonutPage()
-            ProportionBarsPage()
-            HalfGaugePage()
-            MilestoneGaugePage()
-            BarPairPage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per component; the home screen counts them (ShowcaseCount).
+    @ViewBuilder static var pages: some View {
+        LinearProgressBarPage()
+        ProgressRingPage()
+        ProportionBarPage()
+        AmountComparisonBarPage()
+        MiniDonutPage()
+        ProportionBarsPage()
+        HalfGaugePage()
+        MilestoneGaugePage()
+        BarPairPage()
     }
 }
 

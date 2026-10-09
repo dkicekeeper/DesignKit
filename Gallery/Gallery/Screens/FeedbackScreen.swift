@@ -12,23 +12,28 @@ import DesignSupport
 import DesignComponents
 
 struct FeedbackScreen: View {
+    static let title = "Status & Feedback"
+
     var body: some View {
-        ShowcasePage(title: "Status & Feedback") {
-            BadgePage()
-            TrendBadgePage()
-            StatusIndicatorBadgePage()
-            StatusBannerPage()
-            MessageBannerPage()
-            InlineStatusTextPage()
-            TooltipPage()
-            SpotlightPage()
-            TypingIndicatorPage()
-            EmptyStatePage()
-            StepTrackerPage()
-            ImportProgressSheetPage()
-            ProgressOverlayPage()
-            SkeletonPrimitivesPage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per component; the home screen counts them (ShowcaseCount).
+    @ViewBuilder static var pages: some View {
+        BadgePage()
+        TrendBadgePage()
+        StatusIndicatorBadgePage()
+        StatusBannerPage()
+        MessageBannerPage()
+        InlineStatusTextPage()
+        TooltipPage()
+        SpotlightPage()
+        TypingIndicatorPage()
+        EmptyStatePage()
+        StepTrackerPage()
+        ImportProgressSheetPage()
+        ProgressOverlayPage()
+        SkeletonPrimitivesPage()
     }
 }
 
@@ -49,7 +54,8 @@ private struct BadgePage: View {
             name: "Badge",
             summary: "A short label in a capsule: tinted (pale background, coloured text) or filled.",
             since: "0.4.0",
-            apps: [.tenra, .dalada]
+            apps: [.tenra, .dalada],
+            styles: ["tinted", "filled"]
         ) {
             if state == .loading {
                 BadgeSkeleton(width: 96)
@@ -79,7 +85,8 @@ private struct TrendBadgePage: View {
             name: "TrendBadge",
             summary: "A change in per cent with an arrow: green up, red down, grey flat (or your colour).",
             since: "0.4.0",
-            apps: [.tenra]
+            apps: [.tenra],
+            styles: ["pill", "inline", "changeIndicator"]
         ) {
             if state == .loading {
                 TrendBadgeSkeleton(style: style)
@@ -130,7 +137,8 @@ private struct StatusBannerPage: View {
             summary: "A status message in a pale box of its colour, or inline; an optional action.",
             since: "1.7.0",
             apps: [.tenra, .dalada],
-            canvas: .fill
+            canvas: .fill,
+            styles: ["standard", "compact"]
         ) {
             if state == .loading {
                 StatusBannerSkeleton(style: compact ? .compact : .standard)
@@ -285,7 +293,8 @@ private struct EmptyStatePage: View {
             canvas: .tall(minHeight: 280),
             notes: [
                 "The icon draws itself on (2.2.0) in an SF Symbols 7 gradient (2.3.0); the error icon wiggles once.",
-            ]
+            ],
+            styles: ["standard", "compact", "error"]
         ) {
             EmptyState(
                 icon: style == .error ? "wifi.slash" : "tray",

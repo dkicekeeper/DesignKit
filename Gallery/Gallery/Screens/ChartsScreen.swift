@@ -12,17 +12,22 @@ import DesignSupport
 import DesignComponents
 
 struct ChartsScreen: View {
+    static let title = "Charts"
+
     var body: some View {
-        ShowcasePage(title: "Charts") {
-            ChartSwitcherPage()
-            LineChartPage()
-            BarChartPage()
-            HeroSparklinePage()
-            SparklinePage()
-            OrbChartPage()
-            ChartSelectionBannerPage()
-            ChartZoomControlsPage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per component; the home screen counts them (ShowcaseCount).
+    @ViewBuilder static var pages: some View {
+        ChartSwitcherPage()
+        LineChartPage()
+        BarChartPage()
+        HeroSparklinePage()
+        SparklinePage()
+        OrbChartPage()
+        ChartSelectionBannerPage()
+        ChartZoomControlsPage()
     }
 }
 

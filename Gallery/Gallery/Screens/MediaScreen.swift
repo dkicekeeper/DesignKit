@@ -12,25 +12,30 @@ import DesignSupport
 import DesignComponents
 
 struct MediaScreen: View {
+    static let title = "Media & Identity"
+
     var body: some View {
-        ShowcasePage(title: "Media & Identity") {
-            IconPage()
-            AvatarPage()
-            AvatarGroupPage()
-            HeroSymbolPage()
-            PackedCircleIconsPage()
-            AchievementMedalPage()
-            AchievementTilePage()
-            AchievementProgressRowPage()
-            ThumbnailPlaceholderPage()
-            PhotoTilePage()
-            RemotePhotoPage()
-            PhotoStripPage()
-            PhotoGridPage()
-            PhotoCarouselPage()
-            PhotoViewerPage()
-            ShareCardFramePage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per component; the home screen counts them (ShowcaseCount).
+    @ViewBuilder static var pages: some View {
+        IconPage()
+        AvatarPage()
+        AvatarGroupPage()
+        HeroSymbolPage()
+        PackedCircleIconsPage()
+        AchievementMedalPage()
+        AchievementTilePage()
+        AchievementProgressRowPage()
+        ThumbnailPlaceholderPage()
+        PhotoTilePage()
+        RemotePhotoPage()
+        PhotoStripPage()
+        PhotoGridPage()
+        PhotoCarouselPage()
+        PhotoViewerPage()
+        ShareCardFramePage()
     }
 }
 
@@ -219,7 +224,8 @@ private struct PackedCircleIconsPage: View {
                 "fan: playing cards along an arc, the largest amount in the middle and in front. Dealt out of a deck; a light runs across them every few seconds.",
                 "orbit: the largest amount in the middle, the rest on a tilted orbit that turns once in 28 s; the far side is smaller and darker.",
                 "Items past Visible fold into a \u{201C}+N\u{201D} circle or card. Under Reduce Motion everything stands still.",
-            ]
+            ],
+            styles: ["glossy", "flat", "fan", "orbit"]
         ) {
             if inCard {
                 // As on Tenra's home: the trailing side of a FinanceCard, on Liquid Glass.
@@ -469,7 +475,8 @@ private struct PhotoGridPage: View {
             since: "2.8.0",
             apps: [.dalada],
             canvas: .fill,
-            notes: ["Lazy: put it in a ScrollView. onReachEnd loads the next page."]
+            notes: ["Lazy: put it in a ScrollView. onReachEnd loads the next page."],
+            styles: ["rounded", "edgeToEdge"]
         ) {
             if state == .loading {
                 PhotoGridSkeleton(style: style)

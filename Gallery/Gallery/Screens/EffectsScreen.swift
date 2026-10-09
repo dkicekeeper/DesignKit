@@ -13,25 +13,30 @@ import DesignTokens
 import DesignComponents
 
 struct EffectsScreen: View {
+    static let title = "Effects"
+
     var body: some View {
-        ShowcasePage(title: "Effects") {
-            CelebrationPage()
-            CompletionMomentPage()
-            RipplePage()
-            SparkleBurstPage()
-            ShinePage()
-            AttentionPulsePage()
-            AuroraBackgroundPage()
-            InteractiveTiltPage()
-            HolographicPage()
-            DissolvePage()
-            VoiceWavePage()
-            EdgeGlowPage()
-            ThinkingShimmerPage()
-            GrainPage()
-            AccentGlowPage()
-            BorderBeamPage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per component; the home screen counts them (ShowcaseCount).
+    @ViewBuilder static var pages: some View {
+        CelebrationPage()
+        CompletionMomentPage()
+        RipplePage()
+        SparkleBurstPage()
+        ShinePage()
+        AttentionPulsePage()
+        AuroraBackgroundPage()
+        InteractiveTiltPage()
+        HolographicPage()
+        DissolvePage()
+        VoiceWavePage()
+        EdgeGlowPage()
+        ThinkingShimmerPage()
+        GrainPage()
+        AccentGlowPage()
+        BorderBeamPage()
     }
 }
 
@@ -241,7 +246,8 @@ private struct VoiceWavePage: View {
                 "level: 0…1 from the app's microphone (RMS). It is smoothed here: fast up, slow down, so speech swells instead of flickering.",
                 "phase: .listening follows the voice; .thinking settles it while the words are understood, with a light running through.",
                 "One Canvas at up to 60 fps, only on screen; still under Reduce Motion. Pair it with EdgeGlow(level:).",
-            ]
+            ],
+            styles: ["ribbons", "orb"]
         ) {
             VoiceLevelSource(kind: source, fixed: level, microphone: microphone) { level in
                 VoiceWave(level: level, phase: phase, style: style)
@@ -394,7 +400,8 @@ private struct AccentGlowPage: View {
             notes: [
                 "style: .aurora (2.5.0, the default): a band of mesh-gradient light in the tint and its neighbours, fading inwards, with a fine grain. No blur, so lighter than .soft, the blurred circle of before.",
                 "drifts: the light moves slowly (onboardingAccentGlow does). Off for heroAccentGlow: under Liquid Glass a still background keeps the glass from redrawing.",
-            ]
+            ],
+            styles: ["aurora", "soft"]
         ) {
             Color.clear
                 .frame(height: 260)
