@@ -683,9 +683,9 @@ FinanceCard(
     corners; a logo sits on a white card, its corner pips and edge in the logo's main colour;
     "+N" is a grey card. The cards are dealt out of a deck one after another (a spring, 70 ms
     apart); every 4.5 s a light (`.shine`) runs across them from the left, card after card.
-  - **`style: .orbit`**: the largest amount as a marble in the middle (half the box's shorter
-    side), the rest as smaller marbles on an orbit seen at a slant (flatness 0.36, tilted
-    −12°), with its faint line. The orbit turns once in 28 s; a marble on the far side is
+  - **`style: .orbit`**: the largest amount as a marble in the middle (0.42 of the box's shorter
+    side), the rest as smaller marbles on an orbit seen at a slant (flatness 0.4, tilted −12°),
+    with its faint line. The orbit turns once in 28 s; a marble on the far side is
     smaller (0.72) and darker and passes behind the middle one, a near one in front. The marbles
     fly out of the middle onto it, then the turn starts. They do not sway.
 

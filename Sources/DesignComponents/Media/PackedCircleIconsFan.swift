@@ -289,7 +289,7 @@ private struct PackedFanCard: View {
         .overlay { edge(accent.opacity(0.55)) }
     }
 
-    /// "+N" on a grey card.
+    /// "+N" on a grey card, and small in two corners: an outer card shows only its edge.
     private var overflowFace: some View {
         let grey = AppColors.Text.tertiary
         return ZStack {
@@ -297,8 +297,10 @@ private struct PackedFanCard: View {
                 LinearGradient(colors: [grey.mix(with: .white, by: 0.15), grey.mix(with: .black, by: 0.2)],
                                startPoint: .topLeading, endPoint: .bottomTrailing)
             )
-            PackedOverflowLabel(count: overflowCount, size: width).foregroundStyle(.white)
+            PackedOverflowLabel(count: overflowCount, size: width)
         }
+        .overlay { corners { PackedOverflowLabel(count: overflowCount, size: width * 0.42) } }
+        .foregroundStyle(.white)
         .overlay { edge(Color.white.opacity(0.3)) }
     }
 

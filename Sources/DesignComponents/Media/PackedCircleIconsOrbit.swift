@@ -16,14 +16,14 @@ import DesignSupport
 
 enum PackedOrbitMetrics {
     /// The middle marble, as a share of the box's shorter side.
-    static let centreShare: CGFloat = 0.5
+    static let centreShare: CGFloat = 0.42
     /// The largest satellite, as a share of the middle marble.
-    static let satelliteShare: CGFloat = 0.6
+    static let satelliteShare: CGFloat = 0.56
     /// The smallest satellite next to the largest, and the "+N" one.
     static let smallestSatellite: CGFloat = 0.62
     static let overflowSatellite: CGFloat = 0.56
     /// The orbit seen at a slant: its height to its width, and its tilt in degrees.
-    static let flatness: CGFloat = 0.36
+    static let flatness: CGFloat = 0.4
     static let tilt: Double = -12
     /// The far side: smaller and darker.
     static let farScale: CGFloat = 0.72
@@ -210,11 +210,11 @@ struct PackedOrbitPath: View {
         Ellipse()
             .stroke(
                 LinearGradient(
-                    colors: [AppColors.Text.tertiary.opacity(0.08), AppColors.Text.tertiary.opacity(0.4)],
+                    colors: [AppColors.Text.tertiary.opacity(0.18), AppColors.Text.tertiary.opacity(0.6)],
                     startPoint: .top,
                     endPoint: .bottom
                 ),
-                lineWidth: 1
+                lineWidth: 1.2
             )
             .frame(width: geometry.radiusX * 2, height: geometry.radiusY * 2)
             .rotationEffect(.degrees(PackedOrbitMetrics.tilt))

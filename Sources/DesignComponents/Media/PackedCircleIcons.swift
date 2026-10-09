@@ -575,6 +575,11 @@ public struct PackedCircleIconsSkeleton: View {
             ForEach(slots) { slot in
                 RoundedRectangle(cornerRadius: slot.size.width * PackedFanMetrics.cornerRatio, style: .continuous)
                     .fill(Skeleton.fill)
+                    // A seam of the background between the cards, so the fan does not merge.
+                    .overlay {
+                        RoundedRectangle(cornerRadius: slot.size.width * PackedFanMetrics.cornerRatio, style: .continuous)
+                            .strokeBorder(.background, lineWidth: 1.5)
+                    }
                     .frame(width: slot.size.width, height: slot.size.height)
                     .rotationEffect(slot.angle)
                     .offset(slot.offset)
