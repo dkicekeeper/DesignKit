@@ -194,6 +194,8 @@ private struct PackedCircleIconsPage: View {
         PackedCircleItem(id: "3", iconSource: .sfSymbol("wallet.bifold.fill"), amount: 220_000, tint: AppColors.warning),
         PackedCircleItem(id: "4", iconSource: .sfSymbol("bitcoinsign.circle.fill"), amount: 90_000, tint: AppColors.transfer),
         PackedCircleItem(id: "5", iconSource: .sfSymbol("building.columns.fill"), amount: 40_000, tint: .purple),
+        PackedCircleItem(id: "6", iconSource: .sfSymbol("chart.line.uptrend.xyaxis"), amount: 25_000, tint: .teal),
+        PackedCircleItem(id: "7", iconSource: .sfSymbol("house.fill"), amount: 12_000, tint: .pink),
     ]
 
     /// Invented brands (GalleryLogos); one has a white logo.
@@ -203,13 +205,21 @@ private struct PackedCircleIconsPage: View {
         PackedCircleItem(id: "3", iconSource: .brandService("Tunewave"), amount: 1_990),
         PackedCircleItem(id: "4", iconSource: .brandService("Cloudy"), amount: 990),
         PackedCircleItem(id: "5", iconSource: .brandService("Reelio"), amount: 490),
+        PackedCircleItem(id: "6", iconSource: .brandService("Tunewave"), amount: 390),
+        PackedCircleItem(id: "7", iconSource: .brandService("Leafnote"), amount: 290),
     ]
 
     var body: some View {
         ComponentPage(
             name: "PackedCircleIcons",
-            summary: "Icons packed as circles sized by their amounts: the accounts of a home card. Glossy marbles since 2.9.0.",
-            apps: [.tenra]
+            summary: "Icons sized by their amounts: the accounts of a home card. Glossy marbles (2.9.0), flat circles, a fan of playing cards or an orbit (3.3.0).",
+            apps: [.tenra],
+            notes: [
+                "glossy: marbles packed without overlap; they burst out of the middle and sway. 3.3.0: a softer gloss.",
+                "fan: playing cards along an arc, the largest amount in the middle and in front. Dealt out of a deck; a light runs across them every few seconds.",
+                "orbit: the largest amount in the middle, the rest on a tilted orbit that turns once in 28 s; the far side is smaller and darker.",
+                "Items past Visible fold into a \u{201C}+N\u{201D} circle or card. Under Reduce Motion everything stands still.",
+            ]
         ) {
             if inCard {
                 // As on Tenra's home: the trailing side of a FinanceCard, on Liquid Glass.
@@ -223,10 +233,10 @@ private struct PackedCircleIconsPage: View {
             }
         } controls: {
             StateControl(state: $state)
-            ChoiceControl("Style", selection: $style, options: [("Glossy", .glossy), ("Flat", .flat)])
+            ChoiceControl("Style", selection: $style, options: [("Glossy", .glossy), ("Flat", .flat), ("Fan", .fan), ("Orbit", .orbit)])
             ChoiceControl("Items", selection: $showsLogos, options: [("Symbols", false), ("Logos", true)])
             ToggleControl("In a card", isOn: $inCard)
-            StepperControl("Visible", value: $maxVisible, in: 1...5)
+            StepperControl("Visible", value: $maxVisible, in: 1...7)
             SliderControl("Width", value: $width, in: 80...200, step: 10) { "\(Int($0)) pt" }
         }
     }
@@ -234,11 +244,11 @@ private struct PackedCircleIconsPage: View {
     @ViewBuilder
     private var specimen: some View {
         if state == .loading {
-            PackedCircleIconsSkeleton(containerWidth: width)
+            PackedCircleIconsSkeleton(containerWidth: width, style: style)
         } else {
             PackedCircleIcons(items: showsLogos ? logos : items, maxVisible: maxVisible, containerWidth: width, style: style)
                 // A new style or set plays the entrance again.
-                .id("\(style)-\(showsLogos)")
+                .id("\(style)-\(showsLogos)-\(maxVisible)")
         }
     }
 }

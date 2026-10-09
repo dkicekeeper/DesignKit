@@ -319,6 +319,18 @@ extension ComponentSnapshots {
             )
         }
 
+        /// `PackedCircleIconsSkeleton` for the fan of cards and the orbit (3.3.0).
+        @Test func packedCircleStyleSkeletons() async {
+            await assertComponentSnapshot(
+                HStack(spacing: AppSpacing.lg) {
+                    PackedCircleIconsSkeleton(style: .fan)
+                    PackedCircleIconsSkeleton(style: .orbit)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark]
+            )
+        }
+
         @Test func headerAndSliderSkeletons() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {

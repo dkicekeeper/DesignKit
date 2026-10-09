@@ -99,5 +99,46 @@ extension ComponentSnapshots {
                 }
             )
         }
+
+        /// The fan of playing cards and the orbit (3.3.0) with symbols: five items, four shown
+        /// and a "+1". Drawn in their final state: the deal, the flight onto the orbit, its turn
+        /// and the light stand still in snapshots.
+        @Test func packedCircleStyles() async {
+            for (name, style) in [("fan", PackedCircleIconsStyle.fan), ("orbit", .orbit)] {
+                await assertComponentSnapshot(
+                    PackedCircleIcons(items: [
+                        PackedCircleItem(id: "1", iconSource: .sfSymbol("creditcard.fill"), amount: 1_250_000, tint: AppColors.accent),
+                        PackedCircleItem(id: "2", iconSource: .sfSymbol("banknote.fill"), amount: 480_000, tint: AppColors.success),
+                        PackedCircleItem(id: "3", iconSource: .sfSymbol("wallet.bifold.fill"), amount: 220_000, tint: AppColors.warning),
+                        PackedCircleItem(id: "4", iconSource: .sfSymbol("bitcoinsign.circle.fill"), amount: 90_000, tint: AppColors.transfer),
+                        PackedCircleItem(id: "5", iconSource: .sfSymbol("building.columns.fill"), amount: 40_000, tint: .purple),
+                    ], maxVisible: 4, style: style)
+                    .frame(maxWidth: .infinity),
+                    named: name
+                )
+            }
+        }
+
+        /// Logos on the fan's white cards and as the orbit's marbles, in a FinanceCard on Liquid
+        /// Glass as on Tenra's home. One glass card per snapshot.
+        @Test func packedCircleStyleLogos() async {
+            for (name, style) in [("fan", PackedCircleIconsStyle.fan), ("orbit", .orbit)] {
+                await assertComponentSnapshot(
+                    FinanceCard(title: "Subscriptions", isEmpty: false, emptyTitle: "", subtitle: "6 active") {
+                        Text(verbatim: "18 470 ₸")
+                    } trailing: {
+                        PackedCircleIcons(items: [
+                            PackedCircleItem(id: "1", iconSource: .brandService("Reelio"), amount: 4_990),
+                            PackedCircleItem(id: "2", iconSource: .brandService("Leafnote"), amount: 2_490),
+                            PackedCircleItem(id: "3", iconSource: .brandService("Tunewave"), amount: 1_990),
+                            PackedCircleItem(id: "4", iconSource: .brandService("Cloudy"), amount: 990),
+                            PackedCircleItem(id: "5", iconSource: .brandService("Reelio"), amount: 490),
+                            PackedCircleItem(id: "6", iconSource: .brandService("Cloudy"), amount: 290),
+                        ], maxVisible: 4, style: style)
+                    },
+                    named: name
+                )
+            }
+        }
     }
 }
