@@ -673,7 +673,25 @@ FinanceCard(
   middle one after another with a little overshoot, then sway by up to 2 pt, each on its own
   beat (an ambient loop: still under Reduce Motion and `.designKitMotion(false)`). `style: .flat`
   is the look before: a symbol on a pale disc of its tint, a logo edge to edge with a thin ring of
-  the background.
+  the background. 3.3.0: the gloss is softer (highlight 0.62, rim 0.42, coloured shadow 0.38, from
+  0.9 / 0.7 / 0.5; `MarbleGlossMetrics`), and two more styles share the box and the "+N":
+  - **`style: .fan`**: playing cards (63 × 88) fanned along an arc around a centre below the box,
+    every lower edge on one arc. The largest amount takes the middle, in front and highest; the
+    rest follow by amount to either side, the right first, each turned further out, lower in the
+    stack and a little smaller (down to 0.8 of the largest by the square root of its share). A
+    symbol is white on a card of its tint, lit from the upper left, with small copies in two
+    corners; a logo sits on a white card, its corner pips and edge in the logo's main colour;
+    "+N" is a grey card. The cards are dealt out of a deck one after another (a spring, 70 ms
+    apart); every 4.5 s a light (`.shine`) runs across them from the left, card after card.
+  - **`style: .orbit`**: the largest amount as a marble in the middle (0.42 of the box's shorter
+    side), the rest as smaller marbles on an orbit seen at a slant (flatness 0.4, tilted −12°),
+    with its faint line. The orbit turns once in 28 s; a marble on the far side is
+    smaller (0.72) and darker and passes behind the middle one, a near one in front. The marbles
+    fly out of the middle onto it, then the turn starts. They do not sway.
+
+  The deal, the flight, the light and the turn stand still under Reduce Motion, while the system
+  saves resources and under `.designKitMotion(false)`, which draws the final picture.
+  `PackedCircleIconsSkeleton(containerWidth:style:)` draws grey circles, cards or an orbit.
 
 #### `RecommendationBox`
 Tinted "lightbulb + advice" callout (icon + text on `color.opacity(0.10)`, `AppRadius.md`). Shared by `CalculationCard` and `TargetProgressCard`. Use for any card-bottom recommendation line.
@@ -1132,7 +1150,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `OrbChart` | `…Skeleton` |
 | `LinearProgressBar`, `ProportionBar`, `MiniProportionBar`, `AmountComparisonBar`, `HeroProportionBar`, `ProgressRing`, `MiniDonut`, `MiniHalfGauge`, `HeroHalfGauge`, `MiniMilestoneGauge`, `HeroMilestoneGauge`, `MiniBarPair`, `HeroBarPair` | `…Skeleton`, with the component's size parameters |
 | `Icon` | `IconSkeleton(style:)` / `IconSkeleton(size:)` |
-| `Avatar`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIcons`, `Badge`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `Rating`, `ChipPicker` | `…Skeleton` |
+| `Avatar`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIcons` (`style:` for its cards or orbit, 3.3.0), `Badge`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `Rating`, `ChipPicker` | `…Skeleton` |
 | `FormattedAmountText`, `ConvertedAmount`, `SpentBudgetText`, `AmountPercentage` | `FormattedAmountTextSkeleton(font:width:)`; `RedactableAmount(isLoading: true)` draws one itself |
 | `HeroSection`, `SectionHeader` (every style) | `HeroSectionSkeleton`, `SectionHeaderSkeleton(style:showsTrailing:showsIcon:)` |
 | `ExpandableText`, `ActivityTimeline`, `MonthCalendar` | `…Skeleton` |
