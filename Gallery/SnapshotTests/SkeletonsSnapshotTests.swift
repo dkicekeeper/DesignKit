@@ -305,6 +305,20 @@ extension ComponentSnapshots {
             )
         }
 
+        /// The symbol before the title as a grey circle in the style's font (3.2.0).
+        @Test func headerIconSkeletons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    SectionHeaderSkeleton(showsTrailing: true, showsIcon: true)
+                    SectionHeaderSkeleton(style: .compact, showsIcon: true)
+                        .screenPadding()
+                    SectionHeaderSkeleton(style: .large, showsIcon: true)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark]
+            )
+        }
+
         @Test func headerAndSliderSkeletons() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {

@@ -1134,7 +1134,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `Icon` | `IconSkeleton(style:)` / `IconSkeleton(size:)` |
 | `Avatar`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIcons`, `Badge`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `Rating`, `ChipPicker` | `…Skeleton` |
 | `FormattedAmountText`, `ConvertedAmount`, `SpentBudgetText`, `AmountPercentage` | `FormattedAmountTextSkeleton(font:width:)`; `RedactableAmount(isLoading: true)` draws one itself |
-| `HeroSection`, `SectionHeader` (every style) | `HeroSectionSkeleton`, `SectionHeaderSkeleton(style:showsTrailing:)` |
+| `HeroSection`, `SectionHeader` (every style) | `HeroSectionSkeleton`, `SectionHeaderSkeleton(style:showsTrailing:showsIcon:)` |
 | `ExpandableText`, `ActivityTimeline`, `MonthCalendar` | `…Skeleton` |
 | `PersonRow`, `CommentRow`, `ThreadCard`, `ReviewCard`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.12.0) | `…Skeleton` (`StatsStripSkeleton(count:)`, `AchievementTileSkeleton(medalSize:)`, `ThumbnailCardSkeleton(width:)`, `PersonRowSkeleton(showsSubtitle:style:)`) |
 | `RemotePhoto` (3.1.0) | `RemotePhotoSkeleton()`: fills the frame; the container gives the corner |
@@ -1331,15 +1331,14 @@ HStack {
 ```
 
 #### `SectionHeader`
-Section header text in five styles, and an optional action at the end of the line (1.15.0).
-SectionHeaderView before 2.0; the list style was SettingsSectionHeaderView, the card style
-DateSectionHeaderView.
+Section header text in four styles, symbols around the title, and an optional action at the end
+of the line (1.15.0). SectionHeaderView before 2.0; the card style was DateSectionHeaderView.
 
 ```swift
 SectionHeader("Transactions")                                      // .default: bodyEmphasis
-SectionHeader("Settings", style: .compact)                         // bodySmall, secondary, uppercase, screen padding
+Section(header: SectionHeader("Notifications", style: .compact)) { … } // bodySmall, secondary, uppercase, no padding
+SectionHeader("Filters", style: .compact).screenPadding()          // the same label on a screen
 SectionHeader("Spending", systemImage: "chart.bar", style: .large) // h3 + accent icon, screen padding
-SectionHeader("Notifications", style: .list)                       // .compact's label, no padding: a List / Form header
 SectionHeader("Yesterday", style: .card) {                         // .default's title on a padded glass card
     FormattedAmountText(amount: 45_000, currency: "KZT", prefix: "-",
                         fontSize: AppTypography.bodySmall, fontWeight: .semibold, color: AppColors.Text.tertiary)
@@ -1348,12 +1347,30 @@ SectionHeader("Yesterday", style: .card) {                         // .default's
 SectionHeader("Trips", systemImage: "map") {                       // with an action
     NavigationLink("All") { TripsList() }
 }
+NavigationLink { TripsList() } label: {                            // a header that leads somewhere
+    SectionHeader("Trips", trailingSystemImage: "chevron.forward")
+}
 ```
 
-The icon shows in `.large` only. The action is any view (a `NavigationLink` "All", a button, a
-spinner); it takes `AppTypography.bodySmall` and sits at the end of the line, inside the style's
-padding. Title and action share an `HStack` with the system spacing and a `Spacer(minLength: 0)`,
-the layout Dalada built by hand before. Skeleton: `SectionHeaderSkeleton(style:showsTrailing:)`.
+**Symbols (3.2.0).** `systemImage` (before the title) and `trailingSystemImage` (right after it)
+show in every style; before 3.2.0 the icon showed in `.large` only and the other styles dropped
+it. Both take the title's font (`.large`'s leading symbol keeps the body size it always had) and
+are hidden from VoiceOver. The leading one is the accent, the label's grey in `.compact`; the
+trailing one the tertiary grey, `imageScale(.small)`, `AppSpacing.xs` after the title. `tint`
+colours both. The trailing symbol says what the header does: `chevron.forward` for one that
+leads somewhere (wrap the header in a `NavigationLink`), `info.circle` for one that explains.
+The end of the line stays the action's.
+
+**`.compact` and `.list` (3.2.0).** `.compact` has no padding of its own, as `.list` had: in a
+`List` / `Form` section header the system insets it, on a screen add `.screenPadding()`, the
+padding rule of every header but `.large` and `.card`. `.list` is deprecated and is `.compact`
+(it also gains the action, which `.list` dropped). `.large` still pads itself.
+
+The action is any view (a `NavigationLink` "All", a button, a spinner); it takes
+`AppTypography.bodySmall` and sits at the end of the line, inside the style's padding. Title and
+action share an `HStack` with the system spacing and a `Spacer(minLength: 0)`, the layout Dalada
+built by hand before. Skeleton: `SectionHeaderSkeleton(style:showsTrailing:showsIcon:)`, the
+leading symbol a grey circle in the style's font.
 
 `.card` is a transaction list's day header: the label is the app's own ("Today", "Yesterday",
 the date), the day's total is the action (DateSectionHeaderView showed it only when above zero,

@@ -95,6 +95,7 @@ extension ComponentSnapshots {
                 VStack(alignment: .leading, spacing: AppSpacing.md) {
                     SectionHeader("Accounts", systemImage: "creditcard")
                     SectionHeader("Compact header", style: .compact)
+                        .screenPadding()
                     SectionHeader("Large header", style: .large)
                     HStack(spacing: AppSpacing.lg) {
                         SelectionIndicator(isSelected: true)
@@ -143,12 +144,45 @@ extension ComponentSnapshots {
                     SectionHeader("Waiting to send", style: .compact) {
                         Button("Send now") {}
                     }
+                    .screenPadding()
                     SectionHeader("Insights", systemImage: "sparkles", style: .large) {
                         Button("All") {}
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// Symbols around the title in every style (3.2.0): the one before it in the accent (the
+        /// label's grey in compact), the one after it in the tertiary grey; a tint colours both.
+        /// The card is its own snapshot: one glass card per snapshot.
+        @Test func sectionHeaderSymbols() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    SectionHeader("Recent trips", systemImage: "map", trailingSystemImage: "chevron.forward") {
+                        Button("All") {}
+                    }
+                    SectionHeader("Waiting to send", systemImage: "icloud.and.arrow.up",
+                                  trailingSystemImage: "info.circle", style: .compact)
+                        .screenPadding()
+                    SectionHeader("Insights", systemImage: "sparkles", trailingSystemImage: "chevron.forward",
+                                  style: .large)
+                    SectionHeader("Goals", systemImage: "target", trailingSystemImage: "chevron.forward",
+                                  tint: AppColors.success)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                named: "styles",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                SectionHeader("Yesterday", systemImage: "calendar", trailingSystemImage: "info.circle",
+                              style: .card) {
+                    FormattedAmountText(amount: 45_000, currency: "KZT", prefix: "-",
+                                        fontSize: AppTypography.bodySmall, fontWeight: .semibold,
+                                        color: AppColors.Text.tertiary)
+                },
+                named: "card"
             )
         }
 
