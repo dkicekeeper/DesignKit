@@ -40,7 +40,7 @@
 | Module | Contents |
 |---|---|
 | `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, inline field styles), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
-| `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `Icon` (a brand logo is `Icon(source: .brandService(name))`; `BrandLogoView` was removed in 2.0.0), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `HapticManager`, `HapticCue` (haptics by meaning, 2.3.0), `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitPhotoLoader` (3.1.0), `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
+| `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `Icon` (a brand logo is `Icon(source: .brandService(name))`; `BrandLogoView` was removed in 2.0.0), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `RecentSearches` and `SearchMatch` (search suggestions, 3.5.0), `HapticManager`, `HapticCue` (haptics by meaning, 2.3.0), `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitPhotoLoader` (3.1.0), `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
 | `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons") |
 
 **Names (2.0.0).** A component is named for what it is, without `View` or `App`: `SectionHeader`,
@@ -1153,6 +1153,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `UniversalRow` | `UniversalRowSkeleton(config:iconStyle:titleFont:showsSubtitle:trailing:)` |
 | `NavigationSettingsRow`, `ToggleSettingsRow`, `ActionSettingsRow`, `MenuPickerRow`, `DatePickerRow`, `CheckmarkRow`, `StepperRow`, `NavigationPickerRow` (3.0.0) | `UniversalRowSkeleton.navigationSettings`, `.toggleSettings`, `.actionSettings`, `.menuPicker`, `.datePicker`, `.checkmark(iconStyle:)`; a stepper row and a navigation picker row are `.menuPicker` (the same shape) |
 | `SliderRow` (1.15.0) | `SliderRowSkeleton(showsHint:)` |
+| `SearchSuggestionRow` (3.5.0), drawn by `.dsSearchSuggestions` while `isLoading` | `SearchSuggestionRowSkeleton(showsSubtitle:)` |
 | `AmountRow` (2.1.0) | `AmountRowSkeleton(style:showsRing:showsDetail:)` |
 | `NetAmountRow`, `ScheduleRow`, `InfoRow`, `ColorPickerRow` | `…Skeleton` |
 | `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `OrbChart` | `…Skeleton` |
@@ -1516,6 +1517,48 @@ TagInput(String(localized: "gear.tags.placeholder"), tags: $item.tags, suggestio
 Return or a comma adds; duplicates (ignoring case) and blanks are dropped; `maxTags` hides the
 field when full. VoiceOver on ×: key `tags.remove` ("Remove %@"). A fixed set of options →
 `ChipPicker`.
+
+#### `.dsSearchSuggestions` *(3.5.0)*
+Lines under the **system** search field: the recent queries while it is empty, then the app's
+suggestions that match what is typed, the typed part in bold. They go in the system's own
+suggestion list (`.searchSuggestions`), so `.searchable` still places the field and the search
+stays the system's (Tenra allows no other); DesignKit draws the lines.
+
+```swift
+@AppStorage("places.recentSearches") private var recent = RecentSearches()
+
+List { … }
+    .searchable(text: $query)
+    .dsSearchSuggestions(text: $query, recent: $recent, suggestions: placeSuggestions,
+                         onSelect: { open($0) })
+```
+
+- **Field empty:** every recent query, newest first, under "Recent" with "Clear"; swipe removes
+  one.
+- **Typing:** up to three recent queries that contain the text, then up to `limit` (5) of
+  `suggestions` whose title, subtitle or completion contain it, ignoring case and diacritics
+  (`SearchMatch`: "е" finds "ё", "cafe" finds "Café"). `isLoading` with nothing to show yet
+  draws three `SearchSuggestionRowSkeleton` lines.
+- **A tap** puts the line's text (`completion`, the title by default) in the field, records it
+  and hides the suggestions until the text changes, so the results show; then `onSearch(query)`
+  and, for a suggestion, `onSelect(suggestion)`. **↖** puts the text in the field to keep
+  typing (a VoiceOver action too: key `search.fill`). A query submitted from the keyboard is
+  recorded as well.
+- **While they show they cover the content** (the system's behaviour); with nothing to show the
+  content stays in view. A screen that filters live (Tenra's History) keeps doing so under them.
+- `RecentSearches` is a value: newest first, no duplicates, 8 by default
+  (`record(_:limit:)`), `RawRepresentable` as a JSON array for `@AppStorage` under the screen's
+  own key. DesignKit keeps nothing itself.
+- `SearchSuggestion(title, subtitle:, icon:, tint:, completion:, id:)`: `icon` is a symbol drawn
+  in `tint` (secondary grey by default) or a brand logo. `SearchSuggestionRow` is the line,
+  `.recent(_:)` with the clock; `SearchSuggestionsContent` is the two sections for a container of
+  the app's own.
+- Strings: `search.recent`, `search.recent.clear`, `search.recent.remove`, `search.suggestions`,
+  `search.fill` ([localization-keys.md](localization-keys.md)).
+
+Used in: Tenra's History (recent queries; its categories and subcategories, which the search
+matches by name), link payments and subcategory search (recent queries); Dalada's places (recent
+queries; places from the collections, a tap opens the place) and people search (recent queries).
 
 #### `MessageComposer` *(1.12.0)*
 The field at the bottom of a conversation (comments, replies): Liquid Glass that grows to five

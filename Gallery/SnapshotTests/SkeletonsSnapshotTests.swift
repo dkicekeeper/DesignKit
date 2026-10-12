@@ -331,6 +331,18 @@ extension ComponentSnapshots {
             )
         }
 
+        /// `SearchSuggestionRowSkeleton` while suggestions load, with and without a subtitle (3.5.0).
+        @Test func searchSuggestionSkeletons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    SearchSuggestionRowSkeleton()
+                    SearchSuggestionRowSkeleton(showsSubtitle: true)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark]
+            )
+        }
+
         @Test func headerAndSliderSkeletons() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {
