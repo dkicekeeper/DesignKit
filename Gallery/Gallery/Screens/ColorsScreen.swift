@@ -105,6 +105,9 @@ struct ColorsScreen: View {
             ShowcaseSection(title: "Category palette", subtitle: "CategoryColors · 30 picker colours, the first 14 also hashed") {
                 paletteDemo
             }
+            ShowcaseSection(title: "Palette (3.7.0)", subtitle: "AppColors.Palette · deep hues for markers, lines and zones · the same in both themes") {
+                deepPaletteDemo
+            }
         }
     }
 
@@ -324,6 +327,66 @@ struct ColorsScreen: View {
                 }
             }
         }
+    }
+}
+
+extension ColorsScreen {
+    /// `AppColors.Palette`: each hue as a map marker (a white symbol on it), its name, hex and
+    /// the contrast of white on it, and as a line and a pale zone fill.
+    var deepPaletteDemo: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.lg) {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: AppSpacing.sm), count: 4), spacing: AppSpacing.md) {
+                ForEach(AppColors.Palette.allCases, id: \.self) { hue in
+                    VStack(spacing: AppSpacing.xxs) {
+                        Circle()
+                            .fill(hue.color)
+                            .frame(width: 36, height: 36)
+                            .overlay {
+                                Image(systemName: "mappin")
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundStyle(.white)
+                            }
+                            .overlay(Circle().stroke(.white, lineWidth: 2))
+                        Text(verbatim: hue.rawValue)
+                            .font(AppTypography.caption.weight(.medium))
+                        Text(verbatim: String(format: "#%06X · %.1f", hue.rgb, Self.whiteContrast(hue.rgb)))
+                            .font(AppTypography.caption2.monospaced())
+                            .foregroundStyle(AppColors.Text.tertiary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                    }
+                }
+            }
+            HStack(spacing: AppSpacing.xs) {
+                ForEach(AppColors.Palette.allCases, id: \.self) { hue in
+                    Capsule()
+                        .fill(hue.color)
+                        .frame(height: 4)
+                }
+            }
+            HStack(spacing: AppSpacing.xs) {
+                ForEach(AppColors.Palette.allCases, id: \.self) { hue in
+                    RoundedRectangle(cornerRadius: AppRadius.xs)
+                        .fill(hue.color.opacity(0.2))
+                        .overlay(RoundedRectangle(cornerRadius: AppRadius.xs).stroke(hue.color, lineWidth: 1))
+                        .frame(height: 24)
+                }
+            }
+            Text("The number after the hex is white on the hue (3:1 is the minimum for a symbol). `.uiColor` for MapLibre, MapKit and Core Graphics; which thing gets which hue stays in the app.")
+                .font(AppTypography.caption)
+                .foregroundStyle(AppColors.Text.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    /// WCAG contrast of white on `rgb`.
+    static func whiteContrast(_ rgb: UInt32) -> Double {
+        func channel(_ shift: UInt32) -> Double {
+            let c = Double((rgb >> shift) & 0xFF) / 255
+            return c <= 0.03928 ? c / 12.92 : pow((c + 0.055) / 1.055, 2.4)
+        }
+        let luminance = 0.2126 * channel(16) + 0.7152 * channel(8) + 0.0722 * channel(0)
+        return 1.05 / (luminance + 0.05)
     }
 }
 
