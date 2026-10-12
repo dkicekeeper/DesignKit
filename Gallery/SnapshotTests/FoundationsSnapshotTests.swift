@@ -151,5 +151,30 @@ extension ComponentSnapshots {
                 appearances: [.light, .dark]
             )
         }
+
+        /// `AppColors.Palette` (3.7.0): each hue as a marker with a white symbol, the same in
+        /// both themes.
+        @Test func palette() async {
+            await assertComponentSnapshot(
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: AppSpacing.sm), count: 5), spacing: AppSpacing.sm) {
+                    ForEach(AppColors.Palette.allCases, id: \.self) { hue in
+                        VStack(spacing: AppSpacing.xxs) {
+                            Circle()
+                                .fill(hue.color)
+                                .frame(width: 30, height: 30)
+                                .overlay {
+                                    Image(systemName: "mappin")
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundStyle(.white)
+                                }
+                                .overlay(Circle().stroke(.white, lineWidth: 2))
+                            Text(verbatim: hue.rawValue)
+                                .font(AppTypography.caption)
+                        }
+                    }
+                },
+                appearances: [.light, .dark]
+            )
+        }
     }
 }

@@ -39,7 +39,7 @@
 
 | Module | Contents |
 |---|---|
-| `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, inline field styles), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
+| `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases, `Palette` 3.7.0), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, inline field styles), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
 | `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `Icon` (a brand logo is `Icon(source: .brandService(name))`; `BrandLogoView` was removed in 2.0.0), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `RecentSearches` and `SearchMatch` (search suggestions, 3.5.0), `HapticManager`, `HapticCue` (haptics by meaning, 2.3.0), `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitPhotoLoader` (3.1.0), `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
 | `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons") |
 
@@ -144,6 +144,13 @@ Modifiers:
 For archived/inactive UI use `Color(.systemGray)` directly — there is no dedicated token.
 
 **Category colors:** `CategoryColors.color(for:opacity:)` (`hexColor(for:)` before 2.1.0: it returns a colour, not a hex) — the 14-colour palette hashed by name; `CategoryColors.paletteColors` (1.10.0) is the palette itself, for an app's own name-coloured visuals (Tenra's letter avatars). DesignKit has no custom-category override; Tenra keeps its `customCategories:` / store-backed overloads app-side. The slot is `CategoryColors.paletteIndex(for:)`, an FNV-1a hash of the name: the same on every launch and device (since 0.7.0; before that it used `String.hashValue`, which Swift seeds per process, so the colour changed between launches). `CategoryColors.pickerPalette` (1.11.0) is what a user can pick (`ColorPickerRow`'s default): the 14 hash colours first, then 16 deeper and neutral shades (30 `#rrggbb` strings). The hash palette itself stays at 14: `paletteIndex` is `hash % count`, so growing it would re-colour every category and avatar that relies on the name; new colours go to the picker only.
+
+**Palette (`AppColors.Palette`, 3.7.0):** deep hues for what an app draws over a map, a photo or a chart: a marker circle with a white symbol, a route or track line, a zone fill. Thirteen cases (`blue`, `indigo`, `violet`, `purple`, `pink`, `red`, `orange`, `ochre`, `green`, `emerald`, `teal`, `cyan`, `slate`), each with `.color` (SwiftUI), `.uiColor` (UIKit, MapKit, MapLibre, Core Graphics) and `.rgb`. Fixed values, the same in light and dark, so a marker image drawn once at style load looks right in both themes (a system colour such as `.systemTeal` resolves to whichever theme was on). White on each is at least 3:1, the WCAG minimum for a symbol; all but `orange` (3.6) reach 4.5. The hues are the `CategoryColors` family, one tone deeper where the category colour would not carry a white symbol. Which thing gets which hue stays in the app: Dalada's place types and map layers (its `MapColors`). Not for text, status or chrome: those are `AppColors.Text`, `.Status` and the accent; a map zone that means "banned" or "soon" uses `Status.negative` / `.warning`.
+
+```swift
+markerFill = AppColors.Palette.teal.uiColor        // MapLibre, Core Graphics
+Circle().fill(AppColors.Palette.teal.color)         // SwiftUI
+```
 
 ### Spacing (`AppSpacing`)
 

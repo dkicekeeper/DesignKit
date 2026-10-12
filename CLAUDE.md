@@ -193,6 +193,9 @@ rather than importing an app type.
   the item row (Dalada's trips, places, articles, gear; Tenra's backups, subcategories) became
   `ItemRow` + `MetaLine`, Dalada's queued-item card `PendingItemCard`, and `CurrencyList`'s row
   the public `CurrencyRow` (Tenra's quick-access currencies), all in 3.6.0.
+- Dalada's map drew its place types, layers and zones in system colours (some white symbols at
+  2.2:1, and a marker image keeps the theme it was drawn in): 3.7.0's `AppColors.Palette` gives
+  fixed deep hues with `UIColor`; Dalada maps its types and layers onto them in `MapColors`.
 - For 4.0 (no hurry): remove `SectionHeader.Style.list`, deprecated in 3.2.0 when `.compact` took
   over its job; no app uses it.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
