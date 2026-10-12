@@ -2,7 +2,7 @@
 //  LoadMoreFooter.swift
 //  DesignKit
 //
-//  The end of a list that loads in pages (3.8.0, benchmark round 3; M3, Polaris, Carbon and
+//  The end of a list that loads in pages (4.1.0, benchmark round 3; M3, Polaris, Carbon and
 //  Atlassian have one): placeholders while the next page comes, "Couldn't load more" with
 //  Retry when it fails, nothing once the list is complete. Dalada's reviews, threads, photos,
 //  feed and trips and Tenra's history loaded the next page by hand, with a bare spinner or

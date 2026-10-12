@@ -32,7 +32,7 @@ import DesignSupport
 ///   `FormSection` row on its own (a name, a note): no chrome of its own (the section's card is
 ///   the chrome), padded like a `.standard` row. `errorMessage`/`helpText` show under it.
 ///
-/// `limit:` (3.8.0) counts characters under the field from 80% of the limit ("980/1000",
+/// `limit:` (4.1.0) counts characters under the field from 80% of the limit ("980/1000",
 /// red over it), beside the help or error line; the inline styles don't show it. The field
 /// does not cut the text: the form decides what to do over the limit.
 public struct FormTextField: View {

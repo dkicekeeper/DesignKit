@@ -848,7 +848,7 @@ UniversalFilterButton(title: "Account", isSelected: hasFilter) {
 ### Input Components
 
 #### `FormTextField`
-Enhanced text field with error/help states. `limit:` (3.8.0) counts characters under the
+Enhanced text field with error/help states. `limit:` (4.1.0) counts characters under the
 field, beside the help or error line, from 80% of the limit (red over it); the inline styles
 don't show it, and the field doesn't cut the text (the form decides).
 
@@ -1053,7 +1053,7 @@ A picker-grid tile: the name (bodyEmphasis, one line) over a 64 pt Liquid Glass 
 
 ### Feedback & Status Components
 
-#### `LoadMoreFooter` / `.onReachEnd` *(3.8.0)*
+#### `LoadMoreFooter` / `.onReachEnd` *(4.1.0)*
 The end of a list that loads in pages. `LoadMoreFooter(state:rows:onLoad:placeholder:)` goes
 after the rows: in `.more` it asks for the next page (`onLoad`, async) as soon as it scrolls
 into view; in `.loading` it shows `rows` placeholders (`SkeletonRow()` by default, or the rows'
@@ -1198,7 +1198,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `SliderRow` (1.15.0) | `SliderRowSkeleton(showsHint:)` |
 | `ItemRow` (3.6.0) | `ItemRowSkeleton(style:showsLeading:showsDetail:metaLines:)` |
 | `PendingItemCard` (3.6.0) | `PendingItemCardSkeleton(contentLines:)` |
-| `RatingSummary` (3.8.0) | `RatingSummarySkeleton(maximum:)` |
+| `RatingSummary` (4.1.0) | `RatingSummarySkeleton(maximum:)` |
 | `SearchSuggestionRow` (3.5.0), drawn by `.dsSearchSuggestions` while `isLoading` | `SearchSuggestionRowSkeleton(showsSubtitle:)` |
 | `AmountRow` (2.1.0) | `AmountRowSkeleton(style:showsRing:showsDetail:)` |
 | `NetAmountRow`, `ScheduleRow`, `InfoRow`, `ColorPickerRow` | `…Skeleton` |
@@ -1214,7 +1214,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `ShareCardFrame` (and `ShareCardSheet` while it loads), `LiveSessionBar`, `DownloadRow`, `ArticleBody` (2.8.0) | `…Skeleton` (`PhotoTileSkeleton(size:cornerRadius:)`, `PhotoStripSkeleton(count:size:)`, `PhotoGridSkeleton(count:columns:style:)`, `ShareCardSkeleton(format:)`, `ArticleBodySkeleton(paragraphs:)`) |
 | `TransactionRow`, `OptionCard`, `StreamingText`, `SnapCardPicker` (2.9.0) | `…Skeleton` (`TransactionRowSkeleton(showsDetails:)`, `StreamingTextSkeleton(font:)`, `SnapCardPickerSkeleton { the card's skeleton }`) |
 
-**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`, `CurrencyRow`, 3.6.0); `MetaLine` (3.6.0, a line inside a row that has the skeleton); `LoadMoreFooter` (3.8.0, the loading state itself); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); `ActionRowLabel` (3.1.0, a label); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
+**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`, `CurrencyRow`, 3.6.0); `MetaLine` (3.6.0, a line inside a row that has the skeleton); `LoadMoreFooter` (4.1.0, the loading state itself); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); `ActionRowLabel` (3.1.0, a label); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
 
 #### `SkeletonText` *(1.7.0)*
 A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `Skeleton`. For a component, use its skeleton (above); `.skeleton(isLoading:)` redacts a real view in place, with the system's placeholder shapes.
@@ -1611,7 +1611,7 @@ queries; places from the collections, a tap opens the place) and people search (
 #### `MessageComposer` *(1.12.0)*
 The field at the bottom of a conversation (comments, replies): Liquid Glass that grows to five
 lines, the send button inside it, the quote of the message being answered above the text, the
-send error over the field. `limit:` (3.8.0) shows the count over the field, trailing, from 80%
+send error over the field. `limit:` (4.1.0) shows the count over the field, trailing, from 80%
 of the limit ("980/1000", `textInput.characterCount` for VoiceOver); over it the count turns
 red and sending is off.
 
@@ -1709,7 +1709,7 @@ A review (a card): author, `Rating` (12 pt stars), the time and a menu slot; a c
 (when the place was visited); the text in an `ExpandableText` folded to four lines; a media
 slot (photos) and an actions row (12 apart). `ReviewCard(author:rating:date:subtitle:text:menu:media:actions:)`.
 
-#### `RatingSummary` *(3.8.0)*
+#### `RatingSummary` *(4.1.0)*
 How an item is rated at a glance, in a glass card that pads itself: the average in `h2`
 (tabular digits), its `Rating` (12 pt stars) and the app's count line, beside a bar per star
 from the top down (`LinearProgressBar` in the warning colour, 6 pt; each bar is the star's

@@ -89,7 +89,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// RatingSummary (3.8.0): the average, stars and count beside a bar per star; the bars
+        /// RatingSummary (4.1.0): the average, stars and count beside a bar per star; the bars
         /// drawn full at once (no fill animation in a snapshot).
         @Test func ratingSummary() async {
             await assertComponentSnapshot(

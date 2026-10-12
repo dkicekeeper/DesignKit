@@ -59,7 +59,7 @@ private struct LoadMoreFooterPage: View {
         ComponentPage(
             name: "LoadMoreFooter",
             summary: "The end of a list that loads in pages: it asks for the next page when it shows, placeholders while it comes, \"Couldn't load more\" with Retry, nothing at the end.",
-            since: "3.8.0",
+            since: "4.1.0",
             apps: [.tenra, .dalada],
             canvas: .fill,
             notes: [

@@ -45,7 +45,7 @@ public struct MessageQuote: Equatable, Sendable {
 /// it), not on a `.bar` background, and give it the screen's side margins. `.disabled(true)`
 /// greys it out, with the placeholder saying why (e.g. "Sign in to comment").
 /// VoiceOver labels: keys `composer.send` (default "Send") and `composer.cancelQuote`
-/// (default "Remove quote"). With `limit:` (3.8.0) the count shows over the field from 80% of
+/// (default "Remove quote"). With `limit:` (4.1.0) the count shows over the field from 80% of
 /// it ("980/1000"), and over the limit it turns red and sending is off.
 public struct MessageComposer: View {
     @Binding var text: String
@@ -68,7 +68,7 @@ public struct MessageComposer: View {
     ///   - isSending: A spinner replaces the arrow and sending is off.
     ///   - canSend: Whether the text may be sent; by default, when it is not blank.
     ///   - errorMessage: Shown over the field (the last send failed).
-    ///   - limit: The most characters a message may have (3.8.0): the count shows from 80% of
+    ///   - limit: The most characters a message may have (4.1.0): the count shows from 80% of
     ///     it, over it the count turns red and sending is off.
     ///   - focus: The host's focus binding, to focus the field from outside (e.g. on "Reply").
     public init(

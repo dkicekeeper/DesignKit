@@ -151,7 +151,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// LoadMoreFooter (3.8.0) when the next page failed: the reason and Retry. (Loading is in
+        /// LoadMoreFooter (4.1.0) when the next page failed: the reason and Retry. (Loading is in
         /// SkeletonsSnapshotTests; `.more` and `.end` draw nothing.)
         @Test func loadMoreFooterFailed() async {
             await assertComponentSnapshot(

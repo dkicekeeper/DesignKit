@@ -201,7 +201,7 @@ rather than importing an app type.
   No deprecated API is left.
 - Benchmark round 3 (2026-10, owner-approved) after 4.0.0: `RatingSummary` (Dalada's reviews
   block), `LoadMoreFooter` + `.onReachEnd` (paged lists in both apps) and `limit:` character
-  counts on `MessageComposer` / `FormTextField`, all in 3.8.0.
+  counts on `MessageComposer` / `FormTextField`, all in 4.1.0.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.

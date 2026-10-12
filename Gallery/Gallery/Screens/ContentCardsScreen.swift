@@ -130,7 +130,7 @@ private struct RatingSummaryPage: View {
         ComponentPage(
             name: "RatingSummary",
             summary: "How an item is rated at a glance: the average, its stars and the review count, and a bar per star from five down.",
-            since: "3.8.0",
+            since: "4.1.0",
             apps: [.dalada],
             canvas: .fill,
             notes: [

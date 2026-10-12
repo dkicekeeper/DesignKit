@@ -371,7 +371,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// LoadMoreFooter (3.8.0) loading the next page: two plain skeleton rows by default.
+        /// LoadMoreFooter (4.1.0) loading the next page: two plain skeleton rows by default.
         @Test func loadMoreFooterLoading() async {
             await assertComponentSnapshot(
                 LoadMoreFooter(state: .loading, onLoad: {}),

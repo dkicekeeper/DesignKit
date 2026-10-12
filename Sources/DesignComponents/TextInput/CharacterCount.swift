@@ -2,7 +2,7 @@
 //  CharacterCount.swift
 //  DesignKit
 //
-//  The "980/1000" under a field with a length limit (3.8.0, benchmark round 3: M3, Fluent,
+//  The "980/1000" under a field with a length limit (4.1.0, benchmark round 3: M3, Fluent,
 //  Carbon, Polaris and Atlassian fields count characters). `MessageComposer(limit:)` and
 //  `FormTextField(limit:)` show it from 80% of the limit; over it, in the destructive colour.
 //

@@ -53,7 +53,7 @@ private struct FormTextFieldPage: View {
             canvas: .fill,
             notes: [
                 "Inline styles show no error or help text: put validation at the form level (InlineStatusText).",
-                "limit: (3.8.0) counts characters under the field from 80% of it, red over it; the field doesn't cut the text.",
+                "limit: (4.1.0) counts characters under the field from 80% of it, red over it; the field doesn't cut the text.",
             ],
             styles: ["standard", "multiline", "inline", "inlineMultiline", "row", "rowMultiline"]
         ) {
@@ -135,7 +135,7 @@ private struct MessageComposerPage: View {
             notes: [
                 "Put it in safeAreaBar(edge: .bottom) so the list scrolls under the glass; give it the screen margins.",
                 "Signed out: .disabled(true) with a placeholder that says why.",
-                "limit: (3.8.0) shows the count over the field from 80% of it; over it the count is red and sending is off.",
+                "limit: (4.1.0) shows the count over the field from 80% of it; over it the count is red and sending is off.",
             ]
         ) {
             MessageComposer(

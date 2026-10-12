@@ -71,7 +71,7 @@ extension ComponentSnapshots {
                     .disabled(true),
                 named: "disabled"
             )
-            // limit: (3.8.0): the count over the field from 80%, red and no sending over it.
+            // limit: (4.1.0): the count over the field from 80%, red and no sending over it.
             await assertComponentSnapshot(
                 MessageComposer(text: .constant("Thin ice up north, stay off it."), placeholder: "Add a comment…",
                                 limit: 36) {},
@@ -84,7 +84,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// FormTextField(limit:) (3.8.0): the count beside the help line from 80% of the limit,
+        /// FormTextField(limit:) (4.1.0): the count beside the help line from 80% of the limit,
         /// red over it.
         @Test func textFieldCounters() async {
             await assertComponentSnapshot(

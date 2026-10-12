@@ -2,7 +2,7 @@
 //  RatingSummary.swift
 //  DesignKit
 //
-//  How an item is rated, at a glance (3.8.0, benchmark round 3): the average in large digits,
+//  How an item is rated, at a glance (4.1.0, benchmark round 3): the average in large digits,
 //  its stars and how many reviews, and a bar per star from the top down, in a glass card
 //  (the App Store's and Google Play's ratings block). Dalada's place reviews drew it as
 //  `ReviewSummaryView`; loading the reviews stays in the app.
