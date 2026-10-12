@@ -48,7 +48,7 @@ private struct SectionHeaderPage: View {
                 "Both symbols show in every style (3.2.0), in the title's font: the one before the title in the accent (the label's grey in compact), the one right after it in the tertiary grey. Tint colours both.",
                 "The symbol after the title says what the header does: chevron.forward for one that leads somewhere (wrap it in a NavigationLink), info.circle for one that explains.",
                 "The action (1.15.0) is any view: a NavigationLink “All”, a button, a spinner, a day's total. It takes bodySmall and sits inside the style's padding.",
-                "3.2.0: compact has no padding of its own, as list had, and list is deprecated (it is compact). On a screen, add .screenPadding().",
+                "3.2.0: compact has no padding of its own, as list had; list, its old name, is removed in 4.0.0. On a screen, add .screenPadding().",
                 "2.0.0: SectionHeaderView before; SettingsSectionHeaderView is the compact style in a List, DateSectionHeaderView the card style with the day's total as the action.",
             ],
             styles: ["default", "compact", "large", "card"]

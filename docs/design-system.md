@@ -46,7 +46,8 @@
 **Names (2.0.0).** A component is named for what it is, without `View` or `App`: `SectionHeader`,
 `EmptyState`, `Avatar`, `Badge`, `Icon`, `DSButton`. The names before 2.0 were deprecated
 typealiases until 3.0.0, which removed them ([migration-2.0.md](migration-2.0.md),
-[migration-3.0.md](migration-3.0.md)).
+[migration-3.0.md](migration-3.0.md)); 4.0.0 removed the last deprecated name,
+`SectionHeader.Style.list` ([migration-4.0.md](migration-4.0.md)).
 The tokens keep their prefix (`AppColors`, `AppSpacing`, `AppIconSize`, …): a token namespace
 is not a view, and `Color` / `Font` would clash with SwiftUI. The button is `DSButton` because
 `Button` is SwiftUI's.
@@ -1413,8 +1414,9 @@ The end of the line stays the action's.
 
 **`.compact` and `.list` (3.2.0).** `.compact` has no padding of its own, as `.list` had: in a
 `List` / `Form` section header the system insets it, on a screen add `.screenPadding()`, the
-padding rule of every header but `.large` and `.card`. `.list` is deprecated and is `.compact`
-(it also gains the action, which `.list` dropped). `.large` still pads itself.
+padding rule of every header but `.large` and `.card`. `.list` was deprecated as a name of
+`.compact` (which also gained the action `.list` dropped) and is removed in 4.0.0
+([migration-4.0.md](migration-4.0.md)). `.large` still pads itself.
 
 The action is any view (a `NavigationLink` "All", a button, a spinner); it takes
 `AppTypography.bodySmall` and sits at the end of the line, inside the style's padding. Title and
