@@ -89,6 +89,16 @@ extension ComponentSnapshots {
             )
         }
 
+        /// RatingSummary (3.8.0): the average, stars and count beside a bar per star; the bars
+        /// drawn full at once (no fill animation in a snapshot).
+        @Test func ratingSummary() async {
+            await assertComponentSnapshot(
+                RatingSummary(average: 4.6, count: 42, distribution: [1, 0, 2, 9, 30],
+                              countLabel: "42 reviews", animatesOnAppear: false),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
         @Test func achievements() async {
             await assertComponentSnapshot(
                 VStack(spacing: AppSpacing.lg) {

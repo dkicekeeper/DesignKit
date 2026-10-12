@@ -34,7 +34,62 @@ struct FeedbackScreen: View {
         ImportProgressSheetPage()
         ProgressOverlayPage()
         PendingItemCardPage()
+        LoadMoreFooterPage()
         SkeletonPrimitivesPage()
+    }
+}
+
+private struct LoadMoreFooterPage: View {
+    @State private var state = 1
+    @State private var showsMessage = false
+    @State private var cardPlaceholder = false
+    @State private var rows = 2
+    @State private var loads = 0
+
+    private var loadState: LoadMoreState {
+        switch state {
+        case 0: .more
+        case 2: .failed(message: showsMessage ? "No connection" : nil)
+        case 3: .end
+        default: .loading
+        }
+    }
+
+    var body: some View {
+        ComponentPage(
+            name: "LoadMoreFooter",
+            summary: "The end of a list that loads in pages: it asks for the next page when it shows, placeholders while it comes, \"Couldn't load more\" with Retry, nothing at the end.",
+            since: "3.8.0",
+            apps: [.tenra, .dalada],
+            canvas: .fill,
+            notes: [
+                "The app maps its flags to LoadMoreState and keeps one request in flight; the footer may ask again while it stays on screen.",
+                ".onReachEnd(of:in:threshold:) asks a few rows before the end (a feed of tall cards).",
+                "Strings: loadMore.failed, common.retry.",
+            ]
+        ) {
+            VStack(alignment: .leading, spacing: AppSpacing.md) {
+                ForEach(0..<2, id: \.self) { index in
+                    ItemRow("Review \(index + 1)", meta: [MetaLine([.text("Aida"), .text("3 days ago")])],
+                            leading: .symbol("star.bubble"))
+                }
+                LoadMoreFooter(state: loadState, rows: rows, onLoad: { loads += 1 }) {
+                    if cardPlaceholder {
+                        ReviewCardSkeleton()
+                    } else {
+                        SkeletonRow()
+                    }
+                }
+                Text("onLoad called \(loads) times")
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.Text.tertiary)
+            }
+        } controls: {
+            ChoiceControl("State", selection: $state, options: [("More", 0), ("Loading", 1), ("Failed", 2), ("End", 3)])
+            ToggleControl("Reason", isOn: $showsMessage)
+            ToggleControl("Card placeholder", isOn: $cardPlaceholder)
+            ChoiceControl("Rows", selection: $rows, options: [("1", 1), ("2", 2), ("3", 3)])
+        }
     }
 }
 

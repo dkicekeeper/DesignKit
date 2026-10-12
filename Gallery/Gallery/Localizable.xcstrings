@@ -958,6 +958,17 @@
         }
       }
     },
+    "loadMore.failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t load more"
+          }
+        }
+      }
+    },
     "menu.close" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1141,6 +1152,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Importing..."
+          }
+        }
+      }
+    },
+    "rating.bar" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rating %1$lld: %2$lld reviews"
           }
         }
       }
@@ -1405,6 +1427,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "More"
+          }
+        }
+      }
+    },
+    "textInput.characterCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld of %2$lld characters"
           }
         }
       }

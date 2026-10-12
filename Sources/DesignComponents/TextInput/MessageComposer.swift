@@ -45,7 +45,8 @@ public struct MessageQuote: Equatable, Sendable {
 /// it), not on a `.bar` background, and give it the screen's side margins. `.disabled(true)`
 /// greys it out, with the placeholder saying why (e.g. "Sign in to comment").
 /// VoiceOver labels: keys `composer.send` (default "Send") and `composer.cancelQuote`
-/// (default "Remove quote").
+/// (default "Remove quote"). With `limit:` (3.8.0) the count shows over the field from 80% of
+/// it ("980/1000"), and over the limit it turns red and sending is off.
 public struct MessageComposer: View {
     @Binding var text: String
     let placeholder: String
@@ -53,6 +54,7 @@ public struct MessageComposer: View {
     let isSending: Bool
     let canSend: Bool?
     let errorMessage: String?
+    let limit: Int?
     let onCancelQuote: (() -> Void)?
     let onSend: () -> Void
     private let externalFocus: FocusState<Bool>.Binding?
@@ -66,6 +68,8 @@ public struct MessageComposer: View {
     ///   - isSending: A spinner replaces the arrow and sending is off.
     ///   - canSend: Whether the text may be sent; by default, when it is not blank.
     ///   - errorMessage: Shown over the field (the last send failed).
+    ///   - limit: The most characters a message may have (3.8.0): the count shows from 80% of
+    ///     it, over it the count turns red and sending is off.
     ///   - focus: The host's focus binding, to focus the field from outside (e.g. on "Reply").
     public init(
         text: Binding<String>,
@@ -74,6 +78,7 @@ public struct MessageComposer: View {
         isSending: Bool = false,
         canSend: Bool? = nil,
         errorMessage: String? = nil,
+        limit: Int? = nil,
         focus: FocusState<Bool>.Binding? = nil,
         onCancelQuote: (() -> Void)? = nil,
         onSend: @escaping () -> Void
@@ -84,6 +89,7 @@ public struct MessageComposer: View {
         self.isSending = isSending
         self.canSend = canSend
         self.errorMessage = errorMessage
+        self.limit = limit
         self.externalFocus = focus
         self.onCancelQuote = onCancelQuote
         self.onSend = onSend
@@ -91,17 +97,35 @@ public struct MessageComposer: View {
 
     private var focusBinding: FocusState<Bool>.Binding { externalFocus ?? $isFocused }
 
+    private var isOverLimit: Bool {
+        guard let limit else { return false }
+        return CharacterCount.isOver(count: text.count, limit: limit)
+    }
+
+    private var showsCount: Bool {
+        guard let limit else { return false }
+        return CharacterCount.isVisible(count: text.count, limit: limit)
+    }
+
     private var isSendEnabled: Bool {
-        guard isEnabled, !isSending else { return false }
+        guard isEnabled, !isSending, !isOverLimit else { return false }
         return canSend ?? !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            if let errorMessage {
-                errorLabel(errorMessage)
-                    .padding(.horizontal, AppSpacing.lg)
-                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+            if errorMessage != nil || showsCount {
+                HStack(alignment: .firstTextBaseline, spacing: AppSpacing.sm) {
+                    if let errorMessage {
+                        errorLabel(errorMessage)
+                    }
+                    Spacer(minLength: 0)
+                    if showsCount, let limit {
+                        CharacterCount(count: text.count, limit: limit)
+                    }
+                }
+                .padding(.horizontal, AppSpacing.lg)
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
 
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
@@ -129,6 +153,7 @@ public struct MessageComposer: View {
         }
         .animation(AppAnimation.contentSpring, value: quote)
         .animation(AppAnimation.contentSpring, value: errorMessage)
+        .animation(AppAnimation.contentSpring, value: showsCount)
         .animation(AppAnimation.fastAnimation, value: isSendEnabled)
     }
 

@@ -71,6 +71,31 @@ extension ComponentSnapshots {
                     .disabled(true),
                 named: "disabled"
             )
+            // limit: (3.8.0): the count over the field from 80%, red and no sending over it.
+            await assertComponentSnapshot(
+                MessageComposer(text: .constant("Thin ice up north, stay off it."), placeholder: "Add a comment…",
+                                limit: 36) {},
+                named: "nearLimit"
+            )
+            await assertComponentSnapshot(
+                MessageComposer(text: .constant("Thin ice up north, stay off the lake this week."),
+                                placeholder: "Add a comment…", limit: 36) {},
+                named: "overLimit"
+            )
+        }
+
+        /// FormTextField(limit:) (3.8.0): the count beside the help line from 80% of the limit,
+        /// red over it.
+        @Test func textFieldCounters() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    FormTextField(text: .constant("Big Almaty Lake, north"), placeholder: "Place name",
+                                  helpText: "Shown on the map", limit: 24)
+                    FormTextField(text: .constant("Big Almaty Lake, the north shore"), placeholder: "Place name",
+                                  limit: 24)
+                },
+                appearances: [.light, .dark, .largeText]
+            )
         }
 
         /// The lines under a search field (3.5.0): recent queries and suggestions, the typed

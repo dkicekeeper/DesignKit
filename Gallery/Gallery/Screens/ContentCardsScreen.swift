@@ -21,6 +21,7 @@ struct ContentCardsScreen: View {
     @ViewBuilder static var pages: some View {
         ThreadCardPage()
         ReviewCardPage()
+        RatingSummaryPage()
         ThumbnailCardPage()
         RecommendationBoxPage()
         EmptyCardPage()
@@ -100,6 +101,53 @@ private struct ReviewCardPage: View {
             ToggleControl("Visit line", isOn: $showsVisit)
             ToggleControl("Long text", isOn: $longText)
             ToggleControl("Actions", isOn: $showsActions)
+        }
+    }
+}
+
+private struct RatingSummaryPage: View {
+    @State private var spread = 0
+    @State private var state: SpecimenState = .content
+
+    /// Reviews per star, one star first.
+    private var distribution: [Int] {
+        switch spread {
+        case 1: [9, 6, 4, 2, 1]
+        case 2: [0, 0, 0, 0, 0]
+        default: [1, 0, 2, 9, 30]
+        }
+    }
+
+    private var count: Int { distribution.reduce(0, +) }
+
+    private var average: Double? {
+        guard count > 0 else { return nil }
+        let total = distribution.enumerated().reduce(0) { $0 + ($1.offset + 1) * $1.element }
+        return Double(total) / Double(count)
+    }
+
+    var body: some View {
+        ComponentPage(
+            name: "RatingSummary",
+            summary: "How an item is rated at a glance: the average, its stars and the review count, and a bar per star from five down.",
+            since: "3.8.0",
+            apps: [.dalada],
+            canvas: .fill,
+            notes: [
+                "distribution counts the reviews per star, one star first; each bar is its count over count.",
+                "countLabel is the app's own line (\"12 reviews\"), so its plurals stay in its strings.",
+                "VoiceOver reads each bar as rating.bar (\"Rating 5: 30 reviews\").",
+            ]
+        ) {
+            if state == .loading {
+                RatingSummarySkeleton()
+            } else {
+                RatingSummary(average: average, count: count, distribution: distribution,
+                              countLabel: "\(count) reviews")
+            }
+        } controls: {
+            StateControl(state: $state)
+            ChoiceControl("Reviews", selection: $spread, options: [("Mostly good", 0), ("Mostly bad", 1), ("None yet", 2)])
         }
     }
 }
