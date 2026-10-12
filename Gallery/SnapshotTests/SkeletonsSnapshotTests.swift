@@ -343,6 +343,27 @@ extension ComponentSnapshots {
             )
         }
 
+        /// ItemRowSkeleton in both styles (3.6.0).
+        @Test func itemRowSkeletons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    ItemRowSkeleton()
+                    ItemRowSkeleton(showsDetail: true, metaLines: 2)
+                    ItemRowSkeleton(style: .large, showsLeading: false)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark]
+            )
+        }
+
+        /// PendingItemCardSkeleton (3.6.0), in its glass card.
+        @Test func pendingItemCardSkeleton() async {
+            await assertComponentSnapshot(
+                PendingItemCardSkeleton(contentLines: 1),
+                appearances: [.light, .dark]
+            )
+        }
+
         @Test func headerAndSliderSkeletons() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {

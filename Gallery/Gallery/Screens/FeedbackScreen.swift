@@ -33,7 +33,68 @@ struct FeedbackScreen: View {
         StepTrackerPage()
         ImportProgressSheetPage()
         ProgressOverlayPage()
+        PendingItemCardPage()
         SkeletonPrimitivesPage()
+    }
+}
+
+private struct PendingItemCardPage: View {
+    @State private var state: SpecimenState = .content
+    @State private var failed = true
+    @State private var showsMessage = true
+    @State private var showsContent = true
+    @State private var showsSymbol = true
+    @State private var showsTime = true
+    @State private var ownQuestion = false
+    @State private var log = ""
+
+    var body: some View {
+        ComponentPage(
+            name: "PendingItemCard",
+            summary: "Something made offline that is not on the server yet: its title and how long ago, waiting or failed with the reason, Retry and Delete (asks first), and its own content under it.",
+            since: "3.6.0",
+            apps: [.dalada],
+            canvas: .fill,
+            notes: [
+                "The queue, the retry and the delete stay in the app: onRetry and onDiscard are async.",
+                "discardConfirmation words Delete's question for the item (\"Delete the trip and its track?\"); pending.discard.confirm by default.",
+                "Strings: pending.waiting, pending.failed, common.retry, pending.discard, pending.discard.confirm.",
+            ]
+        ) {
+            VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                if state == .loading {
+                    PendingItemCardSkeleton(contentLines: showsContent ? 1 : 0)
+                } else {
+                    PendingItemCard(
+                        title: "Morning on Kapchagay",
+                        systemImage: showsSymbol ? "figure.fishing" : nil,
+                        date: showsTime ? Date().addingTimeInterval(-300) : nil,
+                        state: failed ? .failed(message: showsMessage ? "No connection" : "") : .waiting,
+                        discardConfirmation: ownQuestion ? "Delete the trip and its track? It won’t reach the server." : nil,
+                        onRetry: { log = "Retry" },
+                        onDiscard: { log = "Deleted" }
+                    ) {
+                        if showsContent {
+                            MetaLine([.text("14.2 km"), .text("3 h 10 min"), .label("2", systemImage: "photo.on.rectangle")])
+                                .font(AppTypography.caption)
+                        }
+                    }
+                }
+                if !log.isEmpty {
+                    Text(log)
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppColors.Text.secondary)
+                }
+            }
+        } controls: {
+            StateControl(state: $state)
+            ToggleControl("Failed", isOn: $failed)
+            ToggleControl("Reason", isOn: $showsMessage)
+            ToggleControl("Content", isOn: $showsContent)
+            ToggleControl("Symbol", isOn: $showsSymbol)
+            ToggleControl("Time", isOn: $showsTime)
+            ToggleControl("Own Delete question", isOn: $ownQuestion)
+        }
     }
 }
 

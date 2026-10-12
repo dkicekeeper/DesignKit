@@ -31,6 +31,8 @@ struct DataRowsScreen: View {
         ThumbnailRowPage()
         DownloadRowPage()
         TransactionRowPage()
+        ItemRowPage()
+        MetaLinePage()
     }
 }
 
@@ -232,6 +234,130 @@ private struct ScheduleRowPage: View {
             ToggleControl("Done", isOn: $isDone)
             ToggleControl("Detail", isOn: $showsDetail)
         }
+    }
+}
+
+private struct ItemRowPage: View {
+    @State private var style: ItemRowStyle = .standard
+    @State private var leading = 1
+    @State private var showsBadge = false
+    @State private var showsDetail = false
+    @State private var showsNote = true
+    @State private var accessory = 1
+    @State private var state: SpecimenState = .content
+
+    var body: some View {
+        ComponentPage(
+            name: "ItemRow",
+            summary: "A row for an item of the app's own: a symbol, the title with a badge, a description, lines of facts joined by \"·\" and an accessory. Dalada's trips, places, articles and gear; Tenra's backups and subcategories.",
+            since: "3.6.0",
+            apps: [.tenra, .dalada],
+            canvas: .fill,
+            notes: [
+                "standard: title in bodyEmphasis, facts in caption. large: title in body, facts in bodySmall, more air.",
+                "Leading .symbol is a pale circle centred on the row; .glyph a bare symbol at the top, next to a description.",
+                "No padding of its own: a List insets it, a card's stack spaces it.",
+            ],
+            styles: ["standard", "large"]
+        ) {
+            InCard {
+                if state == .loading {
+                    ItemRowSkeleton(style: style, showsLeading: leading != 0, showsDetail: showsDetail,
+                                    metaLines: showsNote ? 2 : 1)
+                } else {
+                    ItemRow(
+                        "Morning on Kapchagay",
+                        badge: showsBadge ? "Auto" : nil,
+                        detail: showsDetail ? "Pike on the north shore, a light wind from the hills." : nil,
+                        meta: metaLines,
+                        leading: leadingValue,
+                        style: style,
+                        titleLineLimit: 1
+                    ) {
+                        switch accessory {
+                        case 1: DisclosureChevron()
+                        case 2:
+                            Image(systemName: "wrench.and.screwdriver")
+                                .foregroundStyle(AppColors.warning)
+                        default: EmptyView()
+                        }
+                    }
+                }
+            }
+        } controls: {
+            StateControl(state: $state)
+            ChoiceControl("Style", selection: $style, options: [("Standard", .standard), ("Large", .large)])
+            ChoiceControl("Leading", selection: $leading, options: [("None", 0), ("Symbol", 1), ("Glyph", 2)])
+            ToggleControl("Badge", isOn: $showsBadge)
+            ToggleControl("Description", isOn: $showsDetail)
+            ToggleControl("Second line", isOn: $showsNote)
+            ChoiceControl("Accessory", selection: $accessory, options: [("None", 0), ("Chevron", 1), ("Status", 2)])
+        }
+    }
+
+    private var leadingValue: ItemRowLeading? {
+        switch leading {
+        case 1: .symbol("figure.fishing")
+        case 2: .glyph("book")
+        default: nil
+        }
+    }
+
+    private var metaLines: [MetaLine] {
+        var lines = [MetaLine([.text("12 Oct"), .text("14.2 km"), .text("3 h 10 min")])]
+        if showsNote {
+            lines.append(MetaLine([.label("with @aida", systemImage: "person.2")], tint: AppColors.Text.tertiary))
+        }
+        return lines
+    }
+}
+
+private struct MetaLinePage: View {
+    @State private var separator = 0
+    @State private var tinted = true
+    @State private var faint = false
+    @State private var oneLine = false
+
+    var body: some View {
+        ComponentPage(
+            name: "MetaLine",
+            summary: "Short facts on one line: text, text with a symbol, a symbol alone, joined by \"·\" or set side by side. It takes the font around it; ItemRow sets it.",
+            since: "3.6.0",
+            apps: [.tenra, .dalada],
+            canvas: .fill,
+            notes: [
+                "dot: facts of one kind (a date, a distance). space: labels with symbols (\"Friends\", \"Pending\").",
+                "A long fact wraps; .lineLimit(1) on the line keeps each to one line.",
+                "At accessibility text sizes the facts go one under another, without dots; a symbol alone stays after its fact.",
+            ]
+        ) {
+            VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                MetaLine(
+                    [.text("Lake"), .text("2.4 km"), .label("4.6", systemImage: "star.fill"),
+                     .symbol("bookmark.fill", accessibilityLabel: "Saved")],
+                    separator: separator == 0 ? .dot : .space,
+                    tint: lineTint
+                )
+                MetaLine(
+                    [.label("Friends", systemImage: "person.2"),
+                     .label("Pending", systemImage: "hourglass", tint: tinted ? AppColors.warning : nil)],
+                    separator: separator == 0 ? .dot : .space,
+                    tint: lineTint
+                )
+                MetaLine([.text("Kapchagay reservoir, north shore"), .text("12 Oct 2026")], tint: lineTint)
+            }
+            .font(AppTypography.caption)
+            .lineLimit(oneLine ? 1 : nil)
+        } controls: {
+            ChoiceControl("Separator", selection: $separator, options: [("Dot", 0), ("Space", 1)])
+            ToggleControl("Tinted item", isOn: $tinted)
+            ToggleControl("Fainter line (tint)", isOn: $faint)
+            ToggleControl("One line", isOn: $oneLine)
+        }
+    }
+
+    private var lineTint: Color {
+        faint ? AppColors.Text.tertiary : AppColors.Text.secondary
     }
 }
 

@@ -150,5 +150,36 @@ extension ComponentSnapshots {
                 appearances: [.light, .dark, .largeText]
             )
         }
+
+        /// PendingItemCard (3.6.0): waiting with content, failed with a reason and the buttons.
+        /// No date: its time runs ("5 min, 12 sec"), so no two renders would match.
+        @Test func pendingItemCards() async {
+            await assertComponentSnapshot(
+                PendingItemCard(
+                    title: "Morning on Kapchagay",
+                    systemImage: "figure.fishing",
+                    date: nil,
+                    state: .waiting,
+                    onRetry: {},
+                    onDiscard: {}
+                ) {
+                    MetaLine([.text("14.2 km"), .text("3 h 10 min")])
+                        .font(AppTypography.caption)
+                },
+                named: "waiting",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                PendingItemCard(
+                    title: "Report from the north shore",
+                    date: nil,
+                    state: .failed(message: "No connection"),
+                    onRetry: {},
+                    onDiscard: {}
+                ),
+                named: "failed",
+                appearances: [.light, .dark, .largeText]
+            )
+        }
     }
 }

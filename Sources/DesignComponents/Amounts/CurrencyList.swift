@@ -109,30 +109,63 @@ public struct CurrencyList: View {
             HapticManager.selection()
             onSelect(currency.code)
         } label: {
-            HStack {
-                VStack(alignment: .leading, spacing: AppSpacing.xxs) {
-                    Text(verbatim: currency.code)
-                        .font(AppTypography.bodyEmphasis)
-                        .foregroundStyle(AppColors.Text.primary)
-                    Text(verbatim: currency.name)
-                        .font(AppTypography.bodySmall)
-                        .foregroundStyle(AppColors.Text.secondary)
-                }
-                Spacer()
-                Text(verbatim: currency.symbol)
-                    .font(AppTypography.body)
-                    .foregroundStyle(AppColors.Text.secondary)
-                if currency.code == selection {
-                    Image(systemName: "checkmark")
-                        .font(AppTypography.bodySmall)
-                        .foregroundStyle(AppColors.accent)
-                }
-            }
-            .padding(.horizontal, AppSpacing.lg)
-            .padding(.vertical, AppSpacing.md)
-            .contentShape(Rectangle())
+            CurrencyRow(currency, isSelected: currency.code == selection)
+                .padding(.horizontal, AppSpacing.lg)
+                .padding(.vertical, AppSpacing.md)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(currency.code == selection ? .isSelected : [])
+    }
+}
+
+// MARK: - Row
+
+/// One currency: the code over its name, the symbol, and a check when chosen (3.6.0; the
+/// row `CurrencyList` draws). No padding of its own: a `List` insets it, `CurrencyList` pads
+/// it in its cards. Wrap it in a `Button` (`.buttonStyle(.plain)`) to make it pick.
+///
+/// ```swift
+/// Button { toggle(currency) } label: {
+///     CurrencyRow(currency, isSelected: chosen.contains(currency.code))
+/// }
+/// .buttonStyle(.plain)
+/// ```
+public struct CurrencyRow: View {
+    let currency: CurrencyInfo
+    let isSelected: Bool
+    let isLocked: Bool
+
+    /// - Parameters:
+    ///   - isLocked: Chosen and not for this list to change (an account's own currency): the
+    ///     check is shown in the tertiary grey.
+    public init(_ currency: CurrencyInfo, isSelected: Bool, isLocked: Bool = false) {
+        self.currency = currency
+        self.isSelected = isSelected
+        self.isLocked = isLocked
+    }
+
+    public var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: AppSpacing.xxs) {
+                Text(verbatim: currency.code)
+                    .font(AppTypography.bodyEmphasis)
+                    .foregroundStyle(AppColors.Text.primary)
+                Text(verbatim: currency.name)
+                    .font(AppTypography.bodySmall)
+                    .foregroundStyle(AppColors.Text.secondary)
+            }
+            Spacer()
+            Text(verbatim: currency.symbol)
+                .font(AppTypography.body)
+                .foregroundStyle(AppColors.Text.secondary)
+            if isSelected || isLocked {
+                Image(systemName: "checkmark")
+                    .font(AppTypography.bodySmall)
+                    .foregroundStyle(isLocked ? AppColors.Text.tertiary : AppColors.accent)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(isSelected || isLocked ? .isSelected : [])
     }
 }
