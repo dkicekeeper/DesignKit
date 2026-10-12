@@ -200,5 +200,67 @@ extension ComponentSnapshots {
                 appearances: [.light, .dark, .largeText]
             )
         }
+
+        /// ItemRow (3.6.0) in both styles, with a pale-circle symbol, a top glyph next to a
+        /// description, a badge, two meta lines and the accessories; one card per style.
+        @Test func itemRows() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    ItemRow(
+                        "Morning on Kapchagay",
+                        meta: [
+                            MetaLine([.text("12 Oct"), .text("14.2 km"), .text("3 h 10 min")]),
+                            MetaLine([.label("with @aida", systemImage: "person.2")], tint: AppColors.Text.tertiary),
+                        ],
+                        leading: .symbol("figure.fishing"),
+                        titleLineLimit: 1
+                    ) {
+                        DisclosureChevron()
+                    }
+                    ItemRow(
+                        "Camp by the river",
+                        meta: [MetaLine([
+                            .label("Friends", systemImage: "person.2"),
+                            .label("Pending", systemImage: "hourglass", tint: AppColors.warning),
+                        ], separator: .space)],
+                        leading: .symbol("tent")
+                    ) {
+                        DisclosureChevron()
+                    }
+                    ItemRow(
+                        "Three knots for every angler",
+                        detail: "The clinch, the palomar and the loop: when each holds and how to tie it.",
+                        meta: [MetaLine([.text("Knots"), .text("4 min"), .symbol("bookmark.fill", accessibilityLabel: "Saved")],
+                                        tint: AppColors.Text.tertiary)],
+                        leading: .glyph("book")
+                    )
+                    ItemRow("Spinning rod", meta: [MetaLine([.text("Shimano"), .text("×2"), .text("620 g")])],
+                            titleFont: AppTypography.body) {
+                        Image(systemName: "wrench.and.screwdriver")
+                            .foregroundStyle(AppColors.warning)
+                    }
+                }
+                .cardContentPadding()
+                .cardStyle(),
+                named: "standard",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    ItemRow("12 Oct 2026, 09:40", badge: "Auto",
+                            meta: [MetaLine([.text("1 204 transactions"), .text("3.1 MB")])], style: .large) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .font(AppTypography.bodySmall)
+                            .foregroundStyle(AppColors.accent)
+                    }
+                    ItemRow("Coffee", meta: [MetaLine([.text("Used 14 times"), .text("Oct 9, 2026")])],
+                            style: .large, titleFont: AppTypography.h4)
+                }
+                .cardContentPadding()
+                .cardStyle(),
+                named: "large",
+                appearances: [.light, .dark, .largeText]
+            )
+        }
     }
 }

@@ -45,6 +45,7 @@ text, not keys. A new key goes there as well.
 | `common.changeIcon` | EditableHero (VoiceOver on the icon) | `Change icon` |
 | `common.close` | PhotoViewer (default `closeTitle`), ShareCardSheet (the close button) | `Close` |
 | `common.color` | ColorPickerRow | — |
+| `common.retry` | PendingItemCard (Retry, 3.6.0) | `Retry` |
 | `common.select` | DateButtons | — |
 | `common.startDate` | DatePickerRow | — |
 | `composer.cancelQuote` | MessageComposer (VoiceOver on the quote's ×) | `Remove quote` |
@@ -113,6 +114,10 @@ text, not keys. A new key goes there as well.
 | `onboarding.stepIndicator.label` | OnboardingStepIndicator | — |
 | `pager.next` | PagerArrows (default `nextLabel`, VoiceOver) | `Next` |
 | `pager.previous` | PagerArrows (default `previousLabel`, VoiceOver) | `Previous` |
+| `pending.discard` | PendingItemCard (Delete and its confirmation button) | `Delete` |
+| `pending.discard.confirm` | PendingItemCard (the confirmation's title) | `Delete it? It won’t reach the server.` |
+| `pending.failed` | PendingItemCard (status) | `Couldn’t upload` |
+| `pending.waiting` | PendingItemCard (status) | `Waiting to upload: it goes once you’re online` |
 | `photo.open` | PhotoStrip, PhotoCarousel (default `openLabel`), PhotoGrid (VoiceOver without `label`) | `Open photo` |
 | `photo.remove` | PhotoStrip (default `removeLabel`, VoiceOver) | `Remove photo` |
 | `progress.importing` | ImportProgressSheet | — |

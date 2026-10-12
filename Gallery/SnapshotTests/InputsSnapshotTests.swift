@@ -108,6 +108,21 @@ extension ComponentSnapshots {
             )
         }
 
+        /// CurrencyRow (3.6.0): chosen in the accent, locked in grey, not chosen.
+        @Test func currencyRows() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.md) {
+                    CurrencyRow(CurrencyInfo(code: "KZT", name: "Kazakhstani tenge", symbol: "₸"),
+                                isSelected: true, isLocked: true)
+                    CurrencyRow(CurrencyInfo(code: "USD", name: "US dollar", symbol: "$"), isSelected: true)
+                    CurrencyRow(CurrencyInfo(code: "EUR", name: "Euro", symbol: "€"), isSelected: false)
+                }
+                .cardContentPadding()
+                .cardStyle(),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
         @Test func calculatorKeypad() async {
             await assertComponentSnapshot(
                 CalculatorKeypad(model: CalculatorInputModel(seed: "1250"))

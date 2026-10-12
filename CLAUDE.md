@@ -189,6 +189,10 @@ rather than importing an app type.
   glass behind the content and added the form pieces Dalada's forms needed (`StepperRow`,
   `NavigationPickerRow`, `FormTextField(.row)`, `EditSheetContainer(isSaving:)`)
   ([docs/migration-3.0.md](docs/migration-3.0.md)).
+- Audit round 5 (2026-10, owner-approved) found three more things the apps drew by hand:
+  the item row (Dalada's trips, places, articles, gear; Tenra's backups, subcategories) became
+  `ItemRow` + `MetaLine`, Dalada's queued-item card `PendingItemCard`, and `CurrencyList`'s row
+  the public `CurrencyRow` (Tenra's quick-access currencies), all in 3.6.0.
 - For 4.0 (no hurry): remove `SectionHeader.Style.list`, deprecated in 3.2.0 when `.compact` took
   over its job; no app uses it.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the

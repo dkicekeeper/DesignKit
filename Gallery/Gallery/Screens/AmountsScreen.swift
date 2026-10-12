@@ -28,6 +28,7 @@ struct AmountsScreen: View {
         CurrencyAmountInputPage()
         CurrencyPickerMenuPage()
         CurrencyListPage()
+        CurrencyRowPage()
         ConvertedAmountPage()
         SpentBudgetTextPage()
         AmountPercentagePage()
@@ -220,6 +221,45 @@ private struct CurrencyListPage: View {
                 Text("Currency: \(currency)").filterChipStyle()
             }
             .buttonStyle(.plain)
+        }
+    }
+}
+
+private struct CurrencyRowPage: View {
+    @State private var chosen: Set<String> = ["USD"]
+    @State private var locksKZT = true
+
+    private let currencies = [
+        CurrencyInfo(code: "KZT", name: "Kazakhstani tenge", symbol: "₸"),
+        CurrencyInfo(code: "USD", name: "US dollar", symbol: "$"),
+        CurrencyInfo(code: "EUR", name: "Euro", symbol: "€"),
+    ]
+
+    var body: some View {
+        ComponentPage(
+            name: "CurrencyRow",
+            summary: "One currency: the code over its name, the symbol and a check when chosen; a locked one (an account's own) is checked in grey. The row CurrencyList draws, for lists of the app's own.",
+            since: "3.6.0",
+            apps: [.tenra],
+            canvas: .fill,
+            notes: ["No padding of its own: a List insets it. Wrap it in a Button with .buttonStyle(.plain) to make it pick."]
+        ) {
+            VStack(spacing: AppSpacing.md) {
+                ForEach(currencies) { currency in
+                    let isLocked = locksKZT && currency.code == "KZT"
+                    Button {
+                        guard !isLocked else { return }
+                        if chosen.contains(currency.code) { chosen.remove(currency.code) } else { chosen.insert(currency.code) }
+                    } label: {
+                        CurrencyRow(currency, isSelected: chosen.contains(currency.code), isLocked: isLocked)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .cardContentPadding()
+            .cardStyle()
+        } controls: {
+            ToggleControl("KZT locked", isOn: $locksKZT)
         }
     }
 }
