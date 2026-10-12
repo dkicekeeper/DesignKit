@@ -31,6 +31,10 @@ import DesignSupport
 /// - `.row` / `.rowMultiline` *(3.0.0)* — a bare, leading-aligned field that fills a
 ///   `FormSection` row on its own (a name, a note): no chrome of its own (the section's card is
 ///   the chrome), padded like a `.standard` row. `errorMessage`/`helpText` show under it.
+///
+/// `limit:` (4.1.0) counts characters under the field from 80% of the limit ("980/1000",
+/// red over it), beside the help or error line; the inline styles don't show it. The field
+/// does not cut the text: the form decides what to do over the limit.
 public struct FormTextField: View {
     @Binding var text: String
     let placeholder: String
@@ -38,6 +42,7 @@ public struct FormTextField: View {
     let keyboardType: UIKeyboardType
     let errorMessage: String?
     let helpText: String?
+    let limit: Int?
     let isDisabled: Bool
     /// When true, the field auto-focuses shortly after appearing. Replaces the
     /// ad-hoc `@FocusState … .task { isFocused = true }` pattern at call sites.
@@ -82,6 +87,7 @@ public struct FormTextField: View {
         keyboardType: UIKeyboardType = .default,
         errorMessage: String? = nil,
         helpText: String? = nil,
+        limit: Int? = nil,
         isDisabled: Bool = false,
         autofocus: Bool = false,
         externalFocus: FocusState<Bool>.Binding? = nil
@@ -92,6 +98,7 @@ public struct FormTextField: View {
         self.keyboardType = keyboardType
         self.errorMessage = errorMessage
         self.helpText = helpText
+        self.limit = limit
         self.isDisabled = isDisabled
         self.autofocus = autofocus
         self.externalFocus = externalFocus
@@ -117,21 +124,20 @@ public struct FormTextField: View {
             // an inline help/error label inside a UniversalRow trailing slot.
             // Surface validation at the form level (banner / `InlineStatusText`).
             if !isInline {
-                if let error = errorMessage {
-                    errorLabel(error)
-                        .transition(.opacity.combined(with: .move(edge: .top)))
-                }
-
-                if let help = helpText, errorMessage == nil {
-                    Text(help)
-                        .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.Text.secondary)
-                        .transition(.opacity)
+                if showsCount, let limit {
+                    HStack(alignment: .firstTextBaseline, spacing: AppSpacing.sm) {
+                        messages
+                        Spacer(minLength: 0)
+                        CharacterCount(count: text.count, limit: limit)
+                    }
+                } else {
+                    messages
                 }
             }
         }
         .animation(AppAnimation.fastAnimation, value: isFieldFocused)
         .animation(AppAnimation.fastAnimation, value: errorMessage != nil)
+        .animation(AppAnimation.fastAnimation, value: showsCount)
         .task {
             guard autofocus else { return }
             // One yield so the field is mounted before the keyboard tries to
@@ -140,6 +146,27 @@ public struct FormTextField: View {
             await Task.yield()
             focusBinding.wrappedValue = true
         }
+    }
+
+    /// The error, else the help text, under the field.
+    @ViewBuilder
+    private var messages: some View {
+        if let error = errorMessage {
+            errorLabel(error)
+                .transition(.opacity.combined(with: .move(edge: .top)))
+        }
+
+        if let help = helpText, errorMessage == nil {
+            Text(help)
+                .font(AppTypography.caption)
+                .foregroundStyle(AppColors.Text.secondary)
+                .transition(.opacity)
+        }
+    }
+
+    private var showsCount: Bool {
+        guard let limit else { return false }
+        return CharacterCount.isVisible(count: text.count, limit: limit)
     }
 
     // MARK: - Field Area

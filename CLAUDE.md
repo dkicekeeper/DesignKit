@@ -199,6 +199,9 @@ rather than importing an app type.
 - DesignKit 4.0.0 (2026-10) removed the last deprecated name, `SectionHeader.Style.list`
   (`.compact` since 3.2.0); nothing else changed ([docs/migration-4.0.md](docs/migration-4.0.md)).
   No deprecated API is left.
+- Benchmark round 3 (2026-10, owner-approved) after 4.0.0: `RatingSummary` (Dalada's reviews
+  block), `LoadMoreFooter` + `.onReachEnd` (paged lists in both apps) and `limit:` character
+  counts on `MessageComposer` / `FormTextField`, all in 4.1.0.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.

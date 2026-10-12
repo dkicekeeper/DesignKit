@@ -848,7 +848,9 @@ UniversalFilterButton(title: "Account", isSelected: hasFilter) {
 ### Input Components
 
 #### `FormTextField`
-Enhanced text field with error/help states.
+Enhanced text field with error/help states. `limit:` (4.1.0) counts characters under the
+field, beside the help or error line, from 80% of the limit (red over it); the inline styles
+don't show it, and the field doesn't cut the text (the form decides).
 
 ```swift
 FormTextField(
@@ -1051,6 +1053,25 @@ A picker-grid tile: the name (bodyEmphasis, one line) over a 64 pt Liquid Glass 
 
 ### Feedback & Status Components
 
+#### `LoadMoreFooter` / `.onReachEnd` *(4.1.0)*
+The end of a list that loads in pages. `LoadMoreFooter(state:rows:onLoad:placeholder:)` goes
+after the rows: in `.more` it asks for the next page (`onLoad`, async) as soon as it scrolls
+into view; in `.loading` it shows `rows` placeholders (`SkeletonRow()` by default, or the rows'
+own skeleton: `ReviewCardSkeleton()`, `PhotoGridSkeleton()`); in `.failed(message:)` the reason
+(or "Couldn't load more") with Retry (`.dsButton(.secondary)`); in `.end` nothing. In a `List`
+it hides its separator. The app maps its own flags to `LoadMoreState` and keeps one request in
+flight (`onLoad` may come again while a short page leaves the footer on screen).
+`.onReachEnd(of:in:threshold:perform:)` on a row asks a few rows before the end, for a feed of
+tall cards. Strings: `loadMore.failed`, `common.retry`. No skeleton of its own: it is the
+loading state. Dalada: reviews, threads, photos, the feed, a person's trips; Tenra: History.
+
+```swift
+List {
+    ForEach(reviews) { ReviewRow(review: $0) }
+    LoadMoreFooter(state: loadState, onLoad: loadMore) { ReviewCardSkeleton() }
+}
+```
+
 #### `PendingItemCard` *(3.6.0)*
 Something made offline that is not on the server yet: its title (with a symbol) and a running "5 min" on the trailing edge, then the status: "waiting to upload" (warning) or "couldn't upload" (destructive) with the reason and Retry / Delete (`.dsButton(.secondary)`; Delete asks first in a confirmation dialog), then the item's own content (`@ViewBuilder`), in a glass card that pads itself. `onRetry` and `onDiscard` are async: the queue stays in the app. `date: nil` shows no time; `discardConfirmation:` words Delete's question for the item ("Delete the trip and its track?", `pending.discard.confirm` by default). Strings: `pending.waiting`, `pending.failed`, `common.retry`, `pending.discard`, `pending.discard.confirm`. Dalada: its queued trips and reports. Skeleton: `PendingItemCardSkeleton(contentLines:)`.
 
@@ -1177,6 +1198,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `SliderRow` (1.15.0) | `SliderRowSkeleton(showsHint:)` |
 | `ItemRow` (3.6.0) | `ItemRowSkeleton(style:showsLeading:showsDetail:metaLines:)` |
 | `PendingItemCard` (3.6.0) | `PendingItemCardSkeleton(contentLines:)` |
+| `RatingSummary` (4.1.0) | `RatingSummarySkeleton(maximum:)` |
 | `SearchSuggestionRow` (3.5.0), drawn by `.dsSearchSuggestions` while `isLoading` | `SearchSuggestionRowSkeleton(showsSubtitle:)` |
 | `AmountRow` (2.1.0) | `AmountRowSkeleton(style:showsRing:showsDetail:)` |
 | `NetAmountRow`, `ScheduleRow`, `InfoRow`, `ColorPickerRow` | `…Skeleton` |
@@ -1192,7 +1214,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `ShareCardFrame` (and `ShareCardSheet` while it loads), `LiveSessionBar`, `DownloadRow`, `ArticleBody` (2.8.0) | `…Skeleton` (`PhotoTileSkeleton(size:cornerRadius:)`, `PhotoStripSkeleton(count:size:)`, `PhotoGridSkeleton(count:columns:style:)`, `ShareCardSkeleton(format:)`, `ArticleBodySkeleton(paragraphs:)`) |
 | `TransactionRow`, `OptionCard`, `StreamingText`, `SnapCardPicker` (2.9.0) | `…Skeleton` (`TransactionRowSkeleton(showsDetails:)`, `StreamingTextSkeleton(font:)`, `SnapCardPickerSkeleton { the card's skeleton }`) |
 
-**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`, `CurrencyRow`, 3.6.0); `MetaLine` (3.6.0, a line inside a row that has the skeleton); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); `ActionRowLabel` (3.1.0, a label); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
+**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`, `CurrencyRow`, 3.6.0); `MetaLine` (3.6.0, a line inside a row that has the skeleton); `LoadMoreFooter` (4.1.0, the loading state itself); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); `ActionRowLabel` (3.1.0, a label); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
 
 #### `SkeletonText` *(1.7.0)*
 A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `Skeleton`. For a component, use its skeleton (above); `.skeleton(isLoading:)` redacts a real view in place, with the system's placeholder shapes.
@@ -1589,7 +1611,9 @@ queries; places from the collections, a tap opens the place) and people search (
 #### `MessageComposer` *(1.12.0)*
 The field at the bottom of a conversation (comments, replies): Liquid Glass that grows to five
 lines, the send button inside it, the quote of the message being answered above the text, the
-send error over the field.
+send error over the field. `limit:` (4.1.0) shows the count over the field, trailing, from 80%
+of the limit ("980/1000", `textInput.characterCount` for VoiceOver); over it the count turns
+red and sending is off.
 
 ```swift
 List { … }
@@ -1684,6 +1708,22 @@ the author and the last activity on the right.
 A review (a card): author, `Rating` (12 pt stars), the time and a menu slot; a caption line
 (when the place was visited); the text in an `ExpandableText` folded to four lines; a media
 slot (photos) and an actions row (12 apart). `ReviewCard(author:rating:date:subtitle:text:menu:media:actions:)`.
+
+#### `RatingSummary` *(4.1.0)*
+How an item is rated at a glance, in a glass card that pads itself: the average in `h2`
+(tabular digits), its `Rating` (12 pt stars) and the app's count line, beside a bar per star
+from the top down (`LinearProgressBar` in the warning colour, 6 pt; each bar is the star's
+count over `count`). `RatingSummary(average:count:distribution:countLabel:animatesOnAppear:)`:
+`distribution` counts the reviews per star, one star first, and its length is the scale;
+`average: nil` (no reviews yet) shows 0.0 and empty stars; `countLabel` is the app's own
+string so its plurals stay in its catalogue. VoiceOver reads each bar as `rating.bar`
+("Rating 5: 30 reviews"). Dalada: a place's reviews. Skeleton: `RatingSummarySkeleton(maximum:)`.
+
+```swift
+RatingSummary(average: summary.ratingAverage, count: summary.reviewsCount,
+              distribution: summary.stars,
+              countLabel: String(localized: "reviews.count \(summary.reviewsCount)"))
+```
 
 #### `ReactionButton`
 A symbol and a count under a post ("👍 12"), or a title ("Helpful · 3"); filled and in the

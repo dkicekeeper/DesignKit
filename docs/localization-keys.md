@@ -45,7 +45,7 @@ text, not keys. A new key goes there as well.
 | `common.changeIcon` | EditableHero (VoiceOver on the icon) | `Change icon` |
 | `common.close` | PhotoViewer (default `closeTitle`), ShareCardSheet (the close button) | `Close` |
 | `common.color` | ColorPickerRow | — |
-| `common.retry` | PendingItemCard (Retry, 3.6.0) | `Retry` |
+| `common.retry` | PendingItemCard (Retry, 3.6.0), LoadMoreFooter (4.1.0) | `Retry` |
 | `common.select` | DateButtons | — |
 | `common.startDate` | DatePickerRow | — |
 | `composer.cancelQuote` | MessageComposer (VoiceOver on the quote's ×) | `Remove quote` |
@@ -104,6 +104,7 @@ text, not keys. A new key goes there as well.
 | `insights.chart.bar` | ChartZoomControls | — |
 | `insights.chart.line` | ChartZoomControls | — |
 | `insights.other` | OrbChart | — |
+| `loadMore.failed` | LoadMoreFooter (`.failed` without a message, 4.1.0) | `Couldn’t load more` |
 | `menu.close` | GlassActionMenu (VoiceOver on the open menu's button) | `Close` |
 | `menu.open` | GlassActionMenu (VoiceOver on the closed button) | `Actions` |
 | `notification.permission.allow` | NotificationPermissionPrompt | — |
@@ -121,6 +122,7 @@ text, not keys. A new key goes there as well.
 | `photo.open` | PhotoStrip, PhotoCarousel (default `openLabel`), PhotoGrid (VoiceOver without `label`) | `Open photo` |
 | `photo.remove` | PhotoStrip (default `removeLabel`, VoiceOver) | `Remove photo` |
 | `progress.importing` | ImportProgressSheet | — |
+| `rating.bar` | RatingSummary (VoiceOver on a bar, 4.1.0; format: star, count) | `Rating %1$lld: %2$lld reviews` |
 | `rating.pick %lld %lld` | RatingPicker (VoiceOver: "4 out of 5") | — |
 | `rating.value %@ %lld` | Rating (VoiceOver: "Rated 4.3 out of 5") | — |
 | `search.fill` | `.dsSearchSuggestions` (↖ on a line, VoiceOver action, 3.5.0) | `Edit in search field` |
@@ -145,6 +147,7 @@ text, not keys. A new key goes there as well.
 | `tags.remove` | TagInput (VoiceOver on a tag's ×, arg `%@`) | `Remove %@` |
 | `text.less` | ExpandableText | `Less` |
 | `text.more` | ExpandableText | `More` |
+| `textInput.characterCount` | MessageComposer / FormTextField `limit:` (VoiceOver on the count, 4.1.0; format: count, limit) | `%1$lld of %2$lld characters` |
 | `thumbnail.saved` | ThumbnailCard, ThumbnailRow (VoiceOver on the bookmark; `savedLabel` replaces it) | `Saved` |
 | `thumbnail.verified` | ThumbnailCard, ThumbnailRow (VoiceOver on the seal; `verifiedLabel` replaces it) | `Verified` |
 | `timeFilter.customPeriod` | DateRangePickerSheet (default `title`) | `Custom period` |

@@ -151,6 +151,18 @@ extension ComponentSnapshots {
             )
         }
 
+        /// LoadMoreFooter (4.1.0) when the next page failed: the reason and Retry. (Loading is in
+        /// SkeletonsSnapshotTests; `.more` and `.end` draw nothing.)
+        @Test func loadMoreFooterFailed() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.md) {
+                    LoadMoreFooter(state: .failed(message: nil), onLoad: {})
+                    LoadMoreFooter(state: .failed(message: "No connection"), onLoad: {})
+                },
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
         /// PendingItemCard (3.6.0): waiting with content, failed with a reason and the buttons.
         /// No date: its time runs ("5 min, 12 sec"), so no two renders would match.
         @Test func pendingItemCards() async {

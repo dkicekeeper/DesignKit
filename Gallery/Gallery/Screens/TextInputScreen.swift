@@ -33,6 +33,7 @@ private struct FormTextFieldPage: View {
     @State private var showsError = false
     @State private var showsHelp = true
     @State private var disabled = false
+    @State private var limited = false
 
     private var fieldStyle: FormTextField.Style {
         switch style {
@@ -50,7 +51,10 @@ private struct FormTextFieldPage: View {
             summary: "A form field with focus, error, help and disabled states; inline styles sit in a row's trailing slot, row styles fill a FormSection row (3.0.0).",
             apps: [.tenra, .dalada],
             canvas: .fill,
-            notes: ["Inline styles show no error or help text: put validation at the form level (InlineStatusText)."],
+            notes: [
+                "Inline styles show no error or help text: put validation at the form level (InlineStatusText).",
+                "limit: (4.1.0) counts characters under the field from 80% of it, red over it; the field doesn't cut the text.",
+            ],
             styles: ["standard", "multiline", "inline", "inlineMultiline", "row", "rowMultiline"]
         ) {
             if style >= 3 {
@@ -62,6 +66,7 @@ private struct FormTextFieldPage: View {
                         style: fieldStyle,
                         errorMessage: showsError ? "The name is too short" : nil,
                         helpText: showsHelp ? "Shown on the map" : nil,
+                        limit: limited ? 20 : nil,
                         isDisabled: disabled
                     )
                 }
@@ -78,6 +83,7 @@ private struct FormTextFieldPage: View {
                     style: fieldStyle,
                     errorMessage: showsError ? "The name is too short" : nil,
                     helpText: showsHelp ? "Shown on the map" : nil,
+                    limit: limited ? 20 : nil,
                     isDisabled: disabled
                 )
             }
@@ -85,6 +91,7 @@ private struct FormTextFieldPage: View {
             ChoiceControl("Style", selection: $style, options: [("Standard", 0), ("Multiline", 1), ("Inline", 2), ("Row", 3), ("Row, multiline", 4)])
             ToggleControl("Error", isOn: $showsError)
             ToggleControl("Help text", isOn: $showsHelp)
+            ToggleControl("Limit 20", isOn: $limited)
             ToggleControl("Disabled", isOn: $disabled)
             TextControl("Text", text: $text)
         }
@@ -116,6 +123,7 @@ private struct MessageComposerPage: View {
     @State private var showsError = false
     @State private var isSending = false
     @State private var disabled = false
+    @State private var limited = false
 
     var body: some View {
         ComponentPage(
@@ -127,6 +135,7 @@ private struct MessageComposerPage: View {
             notes: [
                 "Put it in safeAreaBar(edge: .bottom) so the list scrolls under the glass; give it the screen margins.",
                 "Signed out: .disabled(true) with a placeholder that says why.",
+                "limit: (4.1.0) shows the count over the field from 80% of it; over it the count is red and sending is off.",
             ]
         ) {
             MessageComposer(
@@ -135,6 +144,7 @@ private struct MessageComposerPage: View {
                 quote: showsQuote ? MessageQuote(title: "Replying to Aida", text: "Was anyone on the lake this weekend?") : nil,
                 isSending: isSending,
                 errorMessage: showsError ? "No connection. Try again." : nil,
+                limit: limited ? 40 : nil,
                 onCancelQuote: { showsQuote = false }
             ) {
                 isSending = true
@@ -149,7 +159,9 @@ private struct MessageComposerPage: View {
             ToggleControl("Quote", isOn: $showsQuote)
             ToggleControl("Error", isOn: $showsError)
             ToggleControl("Sending", isOn: $isSending)
+            ToggleControl("Limit 40", isOn: $limited)
             ToggleControl("Disabled", isOn: $disabled)
+            TextControl("Text", text: $text)
         }
     }
 }
