@@ -339,10 +339,12 @@ public struct SearchSuggestionRow: View {
                     .foregroundStyle(AppColors.Text.primary)
                     .lineLimit(2)
                 if let subtitle {
+                    // Two lines, so a large text size wraps "Reservoir · 70 km" instead of
+                    // cutting the distance off (3.5.1).
                     Text(subtitle)
                         .font(AppTypography.bodySmall)
                         .foregroundStyle(AppColors.Text.secondary)
-                        .lineLimit(1)
+                        .lineLimit(2)
                 }
             }
             Spacer(minLength: AppSpacing.sm)

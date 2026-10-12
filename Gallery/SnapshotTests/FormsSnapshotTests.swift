@@ -3,7 +3,8 @@
 //  DesignKit Gallery snapshot tests
 //
 //  Form sections with their picker rows, settings headers, the entity-detail hero.
-//  Dates are fixed, so the picture does not depend on the day the test runs.
+//  Dates are fixed, so the picture does not depend on the day the test runs; the picker row
+//  shows a time, not a date (see formSection).
 //
 
 import SwiftUI
@@ -21,7 +22,12 @@ extension ComponentSnapshots {
                 VStack(alignment: .leading, spacing: AppSpacing.md) {
                     SectionHeader("Subscription", style: .compact)
                     FormSection(header: "Payment", footer: "Charged on the 17th of every month") {
-                        DatePickerRow(icon: "calendar", title: "Start date", selection: .constant(FormsSample.startDate))
+                        // A time, not a date: the system's compact date label took the short style
+                        // ("6/17/26") in the runs of 5-9 October and the medium one ("Jun 17, 2026")
+                        // on 12 October, on the same runner image, simulator and Xcode. A time has
+                        // one style, and the row (icon, title, pill) is the same.
+                        DatePickerRow(icon: "clock", title: "Reminder", selection: .constant(FormsSample.startDate),
+                                      displayedComponents: .hourAndMinute)
                         MenuPickerRow(
                             icon: "arrow.triangle.2.circlepath",
                             title: "Frequency",

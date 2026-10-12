@@ -169,6 +169,10 @@ extension ComponentSnapshots.Display {
 - Show the variants side by side in one test: fewer images, the same coverage.
 - No dates from the clock, no network, no random data. Pass fixed values, like
   `CalendarRange(today:calendar:)` in `monthCalendar()` and the chart points without dates.
+- No system compact date picker showing a date: even with a fixed date its label took the short
+  style ("6/17/26") in some runs and the medium one ("Jun 17, 2026") in others, on the same
+  image, simulator and Xcode (October 2026). `formSection()` shows `DatePickerRow` with a time
+  (`displayedComponents: .hourAndMinute`), which has one style.
 - Turn off entrance animations where the component has a switch (`animatesOnAppear: false`).
 - Texts are passed in. Keys from the host bundle would render as raw keys.
 - Then run CI with `record_snapshots: missing`.
