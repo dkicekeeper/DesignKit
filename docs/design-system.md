@@ -1550,7 +1550,8 @@ List { … }
   (`record(_:limit:)`), `RawRepresentable` as a JSON array for `@AppStorage` under the screen's
   own key. DesignKit keeps nothing itself.
 - `SearchSuggestion(title, subtitle:, icon:, tint:, completion:, id:)`: `icon` is a symbol drawn
-  in `tint` (secondary grey by default) or a brand logo. `SearchSuggestionRow` is the line,
+  in `tint` (secondary grey by default) or a brand logo. The title and the subtitle take up to two
+  lines each (the subtitle since 3.5.1); the icon's slot grows with the text size. `SearchSuggestionRow` is the line,
   `.recent(_:)` with the clock; `SearchSuggestionsContent` is the two sections for a container of
   the app's own.
 - Strings: `search.recent`, `search.recent.clear`, `search.recent.remove`, `search.suggestions`,
