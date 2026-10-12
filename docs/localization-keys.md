@@ -118,6 +118,11 @@ text, not keys. A new key goes there as well.
 | `progress.importing` | ImportProgressSheet | — |
 | `rating.pick %lld %lld` | RatingPicker (VoiceOver: "4 out of 5") | — |
 | `rating.value %@ %lld` | Rating (VoiceOver: "Rated 4.3 out of 5") | — |
+| `search.fill` | `.dsSearchSuggestions` (↖ on a line, VoiceOver action, 3.5.0) | `Edit in search field` |
+| `search.recent` | `.dsSearchSuggestions` (section title) | `Recent` |
+| `search.recent.clear` | `.dsSearchSuggestions` (clears the recent queries) | `Clear` |
+| `search.recent.remove` | `.dsSearchSuggestions` (swipe on a recent query) | `Remove` |
+| `search.suggestions` | `.dsSearchSuggestions` (section title) | `Suggestions` |
 | `share.failed` | ShareCardSheet (the data did not load) | `Couldn’t prepare the picture` |
 | `share.format` | ShareCardSheet (the format picker, VoiceOver) | `Format` |
 | `share.format.post` | ShareCard.Format.title | `Post` |

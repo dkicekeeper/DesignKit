@@ -2,8 +2,8 @@
 //  InputsSnapshotTests.swift
 //  DesignKit Gallery snapshot tests
 //
-//  Pickers, chips, rating input, text fields, tags, the message composer, the calculator
-//  keypad, amount text, action buttons. Nothing is focused.
+//  Pickers, chips, rating input, text fields, tags, the message composer, search suggestions,
+//  the calculator keypad, amount text, action buttons. Nothing is focused.
 //
 
 import SwiftUI
@@ -70,6 +70,41 @@ extension ComponentSnapshots {
                 MessageComposer(text: .constant(""), placeholder: "Sign in to comment") {}
                     .disabled(true),
                 named: "disabled"
+            )
+        }
+
+        /// The lines under a search field (3.5.0): recent queries and suggestions, the typed
+        /// part in bold, the ↖ fill button, under the sections' compact headers.
+        @Test func searchSuggestions() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    SectionHeader("Recent", style: .compact) {
+                        Button("Clear") {}
+                    }
+                    SearchSuggestionRow.recent("Kapchagay", highlighting: "ka") {}
+                    SearchSuggestionRow.recent("pike") {}
+                    SectionHeader("Suggestions", style: .compact)
+                        .padding(.top, AppSpacing.sm)
+                    SearchSuggestionRow(
+                        "Kaindy Lake",
+                        subtitle: "Lake · 280 km",
+                        icon: .sfSymbol("drop.fill"),
+                        tint: AppColors.accent,
+                        highlighting: "ka"
+                    ) {}
+                    SearchSuggestionRow(
+                        "Kapchagay Reservoir",
+                        subtitle: "Reservoir · 70 km",
+                        icon: .sfSymbol("water.waves"),
+                        tint: AppColors.accent,
+                        highlighting: "ka"
+                    ) {}
+                    SearchSuggestionRow("Coffee", subtitle: "Category", icon: .sfSymbol("cup.and.saucer.fill"),
+                                        tint: AppColors.warning, highlighting: "co")
+                }
+                .padding(AppSpacing.lg)
+                .cardStyle(),
+                appearances: [.light, .dark, .largeText]
             )
         }
 

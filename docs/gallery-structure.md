@@ -57,7 +57,7 @@ Gallery — сколько в нём компонентов; оно считае
 | Раздел | Компоненты | Аналог |
 |---|---|---|
 | **Actions** | `DSButton` (иконка слева, справа, сверху или одна; вид × роль × размер, форма, загрузка), `.dsButton`, `.bounce`, `ReactionButton`, `GlassActionMenu` (2.3.0), `AmountVisibilityToggle`, `UniversalFilterButton` | M3 Actions, HIG Menus and actions |
-| **Text Input** | `FormTextField`, `AnimatedTitleInput`, `MessageComposer`, `TagInput` | M3 Text inputs |
+| **Text Input** | `FormTextField`, `AnimatedTitleInput`, `MessageComposer`, `TagInput`, `SearchSuggestions` (`.dsSearchSuggestions`, 3.5.0) | M3 Text inputs |
 | **Selection** | `SegmentedPicker`, `ChipPicker`, `RatingPicker`, `SelectionIndicator`, `DateButtons`, `IconPicker`, `SnapCardPicker`, `OptionCardPicker` (2.9.0) | M3 Selection, HIG Selection and input |
 | **Amounts & Currency** | `AmountInput`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `CurrencyList`, `FormattedAmountText`, `LiveAmountText` (2.3.0), `ConvertedAmount`, `SpentBudgetText`, `AmountPercentage`, `RedactableAmount` | своя область DesignKit (у Polaris — Money) |
 | **Rows: Settings & Forms** | `UniversalRow`, `InfoRow`, `NavigationSettingsRow`, `ToggleSettingsRow`, `ActionSettingsRow`, `ActionRowLabel` (3.1.0), `MenuPickerRow`, `NavigationPickerRow`, `StepperRow` (3.0.0), `SliderRow`, `DatePickerRow`, `ColorPickerRow`, `CheckmarkRow`, `DisclosureChevron` | M3 Lists |
