@@ -2,10 +2,14 @@
 
 > Reference for Claude: which components to use, where, and how.
 >
-> **Source.** Adapted from Tenra's `docs/design-system.md` (Tenra `74a12c5`, 2026-09-26) — Tenra's
-> design system is the reference. Rules, tokens and component contracts are Tenra's; paths point
-> into this package. Call-site examples ("Used in: …") name Tenra screens — they illustrate
-> intent, they are not DesignKit code.
+> **Source of truth.** DesignKit is the only place the design system lives (since 0.3.0,
+> 2026-10). This guide began as Tenra's own, and Tenra's look is still the reference. Call-site
+> examples ("Used in: …") name Tenra and Dalada screens to show intent; they are not DesignKit
+> code.
+>
+> **How each app uses DesignKit** (its adapters, screen patterns, the effects in use): Tenra's
+> `docs/design-system.md`, Dalada's `CLAUDE.md` («Компоненты интерфейса», a table from what a
+> screen needs to the components).
 >
 > **Availability.** Section 0 lists which documented components ship in DesignKit and which
 > stay in the host app (they depend on app models or services). Anything marked *app-side* is
@@ -23,7 +27,7 @@
 5. [Decision Trees](#5-decision-trees)
 6. [Formatting & Display](#6-formatting--display)
 7. [Haptics](#7-haptics)
-8. [Remaining Native Form Views](#8-remaining-native-form-views)
+8. [Forms: cards, not the system Form](#8-forms-cards-not-the-system-form)
 9. [Animation Guidelines](#9-animation-guidelines)
 10. [cardStyle Padding Contract](#10-cardstyle-padding-contract)
 11. [AnimatedInputComponents Deep Dive](#11-animatedinputcomponents-deep-dive)
@@ -74,7 +78,9 @@ DesignKit ships no networking, persistence or FX. A host app wires these once, i
 ### 0.3 App-side (documented here, not in DesignKit)
 
 These depend on app models/services. Port one only after replacing the dependency with a
-generic input or a host hook (see [CLAUDE.md](../CLAUDE.md) → *Porting a component*).
+generic input or a host hook (see [CLAUDE.md](../CLAUDE.md) → *Porting a component*). Each app
+documents its own side: Tenra in its `docs/design-system.md` (§3 lists every adapter and the
+component it maps onto), Dalada in its `CLAUDE.md`.
 
 - **Tenra models** (`Transaction`, `Account`, `CustomCategory`, `RecurringSeries`, loans, deposits): `TransactionCard`, `BudgetSettingsSection`, `EntityDetailScaffold`, `GroupedTransactionList`, `CategoryStyleHelper` / `CategoryStyleCache`, `TransactionDisplayHelper`, `CategoryDisplay`.
 - **`PeriodDataPoint` adapters** (Tenra): `PeriodDataPoint: ChartPoint`, `PeriodChartSeries` → `ChartSeries`, and convenience inits keeping the old call sites (`granularity:`, `currency:`). `PeriodBreakdownRow` and `ChartAxisHelpers`' period labels stay app-side.
@@ -363,8 +369,8 @@ EditSheetContainer(
 
 | Mode | `wrapInForm` | Content Structure | Used By |
 |------|-------------|-------------------|---------|
-| Hero-form | `false` | `ScrollView` → `VStack` → `EditableHeroSection` + `FormSection` | Account, Subscription, Category edit |
-| Native form | `true` | `Form` → `Section` groups | Deposit, Loan edit, Payment/Rate forms |
+| Card form | `false` | `ScrollView` → `VStack` → optional `EditableHero` + `FormSection` cards | every form in both apps: Tenra's entity edit and action sheets, Dalada's forms (§4) |
+| System form | `true` (the default) | `Form` → `Section` groups | no screen in either app; for a host that wants the system look (§8) |
 
 #### `FormSection`
 **Purpose:** Groups form rows with optional header/footer.
@@ -379,9 +385,9 @@ FormSection(header: "Settings", footer: nil, style: .card) {
 
 | Style | Background | Use For |
 |-------|-----------|---------|
-| `.card` | `.formCardStyle()` (Material; **not** Liquid Glass) | Default; hero-form sections. Material is intentional — iOS 26 `glassEffect` would become the morph-source for any `Picker(.menu)` / `MenuPickerRow` inside, collapsing single-row sections into the popover at tap |
-| `.list` | None | Inside `List` |
-| `.plain` | None | Raw passthrough |
+| `.card` (the only style) | `.formCardStyle()` (Material; **not** Liquid Glass) | Every form card. Material is intentional — iOS 26 `glassEffect` would become the morph-source for any `Picker(.menu)` / `MenuPickerRow` inside, collapsing single-row sections into the popover at tap |
+
+Inside a `List`, group rows with `Section(header: SectionHeader(title, style: .compact))` instead.
 
 #### `EditableHero` *(1.10.0)*
 The top of an edit sheet: a glass hero icon (entrance spring) that opens `IconPicker`, the name typed in place (`AnimatedTitleInput`), and with `.amountAndCurrency` an amount (`AmountInput`, 48 pt) and a currency chip that pushes `CurrencyList` (so put the hero in a `NavigationStack`). `iconTint` draws a symbol in that colour on glass (a category); `.symbolsOnly` hides the logos tab. Tenra: `EditableHeroSection` (its `HeroConfig` presets, the category hex colour) is an adapter.
@@ -392,7 +398,7 @@ EditableHero(icon: $icon, title: $name, titlePlaceholder: "Account name",
 ```
 
 #### `HeroSection`
-**Purpose:** Read-only icon + title (+ optional amount / subtitle / progress) hero for entity-**detail** screens and simple icon+title contexts (`InsightDetailView`, `InsightDeepDiveView`, `TransactionAddModal`). For edit flows with bindings use `EditableHeroSection` instead.
+**Purpose:** Read-only icon + title (+ optional amount / subtitle / progress) hero for entity-**detail** screens and simple icon+title contexts (`InsightDetailView`, `InsightDeepDiveView`, `TransactionAddModal`). For edit flows with bindings use `EditableHero` instead.
 
 - ⚠️ **`icon: nil` renders a placeholder container** (intentional). To omit the icon block entirely (e.g. the icon lives elsewhere, like a `OrbChart` centre), pass **`showsIcon: false`** — not `icon: nil`.
 - **`primaryAmount` / `primaryCurrency`** — built-in amount slot (h3). Prefer it over a sibling `FormattedAmountText`. **`primaryAmountColor`** overrides its colour (default `AppColors.textSecondary`).
@@ -759,15 +765,17 @@ Icon(source: .bankLogo(.kaspi), style: .bankLogo(size: AppIconSize.xl))
 
 **Accessibility:** `Icon.body` has `accessibilityHidden(true)` — it is always decorative within its parent row/card. The parent element owns the accessibility label. Do not override this unless `Icon` is the sole content of an interactive element with no other text.
 
-**Icon picker catalog** *(app-side, Tenra)*: `IconPickerView`'s Icons tab shows `IconCatalog` (`Tenra/Utils/IconCatalog.swift`):
-~550 SF Symbols in 18 groups plus a "frequently used" row, with system `.searchable` search. The data file
-`IconCatalog+Data.swift` is GENERATED by `scripts/generate_icon_catalog.py` from the SF Symbols metadata in
-macOS (`CoreGlyphs.bundle`): only symbols available on the deployment target (iOS 26.0) are emitted, `.fill`
+**Icon picker catalog** *(1.10.0)*: `IconPicker`'s Icons tab shows `IconCatalog`
+(`Sources/DesignSupport/IconCatalog.swift`): ~550 SF Symbols in 18 groups plus a "frequently used" row,
+with system `.searchable` search. The data file `IconCatalog+Data.swift` is GENERATED by
+`scripts/generate_icon_catalog.py` from the SF Symbols metadata in macOS (`CoreGlyphs.bundle`): only symbols available on the deployment target (iOS 26.0) are emitted, `.fill`
 variants are preferred, and every name is checked. To add icons or search words, edit the script and run
 `python3 scripts/generate_icon_catalog.py`; never edit the data file by hand. Search matches the query against
 every language at once: 116 concepts with terms in all 11 app languages (including currency names), the
-localized group titles, and Apple's English keywords. New group titles need a key in all 11 locales.
-Pinned by `IconCatalogTests` (every symbol renders, concepts point into the catalog, multilingual queries).
+localized group titles, and Apple's English keywords. A new group title is a new localization key
+([localization-keys.md](localization-keys.md)) that each app translates. Pinned by
+`Tests/DesignSupportTests/IconCatalogTests.swift` (every symbol renders, concepts point into the catalog,
+multilingual queries).
 
 **IconStyle presets:**
 
@@ -848,16 +856,16 @@ FormTextField(
 Use for: text inputs inside `FormSection`. `.inline` sits in a row's trailing slot (right-aligned,
 no chrome); `.row` / `.rowMultiline` *(3.0.0)* fill a `FormSection` row on their own (a name, a
 note): leading-aligned, no chrome of their own, padded like a `.standard` row, with the error and
-help text under them. NOT for amounts (use `AnimatedAmountInput`) or hero titles (use `AnimatedTitleInput`).
+help text under them. NOT for amounts (use `AmountInput` / `CurrencyAmountInput`) or hero titles (use `AnimatedTitleInput`).
 
-#### `AnimatedAmountInput` → `AmountInput`
-Hero-style large formatted amount with `.numericText()` transition.
+#### `AmountInput`
+Hero-style large formatted amount with `.numericText()` transition (it replaced `AnimatedAmountInput`).
 
 ```swift
-AnimatedAmountInput(amount: $amountString, baseFontSize: 48, color: .primary)
+AmountInput(amount: $balance, baseFontSize: 48, placeholderColor: AppColors.Text.tertiary)
 ```
 
-Use in: `EditableHeroSection` balance fields. NOT for compact form rows.
+Used by `EditableHero` (the balance) and `CurrencyAmountInput`. NOT for compact form rows (§11).
 
 #### `AnimatedTitleInput`
 Hero-style name input with `.interpolate` character transition.
@@ -866,7 +874,7 @@ Hero-style name input with `.interpolate` character transition.
 AnimatedTitleInput(text: $name, placeholder: "Account Name", font: AppTypography.h1)
 ```
 
-Use in: `EditableHeroSection` title fields only.
+Used by `EditableHero` (the name) only.
 
 #### `DateButtons`
 Yesterday / Today / Calendar picker for transaction forms.
@@ -1889,139 +1897,83 @@ Used in: `OnboardingWelcomeStep` (bottom), Account/Category/Subscription/Deposit
 
 ## 4. View Patterns
 
-### Edit View — Hero Style
-Used by: `AccountEditView`, `SubscriptionEditView`, `CategoryEditView`, `DepositEditView`, `LoanEditView`
+How the apps put the components together. Each app's own guide names its screens (Tenra's
+`docs/design-system.md` §4, Dalada's `CLAUDE.md`).
+
+### Edit sheet: cards, with or without a hero
 
 ```
-EditSheetContainer(wrapInForm: false)
+EditSheetContainer(title:, wrapInForm: false, isSaving:, onSave:, onCancel:)   ✕ and ✓ in the toolbar
 └── ScrollView
     └── VStack(spacing: AppSpacing.xl)
-        ├── EditableHeroSection(config: .accountHero)  // icon + title + balance
-        ├── FormSection(.card, header: "Details") {
-        │   ├── UniversalRow { ... }
-        │   ├── Divider()
-        │   ├── MenuPickerRow(...)
-        │   ├── Divider()
-        │   └── DatePickerRow(...)
+        ├── EditableHero(…)                  optional: icon, name, amount + currency
+        ├── FormSection(header:) {           a Material card of rows
+        │   FormTextField(style: .row)  or  UniversalRow { FormTextField(style: .inline) }
+        │   Divider().padding(.leading, AppSpacing.lg)
+        │   MenuPickerRow / NavigationPickerRow / DatePickerRow / StepperRow / SliderRow
+        │   ToggleSettingsRow(config: .standard)
         │   }
-        └── FormSection(.card, header: "More") { ... }
+        ├── FormSection(…) { … }
+        └── InlineStatusText(…)              validation under the cards
 ```
 
-### Edit View — Native Form
-Used by: `LoanPaymentView`, `LoanRateChangeView`, `LoanEarlyRepaymentView`, `DepositRateChangeView`
+With a hero: Tenra's entity edit sheets (account, category, subscription, deposit, loan). Without:
+Tenra's rate-change and pay-all sheets; Dalada's forms (trip, catch, check-in, place, gear,
+review, thread, checklist, report). Neither app has a system `Form` sheet (§8).
+
+### Money entry
 
 ```
-EditSheetContainer(wrapInForm: true)
-└── Form (auto-wrapped)
-    ├── Section(header: "Basic Info") {
-    │   ├── TextField(...)
-    │   ├── Picker(...)
-    │   └── Toggle(...)
-    │   }
-    ├── Section(header: "Details") {
-    │   ├── DatePicker(...)
-    │   └── TextField(...)
-    │   }
-    └── InlineStatusText(...)  // validation below sections
+ScrollView
+└── VStack
+    ├── HeroSection(…)                               what the money is for
+    ├── CurrencyAmountInput(…, calculatorModel:)     amount, currency chip, the "≈ …" line
+    ├── SectionHeader + SnapCardPicker / ChipPicker  source, category
+    └── FormSection { … }                            date, note
+.safeAreaInset(edge: .bottom) { CalculatorKeypad(…) }
 ```
 
-### Detail View
-Used by: `SubscriptionDetailView`, `DepositDetailView`, `LoanDetailView`
+Tenra's add and edit transaction sheets and loan payments. The focus rule between the keypad and
+a text field is in §6 ("Calculator amount input").
+
+### Detail screen
 
 ```
 ScrollView
 └── VStack(spacing: AppSpacing.lg)
-    ├── Card 1: Header (.cardStyle())
-    │   └── Icon(.glassHero) + Title + Balance
-    ├── Card 2: Info (.cardStyle())
-    │   └── InfoRow list
-    ├── Card 3: Stats (.cardStyle())
-    │   └── InfoRow / custom rows
-    ├── Actions Section
-    │   ├── DSButton("…", fullWidth: true) { }
-    │   └── DSButton("…", appearance: .secondary, fullWidth: true) { }
-    └── .toolbar { Menu("...") { edit, delete, ... } }
+    ├── HeroSection(…).screenPadding().scrollHero()
+    ├── HStack { DSButton(…); DSButton(…, appearance: .secondary) }
+    ├── VStack { InfoRow … }.padding(AppSpacing.lg).cardStyle()
+    ├── the screen's own cards
+    └── history: day sections, SectionHeader(day) over TransactionRow rows
+.heroAccentGlow(icon:tint:)        a glow tinted from the hero icon
+.toolbar { Menu { edit, delete, … } }
 ```
 
-Cards use staggered `.chartAppear(delay:)` for entrance animation.
+Tenra builds every entity detail screen this way (its `EntityDetailScaffold`).
 
-### List View — Management
-Used by: `AccountsManagementView`, `CategoriesManagementView`
+### Lists
 
-```
-List {
-    ForEach(items) { item in
-        CustomRow(item)
-            .swipeActions(edge: .trailing) { delete }
-    }
-    .onMove { reorder }
-}
-.toolbar { Button("Add") { showAddSheet = true } }
-.sheet(isPresented: $showAddSheet) { EditView() }
-```
+| List | Built from |
+|---|---|
+| Entities to manage (reorder, delete) | `List` of `AmountRow(style: .list)`, `.onMove`, swipe actions; `AmountRowSkeleton(style: .list)` rows while loading |
+| Cards | `ScrollView` → `VStack(spacing: AppSpacing.lg)` of cards (`RecurringPaymentCard`, `PayoffProgressCard`, `ThumbnailCard`, …) in `NavigationLink`s; `EmptyState` when there are none |
+| Day-grouped history | `List` of `Section`s: header `SectionHeader(day, style: .card) { day total }`, rows `TransactionRow`. Slice the sections (`prefix(visibleSectionLimit)` and a trigger at the end): 500+ sections in a `List` freeze |
+| Settings | `List` of `Section(header: SectionHeader(title, style: .compact))` with `UniversalRow(config: .settings)` rows (`.navigationRow {}`, `.actionRow(role:) {}`), `ToggleSettingsRow`, `ActionSettingsRow` |
 
-### List View — Scrollable Cards
-Used by: `SubscriptionsListView`, `LoansListView`
+### Dashboard
 
-```
-ScrollView
-└── VStack(spacing: AppSpacing.lg)
-    ├── Optional summary card (.cardStyle())
-    └── ForEach(items) { item in
-            NavigationLink(value: destination) {
-                ItemCard()
-            }
-            .chartAppear(delay: index * 0.05)
-        }
-```
+`ScrollView` → `VStack(spacing: AppSpacing.lg)`: `BalanceCard`s in a `UniversalCarousel(config:
+.cards)`, a `CashFlowCard`, a grid of `ProgressRingTile`s, `FinanceCard` summaries with
+`PackedCircleIcons`. Tenra's Home and Finances tabs.
 
-### Transaction List (History)
-```
-List {
-    ForEach(sections.prefix(visibleSectionLimit)) { section in
-        Section {
-            ForEach(section.transactions) { tx in
-                TransactionCard(transaction: tx, styleData: preComputed, ...)
-            }
-        } header: {
-            SectionHeader(section.dateKey, style: .card) {
-                if total > 0 {
-                    FormattedAmountText(amount: total, currency: cur, prefix: "-",
-                                        fontSize: AppTypography.bodySmall, fontWeight: .semibold,
-                                        color: AppColors.Text.tertiary)
-                }
-            }
-        }
-    }
-    // Infinite scroll trigger
-    if visibleSectionLimit < sections.count {
-        ProgressView().onAppear { visibleSectionLimit += 100 }
-    }
-}
-```
+### Empty, loading, error
 
-### Settings
-```
-List {
-    SettingsGeneralSection(...)
-    SettingsDataManagementSection(...)
-    SettingsExportImportSection(...)
-    SettingsDangerZoneSection(...)
-}
-```
-
-Each section uses `UniversalRow(config: .settings)` with `.navigationRow {}` or `.actionRow(role:) {}`.
-
-### Home Screen (Dashboard)
-```
-ScrollView
-└── VStack(spacing: AppSpacing.lg)
-    ├── AccountsCarousel (UniversalCarousel)
-    ├── CashFlowCard (3-state: loading/empty/data)
-    ├── CategoryGridView (adaptive grid of category chips)
-    ├── SubscriptionsCardView (.cardStyle())
-    └── LoansCardView (.cardStyle())
-```
+- Loading: the component's `<Name>Skeleton` in its place, never a `ProgressView()`; the content
+  replaces it with `.transition(.skeletonReveal)` ([motion.md](motion.md)).
+- Empty: `EmptyState` (`.standard` on a screen, `.compact` in a card, `.error` for a failure).
+- A card that switches between empty and loaded animates the switch (§9, "Card State
+  Transitions").
 
 ---
 
@@ -2031,14 +1983,22 @@ ScrollView
 
 ```
 Amount input?
-├── Hero-style (large, animated) → AnimatedAmountInput
-└── Compact form row → FormTextField(keyboardType: .decimalPad)
+├── With a currency, a conversion or the calculator → CurrencyAmountInput
+│   (calculatorModel: + CalculatorKeypad for the calculator)
+├── Large amount alone (a hero) → AmountInput (EditableHero uses it)
+└── Compact form row → UniversalRow { FormTextField(style: .inline, keyboardType: .decimalPad) }
 
 Text input?
-├── Hero title (large, animated) → AnimatedTitleInput
-├── Multiline description → FormTextField(style: .multiline(min:max:))
+├── Hero title (large, animated) → AnimatedTitleInput (EditableHero uses it)
+├── A field that fills a form row (name, note) → FormTextField(style: .row / .rowMultiline)
+├── The value of a labelled row → UniversalRow { FormTextField(style: .inline) }
+├── Multiline description outside a card → FormTextField(style: .multiline(min:max:))
 ├── Single-line form field → FormTextField(style: .standard)
 └── A message sent at once (comment, reply) → MessageComposer
+
+Number?
+├── Small steps (people, days) → StepperRow
+└── A value on a range (radius, distance) → SliderRow
 
 Date input?
 ├── Transaction (needs Yesterday/Today shortcuts) → DateButtons / .dateButtonsSafeArea()
@@ -2047,16 +2007,18 @@ Date input?
 Single-select picker?
 ├── Few options (2-5) in form → MenuPickerRow
 ├── 2-4 exclusive modes → SegmentedPicker
-└── Many options → NavigationLink to selection list
+├── Chips (filters, tags, "All") → ChipPicker
+└── Many options (a long list, with search) → NavigationPickerRow
 
 Currency?
-└── CurrencySelectorView (inside EditableHeroSection, automatic)
+└── CurrencyPickerMenu (inside EditableHero and CurrencyAmountInput, automatic);
+    the full list → CurrencyList
 ```
 
 ### "Which row component?"
 
 ```
-Inside FormSection(.card)?
+Inside FormSection?
 └── Always use UniversalRow(config: .standard)
     ├── Read-only label+value → InfoRow (wrapper)
     ├── Picker → MenuPickerRow (wrapper)
@@ -2086,14 +2048,13 @@ A part of a whole, an insight's item (amount on the trailing edge)?
 
 ```
 Modal edit form?
-└── EditSheetContainer
-    ├── Entity edit (account/category/subscription/deposit/loan) → wrapInForm: false (hero-form)
-    └── Simple action form (payment, rate change) → wrapInForm: true
+└── EditSheetContainer(wrapInForm: false) over a ScrollView of FormSection cards (§4)
+    ├── An entity with an icon and a name → EditableHero on top
+    └── Anything else (an action, a payment, a rate change, a report) → the cards alone
 
 Grouping form rows?
-├── Inside hero-form → FormSection(.card)
-├── Inside native Form → Section(header:)
-└── Inside List → FormSection(.list) or Section
+├── In a sheet → FormSection
+└── Inside List → Section(header: SectionHeader(title, style: .compact))
 
 Horizontal scroll?
 └── UniversalCarousel with appropriate preset
@@ -2176,11 +2137,11 @@ Rendering a money amount?
 │   └── → Formatting.formatCurrencySmart(amount, currency:)
 │
 ├── Input component (user typing an amount)?
-│   └── → AmountInputView / AmountInput / AmountDigitDisplay / AnimatedAmountInput
+│   └── → CurrencyAmountInput / AmountInput / AmountDigitDisplay (Tenra: its AmountInputView)
 │       (these use AmountInputFormatting internally — do not bypass)
 │
 ├── Compact chart axis label?
-│   └── → ChartAxisHelpers.formatCompact(amount)
+│   └── → ChartValueFormat.compactString(amount)
 │
 ├── Storage, CSV, search-match key, persistence?
 │   └── → AmountFormatter.format(_:) / .parse(_:)
@@ -2191,11 +2152,11 @@ Rendering a money amount?
 
 #### Calculator amount input
 
-`AmountInputView(calculatorModel:)` swaps the system keyboard for an in-app `CalculatorKeypad` driven by `CalculatorInputModel` (pure `Decimal` evaluator `ExpressionEvaluator` — `+ − × ÷`, no `=`, live result). Used in `TransactionAddModal`, `AccountActionView`, `TransactionEditView`, `LoanPaymentView`, `LoanEarlyRepaymentView`. (Entity-edit heroes via `EditableHeroSection` stay on the system keyboard — they're forms, not calculators.)
+`CurrencyAmountInput(calculatorModel:)` (Tenra: `AmountInputView(calculatorModel:)`) swaps the system keyboard for an in-app `CalculatorKeypad` driven by `CalculatorInputModel` (pure `Decimal` evaluator `ExpressionEvaluator` — `+ − × ÷`, no `=`, live result). Used in Tenra's `TransactionAddModal`, `AccountActionView`, `TransactionEditView`, `LoanPaymentView`, `LoanEarlyRepaymentView`. (Entity-edit heroes via `EditableHero` stay on the system keyboard — they're forms, not calculators.)
 
 - Host owns `@State CalculatorInputModel`, places `CalculatorKeypad` via `.safeAreaInset(.bottom)`, and mirrors `calc.amountText → formData.amountText` with `.onChange` (validation/save/conversion keep reading the existing amount binding).
 - Pre-fill via `CalculatorInputModel(seed:)` (at init) or `.seed(_:)` (in `onAppear`, for defaults computed late).
-- ⚠️ **A form with BOTH the keypad AND an inline `FormTextField` (description) must coordinate focus or two keyboards stack.** Pattern: host `@FocusState descriptionFocused`; pass `externalFocus: $descriptionFocused` to the text field; show the keypad `if !descriptionFocused`; wire `AmountInputView(onCalculatorTap:)` to set it `false`. `FormTextField(externalFocus:)` is optional and defaults to internal focus (existing call sites unchanged).
+- ⚠️ **A form with BOTH the keypad AND an inline `FormTextField` (description) must coordinate focus or two keyboards stack.** Pattern: host `@FocusState descriptionFocused`; pass `externalFocus: $descriptionFocused` to the text field; show the keypad `if !descriptionFocused`; wire `CurrencyAmountInput(onCalculatorTap:)` to set it `false`. `FormTextField(externalFocus:)` is optional and defaults to internal focus (existing call sites unchanged).
 
 #### Forbidden patterns (will be flagged in code review)
 
@@ -2259,7 +2220,7 @@ For signed deltas ("+1 200 ₸" / "−500 ₸"):
 - **Positive needs explicit `prefix: "+"`** — pass `prefix: diff > 0 ? "+" : ""` to `FormattedAmountText` or `InfoRow(... amount:currency:prefix:)`.
 - DO NOT compose with `String(format: "%@%@", "+", Formatting.formatCurrency(...))`.
 
-For income/expense `+`/`−` styling in transaction lists, use `TransactionDisplayHelper.amountPrefix(for:)` + `TransactionDisplayHelper.amountColor(for:)` and pass results to `FormattedAmountText`.
+For income/expense `+`/`−` styling in transaction lists, pass the sign as `prefix:` and the colour as `color:` to `FormattedAmountText` (Tenra resolves both from the transaction type with its `TransactionDisplayHelper`).
 
 ### Currency Symbols
 
@@ -2269,38 +2230,12 @@ Formatting.currencySymbol(for: "KZT") // → "₸"
 
 Supported: KZT→₸, USD→$, EUR→€, RUB→₽, GBP→£, CNY→¥, JPY→¥. Unknown → code string.
 
-### Transaction Amount Color/Prefix
+### App-side helpers
 
-```swift
-TransactionDisplayHelper.amountColor(for: .income)   // → .green
-TransactionDisplayHelper.amountPrefix(for: .expense)  // → "-"
-```
-
-Deposit-aware overloads accept `targetAccountId`, `depositAccountId`, `isPlanned`.
-
-### Date Formatting
-
-| Formatter | Format | Use For |
-|-----------|--------|---------|
-| `DateFormatters.dateFormatter` | `yyyy-MM-dd` | Storage, parsing |
-| `DateFormatters.displayDateFormatter` | `d MMMM` | Display ("10 March") |
-| `DateFormatters.displayDateWithYearFormatter` | `d MMMM yyyy` | Display with year |
-| `DateFormatters.timeFormatter` | `HH:mm` | Time display |
-
-### Category Styling
-
-Pre-compute at ForEach call site, not inside row views:
-
-```swift
-let styleData = CategoryStyleHelper.cached(
-    category: tx.category,
-    type: tx.type,
-    customCategories: customCategories
-)
-// Pass styleData (Equatable struct) to TransactionCard
-```
-
-`CategoryStyleCache.shared` handles caching. Invalidate on category edit via `.invalidateCategory(_:type:)`.
+Tenra's `TransactionDisplayHelper` (amount colour and sign by transaction type), `DateFormatters`
+(storage and display dates) and `CategoryStyleHelper` / `CategoryStyleCache` (a category's icon and
+colour, resolved once per row) read Tenra's models, so they stay in Tenra; its
+`docs/design-system.md` §6 documents them.
 
 ---
 
@@ -2321,16 +2256,16 @@ View modifier: `.hapticFeedback(.light)` attaches tap gesture haptic.
 
 ---
 
-## 8. Remaining Native Form Views
+## 8. Forms: cards, not the system Form
 
-The following views still use `EditSheetContainer(wrapInForm: true)` with native `Form`/`Section`. This is intentional — they are simple single-purpose forms (payment entry, rate change) where hero-style UI would be overkill:
-
-- `LoanPaymentView` — single amount + date entry
-- `LoanRateChangeView` — single rate + date entry
-- `LoanEarlyRepaymentView` — amount + type selection
-- `DepositRateChangeView` — single rate + date entry
-
-All primary entity edit views (`Account`, `Subscription`, `Category`, `Deposit`, `Loan`) now use the hero-form pattern consistently.
+Every form in both apps is `EditSheetContainer(wrapInForm: false)` over a `ScrollView` of
+`FormSection` cards, with or without an `EditableHero` on top (§4): Tenra's entity edits, loan
+payments and rate changes, Dalada's trip, catch, check-in and place forms. Neither app has a
+system `Form` sheet left. A new form is built the same way: the rows that fill a card
+(`FormTextField(style: .row)`, `MenuPickerRow`, `NavigationPickerRow`, `DatePickerRow`,
+`StepperRow`, `SliderRow`, `ToggleSettingsRow(config: .standard)`) pad themselves for it (§10).
+`wrapInForm: true`, still the parameter's default, wraps the content in a system `Form` for a
+host that wants the grouped-list look.
 
 ---
 
@@ -2454,7 +2389,7 @@ VStack, HStack, custom cards must add `.padding(AppSpacing.lg)` (or the equivale
 | `BlinkingCursor` | Animated cursor for text inputs |
 | `AmountDigitDisplay` | Animated amount display using single `Text` with `.numericText()` transition |
 | `AmountInput` | Self-contained amount input (`AmountDigitDisplay` + hidden `TextField` + focus management) |
-| `AmountInputView` | Thin wrapper around `AmountInput` + currency selector + conversion display + error |
+| `CurrencyAmountInput` (`CurrencyAmountInput.swift`, 1.10.0) | `AmountInput` (or `CalculatorAmountDisplay` with a calculator) + the currency chip + the "≈" conversion line + the error. Tenra wraps it as `AmountInputView` |
 
 ### Visual Digit Grouping via `AttributedString.kern`
 
@@ -2464,7 +2399,7 @@ Space characters in the string shift character positions on grouping change ("1 
 
 `AttributedString.kern` is a styling attribute **invisible to `.numericText()`** — the string stays "12345" but renders as "12 345". Only the actual typed/deleted digit animates.
 
-Used in both `AmountDigitDisplay` and `AmountInputView` conversion display.
+Used by `AmountDigitDisplay`, so every amount input (`AmountInput`, `CalculatorAmountDisplay`, `CurrencyAmountInput`) groups digits this way.
 
 ### Font Sizing
 
@@ -2507,6 +2442,5 @@ Mutating `shared.prop = x` also triggers `didSet` (Swift copies struct and reass
 
 ---
 
-*Last Updated: 2026-05-05*
-
-*DesignKit adaptation: 2026-09-30 (from Tenra `74a12c5`).*
+*Last reviewed against the code: 2026-10-12 (3.4.0). Adapted from Tenra's guide on 2026-09-30
+(Tenra `74a12c5`).*
