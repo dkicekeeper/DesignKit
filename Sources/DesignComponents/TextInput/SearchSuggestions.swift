@@ -287,6 +287,10 @@ public struct SearchSuggestionRow: View {
     let query: String
     let onFill: (() -> Void)?
 
+    /// The icon's slot grows with the text, so a large symbol never runs into the title and
+    /// the titles of all lines stay aligned.
+    @ScaledMetric(relativeTo: .body) private var iconSide: CGFloat = AppIconSize.lg
+
     static var fillTitle: String {
         String(localized: "search.fill", defaultValue: "Edit in search field")
     }
@@ -364,11 +368,11 @@ public struct SearchSuggestionRow: View {
             Image(systemName: name)
                 .font(AppTypography.body)
                 .foregroundStyle(tint ?? AppColors.Text.secondary)
-                .frame(width: AppIconSize.lg, height: AppIconSize.lg)
+                .frame(width: iconSide, height: iconSide)
                 .accessibilityHidden(true)
         case .brandService:
             Icon(source: icon, size: AppIconSize.lg)
-                .frame(width: AppIconSize.lg, height: AppIconSize.lg)
+                .frame(width: iconSide, height: iconSide)
         case nil:
             EmptyView()
         }
