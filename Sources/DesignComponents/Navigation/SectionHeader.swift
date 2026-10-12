@@ -7,6 +7,7 @@
 //  2.0.0: named SectionHeaderView before; SettingsSectionHeaderView became the `.list` style
 //  and DateSectionHeaderView the `.card` style.
 //  3.2.0: `.list` is `.compact`, which no longer pads itself; both symbols show in every style.
+//  4.0.0: the deprecated `.list` name is removed.
 //
 
 import SwiftUI
@@ -64,10 +65,6 @@ public struct SectionHeader: View {
 
         /// The default title on a glass card, padded (2.0.0)
         case card
-
-        /// The compact label without padding: what `.compact` is since 3.2.0.
-        @available(*, deprecated, renamed: "compact", message: "Since 3.2.0 .compact has no padding of its own, as .list had. Use .compact.")
-        public static var list: Style { .compact }
     }
 
     /// - Parameters:

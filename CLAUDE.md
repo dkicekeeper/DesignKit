@@ -196,8 +196,9 @@ rather than importing an app type.
 - Dalada's map drew its place types, layers and zones in system colours (some white symbols at
   2.2:1, and a marker image keeps the theme it was drawn in): 3.7.0's `AppColors.Palette` gives
   fixed deep hues with `UIColor`; Dalada maps its types and layers onto them in `MapColors`.
-- For 4.0 (no hurry): remove `SectionHeader.Style.list`, deprecated in 3.2.0 when `.compact` took
-  over its job; no app uses it.
+- DesignKit 4.0.0 (2026-10) removed the last deprecated name, `SectionHeader.Style.list`
+  (`.compact` since 3.2.0); nothing else changed ([docs/migration-4.0.md](docs/migration-4.0.md)).
+  No deprecated API is left.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.
@@ -215,6 +216,7 @@ rather than importing an app type.
 | Snapshot tests: what is covered, recording references, the pinned Xcode | [docs/snapshots.md](docs/snapshots.md) |
 | Moving an app to 2.0 (renames, `DSButton`, icon sizes, visual changes) | [docs/migration-2.0.md](docs/migration-2.0.md) |
 | Moving an app to 3.0 (removed names and their replacements, card colours) | [docs/migration-3.0.md](docs/migration-3.0.md) |
+| Moving an app to 4.0 (`SectionHeader.Style.list` removed) | [docs/migration-4.0.md](docs/migration-4.0.md) |
 | What exists vs Apple HIG / Material / Fluent / Carbon / Polaris / Atlassian, next candidates | [docs/benchmark.md](docs/benchmark.md) |
 | Where a component goes (Gallery sections, source folders), how its Gallery page is built | [docs/gallery-structure.md](docs/gallery-structure.md) |
 | How an app uses DesignKit (its adapters, screens, effects in use) | Tenra's `docs/design-system.md`, Dalada's `CLAUDE.md` («Компоненты интерфейса») |
