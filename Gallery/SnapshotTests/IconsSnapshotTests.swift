@@ -100,8 +100,9 @@ extension ComponentSnapshots {
             )
         }
 
-        /// The shelf (4.4.0) and the orbit (3.3.0) with symbols: five items, four shown and a
-        /// "+1". Drawn in their final state: the rise out of the pocket, the flight onto the
+        /// The shelf (4.4.0) and the orbit (3.3.0) with symbols: five items, the orbit showing
+        /// four and a "+1", the shelf as many 36 pt tiles as fit its 120 pt (three and a "+2",
+        /// 4.5.1). Drawn in their final state: the rise out of the pocket, the flight onto the
         /// orbit, its turn and the light stand still in snapshots.
         @Test func packedCircleStyles() async {
             for (name, style) in [("shelf", PackedCircleIconsStyle.shelf), ("orbit", .orbit)] {
@@ -119,8 +120,8 @@ extension ComponentSnapshots {
             }
         }
 
-        /// The shelf (4.4.0) wide, four logos and no "+N": the tiles at their size, a tenth over
-        /// each other, as in the reference it was drawn from.
+        /// The shelf (4.4.0) wide, four logos and no "+N": the tiles at their 36 pt (4.5.1), a
+        /// tenth over each other, the shelf as wide as its row.
         @Test func packedShelfWide() async {
             await assertComponentSnapshot(
                 PackedCircleIcons(items: [
@@ -133,7 +134,8 @@ extension ComponentSnapshots {
         }
 
         /// Logos as the shelf's tiles and as the orbit's marbles, in a FinanceCard on Liquid Glass
-        /// as on Tenra's home. One glass card per snapshot.
+        /// as on Tenra's home: six items, the shelf's three tiles and a "+3" at the card's
+        /// trailing edge (4.5.1). One glass card per snapshot.
         @Test func packedCircleStyleLogos() async {
             for (name, style) in [("shelf", PackedCircleIconsStyle.shelf), ("orbit", .orbit)] {
                 await assertComponentSnapshot(

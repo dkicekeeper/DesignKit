@@ -627,8 +627,9 @@ private struct DissolvePage: View {
 
 // MARK: - Hero background (4.5.0)
 
-/// The top of a detail screen on colour: a hero, its chart and its trend in white on a gradient
-/// of the insight's colour, the cards below rising over its fade.
+/// The top of a detail screen on colour: a hero, its chart and its trend on a gradient of the
+/// insight's colour (white on a deep one in dark mode, black on a pale one in light mode), the
+/// cards below rising over its fade.
 private struct HeroBackgroundPage: View {
     @State private var tone = 2
     @State private var chart = 0
@@ -643,14 +644,14 @@ private struct HeroBackgroundPage: View {
     var body: some View {
         ComponentPage(
             name: ".heroBackground",
-            summary: "The top of a detail screen on colour: a gradient of the colour, a tone deeper, behind the hero and up under the navigation bar, fading into the page; the hero pieces in it turn white.",
+            summary: "The top of a detail screen on colour: a gradient of the colour from the screen's top edge, behind the navigation bar and the hero, fading into the page. In dark mode a tone deeper with the hero pieces in white; in light mode a pale tint with them in black.",
             since: "4.5.0",
             apps: [.tenra],
             canvas: .bleed,
             notes: [
-                "Sets \\.heroTone to .onColor: HeroSection, TrendBadge, HeroHalfGauge, HeroBarPair, HeroSparkline, HeroMilestoneGauge and HeroProportionBar draw in white. ScoreGaugeCard(style: .hero) lies on it.",
+                "Dark mode: sets \\.heroTone to .onColor, so HeroSection, TrendBadge, HeroHalfGauge, HeroBarPair, HeroSparkline, HeroMilestoneGauge and HeroProportionBar draw in white. Light mode (4.5.1): a pale tint, the tone stays .onSurface and the pieces draw as on the page, the text in black. ScoreGaugeCard(style: .hero) lies on it.",
                 "Edge to edge at the top of a scroll view; the cards that follow rise over its 96 pt fade (.padding(.top, -AppSpacing.xxl)).",
-                ".heroScrollEdge() on the scroll view keeps the bar's soft scroll edge off while the colour is under the bar, so it reaches the top of the screen. “Open as a screen” shows both.",
+                ".heroScrollEdge() on the scroll view keeps the bar's soft scroll edge off while the colour is under the bar, and starts the gradient at the screen's top edge, not under the bar (4.5.1). “Open as a screen” shows both.",
             ]
         ) {
             VStack(spacing: AppSpacing.xl) {

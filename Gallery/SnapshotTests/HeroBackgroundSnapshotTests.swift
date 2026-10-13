@@ -3,9 +3,11 @@
 //  DesignKit Gallery snapshot tests
 //
 //  The hero pieces on colour (`.heroBackground`, 4.5.0): `HeroSection` with its trend,
-//  `HeroBarPair`, `HeroSparkline`, `HeroMilestoneGauge` and `HeroProportionBar` in white, each
-//  clipped to its own box (the gradient runs up and down past a hero on a screen), and
-//  `ScoreGaugeCard(amount:)` as a hero, as on a screen.
+//  `HeroBarPair`, `HeroSparkline`, `HeroMilestoneGauge` and `HeroProportionBar`, in white on the
+//  deep gradient in dark mode and as on the page, in black, on the pale one in light mode
+//  (4.5.1), each clipped to its own box (the gradient runs up and down past a hero on a
+//  screen), and `ScoreGaugeCard(amount:)` as a hero, as on a screen, a long amount shrunk to
+//  stay inside the arc (4.5.1).
 //
 
 import SwiftUI
@@ -62,6 +64,16 @@ extension ComponentSnapshots {
                 ScoreGaugeCard(amount: 84_900, currency: "KZT", maxValue: 84_900 * 1.15, norm: 6_100,
                                grade: "13.9× the usual", color: AppColors.destructive,
                                subtitle: "Furniture, 3 Oct", style: .hero)
+            )
+        }
+
+        /// A long amount on the hero (4.5.1): it shrinks to the room inside the arc instead of
+        /// running onto it.
+        @Test func scoreGaugeHeroLongAmount() async {
+            await assertComponentSnapshot(
+                ScoreGaugeCard(amount: 1_200_000, currency: "KZT", maxValue: 1_200_000 * 1.15, norm: 30_700,
+                               grade: "39.1× the usual", color: AppColors.warning,
+                               subtitle: "Furniture, 29 Sep", style: .hero)
             )
         }
     }

@@ -5,7 +5,9 @@
 //  `PackedCircleIcons(style: .shelf)` (4.4.0): the items as app icons standing in a row in a
 //  pocket. Square tiles of one size, the largest amount on the left, each a little over the one
 //  before it and turned a few degrees, cut off flat by the box's lower edge, so every icon reads.
-//  The box is as tall as the row needs, up to the height it is given.
+//  4.5.1: the tiles are 36 pt in every shelf, whatever the count (they shrank with more items
+//  before); as many as fit the width stand in the row, the rest go into the "+N" tile, and the
+//  box is as wide and as tall as the row, up to the size it is given.
 //  They rise out of the pocket one after another on appear, and every few seconds a light runs
 //  across them from left to right. It replaced 3.3.0's fan of playing cards, where the cards
 //  behind the top one barely showed.
@@ -19,15 +21,14 @@ import DesignTokens
 import DesignSupport
 
 enum PackedShelfMetrics {
+    /// A tile's side in every shelf (4.5.1), less only in a box too small for one tile.
+    static let side: CGFloat = 36
     /// The share of a tile's height above the pocket.
     static let exposure: CGFloat = 0.74
-    /// How far a tile covers the one before it, in widths: the most the tiles keep to, and the
-    /// most they take to stay `minSide` wide in a narrow box.
+    /// How far a tile covers the one before it, in widths: when there is room, and the most
+    /// they close up to fit one more tile in the width.
     static let targetOverlap: CGFloat = 0.1
-    static let maxOverlap: CGFloat = 0.3
-    /// The least they overlap when the box is wide: they never stand apart.
-    static let minOverlap: CGFloat = 0.06
-    static let minSide: CGFloat = 28
+    static let maxOverlap: CGFloat = 0.36
     /// Room for the turned tiles' corners and lifts, in widths, and for their shadows.
     static let tiltSlack: CGFloat = 0.1
     static let margin: CGFloat = 4
@@ -63,44 +64,54 @@ struct PackedShelfSlot: Identifiable, Equatable {
 }
 
 enum PackedShelfLayout {
-    /// A tile's side for `count` tiles in `box`: as large as the height allows and as close as
-    /// `targetOverlap` lets them fit; in a narrow box they overlap more (up to `maxOverlap`) to
-    /// stay `minSide` wide.
-    static func side(count: Int, in box: CGSize) -> CGFloat {
-        guard count > 0, box.width > 0, box.height > 0 else { return 0 }
+    /// A tile's side in `box`: `PackedShelfMetrics.side`, whatever the count (4.5.1), less only
+    /// when the box is too low or too narrow for one tile.
+    static func side(in box: CGSize) -> CGFloat {
+        guard box.width > 0, box.height > 0 else { return 0 }
         let metrics = PackedShelfMetrics.self
-        let width = box.width - 2 * metrics.margin
-        let gaps = CGFloat(count - 1)
-        func widthFitting(overlap: CGFloat) -> CGFloat {
-            width / (1 + metrics.tiltSlack + gaps * (1 - overlap))
-        }
         let byHeight = (box.height - metrics.margin) / (metrics.exposure + metrics.tiltSlack)
-        let byWidth = max(widthFitting(overlap: metrics.targetOverlap),
-                          min(metrics.minSide, widthFitting(overlap: metrics.maxOverlap)))
-        return max(0, min(byHeight, byWidth))
+        let byWidth = (box.width - 2 * metrics.margin) / (1 + metrics.tiltSlack)
+        return max(0, min(metrics.side, byHeight, byWidth))
     }
 
-    /// The box the row takes: the width it is given, and as tall as the tiles above the pocket
-    /// need, up to the height it is given.
+    /// How many tiles fit across `box`, overlapping at most `maxOverlap`.
+    static func capacity(in box: CGSize) -> Int {
+        let metrics = PackedShelfMetrics.self
+        let side = side(in: box)
+        guard side > 0 else { return 0 }
+        let room = box.width - 2 * metrics.margin - side * (1 + metrics.tiltSlack)
+        return 1 + max(0, Int((room / (side * (1 - metrics.maxOverlap))).rounded(.down)))
+    }
+
+    /// From one tile's centre to the next for `count` tiles across `width`: `targetOverlap`
+    /// apart, closer (up to `maxOverlap`, `capacity`) when the width is short.
+    static func step(count: Int, side: CGFloat, width: CGFloat) -> CGFloat {
+        guard count > 1 else { return 0 }
+        let metrics = PackedShelfMetrics.self
+        let room = width - 2 * metrics.margin - side * (1 + metrics.tiltSlack)
+        return max(0, min(side * (1 - metrics.targetOverlap), room / CGFloat(count - 1)))
+    }
+
+    /// The box the row of `count` tiles takes: as wide as the row and as tall as the tiles
+    /// above the pocket need, up to the box it is given.
     static func fittedBox(count: Int, in box: CGSize) -> CGSize {
         let metrics = PackedShelfMetrics.self
-        let side = side(count: count, in: box)
-        return CGSize(width: box.width,
+        let side = side(in: box)
+        let row = side * (1 + metrics.tiltSlack)
+            + CGFloat(max(count - 1, 0)) * step(count: count, side: side, width: box.width)
+        return CGSize(width: min(box.width, row + 2 * metrics.margin),
                       height: min(box.height, side * (metrics.exposure + metrics.tiltSlack) + metrics.margin))
     }
 
-    /// The row for `ids` (left to right) in `box`, the pocket's edge at the box's lower edge.
-    /// The tiles spread over the width, overlapping at least `minOverlap`, the row centred.
+    /// The row for `ids` (left to right) in `box` (`fittedBox`), the pocket's edge at the box's
+    /// lower edge, the row centred.
     static func slots(ids: [String], in box: CGSize) -> [PackedShelfSlot] {
         let count = ids.count
         guard count > 0, box.width > 0, box.height > 0 else { return [] }
         let metrics = PackedShelfMetrics.self
-        let width = box.width - 2 * metrics.margin
+        let side = side(in: box)
+        let step = step(count: count, side: side, width: box.width)
         let gaps = CGFloat(count - 1)
-        let side = side(count: count, in: box)
-        let step = count > 1
-            ? min(side * (1 - metrics.minOverlap), (width - side * (1 + metrics.tiltSlack)) / gaps)
-            : 0
         let row = side + step * gaps
         let pocket = box.height / 2
 
@@ -134,34 +145,37 @@ struct PackedPocketShape: Shape {
 struct PackedShelf: View {
     static let overflowID = "__overflow__"
 
+    /// All the items: the shelf shows the largest that fit.
     let items: [PackedCircleItem]
-    let overflowCount: Int
+    /// The most items shown; past it, or past the width, the rest go into "+N".
+    let maxVisible: Int
     let size: CGSize
 
     @Environment(\.designKitMotion) private var designKitMotion
     /// Counts the lights that have run across the shelf.
     @State private var sweep = 0
 
-    init(items: [PackedCircleItem], overflowCount: Int, size: CGSize) {
+    init(items: [PackedCircleItem], maxVisible: Int, size: CGSize) {
         self.items = items
-        self.overflowCount = overflowCount
+        self.maxVisible = maxVisible
         self.size = size
     }
 
-    /// The items by amount, the largest first (on the left).
-    private var ranked: [PackedCircleItem] {
-        items.sorted { $0.amount > $1.amount }
-    }
-
-    private var ids: [String] {
-        var ids = ranked.map(\.id)
-        if overflowCount > 0 { ids.append(Self.overflowID) }
-        return ids
+    /// The items shown, by amount, the largest first (on the left), and how many go into "+N".
+    static func shown(_ items: [PackedCircleItem], maxVisible: Int, in size: CGSize) -> (items: [PackedCircleItem], overflow: Int) {
+        let ranked = items.sorted { $0.amount > $1.amount }
+        let room = PackedShelfLayout.capacity(in: size)
+        if ranked.count <= min(maxVisible, room) { return (ranked, 0) }
+        // One tile goes to "+N".
+        let count = max(0, min(maxVisible, room - 1))
+        return (Array(ranked.prefix(count)), ranked.count - count)
     }
 
     var body: some View {
-        let ranked = self.ranked
-        let ids = self.ids
+        let shown = Self.shown(items, maxVisible: maxVisible, in: size)
+        let ranked = shown.items
+        let overflowCount = shown.overflow
+        let ids = ranked.map(\.id) + (overflowCount > 0 ? [Self.overflowID] : [])
         let box = PackedShelfLayout.fittedBox(count: ids.count, in: size)
         let slots = PackedShelfLayout.slots(ids: ids, in: box)
         let side = slots.first?.side ?? 0

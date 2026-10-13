@@ -12,6 +12,8 @@
 //  along an arc) and `.orbit` (marbles on a turning orbit, PackedCircleIconsOrbit.swift).
 //  4.4.0: `.shelf` (app icons in a row in a pocket, PackedCircleIconsShelf.swift) replaces the
 //  fan, whose cards behind the top one barely showed; `.fan` is deprecated and draws the shelf.
+//  4.5.1: the shelf's tiles are 36 pt whatever the count; the largest that fit the width show,
+//  the rest go into "+N", and the shelf is as wide as its row.
 //
 
 import SwiftUI
@@ -44,11 +46,12 @@ public enum PackedCircleIconsStyle: Sendable {
     case glossy
     /// The look before 2.9.0: a symbol on a pale disc of its colour, a logo edge to edge.
     case flat
-    /// App icons standing in a row in a pocket (4.4.0): square tiles of one size, the largest
-    /// amount on the left, each a little over the one before and turned a few degrees, cut off
-    /// flat by the box's lower edge so every one reads. A logo fills its tile. They rise out of
-    /// the pocket one after another, and every few seconds a light runs across them (not under
-    /// Reduce Motion).
+    /// App icons standing in a row in a pocket (4.4.0): square tiles of one size (36 pt in every
+    /// shelf since 4.5.1), the largest amount on the left, each a little over the one before and
+    /// turned a few degrees, cut off flat by the box's lower edge so every one reads. As many as
+    /// fit the width show (at most `maxVisible`), the rest in a "+N" tile, and the shelf is as
+    /// wide as its row (4.5.1). A logo fills its tile. They rise out of the pocket one after
+    /// another, and every few seconds a light runs across them (not under Reduce Motion).
     case shelf
     /// 3.3.0's playing cards fanned along an arc. Since 4.4.0 it draws the shelf.
     @available(*, deprecated, message: "The fan became the shelf in 4.4.0: app icons in a row in a pocket, every one readable. Use .shelf.")
@@ -156,8 +159,9 @@ public struct PackedCircleIcons: View {
         case .orbit:
             PackedOrbit(items: visible, overflowCount: overflowCount, size: boxSize)
         default:
-            // `.shelf`, and the deprecated `.fan` (not named, so the package builds clean).
-            PackedShelf(items: visible, overflowCount: overflowCount, size: boxSize)
+            // `.shelf`, and the deprecated `.fan` (not named, so the package builds clean). It
+            // shows the largest that fit its width (4.5.1).
+            PackedShelf(items: items, maxVisible: maxVisible, size: boxSize)
         }
     }
 
@@ -554,7 +558,7 @@ public struct PackedCircleIconsSkeleton: View {
             default: shelf
             }
         }
-        .frame(width: containerWidth, height: boxHeight)
+        .frame(width: boxSize.width, height: boxSize.height)
         .shimmer()
         .skeletonLoadingLabel()
     }
@@ -574,18 +578,24 @@ public struct PackedCircleIconsSkeleton: View {
         }
     }
 
-    /// The shelf is as tall as its row, as the component is; the other styles fill the box.
-    private var boxHeight: CGFloat {
+    /// The shelf is as wide and as tall as its row, as the component is; the other styles fill
+    /// the box.
+    private var boxSize: CGSize {
         switch style {
-        case .glossy, .flat, .orbit: height
-        default: PackedShelfLayout.fittedBox(count: 4, in: CGSize(width: containerWidth, height: height)).height
+        case .glossy, .flat, .orbit: CGSize(width: containerWidth, height: height)
+        default: PackedShelfLayout.fittedBox(count: shelfCount, in: CGSize(width: containerWidth, height: height))
         }
     }
 
-    /// Four grey tiles standing in the pocket as the tiles do.
+    /// Four tiles, or as many as fit.
+    private var shelfCount: Int {
+        min(4, PackedShelfLayout.capacity(in: CGSize(width: containerWidth, height: height)))
+    }
+
+    /// Grey tiles standing in the pocket as the tiles do.
     private var shelf: some View {
-        let box = PackedShelfLayout.fittedBox(count: 4, in: CGSize(width: containerWidth, height: height))
-        let slots = PackedShelfLayout.slots(ids: ["0", "1", "2", "3"], in: box)
+        let box = boxSize
+        let slots = PackedShelfLayout.slots(ids: (0..<shelfCount).map(String.init), in: box)
         return ZStack {
             ForEach(slots) { slot in
                 let corner = slot.side * PackedShelfMetrics.cornerRatio

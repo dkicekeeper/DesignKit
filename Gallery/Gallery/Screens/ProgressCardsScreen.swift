@@ -186,7 +186,7 @@ private struct ScoreGaugeCardPage: View {
             canvas: style == .hero ? .bleed : .fill,
             notes: [
                 "decodesScore (2.7.0): the score decodes itself as it appears and when it changes.",
-                ".hero (4.2.0): no card and no .screenPadding(); on colour its gradient reaches up under the navigation bar. “Open as a screen” shows it there.",
+                ".hero (4.2.0): no card and no .screenPadding(); on colour its gradient starts at the screen's top edge, deep with white text in dark mode, pale with black text in light mode (4.5.1). A long score shrinks to stay inside the arc (4.5.1). “Open as a screen” shows it there.",
                 "value:fractionDigits:unit: (4.3.0) shows a rate, “12.4%”, on a scale of maxScore; Trend(direction:change:caption:) a change in the score's own units, “+5”.",
                 "amount:currency:maxValue:norm: (4.5.0) shows an amount in the app's format, hidden with the app's amounts, with a reference (an average, a budget) notched on the arc.",
             ],
@@ -203,7 +203,8 @@ private struct ScoreGaugeCardPage: View {
                     SavingsRateSample(rate: score * 0.4, hasData: hasData, decodes: decodes, style: style, tone: tone,
                                       showsTrend: showsTrend)
                 case .amount:
-                    LargeExpenseSample(amount: score * 1_000, hasData: hasData, style: style, tone: tone)
+                    // Up to 2 000 000 ₸: a long amount shrinks inside the arc (4.5.1).
+                    LargeExpenseSample(amount: score * 20_000, hasData: hasData, style: style, tone: tone)
                 }
             }
         } controls: {
@@ -288,7 +289,7 @@ private struct LargeExpenseSample: View {
     var style: ScoreGaugeCard.Style = .card
     var tone: HeroHalfGauge.Tone = .onColor
 
-    private let usual = 6_100.0
+    private let usual = 30_700.0
 
     var body: some View {
         ScoreGaugeCard(amount: hasData ? amount : nil, currency: "KZT", maxValue: max(amount, usual) * 1.15, norm: usual,
