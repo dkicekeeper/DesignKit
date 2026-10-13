@@ -28,7 +28,8 @@ import DesignSupport
 ///
 /// `.hero` is not a card: it fills the width (no `.screenPadding()`), its gauge runs out past
 /// both edges (`HeroHalfGauge(style: .bleed)`) and, `.onColor`, it lies on a gradient of its
-/// colour that reaches up under the navigation bar and fades into the page at the bottom.
+/// colour, a tone deeper so white text reads, that reaches up under the navigation bar and fades
+/// into the page below the hero, where the cards that follow may rise over it.
 public struct ScoreGaugeCard: View {
     /// Where the score sits (4.2.0).
     public enum Style: Hashable, Sendable {
@@ -66,6 +67,8 @@ public struct ScoreGaugeCard: View {
     let tone: HeroHalfGauge.Tone
     let showsMaximum: Bool
     let trend: Trend?
+
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     /// - Parameters:
     ///   - score: `nil` when it cannot be computed: the gauge stays empty and the number reads "—".
@@ -184,7 +187,8 @@ public struct ScoreGaugeCard: View {
                     .materialize(delay: 0.35)
             }
 
-            HStack(spacing: AppSpacing.sm) {
+            // Side by side; one under the other at accessibility sizes (the 1.3.0 rule).
+            capsuleLayout {
                 Text(grade)
                     .font(AppTypography.bodySmall.weight(.semibold))
                     .foregroundStyle(onColor ? AppColors.Text.primaryOnDark : color)
@@ -211,6 +215,12 @@ public struct ScoreGaugeCard: View {
                 ScoreHeroBackground(color: color)
             }
         }
+    }
+
+    private var capsuleLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(spacing: AppSpacing.sm))
+            : AnyLayout(HStackLayout(spacing: AppSpacing.sm))
     }
 
     private var heroScoreColor: Color {
@@ -257,7 +267,8 @@ public struct ScoreGaugeCard: View {
                 .foregroundStyle(onColor ? AppColors.Text.primaryOnDark : AppColors.Text.secondary)
         }
         .font(AppTypography.bodySmall)
-        .lineLimit(1)
+        .lineLimit(2)
+        .multilineTextAlignment(.center)
         .padding(.horizontal, AppSpacing.md)
         .padding(.vertical, AppSpacing.xs)
         .modifier(HeroCapsule(onColor: onColor, fill: AppColors.Background.neutral1))
@@ -275,33 +286,50 @@ private struct HeroCapsule: ViewModifier {
     }
 }
 
-/// The hero's gradient: mesh light in shades of the score's colour, opaque at the top (under
-/// the navigation bar) and fading into the page at the bottom, with a fine grain.
+/// The hero's gradient: mesh light in shades of the score's colour, a tone deeper so white text
+/// reads on it, opaque behind the whole hero (and up under the navigation bar), then fading into
+/// the page below it, where the cards that follow rise over it. A fine grain against banding.
 private struct ScoreHeroBackground: View {
     let color: Color
 
     var body: some View {
         mesh
             .grain()
+            .mask {
+                VStack(spacing: 0) {
+                    Rectangle()
+                    LinearGradient(colors: [.black, .black.opacity(0)], startPoint: .top, endPoint: .bottom)
+                        .frame(height: ScoreHeroMetrics.fade)
+                }
+            }
+            .padding(.bottom, -ScoreHeroMetrics.fade)
             .ignoresSafeArea(edges: .top)
             .allowsHitTesting(false)
             .accessibilityHidden(true)
     }
 
-    /// Three columns of shades, rows fading from the top down (as `.accentGlow`'s aurora).
+    /// The score's colour a tone deeper: white on the deepened success, warning and destructive
+    /// colours is at least 3:1, the minimum for large text (the plain colours give about 2:1).
+    private var base: Color {
+        var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
+        UIColor(color).getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+        return Color(hue: Double(hue), saturation: Double(min(1, saturation * 1.05)),
+                     brightness: Double(brightness * ScoreHeroMetrics.depth))
+    }
+
+    /// Three columns of shades in three rows (as `.accentGlow`'s aurora), all opaque.
     private var mesh: MeshGradient {
-        let palette = AuroraBackground.palette(around: color, spread: ScoreHeroMetrics.hueSpread)
+        let palette = AuroraBackground.palette(around: base, spread: ScoreHeroMetrics.hueSpread)
         let columns = [palette[0], palette[1], palette[5]]
-        let rows = ScoreHeroMetrics.rowOpacity
         var points = [SIMD2<Float>]()
         var colors = [Color]()
-        for row in rows.indices {
+        for row in 0..<3 {
             for column in 0..<3 {
-                points.append(SIMD2(Float(column) / 2, Float(row) / Float(rows.count - 1)))
-                colors.append(columns[(column + row) % columns.count].opacity(rows[row]))
+                points.append(SIMD2(Float(column) / 2, Float(row) / 2))
+                colors.append(columns[(column + row) % columns.count])
             }
         }
-        return MeshGradient(width: 3, height: rows.count, points: points, colors: colors)
+        return MeshGradient(width: 3, height: 3, points: points, colors: colors)
     }
 }
 
@@ -312,8 +340,10 @@ enum ScoreHeroMetrics {
     static let bottomPadding: CGFloat = AppSpacing.xxl
     /// Shades of one colour, as the hero glow (`.accentGlow`, 3.4.0).
     static let hueSpread: Double = 12
-    /// The gradient's opacity from the top down: full under the score, gone at the bottom.
-    static let rowOpacity: [Double] = [1, 1, 0.85, 0.35, 0]
+    /// How far below the hero its gradient fades out (under the cards that rise over it).
+    static let fade: CGFloat = 96
+    /// The score's colour is deepened to this share of its brightness behind white text.
+    static let depth: CGFloat = 0.78
 }
 
 // MARK: - Skeleton

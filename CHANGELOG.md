@@ -34,8 +34,9 @@ edges, with a knob on the value, on a gradient of its colour.
   translucent white track for a coloured background.
 - `ScoreGaugeCard(style: .hero)`: the top of a screen, not a card. The bleed gauge, the score in
   `AppTypography.display`, the grade and the trend in capsules under it, the subtitle below. With
-  `tone: .onColor` (the default for the hero) it lies on a gradient of its colour that reaches up
-  under the navigation bar and fades into the page; `.onSurface` draws on the page.
+  `tone: .onColor` (the default for the hero) it lies on a gradient of its colour, a tone deeper
+  so white text reads on it, that reaches up under the navigation bar and fades into the page
+  below the hero; `.onSurface` draws on the page.
   `ScoreGaugeCardSkeleton(style:)`.
 - `ScoreGaugeCard(showsMaximum:)` adds "/100" after the score, and `trend:`
   (`ScoreGaugeCard.Trend(direction:changePercent:caption:)`) a capsule "↗ +17.0% than last month";

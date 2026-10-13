@@ -257,6 +257,8 @@ struct BleedGaugeGeometry {
     static let maxArcWidth: CGFloat = 560
     /// The width when none is offered (a phone's).
     static let defaultWidth: CGFloat = 390
+    /// How far past each edge the arc is drawn, in radians, so its ends are cut there.
+    static let overrun: Double = 0.3
 
     /// Half the visible angle, in radians.
     var half: Double { span * .pi / 360 }
@@ -267,8 +269,26 @@ struct BleedGaugeGeometry {
     /// Room above the apex for the knob and its shadow.
     var top: CGFloat { knobDiameter / 2 + 4 }
     var center: CGPoint { CGPoint(x: width / 2, y: top + radius) }
-    /// From the top of the knob at the apex to below the arc where it meets the edges.
-    var height: CGFloat { top + radius * CGFloat(1 - cos(half)) + max(lineWidth, knobDiameter) / 2 + 4 }
+    /// From the top of the knob at the apex to the lowest point of the stroke inside the view:
+    /// near the edges the inner side of a thick stroke dips well below its centre line.
+    var height: CGFloat {
+        let knobBottom = point(at: angle(for: 0)).y + knobDiameter / 2 + 4
+        return max(bandBottom + 2, knobBottom)
+    }
+
+    /// The lowest point of the stroke between the view's edges.
+    private var bandBottom: CGFloat {
+        let extent = half + Self.overrun
+        var lowest: CGFloat = 0
+        for step in 0...90 {
+            let angle = -extent + 2 * extent * Double(step) / 90
+            for r in [radius - lineWidth / 2, radius + lineWidth / 2] {
+                let p = point(at: angle, radius: r)
+                if p.x >= 0 && p.x <= width { lowest = max(lowest, p.y) }
+            }
+        }
+        return lowest
+    }
 
     /// The value's angle: 0 and 1 sit just inside the edges, so the knob shows whole.
     func angle(for fraction: Double) -> Double {
@@ -351,8 +371,8 @@ struct BleedGaugeCanvas: View, Animatable {
             context.translateBy(x: 0, y: margin)
             let stroke = StrokeStyle(lineWidth: lineWidth, lineCap: .round)
             // Past the edges, so the ends are cut there, not rounded.
-            let start = -geometry.half - 0.3
-            let end = geometry.half + 0.3
+            let start = -geometry.half - BleedGaugeGeometry.overrun
+            let end = geometry.half + BleedGaugeGeometry.overrun
             let value = geometry.angle(for: fraction)
             let progress = geometry.arc(from: start, to: value)
 
@@ -426,7 +446,8 @@ public struct HeroHalfGaugeSkeleton: View {
                 Canvas { context, size in
                     let geometry = BleedGaugeGeometry(width: size.width, lineWidth: lineWidth, span: span)
                     context.stroke(
-                        geometry.arc(from: -geometry.half - 0.3, to: geometry.half + 0.3),
+                        geometry.arc(from: -geometry.half - BleedGaugeGeometry.overrun,
+                                     to: geometry.half + BleedGaugeGeometry.overrun),
                         with: .color(Skeleton.fill),
                         style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
                     )
