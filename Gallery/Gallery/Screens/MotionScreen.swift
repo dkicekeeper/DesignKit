@@ -14,27 +14,32 @@ import DesignSupport
 import DesignComponents
 
 struct MotionScreen: View {
+    static let title = "Motion"
+
     var body: some View {
-        ShowcasePage(title: "Motion") {
-            MotionSpringsPage()
-            SymbolMotionPage()
-            MotionTransitionsPage()
-            TextRevealPage()
-            StreamingTextPage()
-            CascadeInPage()
-            ScrambleTextPage()
-            ScrollRevealPage()
-            ChartDrawInPage()
-            SkeletonRevealPage()
-            ScrollHeroPage()
-            HapticCuesPage()
-            SpringsPage()
-            DurationsPage()
-            StaggeredEntrancePage()
-            ChartAppearPage()
-            ContentRevealPage()
-            BlurSlidePage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per subject; the Updates screen links to them (ComponentIndex).
+    @ViewBuilder static var pages: some View {
+        MotionSpringsPage()
+        SymbolMotionPage()
+        MotionTransitionsPage()
+        TextRevealPage()
+        StreamingTextPage()
+        CascadeInPage()
+        ScrambleTextPage()
+        ScrollRevealPage()
+        ChartDrawInPage()
+        SkeletonRevealPage()
+        ScrollHeroPage()
+        HapticCuesPage()
+        SpringsPage()
+        DurationsPage()
+        StaggeredEntrancePage()
+        ChartAppearPage()
+        ContentRevealPage()
+        BlurSlidePage()
     }
 }
 

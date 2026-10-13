@@ -118,6 +118,9 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
 
 ## Что добавлено в этих раундах
 
+Коротко, по раундам сравнения. Полный список изменений каждой версии и переход на неё —
+[CHANGELOG.md](../CHANGELOG.md) (и экран Updates в Gallery).
+
 - **0.4.0** — из Dalada и Tenra: `BadgeView`, `TrendBadge`, `StatTile`, `AvatarView`,
   `RatingView` / `RatingPicker`, `ChipPicker`, `LinearProgressBar(value:)`, `SelectionIndicator(tint:)`.
 - **0.5.0** — графики трендов на общей модели `ChartPoint`: `LineChart`, `BarChart`,

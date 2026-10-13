@@ -18,11 +18,15 @@ import DesignComponents
 /// A showcase screen. Every page in `content` (a `ComponentPage` or a `ShowcaseSection`) is a
 /// page of its own: chips under the navigation bar name the pages and switch between them, and
 /// a horizontal swipe pages too. A screen with a single page is one scrolling page without chips.
+/// A link to a component (the Updates screen's) opens the screen on its page
+/// (`showcaseInitialPage`).
 struct ShowcasePage<Content: View>: View {
     let title: String
     @ViewBuilder var content: Content
 
     @State private var selection = 0
+    @State private var openedInitialPage = false
+    @Environment(\.showcaseInitialPage) private var initialPage
 
     var body: some View {
         Group(subviews: content) { pages in
@@ -42,6 +46,15 @@ struct ShowcasePage<Content: View>: View {
                         },
                         selection: $selection
                     )
+                }
+                .onAppear {
+                    guard !openedInitialPage, let initialPage else { return }
+                    openedInitialPage = true
+                    if let index = pages.indices.first(where: {
+                        pages[$0].containerValues.showcaseTitle == initialPage
+                    }) {
+                        selection = index
+                    }
                 }
             } else {
                 page(ForEach(pages) { $0 })
@@ -256,7 +269,18 @@ private struct ComponentHeader: View {
             if since != nil || !apps.isEmpty {
                 HStack(spacing: AppSpacing.xs) {
                     if let since {
-                        Badge("since \(since)", color: AppColors.Status.neutral)
+                        // The release notes of the version it came in (CHANGELOG.md).
+                        if let release = Changelog.bundled?.release(mentionedIn: since) {
+                            NavigationLink {
+                                UpdateDetailScreen(release: release)
+                            } label: {
+                                Badge("since \(since)", systemImage: "doc.text", color: AppColors.Status.neutral)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityHint("Opens the release notes")
+                        } else {
+                            Badge("since \(since)", color: AppColors.Status.neutral)
+                        }
                     }
                     ForEach(apps, id: \.self) { app in
                         Badge(app.rawValue, color: AppColors.accent)

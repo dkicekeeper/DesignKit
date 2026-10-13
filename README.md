@@ -4,8 +4,9 @@ A reusable SwiftUI design system extracted from the **Tenra** iOS app and shared
 **Dalada**. Tokens, components and motion rules are Tenra's (the reference implementation);
 this package makes them versioned and reusable.
 
-> Status: **0.x — pre-1.0.** Both apps consume the package (Tenra since 0.3.0) and pick up new
-> releases automatically; design-system changes are made here.
+> Status: **4.x.** Both apps consume the package (Tenra since 0.3.0) and pick up new releases
+> automatically; design-system changes are made here. What each version added and changed, and
+> how to move an app to it: [CHANGELOG.md](CHANGELOG.md).
 
 ## Run the Gallery
 
@@ -17,8 +18,10 @@ xcodegen generate                 # the project is generated from project.yml
 open Gallery.xcodeproj            # then Run (⌘R) on an iPhone simulator (iOS 26+)
 ```
 
-Screens: **Colors, Typography (Inter), Spacing & Radius, Icon Sizes, Icons, Buttons, Cards &
-Surfaces, Motion, Components, Forms & Settings, Inputs & Charts**.
+Screens: **Updates** (the changelog, with links to the components each release names), six
+foundations and 17 component sections by what a component does
+([docs/gallery-structure.md](docs/gallery-structure.md)); every component has a page with
+controls for its parameters and states.
 
 The Gallery also ships to **TestFlight** on every DesignKit update in `main` — with a
 Tenra / Dalada theme switch, so each app's accent can be checked on a device. Setup and details:
@@ -45,13 +48,13 @@ Highlights of `DesignComponents`: `FinanceCard`, `InsightsStatCard`, `HeroSectio
 `UniversalCarousel`, `UniversalFilterButton`, `MessageBanner`, `EmptyState`,
 `FormattedAmountText` (adaptive abbreviation), calculator keypad, `OrbChart`, `ProgressRing`,
 `LinearProgressBar`, Mini*/Hero* gauges and bar pairs, `AccentGlow`, `BlurSlideTransition`,
-`SiriGlow`. Full inventory: [docs/design-system.md §0](docs/design-system.md).
+`EdgeGlow`. Full inventory: [docs/design-system.md §0](docs/design-system.md).
 
 ## Using it in an app
 
 ```swift
 // Package.swift
-.package(url: "https://github.com/dkicekeeper/DesignKit", exact: "0.3.0")
+.package(url: "https://github.com/dkicekeeper/DesignKit", exact: "4.1.0")
 // during development, point at a local checkout instead:
 .package(path: "../DesignKit")
 ```
@@ -85,7 +88,7 @@ Read [CLAUDE.md](CLAUDE.md) first — what belongs here, how to port a component
 stability and versioning rules, Xcode 26/27 compatibility. CI (`.github/workflows/ci.yml`)
 builds the package, the Gallery and Dalada against every push.
 
-Docs: [design-system.md](docs/design-system.md) · [charts.md](docs/charts.md) ·
+Docs: [CHANGELOG.md](CHANGELOG.md) · [design-system.md](docs/design-system.md) · [charts.md](docs/charts.md) ·
 [gotchas.md](docs/gotchas.md) · [localization-keys.md](docs/localization-keys.md) ·
 [testflight.md](docs/testflight.md) · [benchmark.md](docs/benchmark.md)
 

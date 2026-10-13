@@ -21,6 +21,9 @@ targets:
     deploymentTarget: "26.0"
     sources:
       - Gallery
+      # The repository's changelog, read by the Updates screen (Gallery/Updates/Changelog.swift).
+      - path: ../CHANGELOG.md
+        buildPhase: resources
     dependencies:
       - package: DesignKit
         product: DesignKit
@@ -74,6 +77,8 @@ targets:
         excludes:
           - "__Snapshots__"
           - "__Snapshots__/**"
+      # The changelog's parser, checked against the bundled CHANGELOG.md (ChangelogTests).
+      - path: Gallery/Updates/Changelog.swift
     dependencies:
       - target: Gallery
       - package: DesignKit

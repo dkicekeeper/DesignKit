@@ -10,12 +10,17 @@ import DesignTokens
 import DesignComponents
 
 struct SurfacesScreen: View {
+    static let title = "Surfaces"
+
     var body: some View {
-        ShowcasePage(title: "Surfaces") {
-            CardStylePage()
-            FormCardStylePage()
-            FilterChipStylePage()
-        }
+        ShowcasePage(title: Self.title) { Self.pages }
+    }
+
+    /// One page per surface; the Updates screen links to them (ComponentIndex).
+    @ViewBuilder static var pages: some View {
+        CardStylePage()
+        FormCardStylePage()
+        FilterChipStylePage()
     }
 }
 

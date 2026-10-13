@@ -2,8 +2,9 @@ name: TestFlight
 
 # Every DesignKit update on main → a Gallery build in TestFlight. Same pipeline as Dalada's:
 # a GitHub-hosted Mac archives the Gallery, Xcode cloud-signs it with an App Store Connect API
-# key, and the build is uploaded. Version = VERSION, build = run number. "What to Test" lists
-# the DesignKit commits since the previous release tag.
+# key, and the build is uploaded. Version = VERSION, build = run number. "What to Test" is the
+# version's CHANGELOG.md section on a release build, the commits since the previous release tag
+# on any other. CHANGELOG.md is a path too: the Gallery's Updates screen shows it.
 #
 # One-time setup (docs/testflight.md): the app record in App Store Connect and three repository
 # secrets — ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8 (the same Admin key Dalada uses works).
@@ -16,6 +17,7 @@ on:
       - "Gallery/**"
       - "Package.swift"
       - "VERSION"
+      - "CHANGELOG.md"
       - ".github/workflows/testflight.yml"
       - ".github/scripts/asc.py"
   workflow_dispatch:
@@ -184,10 +186,16 @@ jobs:
           mkdir -p "$RUNNER_TEMP/asc"
           printf '%s\n' "$ASC_KEY_P8" > "$RUNNER_TEMP/asc/key.p8"
           export ASC_KEY_PATH="$RUNNER_TEMP/asc/key.p8"
-          # Commits since the previous release tag (or the last 15 when there is none).
-          TAG=$(git describe --tags --abbrev=0 --match '[0-9]*.[0-9]*.[0-9]*' HEAD^ 2>/dev/null || true)
-          if [ -n "$TAG" ]; then RANGE="$TAG..HEAD"; else RANGE="-15"; fi
-          export WHATS_NEW="$(printf 'DesignKit %s — changes:\n' "$VERSION"; git log --no-merges --format='• %s' $RANGE | head -25)"
+          # A release build (this push changed VERSION): the version's CHANGELOG.md section.
+          # Any other build: the commits since the previous release tag (or the last 15).
+          if ! git diff --quiet HEAD^ HEAD -- VERSION 2>/dev/null \
+             && NOTES=$(python3 .github/scripts/changelog.py plain "$VERSION"); then
+            export WHATS_NEW="$(printf 'DesignKit %s\n\n%s' "$VERSION" "$NOTES")"
+          else
+            TAG=$(git describe --tags --abbrev=0 --match '[0-9]*.[0-9]*.[0-9]*' HEAD^ 2>/dev/null || true)
+            if [ -n "$TAG" ]; then RANGE="$TAG..HEAD"; else RANGE="-15"; fi
+            export WHATS_NEW="$(printf 'DesignKit %s: changes since %s\n' "$VERSION" "${TAG:-the start}"; git log --no-merges --format='• %s' $RANGE | head -25)"
+          fi
           python3 -m venv "$RUNNER_TEMP/ascenv"
           "$RUNNER_TEMP/ascenv/bin/pip" install --quiet pyjwt cryptography
           "$RUNNER_TEMP/ascenv/bin/python" .github/scripts/asc.py whats-new

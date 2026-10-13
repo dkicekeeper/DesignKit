@@ -29,10 +29,18 @@ enum GalleryTheme: String, CaseIterable, Identifiable {
 
 struct RootView: View {
     @State private var theme: GalleryTheme = .tenra
+    /// Which page shows which component, for the links in the release notes.
+    @State private var componentIndex = ComponentIndex()
 
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    row(UpdatesScreen.title, "sparkles.rectangle.stack", .orange,
+                        trailing: Changelog.bundled?.releases.first?.version) { UpdatesScreen() }
+                } footer: {
+                    Text("What each version added and changed, and how to move an app to it.")
+                }
                 Section {
                     row("Colors", "paintpalette.fill", AppColors.accent) { ColorsScreen() }
                     row("Typography", "textformat", .pink) { TypographyScreen() }
@@ -94,7 +102,9 @@ struct RootView: View {
                     .foregroundStyle(AppColors.textSecondary)
                     .padding(.bottom, AppSpacing.xs)
             }
+            .background { ComponentIndexReader(index: $componentIndex) }
         }
+        .environment(\.componentIndex, componentIndex)
         .tint(AppColors.accent)
         // Tokens are static reads: a new identity re-renders every screen with the new accent.
         .id(theme)
@@ -122,9 +132,10 @@ struct RootView: View {
         _ title: String,
         _ symbol: String,
         _ tint: Color,
+        trailing: String? = nil,
         @ViewBuilder destination: @escaping () -> Destination
     ) -> some View {
-        row(title, symbol, tint, pages: EmptyView(), destination: destination)
+        row(title, symbol, tint, pages: EmptyView(), trailing: trailing, destination: destination)
     }
 
     /// A screen of components: its row counts the screen's component pages.
@@ -133,6 +144,7 @@ struct RootView: View {
         _ symbol: String,
         _ tint: Color,
         pages: Pages,
+        trailing: String? = nil,
         @ViewBuilder destination: @escaping () -> Destination
     ) -> some View {
         NavigationLink {
@@ -150,6 +162,11 @@ struct RootView: View {
                 Spacer()
                 if Pages.self != EmptyView.self {
                     ShowcaseCount { pages }
+                } else if let trailing {
+                    Text(verbatim: trailing)
+                        .font(AppTypography.bodySmall)
+                        .foregroundStyle(AppColors.textSecondary)
+                        .monospacedDigit()
                 }
             }
         }
