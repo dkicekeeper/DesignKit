@@ -160,6 +160,7 @@ private struct ScoreCardPage: View {
             }
         } controls: {
             StateControl(state: $state)
+            ChoiceControl("Value", selection: $isRate, options: [("Score 0–100", false), ("Rate 12.4%", true)])
             SliderControl("Score", value: $score, in: 0...100, step: 1)
             ToggleControl("Decodes score", isOn: $decodes)
         }
@@ -174,6 +175,7 @@ private struct ScoreGaugeCardPage: View {
     @State private var tone: HeroHalfGauge.Tone = .onColor
     @State private var showsMaximum = false
     @State private var showsTrend = false
+    @State private var isRate = false
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -186,14 +188,20 @@ private struct ScoreGaugeCardPage: View {
             notes: [
                 "decodesScore (2.7.0): the score decodes itself as it appears and when it changes.",
                 ".hero (4.2.0): no card and no .screenPadding(); on colour its gradient reaches up under the navigation bar. “Open as a screen” shows it there.",
+                "value:fractionDigits:unit: (4.3.0) shows a rate, “12.4%”, on a scale of maxScore; Trend(direction:change:caption:) a change in the score's own units, “+5”.",
             ],
             styles: ["card", "hero"]
         ) {
             if state == .loading {
                 ScoreGaugeCardSkeleton(style: style)
             } else {
-                ScoreGaugeSample(score: score, hasData: hasData, decodes: decodes, style: style, tone: tone,
-                                 showsMaximum: showsMaximum, showsTrend: showsTrend)
+                if isRate {
+                    SavingsRateSample(rate: score * 0.4, hasData: hasData, decodes: decodes, style: style, tone: tone,
+                                      showsTrend: showsTrend)
+                } else {
+                    ScoreGaugeSample(score: score, hasData: hasData, decodes: decodes, style: style, tone: tone,
+                                     showsMaximum: showsMaximum, showsTrend: showsTrend)
+                }
             }
         } controls: {
             StateControl(state: $state)
@@ -201,6 +209,7 @@ private struct ScoreGaugeCardPage: View {
             if style == .hero {
                 ChoiceControl("Tone", selection: $tone, options: [("On colour", .onColor), ("On surface", .onSurface)])
             }
+            ChoiceControl("Value", selection: $isRate, options: [("Score 0–100", false), ("Rate 12.4%", true)])
             SliderControl("Score", value: $score, in: 0...100, step: 1)
             ToggleControl("Has data", isOn: $hasData)
             ToggleControl("Shows /100", isOn: $showsMaximum)
@@ -238,7 +247,29 @@ private struct ScoreGaugeSample: View {
                        style: style,
                        tone: tone,
                        showsMaximum: showsMaximum,
-                       trend: showsTrend ? .init(direction: .up, changePercent: 17, caption: "than last month") : nil)
+                       trend: showsTrend ? .init(direction: .up, change: "+5", caption: "since last month") : nil)
+    }
+}
+
+/// A rate on the score card (4.3.0): "12.4%" on a 0–40% scale with the 10% and 20% marks.
+private struct SavingsRateSample: View {
+    let rate: Double
+    var hasData = true
+    var decodes = false
+    var style: ScoreGaugeCard.Style = .card
+    var tone: HeroHalfGauge.Tone = .onColor
+    var showsTrend = false
+
+    var body: some View {
+        ScoreGaugeCard(value: hasData ? rate : nil, fractionDigits: 1, unit: "%", maxScore: 40, zoneTicks: [10, 20],
+                       grade: hasData ? (rate >= 20 ? "On target" : rate >= 10 ? "Below target" : "Low") : "Not enough data",
+                       color: hasData ? (rate >= 20 ? AppColors.success : rate >= 10 ? AppColors.warning : AppColors.destructive)
+                           : AppColors.textSecondary,
+                       subtitle: "Target: 20% of income",
+                       decodesScore: decodes,
+                       style: style,
+                       tone: tone,
+                       trend: showsTrend ? .init(direction: .down, change: "−1.6 pp", caption: "since last month") : nil)
     }
 }
 

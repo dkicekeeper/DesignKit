@@ -47,6 +47,16 @@ extension ComponentSnapshots {
             )
         }
 
+        /// A rate on the hero (4.3.0): "12.4%" with its unit small, a 0–40 scale with the 10% and
+        /// 20% marks, a change in percentage points.
+        @Test func scoreGaugeHeroRate() async {
+            await assertComponentSnapshot(
+                ScoreGaugeCard(value: 12.4, unit: "%", maxScore: 40, zoneTicks: [10, 20], grade: "Below target",
+                               color: AppColors.warning, subtitle: "Target: 20% of income", style: .hero,
+                               trend: .init(direction: .down, change: "−1.6 pp", caption: "since last month"))
+            )
+        }
+
         @Test func scoreCards() async {
             await assertComponentSnapshot(
                 ScoreCard(title: "Health score", grade: "Good", score: 72, color: AppColors.success),
