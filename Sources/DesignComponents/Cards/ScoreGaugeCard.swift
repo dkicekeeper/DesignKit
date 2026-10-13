@@ -41,22 +41,39 @@ public struct ScoreGaugeCard: View {
     }
 
     /// A change against an earlier score, shown in a capsule under the score (4.2.0):
-    /// "↗ +17.0% than last month".
+    /// "↗ +17.0% than last month", or in the score's own units (4.3.0): "↗ +5 since last month".
     public struct Trend: Hashable, Sendable {
         public let direction: TrendBadge.Direction
-        /// Signed percent; nil shows the arrow and the caption only.
+        /// Signed percent; nil when the change is given as text, or not at all.
         public let changePercent: Double?
+        /// The change as shown: "+17.0%" from `changePercent`, or the app's own ("+5").
+        public let changeText: String?
         /// What the change is against ("than last month"); the app's own string.
         public let caption: String
 
         public init(direction: TrendBadge.Direction, changePercent: Double?, caption: String) {
             self.direction = direction
             self.changePercent = changePercent
+            self.changeText = changePercent.map(TrendBadge.format)
+            self.caption = caption
+        }
+
+        /// A change in the score's own units, formatted by the app (4.3.0): points of a score
+        /// ("+5"), percentage points of a rate ("−1.6 pp").
+        public init(direction: TrendBadge.Direction, change: String?, caption: String) {
+            self.direction = direction
+            self.changePercent = nil
+            self.changeText = change
             self.caption = caption
         }
     }
 
-    let score: Int?
+    /// The score; nil before it can be computed.
+    let value: Double?
+    /// Digits after the decimal point (4.3.0; 0 for a whole score).
+    let fractionDigits: Int
+    /// Set small after the number, as "/100" is: "%" (4.3.0).
+    let unit: String?
     let maxScore: Double
     let zoneTicks: [Double]
     let grade: String
@@ -67,6 +84,7 @@ public struct ScoreGaugeCard: View {
     let tone: HeroHalfGauge.Tone
     let showsMaximum: Bool
     let trend: Trend?
+    let entranceDelay: Double
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -82,6 +100,8 @@ public struct ScoreGaugeCard: View {
     ///     (`.onSurface`). The card is always on its glass.
     ///   - showsMaximum: "/100" after the score.
     ///   - trend: A capsule with the change against an earlier score.
+    ///   - entranceDelay: Seconds before the gauge sweeps and the score appears (4.3.0): a screen
+    ///     that opens with a zoom transition lets it finish first.
     public init(
         score: Int?,
         maxScore: Double = 100,
@@ -93,9 +113,47 @@ public struct ScoreGaugeCard: View {
         style: Style = .card,
         tone: HeroHalfGauge.Tone = .onColor,
         showsMaximum: Bool = false,
-        trend: Trend? = nil
+        trend: Trend? = nil,
+        entranceDelay: Double = 0
     ) {
-        self.score = score
+        self.init(value: score.map(Double.init), fractionDigits: 0, unit: nil, maxScore: maxScore,
+                  zoneTicks: zoneTicks, grade: grade, color: color, subtitle: subtitle,
+                  decodesScore: decodesScore, style: style, tone: tone, showsMaximum: showsMaximum,
+                  trend: trend, entranceDelay: entranceDelay)
+    }
+
+    /// A score with a fraction and a unit (4.3.0): a rate, "12.4%" on a scale of `maxScore`.
+    ///
+    /// ```swift
+    /// ScoreGaugeCard(value: 12.4, unit: "%", maxScore: 40, zoneTicks: [10, 20],
+    ///                grade: "Below target", color: AppColors.warning,
+    ///                subtitle: "Target: 20% of income", decodesScore: true, style: .hero)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - value: `nil` when it cannot be computed. Below 0 the gauge stays empty and the number
+    ///     shows the sign; above `maxScore` the gauge is full.
+    ///   - fractionDigits: Digits after the decimal point, in the app's locale ("12,4").
+    ///   - unit: Set small after the number, as "/100" is.
+    public init(
+        value: Double?,
+        fractionDigits: Int = 1,
+        unit: String? = nil,
+        maxScore: Double = 100,
+        zoneTicks: [Double] = [],
+        grade: String,
+        color: Color,
+        subtitle: String,
+        decodesScore: Bool = false,
+        style: Style = .card,
+        tone: HeroHalfGauge.Tone = .onColor,
+        showsMaximum: Bool = false,
+        trend: Trend? = nil,
+        entranceDelay: Double = 0
+    ) {
+        self.value = value
+        self.fractionDigits = max(0, fractionDigits)
+        self.unit = unit
         self.maxScore = maxScore
         self.zoneTicks = zoneTicks
         self.grade = grade
@@ -106,6 +164,7 @@ public struct ScoreGaugeCard: View {
         self.tone = tone
         self.showsMaximum = showsMaximum
         self.trend = trend
+        self.entranceDelay = max(0, entranceDelay)
     }
 
     public var body: some View {
@@ -123,20 +182,21 @@ public struct ScoreGaugeCard: View {
         VStack(spacing: AppSpacing.lg) {
             ZStack(alignment: .bottom) {
                 HeroHalfGauge(
-                    value: score.map(Double.init) ?? 0,
+                    value: value ?? 0,
                     maxValue: maxScore,
                     zoneTicks: zoneTicks,
                     color: color,
                     diameter: 220,
-                    lineWidth: 16
+                    lineWidth: 16,
+                    entranceDelay: entranceDelay
                 )
 
                 // Score + grade sit inside the semicircle's interior.
                 VStack(spacing: AppSpacing.xs) {
                     scoreLine(font: AppTypography.h1.bold(), maximumFont: AppTypography.h4,
                               maximumColor: AppColors.Text.tertiary)
-                        .foregroundStyle(score != nil ? color : AppColors.Text.tertiary)
-                        .materialize(delay: 0.35)
+                        .foregroundStyle(value != nil ? color : AppColors.Text.tertiary)
+                        .materialize(delay: entranceDelay + 0.35)
 
                     Text(grade)
                         .font(AppTypography.bodySmall)
@@ -145,11 +205,11 @@ public struct ScoreGaugeCard: View {
                         .padding(.vertical, AppSpacing.xs)
                         .background(AppColors.pale(color))
                         .clipShape(Capsule())
-                        .materialize(delay: 0.45)
+                        .materialize(delay: entranceDelay + 0.45)
 
                     if let trend {
                         trendCapsule(trend, onColor: false)
-                            .materialize(delay: 0.5)
+                            .materialize(delay: entranceDelay + 0.5)
                     }
                 }
             }
@@ -172,19 +232,20 @@ public struct ScoreGaugeCard: View {
         VStack(spacing: AppSpacing.md) {
             ZStack(alignment: .bottom) {
                 HeroHalfGauge(
-                    value: score.map(Double.init) ?? 0,
+                    value: value ?? 0,
                     maxValue: maxScore,
                     zoneTicks: zoneTicks,
                     color: color,
                     style: .bleed,
                     tone: tone,
-                    lineWidth: ScoreHeroMetrics.lineWidth
+                    lineWidth: ScoreHeroMetrics.lineWidth,
+                    entranceDelay: entranceDelay
                 )
 
                 scoreLine(font: AppTypography.display, maximumFont: AppTypography.h3.weight(.regular),
                           maximumColor: onColor ? AppColors.Text.secondaryOnDark : AppColors.Text.tertiary)
                     .foregroundStyle(heroScoreColor)
-                    .materialize(delay: 0.35)
+                    .materialize(delay: entranceDelay + 0.35)
             }
 
             // Side by side; one under the other at accessibility sizes (the 1.3.0 rule).
@@ -200,7 +261,7 @@ public struct ScoreGaugeCard: View {
                     trendCapsule(trend, onColor: onColor)
                 }
             }
-            .materialize(delay: 0.45)
+            .materialize(delay: entranceDelay + 0.45)
 
             Text(subtitle)
                 .font(AppTypography.bodyEmphasis)
@@ -224,22 +285,29 @@ public struct ScoreGaugeCard: View {
     }
 
     private var heroScoreColor: Color {
-        if onColor { return score != nil ? AppColors.Text.primaryOnDark : AppColors.Text.secondaryOnDark }
-        return score != nil ? color : AppColors.Text.tertiary
+        if onColor { return value != nil ? AppColors.Text.primaryOnDark : AppColors.Text.secondaryOnDark }
+        return value != nil ? color : AppColors.Text.tertiary
     }
 
     // MARK: - Parts
 
-    /// The score, and "/100" after it with `showsMaximum`.
+    /// The score, then its unit and "/100" after it, small (`unit`, `showsMaximum`).
     @ViewBuilder
     private func scoreLine(font: Font, maximumFont: Font, maximumColor: Color) -> some View {
-        if showsMaximum {
+        if showsMaximum || unit != nil {
             HStack(alignment: .firstTextBaseline, spacing: AppSpacing.xxs) {
                 scoreText
                     .font(font)
-                Text(verbatim: "/\(Int(maxScore))")
-                    .font(maximumFont)
-                    .foregroundStyle(maximumColor)
+                if let unit {
+                    Text(verbatim: unit)
+                        .font(maximumFont)
+                        .foregroundStyle(maximumColor)
+                }
+                if showsMaximum {
+                    Text(verbatim: "/\(Int(maxScore))")
+                        .font(maximumFont)
+                        .foregroundStyle(maximumColor)
+                }
             }
         } else {
             scoreText
@@ -247,12 +315,17 @@ public struct ScoreGaugeCard: View {
         }
     }
 
+    /// The number in the app's locale with `fractionDigits` digits ("72", "12,4").
+    private var valueText: String? {
+        value.map { $0.formatted(.number.precision(.fractionLength(fractionDigits))) }
+    }
+
     @ViewBuilder
     private var scoreText: some View {
-        if decodesScore, let score {
-            ScrambleText("\(score)")
+        if decodesScore, let valueText {
+            ScrambleText(valueText)
         } else {
-            Text(verbatim: score.map { "\($0)" } ?? "—")
+            Text(verbatim: valueText ?? "—")
         }
     }
 
@@ -261,7 +334,7 @@ public struct ScoreGaugeCard: View {
         HStack(spacing: AppSpacing.xs) {
             Image(systemName: trend.direction.systemImage)
                 .foregroundStyle(onColor ? AppColors.Text.primaryOnDark : trend.direction.color)
-            Text(verbatim: [trend.changePercent.map(TrendBadge.format), trend.caption]
+            Text(verbatim: [trend.changeText, trend.caption]
                 .compactMap { $0 }
                 .joined(separator: " "))
                 .foregroundStyle(onColor ? AppColors.Text.primaryOnDark : AppColors.Text.secondary)

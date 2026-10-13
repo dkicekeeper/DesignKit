@@ -16,6 +16,37 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 4.3.0 - 2026-10-13
+
+`ScoreGaugeCard` shows a rate as well as a score, and a change in the score's own units.
+[#57](https://github.com/dkicekeeper/DesignKit/pull/57)
+
+### Added
+
+- `ScoreGaugeCard(value:fractionDigits:unit:maxScore:…)`: a number with a fraction, in the app's
+  locale ("12,4"), and a unit set small after it, as "/100" is ("12.4%"). Below 0 the gauge stays
+  empty and the number shows its sign; above `maxScore` the gauge is full. The `score: Int?` init
+  is unchanged.
+- `ScoreGaugeCard.Trend(direction:change:caption:)`: a change the app formats in the score's own
+  units, "+5" points or "−1.6 pp", instead of a percent. `Trend.changeText` holds what the
+  capsule shows.
+- `ScoreGaugeCard(entranceDelay:)`: seconds before the gauge sweeps and the score appears, so a
+  screen that opens with a zoom transition shows the entrance after it.
+
+### Migration
+
+- A rate shown by hand next to a gauge → the card or the hero with its unit:
+
+```swift
+ScoreGaugeCard(value: rate, unit: "%", maxScore: max(rate * 1.15, 40), zoneTicks: [10, 20],
+               grade: band, color: severity.color, subtitle: "Target: 20% of income",
+               decodesScore: true, style: .hero)
+```
+
+### Gallery and tooling
+
+- The `ScoreGaugeCard` page has a Value control (a score or a rate); its trends are in points.
+
 ## 4.2.0 - 2026-10-13
 
 A hero score at the top of a screen: a half gauge wider than the screen that runs out past both
