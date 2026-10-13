@@ -28,8 +28,10 @@ import DesignSupport
 ///
 /// `.hero` is not a card: it fills the width (no `.screenPadding()`), its gauge runs out past
 /// both edges (`HeroHalfGauge(style: .bleed)`) and, `.onColor`, it lies on a gradient of its
-/// colour, a tone deeper so white text reads, that reaches up under the navigation bar and fades
-/// into the page below the hero, where the cards that follow may rise over it.
+/// colour (`.heroBackground`) that reaches up to the screen's top edge and fades into the page
+/// below the hero, where the cards that follow may rise over it: a tone deeper with white text
+/// in dark mode, a pale tint with black text in light mode (4.5.1). The score shrinks to stay
+/// inside the arc (4.5.1).
 public struct ScoreGaugeCard: View {
     /// Where the score sits (4.2.0).
     public enum Style: Hashable, Sendable {
@@ -91,6 +93,7 @@ public struct ScoreGaugeCard: View {
     let entranceDelay: Double
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.colorScheme) private var colorScheme
 
     /// - Parameters:
     ///   - score: `nil` when it cannot be computed: the gauge stays empty and the number reads "—".
@@ -100,8 +103,9 @@ public struct ScoreGaugeCard: View {
     ///   - decodesScore: The number decodes itself as it appears and when it changes
     ///     (`ScrambleText`, 2.7.0).
     ///   - style: `.card` or `.hero` (4.2.0).
-    ///   - tone: `.hero` only: on a gradient of `color` (`.onColor`, white text) or on the page
-    ///     (`.onSurface`). The card is always on its glass.
+    ///   - tone: `.hero` only: on a gradient of `color` (`.onColor`: white text in dark mode,
+    ///     black on a pale tint in light mode since 4.5.1) or on the page (`.onSurface`). The
+    ///     card is always on its glass.
     ///   - showsMaximum: "/100" after the score.
     ///   - trend: A capsule with the change against an earlier score.
     ///   - entranceDelay: Seconds before the gauge sweeps and the score appears (4.3.0): a screen
@@ -292,11 +296,15 @@ public struct ScoreGaugeCard: View {
 
     // MARK: - Hero
 
-    private var onColor: Bool { tone == .onColor }
+    /// On its gradient (`.hero`, `tone: .onColor`).
+    private var onGradient: Bool { style == .hero && tone == .onColor }
+    /// White pieces: on the gradient in dark mode, a tone deeper. In light mode the gradient is
+    /// a pale tint and the pieces are as on the page, the text in black (4.5.1).
+    private var onColor: Bool { onGradient && colorScheme == .dark }
 
     private var hero: some View {
         VStack(spacing: AppSpacing.md) {
-            ZStack(alignment: .bottom) {
+            BleedScoreLayout(lineWidth: ScoreHeroMetrics.lineWidth, span: ScoreHeroMetrics.span) {
                 HeroHalfGauge(
                     value: value ?? 0,
                     norm: norm,
@@ -304,7 +312,8 @@ public struct ScoreGaugeCard: View {
                     zoneTicks: zoneTicks,
                     color: color,
                     style: .bleed,
-                    tone: tone,
+                    tone: onColor ? .onColor : .onSurface,
+                    span: ScoreHeroMetrics.span,
                     lineWidth: ScoreHeroMetrics.lineWidth,
                     entranceDelay: entranceDelay
                 )
@@ -312,7 +321,9 @@ public struct ScoreGaugeCard: View {
                 scoreLine(font: AppTypography.display, maximumFont: AppTypography.h3.weight(.regular),
                           maximumColor: onColor ? AppColors.Text.secondaryOnDark : AppColors.Text.tertiary,
                           color: heroScoreColor)
-                    .screenPadding()
+                    // Shrinks to the room inside the arc (BleedScoreLayout).
+                    .lineLimit(1)
+                    .minimumScaleFactor(ScoreHeroMetrics.minimumScoreScale)
                     .materialize(delay: entranceDelay + 0.35)
             }
 
@@ -320,10 +331,10 @@ public struct ScoreGaugeCard: View {
             capsuleLayout {
                 Text(grade)
                     .font(AppTypography.bodySmall.weight(.semibold))
-                    .foregroundStyle(onColor ? AppColors.Text.primaryOnDark : color)
+                    .foregroundStyle(onColor ? AppColors.Text.primaryOnDark : onGradient ? AppColors.Text.primary : color)
                     .padding(.horizontal, AppSpacing.md)
                     .padding(.vertical, AppSpacing.xs)
-                    .modifier(HeroCapsule(onColor: onColor, fill: AppColors.pale(color)))
+                    .modifier(HeroCapsule(onColor: onColor, fill: capsuleFill(AppColors.pale(color))))
 
                 if let trend {
                     trendCapsule(trend, onColor: onColor)
@@ -333,13 +344,19 @@ public struct ScoreGaugeCard: View {
 
             Text(subtitle)
                 .font(AppTypography.bodyEmphasis)
-                .foregroundStyle(onColor ? AppColors.Text.primaryOnDark : AppColors.Text.secondary)
+                .foregroundStyle(onColor ? AppColors.Text.primaryOnDark
+                                 : onGradient ? AppColors.Text.primary : AppColors.Text.secondary)
                 .multilineTextAlignment(.center)
                 .screenPadding()
         }
         .padding(.bottom, ScoreHeroMetrics.bottomPadding)
         .frame(maxWidth: .infinity)
-        .modifier(ScoreHeroBackground(color: color, isOn: onColor))
+        .modifier(ScoreHeroBackground(color: color, isOn: onGradient))
+    }
+
+    /// A capsule's fill on the page; frosted white on the pale gradient (4.5.1).
+    private func capsuleFill(_ fill: Color) -> Color {
+        onGradient ? AppColors.staticWhite.opacity(ScoreHeroMetrics.paleCapsuleOpacity) : fill
     }
 
     private var capsuleLayout: AnyLayout {
@@ -350,6 +367,7 @@ public struct ScoreGaugeCard: View {
 
     private var heroScoreColor: Color {
         if onColor { return value != nil ? AppColors.Text.primaryOnDark : AppColors.Text.secondaryOnDark }
+        if onGradient { return value != nil ? AppColors.Text.primary : AppColors.Text.tertiary }
         return value != nil ? color : AppColors.Text.tertiary
     }
 
@@ -361,7 +379,10 @@ public struct ScoreGaugeCard: View {
     private func scoreLine(font: Font, maximumFont: Font, maximumColor: Color, color: Color) -> some View {
         if let currency {
             if let value {
-                FormattedAmountText(amount: value, currency: currency, fontSize: font, color: color)
+                // The whole number, smaller when it is long (4.5.1): it is what the hero is
+                // about, so it is never abbreviated to "85K".
+                FormattedAmountText(amount: value, currency: currency, fontSize: font, color: color,
+                                    policy: .full)
                     .lineLimit(1)
                     .minimumScaleFactor(0.4)
             } else {
@@ -414,14 +435,15 @@ public struct ScoreGaugeCard: View {
             Text(verbatim: [trend.changeText, trend.caption]
                 .compactMap { $0 }
                 .joined(separator: " "))
-                .foregroundStyle(onColor ? AppColors.Text.primaryOnDark : AppColors.Text.secondary)
+                .foregroundStyle(onColor ? AppColors.Text.primaryOnDark
+                                 : onGradient ? AppColors.Text.primary : AppColors.Text.secondary)
         }
         .font(AppTypography.bodySmall)
         .lineLimit(2)
         .multilineTextAlignment(.center)
         .padding(.horizontal, AppSpacing.md)
         .padding(.vertical, AppSpacing.xs)
-        .modifier(HeroCapsule(onColor: onColor, fill: AppColors.Background.neutral1))
+        .modifier(HeroCapsule(onColor: onColor, fill: capsuleFill(AppColors.Background.neutral1)))
     }
 }
 
@@ -453,8 +475,56 @@ private struct ScoreHeroBackground: ViewModifier {
 enum ScoreHeroMetrics {
     /// The hero gauge's stroke.
     static let lineWidth: CGFloat = 28
+    /// The degrees of the gauge's circle that show (HeroHalfGauge's default).
+    static let span: Double = 130
     /// Room under the subtitle before the page's own content.
     static let bottomPadding: CGFloat = AppSpacing.xxl
+    /// How small a long score may get to stay inside the arc.
+    static let minimumScoreScale: CGFloat = 0.4
+    /// The capsules' frosted white on the pale gradient of light mode.
+    static let paleCapsuleOpacity: Double = 0.6
+}
+
+/// The score at the foot of the bleed gauge (`ZStack(alignment: .bottom)` before 4.5.1),
+/// offered only the width inside the arc at the height of its top, so a long amount shrinks
+/// (its `minimumScaleFactor`) instead of running onto the arc; the screen's side padding at most.
+struct BleedScoreLayout: Layout {
+    let lineWidth: CGFloat
+    let span: Double
+
+    /// Room between the score and the arc's inner edge (the knob's, which is wider).
+    static let gap: CGFloat = AppSpacing.xs
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        guard let gauge = subviews.first else { return .zero }
+        let size = gauge.sizeThatFits(ProposedViewSize(width: proposal.width, height: nil))
+        let scoreHeight = subviews.count > 1 ? subviews[1].sizeThatFits(.unspecified).height : 0
+        return CGSize(width: size.width, height: max(size.height, scoreHeight))
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        guard let gauge = subviews.first else { return }
+        let gaugeSize = gauge.sizeThatFits(ProposedViewSize(width: bounds.width, height: nil))
+        gauge.place(at: CGPoint(x: bounds.minX, y: bounds.maxY - gaugeSize.height), anchor: .topLeading,
+                    proposal: ProposedViewSize(width: bounds.width, height: gaugeSize.height))
+        guard subviews.count > 1 else { return }
+        let score = subviews[1]
+        let width = Self.scoreWidth(gauge: gaugeSize, scoreHeight: score.sizeThatFits(.unspecified).height,
+                                    lineWidth: lineWidth, span: span)
+        score.place(at: CGPoint(x: bounds.midX, y: bounds.maxY), anchor: .bottom,
+                    proposal: ProposedViewSize(width: width, height: nil))
+    }
+
+    /// The width inside the arc at the score's top, the score's foot on the gauge's.
+    static func scoreWidth(gauge: CGSize, scoreHeight: CGFloat, lineWidth: CGFloat, span: Double) -> CGFloat {
+        let padded = max(0, gauge.width - 2 * AppSpacing.lg)
+        let geometry = BleedGaugeGeometry(width: gauge.width, lineWidth: lineWidth, span: span)
+        let inner = geometry.radius - geometry.knobDiameter / 2 - gap
+        let rise = geometry.center.y - (gauge.height - scoreHeight)
+        guard inner > 0, rise < inner else { return padded }
+        let half = (inner * inner - max(rise, 0) * max(rise, 0)).squareRoot()
+        return min(padded, max(0, 2 * half))
+    }
 }
 
 // MARK: - Skeleton
