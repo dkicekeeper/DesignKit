@@ -30,21 +30,20 @@ extension ComponentSnapshots {
             )
         }
 
-        /// The hero (4.2.0), edge to edge at a phone's width: on its gradient and on the page.
+        /// The hero (4.2.0), edge to edge at 360 pt (the widest a snapshot can be): on its gradient
+        /// and on the page.
         @Test func scoreGaugeHero() async {
             await assertComponentSnapshot(
                 ScoreGaugeCard(score: 84, zoneTicks: [40, 70], grade: "Excellent", color: AppColors.success,
                                subtitle: "Your financial health", style: .hero, showsMaximum: true,
                                trend: .init(direction: .up, changePercent: 17, caption: "than last month")),
                 named: "onColor",
-                width: 402,
                 appearances: [.light, .dark, .largeText]
             )
             await assertComponentSnapshot(
                 ScoreGaugeCard(score: 46, zoneTicks: [40, 70], grade: "Fair", color: AppColors.warning,
                                subtitle: "Room to improve", style: .hero, tone: .onSurface, showsMaximum: true),
-                named: "onSurface",
-                width: 402
+                named: "onSurface"
             )
         }
 
