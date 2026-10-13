@@ -21,7 +21,7 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 The hero on colour and the shelf after a look on a device: the gradient starts at the screen's
 top edge and is pale with black text in light mode, a long amount stays inside the arc, and the
 shelf's tiles are one size in every card.
-[#60](https://github.com/dkicekeeper/DesignKit/pull/60)
+[#61](https://github.com/dkicekeeper/DesignKit/pull/61)
 
 ### Changed
 
