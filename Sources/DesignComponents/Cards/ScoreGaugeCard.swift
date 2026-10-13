@@ -74,6 +74,10 @@ public struct ScoreGaugeCard: View {
     let fractionDigits: Int
     /// Set small after the number, as "/100" is: "%" (4.3.0).
     let unit: String?
+    /// An amount in this currency, in the app's amount format (4.5.0); `nil` for a number.
+    let currency: String?
+    /// A reference marked on the arc: an average, a budget (4.5.0).
+    let norm: Double?
     let maxScore: Double
     let zoneTicks: [Double]
     let grade: String
@@ -151,9 +155,70 @@ public struct ScoreGaugeCard: View {
         trend: Trend? = nil,
         entranceDelay: Double = 0
     ) {
+        self.init(value: value, fractionDigits: fractionDigits, unit: unit, currency: nil, norm: nil,
+                  maxScore: maxScore, zoneTicks: zoneTicks, grade: grade, color: color, subtitle: subtitle,
+                  decodesScore: decodesScore, style: style, tone: tone, showsMaximum: showsMaximum,
+                  trend: trend, entranceDelay: entranceDelay)
+    }
+
+    /// An amount (4.5.0): "84 900 ₸" in the app's amount format, hidden with the app's amounts
+    /// (`\.amountsHidden`), on a scale of `maxValue`, with `norm` marked on the arc. A long
+    /// amount shrinks to fit one line.
+    ///
+    /// ```swift
+    /// // A large expense against the usual one
+    /// ScoreGaugeCard(amount: 84_900, currency: "KZT", maxValue: 84_900 * 1.15, norm: 6_100,
+    ///                grade: "14× the usual", color: AppColors.destructive,
+    ///                subtitle: "Furniture, 3 Oct", style: .hero)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - amount: `nil` when it cannot be computed: the gauge stays empty and the amount reads "—".
+    ///   - maxValue: The end of the scale.
+    ///   - norm: A reference marked on the arc with a notch (an average, a budget).
+    public init(
+        amount: Double?,
+        currency: String,
+        maxValue: Double,
+        norm: Double? = nil,
+        zoneTicks: [Double] = [],
+        grade: String,
+        color: Color,
+        subtitle: String,
+        style: Style = .card,
+        tone: HeroHalfGauge.Tone = .onColor,
+        trend: Trend? = nil,
+        entranceDelay: Double = 0
+    ) {
+        self.init(value: amount, fractionDigits: 0, unit: nil, currency: currency, norm: norm,
+                  maxScore: maxValue, zoneTicks: zoneTicks, grade: grade, color: color, subtitle: subtitle,
+                  decodesScore: false, style: style, tone: tone, showsMaximum: false,
+                  trend: trend, entranceDelay: entranceDelay)
+    }
+
+    private init(
+        value: Double?,
+        fractionDigits: Int,
+        unit: String?,
+        currency: String?,
+        norm: Double?,
+        maxScore: Double,
+        zoneTicks: [Double],
+        grade: String,
+        color: Color,
+        subtitle: String,
+        decodesScore: Bool,
+        style: Style,
+        tone: HeroHalfGauge.Tone,
+        showsMaximum: Bool,
+        trend: Trend?,
+        entranceDelay: Double
+    ) {
         self.value = value
         self.fractionDigits = max(0, fractionDigits)
         self.unit = unit
+        self.currency = currency
+        self.norm = norm
         self.maxScore = maxScore
         self.zoneTicks = zoneTicks
         self.grade = grade
@@ -183,6 +248,7 @@ public struct ScoreGaugeCard: View {
             ZStack(alignment: .bottom) {
                 HeroHalfGauge(
                     value: value ?? 0,
+                    norm: norm,
                     maxValue: maxScore,
                     zoneTicks: zoneTicks,
                     color: color,
@@ -194,8 +260,8 @@ public struct ScoreGaugeCard: View {
                 // Score + grade sit inside the semicircle's interior.
                 VStack(spacing: AppSpacing.xs) {
                     scoreLine(font: AppTypography.h1.bold(), maximumFont: AppTypography.h4,
-                              maximumColor: AppColors.Text.tertiary)
-                        .foregroundStyle(value != nil ? color : AppColors.Text.tertiary)
+                              maximumColor: AppColors.Text.tertiary,
+                              color: value != nil ? color : AppColors.Text.tertiary)
                         .materialize(delay: entranceDelay + 0.35)
 
                     Text(grade)
@@ -233,6 +299,7 @@ public struct ScoreGaugeCard: View {
             ZStack(alignment: .bottom) {
                 HeroHalfGauge(
                     value: value ?? 0,
+                    norm: norm,
                     maxValue: maxScore,
                     zoneTicks: zoneTicks,
                     color: color,
@@ -243,8 +310,9 @@ public struct ScoreGaugeCard: View {
                 )
 
                 scoreLine(font: AppTypography.display, maximumFont: AppTypography.h3.weight(.regular),
-                          maximumColor: onColor ? AppColors.Text.secondaryOnDark : AppColors.Text.tertiary)
-                    .foregroundStyle(heroScoreColor)
+                          maximumColor: onColor ? AppColors.Text.secondaryOnDark : AppColors.Text.tertiary,
+                          color: heroScoreColor)
+                    .screenPadding()
                     .materialize(delay: entranceDelay + 0.35)
             }
 
@@ -271,11 +339,7 @@ public struct ScoreGaugeCard: View {
         }
         .padding(.bottom, ScoreHeroMetrics.bottomPadding)
         .frame(maxWidth: .infinity)
-        .background {
-            if onColor {
-                ScoreHeroBackground(color: color)
-            }
-        }
+        .modifier(ScoreHeroBackground(color: color, isOn: onColor))
     }
 
     private var capsuleLayout: AnyLayout {
@@ -291,13 +355,25 @@ public struct ScoreGaugeCard: View {
 
     // MARK: - Parts
 
-    /// The score, then its unit and "/100" after it, small (`unit`, `showsMaximum`).
+    /// The score, then its unit and "/100" after it, small (`unit`, `showsMaximum`); or the
+    /// amount in the app's format (`currency`, 4.5.0).
     @ViewBuilder
-    private func scoreLine(font: Font, maximumFont: Font, maximumColor: Color) -> some View {
-        if showsMaximum || unit != nil {
+    private func scoreLine(font: Font, maximumFont: Font, maximumColor: Color, color: Color) -> some View {
+        if let currency {
+            if let value {
+                FormattedAmountText(amount: value, currency: currency, fontSize: font, color: color)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.4)
+            } else {
+                Text(verbatim: "—")
+                    .font(font)
+                    .foregroundStyle(color)
+            }
+        } else if showsMaximum || unit != nil {
             HStack(alignment: .firstTextBaseline, spacing: AppSpacing.xxs) {
                 scoreText
                     .font(font)
+                    .foregroundStyle(color)
                 if let unit {
                     Text(verbatim: unit)
                         .font(maximumFont)
@@ -312,6 +388,7 @@ public struct ScoreGaugeCard: View {
         } else {
             scoreText
                 .font(font)
+                .foregroundStyle(color)
         }
     }
 
@@ -359,50 +436,17 @@ private struct HeroCapsule: ViewModifier {
     }
 }
 
-/// The hero's gradient: mesh light in shades of the score's colour, a tone deeper so white text
-/// reads on it, opaque behind the whole hero (and up under the navigation bar), then fading into
-/// the page below it, where the cards that follow rise over it. A fine grain against banding.
-private struct ScoreHeroBackground: View {
+/// The hero's gradient (`.heroBackground`, 4.5.0; drawn here since 4.2.0) when it is on colour.
+private struct ScoreHeroBackground: ViewModifier {
     let color: Color
+    let isOn: Bool
 
-    var body: some View {
-        mesh
-            .grain()
-            .mask {
-                VStack(spacing: 0) {
-                    Rectangle()
-                    LinearGradient(colors: [.black, .black.opacity(0)], startPoint: .top, endPoint: .bottom)
-                        .frame(height: ScoreHeroMetrics.fade)
-                }
-            }
-            .padding(.bottom, -ScoreHeroMetrics.fade)
-            .ignoresSafeArea(edges: .top)
-            .allowsHitTesting(false)
-            .accessibilityHidden(true)
-    }
-
-    /// The score's colour a tone deeper: white on the deepened success, warning and destructive
-    /// colours is at least 3:1, the minimum for large text (the plain colours give about 2:1).
-    private var base: Color {
-        var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
-        UIColor(color).getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
-        return Color(hue: Double(hue), saturation: Double(min(1, saturation * 1.05)),
-                     brightness: Double(brightness * ScoreHeroMetrics.depth))
-    }
-
-    /// Three columns of shades in three rows (as `.accentGlow`'s aurora), all opaque.
-    private var mesh: MeshGradient {
-        let palette = AuroraBackground.palette(around: base, spread: ScoreHeroMetrics.hueSpread)
-        let columns = [palette[0], palette[1], palette[5]]
-        var points = [SIMD2<Float>]()
-        var colors = [Color]()
-        for row in 0..<3 {
-            for column in 0..<3 {
-                points.append(SIMD2(Float(column) / 2, Float(row) / 2))
-                colors.append(columns[(column + row) % columns.count])
-            }
+    func body(content: Content) -> some View {
+        if isOn {
+            content.heroBackground(color)
+        } else {
+            content
         }
-        return MeshGradient(width: 3, height: 3, points: points, colors: colors)
     }
 }
 
@@ -411,12 +455,6 @@ enum ScoreHeroMetrics {
     static let lineWidth: CGFloat = 28
     /// Room under the subtitle before the page's own content.
     static let bottomPadding: CGFloat = AppSpacing.xxl
-    /// Shades of one colour, as the hero glow (`.accentGlow`, 3.4.0).
-    static let hueSpread: Double = 12
-    /// How far below the hero its gradient fades out (under the cards that rise over it).
-    static let fade: CGFloat = 96
-    /// The score's colour is deepened to this share of its brightness behind white text.
-    static let depth: CGFloat = 0.78
 }
 
 // MARK: - Skeleton

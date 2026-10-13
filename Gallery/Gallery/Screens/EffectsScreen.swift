@@ -5,7 +5,7 @@
 //  Effects: celebrations, sparkles, shine, attention pulse, the aurora, touch tilt (2.2.0);
 //  the completion moment and the Metal ripple (2.3.0); the voice wave, the edge glow and the
 //  thinking shimmer (2.4.0); weighted aurora spots, the aurora accent glow and grain (2.5.0);
-//  holographic foil and dissolve (2.6.0); the border beam.
+//  holographic foil and dissolve (2.6.0); the border beam; the hero background (4.5.0).
 //
 
 import SwiftUI
@@ -37,6 +37,7 @@ struct EffectsScreen: View {
         GrainPage()
         AccentGlowPage()
         BorderBeamPage()
+        HeroBackgroundPage()
     }
 }
 
@@ -621,5 +622,116 @@ private struct DissolvePage: View {
                 withAnimation(.easeOut(duration: 0.6)) { items.append("Lunch \(removed) · 3 500 ₸") }
             }
         }
+    }
+}
+
+// MARK: - Hero background (4.5.0)
+
+/// The top of a detail screen on colour: a hero, its chart and its trend in white on a gradient
+/// of the insight's colour, the cards below rising over its fade.
+private struct HeroBackgroundPage: View {
+    @State private var tone = 2
+    @State private var chart = 0
+
+    private static let tones: [(String, Color)] = [
+        ("Positive", AppColors.success), ("Neutral", AppColors.accent),
+        ("Warning", AppColors.warning), ("Critical", AppColors.destructive),
+    ]
+
+    private var color: Color { Self.tones[tone].1 }
+
+    var body: some View {
+        ComponentPage(
+            name: ".heroBackground",
+            summary: "The top of a detail screen on colour: a gradient of the colour, a tone deeper, behind the hero and up under the navigation bar, fading into the page; the hero pieces in it turn white.",
+            since: "4.5.0",
+            apps: [.tenra],
+            canvas: .bleed,
+            notes: [
+                "Sets \\.heroTone to .onColor: HeroSection, TrendBadge, HeroHalfGauge, HeroBarPair, HeroSparkline, HeroMilestoneGauge and HeroProportionBar draw in white. ScoreGaugeCard(style: .hero) lies on it.",
+                "Edge to edge at the top of a scroll view; the cards that follow rise over its 96 pt fade (.padding(.top, -AppSpacing.xxl)).",
+                ".heroScrollEdge() on the scroll view keeps the bar's soft scroll edge off while the colour is under the bar, so it reaches the top of the screen. “Open as a screen” shows both.",
+            ]
+        ) {
+            VStack(spacing: AppSpacing.xl) {
+                HeroBackgroundSample(chart: chart)
+                    .heroBackground(color)
+                Text(verbatim: "A card rises over the fade")
+                    .font(AppTypography.bodyEmphasis)
+                    .frame(maxWidth: .infinity)
+                    .cardContentPadding()
+                    .cardStyle()
+                    .screenPadding()
+                    .padding(.top, -AppSpacing.xxl)
+            }
+        } controls: {
+            ChoiceControl("Tone", selection: $tone, options: Self.tones.indices.map { (Self.tones[$0].0, $0) })
+            ChoiceControl("Hero chart", selection: $chart, options: [("Bars", 0), ("Line", 1), ("Shares", 2)])
+            NavigationLink {
+                HeroBackgroundScreen(color: color, chart: chart)
+            } label: {
+                Label("Open as a screen", systemImage: "iphone")
+                    .font(AppTypography.bodySmall.weight(.medium))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .tint(AppColors.accent)
+        }
+    }
+}
+
+/// An insight's hero: the header, its trend and a chart.
+private struct HeroBackgroundSample: View {
+    let chart: Int
+
+    var body: some View {
+        VStack(spacing: AppSpacing.xl) {
+            HeroSection(icon: nil, title: "Spending", showsIcon: false, primaryAmount: 284_000,
+                        primaryCurrency: "KZT", subtitle: "September against August") {
+                TrendBadge(direction: .up, changePercent: 12.4)
+            }
+            switch chart {
+            case 0:
+                HeroBarPair(previous: 252_000, current: 284_000, color: AppColors.warning, currency: "KZT")
+            case 1:
+                HeroSparkline(dataPoints: Array(GallerySamples.months.suffix(8)), series: GallerySamples.distance,
+                              markExtremes: true)
+            default:
+                HeroProportionBar(segments: GallerySamples.slices, currency: "KZT")
+                    .screenPadding()
+            }
+        }
+        .padding(.vertical, AppSpacing.lg)
+        .padding(.bottom, AppSpacing.xxl)
+    }
+}
+
+/// The hero where it lives: the top of a screen under an inline navigation bar.
+private struct HeroBackgroundScreen: View {
+    let color: Color
+    let chart: Int
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: AppSpacing.lg) {
+                HeroBackgroundSample(chart: chart)
+                    .heroBackground(color)
+                VStack(spacing: AppSpacing.lg) {
+                    ForEach(["August", "July", "June", "May"], id: \.self) { month in
+                        Text(verbatim: month)
+                            .font(AppTypography.bodyEmphasis)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .cardContentPadding()
+                            .cardStyle()
+                    }
+                }
+                .screenPadding()
+                // The cards rise over the fading end of the gradient.
+                .padding(.top, -AppSpacing.xxl)
+            }
+            .padding(.bottom, AppSpacing.lg)
+        }
+        .heroScrollEdge()
+        .navigationTitle("Spending")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

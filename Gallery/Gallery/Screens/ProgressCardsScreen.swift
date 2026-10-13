@@ -174,7 +174,7 @@ private struct ScoreGaugeCardPage: View {
     @State private var tone: HeroHalfGauge.Tone = .onColor
     @State private var showsMaximum = false
     @State private var showsTrend = false
-    @State private var isRate = false
+    @State private var valueKind: ScoreValueKind = .score
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -188,18 +188,22 @@ private struct ScoreGaugeCardPage: View {
                 "decodesScore (2.7.0): the score decodes itself as it appears and when it changes.",
                 ".hero (4.2.0): no card and no .screenPadding(); on colour its gradient reaches up under the navigation bar. “Open as a screen” shows it there.",
                 "value:fractionDigits:unit: (4.3.0) shows a rate, “12.4%”, on a scale of maxScore; Trend(direction:change:caption:) a change in the score's own units, “+5”.",
+                "amount:currency:maxValue:norm: (4.5.0) shows an amount in the app's format, hidden with the app's amounts, with a reference (an average, a budget) notched on the arc.",
             ],
             styles: ["card", "hero"]
         ) {
             if state == .loading {
                 ScoreGaugeCardSkeleton(style: style)
             } else {
-                if isRate {
-                    SavingsRateSample(rate: score * 0.4, hasData: hasData, decodes: decodes, style: style, tone: tone,
-                                      showsTrend: showsTrend)
-                } else {
+                switch valueKind {
+                case .score:
                     ScoreGaugeSample(score: score, hasData: hasData, decodes: decodes, style: style, tone: tone,
                                      showsMaximum: showsMaximum, showsTrend: showsTrend)
+                case .rate:
+                    SavingsRateSample(rate: score * 0.4, hasData: hasData, decodes: decodes, style: style, tone: tone,
+                                      showsTrend: showsTrend)
+                case .amount:
+                    LargeExpenseSample(amount: score * 1_000, hasData: hasData, style: style, tone: tone)
                 }
             }
         } controls: {
@@ -208,7 +212,7 @@ private struct ScoreGaugeCardPage: View {
             if style == .hero {
                 ChoiceControl("Tone", selection: $tone, options: [("On colour", .onColor), ("On surface", .onSurface)])
             }
-            ChoiceControl("Value", selection: $isRate, options: [("Score 0–100", false), ("Rate 12.4%", true)])
+            ChoiceControl("Value", selection: $valueKind, options: [("Score", .score), ("Rate", .rate), ("Amount", .amount)])
             SliderControl("Score", value: $score, in: 0...100, step: 1)
             ToggleControl("Has data", isOn: $hasData)
             ToggleControl("Shows /100", isOn: $showsMaximum)
@@ -272,6 +276,30 @@ private struct SavingsRateSample: View {
     }
 }
 
+/// What the Value control shows.
+private enum ScoreValueKind: Hashable {
+    case score, rate, amount
+}
+
+/// An amount on the card (4.5.0): a large expense against the usual one, notched on the arc.
+private struct LargeExpenseSample: View {
+    let amount: Double
+    var hasData = true
+    var style: ScoreGaugeCard.Style = .card
+    var tone: HeroHalfGauge.Tone = .onColor
+
+    private let usual = 6_100.0
+
+    var body: some View {
+        ScoreGaugeCard(amount: hasData ? amount : nil, currency: "KZT", maxValue: max(amount, usual) * 1.15, norm: usual,
+                       grade: hasData ? "\((amount / usual).formatted(.number.precision(.fractionLength(1))))× the usual" : "Not enough data",
+                       color: hasData ? (amount / usual >= 8 ? AppColors.destructive : AppColors.warning) : AppColors.textSecondary,
+                       subtitle: "Furniture, 3 Oct",
+                       style: style,
+                       tone: tone)
+    }
+}
+
 /// `ScoreGaugeCard(style: .hero)` where it lives: the top of a screen under an inline navigation
 /// bar, edge to edge, and glass cards that rise over the bottom of its gradient.
 private struct ScoreHeroScreen: View {
@@ -292,6 +320,8 @@ private struct ScoreHeroScreen: View {
             }
             .padding(.bottom, AppSpacing.lg)
         }
+        // The colour reaches the top of the screen under the bar (4.5.0).
+        .heroScrollEdge()
         .navigationTitle("Financial health")
         .navigationBarTitleDisplayMode(.inline)
     }

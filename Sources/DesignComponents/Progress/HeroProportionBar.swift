@@ -31,6 +31,19 @@ public struct HeroProportionBar: View {
     @State private var entered = false
     @State private var selectedID: String?
     @Environment(\.amountsHidden) private var amountsHidden
+    /// Inside `.heroBackground(_:)` (4.5.0): the segments in white, fading from the largest
+    /// share; the legend in white.
+    @Environment(\.heroTone) private var heroTone
+
+    private var onColor: Bool { heroTone == .onColor }
+
+    /// A segment's fill: its colour on the page; on colour, white at a step lower for each
+    /// segment after the first (the legend's dots match).
+    private func segmentColor(_ segment: DonutSlice, index: Int) -> Color {
+        guard onColor else { return segment.color }
+        let steps: [Double] = [1, 0.72, 0.52, 0.38, 0.28]
+        return AppColors.staticWhite.opacity(steps[min(index, steps.count - 1)])
+    }
 
     private var immediate: Bool { AppAnimation.isReduceMotionEnabled }
     private static let waveStep: Double = 0.08
@@ -54,7 +67,7 @@ public struct HeroProportionBar: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.lg) {
             bar
-                .chartGlow(radius: 14, yOffset: 8, opacity: 0.5)
+                .chartGlow(radius: 14, yOffset: 8, opacity: onColor ? 0.2 : 0.5)
             legend
         }
         .onAppear { entered = true }
@@ -89,7 +102,7 @@ public struct HeroProportionBar: View {
             : .spring(response: 0.45, dampingFraction: 0.75)
                 .delay(entranceDelay + Double(index) * Self.waveStep)
         return RoundedRectangle(cornerRadius: AppRadius.xl)
-            .fill(segment.color)
+            .fill(segmentColor(segment, index: index))
             .frame(width: segmentWidth(segment, totalWidth: totalWidth))
             .opacity(opacity(for: segment.id))
             .scaleEffect(entered ? 1 : 0.4, anchor: .leading)
@@ -103,7 +116,7 @@ public struct HeroProportionBar: View {
     private var legend: some View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             ForEach(Array(segments.enumerated()), id: \.element.id) { index, segment in
-                legendRow(segment)
+                legendRow(segment, index: index)
                     .materialize(
                         delay: entranceDelay + 0.25 + Double(index) * Self.waveStep,
                         animatesOnAppear: !immediate
@@ -113,28 +126,28 @@ public struct HeroProportionBar: View {
         .animation(AppAnimation.chartBannerFade, value: selectedID)
     }
 
-    private func legendRow(_ segment: DonutSlice) -> some View {
+    private func legendRow(_ segment: DonutSlice, index: Int) -> some View {
         HStack(spacing: AppSpacing.sm) {
             Circle()
-                .fill(segment.color)
+                .fill(segmentColor(segment, index: index))
                 .frame(width: 9, height: 9)
 
             Text(segment.label)
-                .font(selectedID == segment.id ? AppTypography.bodyEmphasis : AppTypography.body)
-                .foregroundStyle(AppColors.Text.primary)
+                .font(selectedID == segment.id || onColor ? AppTypography.bodyEmphasis : AppTypography.body)
+                .foregroundStyle(onColor ? AppColors.Text.primaryOnDark : AppColors.Text.primary)
                 .lineLimit(1)
 
             Spacer(minLength: AppSpacing.sm)
 
             Text("\(Int(segment.percentage.rounded()))%")
-                .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.Text.secondary)
+                .font(onColor ? AppTypography.bodySmall.weight(.semibold) : AppTypography.bodySmall)
+                .foregroundStyle(onColor ? AppColors.Text.primaryOnDark : AppColors.Text.secondary)
 
             Text(amountsHidden
                  ? Formatting.hiddenAmount(currency: currency)
                  : Formatting.formatCurrencySmart(segment.amount, currency: currency))
                 .font(AppTypography.numbers(AppTypography.bodyEmphasis))
-                .foregroundStyle(AppColors.Text.primary)
+                .foregroundStyle(onColor ? AppColors.Text.primaryOnDark : AppColors.Text.primary)
         }
         .opacity(opacity(for: segment.id))
         .contentShape(Rectangle())

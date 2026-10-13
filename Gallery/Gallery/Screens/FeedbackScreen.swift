@@ -192,6 +192,7 @@ private struct BadgePage: View {
 private struct TrendBadgePage: View {
     @State private var change = 12.4
     @State private var style: TrendBadge.Style = .pill
+    @State private var onColor = false
     @State private var state: SpecimenState = .content
 
     private var direction: TrendBadge.Direction { change > 0.5 ? .up : change < -0.5 ? .down : .flat }
@@ -202,15 +203,19 @@ private struct TrendBadgePage: View {
             summary: "A change in per cent with an arrow: green up, red down, grey flat (or your colour).",
             since: "0.4.0",
             apps: [.tenra],
+            canvas: onColor ? .bleed : .standard,
+            notes: ["Inside .heroBackground (4.5.0) it is white, the pill a translucent white capsule."],
             styles: ["pill", "inline", "changeIndicator"]
         ) {
             if state == .loading {
                 TrendBadgeSkeleton(style: style)
             } else {
                 TrendBadge(direction: direction, changePercent: change, style: style)
+                    .galleryHeroBackground(onColor, color: AppColors.accent)
             }
         } controls: {
             StateControl(state: $state)
+            HeroBackgroundControl(onColor: $onColor)
             SliderControl("Change", value: $change, in: -50...50, step: 0.1) { "\($0.formatted(.number.precision(.fractionLength(1))))%" }
             ChoiceControl("Style", selection: $style, options: [("Pill", .pill), ("Inline", .inline), ("Indicator", .changeIndicator)])
         }

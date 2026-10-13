@@ -162,6 +162,7 @@ private struct MiniDonutPage: View {
 
 private struct ProportionBarsPage: View {
     @State private var hero = true
+    @State private var onColor = false
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -169,13 +170,15 @@ private struct ProportionBarsPage: View {
             name: "Mini/HeroProportionBar",
             summary: "A breakdown as a stacked bar: mini for cards, hero with a tappable legend for detail screens.",
             apps: [.tenra],
-            canvas: .fill
+            canvas: hero && onColor ? .bleed : .fill,
+            notes: ["Hero inside .heroBackground (4.5.0): the segments in white, a step fainter after the largest; the legend in white."]
         ) {
             if hero {
                 if state == .loading {
                     HeroProportionBarSkeleton(segments: 4)
                 } else {
                     HeroProportionBar(segments: GallerySamples.slices, currency: "KZT")
+                        .galleryHeroBackground(onColor, color: AppColors.accent)
                 }
             } else if state == .loading {
                 MiniProportionBarSkeleton()
@@ -185,6 +188,9 @@ private struct ProportionBarsPage: View {
         } controls: {
             StateControl(state: $state)
             ChoiceControl("Size", selection: $hero, options: [("Hero", true), ("Mini", false)])
+            if hero {
+                HeroBackgroundControl(onColor: $onColor)
+            }
         }
     }
 }
@@ -205,10 +211,10 @@ private struct HalfGaugePage: View {
             name: "Mini/HeroHalfGauge",
             summary: "A value on a half-circle with an optional norm marker and zone ticks; .bleed runs a wider circle out past both edges with a knob on the value.",
             apps: [.tenra],
-            canvas: bleeds ? .bleed : .standard,
+            canvas: bleeds || (hero && tone == .onColor) ? .bleed : .standard,
             notes: [
                 ".bleed (4.2.0) takes the width it is offered: put it edge to edge, without .screenPadding(). Zones and the norm become notches.",
-                "tone: .onColor draws a white arc for a coloured background, as ScoreGaugeCard(style: .hero) does.",
+                "tone: .onColor draws a white arc for a coloured background, as ScoreGaugeCard(style: .hero) does. Without tone it follows .heroBackground (4.5.0).",
             ],
             styles: ["standard", "bleed"]
         ) {
@@ -220,8 +226,7 @@ private struct HalfGaugePage: View {
                                   color: AppColors.success, style: style, tone: tone, span: span, diameter: 220,
                                   lineWidth: bleeds ? 28 : 20)
                         .id("\(value)\(norm)\(style)\(tone)\(span)")
-                        .padding(.vertical, tone == .onColor ? AppSpacing.lg : 0)
-                        .background { if tone == .onColor { Rectangle().fill(AppColors.success.gradient) } }
+                        .galleryHeroBackground(tone == .onColor)
                 }
             } else if state == .loading {
                 MiniHalfGaugeSkeleton()
@@ -247,6 +252,7 @@ private struct HalfGaugePage: View {
 private struct MilestoneGaugePage: View {
     @State private var value = 4.2
     @State private var hero = true
+    @State private var onColor = false
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -254,14 +260,16 @@ private struct MilestoneGaugePage: View {
             name: "Mini/HeroMilestoneGauge",
             summary: "Progress towards a target on a segmented scale.",
             apps: [.tenra],
-            canvas: .fill
+            canvas: hero && onColor ? .bleed : .fill,
+            notes: ["Hero inside .heroBackground (4.5.0): white segments on translucent white, a white target."]
         ) {
             if hero {
                 if state == .loading {
                     HeroMilestoneGaugeSkeleton()
                 } else {
                     HeroMilestoneGauge(value: value, target: 6, maxValue: 12, color: AppColors.accent)
-                        .id(value)
+                        .id("\(value)\(onColor)")
+                        .galleryHeroBackground(onColor, color: AppColors.accent)
                 }
             } else if state == .loading {
                 MiniMilestoneGaugeSkeleton()
@@ -271,6 +279,9 @@ private struct MilestoneGaugePage: View {
         } controls: {
             StateControl(state: $state)
             ChoiceControl("Size", selection: $hero, options: [("Hero", true), ("Mini", false)])
+            if hero {
+                HeroBackgroundControl(onColor: $onColor)
+            }
             SliderControl("Value (target 6 of 12)", value: $value, in: 0...12, step: 0.1)
         }
     }
@@ -280,13 +291,16 @@ private struct BarPairPage: View {
     @State private var current = 280_000.0
     @State private var projection = false
     @State private var hero = true
+    @State private var onColor = false
     @State private var state: SpecimenState = .content
 
     var body: some View {
         ComponentPage(
             name: "Mini/HeroBarPair",
             summary: "The previous period against the current one; a projection is dashed.",
-            apps: [.tenra]
+            apps: [.tenra],
+            canvas: hero && onColor ? .bleed : .standard,
+            notes: ["Hero inside .heroBackground (4.5.0): a white bar, a translucent white one before it."]
         ) {
             if hero {
                 if state == .loading {
@@ -294,7 +308,8 @@ private struct BarPairPage: View {
                 } else {
                     HeroBarPair(previous: 320_000, current: current, color: AppColors.accent,
                                 isProjection: projection, currency: "KZT")
-                        .id("\(current)\(projection)")
+                        .id("\(current)\(projection)\(onColor)")
+                        .galleryHeroBackground(onColor, color: AppColors.warning)
                 }
             } else if state == .loading {
                 MiniBarPairSkeleton()
@@ -304,6 +319,9 @@ private struct BarPairPage: View {
         } controls: {
             StateControl(state: $state)
             ChoiceControl("Size", selection: $hero, options: [("Hero", true), ("Mini", false)])
+            if hero {
+                HeroBackgroundControl(onColor: $onColor)
+            }
             SliderControl("Current (previous 320 000)", value: $current, in: 0...500_000, step: 1_000)
             ToggleControl("Projection", isOn: $projection)
         }

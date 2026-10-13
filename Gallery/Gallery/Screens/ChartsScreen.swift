@@ -119,6 +119,7 @@ private struct BarChartPage: View {
 private struct HeroSparklinePage: View {
     @State private var projects = true
     @State private var marksExtremes = true
+    @State private var onColor = false
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -127,7 +128,8 @@ private struct HeroSparklinePage: View {
             summary: "A detail screen's hero trend: a dashed projection tail, min and max markers, tap for a value.",
             since: "0.5.0",
             apps: [.tenra],
-            canvas: .bleed
+            canvas: .bleed,
+            notes: ["Inside .heroBackground (4.5.0): a white line over a white fade, white points, translucent white axes."]
         ) {
             if state == .loading {
                 HeroSparklineSkeleton()
@@ -139,10 +141,12 @@ private struct HeroSparklinePage: View {
                     markExtremes: marksExtremes,
                     valueFormat: .custom({ "\($0.formatted(.number.precision(.fractionLength(0...1)))) km" })
                 )
-                .id("\(projects)\(marksExtremes)")
+                .id("\(projects)\(marksExtremes)\(onColor)")
+                .galleryHeroBackground(onColor, color: AppColors.accent)
             }
         } controls: {
             StateControl(state: $state)
+            HeroBackgroundControl(onColor: $onColor)
             ToggleControl("Projection", isOn: $projects)
             ToggleControl("Min and max", isOn: $marksExtremes)
         }

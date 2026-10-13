@@ -7,6 +7,8 @@
 //  card supplies its own title, empty-state copy, hero value, subtitle and
 //  trailing icon facepile; the shell owns the identical layout, empty-state
 //  swap, padding and glass styling.
+//  4.5.0: the trailing icons stand in the middle of the card's height, not at its top
+//  (`PackedCircleIcons(style: .shelf)` is a short row).
 //
 
 import SwiftUI
@@ -42,7 +44,7 @@ public struct FinanceCard<Hero: View, Trailing: View>: View {
     }
 
     public var body: some View {
-        HStack(alignment: .top, spacing: AppSpacing.md) {
+        HStack(alignment: .center, spacing: AppSpacing.md) {
             VStack(alignment: .leading, spacing: AppSpacing.lg) {
                 Text(title)
                     .font(AppTypography.h3)
@@ -133,7 +135,7 @@ public struct FinanceCardSkeleton: View {
     }
 
     public var body: some View {
-        HStack(alignment: .top, spacing: AppSpacing.md) {
+        HStack(alignment: .center, spacing: AppSpacing.md) {
             VStack(alignment: .leading, spacing: AppSpacing.lg) {
                 SkeletonText(AppTypography.h3, width: 120)
                 VStack(alignment: .leading, spacing: AppSpacing.sm) {

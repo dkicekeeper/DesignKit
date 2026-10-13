@@ -40,6 +40,14 @@ public struct HeroBarPair: View {
     /// the same explore-by-tap interaction the period charts have.
     @State private var selectedBar: Int?
     @Environment(\.amountsHidden) private var amountsHidden
+    /// Inside `.heroBackground(_:)` (4.5.0): white bars, a translucent white one before.
+    @Environment(\.heroTone) private var heroTone
+
+    private var onColor: Bool { heroTone == .onColor }
+    /// The current bar: its colour on the page, white on colour.
+    private var barColor: Color { onColor ? AppColors.staticWhite : color }
+    /// The earlier bar and the baseline.
+    private var mutedColor: Color { onColor ? AppColors.staticWhite : AppColors.Text.secondary }
     private var immediate: Bool { !animatesOnAppear || AppAnimation.isReduceMotionEnabled }
     static let cornerRadius: CGFloat = 10
     /// Bars shorter than this read as "missing" — a zero value stays visible.
@@ -79,7 +87,7 @@ public struct HeroBarPair: View {
                 bar(
                     height: barHeight(previous),
                     delay: entranceDelay + 0.05,
-                    fill: AnyShapeStyle(AppColors.Text.secondary.opacity(0.25))
+                    fill: AnyShapeStyle(mutedColor.opacity(onColor ? 0.35 : 0.25))
                 )
                 .overlay(alignment: .top) {
                     valueAnnotation(previous, index: 0, tint: AppColors.Text.secondary)
@@ -92,12 +100,12 @@ public struct HeroBarPair: View {
                 bar(
                     height: barHeight(current),
                     delay: entranceDelay + 0.22,
-                    fill: AnyShapeStyle(isProjection ? color.opacity(0.3) : color)
+                    fill: AnyShapeStyle(isProjection ? barColor.opacity(0.3) : barColor)
                 )
                 .overlay(alignment: .bottom) {
                     if isProjection {
                         RoundedRectangle(cornerRadius: Self.cornerRadius)
-                            .strokeBorder(color, style: StrokeStyle(lineWidth: 2, dash: [6, 5]))
+                            .strokeBorder(barColor, style: StrokeStyle(lineWidth: 2, dash: [6, 5]))
                             .frame(width: barWidth, height: entered ? barHeight(current) : 0)
                             .animation(
                                 immediate ? nil : .spring(response: 0.55, dampingFraction: 0.7).delay(entranceDelay + 0.22),
@@ -108,7 +116,7 @@ public struct HeroBarPair: View {
                 .chartGlow(
                     radius: 18,
                     yOffset: 12,
-                    opacity: isProjection ? 0.3 : 0.55
+                    opacity: onColor ? 0.2 : (isProjection ? 0.3 : 0.55)
                 )
                 .overlay(alignment: .top) {
                     valueAnnotation(current, index: 1, tint: color)
@@ -119,7 +127,7 @@ public struct HeroBarPair: View {
 
             // Baseline hairline grounding both bars.
             RoundedRectangle(cornerRadius: 0.5)
-                .fill(AppColors.Text.secondary.opacity(0.2))
+                .fill(mutedColor.opacity(onColor ? 0.35 : 0.2))
                 .frame(width: barWidth * 2 + AppSpacing.xxl + AppSpacing.xl * 2, height: 1)
                 .padding(.top, AppSpacing.xs)
         }

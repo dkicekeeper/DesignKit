@@ -221,6 +221,10 @@ rather than importing an app type.
   `HeroHalfGauge(style: .bleed)`, a gauge wider than the screen with a knob, on a gradient of its
   colour (`tone: .onColor`) or on the page; `AppTypography.display` for its number. Tenra's
   Financial Health screen uses it.
+- Insight details on colour (4.5.0, owner-approved): `.heroBackground(color)` behind any hero
+  with its pieces in white (`\.heroTone`), `.heroScrollEdge()` on the screen's scroll view so
+  the colour reaches the top of the screen, and `ScoreGaugeCard(amount:)`. Tenra's insight
+  details open on the colour of their tone.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.
