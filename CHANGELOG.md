@@ -16,6 +16,72 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 4.5.0 - 2026-10-13
+
+The top of a detail screen on colour: `.heroBackground(color)` behind any hero, with its pieces in
+white, the colour reaching the top of the screen. `ScoreGaugeCard` shows an amount.
+[#59](https://github.com/dkicekeeper/DesignKit/pull/59)
+
+### Added
+
+- `.heroBackground(_ color:)`: the gradient `ScoreGaugeCard(style: .hero)` lies on, for any hero.
+  Mesh light in shades of the colour, a tone deeper so white text reads on it, opaque behind the
+  hero, up under the navigation bar and past the top of the screen, fading into the page over
+  96 pt below it, where the cards that follow rise over it. It tells its content it is on colour.
+- `HeroTone` and `EnvironmentValues.heroTone` (`.onSurface` by default, `.onColor` inside
+  `.heroBackground`). On colour, `HeroSection`'s text is white with a semibold subtitle,
+  `TrendBadge` is white in a translucent white capsule, and `HeroBarPair`, `HeroSparkline`,
+  `HeroMilestoneGauge` and `HeroProportionBar` draw white marks on translucent white tracks and
+  axes (the proportion bar's segments a step fainter after the largest).
+- `HeroHalfGauge(tone:)` without a tone follows `heroTone`; `HeroHalfGauge.Tone` is `HeroTone`.
+- `.heroScrollEdge()`: on the scroll view of a screen with a hero on colour, keeps the navigation
+  bar's soft scroll edge off while the colour is under the bar and brings it back once the cards
+  after the hero scroll under it.
+- `ScoreGaugeCard(amount:currency:maxValue:norm:…)`: an amount in the app's format, hidden with
+  the app's amounts, a long one shrinking to fit; `norm` is notched on the arc (an average, a
+  budget).
+
+### Changed
+
+- `ScoreGaugeCard(style: .hero)`'s colour carries on past the top of the screen, so a pull down
+  shows more colour, not the page. Under the navigation bar iOS 26's soft scroll edge faded it
+  out: add `.heroScrollEdge()` to the screen's scroll view (Migration).
+- `FinanceCard`'s trailing icons stand in the middle of the card's height, not at its top.
+
+### Migration
+
+- A screen with `ScoreGaugeCard(style: .hero)` or `.heroBackground`: `.heroScrollEdge()` on its
+  scroll view.
+- A detail screen's header on colour: the hero and its chart in `.heroBackground`, edge to edge,
+  and the cards after it rising over the fade.
+
+```swift
+ScrollView {
+    VStack(spacing: AppSpacing.xl) {
+        VStack(spacing: AppSpacing.xl) {
+            HeroSection(icon: nil, title: "Spending", showsIcon: false,
+                        primaryAmount: 284_000, primaryCurrency: "KZT") { TrendBadge(…) }
+            HeroBarPair(previous: 252_000, current: 284_000, color: color)
+        }
+        .padding(.bottom, AppSpacing.xxl)
+        .heroBackground(color)
+        DetailCard(…)
+            .padding(.top, -AppSpacing.xxl)
+    }
+}
+.heroScrollEdge()
+```
+
+### Gallery and tooling
+
+- A `.heroBackground` page (Effects) with a Tone, a Hero chart and "Open as a screen".
+- A Background control (Page or Colour) on the `HeroSection`, `TrendBadge`, `HeroSparkline`,
+  `HeroProportionBar`, `HeroMilestoneGauge` and `HeroBarPair` pages. `HeroHalfGauge` on colour
+  lies on the hero background. The `ScoreGaugeCard` page's Value control has Amount, and its
+  screen uses `.heroScrollEdge()`.
+- New snapshots `heroSectionOnColor`, `heroChartsOnColor` and `scoreGaugeHeroAmount`. Re-recorded:
+  the hero gauge on colour (its colour above it) and the `FinanceCard` ones (icons centred).
+
 ## 4.4.0 - 2026-10-13
 
 `PackedCircleIcons(style: .shelf)`: the items as app icons standing in a row in a pocket, every

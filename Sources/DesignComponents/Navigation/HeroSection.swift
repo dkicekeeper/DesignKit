@@ -7,6 +7,8 @@
 //  - Amount / subtitle / progress / currency-conversion are all optional.
 //  - Icon animates in with a spring scale-up on appear.
 //  - For edit flows with bindings + IconPicker use `EditableHero` instead.
+//  - Inside `.heroBackground(_:)` (4.5.0) its text is white; the subtitle is semibold there,
+//    so it reads as large text on the colour.
 //
 
 import SwiftUI
@@ -37,6 +39,11 @@ public struct HeroSection<Accessory: View>: View {
 
     @State private var iconScale: CGFloat = AppAnimation.heroHiddenScale
     @State private var iconOpacity: Double = 0
+    @Environment(\.heroTone) private var heroTone
+
+    private var onColor: Bool { heroTone == .onColor }
+    /// The amount, the metric and the subtitle: secondary on the page, white on colour.
+    private var secondaryColor: Color { onColor ? AppColors.Text.primaryOnDark : AppColors.Text.secondary }
 
     public init(
         icon: IconSource?,
@@ -101,6 +108,7 @@ public struct HeroSection<Accessory: View>: View {
             VStack(alignment: .center, spacing: AppSpacing.xs) {
                 Text(title)
                     .font(AppTypography.h1)
+                    .foregroundStyle(onColor ? AnyShapeStyle(AppColors.Text.primaryOnDark) : AnyShapeStyle(.primary))
                     .multilineTextAlignment(.center)
 
                 if let primaryAmount, !primaryCurrency.isEmpty {
@@ -108,7 +116,7 @@ public struct HeroSection<Accessory: View>: View {
                         amount: primaryAmount,
                         currency: primaryCurrency,
                         fontSize: AppTypography.h3,
-                        color: primaryAmountColor ?? AppColors.Text.secondary
+                        color: onColor ? AppColors.Text.primaryOnDark : (primaryAmountColor ?? AppColors.Text.secondary)
                     )
 
                     if showBaseConversion, !baseCurrency.isEmpty, primaryCurrency != baseCurrency {
@@ -117,7 +125,7 @@ public struct HeroSection<Accessory: View>: View {
                             fromCurrency: primaryCurrency,
                             toCurrency: baseCurrency,
                             fontSize: AppTypography.h3,
-                            color: AppColors.Text.secondary.opacity(0.7)
+                            color: onColor ? AppColors.Text.secondaryOnDark : AppColors.Text.secondary.opacity(0.7)
                         )
                     }
                 } else if let primaryText {
@@ -125,7 +133,7 @@ public struct HeroSection<Accessory: View>: View {
                     // same visual slot/style as the amount.
                     Text(primaryText)
                         .font(AppTypography.h3)
-                        .foregroundStyle(primaryAmountColor ?? AppColors.Text.secondary)
+                        .foregroundStyle(onColor ? AppColors.Text.primaryOnDark : (primaryAmountColor ?? AppColors.Text.secondary))
                         .multilineTextAlignment(.center)
                 }
 
@@ -134,8 +142,8 @@ public struct HeroSection<Accessory: View>: View {
 
                 if let subtitle {
                     Text(subtitle)
-                        .font(AppTypography.body)
-                        .foregroundStyle(AppColors.Text.secondary)
+                        .font(onColor ? AppTypography.bodyEmphasis : AppTypography.body)
+                        .foregroundStyle(secondaryColor)
                         .padding(.top, AppSpacing.xs)
                 }
 
@@ -145,8 +153,8 @@ public struct HeroSection<Accessory: View>: View {
                         Text("·")
                         Text("\(Int((progress.fraction * 100).rounded()))%")
                     }
-                    .font(AppTypography.body)
-                    .foregroundStyle(AppColors.Text.secondary)
+                    .font(onColor ? AppTypography.bodyEmphasis : AppTypography.body)
+                    .foregroundStyle(secondaryColor)
                     .padding(.top, AppSpacing.xs)
                 }
             }

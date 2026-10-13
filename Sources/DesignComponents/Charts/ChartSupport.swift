@@ -93,34 +93,81 @@ func paddedChartDomain(yMin: Double, yMax: Double, allowsNegative: Bool) -> Clos
 // MARK: - Axis builders
 
 extension View {
-    /// Category X axis: greedy collision resolution, display strings from `labelMap`.
-    func chartCategoryXAxis(labelMap: [String: String]) -> some View {
-        chartXAxis {
-            AxisMarks { value in
-                AxisValueLabel(collisionResolution: .greedy(minimumSpacing: 6)) {
-                    if let label = value.as(String.self) {
-                        Text(labelMap[label] ?? label)
-                            .font(AppTypography.caption2)
-                            .lineLimit(1)
+    /// Category X axis: greedy collision resolution, display strings from `labelMap`. On
+    /// colour (`tone: .onColor`, 4.5.0) the labels are translucent white.
+    @ViewBuilder
+    func chartCategoryXAxis(labelMap: [String: String], tone: HeroTone = .onSurface) -> some View {
+        if tone == .onColor {
+            chartXAxis {
+                AxisMarks { value in
+                    AxisValueLabel(collisionResolution: .greedy(minimumSpacing: 6)) {
+                        if let label = value.as(String.self) {
+                            Text(labelMap[label] ?? label)
+                                .font(AppTypography.caption2)
+                                .foregroundStyle(ChartOnColor.label)
+                                .lineLimit(1)
+                        }
+                    }
+                }
+            }
+        } else {
+            chartXAxis {
+                AxisMarks { value in
+                    AxisValueLabel(collisionResolution: .greedy(minimumSpacing: 6)) {
+                        if let label = value.as(String.self) {
+                            Text(labelMap[label] ?? label)
+                                .font(AppTypography.caption2)
+                                .lineLimit(1)
+                        }
                     }
                 }
             }
         }
     }
 
-    /// Leading Y axis with grid lines and compact values ("75K").
-    func chartCompactYAxis() -> some View {
-        chartYAxis {
-            AxisMarks(position: .leading) { value in
-                AxisGridLine()
-                AxisValueLabel {
-                    if let amount = value.as(Double.self) {
-                        Text(ChartValueFormat.compactString(amount))
-                            .font(AppTypography.caption2)
+    /// Leading Y axis with grid lines and compact values ("75K"). On colour (`tone: .onColor`,
+    /// 4.5.0) the grid and the labels are translucent white.
+    @ViewBuilder
+    func chartCompactYAxis(tone: HeroTone = .onSurface) -> some View {
+        if tone == .onColor {
+            chartYAxis {
+                AxisMarks(position: .leading) { value in
+                    AxisGridLine()
+                        .foregroundStyle(ChartOnColor.grid)
+                    AxisValueLabel {
+                        if let amount = value.as(Double.self) {
+                            Text(ChartValueFormat.compactString(amount))
+                                .font(AppTypography.caption2)
+                                .foregroundStyle(ChartOnColor.label)
+                        }
+                    }
+                }
+            }
+        } else {
+            chartYAxis {
+                AxisMarks(position: .leading) { value in
+                    AxisGridLine()
+                    AxisValueLabel {
+                        if let amount = value.as(Double.self) {
+                            Text(ChartValueFormat.compactString(amount))
+                                .font(AppTypography.caption2)
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+/// A chart's marks on colour (`.heroBackground`, 4.5.0): white, the grid and labels translucent.
+enum ChartOnColor {
+    static let mark = AppColors.staticWhite
+    static let label = AppColors.staticWhite.opacity(0.78)
+    static let grid = AppColors.staticWhite.opacity(0.22)
+    /// The area under a line: white fading out downwards.
+    static var area: AnyShapeStyle {
+        AnyShapeStyle(LinearGradient(colors: [AppColors.staticWhite.opacity(0.32), AppColors.staticWhite.opacity(0)],
+                                     startPoint: .top, endPoint: .bottom))
     }
 }
 

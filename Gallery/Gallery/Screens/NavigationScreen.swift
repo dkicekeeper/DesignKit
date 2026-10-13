@@ -110,6 +110,7 @@ private struct HeroSectionPage: View {
     @State private var showsProgress = true
     @State private var showsIcon = true
     @State private var spent = 185_000.0
+    @State private var onColor = false
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -117,7 +118,8 @@ private struct HeroSectionPage: View {
             name: "HeroSection",
             summary: "The top of a detail screen: the icon, the name, the main amount, a subtitle and progress.",
             apps: [.tenra],
-            canvas: .tall(minHeight: 300)
+            canvas: onColor ? .bleed : .tall(minHeight: 300),
+            notes: ["Inside .heroBackground (4.5.0) its text is white and the subtitle semibold."]
         ) {
             if state == .loading {
                 HeroSectionSkeleton(showsIcon: showsIcon, showsProgress: showsProgress)
@@ -132,9 +134,11 @@ private struct HeroSectionPage: View {
                     subtitle: "This month",
                     progress: showsProgress ? ProgressConfig(current: spent, total: 250_000, label: "Budget", color: .orange) : nil
                 )
+                .galleryHeroBackground(onColor, color: AppColors.warning)
             }
         } controls: {
             StateControl(state: $state)
+            HeroBackgroundControl(onColor: $onColor)
             ToggleControl("Icon", isOn: $showsIcon)
             ToggleControl("Progress", isOn: $showsProgress)
             SliderControl("Spent of 250 000", value: $spent, in: 0...400_000, step: 1_000)

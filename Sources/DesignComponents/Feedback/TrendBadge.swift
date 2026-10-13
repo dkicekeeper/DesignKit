@@ -57,6 +57,9 @@ public struct TrendBadge: View {
     let style: Style
     let color: Color?
 
+    /// Inside `.heroBackground(_:)` (4.5.0): white, the pill a translucent white capsule.
+    @Environment(\.heroTone) private var heroTone
+
     /// - Parameters:
     ///   - direction: Arrow direction.
     ///   - changePercent: Signed change in percent (`12.4` → "+12.4%"). `nil` shows the arrow only.
@@ -74,7 +77,9 @@ public struct TrendBadge: View {
         self.color = color
     }
 
-    private var effectiveColor: Color { color ?? direction.color }
+    private var effectiveColor: Color {
+        heroTone == .onColor ? AppColors.Text.primaryOnDark : (color ?? direction.color)
+    }
 
     public var body: some View {
         if style == .changeIndicator {
@@ -102,7 +107,7 @@ public struct TrendBadge: View {
             }
             .lineLimit(1)
             .foregroundStyle(effectiveColor)
-            .modifier(TrendPillModifier(isActive: style == .pill, color: effectiveColor))
+            .modifier(TrendPillModifier(isActive: style == .pill, color: effectiveColor, onColor: heroTone == .onColor))
             // Keep the pill's intrinsic width — never let a tight parent squeeze the
             // icon + percent into a wrap; ViewThatFits can then drop it to a new line.
             .fixedSize(horizontal: true, vertical: false)
@@ -120,13 +125,14 @@ public struct TrendBadge: View {
 private struct TrendPillModifier: ViewModifier {
     let isActive: Bool
     let color: Color
+    var onColor = false
 
     func body(content: Content) -> some View {
         if isActive {
             content
                 .padding(.horizontal, AppSpacing.sm)
                 .padding(.vertical, AppSpacing.xs)
-                .background(AppColors.pale(color))
+                .background(onColor ? AppColors.staticWhite.opacity(0.2) : AppColors.pale(color))
                 .clipShape(Capsule())
         } else {
             content

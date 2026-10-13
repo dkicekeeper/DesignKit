@@ -34,6 +34,11 @@ public struct HeroSparkline<Point: ChartPoint>: View {
 
     @State private var selectedValueLabel: String?
     @State private var cache = ChartPointCache()
+    /// Inside `.heroBackground(_:)` (4.5.0): a white line over a white fade, white points,
+    /// translucent white axes.
+    @Environment(\.heroTone) private var heroTone
+
+    private var onColor: Bool { heroTone == .onColor }
 
     /// - Parameters:
     ///   - projectedValue: forecast endpoint drawn after the last point (dashed, hollow).
@@ -65,7 +70,7 @@ public struct HeroSparkline<Point: ChartPoint>: View {
     private var values: [Double] { dataPoints.map(series.value) }
 
     /// Last-point dot and projection tail: the solid colour, or the latest value's sign.
-    private var tintColor: Color { series.color(for: values.last ?? 0) }
+    private var tintColor: Color { onColor ? ChartOnColor.mark : series.color(for: values.last ?? 0) }
 
     /// Padded axis domain (~6 % headroom) including the projection endpoint.
     private var yDomain: ClosedRange<Double> {
@@ -133,8 +138,9 @@ public struct HeroSparkline<Point: ChartPoint>: View {
         let domain = yDomain
         // Style gradients resolve against the marks' own bounds: UNPADDED envelope.
         let styleEnvelope = min(cache.yMin, 0)...max(cache.yMax, 1)
-        let lineFill = series.lineStyle(yDomain: styleEnvelope)
-        let areaFill = series.areaStyle(yDomain: styleEnvelope)
+        let lineFill = onColor ? AnyShapeStyle(ChartOnColor.mark) : series.lineStyle(yDomain: styleEnvelope)
+        let areaFill = onColor ? ChartOnColor.area : series.areaStyle(yDomain: styleEnvelope)
+        let onColor = self.onColor
         var categoryDomain = dataPoints.map(\.chartLabel)
         if projectedValue != nil { categoryDomain.append(Self.projectionLabel) }
         let tint = tintColor
@@ -164,7 +170,7 @@ public struct HeroSparkline<Point: ChartPoint>: View {
 
             if series.showsZeroRule, domain.lowerBound < 0 {
                 RuleMark(y: .value("Zero", 0))
-                    .foregroundStyle(AppColors.Text.tertiary.opacity(0.5))
+                    .foregroundStyle(onColor ? ChartOnColor.label : AppColors.Text.tertiary.opacity(0.5))
                     .lineStyle(StrokeStyle(lineWidth: 0.5, dash: [4, 4]))
             }
 
@@ -192,7 +198,7 @@ public struct HeroSparkline<Point: ChartPoint>: View {
                     Circle()
                         .strokeBorder(tint, lineWidth: 2)
                         .frame(width: 11, height: 11)
-                        .background(Circle().fill(AppColors.Background.base))
+                        .background(Circle().fill(onColor ? Color.clear : AppColors.Background.base))
                 }
             }
 
@@ -206,13 +212,13 @@ public struct HeroSparkline<Point: ChartPoint>: View {
                     y: .value("Value", vals[maxIdx])
                 )
                 .symbolSize(90)
-                .foregroundStyle(AppColors.success)
+                .foregroundStyle(onColor ? ChartOnColor.mark : AppColors.success)
                 PointMark(
                     x: .value("Period", dataPoints[minIdx].chartLabel),
                     y: .value("Value", vals[minIdx])
                 )
                 .symbolSize(90)
-                .foregroundStyle(AppColors.destructive)
+                .foregroundStyle(onColor ? ChartOnColor.label : AppColors.destructive)
             }
 
             // "You are here" dot on the last point.
@@ -228,7 +234,7 @@ public struct HeroSparkline<Point: ChartPoint>: View {
             // Selection emphasis — drawn LAST; the x-domain is locked by chartXScale.
             if let p = selectedPoint {
                 let v = series.value(p)
-                let pointColor = series.color(for: v)
+                let pointColor = onColor ? ChartOnColor.mark : series.color(for: v)
                 RuleMark(x: .value("Selected", p.chartLabel))
                     .foregroundStyle(pointColor.opacity(0.5))
                     .lineStyle(StrokeStyle(lineWidth: 1.5))
@@ -243,8 +249,8 @@ public struct HeroSparkline<Point: ChartPoint>: View {
         .chartXScale(domain: categoryDomain)
         .chartYScale(domain: domain)
         .chartXLabelSelectionWithFeedback($selectedValueLabel)
-        .chartCategoryXAxis(labelMap: axisLabels)
-        .chartCompactYAxis()
+        .chartCategoryXAxis(labelMap: axisLabels, tone: heroTone)
+        .chartCompactYAxis(tone: heroTone)
         .chartLegend(.hidden)
     }
 }

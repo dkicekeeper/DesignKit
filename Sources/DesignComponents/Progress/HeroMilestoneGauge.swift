@@ -37,6 +37,10 @@ public struct HeroMilestoneGauge: View {
     @State private var hasEnteredOnce = false
     /// Suppresses the wave animation while resetting for a replay.
     @State private var suppressAnimation = false
+    /// Inside `.heroBackground(_:)` (4.5.0): white segments on translucent white, a white tick.
+    @Environment(\.heroTone) private var heroTone
+
+    private var onColor: Bool { heroTone == .onColor }
     private var immediate: Bool { !animatesOnAppear || AppAnimation.isReduceMotionEnabled || suppressAnimation }
     private var currentEntranceDelay: Double { hasEnteredOnce ? 0 : entranceDelay }
 
@@ -74,14 +78,14 @@ public struct HeroMilestoneGauge: View {
             ZStack(alignment: .leading) {
                 // Muted base row.
                 segmentRow(segmentWidth: segmentWidth) { _ in
-                    AnyShapeStyle(AppColors.Text.secondary.opacity(0.18))
+                    AnyShapeStyle(onColor ? AppColors.staticWhite.opacity(0.28) : AppColors.Text.secondary.opacity(0.18))
                 }
 
                 // Filled run — glass + glow, revealed as a left-to-right wave.
                 segmentRow(segmentWidth: segmentWidth, fillFractionOf: clamped) { _ in
-                    AnyShapeStyle(color)
+                    AnyShapeStyle(onColor ? AppColors.staticWhite : color)
                 }
-                .chartGlow(radius: 14, yOffset: 8)
+                .chartGlow(radius: 14, yOffset: 8, opacity: onColor ? 0.2 : 0.55)
 
                 // Target tick on the boundary after the `target`-th segment,
                 // landing once the wave has passed it.
@@ -168,7 +172,7 @@ public struct HeroMilestoneGauge: View {
         let boundary = min(max(target, 0), maxValue)
         let x = CGFloat(boundary) * (segmentWidth + Self.segmentGap) - Self.segmentGap / 2
         return Capsule()
-            .fill(AppColors.Text.secondary.opacity(0.7))
+            .fill(onColor ? AppColors.staticWhite.opacity(0.9) : AppColors.Text.secondary.opacity(0.7))
             .frame(width: 3, height: segmentHeight + Self.tickOvershoot * 2)
             .offset(x: x - 1.5)
     }

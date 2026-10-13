@@ -38,13 +38,9 @@ public struct HeroHalfGauge: View {
         case bleed
     }
 
-    /// What the gauge is drawn on (4.2.0).
-    public enum Tone: Hashable, Sendable {
-        /// The page's background: the arc in its colour with a glow, a grey track.
-        case onSurface
-        /// A coloured background: a white arc and a translucent white track.
-        case onColor
-    }
+    /// What the gauge is drawn on (4.2.0): the page (the arc in its colour with a glow, a grey
+    /// track) or colour (a white arc, a translucent white track). `HeroTone` since 4.5.0.
+    public typealias Tone = HeroTone
 
     /// The measured value.
     let value: Double
@@ -57,7 +53,10 @@ public struct HeroHalfGauge: View {
     /// Semantic tint of the value arc.
     let color: Color
     var style: Style = .standard
-    var tone: Tone = .onSurface
+    /// `nil`: the tone around it (`\.heroTone`, white inside `.heroBackground`; 4.5.0).
+    var toneOverride: Tone? = nil
+    @Environment(\.heroTone) private var heroTone
+    private var tone: Tone { toneOverride ?? heroTone }
     /// `.bleed`: the degrees of the circle that show, edge to edge.
     var span: Double = 130
 
@@ -92,7 +91,7 @@ public struct HeroHalfGauge: View {
         zoneTicks: [Double] = [],
         color: Color,
         style: Style = .standard,
-        tone: Tone = .onSurface,
+        tone: Tone? = nil,
         span: Double = 130,
         diameter: CGFloat = 240,
         lineWidth: CGFloat = 20,
@@ -105,7 +104,7 @@ public struct HeroHalfGauge: View {
         self.zoneTicks = zoneTicks
         self.color = color
         self.style = style
-        self.tone = tone
+        self.toneOverride = tone
         self.span = min(max(span, 60), 170)
         self.diameter = diameter
         self.lineWidth = lineWidth
