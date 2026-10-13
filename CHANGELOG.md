@@ -26,9 +26,10 @@ shelf's tiles are one size in every card.
 ### Changed
 
 - `.heroBackground` in light mode is a pale tint of the colour (its shades at 30% over the page)
-  with the hero pieces as on the page: `\.heroTone` stays `.onSurface` there, so `HeroSection`,
-  `TrendBadge` and the hero charts draw text in black and marks in their colours. Dark mode keeps
-  the deep gradient with white pieces. The deep gradient read as brown in light mode.
+  with the hero pieces as on the page: `\.heroTone` stays `.onSurface` there, so `TrendBadge` and
+  the hero charts draw marks in their colours, and `HeroSection`'s title, amount and subtitle are
+  black (the amount and subtitle grey on the page), the subtitle semibold. Dark mode keeps the
+  deep gradient with white pieces. The deep gradient read as brown in light mode.
 - `ScoreGaugeCard(style: .hero)` on colour follows it: in light mode the score, grade, trend and
   subtitle are black, the capsules frosted white and the gauge as on the page (its colour, a grey
   track).

@@ -43,6 +43,9 @@ extension EnvironmentValues {
     /// navigation bar and the status bar), from `.heroScrollEdge()`: the hero's gradient starts
     /// there (4.5.1).
     @Entry var heroBarInset: CGFloat = 0
+    /// Inside `.heroBackground(_:)` in light mode (4.5.1): on its pale tint, where a hero's text
+    /// that is grey on the page is black.
+    @Entry var heroOnPale: Bool = false
 }
 
 public extension View {
@@ -100,6 +103,7 @@ private struct HeroBackgroundModifier: ViewModifier {
         content
             // White on the deep gradient; as on the page, in black, on the pale one.
             .environment(\.heroTone, colorScheme == .dark ? .onColor : .onSurface)
+            .environment(\.heroOnPale, colorScheme != .dark)
             .background {
                 HeroBackgroundFill(color: color)
             }
