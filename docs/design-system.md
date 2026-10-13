@@ -222,6 +222,7 @@ All use Inter variable font with Dynamic Type scaling:
 
 | Token | Size | Weight | Use For |
 |-------|------|--------|---------|
+| `display` *(4.2.0)* | 72 | semibold | The one number a screen is about, in a hero (`ScoreGaugeCard(style: .hero)`). Not for titles |
 | `h1` | 34 | bold | Screen titles |
 | `h2` | 28 | semibold | Detail view balances |
 | `h3` | 24 | semibold | Section titles (Insights) |
@@ -734,6 +735,8 @@ Money in against money out: the title (h3), `AmountComparisonBar` and an optiona
 #### `ScoreGaugeCard` *(1.2.0)*
 A score as a hero: `HeroHalfGauge` (220 pt, 16 pt line, `zoneTicks`) with the score (h1 bold) and a grade capsule inside, both with `materialize`, and a centred subtitle below. `score == nil` leaves the gauge empty and shows "—". `decodesScore: true` *(2.7.0)* shows the score as a `ScrambleText`: it decodes itself as the card appears and when it changes. Tenra: `HealthScoreHeroCard` (grade colour, grade-band copy) is an adapter.
 
+`style: .hero` *(4.2.0)* is the top of a screen, not a card: it fills the width (no `.screenPadding()`), its gauge is `HeroHalfGauge(style: .bleed)` (28 pt, a circle wider than the screen whose arc runs out past both edges, a knob on the score, the zones as notches), the score is `AppTypography.display`, the grade and an optional `trend:` (`ScoreGaugeCard.Trend`: arrow, signed percent, the app's caption) sit in capsules under it, the subtitle below. `tone: .onColor` (the default for the hero) lies on a gradient of `color` in shades of one hue that reaches up under the navigation bar and fades into the page at the bottom, with white text and translucent white capsules (no glass: two glass capsules side by side would reflect each other); `.onSurface` draws on the page with the arc in its colour. Cards below may rise over the fading end (`.padding(.top, -AppSpacing.xxl)`, the Gallery's "Open as a screen"). `showsMaximum: true` adds "/100" (both styles). `ScoreGaugeCardSkeleton(style:)`.
+
 #### `ScoreCard` *(1.2.0)*
 A score in the insight feed: title, grade and "72 / 100" on the left, a 120 pt `MiniHalfGauge` on the trailing edge (the same footprint as the feed cards' mini charts). `decodesScore: true` *(2.7.0)* decodes the score as `ScoreGaugeCard` does; leave it off in a lazy feed, where scrolling back would replay it. Tenra: `HealthScoreCardView` is an adapter.
 
@@ -1192,7 +1195,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | Component | Skeleton |
 |---|---|
 | `BalanceCard`, `SelectableBalanceCard`, `FinanceCard`, `CashFlowCard` (also its own loading state), `TotalsCard`, `ComparisonCard`, `InsightsStatCard`, `StatTile`, `RecurringPaymentCard`, `RecommendationBox` | `…Skeleton` (`TotalsCardSkeleton(count:showsTitle:amountFont:)`, `FinanceCardSkeleton(showsTrailing:)`, `RecommendationBoxSkeleton(lines:)`) |
-| `LimitProgressCard`, `TargetProgressCard`, `PayoffProgressCard`, `ScoreCard`, `ScoreGaugeCard`, `MetricCard`, `WeightBreakdownCard`, `CalculationCard`, `ProgressRingTile`, `ProgressRingTileGrid` | `…Skeleton` (`MetricCardSkeleton(chartPlacement:)`, `WeightBreakdownCardSkeleton(segments:)`, `CalculationCardSkeleton(rows:showsHero:)`) |
+| `LimitProgressCard`, `TargetProgressCard`, `PayoffProgressCard`, `ScoreCard`, `ScoreGaugeCard`, `MetricCard`, `WeightBreakdownCard`, `CalculationCard`, `ProgressRingTile`, `ProgressRingTileGrid` | `…Skeleton` (`ScoreGaugeCardSkeleton(style:)`, `MetricCardSkeleton(chartPlacement:)`, `WeightBreakdownCardSkeleton(segments:)`, `CalculationCardSkeleton(rows:showsHero:)`) |
 | `UniversalRow` | `UniversalRowSkeleton(config:iconStyle:titleFont:showsSubtitle:trailing:)` |
 | `NavigationSettingsRow`, `ToggleSettingsRow`, `ActionSettingsRow`, `MenuPickerRow`, `DatePickerRow`, `CheckmarkRow`, `StepperRow`, `NavigationPickerRow` (3.0.0) | `UniversalRowSkeleton.navigationSettings`, `.toggleSettings`, `.actionSettings`, `.menuPicker`, `.datePicker`, `.checkmark(iconStyle:)`; a stepper row and a navigation picker row are `.menuPicker` (the same shape) |
 | `SliderRow` (1.15.0) | `SliderRowSkeleton(showsHint:)` |
@@ -1203,7 +1206,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `AmountRow` (2.1.0) | `AmountRowSkeleton(style:showsRing:showsDetail:)` |
 | `NetAmountRow`, `ScheduleRow`, `InfoRow`, `ColorPickerRow` | `…Skeleton` |
 | `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `OrbChart` | `…Skeleton` |
-| `LinearProgressBar`, `ProportionBar`, `MiniProportionBar`, `AmountComparisonBar`, `HeroProportionBar`, `ProgressRing`, `MiniDonut`, `MiniHalfGauge`, `HeroHalfGauge`, `MiniMilestoneGauge`, `HeroMilestoneGauge`, `MiniBarPair`, `HeroBarPair` | `…Skeleton`, with the component's size parameters |
+| `LinearProgressBar`, `ProportionBar`, `MiniProportionBar`, `AmountComparisonBar`, `HeroProportionBar`, `ProgressRing`, `MiniDonut`, `MiniHalfGauge`, `HeroHalfGauge`, `MiniMilestoneGauge`, `HeroMilestoneGauge`, `MiniBarPair`, `HeroBarPair` | `…Skeleton`, with the component's size parameters (`HeroHalfGaugeSkeleton(style: .bleed)`, 4.2.0) |
 | `Icon` | `IconSkeleton(style:)` / `IconSkeleton(size:)` |
 | `Avatar`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIcons` (`style:` for its cards or orbit, 3.3.0), `Badge`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `Rating`, `ChipPicker` | `…Skeleton` |
 | `FormattedAmountText`, `ConvertedAmount`, `SpentBudgetText`, `AmountPercentage` | `FormattedAmountTextSkeleton(font:width:)`; `RedactableAmount(isLoading: true)` draws one itself |

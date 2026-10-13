@@ -139,6 +139,32 @@ extension ComponentSnapshots {
             )
         }
 
+        /// The bleed half gauge (4.2.0) at a phone's width: the arc runs out past both edges, a knob
+        /// on the value, the zones as notches; on the page and on colour.
+        @Test func bleedGauges() async {
+            await assertComponentSnapshot(
+                HeroHalfGauge(value: 0.62, maxValue: 1, zoneTicks: [0.4, 0.7], color: AppColors.success,
+                              style: .bleed, lineWidth: 28, animatesOnAppear: false),
+                named: "onSurface",
+                width: 402
+            )
+            await assertComponentSnapshot(
+                HeroHalfGauge(value: 0.84, maxValue: 1, zoneTicks: [0.4, 0.7], color: AppColors.destructive,
+                              style: .bleed, tone: .onColor, lineWidth: 28, animatesOnAppear: false)
+                    .padding(.vertical, AppSpacing.lg)
+                    .background(AppColors.destructive),
+                named: "onColor",
+                width: 402
+            )
+            await assertComponentSnapshot(
+                HeroHalfGauge(value: 0, maxValue: 1, color: AppColors.accent, style: .bleed, lineWidth: 28,
+                              animatesOnAppear: false),
+                named: "empty",
+                width: 402,
+                appearances: [.light]
+            )
+        }
+
         @Test func barPairs() async {
             await assertComponentSnapshot(
                 HStack(alignment: .bottom, spacing: AppSpacing.xl) {

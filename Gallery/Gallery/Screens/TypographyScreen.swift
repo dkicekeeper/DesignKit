@@ -8,6 +8,7 @@ import DesignTokens
 
 struct TypographyScreen: View {
     private let styles: [(String, Font, String)] = [
+        ("display · 72 semibold (4.2.0)", AppTypography.display, "84"),
         ("h1 · 34 bold", AppTypography.h1, "Net worth"),
         ("h2 · 28 semibold", AppTypography.h2, "Accounts"),
         ("h3 · 24 semibold", AppTypography.h3, "This month"),

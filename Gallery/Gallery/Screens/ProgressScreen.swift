@@ -193,21 +193,35 @@ private struct HalfGaugePage: View {
     @State private var value = 0.62
     @State private var norm = true
     @State private var hero = true
+    @State private var style: HeroHalfGauge.Style = .standard
+    @State private var tone: HeroHalfGauge.Tone = .onSurface
+    @State private var span = 130.0
     @State private var state: SpecimenState = .content
+
+    private var bleeds: Bool { hero && style == .bleed }
 
     var body: some View {
         ComponentPage(
             name: "Mini/HeroHalfGauge",
-            summary: "A value on a half-circle with an optional norm marker and zone ticks.",
-            apps: [.tenra]
+            summary: "A value on a half-circle with an optional norm marker and zone ticks; .bleed runs a wider circle out past both edges with a knob on the value.",
+            apps: [.tenra],
+            canvas: bleeds ? .bleed : .standard,
+            notes: [
+                ".bleed (4.2.0) takes the width it is offered: put it edge to edge, without .screenPadding(). Zones and the norm become notches.",
+                "tone: .onColor draws a white arc for a coloured background, as ScoreGaugeCard(style: .hero) does.",
+            ],
+            styles: ["standard", "bleed"]
         ) {
             if hero {
                 if state == .loading {
-                    HeroHalfGaugeSkeleton(diameter: 220)
+                    HeroHalfGaugeSkeleton(style: style, diameter: 220, span: span)
                 } else {
                     HeroHalfGauge(value: value, norm: norm ? 0.5 : nil, maxValue: 1, zoneTicks: [0.3, 0.7],
-                                  color: AppColors.success, diameter: 220)
-                        .id("\(value)\(norm)")
+                                  color: AppColors.success, style: style, tone: tone, span: span, diameter: 220,
+                                  lineWidth: bleeds ? 28 : 20)
+                        .id("\(value)\(norm)\(style)\(tone)\(span)")
+                        .padding(.vertical, tone == .onColor ? AppSpacing.lg : 0)
+                        .background { if tone == .onColor { Rectangle().fill(AppColors.success.gradient) } }
                 }
             } else if state == .loading {
                 MiniHalfGaugeSkeleton()
@@ -217,6 +231,13 @@ private struct HalfGaugePage: View {
         } controls: {
             StateControl(state: $state)
             ChoiceControl("Size", selection: $hero, options: [("Hero", true), ("Mini", false)])
+            if hero {
+                ChoiceControl("Style", selection: $style, options: [("Standard", .standard), ("Bleed", .bleed)])
+                ChoiceControl("Tone", selection: $tone, options: [("On surface", .onSurface), ("On colour", .onColor)])
+                if style == .bleed {
+                    SliderControl("Span", value: $span, in: 90...170, step: 5)
+                }
+            }
             SliderControl("Value", value: $value, in: 0...1, step: 0.01)
             ToggleControl("Norm marker", isOn: $norm)
         }

@@ -217,6 +217,10 @@ rather than importing an app type.
 - Benchmark round 3 (2026-10, owner-approved) after 4.0.0: `RatingSummary` (Dalada's reviews
   block), `LoadMoreFooter` + `.onReachEnd` (paged lists in both apps) and `limit:` character
   counts on `MessageComposer` / `FormTextField`, all in 4.1.0.
+- The hero score (4.2.0, owner-approved from a reference): `ScoreGaugeCard(style: .hero)` over
+  `HeroHalfGauge(style: .bleed)`, a gauge wider than the screen with a knob, on a gradient of its
+  colour (`tone: .onColor`) or on the page; `AppTypography.display` for its number. Tenra's
+  Financial Health screen uses it.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.

@@ -16,6 +16,58 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 4.2.0 - 2026-10-13
+
+A hero score at the top of a screen: a half gauge wider than the screen that runs out past both
+edges, with a knob on the value, on a gradient of its colour.
+[#56](https://github.com/dkicekeeper/DesignKit/pull/56)
+
+### Added
+
+- `HeroHalfGauge(style: .bleed)`: a circle wider than the view, only its top `span` degrees (130
+  by default) visible, the arc cut by both edges. It takes the width it is offered (put it edge to
+  edge, without `.screenPadding()`) and its height follows from that width. A knob (a white disc,
+  the colour inside, a soft shadow) marks the value and rides the sweep; 0 and the maximum sit
+  just inside the edges, so the knob shows whole. Zones and the norm are thin notches through the
+  arc. `HeroHalfGaugeSkeleton(style:span:)`.
+- `HeroHalfGauge(tone:)`: `.onSurface` (the default, as before) or `.onColor`, a white arc and a
+  translucent white track for a coloured background.
+- `ScoreGaugeCard(style: .hero)`: the top of a screen, not a card. The bleed gauge, the score in
+  `AppTypography.display`, the grade and the trend in capsules under it, the subtitle below. With
+  `tone: .onColor` (the default for the hero) it lies on a gradient of its colour that reaches up
+  under the navigation bar and fades into the page; `.onSurface` draws on the page.
+  `ScoreGaugeCardSkeleton(style:)`.
+- `ScoreGaugeCard(showsMaximum:)` adds "/100" after the score, and `trend:`
+  (`ScoreGaugeCard.Trend(direction:changePercent:caption:)`) a capsule "↗ +17.0% than last month";
+  both work in the card too.
+- `AppTypography.display`: Inter 72 pt semibold, scaling with `.largeTitle`, for the one number a
+  screen is about.
+
+### Migration
+
+- Nothing changes until an app opts in: `style: .card` and `tone: .onSurface` are the defaults.
+- A score at the top of a screen → the hero, edge to edge; cards below may rise over the fading
+  end of its gradient:
+
+```swift
+ScrollView {
+    VStack(spacing: AppSpacing.lg) {
+        ScoreGaugeCard(score: 84, zoneTicks: [40, 70], grade: "Excellent", color: AppColors.success,
+                       subtitle: "Your financial health", style: .hero, showsMaximum: true,
+                       trend: .init(direction: .up, changePercent: 17, caption: "than last month"))
+        cards
+            .screenPadding()
+            .padding(.top, -AppSpacing.xxl)
+    }
+}
+```
+
+### Gallery and tooling
+
+- The `HeroHalfGauge` page has Style, Tone and Span controls; the `ScoreGaugeCard` page has Style,
+  Tone, "Shows /100" and Trend, and "Open as a screen" shows the hero under a navigation bar with
+  cards over its gradient. Typography lists `display`.
+
 ## 4.1.0 - 2026-10-13
 
 Benchmark round 3: three things the major design systems have and the apps built by hand.
