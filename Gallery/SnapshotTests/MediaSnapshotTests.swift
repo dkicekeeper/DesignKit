@@ -4,6 +4,8 @@
 //
 //  Photos, share cards, offline downloads, articles, the live session bar and the profile card
 //  (2.8.0, from Dalada). The photos are gradients with a symbol, the same on every run.
+//  The particle creature (4.6.0) in its still frames: the harness turns motion off, so each mood
+//  is drawn settled, with the eyes open and looking ahead.
 //
 
 import SwiftUI
@@ -170,6 +172,34 @@ extension ComponentSnapshots {
                     DisclosureChevron()
                 },
                 appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// 4.6.0: the creature's still frames, on the dark it is made for.
+        @Test func particleCreature() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.md) {
+                    HStack(spacing: AppSpacing.md) {
+                        ParticleCreature(mood: .idle).frame(width: 150, height: 150)
+                        ParticleCreature(mood: .thinking).frame(width: 150, height: 150)
+                    }
+                    HStack(spacing: AppSpacing.md) {
+                        ParticleCreature(mood: .answering).frame(width: 150, height: 150)
+                        ParticleCreature(mood: .glyph("₸")).frame(width: 150, height: 150)
+                    }
+                    HStack(spacing: AppSpacing.md) {
+                        ParticleCreature(mood: .love).frame(width: 150, height: 150)
+                        ParticleCreature(mood: .sad).frame(width: 150, height: 150)
+                    }
+                    HStack(spacing: AppSpacing.lg) {
+                        ParticleCreature(mood: .idle, style: .compact).frame(width: 40, height: 40)
+                        ParticleCreature(mood: .happy, style: .compact).frame(width: 40, height: 40)
+                        ParticleCreature(mood: .thinking, style: .compact).frame(width: 28, height: 28)
+                    }
+                }
+                .padding(AppSpacing.lg)
+                .background(Color(white: 0.08), in: .rect(cornerRadius: AppRadius.xl)),
+                appearances: [.light, .dark]
             )
         }
 

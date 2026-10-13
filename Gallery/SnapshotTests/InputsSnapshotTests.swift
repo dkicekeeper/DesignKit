@@ -50,6 +50,31 @@ extension ComponentSnapshots {
 
         /// One composer per snapshot: three glass fields stacked in one picture settled in one of
         /// two layouts from run to run (October 2026), half a pixel apart.
+        /// 4.6.0: the person's message, the other side's, and one that was not sent.
+        @Test func messageBubbles() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.md) {
+                    MessageBubble("How much did I spend on cafés this month?")
+                    MessageBubble("Here is October so far, a little calmer than September.", role: .incoming)
+                    MessageBubble("And on taxis?", failure: "No connection") {}
+                }
+                .frame(width: 360),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// 4.6.0: prompts in one row and wrapped.
+        @Test func suggestionChips() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    SuggestionChips(["Compare with September", "Where can I save?"]) { _ in }
+                    SuggestionChips(["Show my subscriptions", "How are my budgets?", "What did I spend most on?"], systemImage: "sparkles", layout: .wrap) { _ in }
+                }
+                .frame(width: 360, alignment: .leading),
+                appearances: [.light, .dark]
+            )
+        }
+
         @Test func messageComposer() async {
             await assertComponentSnapshot(
                 MessageComposer(text: .constant(""), placeholder: "Add a comment…") {},

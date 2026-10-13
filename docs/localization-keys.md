@@ -45,7 +45,7 @@ text, not keys. A new key goes there as well.
 | `common.changeIcon` | EditableHero (VoiceOver on the icon) | `Change icon` |
 | `common.close` | PhotoViewer (default `closeTitle`), ShareCardSheet (the close button) | `Close` |
 | `common.color` | ColorPickerRow | — |
-| `common.retry` | PendingItemCard (Retry, 3.6.0), LoadMoreFooter (4.1.0) | `Retry` |
+| `common.retry` | PendingItemCard (Retry, 3.6.0), LoadMoreFooter (4.1.0), MessageBubble (a message not sent, 4.6.0) | `Retry` |
 | `common.select` | DateButtons | — |
 | `common.startDate` | DatePickerRow | — |
 | `composer.cancelQuote` | MessageComposer (VoiceOver on the quote's ×) | `Remove quote` |

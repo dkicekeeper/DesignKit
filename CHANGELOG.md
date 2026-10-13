@@ -16,6 +16,32 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 4.6.0 - 2026-10-13
+
+The pieces of a conversation with an assistant: a mascot made of light, message bubbles and
+ready-made prompts. Tenra's AI assistant is the first user.
+
+### Added
+
+- `ParticleCreature(mood:style:level:isInteractive:)`: a character made of a swarm of particles
+  in a dark glass sphere, with eyes. Each mood is a shape: `.listening` ripples with the voice,
+  `.thinking` is a small core inside three gyroscope rings, `.answering` pours into a bar chart,
+  `.glyph("₸")` draws a sign in a ring like a coin, `.celebrating` bursts and gathers back; the
+  eyes carry `.happy`, `.surprised`, `.love`, `.proud`, `.wink`, `.confused`, `.determined`,
+  `.worried`, `.sad`, `.sleepy` and `.asleep`. `.hero` and `.compact` styles; interactive, the
+  eyes follow the finger and a tap scatters the swarm. 30 fps, positions from the time, behind
+  `AmbientMotionGate`. `ParticleCreatureSkeleton`.
+- `MessageBubble(_:role:failure:onRetry:)`: the person's message in the accent on the trailing
+  side, the other side's in grey on the leading side; a message not sent says why, with Retry
+  (`common.retry`). `MessageBubbleSkeleton`.
+- `SuggestionChips(_:systemImage:layout:inset:action:)`: prompts sent with a tap, in one
+  scrolling row or wrapped. `SuggestionChipsSkeleton`.
+
+### Gallery and tooling
+
+- Gallery pages for the three, with every mood, style and state; snapshot tests of the
+  creature's still frames, the bubbles, the chips and their skeletons.
+
 ## 4.5.0 - 2026-10-13
 
 The top of a detail screen on colour: `.heroBackground(color)` behind any hero, with its pieces in

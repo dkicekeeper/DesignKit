@@ -2,7 +2,7 @@
 //  ActionsScreen.swift
 //  DesignKit Gallery
 //
-//  Actions: buttons and the controls that run something.
+//  Actions: buttons and the controls that run something, ready-made prompts.
 //
 
 import SwiftUI
@@ -26,6 +26,7 @@ struct ActionsScreen: View {
         GlassActionMenuPage()
         AmountVisibilityTogglePage()
         UniversalFilterButtonPage()
+        SuggestionChipsPage()
     }
 }
 
@@ -317,6 +318,46 @@ private struct GlassActionMenuPage: View {
             .frame(height: 320)
         } controls: {
             ChoiceControl("Direction", selection: $direction, options: [("Up", .up), ("Leading", .leading)])
+        }
+    }
+}
+
+private struct SuggestionChipsPage: View {
+    @State private var wrap = false
+    @State private var icon = true
+    @State private var lastTapped = "—"
+    @State private var state: SpecimenState = .content
+
+    private let suggestions = ["Compare with September", "Where can I save?", "Show my subscriptions", "How are my budgets?"]
+
+    var body: some View {
+        ComponentPage(
+            name: "SuggestionChips",
+            summary: "Ready-made things to say: chips under an answer or on an empty chat, each one a prompt sent with a tap. Nothing stays selected.",
+            since: "4.6.0",
+            apps: [.tenra],
+            canvas: .fill,
+            notes: [
+                "One scrolling row under an answer (inset: keeps the first chip off the edge); wrapped lines for the prompts of an empty chat.",
+                "A choice that stays selected is a ChipPicker.",
+            ]
+        ) {
+            VStack(alignment: .leading, spacing: AppSpacing.md) {
+                if state == .loading {
+                    SuggestionChipsSkeleton()
+                } else {
+                    SuggestionChips(suggestions, systemImage: icon ? "sparkles" : nil, layout: wrap ? .wrap : .scroll) {
+                        lastTapped = $0
+                    }
+                }
+                Text("Tapped: \(lastTapped)")
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.Text.secondary)
+            }
+        } controls: {
+            StateControl(state: $state)
+            ToggleControl("Wrap", isOn: $wrap)
+            ToggleControl("Icon", isOn: $icon)
         }
     }
 }

@@ -1971,6 +1971,47 @@ The screen dims (black 45%) and an `.ultraThinMaterial` panel (`AppRadius.lg`) s
 spinner in the accent, the title (bodyEmphasis) and a message (secondary). Disable the screen
 under it at the call site. Tenra: restoring a backup.
 
+### Assistant *(4.6.0)*
+
+Pieces of a conversation with an assistant. Tenra's assistant is the first user.
+
+#### `ParticleCreature`
+A character made of light: a swarm of particles in a dark glass sphere, with two eyes made of the
+same light. `mood:` is a shape, not a sticker: `.listening` ripples with `level:` (the voice,
+0…1), `.thinking` gathers into a small core inside three gyroscope rings (each spins in its own
+plane while the plane turns round the centre), `.answering` pours into a bar chart with the eyes
+on the tallest bar, `.glyph("₸")` draws a sign in a ring like a coin, `.celebrating` bursts and
+gathers back. The rest live in the eyes and the sphere's motion: `.happy` (arcs, a bounce),
+`.surprised` (round eyes, a swell), `.love` (hearts, a heartbeat), `.proud` (stars, sparkles),
+`.wink`, `.confused` (eyes of two sizes, a tilt, "?"), `.determined` (a squint), `.worried`
+(brows, amber), `.sad` (a tear), `.sleepy` (a yawn), `.asleep` (closed, dim, z's).
+
+`style: .hero` from about 160 pt: the sphere takes 70% of the square, the rest is room for the
+burst, the chart and the extras. `.compact` from 24 pt (an avatar, a tab icon): fewer particles
+clipped to the glass; the chart, coin and burst show as happy. `isInteractive:` (hero): the eyes
+follow the finger and squint near it, the particles move aside, a tap scatters them and cheers
+the creature up, three quick taps make it dizzy (with a light haptic).
+
+One Canvas at 30 fps (60 while a finger is on it), positions computed from the time; a change of
+mood carries each particle from where it was to the new shape in about 0.7 s, staggered, with a
+small overshoot. Ambient motion: behind `AmbientMotionGate`, one still frame of the mood under
+Reduce Motion, `.designKitMotion(false)` and reduced resource usage. Its colours are its own (its
+identity), not the accent. Decorative: hidden from VoiceOver, say what it is doing in text.
+`ParticleCreatureSkeleton(style:)`: a grey sphere where the glass will be.
+
+#### `MessageBubble`
+`MessageBubble(text, role: .outgoing)`: the person's message on the trailing side in the accent,
+white text; `.incoming` on the leading side in `Background.neutral1`. `AppRadius.xl`, body text,
+selectable, at most the width minus 56 pt on the far side. `failure:` fades the bubble and says
+why under it in red; `onRetry:` adds Retry (`common.retry`). Rich replies are the app's own views.
+`MessageBubbleSkeleton(role:)`.
+
+#### `SuggestionChips`
+Prompts a person can send with a tap: `SuggestionChips(suggestions, systemImage:, layout:) {
+send($0) }`. `.scroll` is one row that scrolls sideways (`inset:` keeps the first chip off the
+edge), `.wrap` lays them in lines (an empty chat). `filterChipStyle()`; nothing stays selected
+(a choice that stays is `ChipPicker`). `SuggestionChipsSkeleton(count:)`.
+
 ### Content Reveal (Loading Transitions)
 
 #### `.contentReveal(isReady:delay:)`

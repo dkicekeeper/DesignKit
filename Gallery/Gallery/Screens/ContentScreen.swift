@@ -3,7 +3,7 @@
 //  DesignKit Gallery
 //
 //  Content and layout: folded text, timeline, month calendar, flow layout, form sections, the
-//  edit sheet and its hero.
+//  edit sheet and its hero, message bubbles.
 //
 
 import SwiftUI
@@ -28,6 +28,7 @@ struct ContentScreen: View {
         EditSheetContainerPage()
         EditableHeroPage()
         ArticleBodyPage()
+        MessageBubblePage()
     }
 }
 
@@ -332,3 +333,40 @@ private struct ArticleBodyPage: View {
 }
 
 #Preview { NavigationStack { ContentScreen() } }
+
+private struct MessageBubblePage: View {
+    @State private var text = "How much did I spend on cafés this month?"
+    @State private var incoming = false
+    @State private var failed = false
+    @State private var state: SpecimenState = .content
+
+    var body: some View {
+        ComponentPage(
+            name: "MessageBubble",
+            summary: "One message in a conversation: the person's own on the right in the accent, the other side's on the left in grey. A message not sent says why, with Retry.",
+            since: "4.6.0",
+            apps: [.tenra],
+            canvas: .fill,
+            notes: [
+                "The bubble grows to about 80% of the width; the text is selectable.",
+                "Rich replies (cards, charts) are the app's own views under an incoming bubble or in its place.",
+            ]
+        ) {
+            if state == .loading {
+                MessageBubbleSkeleton(role: incoming ? .incoming : .outgoing)
+            } else {
+                MessageBubble(
+                    text,
+                    role: incoming ? .incoming : .outgoing,
+                    failure: failed ? "No connection" : nil,
+                    onRetry: failed ? {} : nil
+                )
+            }
+        } controls: {
+            StateControl(state: $state)
+            TextControl("Text", text: $text)
+            ToggleControl("Incoming", isOn: $incoming)
+            ToggleControl("Not sent", isOn: $failed)
+        }
+    }
+}
