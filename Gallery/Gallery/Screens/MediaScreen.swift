@@ -217,15 +217,15 @@ private struct PackedCircleIconsPage: View {
     var body: some View {
         ComponentPage(
             name: "PackedCircleIcons",
-            summary: "Icons sized by their amounts: the accounts of a home card. Glossy marbles (2.9.0), flat circles, a fan of playing cards or an orbit (3.3.0).",
+            summary: "Icons sized by their amounts: the accounts of a home card. Glossy marbles (2.9.0), flat circles, an orbit (3.3.0) or app icons on a shelf (4.4.0).",
             apps: [.tenra],
             notes: [
                 "glossy: marbles packed without overlap; they burst out of the middle and sway. 3.3.0: a softer gloss.",
-                "fan: playing cards along an arc, the largest amount in the middle and in front. Dealt out of a deck; a light runs across them every few seconds.",
+                "shelf (4.4.0): app icons in a row in a pocket, the largest amount on the left, each a little over the one before; every one reads. They rise out of the pocket; a light runs across them every few seconds. A logo fills its tile. As tall as its row; best across a card\u{2019}s width (choosing it sets 300 pt and four). It replaced 3.3.0\u{2019}s fan of cards (.fan is deprecated and draws the shelf).",
                 "orbit: the largest amount in the middle, the rest on a tilted orbit that turns once in 28 s; the far side is smaller and darker.",
-                "Items past Visible fold into a \u{201C}+N\u{201D} circle or card. Under Reduce Motion everything stands still.",
+                "Items past Visible fold into a \u{201C}+N\u{201D} circle or tile. Under Reduce Motion everything stands still.",
             ],
-            styles: ["glossy", "flat", "fan", "orbit"]
+            styles: ["glossy", "flat", "shelf", "orbit"]
         ) {
             if inCard {
                 // As on Tenra's home: the trailing side of a FinanceCard, on Liquid Glass.
@@ -239,11 +239,19 @@ private struct PackedCircleIconsPage: View {
             }
         } controls: {
             StateControl(state: $state)
-            ChoiceControl("Style", selection: $style, options: [("Glossy", .glossy), ("Flat", .flat), ("Fan", .fan), ("Orbit", .orbit)])
+            ChoiceControl("Style", selection: $style, options: [("Glossy", .glossy), ("Flat", .flat), ("Shelf", .shelf), ("Orbit", .orbit)])
             ChoiceControl("Items", selection: $showsLogos, options: [("Symbols", false), ("Logos", true)])
             ToggleControl("In a card", isOn: $inCard)
             StepperControl("Visible", value: $maxVisible, in: 1...7)
-            SliderControl("Width", value: $width, in: 80...200, step: 10) { "\(Int($0)) pt" }
+            SliderControl("Width", value: $width, in: 80...300, step: 10) { "\(Int($0)) pt" }
+        }
+        .onChange(of: style) { _, style in
+            // The shelf is a row: shown wide, four tiles, on its own as in the reference.
+            if style == .shelf {
+                width = 300
+                maxVisible = 4
+                inCard = false
+            }
         }
     }
 

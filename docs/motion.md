@@ -102,7 +102,7 @@ Insert with a spring: `withAnimation(AppAnimation.bouncy) { isShown = true }`.
 | `StreamingText(_:highlights:)` | words arrive one by one, each sliding in out of a blur (`.blurSlideWord`); a word that stays in place keeps its identity, so a refined transcript does not replay | one short transition per new word | a live transcript, text a model is writing |
 | `.cascadeIn(index:)` | cards that arrive together fade in and rise 12 pt, `index × 80 ms` apart (gentle spring); under Reduce Motion the same cadence without the rise | one transition per card | the cards a result brings (Tenra's voice input) |
 | `PackedCircleIcons` (`.glossy`) | the marbles burst out of the middle one after another with a little overshoot, then sway by up to 2 pt, each on its own beat | one spring per marble, then a repeating ease on an offset | the circles of a home card |
-| `PackedCircleIcons` (`.fan`, 3.3.0) | the cards are dealt out of a deck into a fan, one after another; every 4.5 s a light runs across them from the left | one spring per card; a `.shine` per card every 4.5 s | a home card's items as a hand of cards |
+| `PackedCircleIcons` (`.shelf`, 4.4.0) | the tiles rise out of the pocket one after another; a second later, and then every 4.5 s, a light runs across them from the left | one spring per tile; a `.shine` per tile every 4.5 s | a home card's items as app icons in a pocket (it replaced 3.3.0's `.fan`, a hand of cards) |
 | `PackedCircleIcons` (`.orbit`, 3.3.0) | the marbles fly out of the middle onto a tilted orbit, which then turns once in 28 s; the far side smaller and darker, behind the middle marble | one spring per marble, then one linear repeating animation of an angle | a home card's items around the largest one |
 
 **2.6.0: surfaces and moments**

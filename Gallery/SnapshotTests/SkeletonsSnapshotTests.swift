@@ -325,11 +325,11 @@ extension ComponentSnapshots {
             )
         }
 
-        /// `PackedCircleIconsSkeleton` for the fan of cards and the orbit (3.3.0).
+        /// `PackedCircleIconsSkeleton` for the shelf (4.4.0) and the orbit (3.3.0).
         @Test func packedCircleStyleSkeletons() async {
             await assertComponentSnapshot(
                 HStack(spacing: AppSpacing.lg) {
-                    PackedCircleIconsSkeleton(style: .fan)
+                    PackedCircleIconsSkeleton(style: .shelf)
                     PackedCircleIconsSkeleton(style: .orbit)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
