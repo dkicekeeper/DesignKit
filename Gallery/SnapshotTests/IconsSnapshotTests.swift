@@ -100,11 +100,11 @@ extension ComponentSnapshots {
             )
         }
 
-        /// The fan of playing cards and the orbit (3.3.0) with symbols: five items, four shown
-        /// and a "+1". Drawn in their final state: the deal, the flight onto the orbit, its turn
-        /// and the light stand still in snapshots.
+        /// The shelf (4.4.0) and the orbit (3.3.0) with symbols: five items, four shown and a
+        /// "+1". Drawn in their final state: the rise out of the pocket, the flight onto the
+        /// orbit, its turn and the light stand still in snapshots.
         @Test func packedCircleStyles() async {
-            for (name, style) in [("fan", PackedCircleIconsStyle.fan), ("orbit", .orbit)] {
+            for (name, style) in [("shelf", PackedCircleIconsStyle.shelf), ("orbit", .orbit)] {
                 await assertComponentSnapshot(
                     PackedCircleIcons(items: [
                         PackedCircleItem(id: "1", iconSource: .sfSymbol("creditcard.fill"), amount: 1_250_000, tint: AppColors.accent),
@@ -119,10 +119,23 @@ extension ComponentSnapshots {
             }
         }
 
-        /// Logos on the fan's white cards and as the orbit's marbles, in a FinanceCard on Liquid
-        /// Glass as on Tenra's home. One glass card per snapshot.
+        /// The shelf (4.4.0) wide, four logos and no "+N": the tiles at their size, a tenth over
+        /// each other, as in the reference it was drawn from.
+        @Test func packedShelfWide() async {
+            await assertComponentSnapshot(
+                PackedCircleIcons(items: [
+                    PackedCircleItem(id: "1", iconSource: .brandService("Reelio"), amount: 4_990),
+                    PackedCircleItem(id: "2", iconSource: .brandService("Cloudy"), amount: 2_490),
+                    PackedCircleItem(id: "3", iconSource: .brandService("Leafnote"), amount: 1_990),
+                    PackedCircleItem(id: "4", iconSource: .brandService("Tunewave"), amount: 990),
+                ], maxVisible: 4, containerWidth: 320, style: .shelf)
+            )
+        }
+
+        /// Logos as the shelf's tiles and as the orbit's marbles, in a FinanceCard on Liquid Glass
+        /// as on Tenra's home. One glass card per snapshot.
         @Test func packedCircleStyleLogos() async {
-            for (name, style) in [("fan", PackedCircleIconsStyle.fan), ("orbit", .orbit)] {
+            for (name, style) in [("shelf", PackedCircleIconsStyle.shelf), ("orbit", .orbit)] {
                 await assertComponentSnapshot(
                     FinanceCard(title: "Subscriptions", isEmpty: false, emptyTitle: "", subtitle: "6 active") {
                         Text(verbatim: "18 470 ₸")

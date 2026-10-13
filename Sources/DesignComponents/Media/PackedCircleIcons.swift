@@ -9,8 +9,9 @@
 //  the marble's skin. A highlight, shading and a shadow of the item's colour (a logo's main
 //  colour) give it depth, the marbles burst out of the middle and then sway. `.flat` is the
 //  look before 2.9.0. 3.3.0: a softer gloss; two more styles, `.fan` (playing cards fanned
-//  along an arc, PackedCircleIconsFan.swift) and `.orbit` (marbles on a turning orbit,
-//  PackedCircleIconsOrbit.swift).
+//  along an arc) and `.orbit` (marbles on a turning orbit, PackedCircleIconsOrbit.swift).
+//  4.4.0: `.shelf` (app icons in a row in a pocket, PackedCircleIconsShelf.swift) replaces the
+//  fan, whose cards behind the top one barely showed; `.fan` is deprecated and draws the shelf.
 //
 
 import SwiftUI
@@ -43,9 +44,14 @@ public enum PackedCircleIconsStyle: Sendable {
     case glossy
     /// The look before 2.9.0: a symbol on a pale disc of its colour, a logo edge to edge.
     case flat
-    /// Playing cards fanned along an arc (3.3.0): the largest amount in the middle, in front and
-    /// highest, the rest by amount to either side and behind. They are dealt out of a deck, and
-    /// now and then a light runs across them (not under Reduce Motion).
+    /// App icons standing in a row in a pocket (4.4.0): square tiles of one size, the largest
+    /// amount on the left, each a little over the one before and turned a few degrees, cut off
+    /// flat by the box's lower edge so every one reads. A logo fills its tile. They rise out of
+    /// the pocket one after another, and every few seconds a light runs across them (not under
+    /// Reduce Motion).
+    case shelf
+    /// 3.3.0's playing cards fanned along an arc. Since 4.4.0 it draws the shelf.
+    @available(*, deprecated, message: "The fan became the shelf in 4.4.0: app icons in a row in a pocket, every one readable. Use .shelf.")
     case fan
     /// An orbit (3.3.0): the largest amount as a marble in the middle, the rest as smaller marbles
     /// on a tilted orbit around it that turns slowly, the far ones smaller and darker. They fly
@@ -147,10 +153,11 @@ public struct PackedCircleIcons: View {
         switch style {
         case .glossy, .flat:
             packed
-        case .fan:
-            PackedCardFan(items: visible, overflowCount: overflowCount, size: boxSize)
         case .orbit:
             PackedOrbit(items: visible, overflowCount: overflowCount, size: boxSize)
+        default:
+            // `.shelf`, and the deprecated `.fan` (not named, so the package builds clean).
+            PackedShelf(items: visible, overflowCount: overflowCount, size: boxSize)
         }
     }
 
@@ -227,7 +234,7 @@ private struct PackedCircleIcon: View {
             case .flat:
                 Icon(source: iconSource, style: flatStyle)
                     .overlay(Circle().strokeBorder(.background, lineWidth: borderWidth))
-            case .glossy, .fan, .orbit:
+            default:
                 PackedMarble(iconSource: iconSource, tint: tintOverride, diameter: diameter, index: index)
             }
         }
@@ -339,7 +346,7 @@ private struct PackedOverflowBadge: View {
                 }
                 .frame(width: diameter, height: diameter)
                 .overlay(Circle().stroke(.background, lineWidth: borderWidth))
-            case .glossy, .fan, .orbit:
+            default:
                 PackedOverflowMarble(count: count, diameter: diameter, index: index)
             }
         }
@@ -526,8 +533,8 @@ private struct MarbleSway: ViewModifier {
 // MARK: - Skeleton
 
 /// Placeholder of a `PackedCircleIcons` in its style: a few circles of falling sizes packed in
-/// the same box; for `.fan` (3.3.0) grey cards fanned the same way, for `.orbit` a grey middle
-/// circle with three on its orbit.
+/// the same box; for `.shelf` (4.4.0; and the deprecated `.fan`) four grey tiles in a row in the
+/// pocket, for `.orbit` (3.3.0) a grey middle circle with three on its orbit.
 public struct PackedCircleIconsSkeleton: View {
     let containerWidth: CGFloat
     let style: PackedCircleIconsStyle
@@ -543,11 +550,11 @@ public struct PackedCircleIconsSkeleton: View {
         Group {
             switch style {
             case .glossy, .flat: circles
-            case .fan: fan
             case .orbit: orbit
+            default: shelf
             }
         }
-        .frame(width: containerWidth, height: height)
+        .frame(width: containerWidth, height: boxHeight)
         .shimmer()
         .skeletonLoadingLabel()
     }
@@ -567,25 +574,36 @@ public struct PackedCircleIconsSkeleton: View {
         }
     }
 
-    /// Four grey cards fanned as the cards are.
-    private var fan: some View {
-        let slots = PackedFanLayout.slots(ids: ["0", "1", "2", "3"], scales: [1, 0.93, 0.87, 0.8],
-                                          in: CGSize(width: containerWidth, height: height))
+    /// The shelf is as tall as its row, as the component is; the other styles fill the box.
+    private var boxHeight: CGFloat {
+        switch style {
+        case .glossy, .flat, .orbit: height
+        default: PackedShelfLayout.fittedBox(count: 4, in: CGSize(width: containerWidth, height: height)).height
+        }
+    }
+
+    /// Four grey tiles standing in the pocket as the tiles do.
+    private var shelf: some View {
+        let box = PackedShelfLayout.fittedBox(count: 4, in: CGSize(width: containerWidth, height: height))
+        let slots = PackedShelfLayout.slots(ids: ["0", "1", "2", "3"], in: box)
         return ZStack {
             ForEach(slots) { slot in
-                RoundedRectangle(cornerRadius: slot.size.width * PackedFanMetrics.cornerRatio, style: .continuous)
+                let corner = slot.side * PackedShelfMetrics.cornerRatio
+                RoundedRectangle(cornerRadius: corner, style: .continuous)
                     .fill(Skeleton.fill)
-                    // A seam of the background between the cards, so the fan does not merge.
+                    // A seam of the background between the tiles, so the row does not merge.
                     .overlay {
-                        RoundedRectangle(cornerRadius: slot.size.width * PackedFanMetrics.cornerRatio, style: .continuous)
+                        RoundedRectangle(cornerRadius: corner, style: .continuous)
                             .strokeBorder(.background, lineWidth: 1.5)
                     }
-                    .frame(width: slot.size.width, height: slot.size.height)
+                    .frame(width: slot.side, height: slot.side)
                     .rotationEffect(slot.angle)
                     .offset(slot.offset)
-                    .zIndex(Double(slots.count - slot.rank))
+                    .zIndex(Double(slot.position))
             }
         }
+        .frame(width: box.width, height: box.height)
+        .clipShape(PackedPocketShape())
     }
 
     /// A grey middle circle, the orbit's line and three circles on it.

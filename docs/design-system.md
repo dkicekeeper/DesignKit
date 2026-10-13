@@ -690,14 +690,23 @@ FinanceCard(
   is the look before: a symbol on a pale disc of its tint, a logo edge to edge with a thin ring of
   the background. 3.3.0: the gloss is softer (highlight 0.62, rim 0.42, coloured shadow 0.38, from
   0.9 / 0.7 / 0.5; `MarbleGlossMetrics`), and two more styles share the box and the "+N":
-  - **`style: .fan`**: playing cards (63 × 88) fanned along an arc around a centre below the box,
-    every lower edge on one arc. The largest amount takes the middle, in front and highest; the
-    rest follow by amount to either side, the right first, each turned further out, lower in the
-    stack and a little smaller (down to 0.8 of the largest by the square root of its share). A
-    symbol is white on a card of its tint, lit from the upper left, with small copies in two
-    corners; a logo sits on a white card, its corner pips and edge in the logo's main colour;
-    "+N" is a grey card. The cards are dealt out of a deck one after another (a spring, 70 ms
-    apart); every 4.5 s a light (`.shine`) runs across them from the left, card after card.
+  - **`style: .shelf`** *(4.4.0)*: app icons standing in a row in a pocket. Square tiles of one
+    size (corner 0.225 of the side), the largest amount on the left, the rest by amount, "+N"
+    last; each tile stands over the one on its left and covers a tenth of it, turned a few
+    degrees (−6°, 4°, −3°, 5°, …) and lifted a little, never two alike side by side. The box's
+    lower edge is the pocket: it cuts the tiles off flat with 0.74 of each above it, and they
+    darken a little where they go in. The tiles take the height of the box and as much of its
+    width as a tenth's overlap allows; in a narrow box they overlap more (up to 0.3) to stay
+    28 pt wide, and in a wide one they spread with at least 0.06 over each other. The shelf is
+    as tall as its row (up to the box's 100 pt), so a row of small tiles leaves no empty box
+    above it; it reads best across a card's width (about 300 pt, four tiles). A logo fills
+    its tile, as an app icon does (white behind a logo that does not fill its square); a symbol
+    is white on a tile of its tint, lit from the upper left; "+N" is a grey tile. A light catches
+    each tile's upper edge, and each casts a shadow on the one to its left. The tiles rise out of
+    the pocket one after another (a spring, 70 ms apart); a second later a light (`.shine`) runs
+    across them from the left, tile after tile, and again every 4.5 s. It replaced 3.3.0's
+    `.fan` (playing cards along an arc, where the cards behind the top one barely showed):
+    `.fan` is deprecated and draws the shelf.
   - **`style: .orbit`**: the largest amount as a marble in the middle (0.42 of the box's shorter
     side), the rest as smaller marbles on an orbit seen at a slant (flatness 0.4, tilted −12°),
     with its faint line. The orbit turns once in 28 s; a marble on the far side is
@@ -706,7 +715,7 @@ FinanceCard(
 
   The deal, the flight, the light and the turn stand still under Reduce Motion, while the system
   saves resources and under `.designKitMotion(false)`, which draws the final picture.
-  `PackedCircleIconsSkeleton(containerWidth:style:)` draws grey circles, cards or an orbit.
+  `PackedCircleIconsSkeleton(containerWidth:style:)` draws grey circles, tiles on the shelf or an orbit.
 
 #### `RecommendationBox`
 Tinted "lightbulb + advice" callout (icon + text on `color.opacity(0.10)`, `AppRadius.md`). Shared by `CalculationCard` and `TargetProgressCard`. Use for any card-bottom recommendation line.
@@ -1210,7 +1219,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `OrbChart` | `…Skeleton` |
 | `LinearProgressBar`, `ProportionBar`, `MiniProportionBar`, `AmountComparisonBar`, `HeroProportionBar`, `ProgressRing`, `MiniDonut`, `MiniHalfGauge`, `HeroHalfGauge`, `MiniMilestoneGauge`, `HeroMilestoneGauge`, `MiniBarPair`, `HeroBarPair` | `…Skeleton`, with the component's size parameters (`HeroHalfGaugeSkeleton(style: .bleed)`, 4.2.0) |
 | `Icon` | `IconSkeleton(style:)` / `IconSkeleton(size:)` |
-| `Avatar`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIcons` (`style:` for its cards or orbit, 3.3.0), `Badge`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `Rating`, `ChipPicker` | `…Skeleton` |
+| `Avatar`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIcons` (`style:` for its shelf, 4.4.0, or orbit, 3.3.0), `Badge`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `Rating`, `ChipPicker` | `…Skeleton` |
 | `FormattedAmountText`, `ConvertedAmount`, `SpentBudgetText`, `AmountPercentage` | `FormattedAmountTextSkeleton(font:width:)`; `RedactableAmount(isLoading: true)` draws one itself |
 | `HeroSection`, `SectionHeader` (every style) | `HeroSectionSkeleton`, `SectionHeaderSkeleton(style:showsTrailing:showsIcon:)` |
 | `ExpandableText`, `ActivityTimeline`, `MonthCalendar` | `…Skeleton` |

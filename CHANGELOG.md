@@ -16,6 +16,42 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 4.4.0 - 2026-10-13
+
+`PackedCircleIcons(style: .shelf)`: the items as app icons standing in a row in a pocket, every
+one readable, with a light running across them. It replaces 3.3.0's fan of playing cards.
+[#58](https://github.com/dkicekeeper/DesignKit/pull/58)
+
+### Added
+
+- `PackedCircleIcons(style: .shelf)`: square tiles of one size in a row, the largest amount on
+  the left, each a little over the one before and turned a few degrees, cut off flat by the
+  box's lower edge as if they stood in a pocket. A logo fills its tile, as an app icon does; a
+  symbol is white on a tile of its tint; "+N" is a grey tile. The tiles rise out of the pocket
+  one after another, and a light (`.shine`) runs across them a second later and then every
+  4.5 s (not under Reduce Motion). The shelf is as tall as its row, up to the box's 100 pt; it
+  reads best across a card's width. In a narrow box the tiles overlap more to stay 28 pt wide.
+  `PackedCircleIconsSkeleton(style: .shelf)`.
+
+### Changed
+
+- `PackedCircleIcons(style: .fan)` draws the shelf: in the fan, the cards behind the top one
+  barely showed. No app uses `.fan`.
+
+### Deprecated
+
+- `PackedCircleIconsStyle.fan` → `.shelf`.
+
+### Migration
+
+- `PackedCircleIcons(style: .fan)` → `PackedCircleIcons(style: .shelf)`.
+
+### Gallery and tooling
+
+- The `PackedCircleIcons` page offers Shelf in place of Fan, and its Width control reaches
+  300 pt. The shelf's snapshots replace the fan's, with `packedShelfWide` added: four logos on a
+  320 pt shelf.
+
 ## 4.3.0 - 2026-10-13
 
 `ScoreGaugeCard` shows a rate as well as a score, and a change in the score's own units.
