@@ -160,7 +160,6 @@ private struct ScoreCardPage: View {
             }
         } controls: {
             StateControl(state: $state)
-            ChoiceControl("Value", selection: $isRate, options: [("Score 0–100", false), ("Rate 12.4%", true)])
             SliderControl("Score", value: $score, in: 0...100, step: 1)
             ToggleControl("Decodes score", isOn: $decodes)
         }
