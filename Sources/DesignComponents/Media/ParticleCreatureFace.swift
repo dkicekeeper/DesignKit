@@ -51,9 +51,11 @@ struct CreatureFace: Equatable {
     var right = CreatureEye(x: 0.25)
     var mouth = CreatureMouth()
 
-    static let cyan: SIMD3<Double> = [120, 225, 255]
-    static let pink: SIMD3<Double> = [255, 110, 160]
-    static let dimCyan: SIMD3<Double> = [90, 150, 200]
+    static let cyan: SIMD3<Double> = [90, 215, 255]
+    static let pink: SIMD3<Double> = [255, 105, 150]
+    static let dimCyan: SIMD3<Double> = [70, 140, 200]
+    /// The face is drawn this much larger than its numbers: big screen eyes.
+    static let scale: Double = 1.3
 
     /// Both eyes the same, mirrored.
     private static func pair(_ eye: CreatureEye, mouth: CreatureMouth = CreatureMouth()) -> CreatureFace {
@@ -177,17 +179,18 @@ enum CreatureFaceRenderer {
         hero: Bool,
         time: Double
     ) {
-        let glowRadius = radius * (hero ? 0.07 : 0.05)
+        let glowRadius = radius * (hero ? 0.09 : 0.06)
+        let r = radius * CreatureFace.scale
         for (eye, isRight) in [(face.left, false), (face.right, true)] where eye.height > 0.001 && eye.width > 0.001 {
             context.drawLayer { glowing in
                 glowing.addFilter(.shadow(color: color(eye.color, 0.9), radius: glowRadius))
-                drawEye(eye, isRight: isRight, anchor: face.anchor, radius: radius, time: time, in: &glowing)
+                drawEye(eye, isRight: isRight, anchor: face.anchor, radius: r, time: time, in: &glowing)
             }
         }
         if hero, face.mouth.form != .none, face.mouth.width > 0.001 {
             context.drawLayer { glowing in
                 glowing.addFilter(.shadow(color: color(face.left.color, 0.8), radius: glowRadius * 0.7))
-                drawMouth(face.mouth, anchor: face.anchor, radius: radius, color: face.left.color, in: &glowing)
+                drawMouth(face.mouth, anchor: face.anchor, radius: r, color: face.left.color, in: &glowing)
             }
         }
     }
@@ -288,9 +291,9 @@ enum CreatureFaceRenderer {
         }
     }
 
-    /// A tear under an eye, `progress` 0…1 down the cheek.
-    static func tear(at point: CGPoint, radius r: Double, in context: inout GraphicsContext) {
-        let size = r * 0.055
+    /// A tear at `point` (under an eye, on its way down).
+    static func tear(at point: CGPoint, radius: Double, in context: inout GraphicsContext) {
+        let size = radius * CreatureFace.scale * 0.055
         var drop = Path()
         drop.move(to: CGPoint(x: point.x, y: point.y - size * 1.6))
         drop.addQuadCurve(to: CGPoint(x: point.x + size, y: point.y + size * 0.2), control: CGPoint(x: point.x + size, y: point.y - size * 0.6))

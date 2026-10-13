@@ -307,9 +307,10 @@ final class ParticleCreatureEngine {
         if pose == .sad && animated && style == .hero {
             let progress = (t * 0.55).truncatingRemainder(dividingBy: 1)
             let eye = shownFace.left
+            let r = geo.radius * CreatureFace.scale
             tear = CGPoint(
-                x: shownFace.anchor.x + eye.x * geo.radius,
-                y: shownFace.anchor.y + (eye.y + eye.height / 2) * geo.radius + progress * geo.radius * 0.45
+                x: shownFace.anchor.x + eye.x * r,
+                y: shownFace.anchor.y + (eye.y + eye.height / 2) * r + progress * r * 0.45
             )
         }
 
