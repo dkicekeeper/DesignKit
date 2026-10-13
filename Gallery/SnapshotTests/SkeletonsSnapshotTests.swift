@@ -227,6 +227,12 @@ extension ComponentSnapshots {
             )
         }
 
+        /// The hero's skeletons (4.2.0), edge to edge at 360 pt (the widest a snapshot can be).
+        @Test func heroGaugeSkeletons() async {
+            await assertComponentSnapshot(ScoreGaugeCardSkeleton(style: .hero), named: "scoreGaugeHero", appearances: [.light])
+            await assertComponentSnapshot(HeroHalfGaugeSkeleton(style: .bleed, lineWidth: 28), named: "bleedGauge", appearances: [.light])
+        }
+
         @Test func gaugeSkeletons() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {

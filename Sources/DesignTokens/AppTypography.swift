@@ -28,6 +28,12 @@ public enum AppTypography {
     /// (e.g., AmountInputView's dynamic font sizing).
     public static let fontFamily = AppInterFont.family
 
+    // MARK: Display
+
+    /// Display — the one number a screen is about, in a hero (72pt semibold, scales with
+    /// largeTitle; 4.2.0): `ScoreGaugeCard(style: .hero)`'s score. Not for titles.
+    public static let display = Font.custom(AppInterFont.family, size: 72, relativeTo: .largeTitle).weight(.semibold)
+
     // MARK: Headers
 
     /// H1 - Screen titles (34pt bold, scales with largeTitle)

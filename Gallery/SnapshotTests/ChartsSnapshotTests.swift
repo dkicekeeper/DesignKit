@@ -139,6 +139,30 @@ extension ComponentSnapshots {
             )
         }
 
+        /// The bleed half gauge (4.2.0): the arc runs out past both edges, a knob on the value,
+        /// the zones as notches; on the page and on colour. At the default 360 pt, the widest a
+        /// snapshot can be (its window adds 2 × 40 pt and must fit the 440 pt screen).
+        @Test func bleedGauges() async {
+            await assertComponentSnapshot(
+                HeroHalfGauge(value: 0.62, maxValue: 1, zoneTicks: [0.4, 0.7], color: AppColors.success,
+                              style: .bleed, lineWidth: 28, animatesOnAppear: false),
+                named: "onSurface"
+            )
+            await assertComponentSnapshot(
+                HeroHalfGauge(value: 0.84, maxValue: 1, zoneTicks: [0.4, 0.7], color: AppColors.destructive,
+                              style: .bleed, tone: .onColor, lineWidth: 28, animatesOnAppear: false)
+                    .padding(.vertical, AppSpacing.lg)
+                    .background(AppColors.destructive),
+                named: "onColor"
+            )
+            await assertComponentSnapshot(
+                HeroHalfGauge(value: 0, maxValue: 1, color: AppColors.accent, style: .bleed, lineWidth: 28,
+                              animatesOnAppear: false),
+                named: "empty",
+                appearances: [.light]
+            )
+        }
+
         @Test func barPairs() async {
             await assertComponentSnapshot(
                 HStack(alignment: .bottom, spacing: AppSpacing.xl) {

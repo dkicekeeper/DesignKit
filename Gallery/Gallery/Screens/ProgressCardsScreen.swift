@@ -170,33 +170,122 @@ private struct ScoreGaugeCardPage: View {
     @State private var score = 72.0
     @State private var hasData = true
     @State private var decodes = false
+    @State private var style: ScoreGaugeCard.Style = .card
+    @State private var tone: HeroHalfGauge.Tone = .onColor
+    @State private var showsMaximum = false
+    @State private var showsTrend = false
     @State private var state: SpecimenState = .content
 
     var body: some View {
         ComponentPage(
             name: "ScoreGaugeCard",
-            summary: "A score as a hero half-gauge with zones; “not enough data” without a score.",
+            summary: "A score as a hero half-gauge with zones; “not enough data” without a score. .hero is the top of a screen, edge to edge.",
             since: "1.2.0",
             apps: [.tenra],
-            canvas: .fill,
-            notes: ["decodesScore (2.7.0): the score decodes itself as it appears and when it changes."]
+            canvas: style == .hero ? .bleed : .fill,
+            notes: [
+                "decodesScore (2.7.0): the score decodes itself as it appears and when it changes.",
+                ".hero (4.2.0): no card and no .screenPadding(); on colour its gradient reaches up under the navigation bar. “Open as a screen” shows it there.",
+            ],
+            styles: ["card", "hero"]
         ) {
             if state == .loading {
-                ScoreGaugeCardSkeleton()
+                ScoreGaugeCardSkeleton(style: style)
             } else {
-                ScoreGaugeCard(score: hasData ? Int(score) : nil, zoneTicks: [40, 70],
-                               grade: hasData ? (score >= 70 ? "Good" : score >= 40 ? "Fair" : "Low") : "Not enough data",
-                               color: hasData ? (score >= 70 ? AppColors.success : score >= 40 ? AppColors.warning : AppColors.destructive)
-                                   : AppColors.textSecondary,
-                               subtitle: hasData ? "You're on track" : "Add a month of income to see your score",
-                               decodesScore: decodes)
+                ScoreGaugeSample(score: score, hasData: hasData, decodes: decodes, style: style, tone: tone,
+                                 showsMaximum: showsMaximum, showsTrend: showsTrend)
             }
         } controls: {
             StateControl(state: $state)
+            ChoiceControl("Style", selection: $style, options: [("Card", .card), ("Hero", .hero)])
+            if style == .hero {
+                ChoiceControl("Tone", selection: $tone, options: [("On colour", .onColor), ("On surface", .onSurface)])
+            }
             SliderControl("Score", value: $score, in: 0...100, step: 1)
             ToggleControl("Has data", isOn: $hasData)
+            ToggleControl("Shows /100", isOn: $showsMaximum)
+            ToggleControl("Trend", isOn: $showsTrend)
             ToggleControl("Decodes score", isOn: $decodes)
+            NavigationLink {
+                ScoreHeroScreen(score: score, tone: tone)
+            } label: {
+                Label("Open as a screen", systemImage: "iphone")
+                    .font(AppTypography.bodySmall.weight(.medium))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .tint(AppColors.accent)
         }
+    }
+}
+
+/// The score card with the Gallery's grades: Good from 70, Fair from 40, Low below.
+private struct ScoreGaugeSample: View {
+    let score: Double
+    var hasData = true
+    var decodes = false
+    var style: ScoreGaugeCard.Style = .card
+    var tone: HeroHalfGauge.Tone = .onColor
+    var showsMaximum = false
+    var showsTrend = false
+
+    var body: some View {
+        ScoreGaugeCard(score: hasData ? Int(score) : nil, zoneTicks: [40, 70],
+                       grade: hasData ? (score >= 70 ? "Good" : score >= 40 ? "Fair" : "Low") : "Not enough data",
+                       color: hasData ? (score >= 70 ? AppColors.success : score >= 40 ? AppColors.warning : AppColors.destructive)
+                           : AppColors.textSecondary,
+                       subtitle: hasData ? "You're on track" : "Add a month of income to see your score",
+                       decodesScore: decodes,
+                       style: style,
+                       tone: tone,
+                       showsMaximum: showsMaximum,
+                       trend: showsTrend ? .init(direction: .up, changePercent: 17, caption: "than last month") : nil)
+    }
+}
+
+/// `ScoreGaugeCard(style: .hero)` where it lives: the top of a screen under an inline navigation
+/// bar, edge to edge, and glass cards that rise over the bottom of its gradient.
+private struct ScoreHeroScreen: View {
+    let score: Double
+    let tone: HeroHalfGauge.Tone
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: AppSpacing.lg) {
+                ScoreGaugeSample(score: score, style: .hero, tone: tone, showsMaximum: true, showsTrend: true)
+                VStack(spacing: AppSpacing.lg) {
+                    TargetProgressSampleCard(title: "Savings rate", current: 0.18, target: 0.2)
+                    TargetProgressSampleCard(title: "Emergency fund", current: 2.4, target: 3)
+                }
+                .screenPadding()
+                // The cards rise over the fading end of the gradient.
+                .padding(.top, -AppSpacing.xxl)
+            }
+            .padding(.bottom, AppSpacing.lg)
+        }
+        .navigationTitle("Financial health")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+/// A plain glass card with a title and a bar, for the hero screen sample.
+private struct TargetProgressSampleCard: View {
+    let title: String
+    let current: Double
+    let target: Double
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            Text(title)
+                .font(AppTypography.bodyEmphasis)
+                .foregroundStyle(AppColors.textPrimary)
+            LinearProgressBar(value: min(current / target, 1), color: AppColors.success)
+            Text(verbatim: "\(current.formatted(.number.precision(.fractionLength(0...2)))) of \(target.formatted(.number.precision(.fractionLength(0...2))))")
+                .font(AppTypography.caption)
+                .foregroundStyle(AppColors.textSecondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardContentPadding()
+        .cardStyle()
     }
 }
 
