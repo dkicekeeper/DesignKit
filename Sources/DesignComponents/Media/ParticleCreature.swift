@@ -551,7 +551,10 @@ final class ParticleCreatureEngine {
                 x = cos(a) * rr
                 y = sin(a) * rr
             } else {
-                let q = glyphPoints[(p.index * 7919) % glyphPoints.count]
+                // The golden-ratio sequence spreads the particles evenly over the sign's points
+                // (a stride through the scan order lined them up in stripes).
+                let step = fraction(Double(p.index - ringCount) * 0.618_033_988_749_895)
+                let q = glyphPoints[min(glyphPoints.count - 1, Int(step * Double(glyphPoints.count)))]
                 x = q.x * r0 * 1.2
                 y = q.y * r0 * 1.2 + r0 * 0.1
             }
@@ -884,7 +887,8 @@ final class ParticleCreatureEngine {
         var eyesLayer = context
         eyesLayer.blendMode = .plusLighter
         if !hero { eyesLayer.clip(to: glass) }
-        let eyeRadius = hero ? 2.1 * geo.unit : 0.95 * r0 / 15.5
+        // Dots as wide as the gaps between them, so an eye reads as one shape, not columns.
+        let eyeRadius = hero ? 0.03 * r0 : 0.95 * r0 / 15.5
         var whites = Path()
         var tearDrops = Path()
         var glows = Path()
@@ -894,7 +898,7 @@ final class ParticleCreatureEngine {
             let rect = CGRect(x: p.x - radius, y: p.y - radius, width: radius * 2, height: radius * 2)
             if tears[n] { tearDrops.addEllipse(in: rect) } else { whites.addEllipse(in: rect) }
             if hero {
-                let glow = eyeRadius * 2.6
+                let glow = eyeRadius * 2.2
                 glows.addEllipse(in: CGRect(x: p.x - glow, y: p.y - glow, width: glow * 2, height: glow * 2))
             }
         }
