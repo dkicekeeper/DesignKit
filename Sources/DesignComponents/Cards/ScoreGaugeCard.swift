@@ -379,7 +379,10 @@ public struct ScoreGaugeCard: View {
     private func scoreLine(font: Font, maximumFont: Font, maximumColor: Color, color: Color) -> some View {
         if let currency {
             if let value {
-                FormattedAmountText(amount: value, currency: currency, fontSize: font, color: color)
+                // The whole number, smaller when it is long (4.5.1): it is what the hero is
+                // about, so it is never abbreviated to "85K".
+                FormattedAmountText(amount: value, currency: currency, fontSize: font, color: color,
+                                    policy: .full)
                     .lineLimit(1)
                     .minimumScaleFactor(0.4)
             } else {

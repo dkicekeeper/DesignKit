@@ -45,7 +45,8 @@ shelf's tiles are one size in every card.
   behind the navigation bar and the status bar; it started at the bottom of the bar, with the
   mesh's top row carried up behind it.
 - `ScoreGaugeCard(style: .hero)`: a long score ("1 200 000 ₸") ran onto the arc. It is offered
-  only the width inside the arc at the height of its top and shrinks to fit.
+  only the width inside the arc at the height of its top and shrinks to fit; an amount stays
+  whole (`FormattedAmountText(policy: .full)`), never abbreviated to "1.2M".
 
 ### Migration
 
