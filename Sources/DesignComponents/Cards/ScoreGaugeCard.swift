@@ -84,6 +84,7 @@ public struct ScoreGaugeCard: View {
     let tone: HeroHalfGauge.Tone
     let showsMaximum: Bool
     let trend: Trend?
+    let entranceDelay: Double
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -99,6 +100,8 @@ public struct ScoreGaugeCard: View {
     ///     (`.onSurface`). The card is always on its glass.
     ///   - showsMaximum: "/100" after the score.
     ///   - trend: A capsule with the change against an earlier score.
+    ///   - entranceDelay: Seconds before the gauge sweeps and the score appears (4.3.0): a screen
+    ///     that opens with a zoom transition lets it finish first.
     public init(
         score: Int?,
         maxScore: Double = 100,
@@ -110,12 +113,13 @@ public struct ScoreGaugeCard: View {
         style: Style = .card,
         tone: HeroHalfGauge.Tone = .onColor,
         showsMaximum: Bool = false,
-        trend: Trend? = nil
+        trend: Trend? = nil,
+        entranceDelay: Double = 0
     ) {
         self.init(value: score.map(Double.init), fractionDigits: 0, unit: nil, maxScore: maxScore,
                   zoneTicks: zoneTicks, grade: grade, color: color, subtitle: subtitle,
                   decodesScore: decodesScore, style: style, tone: tone, showsMaximum: showsMaximum,
-                  trend: trend)
+                  trend: trend, entranceDelay: entranceDelay)
     }
 
     /// A score with a fraction and a unit (4.3.0): a rate, "12.4%" on a scale of `maxScore`.
@@ -144,7 +148,8 @@ public struct ScoreGaugeCard: View {
         style: Style = .card,
         tone: HeroHalfGauge.Tone = .onColor,
         showsMaximum: Bool = false,
-        trend: Trend? = nil
+        trend: Trend? = nil,
+        entranceDelay: Double = 0
     ) {
         self.value = value
         self.fractionDigits = max(0, fractionDigits)
@@ -159,6 +164,7 @@ public struct ScoreGaugeCard: View {
         self.tone = tone
         self.showsMaximum = showsMaximum
         self.trend = trend
+        self.entranceDelay = max(0, entranceDelay)
     }
 
     public var body: some View {
@@ -181,7 +187,8 @@ public struct ScoreGaugeCard: View {
                     zoneTicks: zoneTicks,
                     color: color,
                     diameter: 220,
-                    lineWidth: 16
+                    lineWidth: 16,
+                    entranceDelay: entranceDelay
                 )
 
                 // Score + grade sit inside the semicircle's interior.
@@ -189,7 +196,7 @@ public struct ScoreGaugeCard: View {
                     scoreLine(font: AppTypography.h1.bold(), maximumFont: AppTypography.h4,
                               maximumColor: AppColors.Text.tertiary)
                         .foregroundStyle(value != nil ? color : AppColors.Text.tertiary)
-                        .materialize(delay: 0.35)
+                        .materialize(delay: entranceDelay + 0.35)
 
                     Text(grade)
                         .font(AppTypography.bodySmall)
@@ -198,11 +205,11 @@ public struct ScoreGaugeCard: View {
                         .padding(.vertical, AppSpacing.xs)
                         .background(AppColors.pale(color))
                         .clipShape(Capsule())
-                        .materialize(delay: 0.45)
+                        .materialize(delay: entranceDelay + 0.45)
 
                     if let trend {
                         trendCapsule(trend, onColor: false)
-                            .materialize(delay: 0.5)
+                            .materialize(delay: entranceDelay + 0.5)
                     }
                 }
             }
@@ -231,13 +238,14 @@ public struct ScoreGaugeCard: View {
                     color: color,
                     style: .bleed,
                     tone: tone,
-                    lineWidth: ScoreHeroMetrics.lineWidth
+                    lineWidth: ScoreHeroMetrics.lineWidth,
+                    entranceDelay: entranceDelay
                 )
 
                 scoreLine(font: AppTypography.display, maximumFont: AppTypography.h3.weight(.regular),
                           maximumColor: onColor ? AppColors.Text.secondaryOnDark : AppColors.Text.tertiary)
                     .foregroundStyle(heroScoreColor)
-                    .materialize(delay: 0.35)
+                    .materialize(delay: entranceDelay + 0.35)
             }
 
             // Side by side; one under the other at accessibility sizes (the 1.3.0 rule).
@@ -253,7 +261,7 @@ public struct ScoreGaugeCard: View {
                     trendCapsule(trend, onColor: onColor)
                 }
             }
-            .materialize(delay: 0.45)
+            .materialize(delay: entranceDelay + 0.45)
 
             Text(subtitle)
                 .font(AppTypography.bodyEmphasis)

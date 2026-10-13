@@ -30,6 +30,8 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 - `ScoreGaugeCard.Trend(direction:change:caption:)`: a change the app formats in the score's own
   units, "+5" points or "−1.6 pp", instead of a percent. `Trend.changeText` holds what the
   capsule shows.
+- `ScoreGaugeCard(entranceDelay:)`: seconds before the gauge sweeps and the score appears, so a
+  screen that opens with a zoom transition shows the entrance after it.
 
 ### Migration
 
