@@ -45,7 +45,8 @@ Gallery/               showcase app (xcodegen; the .xcodeproj is not in git): Fo
                        17 component sections by what a component does (docs/gallery-structure.md);
                        every public component has a ComponentPage — header, preview canvas
                        (light/dark), controls for its parameters and states (Loading = its
-                       skeleton), usage notes; ships to TestFlight (docs/testflight.md)
+                       skeleton), usage notes; an Updates screen reads CHANGELOG.md; ships to
+                       TestFlight (docs/testflight.md)
 Gallery/SnapshotTests/ snapshot tests hosted in the Gallery app; references in __Snapshots__
 scripts/               snapshot-tests.sh (CI and local runs of the snapshot tests)
 Shaders/               Metal sources (Ripple, EdgeGlow, Grain, Holographic, Dissolve) + build.sh;
@@ -55,6 +56,8 @@ Shaders/               Metal sources (Ripple, EdgeGlow, Grain, Holographic, Diss
 Tests/                 swift-testing unit tests (formatting, ExpressionEvaluator, calculator
                        model) — run by CI on an iOS Simulator
 docs/                  design-system.md, charts.md, gotchas.md, localization-keys.md, benchmark.md
+CHANGELOG.md           every release, newest first: what it added and changed, how to move an
+                       app to it (the GitHub Release notes and the Gallery's Updates screen)
 ```
 
 Dependencies only point down the list. One product, `DesignKit`, exports all three modules;
@@ -79,8 +82,8 @@ fails here first (manual runs take `dalada_ref` / `tenra_ref` to check an app br
   design-system code lives. Apps add or change components by PR here (develop with Xcode's
   local package override: drag the local DesignKit folder into the app's project), CI builds
   every consumer, merge → release tag → each app's update workflow bumps it. Tenra's look stays
-  the reference: a visual change to a shared component is a design decision, called out in the
-  release notes.
+  the reference: a visual change to a shared component is a design decision, called out under
+  **Changed** in the release's CHANGELOG.md section.
 - **Before that:** DesignKit was synced FROM Tenra's own copy: three-way merge per file
   (base = the Tenra commit of the previous sync, theirs = Tenra `main`, ours = DesignKit),
   keeping DesignKit's `public` API and parameterization. The log below records those syncs.
@@ -149,23 +152,35 @@ rather than importing an app type.
    then record it with a manual CI run, `record_snapshots: missing` (docs/snapshots.md).
 5. Add any new `String(localized:)` key to `docs/localization-keys.md` and its English value
    to `Gallery/Gallery/Localizable.xcstrings`.
-6. Update `docs/design-system.md` (§0 inventory + the component's section).
+6. Update `docs/design-system.md` (§0 inventory + the component's section), and add the
+   component under **Added** in the release's CHANGELOG.md section (with the app view it
+   replaces under **Migration**).
 7. Push; CI must be green on the package, Gallery, snapshot, Dalada and Tenra jobs.
 
 ## API Stability & Versioning
 
 - Semantic versioning with git tags (`0.2.0`, …). Consumers pin a version (`exact:` or
   `.upToNextMinor(from:)`), never a branch.
-- **Cutting a release:** bump `VERSION` in the PR that should ship. On merge,
-  `.github/workflows/release.yml` tags that commit `X.Y.Z` and creates a GitHub Release with the
-  commits since the previous tag (tags are created by Actions — the Claude session's git proxy
-  only pushes branches). TestFlight's Gallery build carries the same version.
+- **Cutting a release:** bump `VERSION` and add its section at the top of
+  [CHANGELOG.md](CHANGELOG.md) in the PR that should ship. On merge,
+  `.github/workflows/release.yml` tags that commit `X.Y.Z` and creates a GitHub Release whose
+  notes are that section (tags are created by Actions — the Claude session's git proxy only
+  pushes branches). TestFlight's Gallery build carries the same version, with the section as
+  "What to Test", and the Gallery's Updates screen shows it.
+- **A CHANGELOG section** is `## X.Y.Z - YYYY-MM-DD`, a line or two on what the release is with
+  its PR link, then the sections that apply, in this order: `### Added` (new API), `### Changed`
+  (what looks or behaves differently in an app after the bump), `### Deprecated` (old → new),
+  `### Removed` (majors only), `### Fixed`, `### Migration` (what an app changes, old → new, a
+  code block where the API changes) and `### Gallery and tooling`. English, no em dashes, one
+  level of `- ` items. CI's `Changelog` job (`.github/scripts/changelog.py check`) fails when
+  the section for `VERSION` is missing or the format is off.
 - **Never remove or rename public API in a minor release.** Deprecate with
   `@available(*, deprecated, message: "… Use X.")` naming the replacement; remove only in the
   next major, once no consumer uses it. Tenra retiring a component is not a reason to delete it
   here.
-- Visual changes to shared components land in every consumer on its next bump — call them out in
-  the release notes. The changed snapshot PNGs in the PR show exactly what changed.
+- Visual changes to shared components land in every consumer on its next bump: list them under
+  **Changed** in the CHANGELOG section. The changed snapshot PNGs in the PR show exactly what
+  changed.
 
 ## Toolchains & Language
 
@@ -217,6 +232,7 @@ rather than importing an app type.
 | Localized strings used by components | [docs/localization-keys.md](docs/localization-keys.md) |
 | Gallery TestFlight pipeline | [docs/testflight.md](docs/testflight.md) |
 | Snapshot tests: what is covered, recording references, the pinned Xcode | [docs/snapshots.md](docs/snapshots.md) |
+| What each version added and changed, and how to move an app to it (also the Gallery's Updates screen) | [CHANGELOG.md](CHANGELOG.md) |
 | Moving an app to 2.0 (renames, `DSButton`, icon sizes, visual changes) | [docs/migration-2.0.md](docs/migration-2.0.md) |
 | Moving an app to 3.0 (removed names and their replacements, card colours) | [docs/migration-3.0.md](docs/migration-3.0.md) |
 | Moving an app to 4.0 (`SectionHeader.Style.list` removed) | [docs/migration-4.0.md](docs/migration-4.0.md) |

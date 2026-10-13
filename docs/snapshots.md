@@ -60,7 +60,10 @@ Not covered on purpose:
   `NotificationPermissionPrompt`, which is `PromptSheet` with Tenra's wording);
 - `HeroBarPair`'s tooltip: it shows on a tap, and the selection is the view's own state (the
   `Tooltip` itself is covered);
-- screens that need app data.
+- screens that need app data;
+- the Gallery's Updates screen: its text is CHANGELOG.md, which grows with every release, so a
+  picture would need recording each time. `ChangelogTests` (swift-testing, in the same target)
+  checks instead that the bundled file reads into every release and section.
 
 All of them have a specimen in the Gallery.
 

@@ -28,6 +28,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # CHANGELOG.md is well formed and has a section for VERSION, so a release PR carries its
+  # notes (release.yml publishes them; the Gallery's Updates screen shows them).
+  changelog:
+    name: Changelog
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check CHANGELOG.md
+        run: python3 .github/scripts/changelog.py check
+
   package:
     name: Package + Gallery
     runs-on: macos-26
