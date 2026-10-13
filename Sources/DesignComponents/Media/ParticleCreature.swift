@@ -2,14 +2,15 @@
 //  ParticleCreature.swift
 //  DesignKit
 //
-//  A character made of light (4.6.0): a swarm of particles in a dark glass sphere, with two
-//  eyes made of the same light. Its moods are shapes, not stickers. Listening, the swarm
-//  ripples with the voice; thinking, it gathers into a small core with three rings that spin
-//  in their own planes while the planes turn round the centre, like a gyroscope; answering, it
-//  pours into a bar chart with the eyes on the tallest bar; `.glyph("₸")`, it draws a sign in a
-//  ring like a coin. The others (happy, celebrating, surprised, love, proud, wink, confused,
-//  determined, worried, sad, sleepy, asleep) live mostly in the eyes and the sphere's motion:
-//  arcs, hearts, stars, a squint, a tear, a bounce, a heartbeat, a yawn.
+//  A character made of light (4.6.0): a swarm of particles in a dark glass sphere, and a face in
+//  the manner of a desk robot's screen: two glowing eyes drawn as solid shapes (a rounded lens
+//  with a top lid and a cheek, an arc, a chevron, a heart, a spiral) and, for some moods, a small
+//  mouth (ParticleCreatureFace.swift). The swarm's moods are shapes: listening, it ripples with
+//  the voice; thinking, it gathers into a small core with three rings that spin in their own
+//  planes while the planes turn round the centre, like a gyroscope; answering, it pours into a
+//  bar chart with the face on the tallest bar; `.glyph("₸")`, it draws a sign in a ring like a
+//  coin. The face carries the rest: ^ ^ for happy, > < for a celebration, hearts, slanted lids
+//  for cross, worried and sad, half-closed lids for sleepy, a wink with a tongue, a tear.
 //
 //  Two styles: `.hero`, the full creature with its glow, the links between the nearest
 //  particles and its extras (z's, hearts, sparkles, a question mark); `.compact`, a small
@@ -35,7 +36,7 @@ import UIKit
 import DesignTokens
 import DesignSupport
 
-/// A creature made of a swarm of light in a glass sphere, with eyes and moods.
+/// A creature made of a swarm of light in a glass sphere, with a glowing face and moods.
 ///
 /// ```swift
 /// ParticleCreature(mood: isThinking ? .thinking : .idle)          // hero
@@ -53,33 +54,33 @@ public struct ParticleCreature: View {
     public enum Mood: Hashable, Sendable {
         /// At rest: the sphere breathes, the eyes glance around and blink.
         case idle
-        /// Listening: the swarm ripples with the voice (`level:`), the eyes open wide.
+        /// Listening: the swarm ripples with the voice (`level:`), the eyes open wide and pulse.
         case listening
-        /// Thinking: a small core inside three gyroscope rings, the eyes look up.
+        /// Thinking: a small core inside three gyroscope rings, the eyes look up and aside.
         case thinking
         /// An answer is ready: the swarm pours into a bar chart.
         case answering
-        /// Pleased: the eyes smile, the sphere bounces.
+        /// Pleased: ^ ^ eyes and a smile, the sphere bounces.
         case happy
-        /// A goal reached: the swarm bursts out and gathers back, then bounces.
+        /// A goal reached: the swarm bursts out and gathers back, > < eyes and an open mouth.
         case celebrating
-        /// Something unexpected: round eyes, the sphere swells for a moment.
+        /// Something unexpected: round eyes and an "o", the sphere swells for a moment.
         case surprised
         /// Thanked: heart eyes, the sphere beats like a heart, hearts rise.
         case love
-        /// Proud of the person: star eyes and sparkles.
+        /// Proud of the person: smiling eyes, a smile and sparkles.
         case proud
-        /// A joke or a secret: one eye winks, the head tilts.
+        /// A joke or a secret: one eye winks, a tongue out, the head tilts.
         case wink
-        /// Did not understand: eyes of two sizes, the head tilts, a question mark.
+        /// Did not understand: one lid lower, the head tilts, a question mark.
         case confused
-        /// Working hard: a squint, the swarm turns faster.
+        /// Working hard: lids slanted down to the middle, the swarm turns faster.
         case determined
-        /// Concerned: worried brows, an amber colour, the sphere shrinks a little.
+        /// Concerned: lids slanted up, a small frown, amber; the sphere shrinks a little.
         case worried
-        /// Sad: lowered eyes and a tear.
+        /// Sad: lids slanted up, a frown and a tear.
         case sad
-        /// Late in the day: half-closed eyes, a slow yawn.
+        /// Late in the day: half-closed lids, slow blinks, a yawn.
         case sleepy
         /// Asleep: closed eyes, dim and slow, z's rise.
         case asleep
@@ -171,6 +172,8 @@ enum ParticleCreatureMetrics {
     /// How long a change of mood carries the particles, and how much later the last one starts.
     static let transition: Double = 0.5
     static let stagger: Double = 0.2
+    /// How long a change of face takes: lids slide, an eye closes and opens in a new form.
+    static let faceTransition: Double = 0.32
 }
 
 // MARK: - Engine
@@ -190,26 +193,16 @@ final class ParticleCreatureEngine {
         let delay: Double
     }
 
-    private struct EyeDot {
-        let side: Int
-        let index: Int
-        let u: Double
-        let ox: Double
-        let oy: Double
-    }
-
     /// The finger, in the view's coordinates; set by the gesture.
     var pointer: CGPoint?
 
     private var particles: [Particle] = []
-    private var eyes: [EyeDot] = []
-    private var eyesPerSide = 0
     private var builtStyle: ParticleCreature.Style?
     private var builtCount = 0
 
     private var origin: Double?
     private var requested: ParticleCreature.Mood = .idle
-    private var pose: Pose = .idle
+    private var pose: CreaturePose = .idle
     private var poseAt: Double = 0
     private var started = false
     private var blending = false
@@ -218,12 +211,12 @@ final class ParticleCreatureEngine {
 
     private var fromParts: [CGPoint] = []
     private var fromDepth: [Double] = []
-    private var fromEyes: [CGPoint] = []
+    private var fromFace: CreatureFace?
     private var fromPalette: [RGB] = CreaturePalette.idle
     private var fromShell: Double = 1
     private var lastParts: [CGPoint] = []
     private var lastDepth: [Double] = []
-    private var lastEyes: [CGPoint] = []
+    private var lastFace: CreatureFace?
     private var lastPalette: [RGB] = CreaturePalette.idle
     private var lastShell: Double = 1
 
@@ -273,7 +266,7 @@ final class ParticleCreatureEngine {
                 forced = true
             }
         }
-        let shown = animated ? effectivePose(at: t) : Pose(mapped)
+        let shown = animated ? effectivePose(at: t) : CreaturePose(mapped)
         if shown != pose || forced || !started {
             begin(shown, at: t, animated: animated && started)
         }
@@ -301,50 +294,45 @@ final class ParticleCreatureEngine {
             depth[n] = z
         }
 
-        var eyePoints = [CGPoint](repeating: .zero, count: eyes.count)
-        var tears = [Bool](repeating: false, count: eyes.count)
-        for n in eyes.indices {
-            let (point, isTear) = eyeTarget(eyes[n], geo, t: t, cy: cy, gaze: gaze, animated: animated)
-            var placed = point
-            if blending, n < fromEyes.count, !isTear {
-                let delay = Double(eyes[n].index) / Double(max(eyesPerSide - 1, 1)) * 0.12
-                placed = blend(fromEyes[n], point, Self.carry(mt - delay))
-            }
-            eyePoints[n] = placed
-            tears[n] = isTear
+        var faceTarget = CreatureFace.of(pose)
+        faceTarget.anchor = faceAnchor(geo, cy: cy)
+        var face = faceTarget
+        if let fromFace, animated {
+            face = CreatureFace.blend(fromFace, faceTarget, Self.carryFace(mt))
+            if mt > ParticleCreatureMetrics.faceTransition + 0.2 { self.fromFace = nil }
+        }
+        lastFace = face
+        let shownFace = animated ? living(face, geo, t: t, gaze: gaze, level: level) : face
+        var tear: CGPoint?
+        if pose == .sad && animated && style == .hero {
+            let progress = (t * 0.55).truncatingRemainder(dividingBy: 1)
+            let eye = shownFace.left
+            tear = CGPoint(
+                x: shownFace.anchor.x + eye.x * geo.radius,
+                y: shownFace.anchor.y + (eye.y + eye.height / 2) * geo.radius + progress * geo.radius * 0.45
+            )
         }
 
         if blending && mt > ParticleCreatureMetrics.transition + ParticleCreatureMetrics.stagger + 0.3 { blending = false }
         lastParts = parts
         lastDepth = depth
-        lastEyes = eyePoints
         lastPalette = palette
         lastShell = shell
 
         draw(in: &context, geo: geo, style: style, t: t, cy: cy, palette: palette, shell: shell,
-             parts: parts, depth: depth, eyePoints: eyePoints, tears: tears)
+             parts: parts, depth: depth, face: shownFace, tear: tear)
     }
 
     // MARK: Building
 
     private func build(style: ParticleCreature.Style, radius: Double) {
-        let count: Int
-        let perSide: Int
-        let columns: Int
-        switch style {
-        case .hero:
-            count = min(max(Int(radius * 3.4), 150), 400)
-            perSide = 26
-            columns = 3
-        case .compact:
-            count = 90
-            perSide = 10
-            columns = 2
+        let count: Int = switch style {
+        case .hero: min(max(Int(radius * 3.4), 150), 400)
+        case .compact: 90
         }
         guard style != builtStyle || count != builtCount else { return }
         builtStyle = style
         builtCount = count
-        eyesPerSide = perSide
 
         let golden = Double.pi * (3 - 5.0.squareRoot())
         particles = (0..<count).map { i in
@@ -360,29 +348,16 @@ final class ParticleCreatureEngine {
                 delay: Double((i * 37) % 50) / 50
             )
         }
-        let rows = Int((Double(perSide) / Double(columns)).rounded(.up))
-        eyes = (0..<2).flatMap { side in
-            (0..<perSide).map { j in
-                EyeDot(
-                    side: side,
-                    index: j,
-                    u: Double(j) / Double(perSide - 1),
-                    ox: Double(j % columns) / Double(columns - 1) - 0.5,
-                    oy: rows > 1 ? Double(j / columns) / Double(rows - 1) - 0.5 : 0
-                )
-            }
-        }
         lastParts = []
-        lastEyes = []
         lastDepth = []
         blending = false
     }
 
-    private func begin(_ next: Pose, at t: Double, animated: Bool) {
-        if animated && lastParts.count == particles.count && lastEyes.count == eyes.count {
+    private func begin(_ next: CreaturePose, at t: Double, animated: Bool) {
+        fromFace = animated ? lastFace : nil
+        if animated && lastParts.count == particles.count {
             fromParts = lastParts
             fromDepth = lastDepth
-            fromEyes = lastEyes
             fromPalette = lastPalette
             fromShell = lastShell
             blending = true
@@ -404,10 +379,10 @@ final class ParticleCreatureEngine {
         }
     }
 
-    private func effectivePose(at t: Double) -> Pose {
-        let base = Pose(requested)
+    private func effectivePose(at t: Double) -> CreaturePose {
+        let base = CreaturePose(requested)
         if t < dizzyUntil { return .dizzy }
-        let cheerable: [Pose] = [.idle, .listening, .asleep, .sleepy, .sad, .worried]
+        let cheerable: [CreaturePose] = [.idle, .listening, .asleep, .sleepy, .sad, .worried]
         if t - pokeAt < 1.3 && cheerable.contains(base) { return .happy }
         return base
     }
@@ -466,15 +441,6 @@ final class ParticleCreatureEngine {
         let a = fraction(sin(k * 91.7 + 3.1) * 43758.5453)
         let b = fraction(sin(k * 57.3 + 1.7) * 24634.6345)
         return a < 0.25 ? (0, 0) : ((a - 0.5) * 1.5, (b - 0.5) * 0.9)
-    }
-
-    private func blinkClosed(_ t: Double, animated: Bool) -> Bool {
-        guard animated else { return false }
-        if t - pokeAt < 0.3 { return true }
-        if pose == .sleepy { return t.truncatingRemainder(dividingBy: 3) < 0.45 }
-        let c = t.truncatingRemainder(dividingBy: 4.3)
-        if c < 0.13 { return true }
-        return Int((t / 4.3).rounded(.down)) % 3 == 2 && c > 0.22 && c < 0.34
     }
 
     private struct Bars {
@@ -663,96 +629,97 @@ final class ParticleCreatureEngine {
         return CGPoint(x: x, y: y)
     }
 
-    // MARK: Eyes
+    // MARK: Face
 
-    private func eyeTarget(_ e: EyeDot, _ geo: Geometry, t: Double, cy: Double, gaze: (x: Double, y: Double), animated: Bool) -> (CGPoint, Bool) {
-        let r0 = geo.radius
-        let right = e.side == 1
-        let spread = r0 * 0.34
-        let sx = right ? spread / 2 : -spread / 2
-        if pose == .answering {
-            let g = bars(geo)
-            let left = g.x0 + 5 * (g.width + g.gap)
-            let top = g.base - Bars.values[5] * r0 * 1.9
-            let ex = left + g.width / 2 + (right ? r0 * 0.07 : -r0 * 0.07)
-            return (shape(e, .arcUp, ex: ex, ey: top - r0 * 0.15, scale: 0.6, height: 1, t: t, r0: r0), false)
-        }
-        if pose == .glyph {
-            return (shape(e, .arcUp, ex: geo.cx + (right ? r0 * 0.2 : -r0 * 0.2), ey: cy - r0 * 0.55, scale: 0.85, height: 1, t: t, r0: r0), false)
-        }
-        let spec = EyeSpec.of(pose)
-        let kind = right ? spec.right : spec.left
-        let angle = right ? spec.rightAngle : spec.leftAngle
-        let scale = (right ? spec.rightScale : spec.leftScale) ?? spec.scale
-        var height = spec.height
-        var lx = gaze.x
-        var ly = gaze.y
-        if pose == .thinking && animated {
-            ly = -1
-            lx = 0.5 * sin(t * 0.9)
-        }
-        if pose == .asleep || pose == .dizzy {
-            lx = 0
-            ly = 0
-        }
-        let ex = geo.cx + sx + lx * r0 * 0.16
-        let ey = cy - r0 * 0.1 + ly * r0 * 0.1 + spec.dy * r0
-        if pose == .idle, let pointer, hypot(pointer.x - ex, pointer.y - ey) < r0 * 0.35 {
-            height *= 0.55
-        }
-        if pose == .sad && animated && e.side == 0 && e.index == eyesPerSide - 1 {
-            let c = (t * 0.55).truncatingRemainder(dividingBy: 1)
-            return (CGPoint(x: ex, y: ey + r0 * 0.1 + c * r0 * 0.5), true)
-        }
-        var point = shape(e, kind, ex: ex, ey: ey, scale: scale, height: height, t: t, r0: r0)
-        let blinkable = kind == .capsule || kind == .round || kind == .half
-        if blinkable && blinkClosed(t, animated: animated) {
-            point.y = ey + (point.y - ey) * 0.1
-        }
-        if angle != 0 { point = rotated(point, around: CGPoint(x: ex, y: ey), by: angle) }
-        if kind == .capsule && pose != .thinking {
-            point.x = ex + (point.x - ex) * (1 - abs(lx) * 0.25)
-        }
-        let lean = tilt(t)
-        if lean != 0 { point = rotated(point, around: CGPoint(x: geo.cx, y: geo.restY), by: lean) }
-        return (point, false)
+    /// A change of face: quicker than the swarm, with a small overshoot.
+    private static func carryFace(_ elapsed: Double) -> Double {
+        let x = min(max(elapsed / ParticleCreatureMetrics.faceTransition, 0), 1)
+        let s = 1.4
+        let m = x - 1
+        return 1 + (s + 1) * m * m * m + s * m * m
     }
 
-    private func shape(_ e: EyeDot, _ kind: EyeKind, ex: Double, ey: Double, scale: Double, height: Double, t: Double, r0: Double) -> CGPoint {
-        let w = r0 * 0.12 * scale
-        let h = r0 * 0.26 * scale * height
-        let u = e.u
-        switch kind {
-        case .round:
-            let a = u * 2 * .pi
-            let rr = r0 * 0.085 * scale
-            return CGPoint(x: ex + cos(a) * rr, y: ey + sin(a) * rr)
-        case .arcUp:
-            let a = .pi + u * .pi
-            let rr = r0 * 0.085 * scale
-            return CGPoint(x: ex + cos(a) * rr, y: ey + r0 * 0.03 + sin(a) * rr * 0.9)
-        case .line:
-            return CGPoint(x: ex + (u - 0.5) * r0 * 0.15 * scale, y: ey + r0 * 0.04)
-        case .half:
-            return CGPoint(x: ex + e.ox * w * 1.1, y: ey + r0 * 0.03 + abs(e.oy) * h * 0.45)
-        case .heart:
-            let a = u * 2 * .pi
-            let s = r0 * 0.0062 * scale * (1 + 0.08 * max(0, sin(t * 7)))
-            let sa = sin(a)
-            let hy = 13 * cos(a) - 5 * cos(2 * a) - 2 * cos(3 * a) - cos(4 * a)
-            return CGPoint(x: ex + 16 * sa * sa * sa * s, y: ey - hy * s)
-        case .star:
-            let a = u * 2 * .pi
-            let rr = r0 * 0.1 * scale * (0.9 + 0.1 * sin(t * 6))
-            let r = rr * (0.28 + 0.72 * pow(abs(cos(2 * a)), 5))
-            return CGPoint(x: ex + cos(a + t * 0.6) * r, y: ey + sin(a + t * 0.6) * r)
-        case .spiral:
-            let a = u * 4 * .pi + t * 7 * (e.side == 1 ? -1 : 1)
-            let r = r0 * 0.1 * u
-            return CGPoint(x: ex + cos(a) * r, y: ey + sin(a) * r)
-        case .capsule:
-            return CGPoint(x: ex + e.ox * w, y: ey + e.oy * h)
+    /// Where the face sits: on the sphere, over the chart's tallest bar, or over the coin.
+    private func faceAnchor(_ geo: Geometry, cy: Double) -> CGPoint {
+        let r0 = geo.radius
+        switch pose {
+        case .answering:
+            let g = bars(geo)
+            let last = Bars.values.count - 1
+            let left = g.x0 + Double(last) * (g.width + g.gap)
+            return CGPoint(x: left + g.width / 2, y: g.base - Bars.values[last] * r0 * 1.9 - r0 * 0.15)
+        case .glyph:
+            return CGPoint(x: geo.cx, y: cy - r0 * 0.55)
+        default:
+            return CGPoint(x: geo.cx, y: cy - r0 * 0.04)
         }
+    }
+
+    /// What time adds to a face: the gaze, blinks, a squint at the finger, the voice, the
+    /// heartbeat, a little breathing.
+    private func living(_ face: CreatureFace, _ geo: Geometry, t: Double, gaze: (x: Double, y: Double), level: Double?) -> CreatureFace {
+        var face = face
+        var lx = gaze.x
+        var ly = gaze.y
+        switch pose {
+        case .thinking:
+            lx = 0.45 + 0.15 * sin(t * 0.9)
+            ly = -0.6
+        case .asleep, .dizzy, .answering, .glyph:
+            lx = 0
+            ly = 0
+        default:
+            break
+        }
+        // Looking aside turns the head: both eyes slide, the far one a little smaller.
+        face.left.x += lx * 0.1
+        face.right.x += lx * 0.1
+        face.left.y += ly * 0.07
+        face.right.y += ly * 0.07
+        face.left.width *= 1 + 0.08 * lx
+        face.left.height *= 1 + 0.05 * lx
+        face.right.width *= 1 - 0.08 * lx
+        face.right.height *= 1 - 0.05 * lx
+        face.anchor.y += sin(t * 1.3) * geo.radius * 0.012
+
+        let blink = blinkAmount(t)
+        if blink > 0 {
+            if face.left.form == .lens { face.left.height *= 1 - 0.92 * blink }
+            if face.right.form == .lens { face.right.height *= 1 - 0.92 * blink }
+        }
+        if pose == .idle, let pointer, hypot(pointer.x - face.anchor.x, pointer.y - face.anchor.y) < geo.radius * 0.5 {
+            face.left.lid = min(face.left.lid + 0.3, 0.9)
+            face.right.lid = min(face.right.lid + 0.3, 0.9)
+        }
+        if pose == .listening {
+            let voice = level ?? (0.4 + 0.4 * abs(sin(t * 2.7) * sin(t * 1.3 + 1)))
+            face.left.height *= 1 + 0.1 * voice
+            face.right.height *= 1 + 0.1 * voice
+        }
+        if pose == .love {
+            let beat = 1 + 0.1 * (pow(max(0, sin(t * 7)), 8) + 0.6 * pow(max(0, sin(t * 7 - 0.9)), 8))
+            face.left.width *= beat
+            face.left.height *= beat
+            face.right.width *= beat
+            face.right.height *= beat
+        }
+        return face
+    }
+
+    /// 0 open … 1 closed. A blink every 4.3 s, a double one every third time; slow and long
+    /// when sleepy; shut for a moment after a tap.
+    private func blinkAmount(_ t: Double) -> Double {
+        if t - pokeAt < 0.3 { return 1 }
+        if pose == .sleepy {
+            let c = t.truncatingRemainder(dividingBy: 3)
+            return c < 0.5 ? sin(c / 0.5 * .pi) : 0
+        }
+        let c = t.truncatingRemainder(dividingBy: 4.3)
+        let pulse: (Double, Double) -> Double = { start, length in
+            c >= start && c < start + length ? sin((c - start) / length * .pi) : 0
+        }
+        let second = Int((t / 4.3).rounded(.down)) % 3 == 2 ? pulse(0.22, 0.14) : 0
+        return max(pulse(0, 0.14), second)
     }
 
     // MARK: Drawing
@@ -767,8 +734,8 @@ final class ParticleCreatureEngine {
         shell: Double,
         parts: [CGPoint],
         depth: [Double],
-        eyePoints: [CGPoint],
-        tears: [Bool]
+        face: CreatureFace,
+        tear: CGPoint?
     ) {
         let r0 = geo.radius
         let cx = geo.cx
@@ -883,28 +850,17 @@ final class ParticleCreatureEngine {
             }
         }
 
-        // The eyes.
-        var eyesLayer = context
-        eyesLayer.blendMode = .plusLighter
-        if !hero { eyesLayer.clip(to: glass) }
-        // Dots as wide as the gaps between them, so an eye reads as one shape, not columns.
-        let eyeRadius = hero ? 0.03 * r0 : 0.95 * r0 / 15.5
-        var whites = Path()
-        var tearDrops = Path()
-        var glows = Path()
-        for n in eyePoints.indices {
-            let p = eyePoints[n]
-            let radius = tears[n] ? eyeRadius * 1.5 : eyeRadius
-            let rect = CGRect(x: p.x - radius, y: p.y - radius, width: radius * 2, height: radius * 2)
-            if tears[n] { tearDrops.addEllipse(in: rect) } else { whites.addEllipse(in: rect) }
-            if hero {
-                let glow = eyeRadius * 2.2
-                glows.addEllipse(in: CGRect(x: p.x - glow, y: p.y - glow, width: glow * 2, height: glow * 2))
-            }
+        // The face, turned with the head.
+        var faceLayer = context
+        if !hero { faceLayer.clip(to: glass) }
+        let lean = tilt(t)
+        if lean != 0 {
+            faceLayer.translateBy(x: cx, y: geo.restY)
+            faceLayer.rotate(by: .radians(lean))
+            faceLayer.translateBy(x: -cx, y: -geo.restY)
         }
-        eyesLayer.fill(whites, with: .color(.white.opacity(0.95)))
-        if !tearDrops.isEmpty { eyesLayer.fill(tearDrops, with: .color(color(CreaturePalette.tear, 0.95))) }
-        if hero { eyesLayer.fill(glows, with: .color(color(CreaturePalette.eyeGlow, 0.05))) }
+        CreatureFaceRenderer.draw(face, in: &faceLayer, radius: r0, hero: hero, time: t)
+        if let tear { CreatureFaceRenderer.tear(at: tear, radius: r0, in: &faceLayer) }
 
         // The front of the glass: a fresnel rim, coloured edges, highlights.
         if shell > 0.02 {
@@ -1068,7 +1024,7 @@ private struct Geometry {
 // MARK: - Poses, eyes, colours
 
 /// The mood on screen: a requested mood, or a short reaction to a touch.
-private enum Pose: Equatable {
+enum CreaturePose: Equatable {
     case idle, listening, thinking, answering, glyph, celebrating, happy, surprised, love, proud
     case wink, confused, determined, worried, sad, sleepy, asleep, dizzy
 
@@ -1095,43 +1051,6 @@ private enum Pose: Equatable {
     }
 }
 
-private enum EyeKind {
-    case capsule, round, arcUp, line, half, heart, star, spiral
-}
-
-/// Each eye's shape per pose: kind, rotation (positive is clockwise), size, offset.
-private struct EyeSpec {
-    var left: EyeKind = .capsule
-    var right: EyeKind = .capsule
-    var height: Double = 1
-    var scale: Double = 1
-    var leftScale: Double?
-    var rightScale: Double?
-    var leftAngle: Double = 0
-    var rightAngle: Double = 0
-    var dy: Double = 0
-
-    static func of(_ pose: Pose) -> EyeSpec {
-        switch pose {
-        case .idle, .glyph, .answering: EyeSpec()
-        case .listening: EyeSpec(height: 1.2)
-        case .thinking: EyeSpec(height: 0.85)
-        case .happy, .celebrating: EyeSpec(left: .arcUp, right: .arcUp)
-        case .worried: EyeSpec(height: 0.62, leftAngle: -0.35, rightAngle: 0.35, dy: 0.06)
-        case .asleep: EyeSpec(left: .line, right: .line)
-        case .surprised: EyeSpec(left: .round, right: .round, scale: 1.15, dy: -0.03)
-        case .love: EyeSpec(left: .heart, right: .heart)
-        case .proud: EyeSpec(left: .star, right: .star)
-        case .sad: EyeSpec(left: .half, right: .half, leftAngle: -0.32, rightAngle: 0.32, dy: 0.07)
-        case .determined: EyeSpec(height: 0.55, leftAngle: 0.38, rightAngle: -0.38)
-        case .confused: EyeSpec(left: .round, right: .half, leftScale: 1.2, rightScale: 0.8)
-        case .wink: EyeSpec(left: .arcUp, right: .capsule)
-        case .sleepy: EyeSpec(left: .half, right: .half, dy: 0.03)
-        case .dizzy: EyeSpec(left: .spiral, right: .spiral)
-        }
-    }
-}
-
 /// The creature's own colours: four tones per pose for the swarm, and the glass. Its look is
 /// its identity, so these are fixed rather than taken from the accent.
 private enum CreaturePalette {
@@ -1153,7 +1072,7 @@ private enum CreaturePalette {
     static let confused: [RGB] = [[150, 130, 255], [90, 200, 230], [200, 150, 255], [120, 170, 240]]
     static let sleepy: [RGB] = [[140, 130, 210], [110, 140, 210], [170, 160, 225], [100, 115, 190]]
 
-    static func of(_ pose: Pose) -> [RGB] {
+    static func of(_ pose: CreaturePose) -> [RGB] {
         switch pose {
         case .idle, .wink, .dizzy: idle
         case .listening: listening
@@ -1179,8 +1098,6 @@ private enum CreaturePalette {
     static let sweep: RGB = [120, 150, 255]
     static let sweepPeak: RGB = [130, 190, 255]
     static let rim: RGB = [176, 186, 255]
-    static let tear: RGB = [150, 205, 255]
-    static let eyeGlow: RGB = [200, 210, 255]
     static let sleepLetter: RGB = [186, 182, 232]
     static let heart: RGB = [255, 140, 190]
     static let sparkle: RGB = [255, 224, 140]
@@ -1255,12 +1172,6 @@ private func smoothStep(_ x: Double) -> Double {
 
 private func blend(_ a: CGPoint, _ b: CGPoint, _ e: Double) -> CGPoint {
     CGPoint(x: a.x + (b.x - a.x) * e, y: a.y + (b.y - a.y) * e)
-}
-
-private func rotated(_ point: CGPoint, around origin: CGPoint, by angle: Double) -> CGPoint {
-    let dx = point.x - origin.x
-    let dy = point.y - origin.y
-    return CGPoint(x: origin.x + dx * cos(angle) - dy * sin(angle), y: origin.y + dx * sin(angle) + dy * cos(angle))
 }
 
 // MARK: - Skeleton

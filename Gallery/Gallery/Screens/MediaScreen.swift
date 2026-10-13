@@ -149,7 +149,7 @@ private struct ParticleCreaturePage: View {
     var body: some View {
         ComponentPage(
             name: "ParticleCreature",
-            summary: "A character made of light: a swarm of particles in a glass sphere, with eyes. Its moods are shapes: a gyroscope while thinking, a chart for an answer, a coin, hearts, a tear.",
+            summary: "A character made of light: a swarm of particles in a glass sphere with a glowing robot face. Its moods are shapes: a gyroscope while thinking, a chart for an answer, a coin; and faces: ^ ^, > <, hearts, slanted lids, a wink, a tear.",
             since: "4.6.0",
             apps: [.tenra],
             canvas: .dark(minHeight: 340),

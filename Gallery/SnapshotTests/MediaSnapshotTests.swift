@@ -175,25 +175,27 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 4.6.0: the creature's still frames, on the dark it is made for.
+        /// 4.6.0: the creature's still frames, every mood, on the dark it is made for.
         @Test func particleCreature() async {
+            let moods: [ParticleCreature.Mood] = [
+                .idle, .listening, .thinking,
+                .answering, .glyph("₸"), .happy,
+                .celebrating, .surprised, .love,
+                .proud, .wink, .confused,
+                .determined, .worried, .sad,
+                .sleepy, .asleep,
+            ]
             await assertComponentSnapshot(
                 VStack(spacing: AppSpacing.md) {
-                    HStack(spacing: AppSpacing.md) {
-                        ParticleCreature(mood: .idle).frame(width: 150, height: 150)
-                        ParticleCreature(mood: .thinking).frame(width: 150, height: 150)
-                    }
-                    HStack(spacing: AppSpacing.md) {
-                        ParticleCreature(mood: .answering).frame(width: 150, height: 150)
-                        ParticleCreature(mood: .glyph("₸")).frame(width: 150, height: 150)
-                    }
-                    HStack(spacing: AppSpacing.md) {
-                        ParticleCreature(mood: .love).frame(width: 150, height: 150)
-                        ParticleCreature(mood: .sad).frame(width: 150, height: 150)
+                    LazyVGrid(columns: Array(repeating: GridItem(.fixed(100), spacing: AppSpacing.md), count: 3), spacing: AppSpacing.md) {
+                        ForEach(moods.indices, id: \.self) { index in
+                            ParticleCreature(mood: moods[index]).frame(width: 100, height: 100)
+                        }
                     }
                     HStack(spacing: AppSpacing.lg) {
                         ParticleCreature(mood: .idle, style: .compact).frame(width: 40, height: 40)
                         ParticleCreature(mood: .happy, style: .compact).frame(width: 40, height: 40)
+                        ParticleCreature(mood: .love, style: .compact).frame(width: 40, height: 40)
                         ParticleCreature(mood: .thinking, style: .compact).frame(width: 28, height: 28)
                     }
                 }

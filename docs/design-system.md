@@ -1976,15 +1976,24 @@ under it at the call site. Tenra: restoring a backup.
 Pieces of a conversation with an assistant. Tenra's assistant is the first user.
 
 #### `ParticleCreature`
-A character made of light: a swarm of particles in a dark glass sphere, with two eyes made of the
-same light. `mood:` is a shape, not a sticker: `.listening` ripples with `level:` (the voice,
-0…1), `.thinking` gathers into a small core inside three gyroscope rings (each spins in its own
-plane while the plane turns round the centre), `.answering` pours into a bar chart with the eyes
-on the tallest bar, `.glyph("₸")` draws a sign in a ring like a coin, `.celebrating` bursts and
-gathers back. The rest live in the eyes and the sphere's motion: `.happy` (arcs, a bounce),
-`.surprised` (round eyes, a swell), `.love` (hearts, a heartbeat), `.proud` (stars, sparkles),
-`.wink`, `.confused` (eyes of two sizes, a tilt, "?"), `.determined` (a squint), `.worried`
-(brows, amber), `.sad` (a tear), `.sleepy` (a yawn), `.asleep` (closed, dim, z's).
+A character made of light: a swarm of particles in a dark glass sphere, with a desk-robot face
+(`ParticleCreatureFace.swift`). The two eyes are glowing solid shapes: a rounded lens with a top
+lid (its height and slant make it sleepy, cross or sad) and a cheek pushing up from below
+(smiling eyes), or an arc (^), a chevron (> <), a heart, a spiral; some moods add a small mouth
+(a smile, a frown, an "o", a tongue). A change of mood eases every number of the face (lids
+slide, eyes widen); an eye that changes form closes and opens in the new one. Time adds the
+gaze (the far eye a little smaller), blinks (a double one now and then), the heartbeat of heart
+eyes and the voice in listening eyes.
+
+`mood:` is also a shape of the swarm: `.listening` ripples with `level:` (the voice, 0…1),
+`.thinking` gathers into a small core inside three gyroscope rings (each spins in its own plane
+while the plane turns round the centre), `.answering` pours into a bar chart with the face on
+the tallest bar, `.glyph("₸")` draws a sign in a ring like a coin, `.celebrating` bursts and
+gathers back. The face: `.happy` (^ ^, a smile, a bounce), `.celebrating` (> <, an open mouth),
+`.surprised` (round eyes, an "o", a swell), `.love` (hearts, a heartbeat), `.proud` (smiling eyes,
+sparkles), `.wink` (a tongue, a tilt), `.confused` (one lid lower, a tilt, "?"), `.determined`
+(lids slanted down to the middle), `.worried` (lids slanted up, amber), `.sad` (a frown, a tear),
+`.sleepy` (half-closed lids, a yawn), `.asleep` (closed, dim, z's).
 
 `style: .hero` from about 160 pt: the sphere takes 70% of the square, the rest is room for the
 burst, the chart and the extras. `.compact` from 24 pt (an avatar, a tab icon): fewer particles

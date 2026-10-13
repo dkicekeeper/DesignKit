@@ -24,13 +24,15 @@ ready-made prompts. Tenra's AI assistant is the first user.
 ### Added
 
 - `ParticleCreature(mood:style:level:isInteractive:)`: a character made of a swarm of particles
-  in a dark glass sphere, with eyes. Each mood is a shape: `.listening` ripples with the voice,
-  `.thinking` is a small core inside three gyroscope rings, `.answering` pours into a bar chart,
-  `.glyph("₸")` draws a sign in a ring like a coin, `.celebrating` bursts and gathers back; the
-  eyes carry `.happy`, `.surprised`, `.love`, `.proud`, `.wink`, `.confused`, `.determined`,
-  `.worried`, `.sad`, `.sleepy` and `.asleep`. `.hero` and `.compact` styles; interactive, the
-  eyes follow the finger and a tap scatters the swarm. 30 fps, positions from the time, behind
-  `AmbientMotionGate`. `ParticleCreatureSkeleton`.
+  in a dark glass sphere, with a desk-robot face: two glowing eyes drawn as solid shapes (a
+  rounded lens with a top lid and a cheek, an arc, a chevron, a heart, a spiral) and a small
+  mouth for some moods, morphing from one mood to the next. The swarm's moods are shapes:
+  `.listening` ripples with the voice, `.thinking` is a small core inside three gyroscope rings,
+  `.answering` pours into a bar chart, `.glyph("₸")` draws a sign in a ring like a coin,
+  `.celebrating` bursts and gathers back; the face carries `.happy`, `.surprised`, `.love`,
+  `.proud`, `.wink`, `.confused`, `.determined`, `.worried`, `.sad`, `.sleepy` and `.asleep`.
+  `.hero` and `.compact` styles; interactive, the eyes follow the finger and a tap scatters the
+  swarm. 30 fps, positions from the time, behind `AmbientMotionGate`. `ParticleCreatureSkeleton`.
 - `MessageBubble(_:role:failure:onRetry:)`: the person's message in the accent on the trailing
   side, the other side's in grey on the leading side; a message not sent says why, with Retry
   (`common.retry`). `MessageBubbleSkeleton`.
