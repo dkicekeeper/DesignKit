@@ -80,7 +80,7 @@ public struct MetricCard<ChartContent: View>: View {
 
     /// - Parameters:
     ///   - title: One line, secondary.
-    ///   - subtitle: Up to three lines, emphasised.
+    ///   - subtitle: Up to three lines, emphasised; empty leaves it out (4.6.0).
     ///   - unit: After the value, secondary ("%", "days").
     ///   - trend: A badge after the value; it drops under the value when both do not fit.
     ///   - chartPlacement: `.trailing` (a mini chart) or `.bottom` (a full-size chart).
@@ -116,10 +116,12 @@ public struct MetricCard<ChartContent: View>: View {
                     .foregroundStyle(AppColors.Text.secondary)
                     .lineLimit(1)
 
-                Text(subtitle)
-                    .font(AppTypography.bodyEmphasis)
-                    .foregroundStyle(AppColors.Text.primary)
-                    .lineLimit(3)
+                if !subtitle.isEmpty {
+                    Text(subtitle)
+                        .font(AppTypography.bodyEmphasis)
+                        .foregroundStyle(AppColors.Text.primary)
+                        .lineLimit(3)
+                }
 
                 metricRow
             }

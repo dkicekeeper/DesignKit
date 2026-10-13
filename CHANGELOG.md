@@ -37,6 +37,11 @@ ready-made prompts. Tenra's AI assistant is the first user.
 - `SuggestionChips(_:systemImage:layout:inset:action:)`: prompts sent with a tap, in one
   scrolling row or wrapped. `SuggestionChipsSkeleton`.
 
+### Changed
+
+- `MetricCard` with an empty `subtitle` leaves the line out instead of keeping a blank line
+  between the title and the value (an assistant's figure has a label and a value only).
+
 ### Gallery and tooling
 
 - Gallery pages for the three, with every mood, style and state; snapshot tests of the
