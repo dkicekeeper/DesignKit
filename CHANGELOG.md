@@ -16,6 +16,18 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 4.9.0 - 2026-10-14
+
+The message field reads over a busy screen: focused, `MessageComposer` fills almost opaque behind
+the text.
+
+### Changed
+
+- `MessageComposer`: while the field is focused, the glass fills with the raised surface colour
+  (`AppColors.Background.elevation1`) at 94%, so the text no longer mixes with the content
+  scrolling under it (Tenra's assistant, Dalada's comments). Unfocused it is clear glass, as
+  before; the snapshots, all unfocused, do not change.
+
 ## 4.8.0 - 2026-10-14
 
 The assistant moves into the tab bar and its field takes attachments and voice: a still glyph of

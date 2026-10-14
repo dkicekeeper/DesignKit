@@ -1670,6 +1670,9 @@ List { … }
   false), a spinner while `isSending`. The glass corner is concentric with it (radius 20).
 - **Placement:** the glass floats over the content, so use `safeAreaBar` (the scroll edge
   blurs under it), not a `.bar` background; the caller gives the side margins.
+- **Focused** *(4.9.0)*: the glass fills with `AppColors.Background.elevation1` at 94% while the
+  field has focus, so what is typed reads over any content scrolling under it; unfocused it is
+  clear glass again.
 - **Disabled:** `.disabled(true)` greys it out; let the placeholder say why ("Sign in to
   comment").
 - **Quote:** `MessageQuote(title: "Replying to Aida", text: …)`, the same type `CommentRow`
