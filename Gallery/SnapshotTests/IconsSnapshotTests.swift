@@ -100,7 +100,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// The shelf (4.4.0) and the orbit (3.3.0) with symbols: five items, the orbit showing
+        /// The shelf (4.4.0) and the orbit (a carousel since 4.7.0) with symbols: five items, the orbit showing
         /// four and a "+1", the shelf as many 36 pt tiles as fit its 120 pt (three and a "+2",
         /// 4.5.1). Drawn in their final state: the rise out of the pocket, the flight onto the
         /// orbit, its turn and the light stand still in snapshots.
@@ -120,6 +120,21 @@ extension ComponentSnapshots {
             }
         }
 
+        /// The orbit wide (4.7.0): a carousel of six coins of one size, the largest in front, the
+        /// far ones smaller and out of focus, those at the sides turned with their rims showing.
+        @Test func packedOrbitWide() async {
+            await assertComponentSnapshot(
+                PackedCircleIcons(items: [
+                    PackedCircleItem(id: "1", iconSource: .brandService("Reelio"), amount: 4_990),
+                    PackedCircleItem(id: "2", iconSource: .brandService("Cloudy"), amount: 2_490),
+                    PackedCircleItem(id: "3", iconSource: .brandService("Leafnote"), amount: 1_990),
+                    PackedCircleItem(id: "4", iconSource: .brandService("Tunewave"), amount: 990),
+                    PackedCircleItem(id: "5", iconSource: .sfSymbol("creditcard.fill"), amount: 690, tint: AppColors.accent),
+                    PackedCircleItem(id: "6", iconSource: .sfSymbol("banknote.fill"), amount: 390, tint: AppColors.success),
+                ], maxVisible: 6, containerWidth: 320, style: .orbit)
+            )
+        }
+
         /// The shelf (4.4.0) wide, four logos and no "+N": the tiles at their 36 pt (4.5.1), a
         /// tenth over each other, the shelf as wide as its row.
         @Test func packedShelfWide() async {
@@ -133,7 +148,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// Logos as the shelf's tiles and as the orbit's marbles, in a FinanceCard on Liquid Glass
+        /// Logos as the shelf's tiles and as the carousel's coins, in a FinanceCard on Liquid Glass
         /// as on Tenra's home: six items, the shelf's three tiles and a "+3" at the card's
         /// trailing edge (4.5.1). One glass card per snapshot.
         @Test func packedCircleStyleLogos() async {

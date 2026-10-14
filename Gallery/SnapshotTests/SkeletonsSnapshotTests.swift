@@ -341,7 +341,8 @@ extension ComponentSnapshots {
             )
         }
 
-        /// `PackedCircleIconsSkeleton` for the shelf (4.4.0) and the orbit (3.3.0).
+        /// `PackedCircleIconsSkeleton` for the shelf (4.4.0) and the orbit (grey coins on the
+        /// carousel's ring since 4.7.0).
         @Test func packedCircleStyleSkeletons() async {
             await assertComponentSnapshot(
                 HStack(spacing: AppSpacing.lg) {

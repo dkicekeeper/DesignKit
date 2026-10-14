@@ -9,7 +9,8 @@
 //  the marble's skin. A highlight, shading and a shadow of the item's colour (a logo's main
 //  colour) give it depth, the marbles burst out of the middle and then sway. `.flat` is the
 //  look before 2.9.0. 3.3.0: a softer gloss; two more styles, `.fan` (playing cards fanned
-//  along an arc) and `.orbit` (marbles on a turning orbit, PackedCircleIconsOrbit.swift).
+//  along an arc) and `.orbit` (marbles on a turning orbit, PackedCircleIconsOrbit.swift; a
+//  carousel of coins since 4.7.0).
 //  4.4.0: `.shelf` (app icons in a row in a pocket, PackedCircleIconsShelf.swift) replaces the
 //  fan, whose cards behind the top one barely showed; `.fan` is deprecated and draws the shelf.
 //  4.5.1: the shelf's tiles are 36 pt whatever the count; the largest that fit the width show,
@@ -56,9 +57,12 @@ public enum PackedCircleIconsStyle: Sendable {
     /// 3.3.0's playing cards fanned along an arc. Since 4.4.0 it draws the shelf.
     @available(*, deprecated, message: "The fan became the shelf in 4.4.0: app icons in a row in a pocket, every one readable. Use .shelf.")
     case fan
-    /// An orbit (3.3.0): the largest amount as a marble in the middle, the rest as smaller marbles
-    /// on a tilted orbit around it that turns slowly, the far ones smaller and darker. They fly
-    /// out of the middle onto it; under Reduce Motion the orbit stands still.
+    /// A carousel of coins (4.7.0; 3.3.0 drew the largest amount as a marble in the middle with
+    /// the rest on a tilted orbit round it): coins of one size, the largest amount first, on a
+    /// ring seen from slightly above that turns slowly, the front ones large and sharp, the far
+    /// ones smaller and out of focus, each turning its face towards its side and showing its
+    /// rim. A swipe spins it, with inertia and a tick per coin; under Reduce Motion it stands
+    /// still. Give it room: it reads from about 240 pt wide.
     case orbit
 }
 
@@ -538,7 +542,8 @@ private struct MarbleSway: ViewModifier {
 
 /// Placeholder of a `PackedCircleIcons` in its style: a few circles of falling sizes packed in
 /// the same box; for `.shelf` (4.4.0; and the deprecated `.fan`) four grey tiles in a row in the
-/// pocket, for `.orbit` (3.3.0) a grey middle circle with three on its orbit.
+/// pocket, for `.orbit` grey coins on the carousel's ring (4.7.0; 3.3.0: a grey middle circle
+/// with three on its orbit).
 public struct PackedCircleIconsSkeleton: View {
     let containerWidth: CGFloat
     let style: PackedCircleIconsStyle
@@ -616,17 +621,15 @@ public struct PackedCircleIconsSkeleton: View {
         .clipShape(PackedPocketShape())
     }
 
-    /// A grey middle circle, the orbit's line and three circles on it.
+    /// Five grey coins on the carousel's ring, as it stands still (4.7.0).
     private var orbit: some View {
         let geometry = PackedOrbitGeometry(box: CGSize(width: containerWidth, height: height))
         return ZStack {
-            PackedOrbitPath(geometry: geometry)
-            Skeleton.circle(geometry.centreDiameter)
-            ForEach(0..<3, id: \.self) { index in
-                let place = geometry.place(at: PackedOrbitGeometry.startAngle(index, of: 3))
-                Skeleton.circle(geometry.satelliteDiameter * PackedOrbitGeometry.depthScale(place.nearness))
+            ForEach(0..<5, id: \.self) { index in
+                let place = geometry.place(at: PackedOrbitGeometry.angle(index, of: 5))
+                Skeleton.circle(geometry.diameter * place.scale)
                     .offset(place.offset)
-                    .zIndex(Double(place.nearness) * 2 - 1)
+                    .zIndex(place.depth)
             }
         }
     }

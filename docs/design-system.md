@@ -715,15 +715,30 @@ In dark mode `\.heroTone` inside it is `.onColor`, and DesignKit's hero pieces d
     across them from the left, tile after tile, and again every 4.5 s. It replaced 3.3.0's
     `.fan` (playing cards along an arc, where the cards behind the top one barely showed):
     `.fan` is deprecated and draws the shelf.
-  - **`style: .orbit`**: the largest amount as a marble in the middle (0.42 of the box's shorter
+  - **`style: .orbit`** *(4.7.0, from an owner's reference)*: a carousel of coins. Coins of one
+    size (0.5 of the box's height, at most 0.3 of its width), the largest amount in front, the
+    rest round a ring seen from slightly above (the far side 0.38 of the height higher, so the far
+    coins show over the near ones; at rest turned 15°, so none stands straight behind another)
+    that turns to the right in front, once in 24 s. Depth is focus and size: a coin at the back
+    is 0.62 of the front one and out of focus (blur up to 0.07 of its diameter), a front one sharp with a
+    soft shadow. A coin turns its face towards the side it is on (up to 55° at the sides, face on
+    again at the back, so none shows its back), its rim (0.07 of the diameter, light plastic in
+    light mode, darker in dark mode) showing out from behind it and along the bottom; a sheen
+    crosses each face from the upper left. Each coin is tilted a few degrees and bobs on its own
+    beat. A logo fills its coin, a symbol is white on a coin of its tint, "+N" grey. A swipe
+    across spins the ring (up and down is left to a scroll view), it coasts with the fling's
+    speed and settles back to its pace in about a second, with a tick (`HapticCue.tick`) as each
+    coin passes the front. The coins come in one after another. Under Reduce Motion it stands
+    still and a swipe turns it without the coast. Reads from about 240 pt wide.
+    *(Before 4.7.0:)* the largest amount as a marble in the middle (0.42 of the box's shorter
     side), the rest as smaller marbles on an orbit seen at a slant (flatness 0.4, tilted −12°),
-    with its faint line. The orbit turns once in 28 s; a marble on the far side is
-    smaller (0.72) and darker and passes behind the middle one, a near one in front. The marbles
-    fly out of the middle onto it, then the turn starts. They do not sway.
+    with its faint line. The orbit turned once in 28 s; a marble on the far side was
+    smaller (0.72) and darker and passed behind the middle one, a near one in front. The marbles
+    flew out of the middle onto it, then the turn started.
 
   The deal, the flight, the light and the turn stand still under Reduce Motion, while the system
   saves resources and under `.designKitMotion(false)`, which draws the final picture.
-  `PackedCircleIconsSkeleton(containerWidth:style:)` draws grey circles, tiles on the shelf or an orbit.
+  `PackedCircleIconsSkeleton(containerWidth:style:)` draws grey circles, tiles on the shelf or grey coins on the carousel's ring.
 
 #### `RecommendationBox`
 Tinted "lightbulb + advice" callout (icon + text on `color.opacity(0.10)`, `AppRadius.md`). Shared by `CalculationCard` and `TargetProgressCard`. Use for any card-bottom recommendation line.
@@ -1659,7 +1674,7 @@ List { … }
   comment").
 - **Quote:** `MessageQuote(title: "Replying to Aida", text: …)`, the same type `CommentRow`
   shows in a reply; the × calls `onCancelQuote`.
-- **Attach and voice** *(4.7.0)*: `leading:` puts a button or a menu inside the glass before the
+- **Attach and voice** *(4.8.0)*: `leading:` puts a button or a menu inside the glass before the
   text, with `MessageComposerAccessory(systemImage:)` as its label (an icon in a circle the size
   of the send button, so they line up); `onVoice:` puts an accent microphone in the send
   button's place while the text is blank, and the send button comes back with the first
@@ -1678,7 +1693,7 @@ MessageComposer(text: $draft, placeholder: String(localized: "assistant.composer
 ```
 
 - VoiceOver: keys `composer.send` ("Send"), `composer.cancelQuote` ("Remove quote") and
-  `composer.voice` ("Dictate", 4.7.0).
+  `composer.voice` ("Dictate", 4.8.0).
 - An input: no skeleton.
 
 #### `FlowLayout` *(0.7.0)*
@@ -1996,7 +2011,8 @@ under it at the call site. Tenra: restoring a backup.
 Pieces of a conversation with an assistant. Tenra's assistant is the first user.
 
 #### `ParticleCreature`
-A character made of light: a swarm of particles in a dark glass sphere, with a desk-robot face
+A character made of light: a swarm of particles in the shape of a sphere, its outline a thin rim
+of light with a glow round it *(4.7.0; a dark glass sphere held the swarm before)*, with a desk-robot face
 (`ParticleCreatureFace.swift`). The two eyes are glowing solid shapes: a rounded lens with a top
 lid (its height and slant make it sleepy, cross or sad) and a cheek pushing up from below
 (smiling eyes), or an arc (^), a chevron (> <), a heart, a spiral; some moods add a small mouth
@@ -2026,20 +2042,25 @@ mood carries each particle from where it was to the new shape in about 0.7 s, st
 small overshoot. Ambient motion: behind `AmbientMotionGate`, one still frame of the mood under
 Reduce Motion, `.designKitMotion(false)` and reduced resource usage. Its colours are its own (its
 identity), not the accent. Decorative: hidden from VoiceOver, say what it is doing in text.
-`ParticleCreatureSkeleton(style:)`: a grey sphere where the glass will be.
+`ParticleCreatureSkeleton(style:)`: a grey sphere where the swarm will be.
 
-*(4.6.1)* It follows the colour scheme. In dark mode it is all light: the swarm glows (added
-light, `.plusLighter`) on the glass and on the page, with a light on the ground. In light mode
-the glass stays dark, an object on the page, and the swarm on it still glows; but light added to
-a white page is lost, so what lies on the page is drawn in ink, with normal blending: the
-particles outside the glass (the bar chart, a burst) 30% deeper and more opaque, without halos;
-the z's, hearts, sparkles and "?" in deeper colours (`CreatureInk`); the face, once its glass has
-faded for the chart, 45% deeper with a fainter glow; and a soft shadow under the sphere instead
-of the light. As the glass fades the swarm on it passes from light to ink. `.compact` is clipped
-to its glass and looks the same in both. On a dark surface in light mode, set
-`.environment(\.colorScheme, .dark)` on it.
+*(4.7.0, from the owner's references of a sphere made of light)* No glass: the sphere is the
+swarm itself, held together by a glow of its colour round it (`CreatureGlow`: 0.2 at the centre,
+out to 1.9 sphere radii, the square's edge at most) and a thin rim of light along its outline,
+brightest where the light falls (the lower right, drifting round once in about 25 s) with a
+blurred glow of its own. The shadow (or the light) on the ground is an ellipse of a round
+gradient, soft all round (it had a hard top and bottom). `.compact` has the same glow, inside
+its sphere, and the same rim.
 
-#### `CreatureGlyph` and `CreatureTabLabel` *(4.7.0)*
+*(4.6.1)* It follows the colour scheme. In dark mode it is all light: the swarm, its links, the
+glow and the rim add light (`.plusLighter`), with a light on the ground. On a light page light
+added to white is lost, so everything is drawn in ink, with normal blending (`CreatureInk`): the
+particles 30% deeper and more opaque, without halos, the links and the rim deeper, the face
+and a tear 45% deeper with a fainter glow, the z's, hearts, sparkles and "?" in deeper colours,
+the glow a faint haze (0.08) and a soft shadow under the sphere. On a dark surface in light
+mode, set `.environment(\.colorScheme, .dark)` on it.
+
+#### `CreatureGlyph` and `CreatureTabLabel` *(4.8.0)*
 `CreatureGlyph()` is the creature as a still, one-colour `Shape`: twelve dots in a ring and two
 capsule eyes (`CreatureGlyphMetrics`). For where the live creature cannot go: a tab bar item and
 sizes under the compact style's 24 pt. `CreatureGlyph.templateImage(size:)` (26 pt by default)

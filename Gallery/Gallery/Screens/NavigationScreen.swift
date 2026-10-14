@@ -223,7 +223,7 @@ private struct CreatureTabLabelPage: View {
         ComponentPage(
             name: "CreatureTabLabel",
             summary: "An assistant's tab: ParticleCreature's still glyph (twelve dots and two eyes) over a title, tinted by the bar.",
-            since: "4.7.0",
+            since: "4.8.0",
             apps: [.tenra],
             notes: [
                 "A tab item takes only an image and a text, so the live creature waits inside the screen the tab opens.",

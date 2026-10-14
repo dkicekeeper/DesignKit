@@ -107,7 +107,7 @@ extension ComponentSnapshots {
                                 placeholder: "Add a comment…", limit: 36) {},
                 named: "overLimit"
             )
-            // 4.7.0: the attach slot and the microphone while the text is blank; the send button
+            // 4.8.0: the attach slot and the microphone while the text is blank; the send button
             // comes back with text.
             await assertComponentSnapshot(
                 MessageComposer(

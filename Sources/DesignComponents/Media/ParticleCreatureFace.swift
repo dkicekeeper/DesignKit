@@ -172,7 +172,7 @@ struct CreatureFace: Equatable {
 
 enum CreatureFaceRenderer {
     /// Draws the face; `radius` is the sphere's, `spin` turns sparkles and spirals. `ink`, 0…1:
-    /// how far the face lies on a light page rather than on its glass (4.6.1), its colours deeper
+    /// how far the face is drawn for a light page (4.6.1; 1 there since 4.7.0), its colours deeper
     /// and its glow fainter by as much, so the eyes read on white.
     static func draw(
         _ face: CreatureFace,
@@ -306,7 +306,8 @@ enum CreatureFaceRenderer {
     }
 
     /// A tear at `point` (under an eye, on its way down).
-    static func tear(at point: CGPoint, radius: Double, in context: inout GraphicsContext) {
+    /// A tear at `point`; `ink` as for the face (4.7.0), so it reads on a light page.
+    static func tear(at point: CGPoint, radius: Double, in context: inout GraphicsContext, ink: Double = 0) {
         let size = radius * CreatureFace.scale * 0.055
         var drop = Path()
         drop.move(to: CGPoint(x: point.x, y: point.y - size * 1.6))
@@ -314,8 +315,8 @@ enum CreatureFaceRenderer {
         drop.addArc(center: CGPoint(x: point.x, y: point.y + size * 0.2), radius: size, startAngle: .radians(0), endAngle: .radians(.pi), clockwise: false)
         drop.addQuadCurve(to: CGPoint(x: point.x, y: point.y - size * 1.6), control: CGPoint(x: point.x - size, y: point.y - size * 0.6))
         context.drawLayer { glowing in
-            glowing.addFilter(.shadow(color: color([130, 200, 255], 0.8), radius: size))
-            glowing.fill(drop, with: .color(color([150, 210, 255], 0.95)))
+            glowing.addFilter(.shadow(color: color(inked([130, 200, 255], ink), 0.8 * (1 - CreatureInk.faceGlowCut * ink)), radius: size))
+            glowing.fill(drop, with: .color(color(inked([150, 210, 255], ink), 0.95)))
         }
     }
 

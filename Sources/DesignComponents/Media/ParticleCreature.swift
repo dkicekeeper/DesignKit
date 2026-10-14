@@ -2,7 +2,8 @@
 //  ParticleCreature.swift
 //  DesignKit
 //
-//  A character made of light (4.6.0): a swarm of particles in a dark glass sphere, and a face in
+//  A character made of light (4.6.0): a swarm of particles in the shape of a sphere, its outline
+//  a thin rim of light with a glow round it (4.7.0; a dark glass sphere held it before), and a face in
 //  the manner of a desk robot's screen: two glowing eyes drawn as solid shapes (a rounded lens
 //  with a top lid and a cheek, an arc, a chevron, a heart, a spiral) and, for some moods, a small
 //  mouth (ParticleCreatureFace.swift). The swarm's moods are shapes: listening, it ripples with
@@ -14,7 +15,7 @@
 //
 //  Two styles: `.hero`, the full creature with its glow, the links between the nearest
 //  particles and its extras (z's, hearts, sparkles, a question mark); `.compact`, a small
-//  sphere for an avatar or a tab icon, with fewer particles clipped to the glass and the chart,
+//  sphere for an avatar or a tab icon, with fewer particles kept inside the sphere and the chart,
 //  coin and burst moods shown as happy.
 //
 //  Interactive (`isInteractive:`, hero): the eyes follow the finger and squint when it comes
@@ -28,11 +29,11 @@
 //  `.designKitMotion(false)` or while the system saves resources it is one still frame of the
 //  mood.
 //
-//  Light mode (4.6.1): the glass stays dark, an object on the page, and the swarm on it still
-//  glows; what lies on the page itself (the bar chart, a burst, the extras, the face once the
-//  glass has faded) is drawn in ink, its colours deepened with normal blending, since light
-//  added to a white page is lost; a soft shadow grounds the sphere instead of a light under it.
-//  On a dark surface in light mode, give it `.environment(\.colorScheme, .dark)`.
+//  Light mode (4.6.1; all of it since 4.7.0, when the glass went): light added to a white page
+//  is lost, so the swarm, its links, the rim, the face and the extras are drawn in ink, their
+//  colours deepened with normal blending; the glow becomes a faint haze and a soft shadow
+//  grounds the sphere instead of a light under it. On a dark surface in light mode, give it
+//  `.environment(\.colorScheme, .dark)`.
 //
 //  Tenra's assistant is the first user; which mood each of its states shows stays in the app.
 //
@@ -42,7 +43,7 @@ import UIKit
 import DesignTokens
 import DesignSupport
 
-/// A creature made of a swarm of light in a glass sphere, with a glowing face and moods.
+/// A creature made of a swarm of light in the shape of a sphere, with a glowing face and moods.
 ///
 /// ```swift
 /// ParticleCreature(mood: isThinking ? .thinking : .idle)          // hero
@@ -56,9 +57,8 @@ import DesignSupport
 /// The hero's sphere takes about 70% of the square; the rest is room for the burst, the chart
 /// and the extras. Decorative: hidden from VoiceOver, say what it is doing in text.
 ///
-/// It follows the colour scheme (4.6.1): in light mode what lies on the page around the glass is
-/// drawn in deeper colours; on a dark surface in light mode, set `.environment(\.colorScheme,
-/// .dark)` on it.
+/// It follows the colour scheme (4.6.1): light on a dark page, in deeper colours (ink) on a light
+/// one; on a dark surface in light mode, set `.environment(\.colorScheme, .dark)` on it.
 public struct ParticleCreature: View {
     /// What the creature feels or does.
     public enum Mood: Hashable, Sendable {
@@ -759,50 +759,57 @@ final class ParticleCreatureEngine {
         let center = CGPoint(x: cx, y: cy)
         let sphereRect = CGRect(x: cx - shellRadius, y: cy - shellRadius, width: shellRadius * 2, height: shellRadius * 2)
         let globe = Path(ellipseIn: sphereRect)
-        let glass = Path(ellipseIn: sphereRect.insetBy(dx: shellRadius * 0.03, dy: shellRadius * 0.03))
         let hero = style == .hero
-        /// Light mode, the hero: the page around the glass is light (4.6.1).
-        let inked = hero && onLight
 
-        // The light on the ground; on a light page, a soft shadow.
+        // The shadow on the ground: soft all round, an ellipse of a round gradient. Light of the
+        // swarm's colour in the dark, a shadow on a light page.
         if hero {
             let groundY = geo.restY + r0 * 1.34
             let lift = pose == .happy || pose == .celebrating ? abs(sin(t * 4.2)) : 0
-            let rx = r0 * 1.25 * (1 - lift * 0.2)
-            let ry = r0 * 0.17
-            let ground = inked
-                ? [Color.black.opacity(CreatureInk.shadow * shell * (1 - lift * 0.4)), Color.black.opacity(0)]
-                : [color(palette[0], 0.16 * shell), color(palette[0], 0)]
-            context.fill(
-                Path(ellipseIn: CGRect(x: cx - rx, y: groundY - ry, width: rx * 2, height: ry * 2)),
+            let rx = r0 * 1.3 * (1 - lift * 0.2)
+            let ry = r0 * 0.2
+            let strength = (onLight ? CreatureInk.shadow : CreatureGlow.ground) * shell * (1 - lift * 0.4)
+            let tone = onLight ? RGB(0, 0, 0) : palette[0]
+            var ground = context
+            ground.translateBy(x: cx, y: groundY)
+            ground.scaleBy(x: 1, y: ry / rx)
+            ground.fill(
+                Path(ellipseIn: CGRect(x: -rx, y: -rx, width: rx * 2, height: rx * 2)),
                 with: .radialGradient(
-                    Gradient(colors: ground),
-                    center: CGPoint(x: cx, y: groundY), startRadius: 0, endRadius: r0 * 1.25
+                    Gradient(stops: [
+                        .init(color: color(tone, strength), location: 0),
+                        .init(color: color(tone, strength * 0.45), location: 0.45),
+                        .init(color: color(tone, 0), location: 1),
+                    ]),
+                    center: .zero, startRadius: 0, endRadius: rx
                 )
             )
         }
 
-        // The glass, its inner glow, and the sweep of light while thinking.
+        // The glow round the sphere (4.7.0, where the glass was): light of its colour in the
+        // dark, a faint haze on a light page; and the sweep of light while thinking.
         if shell > 0.02 {
-            var back = context
-            back.opacity = shell
-            back.fill(globe, with: .radialGradient(
-                Gradient(stops: [
-                    .init(color: CreaturePalette.glassLight, location: 0),
-                    .init(color: CreaturePalette.glassMid, location: 0.55),
-                    .init(color: CreaturePalette.glassDeep, location: 1),
-                ]),
-                center: CGPoint(x: cx - shellRadius * 0.3, y: cy - shellRadius * 0.35),
-                startRadius: shellRadius * 0.05, endRadius: shellRadius * 1.35
-            ))
-            back.blendMode = .plusLighter
-            let pulse = 0.75 + 0.25 * sin(t * 2)
-            back.fill(globe, with: .radialGradient(
-                Gradient(colors: [color(palette[0], 0.17 * pulse), color(palette[0], 0)]),
-                center: center, startRadius: 0, endRadius: shellRadius * 0.85
-            ))
-            if pose == .thinking {
-                back.fill(globe, with: .conicGradient(
+            var glow = context
+            glow.opacity = shell
+            if !onLight { glow.blendMode = .plusLighter }
+            let pulse = 0.8 + 0.2 * sin(t * 2)
+            let alpha = (onLight ? CreatureGlow.haze : CreatureGlow.halo) * pulse
+            let reach = hero
+                ? min(shellRadius * CreatureGlow.reach, min(geo.width, geo.height) / 2)
+                : shellRadius
+            glow.fill(
+                Path(ellipseIn: CGRect(x: cx - reach, y: cy - reach, width: reach * 2, height: reach * 2)),
+                with: .radialGradient(
+                    Gradient(stops: [
+                        .init(color: color(palette[0], alpha), location: 0),
+                        .init(color: color(palette[0], alpha * 0.6), location: min(0.95, shellRadius / reach * 0.8)),
+                        .init(color: color(palette[0], 0), location: 1),
+                    ]),
+                    center: center, startRadius: 0, endRadius: reach
+                )
+            )
+            if pose == .thinking && !onLight {
+                glow.fill(globe, with: .conicGradient(
                     Gradient(stops: [
                         .init(color: color(CreaturePalette.sweep, 0), location: 0),
                         .init(color: color(CreaturePalette.sweepPeak, 0.12), location: 0.08),
@@ -814,13 +821,12 @@ final class ParticleCreatureEngine {
             }
         }
 
-        // The swarm, bucketed by colour and depth. Light on the glass; on a light page only what
-        // is on the glass, as it fades with it, and the rest in ink below.
+        // The swarm, bucketed by colour and depth: light added in the dark; in ink on a light
+        // page (4.6.1), where light added to white is lost.
         let dim: Double = pose == .asleep ? 0.45 : pose == .sleepy ? 0.7 : 1
         var swarm = context
-        swarm.blendMode = .plusLighter
-        if !hero || inked { swarm.clip(to: glass) }
-        if inked { swarm.opacity = shell }
+        if !onLight { swarm.blendMode = .plusLighter }
+        if !hero { swarm.clip(to: globe) }
         let levels = 6
         var dots = [[Path]](repeating: [Path](repeating: Path(), count: levels), count: 4)
         var halos = [Path](repeating: Path(), count: 4)
@@ -833,41 +839,22 @@ final class ParticleCreatureEngine {
             let p = parts[n]
             let tone = particles[n].tone
             dots[tone][level].addEllipse(in: CGRect(x: p.x - radius, y: p.y - radius, width: radius * 2, height: radius * 2))
-            if hero && z > 0.86 {
+            if hero && !onLight && z > 0.86 {
                 let halo = radius * 2.6
                 halos[tone].addEllipse(in: CGRect(x: p.x - halo, y: p.y - halo, width: halo * 2, height: halo * 2))
             }
         }
-        if !inked || shell > 0.02 {
-            for tone in 0..<4 {
-                for level in 0..<levels where !dots[tone][level].isEmpty {
-                    let zl = (Double(level) + 0.5) / Double(levels)
-                    swarm.fill(dots[tone][level], with: .color(color(whiten(palette[tone], 0.15 * zl), (0.16 + 0.6 * zl) * dim)))
-                }
-                if !halos[tone].isEmpty {
-                    swarm.fill(halos[tone], with: .color(color(whiten(palette[tone], 0.14), 0.035 * dim)))
-                }
+        for tone in 0..<4 {
+            let ink = deepen(palette[tone], CreatureInk.depth)
+            for level in 0..<levels where !dots[tone][level].isEmpty {
+                let zl = (Double(level) + 0.5) / Double(levels)
+                let shade = onLight
+                    ? color(ink, (CreatureInk.nearAlpha + CreatureInk.depthAlpha * zl) * dim)
+                    : color(whiten(palette[tone], 0.15 * zl), (0.16 + 0.6 * zl) * dim)
+                swarm.fill(dots[tone][level], with: .color(shade))
             }
-        }
-        if inked {
-            // In ink: outside the glass, and inside it as far as the glass has faded.
-            func fillInk(_ layer: inout GraphicsContext) {
-                for tone in 0..<4 {
-                    let ink = deepen(palette[tone], CreatureInk.depth)
-                    for level in 0..<levels where !dots[tone][level].isEmpty {
-                        let zl = (Double(level) + 0.5) / Double(levels)
-                        layer.fill(dots[tone][level], with: .color(color(ink, (CreatureInk.nearAlpha + CreatureInk.depthAlpha * zl) * dim)))
-                    }
-                }
-            }
-            var page = context
-            if shell > 0.02 { page.clip(to: glass, options: .inverse) }
-            fillInk(&page)
-            if shell > 0.02 && shell < 0.98 {
-                var fading = context
-                fading.clip(to: glass)
-                fading.opacity = 1 - shell
-                fillInk(&fading)
+            if !halos[tone].isEmpty {
+                swarm.fill(halos[tone], with: .color(color(whiten(palette[tone], 0.14), 0.035 * dim)))
             }
         }
 
@@ -890,76 +877,62 @@ final class ParticleCreatureEngine {
                     links[bucket].addLine(to: pb)
                 }
             }
+            let linkTone = onLight ? deepen(palette[1], CreatureInk.depth) : palette[1]
             for bucket in 0..<3 where !links[bucket].isEmpty {
-                let alpha = (Double(bucket) + 0.5) / 3 * 0.11 * dim
-                swarm.stroke(links[bucket], with: .color(color(palette[1], alpha)), lineWidth: 0.6 * max(geo.unit, 0.6))
+                let alpha = (Double(bucket) + 0.5) / 3 * (onLight ? CreatureInk.links : 0.11) * dim
+                swarm.stroke(links[bucket], with: .color(color(linkTone, alpha)), lineWidth: 0.6 * max(geo.unit, 0.6))
             }
         }
 
-        // The face, turned with the head.
+        // The sphere's outline in light (4.7.0): a thin rim, brightest on the side the light
+        // falls on, which drifts round slowly; with a glow in the dark, in ink on a light page.
+        if shell > 0.02 {
+            let rimTone = onLight ? deepen(palette[0], CreatureInk.depth) : whiten(palette[1], 0.35)
+            let peak = onLight ? CreatureGlow.inkRimPeak : CreatureGlow.rimPeak
+            let floor = onLight ? CreatureGlow.inkRimFloor : CreatureGlow.rimFloor
+            let crest = onLight ? rimTone : whiten(rimTone, 0.55)
+            let light = GraphicsContext.Shading.conicGradient(
+                Gradient(stops: [
+                    .init(color: color(rimTone, floor), location: 0),
+                    .init(color: color(rimTone, peak * 0.7), location: 0.22),
+                    .init(color: color(crest, peak), location: 0.32),
+                    .init(color: color(rimTone, peak * 0.55), location: 0.45),
+                    .init(color: color(rimTone, floor), location: 0.7),
+                    .init(color: color(rimTone, floor), location: 1),
+                ]),
+                center: center,
+                angle: .radians(CreatureGlow.lightAngle + t * CreatureGlow.drift)
+            )
+            let lineWidth = hero ? max(1, 1.5 * geo.scale) : max(0.7, r0 / 22)
+            var rim = context
+            rim.opacity = shell
+            if !onLight {
+                rim.blendMode = .plusLighter
+                rim.drawLayer { halo in
+                    halo.addFilter(.blur(radius: lineWidth * 2.5))
+                    halo.stroke(globe, with: light, lineWidth: lineWidth * 3)
+                }
+            }
+            rim.stroke(globe, with: light, lineWidth: lineWidth)
+        }
+
+        // The face, turned with the head; in ink on a light page.
         var faceLayer = context
-        if !hero { faceLayer.clip(to: glass) }
+        if !hero { faceLayer.clip(to: globe) }
         let lean = tilt(t)
         if lean != 0 {
             faceLayer.translateBy(x: cx, y: geo.restY)
             faceLayer.rotate(by: .radians(lean))
             faceLayer.translateBy(x: -cx, y: -geo.restY)
         }
-        // On a light page, the face is in ink as far as its glass has faded (the bar chart).
-        let faceInk = inked ? 1 - shell : 0
+        let faceInk: Double = onLight ? 1 : 0
         CreatureFaceRenderer.draw(face, in: &faceLayer, radius: r0, hero: hero, time: t, ink: faceInk)
-        if let tear { CreatureFaceRenderer.tear(at: tear, radius: r0, in: &faceLayer) }
-
-        // The front of the glass: a fresnel rim, coloured edges, highlights.
-        if shell > 0.02 {
-            var front = context
-            front.opacity = shell
-            front.fill(globe, with: .radialGradient(
-                Gradient(stops: [
-                    .init(color: color(CreaturePalette.rim, 0), location: 0.78),
-                    .init(color: color(CreaturePalette.rim, 0.22), location: 1),
-                ]),
-                center: center, startRadius: 0, endRadius: shellRadius
-            ))
-            if hero {
-                let s = geo.scale
-                for edge in CreaturePalette.edges {
-                    let ring = Path(ellipseIn: CGRect(
-                        x: cx + edge.dx * s - (shellRadius - 0.6 * s),
-                        y: cy + edge.dy * s - (shellRadius - 0.6 * s),
-                        width: (shellRadius - 0.6 * s) * 2,
-                        height: (shellRadius - 0.6 * s) * 2
-                    ))
-                    front.stroke(ring, with: .color(color(edge.color, edge.alpha)), lineWidth: max(0.5, 1.2 * s))
-                }
-            } else {
-                front.stroke(
-                    Path(ellipseIn: sphereRect.insetBy(dx: 0.3, dy: 0.3)),
-                    with: .color(.white.opacity(0.45)), lineWidth: 0.6 * r0 / 15.5
-                )
-            }
-            let hx = cx - shellRadius * 0.38
-            let hy = cy - shellRadius * 0.5
-            let sheen = Path(ellipseIn: CGRect(x: -shellRadius * 0.42, y: -shellRadius * 0.26, width: shellRadius * 0.84, height: shellRadius * 0.52))
-                .applying(CGAffineTransform(rotationAngle: -0.55).concatenating(CGAffineTransform(translationX: hx, y: hy)))
-            front.fill(sheen, with: .radialGradient(
-                Gradient(colors: [.white.opacity(0.2), .white.opacity(0)]),
-                center: CGPoint(x: hx, y: hy), startRadius: 0, endRadius: shellRadius * 0.42
-            ))
-            let glint = Path(ellipseIn: CGRect(x: -shellRadius * 0.07, y: -shellRadius * 0.035, width: shellRadius * 0.14, height: shellRadius * 0.07))
-                .applying(CGAffineTransform(rotationAngle: -0.6).concatenating(
-                    CGAffineTransform(translationX: cx - shellRadius * 0.48, y: cy - shellRadius * 0.58)))
-            front.fill(glint, with: .color(.white.opacity(0.6)))
-            var arc = Path()
-            arc.addArc(center: center, radius: shellRadius * 0.9, startAngle: .radians(.pi * 0.2), endAngle: .radians(.pi * 0.8), clockwise: false)
-            front.stroke(arc, with: .color(.white.opacity(0.1)), lineWidth: hero ? 3 * geo.scale : r0 / 15.5)
-        }
+        if let tear { CreatureFaceRenderer.tear(at: tear, radius: r0, in: &faceLayer, ink: faceInk) }
 
         if hero { drawExtras(in: &context, geo: geo, t: t, cy: cy, onLight: onLight) }
     }
 
-    /// The z's, hearts, sparkles and question mark beside the glass: on the page, so in ink on a
-    /// light one.
+    /// The z's, hearts, sparkles and question mark beside the sphere: in ink on a light page.
     private func drawExtras(in context: inout GraphicsContext, geo: Geometry, t: Double, cy: Double, onLight: Bool) {
         let s = geo.scale
         let shellRadius = geo.radius * 1.2
@@ -1042,18 +1015,20 @@ final class ParticleCreatureEngine {
     }
 }
 
-/// Light mode (4.6.1): what lies on a light page instead of the dark glass. Light added to white
-/// is lost, so it is drawn with normal blending in deeper colours.
+/// Light mode (4.6.1): the creature on a light page. Light added to white is lost, so it is
+/// drawn with normal blending in deeper colours.
 enum CreatureInk {
     /// How far a particle's colour is taken towards black.
     static let depth: Double = 0.3
     /// A particle's opacity, the far ones fainter: `nearAlpha + depthAlpha × depth`.
     static let nearAlpha: Double = 0.4
     static let depthAlpha: Double = 0.55
+    /// The links' strongest opacity (0.11 in the dark, where they add light).
+    static let links: Double = 0.22
     /// The shadow under the sphere, where the dark draws a light on the ground.
-    static let shadow: Double = 0.16
-    /// The face once its glass has faded (the bar chart): its colours this much deeper, its glow
-    /// this much fainter, so cyan eyes read on white.
+    static let shadow: Double = 0.18
+    /// The face: its colours this much deeper, its glow this much fainter, so cyan eyes read on
+    /// white.
     static let faceDepth: Double = 0.45
     static let faceGlowCut: Double = 0.7
     /// The extras: a lavender z, a pink heart, an amber sparkle, a violet question mark.
@@ -1061,6 +1036,27 @@ enum CreatureInk {
     static let heart: SIMD3<Double> = [228, 70, 138]
     static let sparkle: SIMD3<Double> = [222, 156, 20]
     static let question: SIMD3<Double> = [112, 92, 226]
+}
+
+/// What holds the swarm together since the glass went (4.7.0): a glow round it and a rim of
+/// light along its outline, as in the owner's references of a sphere made of light.
+enum CreatureGlow {
+    /// The glow's opacity at the centre: light in the dark, a haze on a light page.
+    static let halo: Double = 0.2
+    static let haze: Double = 0.08
+    /// How far the hero's glow reaches, in sphere radii (the square's edge at most).
+    static let reach: Double = 1.9
+    /// The light on the ground under the sphere in the dark.
+    static let ground: Double = 0.2
+    /// The rim's opacity where the light falls and on the far side; in the dark and in ink.
+    static let rimPeak: Double = 0.85
+    static let rimFloor: Double = 0.12
+    static let inkRimPeak: Double = 0.6
+    static let inkRimFloor: Double = 0.1
+    /// Where the light falls on the rim (radians, from the right, clockwise: the lower right)
+    /// and how fast it drifts round (radians a second).
+    static let lightAngle: Double = 0.2
+    static let drift: Double = 0.25
 }
 
 // MARK: - Geometry
@@ -1126,7 +1122,7 @@ enum CreaturePose: Equatable {
     }
 }
 
-/// The creature's own colours: four tones per pose for the swarm, and the glass. Its look is
+/// The creature's own colours: four tones per pose for the swarm, and its extras. Its look is
 /// its identity, so these are fixed rather than taken from the accent.
 private enum CreaturePalette {
     typealias RGB = SIMD3<Double>
@@ -1167,21 +1163,12 @@ private enum CreaturePalette {
         }
     }
 
-    static let glassLight = Color(.sRGB, red: 43 / 255, green: 36 / 255, blue: 102 / 255)
-    static let glassMid = Color(.sRGB, red: 18 / 255, green: 15 / 255, blue: 44 / 255)
-    static let glassDeep = Color(.sRGB, red: 6 / 255, green: 5 / 255, blue: 14 / 255)
     static let sweep: RGB = [120, 150, 255]
     static let sweepPeak: RGB = [130, 190, 255]
-    static let rim: RGB = [176, 186, 255]
     static let sleepLetter: RGB = [186, 182, 232]
     static let heart: RGB = [255, 140, 190]
     static let sparkle: RGB = [255, 224, 140]
     static let question: RGB = [206, 198, 255]
-    static let edges: [(color: RGB, alpha: Double, dx: Double, dy: Double)] = [
-        ([255, 90, 140], 0.15, -0.9, 0),
-        ([90, 255, 220], 0.13, 0.9, 0),
-        ([150, 160, 255], 0.22, 0, 0.9),
-    ]
     static let sparkleSpots: [CGPoint] = [
         CGPoint(x: -0.95, y: -0.7), CGPoint(x: 0.92, y: -0.55), CGPoint(x: -0.8, y: 0.75), CGPoint(x: 1.0, y: 0.6),
     ]
@@ -1251,7 +1238,7 @@ private func blend(_ a: CGPoint, _ b: CGPoint, _ e: Double) -> CGPoint {
 
 // MARK: - Skeleton
 
-/// The creature's place while it loads: a grey sphere where the glass will be.
+/// The creature's place while it loads: a grey sphere where the swarm will be.
 public struct ParticleCreatureSkeleton: View {
     let style: ParticleCreature.Style
 

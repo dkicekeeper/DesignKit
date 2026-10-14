@@ -6,7 +6,7 @@
 //  button inside it, an optional quote of the message being answered above the text, and the
 //  send error over the field. (HIG Messages, Material text field with a trailing action.)
 //  Made for Dalada's comments and thread replies; who may write and what sending does stay in
-//  the app. 4.7.0, for Tenra's assistant: a leading slot inside the glass (an attach menu,
+//  the app. 4.8.0, for Tenra's assistant: a leading slot inside the glass (an attach menu,
 //  `MessageComposerAccessory` as its label) and `onVoice:`, a microphone in the send button's
 //  place while the text is blank.
 //
@@ -75,10 +75,10 @@ public struct MessageComposer<Leading: View>: View {
     ///   - limit: The most characters a message may have (4.1.0): the count shows from 80% of
     ///     it, over it the count turns red and sending is off.
     ///   - focus: The host's focus binding, to focus the field from outside (e.g. on "Reply").
-    ///   - leading: Inside the glass before the text (4.7.0): an attach button or menu, with
+    ///   - leading: Inside the glass before the text (4.8.0): an attach button or menu, with
     ///     `MessageComposerAccessory` as its label.
     ///   - onVoice: A microphone takes the send button's place while the text is blank
-    ///     (4.7.0); a tap calls it.
+    ///     (4.8.0); a tap calls it.
     public init(
         text: Binding<String>,
         placeholder: String,
@@ -154,7 +154,9 @@ public struct MessageComposer<Leading: View>: View {
                 }
 
                 HStack(alignment: .bottom, spacing: AppSpacing.sm) {
-                    leading
+                    if hasLeading {
+                        leading
+                    }
 
                     TextField(placeholder, text: $text, axis: .vertical)
                         .lineLimit(1...5)
@@ -163,13 +165,7 @@ public struct MessageComposer<Leading: View>: View {
                         .foregroundStyle(AppColors.Text.primary)
                         .frame(minHeight: MessageComposerMetrics.buttonSize)
 
-                    if showsVoice, let onVoice {
-                        voiceButton(onVoice)
-                            .transition(.scale.combined(with: .opacity))
-                    } else {
-                        sendButton
-                            .transition(.scale.combined(with: .opacity))
-                    }
+                    trailingButton
                 }
             }
             .padding(.leading, hasLeading ? MessageComposerMetrics.inset : AppSpacing.lg)
@@ -182,10 +178,30 @@ public struct MessageComposer<Leading: View>: View {
         .animation(AppAnimation.contentSpring, value: errorMessage)
         .animation(AppAnimation.contentSpring, value: showsCount)
         .animation(AppAnimation.fastAnimation, value: isSendEnabled)
-        .animation(AppAnimation.fastAnimation, value: showsVoice)
     }
 
     // MARK: - Parts
+
+    /// The send button; with `onVoice:`, the microphone in its place while the text is blank.
+    /// Without it the view is the send button alone, as before 4.8.0, so composers that do not
+    /// dictate lay out exactly as they did.
+    @ViewBuilder
+    private var trailingButton: some View {
+        if let onVoice {
+            Group {
+                if showsVoice {
+                    voiceButton(onVoice)
+                        .transition(.scale.combined(with: .opacity))
+                } else {
+                    sendButton
+                        .transition(.scale.combined(with: .opacity))
+                }
+            }
+            .animation(AppAnimation.fastAnimation, value: showsVoice)
+        } else {
+            sendButton
+        }
+    }
 
     private func voiceButton(_ action: @escaping () -> Void) -> some View {
         Button {
@@ -312,7 +328,7 @@ extension MessageComposer where Leading == EmptyView {
     }
 }
 
-/// The label of a button or menu in `MessageComposer`'s leading slot (4.7.0): an icon in a
+/// The label of a button or menu in `MessageComposer`'s leading slot (4.8.0): an icon in a
 /// circle the size of the send button, so it lines up with it.
 ///
 /// ```swift

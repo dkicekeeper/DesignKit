@@ -175,9 +175,9 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 4.6.0: the creature's still frames, every mood, on the page: all light in dark mode;
-        /// in light mode (4.6.1) the dark glass on white, the chart, the extras and the shadow
-        /// in ink.
+        /// 4.6.0: the creature's still frames, every mood, on the page: all light in dark mode,
+        /// all ink in light mode (4.6.1); without its glass since 4.7.0, a glow and a rim of
+        /// light round the swarm, a soft shadow under it.
         @Test func particleCreature() async {
             let moods: [ParticleCreature.Mood] = [
                 .idle, .listening, .thinking,
@@ -206,7 +206,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 4.7.0: the still glyph at a tab icon's size and larger, and the tab label it makes.
+        /// 4.8.0: the still glyph at a tab icon's size and larger, and the tab label it makes.
         @Test func creatureGlyph() async {
             await assertComponentSnapshot(
                 HStack(spacing: AppSpacing.lg) {

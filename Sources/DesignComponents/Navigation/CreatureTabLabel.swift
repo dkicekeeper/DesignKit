@@ -2,7 +2,7 @@
 //  CreatureTabLabel.swift
 //  DesignKit
 //
-//  The tab bar item of an assistant drawn as ParticleCreature (4.7.0): its still glyph
+//  The tab bar item of an assistant drawn as ParticleCreature (4.8.0): its still glyph
 //  (CreatureGlyph) over a title. A tab item takes only an image and a text, so the live creature
 //  waits inside the screen the tab opens.
 //

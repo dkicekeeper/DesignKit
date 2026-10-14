@@ -2,7 +2,7 @@
 //  CreatureGlyph.swift
 //  DesignKit
 //
-//  ParticleCreature as a still glyph (4.7.0): twelve dots in a ring and two capsule eyes, in one
+//  ParticleCreature as a still glyph (4.8.0): twelve dots in a ring and two capsule eyes, in one
 //  colour. For where the live creature cannot go: a tab bar item (CreatureTabLabel; a tab item
 //  takes only an image and a text) and sizes under the compact style's 24 pt.
 //
