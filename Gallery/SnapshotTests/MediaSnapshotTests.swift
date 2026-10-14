@@ -216,7 +216,7 @@ extension ComponentSnapshots {
                         speech: CreatureSpeech("Hi! Three payments are due this week.", duration: .untilChanged)
                     )
                     .frame(width: 140, height: 140)
-                    .padding(.top, 96)
+                    .padding(.top, 130)
                     .frame(maxWidth: .infinity)
                     ParticleCreature(
                         mood: .idle,

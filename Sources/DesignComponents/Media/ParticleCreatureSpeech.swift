@@ -166,7 +166,8 @@ enum CreatureSpeechTiming {
 // MARK: - The bubble
 
 /// A speech bubble with a comic outline and a tail on `tailEdge`, the line typed in from
-/// `start` when `isTyping`. Laid out left to right (the creature places it by its own sides);
+/// `start` when `isTyping`. It hugs its text and wraps at the width it is offered (the creature
+/// offers `CreatureSpeechMetrics.maxWidth`). Laid out left to right (the creature places it by its own sides);
 /// the text keeps the app's direction (`textDirection`).
 struct CreatureSpeechBubble: View {
     let speech: CreatureSpeech
@@ -214,7 +215,6 @@ struct CreatureSpeechBubble: View {
                 shape.stroke(outline, style: StrokeStyle(lineWidth: CreatureSpeechMetrics.outlineWidth, lineJoin: .round))
             }
             .shadow(color: glows ? outline.opacity(0.45) : .clear, radius: glows ? 6 : 0)
-            .frame(maxWidth: CreatureSpeechMetrics.maxWidth)
         return Group {
             if let action = speech.action {
                 Button(action: action) { bubble }

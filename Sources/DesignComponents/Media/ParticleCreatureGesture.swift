@@ -181,7 +181,7 @@ struct CreatureMotion {
             let reach = Self.smooth(p / 0.22) * Self.smooth((1 - p) / 0.2)
             let u = min(max((p - 0.18) / 0.67, 0), 1)
             let swing = 0.42 * sin(2 * .pi * 3 * u) * sin(.pi * u)
-            m.hand = CreatureHand(shape: .open, x: 1.42 * trailing, y: -0.42, angle: swing * trailing,
+            m.hand = CreatureHand(shape: .open, x: 1.3 * trailing, y: -0.42, angle: swing * trailing,
                                   reach: reach, mirrored: isRTL)
             m.tilt = 0.04 * reach * trailing
             m.gazeX = 0.8 * trailing
@@ -199,7 +199,9 @@ struct CreatureMotion {
             case .up: vy = -1
             case .down: vy = 1
             }
-            let distance = 1.5 + poke
+            // Close to the rim (the fist overlaps it a little), so the finger stays inside the
+            // creature's square: it has less room above the sphere than beside or below it.
+            let distance = (direction == .up ? 1.02 : 1.15) + poke
             // The finger points along the direction; angle 0 is up.
             let angle = atan2(vx, -vy)
             m.hand = CreatureHand(shape: .pointing, x: vx * distance, y: vy * distance, angle: angle,
@@ -249,14 +251,14 @@ struct CreatureHand {
         switch shape {
         case .open:
             return [
-                CreatureHandPart(cx: 0, cy: 0, rx: 0.2, ry: 0.27, exponent: 2.6, turn: 0),
-                CreatureHandPart(cx: -0.2, cy: 0.06, rx: 0.085, ry: 0.13, exponent: 2, turn: -0.5),
+                CreatureHandPart(cx: 0, cy: 0, rx: 0.25, ry: 0.34, exponent: 2.6, turn: 0),
+                CreatureHandPart(cx: -0.25, cy: 0.08, rx: 0.105, ry: 0.16, exponent: 2, turn: -0.5),
             ]
         case .pointing:
             return [
-                CreatureHandPart(cx: 0, cy: 0.06, rx: 0.17, ry: 0.15, exponent: 2.6, turn: 0),
-                CreatureHandPart(cx: 0.04, cy: -0.24, rx: 0.055, ry: 0.2, exponent: 2.2, turn: 0),
-                CreatureHandPart(cx: -0.17, cy: 0.02, rx: 0.06, ry: 0.085, exponent: 2, turn: -0.4),
+                CreatureHandPart(cx: 0, cy: 0.07, rx: 0.2, ry: 0.18, exponent: 2.6, turn: 0),
+                CreatureHandPart(cx: 0.05, cy: -0.29, rx: 0.066, ry: 0.24, exponent: 2.2, turn: 0),
+                CreatureHandPart(cx: -0.2, cy: 0.02, rx: 0.072, ry: 0.1, exponent: 2, turn: -0.4),
             ]
         }
     }
@@ -296,15 +298,17 @@ struct CreatureHand {
         }
     }
 
-    /// A point of the hand's own drawing (sphere radii, fingers up) in the view.
+    /// A point of the hand's own drawing (sphere radii, fingers up) in the view. An open hand
+    /// turns at the wrist (it waves); a pointing one round its middle (it aims).
     private func place(_ point: (Double, Double), center: CGPoint, radius r: Double) -> CGPoint {
+        let pivot = shape == .open ? 0.3 : 0
         let px = mirrored ? -point.0 : point.0
-        let py = point.1
+        let py = point.1 - pivot
         let c = cos(angle)
         let s = sin(angle)
         return CGPoint(
             x: center.x + (x + px * c - py * s) * r,
-            y: center.y + (y + px * s + py * c) * r
+            y: center.y + (y + pivot + px * s + py * c) * r
         )
     }
 }
