@@ -2065,13 +2065,13 @@ the glow a faint haze (0.08) and a soft shadow under the sphere. On a dark surfa
 mode, set `.environment(\.colorScheme, .dark)` on it.
 
 *(4.9.1, the owner's idea)* The core: without the glass the swarm had no body on a white page,
-so a soft ball of the mood's colours sits at its centre (`CreatureCore`), with no edge, from its
-first colour to its third. The far half of the swarm is drawn behind it and the near half in
-front, so it sits inside. On a light page it is the creature's body: colour with normal blending,
-0.55 at the centre, reaching 0.9 of the particle sphere's radius and holding its colour well out
-before it fades, the colours 10% deeper so pale moods show. In the dark it adds light, smaller
-and fainter (0.24, 0.72 of the radius, a bell-shaped fall-off), so the glowing eyes over it keep
-their contrast. It breathes with the sphere (swells 6%, brightens 15%), burns 1.3 times
+so a soft ball of the mood's colours fills it (`CreatureCore`), from its first colour to its
+third: it reaches 1.12 of the particle sphere's radius, just inside the rim at 1.2, its colour
+holding well out from the centre before it fades, with no edge. The far half of the swarm is
+drawn behind it and the near half in front, so it sits inside. On a light page it is the
+creature's body, colour with normal blending (0.55 at the centre, the colours 10% deeper so pale
+moods show); in the dark it adds light, fainter (0.3), so the glowing eyes over it keep their
+contrast. It breathes with the sphere (swells 6%, brightens 15%), burns 1.3 times
 brighter while thinking, dims asleep (0.45) and sleepy (0.7), flares at a tap and fades with the
 sphere when it pours into the chart; a change of mood eases its strength like the colours.
 `.compact` has it at 0.7 of the hero's strength, inside its sphere.

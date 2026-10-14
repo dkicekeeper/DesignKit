@@ -159,7 +159,7 @@ private struct ParticleCreaturePage: View {
                 "Interactive: the eyes follow the finger, a tap scatters the swarm, three quick taps make it dizzy.",
                 "30 fps, positions from the time; one still frame under Reduce Motion. Decorative: say what it is doing in text.",
                 "No glass (4.7.0): the swarm is held by a glow of its colour and a thin rim of light along its outline, brightest where the light falls; the shadow on the ground is soft all round.",
-                "The core (4.9.1): a soft ball of the mood's colours inside the swarm, the far particles behind it and the near ones in front. It breathes with the sphere, burns brighter while thinking, dims asleep and flares at a tap; fainter in the compact style.",
+                "The core (4.9.1): a soft ball of the mood's colours that fills the sphere almost to its rim, the far particles behind it and the near ones in front. It breathes with the sphere, burns brighter while thinking, dims asleep and flares at a tap; fainter in the compact style.",
                 "Light mode (4.6.1): everything in ink, deeper colours with normal blending (light added to white is lost); the core a ball of colour that gives the swarm a body on white, the glow a faint haze, a soft shadow under it. On a dark surface in light mode, set .environment(\\.colorScheme, .dark) on it.",
             ],
             styles: ["hero", "compact"]

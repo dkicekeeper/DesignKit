@@ -24,12 +24,12 @@ creature without its glass has a body on a white page.
 
 ### Changed
 
-- `ParticleCreature` (the owner's idea): a soft ball of the mood's colours inside the swarm, with
-  no edge, the far particles behind it and the near ones in front. On a light page it is the
-  creature's body, colour at 0.55 reaching 0.9 of the sphere; in the dark it adds light, smaller
-  and fainter (0.24), so the glowing eyes over it keep their contrast. It breathes with the
-  sphere, burns brighter while thinking, dims asleep and flares at a tap. `.compact` has it
-  fainter, inside its sphere.
+- `ParticleCreature` (the owner's idea): a soft ball of the mood's colours fills the sphere almost
+  to its rim, with no edge, the far particles behind it and the near ones in front. On a light
+  page it is the creature's body, colour at 0.55 at the centre; in the dark it adds light, fainter
+  (0.3), so the glowing eyes over it keep their contrast. It breathes with the sphere, burns
+  brighter while thinking, dims asleep and flares at a tap. `.compact` has it fainter, inside its
+  sphere.
 
 ### Gallery and tooling
 

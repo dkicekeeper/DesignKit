@@ -977,34 +977,27 @@ final class ParticleCreatureEngine {
         let alpha = min(1, (onLight ? CreatureCore.ink : CreatureCore.light) * (hero ? 1 : CreatureCore.compact)
             * strength * (1 + CreatureCore.breath * breath + CreatureCore.flare * flare))
         guard alpha > 0.005 else { return }
-        let reach = r0 * (onLight ? CreatureCore.inkReach : CreatureCore.reach)
-            * (1 + CreatureCore.swell * breath + 0.12 * flare)
+        let reach = r0 * CreatureCore.reach * (1 + CreatureCore.swell * breath + 0.12 * flare)
         let inner = onLight ? deepen(palette[0], CreatureCore.depth) : whiten(palette[0], 0.3)
         let outer = onLight ? deepen(palette[2], CreatureCore.depth) : palette[2]
         let middle = inner + (outer - inner) * 0.5
         var layer = context
         if !onLight { layer.blendMode = .plusLighter }
         if !hero { layer.clip(to: globe) }
-        // No edge: a bell-shaped fall-off in the dark; on a light page a fuller ball whose
-        // colour holds further out before it fades, so it reads as a body against white.
-        let stops: [Gradient.Stop] = onLight
-            ? [
-                .init(color: color(inner, alpha), location: 0),
-                .init(color: color(inner, alpha * 0.9), location: 0.3),
-                .init(color: color(middle, alpha * 0.6), location: 0.55),
-                .init(color: color(outer, alpha * 0.22), location: 0.8),
-                .init(color: color(outer, 0), location: 1),
-            ]
-            : [
-                .init(color: color(inner, alpha), location: 0),
-                .init(color: color(inner, alpha * 0.83), location: 0.25),
-                .init(color: color(middle, alpha * 0.47), location: 0.5),
-                .init(color: color(outer, alpha * 0.17), location: 0.75),
-                .init(color: color(outer, 0), location: 1),
-            ]
+        // It fills the sphere almost to the rim and has no edge: its colour holds well out from
+        // the centre, then fades to nothing just inside the rim.
         layer.fill(
             Path(ellipseIn: CGRect(x: center.x - reach, y: center.y - reach, width: reach * 2, height: reach * 2)),
-            with: .radialGradient(Gradient(stops: stops), center: center, startRadius: 0, endRadius: reach)
+            with: .radialGradient(
+                Gradient(stops: [
+                    .init(color: color(inner, alpha), location: 0),
+                    .init(color: color(inner, alpha * 0.9), location: 0.3),
+                    .init(color: color(middle, alpha * 0.65), location: 0.55),
+                    .init(color: color(outer, alpha * 0.3), location: 0.8),
+                    .init(color: color(outer, 0), location: 1),
+                ]),
+                center: center, startRadius: 0, endRadius: reach
+            )
         )
     }
 
@@ -1138,14 +1131,14 @@ enum CreatureGlow {
 /// The core (4.9.1, the owner's idea once the glass went): a soft ball of the mood's colours
 /// at the centre of the swarm, its heart. Without it the swarm had no body on a white page.
 enum CreatureCore {
-    /// How far it reaches, in particle-sphere radii (it fades out there): in the dark, and wider
-    /// on a light page, where it is the creature's body against white (the owner's review).
-    static let reach: Double = 0.72
-    static let inkReach: Double = 0.9
-    /// Its opacity at the centre: colour on a light page, light in the dark (where the eyes over
-    /// it glow and need the contrast).
+    /// How far it reaches, in particle-sphere radii (it fades out there): almost the whole
+    /// sphere, whose rim is at 1.2 (the owner's review: the first core, 0.72, was a cloud round
+    /// the eyes).
+    static let reach: Double = 1.12
+    /// Its opacity at the centre: colour on a light page, light in the dark (fainter there, so
+    /// the glowing eyes over it keep their contrast).
     static let ink: Double = 0.55
-    static let light: Double = 0.24
+    static let light: Double = 0.3
     /// On a light page its colours this much deeper, so the pale moods (the coin's yellow) show.
     static let depth: Double = 0.1
     /// The avatar's core, as a share of the hero's.
