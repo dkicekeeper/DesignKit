@@ -20,7 +20,7 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 
 From two references the owner shared: `PackedCircleIcons(style: .orbit)` becomes a carousel of
 coins that a swipe spins, and `ParticleCreature` loses its glass, a sphere made of light.
-[#63](https://github.com/dkicekeeper/DesignKit/pull/63)
+[#64](https://github.com/dkicekeeper/DesignKit/pull/64)
 
 ### Changed
 
