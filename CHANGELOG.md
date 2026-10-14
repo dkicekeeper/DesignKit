@@ -16,6 +16,37 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 4.6.1 - 2026-10-14
+
+`ParticleCreature` on a light page: the glass stays dark and what lies around it is drawn in
+deeper colours, so the creature reads on white as it does on black.
+[#62](https://github.com/dkicekeeper/DesignKit/pull/62)
+
+### Changed
+
+- `ParticleCreature` follows the colour scheme. In light mode the glass stays dark and the swarm
+  on it still glows, while what lies on the page is drawn in ink with normal blending, since
+  light added to white is lost: the particles outside the glass (the bar chart, a burst) 30%
+  deeper and more opaque, the z's, hearts, sparkles and "?" in deeper colours, the face once its
+  glass has faded (the chart) deeper with a fainter glow, and a soft shadow under the sphere
+  instead of a light. Dark mode and `.compact` look as before.
+
+### Migration
+
+- Nothing to change on a page. A creature on a dark surface in light mode takes
+  `.environment(\.colorScheme, .dark)`:
+
+```swift
+ParticleCreature(mood: .idle)
+    .background(Color.black)
+    .environment(\.colorScheme, .dark)
+```
+
+### Gallery and tooling
+
+- The Gallery page shows the creature on the light canvas in light mode; its snapshot test
+  draws it on the page in both appearances (re-recorded).
+
 ## 4.6.0 - 2026-10-13
 
 The pieces of a conversation with an assistant: a mascot made of light, message bubbles and

@@ -175,7 +175,9 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 4.6.0: the creature's still frames, every mood, on the dark it is made for.
+        /// 4.6.0: the creature's still frames, every mood, on the page: all light in dark mode;
+        /// in light mode (4.6.1) the dark glass on white, the chart, the extras and the shadow
+        /// in ink.
         @Test func particleCreature() async {
             let moods: [ParticleCreature.Mood] = [
                 .idle, .listening, .thinking,
@@ -199,8 +201,7 @@ extension ComponentSnapshots {
                         ParticleCreature(mood: .thinking, style: .compact).frame(width: 28, height: 28)
                     }
                 }
-                .padding(AppSpacing.lg)
-                .background(Color(white: 0.08), in: .rect(cornerRadius: AppRadius.xl)),
+                .padding(AppSpacing.lg),
                 appearances: [.light, .dark]
             )
         }

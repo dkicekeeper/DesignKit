@@ -171,28 +171,42 @@ struct CreatureFace: Equatable {
 // MARK: - Drawing
 
 enum CreatureFaceRenderer {
-    /// Draws the face; `radius` is the sphere's, `spin` turns sparkles and spirals.
+    /// Draws the face; `radius` is the sphere's, `spin` turns sparkles and spirals. `ink`, 0…1:
+    /// how far the face lies on a light page rather than on its glass (4.6.1), its colours deeper
+    /// and its glow fainter by as much, so the eyes read on white.
     static func draw(
         _ face: CreatureFace,
         in context: inout GraphicsContext,
         radius: Double,
         hero: Bool,
-        time: Double
+        time: Double,
+        ink: Double = 0
     ) {
+        var face = face
+        if ink > 0 {
+            face.left.color = inked(face.left.color, ink)
+            face.right.color = inked(face.right.color, ink)
+        }
+        let glow = 1 - CreatureInk.faceGlowCut * ink
         let glowRadius = radius * (hero ? 0.09 : 0.06)
         let r = radius * CreatureFace.scale
         for (eye, isRight) in [(face.left, false), (face.right, true)] where eye.height > 0.001 && eye.width > 0.001 {
             context.drawLayer { glowing in
-                glowing.addFilter(.shadow(color: color(eye.color, 0.9), radius: glowRadius))
+                glowing.addFilter(.shadow(color: color(eye.color, 0.9 * glow), radius: glowRadius))
                 drawEye(eye, isRight: isRight, anchor: face.anchor, radius: r, time: time, in: &glowing)
             }
         }
         if hero, face.mouth.form != .none, face.mouth.width > 0.001 {
             context.drawLayer { glowing in
-                glowing.addFilter(.shadow(color: color(face.left.color, 0.8), radius: glowRadius * 0.7))
+                glowing.addFilter(.shadow(color: color(face.left.color, 0.8 * glow), radius: glowRadius * 0.7))
                 drawMouth(face.mouth, anchor: face.anchor, radius: r, color: face.left.color, in: &glowing)
             }
         }
+    }
+
+    /// A colour of the face deepened as far as `amount` of `CreatureInk.faceDepth`.
+    private static func inked(_ rgb: SIMD3<Double>, _ amount: Double) -> SIMD3<Double> {
+        rgb * (1 - CreatureInk.faceDepth * min(max(amount, 0), 1))
     }
 
     private static func drawEye(_ eye: CreatureEye, isRight: Bool, anchor: CGPoint, radius r: Double, time: Double, in context: inout GraphicsContext) {

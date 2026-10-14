@@ -28,6 +28,12 @@
 //  `.designKitMotion(false)` or while the system saves resources it is one still frame of the
 //  mood.
 //
+//  Light mode (4.6.1): the glass stays dark, an object on the page, and the swarm on it still
+//  glows; what lies on the page itself (the bar chart, a burst, the extras, the face once the
+//  glass has faded) is drawn in ink, its colours deepened with normal blending, since light
+//  added to a white page is lost; a soft shadow grounds the sphere instead of a light under it.
+//  On a dark surface in light mode, give it `.environment(\.colorScheme, .dark)`.
+//
 //  Tenra's assistant is the first user; which mood each of its states shows stays in the app.
 //
 
@@ -49,6 +55,10 @@ import DesignSupport
 /// Give it a square: the hero looks right from about 160 pt, the compact style from 24 pt.
 /// The hero's sphere takes about 70% of the square; the rest is room for the burst, the chart
 /// and the extras. Decorative: hidden from VoiceOver, say what it is doing in text.
+///
+/// It follows the colour scheme (4.6.1): in light mode what lies on the page around the glass is
+/// drawn in deeper colours; on a dark surface in light mode, set `.environment(\.colorScheme,
+/// .dark)` on it.
 public struct ParticleCreature: View {
     /// What the creature feels or does.
     public enum Mood: Hashable, Sendable {
@@ -102,6 +112,7 @@ public struct ParticleCreature: View {
     let isInteractive: Bool
 
     @Environment(\.designKitMotion) private var designKitMotion
+    @Environment(\.colorScheme) private var colorScheme
     @State private var engine = ParticleCreatureEngine()
     @State private var isTouching = false
 
@@ -139,8 +150,10 @@ public struct ParticleCreature: View {
         let mood = mood
         let style = style
         let level = level
+        let onLight = colorScheme == .light
         return Canvas { context, size in
-            engine.render(in: &context, size: size, mood: mood, style: style, level: level, time: time)
+            engine.render(in: &context, size: size, mood: mood, style: style, level: level, time: time,
+                          onLight: onLight)
         }
     }
 
@@ -247,7 +260,8 @@ final class ParticleCreatureEngine {
         mood: ParticleCreature.Mood,
         style: ParticleCreature.Style,
         level: Double?,
-        time: Double?
+        time: Double?,
+        onLight: Bool = false
     ) {
         let geo = Geometry(size: size, style: style)
         guard geo.radius > 1 else { return }
@@ -321,7 +335,7 @@ final class ParticleCreatureEngine {
         lastShell = shell
 
         draw(in: &context, geo: geo, style: style, t: t, cy: cy, palette: palette, shell: shell,
-             parts: parts, depth: depth, face: shownFace, tear: tear)
+             parts: parts, depth: depth, face: shownFace, tear: tear, onLight: onLight)
     }
 
     // MARK: Building
@@ -736,7 +750,8 @@ final class ParticleCreatureEngine {
         parts: [CGPoint],
         depth: [Double],
         face: CreatureFace,
-        tear: CGPoint?
+        tear: CGPoint?,
+        onLight: Bool
     ) {
         let r0 = geo.radius
         let cx = geo.cx
@@ -746,17 +761,22 @@ final class ParticleCreatureEngine {
         let globe = Path(ellipseIn: sphereRect)
         let glass = Path(ellipseIn: sphereRect.insetBy(dx: shellRadius * 0.03, dy: shellRadius * 0.03))
         let hero = style == .hero
+        /// Light mode, the hero: the page around the glass is light (4.6.1).
+        let inked = hero && onLight
 
-        // The light on the ground.
+        // The light on the ground; on a light page, a soft shadow.
         if hero {
             let groundY = geo.restY + r0 * 1.34
             let lift = pose == .happy || pose == .celebrating ? abs(sin(t * 4.2)) : 0
             let rx = r0 * 1.25 * (1 - lift * 0.2)
             let ry = r0 * 0.17
+            let ground = inked
+                ? [Color.black.opacity(CreatureInk.shadow * shell * (1 - lift * 0.4)), Color.black.opacity(0)]
+                : [color(palette[0], 0.16 * shell), color(palette[0], 0)]
             context.fill(
                 Path(ellipseIn: CGRect(x: cx - rx, y: groundY - ry, width: rx * 2, height: ry * 2)),
                 with: .radialGradient(
-                    Gradient(colors: [color(palette[0], 0.16 * shell), color(palette[0], 0)]),
+                    Gradient(colors: ground),
                     center: CGPoint(x: cx, y: groundY), startRadius: 0, endRadius: r0 * 1.25
                 )
             )
@@ -794,11 +814,13 @@ final class ParticleCreatureEngine {
             }
         }
 
-        // The swarm, bucketed by colour and depth.
+        // The swarm, bucketed by colour and depth. Light on the glass; on a light page only what
+        // is on the glass, as it fades with it, and the rest in ink below.
         let dim: Double = pose == .asleep ? 0.45 : pose == .sleepy ? 0.7 : 1
         var swarm = context
         swarm.blendMode = .plusLighter
-        if !hero { swarm.clip(to: glass) }
+        if !hero || inked { swarm.clip(to: glass) }
+        if inked { swarm.opacity = shell }
         let levels = 6
         var dots = [[Path]](repeating: [Path](repeating: Path(), count: levels), count: 4)
         var halos = [Path](repeating: Path(), count: 4)
@@ -816,13 +838,36 @@ final class ParticleCreatureEngine {
                 halos[tone].addEllipse(in: CGRect(x: p.x - halo, y: p.y - halo, width: halo * 2, height: halo * 2))
             }
         }
-        for tone in 0..<4 {
-            for level in 0..<levels where !dots[tone][level].isEmpty {
-                let zl = (Double(level) + 0.5) / Double(levels)
-                swarm.fill(dots[tone][level], with: .color(color(whiten(palette[tone], 0.15 * zl), (0.16 + 0.6 * zl) * dim)))
+        if !inked || shell > 0.02 {
+            for tone in 0..<4 {
+                for level in 0..<levels where !dots[tone][level].isEmpty {
+                    let zl = (Double(level) + 0.5) / Double(levels)
+                    swarm.fill(dots[tone][level], with: .color(color(whiten(palette[tone], 0.15 * zl), (0.16 + 0.6 * zl) * dim)))
+                }
+                if !halos[tone].isEmpty {
+                    swarm.fill(halos[tone], with: .color(color(whiten(palette[tone], 0.14), 0.035 * dim)))
+                }
             }
-            if !halos[tone].isEmpty {
-                swarm.fill(halos[tone], with: .color(color(whiten(palette[tone], 0.14), 0.035 * dim)))
+        }
+        if inked {
+            // In ink: outside the glass, and inside it as far as the glass has faded.
+            func fillInk(_ layer: inout GraphicsContext) {
+                for tone in 0..<4 {
+                    let ink = deepen(palette[tone], CreatureInk.depth)
+                    for level in 0..<levels where !dots[tone][level].isEmpty {
+                        let zl = (Double(level) + 0.5) / Double(levels)
+                        layer.fill(dots[tone][level], with: .color(color(ink, (CreatureInk.nearAlpha + CreatureInk.depthAlpha * zl) * dim)))
+                    }
+                }
+            }
+            var page = context
+            if shell > 0.02 { page.clip(to: glass, options: .inverse) }
+            fillInk(&page)
+            if shell > 0.02 && shell < 0.98 {
+                var fading = context
+                fading.clip(to: glass)
+                fading.opacity = 1 - shell
+                fillInk(&fading)
             }
         }
 
@@ -860,7 +905,9 @@ final class ParticleCreatureEngine {
             faceLayer.rotate(by: .radians(lean))
             faceLayer.translateBy(x: -cx, y: -geo.restY)
         }
-        CreatureFaceRenderer.draw(face, in: &faceLayer, radius: r0, hero: hero, time: t)
+        // On a light page, the face is in ink as far as its glass has faded (the bar chart).
+        let faceInk = inked ? 1 - shell : 0
+        CreatureFaceRenderer.draw(face, in: &faceLayer, radius: r0, hero: hero, time: t, ink: faceInk)
         if let tear { CreatureFaceRenderer.tear(at: tear, radius: r0, in: &faceLayer) }
 
         // The front of the glass: a fresnel rim, coloured edges, highlights.
@@ -908,10 +955,12 @@ final class ParticleCreatureEngine {
             front.stroke(arc, with: .color(.white.opacity(0.1)), lineWidth: hero ? 3 * geo.scale : r0 / 15.5)
         }
 
-        if hero { drawExtras(in: &context, geo: geo, t: t, cy: cy) }
+        if hero { drawExtras(in: &context, geo: geo, t: t, cy: cy, onLight: onLight) }
     }
 
-    private func drawExtras(in context: inout GraphicsContext, geo: Geometry, t: Double, cy: Double) {
+    /// The z's, hearts, sparkles and question mark beside the glass: on the page, so in ink on a
+    /// light one.
+    private func drawExtras(in context: inout GraphicsContext, geo: Geometry, t: Double, cy: Double, onLight: Bool) {
         let s = geo.scale
         let shellRadius = geo.radius * 1.2
         let cx = geo.cx
@@ -920,7 +969,7 @@ final class ParticleCreatureEngine {
         case .asleep:
             let letter = extras.resolve(Text(verbatim: "z")
                 .font(.system(size: 22 * s, weight: .heavy, design: .rounded))
-                .foregroundStyle(color(CreaturePalette.sleepLetter, 1)))
+                .foregroundStyle(color(onLight ? CreatureInk.sleepLetter : CreaturePalette.sleepLetter, 1)))
             for k in 0..<3 {
                 let ph = (t * 0.4 + Double(k) / 3).truncatingRemainder(dividingBy: 1)
                 extras.opacity = sin(ph * .pi)
@@ -934,19 +983,19 @@ final class ParticleCreatureEngine {
                     at: CGPoint(x: cx + shellRadius * (0.7 + 0.15 * sin(ph * 6 + Double(k))), y: cy - shellRadius * 0.5 - ph * 90 * s),
                     scale: (0.45 + 0.15 * Double(k)) * s
                 )
-                extras.fill(heart, with: .color(color(CreaturePalette.heart, 1)))
+                extras.fill(heart, with: .color(color(onLight ? CreatureInk.heart : CreaturePalette.heart, 1)))
             }
         case .proud:
             for (k, spot) in CreaturePalette.sparkleSpots.enumerated() {
                 extras.opacity = 0.25 + 0.75 * pow(abs(sin(t * 2.2 + Double(k) * 1.7)), 3)
                 let spark = Self.sparkle(at: CGPoint(x: cx + spot.x * shellRadius, y: cy + spot.y * shellRadius), radius: (7 + Double(k)) * s)
-                extras.fill(spark, with: .color(color(CreaturePalette.sparkle, 1)))
+                extras.fill(spark, with: .color(color(onLight ? CreatureInk.sparkle : CreaturePalette.sparkle, 1)))
             }
         case .confused:
             extras.opacity = 0.9
             let mark = extras.resolve(Text(verbatim: "?")
                 .font(.system(size: 34 * s, weight: .heavy, design: .rounded))
-                .foregroundStyle(color(CreaturePalette.question, 1)))
+                .foregroundStyle(color(onLight ? CreatureInk.question : CreaturePalette.question, 1)))
             extras.draw(mark, at: CGPoint(x: cx + shellRadius * 0.68, y: cy - shellRadius * 0.72 + sin(t * 2.4) * 6 * s), anchor: .bottomLeading)
         default:
             break
@@ -987,6 +1036,31 @@ final class ParticleCreatureEngine {
     private func whiten(_ rgb: RGB, _ amount: Double) -> RGB {
         rgb + (RGB(repeating: 255) - rgb) * amount
     }
+
+    private func deepen(_ rgb: RGB, _ amount: Double) -> RGB {
+        rgb * (1 - amount)
+    }
+}
+
+/// Light mode (4.6.1): what lies on a light page instead of the dark glass. Light added to white
+/// is lost, so it is drawn with normal blending in deeper colours.
+enum CreatureInk {
+    /// How far a particle's colour is taken towards black.
+    static let depth: Double = 0.3
+    /// A particle's opacity, the far ones fainter: `nearAlpha + depthAlpha × depth`.
+    static let nearAlpha: Double = 0.4
+    static let depthAlpha: Double = 0.55
+    /// The shadow under the sphere, where the dark draws a light on the ground.
+    static let shadow: Double = 0.16
+    /// The face once its glass has faded (the bar chart): its colours this much deeper, its glow
+    /// this much fainter, so cyan eyes read on white.
+    static let faceDepth: Double = 0.45
+    static let faceGlowCut: Double = 0.7
+    /// The extras: a lavender z, a pink heart, an amber sparkle, a violet question mark.
+    static let sleepLetter: SIMD3<Double> = [104, 98, 170]
+    static let heart: SIMD3<Double> = [228, 70, 138]
+    static let sparkle: SIMD3<Double> = [222, 156, 20]
+    static let question: SIMD3<Double> = [112, 92, 226]
 }
 
 // MARK: - Geometry
