@@ -2076,6 +2076,43 @@ brighter while thinking, dims asleep (0.45) and sleepy (0.7), flares at a tap an
 sphere when it pours into the chart; a change of mood eases its strength like the colours.
 `.compact` has it at 0.7 of the hero's strength, inside its sphere.
 
+*(4.10.0, the owner's plan for the assistant as a character)* It speaks and gestures.
+`speech: CreatureSpeech("Hi!")` says a line in words of light, with no bubble (the owner's
+choice: a comic bubble was a flat sticker beside a creature made of light). Each letter is drawn
+on its own (`CreatureSpeechWords` over a `TextRenderer`): it leaves the mouth when its turn comes
+(about 35 letters a second, a pause after a comma, 0.18 s, or a full stop, 0.35 s), flies to its
+place on a rising arc in 0.4 s, growing from 0.3 of its size, and lands; the mouth talks while
+the letters leave (`CreatureSpeechTiming`: open and shut about four times a second, shut in a
+pause). The type is SF Rounded bold, scaling with Dynamic Type, centred, offered 240 pt
+(`maxWidth:` narrows it, for a creature in a navigation bar), in the mood's main colour: ink on
+a light page (its colour 45% deeper, as the face), lighter in the dark (45% towards white) with
+a glow of its colour; a soft halo of the page round each letter keeps the words readable over
+anything. `emotion:` says how the words live once they land, `.automatic` taking it from the
+mood when the line comes (joy for happy, celebrating, proud and love; a thought while thinking;
+worry, sadness; a whisper when sleepy or asleep; calm otherwise): `.calm` rests; `.joy` is bigger
+and heavier (`title2`), bounces as it lands, a wave of hops runs along it every 1.8 s and
+sparkles twinkle round it, the mouth opening wide; `.thought` is slanted, a little pale and
+sways, the mouth still and the eyes on the words; `.whisper` is small (`callout`), pale and
+glimmers out of a blur, the mouth barely moving; `.worry` trembles; `.dizzy` tilts and sways;
+`.sad` sinks and fades a little. `placement:` `.above` (over the sphere) or `.trailing` /
+`.leading` (beside it, on the upper side of the rim); the creature's view does not grow for it,
+so the screen leaves room on that side. `duration:` `.automatic` (the letters out, then 2 to 5 s
+by length), `.seconds(_)` or `.untilChanged`; the words fade when they go. A new line (another
+text or `id:`) replaces the one on screen, `nil` takes it away; `action:` makes the words a
+button. VoiceOver reads them; the creature stays hidden. Under Reduce Motion the line stands
+whole and still. Hero only.
+
+`.creatureGesture(_:trigger:)` plays a `CreatureGesture` each time `trigger` changes, like
+`sensoryFeedback`: `.nod` (two dips), `.shake` (twice, the eyes leading), `.hop` (crouch, jump,
+squash), `.shrug` (squashed, eyes up), `.flinch` (shrinks and blinks), `.perk` (stretches up,
+eyes wide), `.wave` and `.point(.leading / .trailing / .up / .down)`: about 32 particles leave the
+sphere, gather into a mitten beside it (no arm) with a soft fill and an outline of the mood's
+colours, wave three times or point and poke, and flow back. The sphere moves, turns and squashes
+round its bottom with all on it; its shadow stays on the ground and shrinks in a hop. 0.55 to
+2 s, then back to the mood. `.compact` hops for a wave and perks for a point. Nothing plays on
+appear, under Reduce Motion or with `.designKitMotion(false)`;
+`.creatureGestureFrame(_:progress:)` holds a gesture in a still frame (posters, snapshots).
+
 #### `CreatureGlyph` and `CreatureTabLabel` *(4.8.0)*
 `CreatureGlyph()` is the creature as a still, one-colour `Shape`: twelve dots in a ring and two
 capsule eyes (`CreatureGlyphMetrics`). For where the live creature cannot go: a tab bar item and

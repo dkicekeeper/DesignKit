@@ -137,6 +137,26 @@ private struct ParticleCreaturePage: View {
     @State private var size = 280.0
     @State private var level = 0.5
     @State private var state: SpecimenState = .content
+    @State private var line = "Hi! Three payments are due this week."
+    @State private var placement = 0
+    @State private var emotion = 0
+    @State private var speech: CreatureSpeech?
+    @State private var said = 0
+    @State private var gesture = 0
+    @State private var played = 0
+
+    private static let emotions: [(String, CreatureSpeech.Emotion)] = [
+        ("From mood", .automatic), ("Calm", .calm), ("Joy", .joy), ("Thought", .thought), ("Whisper", .whisper),
+        ("Worry", .worry), ("Dizzy", .dizzy), ("Sad", .sad),
+    ]
+    private static let placements: [(String, CreatureSpeech.Placement)] = [
+        ("Above", .above), ("Trailing", .trailing), ("Leading", .leading),
+    ]
+    private static let gestures: [(String, CreatureGesture)] = [
+        ("Nod", .nod), ("Shake", .shake), ("Hop", .hop), ("Shrug", .shrug), ("Flinch", .flinch),
+        ("Perk", .perk), ("Wave", .wave), ("Point →", .point(.trailing)), ("Point ←", .point(.leading)),
+        ("Point ↑", .point(.up)), ("Point ↓", .point(.down)),
+    ]
 
     private static let moods: [(String, ParticleCreature.Mood)] = [
         ("Idle", .idle), ("Listening", .listening), ("Thinking", .thinking), ("Answering", .answering),
@@ -146,6 +166,21 @@ private struct ParticleCreaturePage: View {
     ]
 
     private var style: ParticleCreature.Style { compact ? .compact : .hero }
+
+    /// Words beside the creature need the canvas's width: the creature gets smaller.
+    private var side: CGFloat {
+        if compact { return min(size, 96) }
+        return speech != nil && Self.placements[placement].1 != .above ? min(size, 120) : size
+    }
+
+    private var wordsSide: Alignment {
+        guard speech != nil else { return .center }
+        switch Self.placements[placement].1 {
+        case .above: return .center
+        case .trailing: return .leading
+        case .leading: return .trailing
+        }
+    }
 
     var body: some View {
         ComponentPage(
@@ -160,6 +195,8 @@ private struct ParticleCreaturePage: View {
                 "30 fps, positions from the time; one still frame under Reduce Motion. Decorative: say what it is doing in text.",
                 "No glass (4.7.0): the swarm is held by a glow of its colour and a thin rim of light along its outline, brightest where the light falls; the shadow on the ground is soft all round.",
                 "The core (4.9.1): a soft ball of the mood's colours that fills the sphere almost to its rim, the far particles behind it and the near ones in front. It breathes with the sphere, burns brighter while thinking, dims asleep and flares at a tap; fainter in the compact style.",
+                "Speech (4.10.0): speech: CreatureSpeech(\"Hi!\") says a line in words of light, no bubble: each letter flies out of the mouth on an arc to its place while the mouth talks, in rounded bold type in the mood's colour (ink on a light page, glowing in the dark) with a soft halo of the page round it. Then the words move with the emotion (from the mood by default): calm rests, joy hops in a wave with sparkles, a thought sways in a slant (the mouth still, the eyes on the words), a whisper glimmers small and pale, worry trembles, dizzy spins, sad sinks. Above or beside it; they go after a few seconds (or stay: duration .untilChanged). Hero only; leave room on their side.",
+                "Gestures (4.10.0): .creatureGesture(.nod, trigger: value) plays one each time the value changes: nod, shake, hop, shrug, flinch, perk, and a hand of particles that waves or points. The compact style hops for a wave and perks for a point.",
                 "Light mode (4.6.1): everything in ink, deeper colours with normal blending (light added to white is lost); the core a ball of colour that gives the swarm a body on white, the glow a faint haze, a soft shadow under it. On a dark surface in light mode, set .environment(\\.colorScheme, .dark) on it.",
             ],
             styles: ["hero", "compact"]
@@ -172,12 +209,16 @@ private struct ParticleCreaturePage: View {
                         mood: Self.moods[mood].1,
                         style: style,
                         level: Self.moods[mood].1 == .listening ? level : nil,
-                        isInteractive: interactive
+                        isInteractive: interactive,
+                        speech: speech
                     )
+                    .creatureGesture(Self.gestures[gesture].1, trigger: played)
                 }
             }
-            .frame(width: compact ? min(size, 96) : size, height: compact ? min(size, 96) : size)
-            .frame(maxWidth: .infinity)
+            .frame(width: side, height: side)
+            // Room for the words: over the creature, or beside it with the creature at the far edge.
+            .padding(.top, speech != nil && Self.placements[placement].1 == .above ? 80 : 0)
+            .frame(maxWidth: .infinity, alignment: wordsSide)
         } controls: {
             StateControl(state: $state)
             ChoiceControl("Mood", selection: $mood, options: Self.moods.indices.map { (Self.moods[$0].0, $0) })
@@ -185,6 +226,16 @@ private struct ParticleCreaturePage: View {
             ToggleControl("Interactive", isOn: $interactive)
             SliderControl("Size", value: $size, in: 24...320, step: 4) { "\(Int($0)) pt" }
             SliderControl("Voice level", value: $level, in: 0...1)
+            TextControl("Line", text: $line)
+            ChoiceControl("Emotion", selection: $emotion, options: Self.emotions.indices.map { (Self.emotions[$0].0, $0) })
+            ChoiceControl("Placement", selection: $placement, options: Self.placements.indices.map { (Self.placements[$0].0, $0) })
+            ActionControl("Say it", systemImage: "text.bubble") {
+                said += 1
+                speech = CreatureSpeech(line, emotion: Self.emotions[emotion].1,
+                                        placement: Self.placements[placement].1, id: said)
+            }
+            ChoiceControl("Gesture", selection: $gesture, options: Self.gestures.indices.map { (Self.gestures[$0].0, $0) })
+            ActionControl("Play gesture") { played += 1 }
         }
     }
 }

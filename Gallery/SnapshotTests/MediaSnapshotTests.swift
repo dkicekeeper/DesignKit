@@ -206,6 +206,103 @@ extension ComponentSnapshots {
             )
         }
 
+        /// 4.10.0: words of light, every letter in place (motion is off): joy over a happy
+        /// creature (the emotion from its mood) and a calm line beside an idle one.
+        /// `.untilChanged`, so the words cannot leave while they are captured.
+        @Test func particleCreatureSpeech() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.lg) {
+                    ParticleCreature(
+                        mood: .happy,
+                        speech: CreatureSpeech("Hi! Three payments this week.", duration: .untilChanged)
+                    )
+                    .frame(width: 140, height: 140)
+                    .padding(.top, 110)
+                    .frame(maxWidth: .infinity)
+                    ParticleCreature(
+                        mood: .idle,
+                        speech: CreatureSpeech("Ask me anything", placement: .trailing, duration: .untilChanged)
+                    )
+                    .frame(width: 110, height: 110)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(AppSpacing.lg),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// 4.10.0: a thought over the creature, slanted, and a whisper beside a sleepy one.
+        @Test func particleCreatureThought() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.lg) {
+                    ParticleCreature(
+                        mood: .idle,
+                        speech: CreatureSpeech("Coffee again?", emotion: .thought, duration: .untilChanged)
+                    )
+                    .frame(width: 140, height: 140)
+                    .padding(.top, 90)
+                    .frame(maxWidth: .infinity)
+                    ParticleCreature(
+                        mood: .sleepy,
+                        speech: CreatureSpeech("Psst… it's late", placement: .trailing, duration: .untilChanged)
+                    )
+                    .frame(width: 110, height: 110)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(AppSpacing.lg),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// 4.10.0: the other emotions beside the creature: worried letters out of line, dizzy
+        /// ones tilted, sad ones sunk and paler.
+        @Test func particleCreatureFeelings() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.lg) {
+                    ParticleCreature(
+                        mood: .worried,
+                        speech: CreatureSpeech("No connection…", placement: .trailing, duration: .untilChanged)
+                    )
+                    .frame(width: 100, height: 100)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    ParticleCreature(
+                        mood: .idle,
+                        speech: CreatureSpeech("Whoa, I'm dizzy!", emotion: .dizzy, placement: .trailing, duration: .untilChanged)
+                    )
+                    .frame(width: 100, height: 100)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    ParticleCreature(
+                        mood: .sad,
+                        speech: CreatureSpeech("Not this time", placement: .trailing, duration: .untilChanged)
+                    )
+                    .frame(width: 100, height: 100)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(AppSpacing.lg),
+                appearances: [.light, .dark]
+            )
+        }
+
+        /// 4.10.0: gestures held halfway in a still frame: the hand of particles waving and
+        /// pointing each way, a nod, a hop in the air, a shrug, a perk.
+        @Test func particleCreatureGestures() async {
+            let frames: [(CreatureGesture, Double)] = [
+                (.wave, 0.5), (.point(.trailing), 0.5), (.point(.up), 0.5),
+                (.nod, 0.25), (.hop, 0.45), (.shrug, 0.5),
+            ]
+            await assertComponentSnapshot(
+                LazyVGrid(columns: Array(repeating: GridItem(.fixed(100), spacing: AppSpacing.md), count: 3), spacing: AppSpacing.md) {
+                    ForEach(frames.indices, id: \.self) { index in
+                        ParticleCreature(mood: .happy)
+                            .creatureGestureFrame(frames[index].0, progress: frames[index].1)
+                            .frame(width: 100, height: 100)
+                    }
+                }
+                .padding(AppSpacing.lg),
+                appearances: [.light, .dark]
+            )
+        }
+
         /// 4.8.0: the still glyph at a tab icon's size and larger, and the tab label it makes.
         @Test func creatureGlyph() async {
             await assertComponentSnapshot(
