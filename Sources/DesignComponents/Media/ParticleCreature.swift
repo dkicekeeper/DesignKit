@@ -4,7 +4,7 @@
 //
 //  A character made of light (4.6.0): a swarm of particles in the shape of a sphere, its outline
 //  a thin rim of light with a glow round it (4.7.0; a dark glass sphere held it before), a soft
-//  core of its colours inside that breathes with it (4.8.1), and a face in the manner of a
+//  core of its colours inside that breathes with it (4.9.1), and a face in the manner of a
 //  desk robot's screen: two glowing eyes drawn as solid shapes (a rounded lens
 //  with a top lid and a cheek, an arc, a chevron, a heart, a spiral) and, for some moods, a small
 //  mouth (ParticleCreatureFace.swift). The swarm's moods are shapes: listening, it ripples with
@@ -393,7 +393,7 @@ final class ParticleCreatureEngine {
         poseAt = t
     }
 
-    /// How strongly the core burns in a mood (4.8.1): brighter while thinking, dim asleep.
+    /// How strongly the core burns in a mood (4.9.1): brighter while thinking, dim asleep.
     private static func coreStrength(_ pose: CreaturePose) -> Double {
         switch pose {
         case .thinking: CreatureCore.thinking
@@ -957,7 +957,7 @@ final class ParticleCreatureEngine {
         if hero { drawExtras(in: &context, geo: geo, t: t, cy: cy, onLight: onLight) }
     }
 
-    /// The core (4.8.1): a soft ball of the mood's colours inside the swarm, so the creature has
+    /// The core (4.9.1): a soft ball of the mood's colours inside the swarm, so the creature has
     /// a body on a white page. It breathes with the sphere and flares at a tap; colour on a
     /// light page, light in the dark, fainter in the avatar.
     private func drawCore(
@@ -977,26 +977,34 @@ final class ParticleCreatureEngine {
         let alpha = min(1, (onLight ? CreatureCore.ink : CreatureCore.light) * (hero ? 1 : CreatureCore.compact)
             * strength * (1 + CreatureCore.breath * breath + CreatureCore.flare * flare))
         guard alpha > 0.005 else { return }
-        let reach = r0 * CreatureCore.reach * (1 + CreatureCore.swell * breath + 0.12 * flare)
+        let reach = r0 * (onLight ? CreatureCore.inkReach : CreatureCore.reach)
+            * (1 + CreatureCore.swell * breath + 0.12 * flare)
         let inner = onLight ? deepen(palette[0], CreatureCore.depth) : whiten(palette[0], 0.3)
         let outer = onLight ? deepen(palette[2], CreatureCore.depth) : palette[2]
         let middle = inner + (outer - inner) * 0.5
         var layer = context
         if !onLight { layer.blendMode = .plusLighter }
         if !hero { layer.clip(to: globe) }
-        // A bell-shaped fall-off, so the ball has no edge.
+        // No edge: a bell-shaped fall-off in the dark; on a light page a fuller ball whose
+        // colour holds further out before it fades, so it reads as a body against white.
+        let stops: [Gradient.Stop] = onLight
+            ? [
+                .init(color: color(inner, alpha), location: 0),
+                .init(color: color(inner, alpha * 0.9), location: 0.3),
+                .init(color: color(middle, alpha * 0.6), location: 0.55),
+                .init(color: color(outer, alpha * 0.22), location: 0.8),
+                .init(color: color(outer, 0), location: 1),
+            ]
+            : [
+                .init(color: color(inner, alpha), location: 0),
+                .init(color: color(inner, alpha * 0.83), location: 0.25),
+                .init(color: color(middle, alpha * 0.47), location: 0.5),
+                .init(color: color(outer, alpha * 0.17), location: 0.75),
+                .init(color: color(outer, 0), location: 1),
+            ]
         layer.fill(
             Path(ellipseIn: CGRect(x: center.x - reach, y: center.y - reach, width: reach * 2, height: reach * 2)),
-            with: .radialGradient(
-                Gradient(stops: [
-                    .init(color: color(inner, alpha), location: 0),
-                    .init(color: color(inner, alpha * 0.83), location: 0.25),
-                    .init(color: color(middle, alpha * 0.47), location: 0.5),
-                    .init(color: color(outer, alpha * 0.17), location: 0.75),
-                    .init(color: color(outer, 0), location: 1),
-                ]),
-                center: center, startRadius: 0, endRadius: reach
-            )
+            with: .radialGradient(Gradient(stops: stops), center: center, startRadius: 0, endRadius: reach)
         )
     }
 
@@ -1127,14 +1135,16 @@ enum CreatureGlow {
     static let drift: Double = 0.25
 }
 
-/// The core (4.8.1, the owner's idea once the glass went): a soft ball of the mood's colours
+/// The core (4.9.1, the owner's idea once the glass went): a soft ball of the mood's colours
 /// at the centre of the swarm, its heart. Without it the swarm had no body on a white page.
 enum CreatureCore {
-    /// How far it reaches, in particle-sphere radii (it fades out there).
+    /// How far it reaches, in particle-sphere radii (it fades out there): in the dark, and wider
+    /// on a light page, where it is the creature's body against white (the owner's review).
     static let reach: Double = 0.72
+    static let inkReach: Double = 0.9
     /// Its opacity at the centre: colour on a light page, light in the dark (where the eyes over
     /// it glow and need the contrast).
-    static let ink: Double = 0.42
+    static let ink: Double = 0.55
     static let light: Double = 0.24
     /// On a light page its colours this much deeper, so the pale moods (the coin's yellow) show.
     static let depth: Double = 0.1
