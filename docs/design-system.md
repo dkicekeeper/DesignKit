@@ -2009,6 +2009,17 @@ Reduce Motion, `.designKitMotion(false)` and reduced resource usage. Its colours
 identity), not the accent. Decorative: hidden from VoiceOver, say what it is doing in text.
 `ParticleCreatureSkeleton(style:)`: a grey sphere where the glass will be.
 
+*(4.6.1)* It follows the colour scheme. In dark mode it is all light: the swarm glows (added
+light, `.plusLighter`) on the glass and on the page, with a light on the ground. In light mode
+the glass stays dark, an object on the page, and the swarm on it still glows; but light added to
+a white page is lost, so what lies on the page is drawn in ink, with normal blending: the
+particles outside the glass (the bar chart, a burst) 30% deeper and more opaque, without halos;
+the z's, hearts, sparkles and "?" in deeper colours (`CreatureInk`); the face, once its glass has
+faded for the chart, 45% deeper with a fainter glow; and a soft shadow under the sphere instead
+of the light. As the glass fades the swarm on it passes from light to ink. `.compact` is clipped
+to its glass and looks the same in both. On a dark surface in light mode, set
+`.environment(\.colorScheme, .dark)` on it.
+
 #### `MessageBubble`
 `MessageBubble(text, role: .outgoing)`: the person's message on the trailing side in the accent,
 white text; `.incoming` on the leading side in `Background.neutral1`. `AppRadius.xl`, body text,
