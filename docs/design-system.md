@@ -2132,6 +2132,21 @@ from VoiceOver; a daydream does not end the quiet). A touch, a line, a gesture o
 the quiet and wakes it. Nothing under Reduce Motion or `.designKitMotion(false)`; a picture with an
 empty `label:` is hidden from VoiceOver.
 
+*(4.12.0)* It wears an accessory (`accessory: CreatureAccessory?`), drawn in its own light as the
+hand of a gesture is: a soft fill and a thin outline of the mood's colours (ink on a light page,
+light in the dark), stronger solid parts (a pompom, the gems, the ear cups) and dots of light along
+the outline about 0.085 of the radius apart, twinkling. On the head, sitting on the sphere's outline
+and moving with it (hops, tilts, squashes): `.partyHat` (a cone askew with stripes and a pompom),
+`.crown` (five points, three gems), `.beanie` (a dome with a turned-up band and a pompom),
+`.taqiya` (a low cap with a zigzag ornament and a diamond), `.headphones` (a band over the top and
+two cups). On the eyes, fitted to them and following the gaze: `.glasses` (two round lenses and a
+bridge), `.sunglasses` (dark lenses with a glint, drawn over the eyes), `.sleepMask` (a mask over
+the eyes with closed eyes drawn on it). A change puts the new one on, its dots leaving the sphere
+one after another and gathering into the outline in 0.9 s, then the outline and the fill come; the
+old one comes off in 0.6 s, its dots scattering outward. A hat goes with the sphere when the swarm
+pours into the chart. The compact style wears hats only, a little smaller, without dots; the app
+decides what it wears and when (Tenra: holidays, a crown on a day it celebrates, a wardrobe).
+
 #### `CreatureGlyph` and `CreatureTabLabel` *(4.8.0)*
 `CreatureGlyph()` is the creature as a still, one-colour `Shape`: twelve dots in a ring and two
 capsule eyes (`CreatureGlyphMetrics`). For where the live creature cannot go: a tab bar item and

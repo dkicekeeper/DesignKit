@@ -147,6 +147,7 @@ private struct ParticleCreaturePage: View {
     @State private var picture = 0
     @State private var fidgets = true
     @State private var dreams = false
+    @State private var accessory = 0
     @State private var doze = 0
 
     private static let emotions: [(String, CreatureSpeech.Emotion)] = [
@@ -158,6 +159,10 @@ private struct ParticleCreaturePage: View {
         ("Card", "creditcard.fill"), ("Star", "star.fill"),
     ]
     private static let dozes: [(String, Double?)] = [("Never", nil), ("10 s", 10), ("30 s", 30)]
+    private static let accessories: [(String, CreatureAccessory?)] = [
+        ("None", nil), ("Party hat", .partyHat), ("Crown", .crown), ("Beanie", .beanie), ("Taqiya", .taqiya),
+        ("Headphones", .headphones), ("Glasses", .glasses), ("Sunglasses", .sunglasses), ("Sleep mask", .sleepMask),
+    ]
     private static let placements: [(String, CreatureSpeech.Placement)] = [
         ("Above", .above), ("Trailing", .trailing), ("Leading", .leading),
     ]
@@ -207,6 +212,7 @@ private struct ParticleCreaturePage: View {
                 "Speech (4.10.0): speech: CreatureSpeech(\"Hi!\") says a line in words of light, no bubble: each letter flies out of the mouth on an arc to its place while the mouth talks, in rounded bold type in the mood's colour (ink on a light page, glowing in the dark) with a soft halo of the page round it. Then the words move with the emotion (from the mood by default): calm rests, joy hops in a wave with sparkles, a thought sways in a slant (the mouth still, the eyes on the words), a whisper glimmers small and pale, worry trembles, dizzy spins, sad sinks. Above or beside it; they go after a few seconds (or stay: duration .untilChanged). Hero only; leave room on their side.",
                 "Gestures (4.10.0): .creatureGesture(.nod, trigger: value) plays one each time the value changes: nod, shake, hop, shrug, flinch, perk, and a hand of particles that waves or points. The compact style hops for a wave and perks for a point.",
                 "Thoughts (4.11.0): a thought comes out of the top of the head with three dots of light rising to it, and CreatureSpeech(symbol:label:) thinks a picture, an SF Symbol drawn in dots that gather from the head.",
+                "Accessories (4.12.0): accessory: .partyHat, .crown, .beanie, .taqiya, .headphones (on the head, moving with the sphere), .glasses, .sunglasses, .sleepMask (on the eyes, following the gaze). Drawn in its own light: a soft fill, an outline and dots of light that gather from the sphere when it is put on and scatter when it comes off. The compact style wears hats only.",
                 "A life of its own (4.11.0): .creatureAmbience(CreatureAmbience(dozesAfter: 40)) makes an idle hero look round, stretch, rock or bounce now and then, doze off after a quiet spell (sleepy, then asleep) and daydream of the pictures it is given (daydreams:, about every 30 to 60 s); a touch, a line, a gesture or a new mood wakes it. Off by default.",
                 "Light mode (4.6.1): everything in ink, deeper colours with normal blending (light added to white is lost); the core a ball of colour that gives the swarm a body on white, the glow a faint haze, a soft shadow under it. On a dark surface in light mode, set .environment(\\.colorScheme, .dark) on it.",
             ],
@@ -221,7 +227,8 @@ private struct ParticleCreaturePage: View {
                         style: style,
                         level: Self.moods[mood].1 == .listening ? level : nil,
                         isInteractive: interactive,
-                        speech: speech
+                        speech: speech,
+                        accessory: Self.accessories[accessory].1
                     )
                     .creatureGesture(Self.gestures[gesture].1, trigger: played)
                     .creatureAmbience(CreatureAmbience(fidgets: fidgets, dozesAfter: Self.dozes[doze].1,
@@ -257,6 +264,7 @@ private struct ParticleCreaturePage: View {
             }
             ToggleControl("Fidgets", isOn: $fidgets)
             ToggleControl("Daydreams", isOn: $dreams)
+            ChoiceControl("Accessory", selection: $accessory, options: Self.accessories.indices.map { (Self.accessories[$0].0, $0) })
             ChoiceControl("Dozes after", selection: $doze, options: Self.dozes.indices.map { (Self.dozes[$0].0, $0) })
         }
     }
