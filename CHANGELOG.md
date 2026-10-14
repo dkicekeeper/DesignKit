@@ -49,6 +49,50 @@ ready-made prompts. Tenra's AI assistant is the first user.
 - Gallery pages for the three, with every mood, style and state; snapshot tests of the
   creature's still frames, the bubbles, the chips and their skeletons.
 
+## 4.5.1 - 2026-10-13
+
+The hero on colour and the shelf after a look on a device: the gradient starts at the screen's
+top edge and is pale with black text in light mode, a long amount stays inside the arc, and the
+shelf's tiles are one size in every card.
+[#61](https://github.com/dkicekeeper/DesignKit/pull/61)
+
+### Changed
+
+- `.heroBackground` in light mode is a pale tint of the colour (its shades at 30% over the page)
+  with the hero pieces as on the page: `\.heroTone` stays `.onSurface` there, so `TrendBadge` and
+  the hero charts draw marks in their colours, and `HeroSection`'s title, amount and subtitle are
+  black (the amount and subtitle grey on the page), the subtitle semibold. Dark mode keeps the
+  deep gradient with white pieces. The deep gradient read as brown in light mode.
+- `ScoreGaugeCard(style: .hero)` on colour follows it: in light mode the score, grade, trend and
+  subtitle are black, the capsules frosted white and the gauge as on the page (its colour, a grey
+  track).
+- `PackedCircleIcons(style: .shelf)`: the tiles are 36 pt in every shelf, whatever the count
+  (they shrank as the count grew, so a card with six items drew tiny tiles beside one with
+  three). As many as fit the width stand in the row, the largest amounts, closing up to 0.36
+  over each other to fit one more (four in the default 120 pt); the rest go into the "+N" tile,
+  and `maxVisible` still caps the row. The shelf is as wide as its row, so in a card's trailing
+  slot it stands at the trailing edge. Its skeleton matches.
+
+### Fixed
+
+- `.heroBackground` with `.heroScrollEdge()` starts its gradient at the screen's top edge,
+  behind the navigation bar and the status bar; it started at the bottom of the bar, with the
+  mesh's top row carried up behind it.
+- `ScoreGaugeCard(style: .hero)`: a long score ("1 200 000 ₸") ran onto the arc. It is offered
+  only the width inside the arc at the height of its top and shrinks to fit; an amount stays
+  whole (`FormattedAmountText(policy: .full)`), never abbreviated to "1.2M".
+
+### Migration
+
+- Nothing to change. A screen with `.heroBackground` gets the gradient from the top edge only
+  with `.heroScrollEdge()` on its scroll view, as 4.5.0 already asked.
+
+### Gallery and tooling
+
+- Snapshot test `scoreGaugeHeroLongAmount`; the hero, hero background and shelf references
+  re-recorded. The ScoreGaugeCard page's amount reaches 2 000 000 ₸, and the notes describe the
+  light mode.
+
 ## 4.5.0 - 2026-10-13
 
 The top of a detail screen on colour: `.heroBackground(color)` behind any hero, with its pieces in

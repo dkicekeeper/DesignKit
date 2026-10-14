@@ -40,10 +40,22 @@ public struct HeroSection<Accessory: View>: View {
     @State private var iconScale: CGFloat = AppAnimation.heroHiddenScale
     @State private var iconOpacity: Double = 0
     @Environment(\.heroTone) private var heroTone
+    @Environment(\.heroOnPale) private var onPale
 
     private var onColor: Bool { heroTone == .onColor }
-    /// The amount, the metric and the subtitle: secondary on the page, white on colour.
-    private var secondaryColor: Color { onColor ? AppColors.Text.primaryOnDark : AppColors.Text.secondary }
+    /// The subtitle and the progress line: secondary on the page, white on colour, black on the
+    /// pale gradient of light mode (4.5.1).
+    private var secondaryColor: Color {
+        onColor ? AppColors.Text.primaryOnDark : onPale ? AppColors.Text.primary : AppColors.Text.secondary
+    }
+    /// The amount and the metric: secondary on the page unless the app sets a colour; white on
+    /// colour; black on the pale gradient (4.5.1).
+    private var amountColor: Color {
+        onColor ? AppColors.Text.primaryOnDark
+            : primaryAmountColor ?? (onPale ? AppColors.Text.primary : AppColors.Text.secondary)
+    }
+    /// Semibold under the title on a gradient, so it reads there.
+    private var subtitleFont: Font { onColor || onPale ? AppTypography.bodyEmphasis : AppTypography.body }
 
     public init(
         icon: IconSource?,
@@ -116,7 +128,7 @@ public struct HeroSection<Accessory: View>: View {
                         amount: primaryAmount,
                         currency: primaryCurrency,
                         fontSize: AppTypography.h3,
-                        color: onColor ? AppColors.Text.primaryOnDark : (primaryAmountColor ?? AppColors.Text.secondary)
+                        color: amountColor
                     )
 
                     if showBaseConversion, !baseCurrency.isEmpty, primaryCurrency != baseCurrency {
@@ -133,7 +145,7 @@ public struct HeroSection<Accessory: View>: View {
                     // same visual slot/style as the amount.
                     Text(primaryText)
                         .font(AppTypography.h3)
-                        .foregroundStyle(onColor ? AppColors.Text.primaryOnDark : (primaryAmountColor ?? AppColors.Text.secondary))
+                        .foregroundStyle(amountColor)
                         .multilineTextAlignment(.center)
                 }
 
@@ -142,7 +154,7 @@ public struct HeroSection<Accessory: View>: View {
 
                 if let subtitle {
                     Text(subtitle)
-                        .font(onColor ? AppTypography.bodyEmphasis : AppTypography.body)
+                        .font(subtitleFont)
                         .foregroundStyle(secondaryColor)
                         .padding(.top, AppSpacing.xs)
                 }
@@ -153,7 +165,7 @@ public struct HeroSection<Accessory: View>: View {
                         Text("·")
                         Text("\(Int((progress.fraction * 100).rounded()))%")
                     }
-                    .font(onColor ? AppTypography.bodyEmphasis : AppTypography.body)
+                    .font(subtitleFont)
                     .foregroundStyle(secondaryColor)
                     .padding(.top, AppSpacing.xs)
                 }
