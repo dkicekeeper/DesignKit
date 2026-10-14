@@ -129,9 +129,9 @@ public enum CreatureSpeechMetrics {
     public static let maxWidth: CGFloat = 240
     /// A letter's flight from the mouth to its place.
     static let flight: Double = 0.4
-    /// The gap between the words and the creature's rim, its glow taken in (`rim` × its radius).
+    /// The gap between the words and the sphere's outline (`rim` × its radius).
     static let gap: CGFloat = 8
-    static let rim: Double = 1.1
+    static let rim: Double = 1.2
     /// The mouth under the sphere's centre, in its radius: where the letters come from.
     static let mouth: Double = 0.3
     /// How far the mood's colour is taken towards white for words in the dark.
@@ -261,13 +261,9 @@ struct CreatureSpeechWords: View {
                 emotion: emotion,
                 anchor: anchor,
                 mouth: mouth,
-                sparkle: color
+                sparkle: color,
+                glow: glows ? color.opacity(0.55) : nil
             ))
-            // A halo of the page round each letter, so the words read over anything; in the
-            // dark, a glow of their colour too.
-            .shadow(color: AppColors.Background.base, radius: CreatureSpeechMetrics.haloRadius)
-            .shadow(color: AppColors.Background.base, radius: CreatureSpeechMetrics.haloRadius)
-            .shadow(color: glows ? color.opacity(0.55) : .clear, radius: glows ? CreatureSpeechMetrics.glowRadius : 0)
         return Group {
             if let action = speech.action {
                 Button(action: action) { line }
@@ -288,13 +284,12 @@ struct CreatureSpeechRenderer: TextRenderer {
     let anchor: UnitPoint
     let mouth: CGSize
     let sparkle: Color
+    /// A glow of the words' colour round them, in the dark.
+    var glow: Color?
 
-    /// Room outside the text for the letters' flight from the mouth, their arc and the sparkles.
-    var displayPadding: EdgeInsets {
-        let around = 56.0
-        let side = abs(Double(mouth.width)) + around
-        return EdgeInsets(top: around, leading: side, bottom: max(0, Double(mouth.height)) + around, trailing: side)
-    }
+    // The letters fly outside the text's bounds, so nothing here may make the text a layer of
+    // its own (a view's shadow, `displayPadding`, which also moves the drawing): the halo and
+    // the glow are filters of the drawing itself.
 
     func draw(layout: Text.Layout, in context: inout GraphicsContext) {
         // The text's own bounds, to find the mouth in its coordinates.
@@ -309,6 +304,13 @@ struct CreatureSpeechRenderer: TextRenderer {
         let mouthY = anchorY + Double(mouth.height)
         let time = elapsed ?? 0
         let flight = CreatureSpeechMetrics.flight
+        // A halo of the page round each letter, so the words read over anything; in the dark,
+        // a glow of their colour too.
+        if let glow {
+            context.addFilter(.shadow(color: glow, radius: CreatureSpeechMetrics.glowRadius))
+        }
+        context.addFilter(.shadow(color: AppColors.Background.base, radius: CreatureSpeechMetrics.haloRadius))
+        context.addFilter(.shadow(color: AppColors.Background.base, radius: CreatureSpeechMetrics.haloRadius))
 
         var index = 0
         for line in layout {
