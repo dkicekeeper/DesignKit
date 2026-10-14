@@ -118,17 +118,19 @@ struct CreatureAccessoryDrawing {
             d.lines = [-0.36, 0, 0.36].map { [CGPoint(x: $0, y: -0.87), CGPoint(x: $0, y: -0.73)] }
             d.solids = [circle(center: CGPoint(x: 0, y: -1.27), radius: 0.09)]
         case .taqiya:
-            var cap = [CGPoint(x: -0.5, y: -0.82), CGPoint(x: -0.47, y: -1.02)]
-            cap += arc(center: CGPoint(x: 0, y: -1.02), rx: 0.47, ry: 0.1, from: .pi, to: 2 * .pi, steps: 12)
-            cap += [CGPoint(x: 0.5, y: -0.82)]
-            cap += arc(center: CGPoint(x: 0, y: -0.82), rx: 0.5, ry: 0.06, from: 0, to: .pi, steps: 10)
+            // A round skullcap on the crown of the head: a low dome, a zigzag ornament round it
+            // and a small four-pointed star in front.
+            var cap = arc(center: CGPoint(x: 0, y: -0.86), rx: 0.52, ry: 0.34, from: .pi, to: 2 * .pi, steps: 18)
+            cap += arc(center: CGPoint(x: 0, y: -0.86), rx: 0.52, ry: 0.05, from: 0, to: .pi, steps: 10)
             d.shapes = [cap]
-            // The ornament: a zigzag round the cap and a diamond in front.
             d.lines = [(0...8).map { k in
-                CGPoint(x: -0.4 + Double(k) * 0.1, y: k.isMultiple(of: 2) ? -0.88 : -0.96)
+                let x = -0.4 + Double(k) * 0.1
+                let rim = -0.86 - 0.34 * (1 - (x / 0.52) * (x / 0.52)).squareRoot()
+                return CGPoint(x: x, y: rim + (k.isMultiple(of: 2) ? 0.1 : 0.17))
             }]
             d.solids = [[
-                CGPoint(x: 0, y: -1.1), CGPoint(x: 0.05, y: -1.04), CGPoint(x: 0, y: -0.98), CGPoint(x: -0.05, y: -1.04),
+                CGPoint(x: 0, y: -1.1), CGPoint(x: 0.02, y: -1.07), CGPoint(x: 0.05, y: -1.05), CGPoint(x: 0.02, y: -1.03),
+                CGPoint(x: 0, y: -1.0), CGPoint(x: -0.02, y: -1.03), CGPoint(x: -0.05, y: -1.05), CGPoint(x: -0.02, y: -1.07),
             ]]
         case .headphones:
             let outer = arc(center: .zero, rx: 1.1, ry: 1.1, from: -.pi * 0.9, to: -.pi * 0.1, steps: 24)
