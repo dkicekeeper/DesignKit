@@ -16,6 +16,25 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 4.9.1 - 2026-10-14
+
+`ParticleCreature` gets a core: a soft ball of its colours at the centre of the swarm, so the
+creature without its glass has a body on a white page.
+[#66](https://github.com/dkicekeeper/DesignKit/pull/66)
+
+### Changed
+
+- `ParticleCreature` (the owner's idea): a soft ball of the mood's colours inside the swarm, with
+  a bell-shaped fall-off and no edge, the far particles behind it and the near ones in front. On
+  a light page it is colour (0.42 at the centre), in the dark it adds light (0.24, so the glowing
+  eyes over it keep their contrast). It breathes with the sphere, burns brighter while thinking,
+  dims asleep and flares at a tap. `.compact` has it fainter, inside its sphere.
+
+### Gallery and tooling
+
+- Gallery: the creature's summary and notes describe the core.
+- Snapshot references: the creature's still frames, in light and dark, re-recorded with the core.
+
 ## 4.9.0 - 2026-10-14
 
 The message field reads over a busy screen: focused, `MessageComposer` fills almost opaque behind

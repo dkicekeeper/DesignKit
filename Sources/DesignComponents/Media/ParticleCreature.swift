@@ -3,8 +3,9 @@
 //  DesignKit
 //
 //  A character made of light (4.6.0): a swarm of particles in the shape of a sphere, its outline
-//  a thin rim of light with a glow round it (4.7.0; a dark glass sphere held it before), and a face in
-//  the manner of a desk robot's screen: two glowing eyes drawn as solid shapes (a rounded lens
+//  a thin rim of light with a glow round it (4.7.0; a dark glass sphere held it before), a soft
+//  core of its colours inside that breathes with it (4.8.1), and a face in the manner of a
+//  desk robot's screen: two glowing eyes drawn as solid shapes (a rounded lens
 //  with a top lid and a cheek, an arc, a chevron, a heart, a spiral) and, for some moods, a small
 //  mouth (ParticleCreatureFace.swift). The swarm's moods are shapes: listening, it ripples with
 //  the voice; thinking, it gathers into a small core with three rings that spin in their own
@@ -31,9 +32,9 @@
 //
 //  Light mode (4.6.1; all of it since 4.7.0, when the glass went): light added to a white page
 //  is lost, so the swarm, its links, the rim, the face and the extras are drawn in ink, their
-//  colours deepened with normal blending; the glow becomes a faint haze and a soft shadow
-//  grounds the sphere instead of a light under it. On a dark surface in light mode, give it
-//  `.environment(\.colorScheme, .dark)`.
+//  colours deepened with normal blending; the core is a ball of colour, the glow a faint haze,
+//  and a soft shadow grounds the sphere instead of a light under it. On a dark surface in light
+//  mode, give it `.environment(\.colorScheme, .dark)`.
 //
 //  Tenra's assistant is the first user; which mood each of its states shows stays in the app.
 //
@@ -227,11 +228,13 @@ final class ParticleCreatureEngine {
     private var fromFace: CreatureFace?
     private var fromPalette: [RGB] = CreaturePalette.idle
     private var fromShell: Double = 1
+    private var fromCore: Double = 1
     private var lastParts: [CGPoint] = []
     private var lastDepth: [Double] = []
     private var lastFace: CreatureFace?
     private var lastPalette: [RGB] = CreaturePalette.idle
     private var lastShell: Double = 1
+    private var lastCore: Double = 1
 
     private var pokeAt: Double = -100
     private var pokePoint: CGPoint = .zero
@@ -292,6 +295,8 @@ final class ParticleCreatureEngine {
         let palette = (0..<4).map { fromPalette[$0] + (CreaturePalette.of(pose)[$0] - fromPalette[$0]) * paletteMix }
         let shellTarget: Double = pose == .answering ? 0 : 1
         let shell = blending ? fromShell + (shellTarget - fromShell) * smoothStep(mt / 0.6) : shellTarget
+        let coreTarget = Self.coreStrength(pose)
+        let core = blending ? fromCore + (coreTarget - fromCore) * paletteMix : coreTarget
         let gaze = animated ? gazeDirection(geo, t: t) : (x: 0, y: 0)
 
         var parts = [CGPoint](repeating: .zero, count: particles.count)
@@ -333,9 +338,10 @@ final class ParticleCreatureEngine {
         lastDepth = depth
         lastPalette = palette
         lastShell = shell
+        lastCore = core
 
         draw(in: &context, geo: geo, style: style, t: t, cy: cy, palette: palette, shell: shell,
-             parts: parts, depth: depth, face: shownFace, tear: tear, onLight: onLight)
+             core: core, parts: parts, depth: depth, face: shownFace, tear: tear, onLight: onLight)
     }
 
     // MARK: Building
@@ -375,14 +381,26 @@ final class ParticleCreatureEngine {
             fromDepth = lastDepth
             fromPalette = lastPalette
             fromShell = lastShell
+            fromCore = lastCore
             blending = true
         } else {
             fromPalette = CreaturePalette.of(next)
             fromShell = next == .answering ? 0 : 1
+            fromCore = Self.coreStrength(next)
             blending = false
         }
         pose = next
         poseAt = t
+    }
+
+    /// How strongly the core burns in a mood (4.8.1): brighter while thinking, dim asleep.
+    private static func coreStrength(_ pose: CreaturePose) -> Double {
+        switch pose {
+        case .thinking: CreatureCore.thinking
+        case .asleep: 0.45
+        case .sleepy: 0.7
+        default: 1
+        }
     }
 
     /// The compact sphere has no room for the chart, the coin or the burst.
@@ -747,6 +765,7 @@ final class ParticleCreatureEngine {
         cy: Double,
         palette: [RGB],
         shell: Double,
+        core: Double,
         parts: [CGPoint],
         depth: [Double],
         face: CreatureFace,
@@ -822,7 +841,7 @@ final class ParticleCreatureEngine {
         }
 
         // The swarm, bucketed by colour and depth: light added in the dark; in ink on a light
-        // page (4.6.1), where light added to white is lost.
+        // page (4.6.1), where light added to white is lost. The far half, the core, the near half.
         let dim: Double = pose == .asleep ? 0.45 : pose == .sleepy ? 0.7 : 1
         var swarm = context
         if !onLight { swarm.blendMode = .plusLighter }
@@ -844,18 +863,24 @@ final class ParticleCreatureEngine {
                 halos[tone].addEllipse(in: CGRect(x: p.x - halo, y: p.y - halo, width: halo * 2, height: halo * 2))
             }
         }
-        for tone in 0..<4 {
-            let ink = deepen(palette[tone], CreatureInk.depth)
-            for level in 0..<levels where !dots[tone][level].isEmpty {
-                let zl = (Double(level) + 0.5) / Double(levels)
-                let shade = onLight
-                    ? color(ink, (CreatureInk.nearAlpha + CreatureInk.depthAlpha * zl) * dim)
-                    : color(whiten(palette[tone], 0.15 * zl), (0.16 + 0.6 * zl) * dim)
-                swarm.fill(dots[tone][level], with: .color(shade))
+        func fillDots(_ range: Range<Int>) {
+            for tone in 0..<4 {
+                let ink = deepen(palette[tone], CreatureInk.depth)
+                for level in range where !dots[tone][level].isEmpty {
+                    let zl = (Double(level) + 0.5) / Double(levels)
+                    let shade = onLight
+                        ? color(ink, (CreatureInk.nearAlpha + CreatureInk.depthAlpha * zl) * dim)
+                        : color(whiten(palette[tone], 0.15 * zl), (0.16 + 0.6 * zl) * dim)
+                    swarm.fill(dots[tone][level], with: .color(shade))
+                }
             }
-            if !halos[tone].isEmpty {
-                swarm.fill(halos[tone], with: .color(color(whiten(palette[tone], 0.14), 0.035 * dim)))
-            }
+        }
+        fillDots(0..<levels / 2)
+        drawCore(in: context, center: center, radius: r0, hero: hero, globe: globe, t: t,
+                 palette: palette, strength: core * shell, onLight: onLight)
+        fillDots(levels / 2..<levels)
+        for tone in 0..<4 where !halos[tone].isEmpty {
+            swarm.fill(halos[tone], with: .color(color(whiten(palette[tone], 0.14), 0.035 * dim)))
         }
 
         // Faint links between the nearest particles on the front.
@@ -930,6 +955,49 @@ final class ParticleCreatureEngine {
         if let tear { CreatureFaceRenderer.tear(at: tear, radius: r0, in: &faceLayer, ink: faceInk) }
 
         if hero { drawExtras(in: &context, geo: geo, t: t, cy: cy, onLight: onLight) }
+    }
+
+    /// The core (4.8.1): a soft ball of the mood's colours inside the swarm, so the creature has
+    /// a body on a white page. It breathes with the sphere and flares at a tap; colour on a
+    /// light page, light in the dark, fainter in the avatar.
+    private func drawCore(
+        in context: GraphicsContext,
+        center: CGPoint,
+        radius r0: Double,
+        hero: Bool,
+        globe: Path,
+        t: Double,
+        palette: [RGB],
+        strength: Double,
+        onLight: Bool
+    ) {
+        let breath = sin(t * CreatureCore.breathRate)
+        let since = t - pokeAt
+        let flare = since >= 0 && since < 1.2 ? exp(-since / 0.25) : 0
+        let alpha = min(1, (onLight ? CreatureCore.ink : CreatureCore.light) * (hero ? 1 : CreatureCore.compact)
+            * strength * (1 + CreatureCore.breath * breath + CreatureCore.flare * flare))
+        guard alpha > 0.005 else { return }
+        let reach = r0 * CreatureCore.reach * (1 + CreatureCore.swell * breath + 0.12 * flare)
+        let inner = onLight ? deepen(palette[0], CreatureCore.depth) : whiten(palette[0], 0.3)
+        let outer = onLight ? deepen(palette[2], CreatureCore.depth) : palette[2]
+        let middle = inner + (outer - inner) * 0.5
+        var layer = context
+        if !onLight { layer.blendMode = .plusLighter }
+        if !hero { layer.clip(to: globe) }
+        // A bell-shaped fall-off, so the ball has no edge.
+        layer.fill(
+            Path(ellipseIn: CGRect(x: center.x - reach, y: center.y - reach, width: reach * 2, height: reach * 2)),
+            with: .radialGradient(
+                Gradient(stops: [
+                    .init(color: color(inner, alpha), location: 0),
+                    .init(color: color(inner, alpha * 0.83), location: 0.25),
+                    .init(color: color(middle, alpha * 0.47), location: 0.5),
+                    .init(color: color(outer, alpha * 0.17), location: 0.75),
+                    .init(color: color(outer, 0), location: 1),
+                ]),
+                center: center, startRadius: 0, endRadius: reach
+            )
+        )
     }
 
     /// The z's, hearts, sparkles and question mark beside the sphere: in ink on a light page.
@@ -1057,6 +1125,29 @@ enum CreatureGlow {
     /// and how fast it drifts round (radians a second).
     static let lightAngle: Double = 0.2
     static let drift: Double = 0.25
+}
+
+/// The core (4.8.1, the owner's idea once the glass went): a soft ball of the mood's colours
+/// at the centre of the swarm, its heart. Without it the swarm had no body on a white page.
+enum CreatureCore {
+    /// How far it reaches, in particle-sphere radii (it fades out there).
+    static let reach: Double = 0.72
+    /// Its opacity at the centre: colour on a light page, light in the dark (where the eyes over
+    /// it glow and need the contrast).
+    static let ink: Double = 0.42
+    static let light: Double = 0.24
+    /// On a light page its colours this much deeper, so the pale moods (the coin's yellow) show.
+    static let depth: Double = 0.1
+    /// The avatar's core, as a share of the hero's.
+    static let compact: Double = 0.7
+    /// The breath, in step with the sphere's (radians a second): how much it swells and
+    /// brightens.
+    static let breathRate: Double = 1.3
+    static let swell: Double = 0.06
+    static let breath: Double = 0.15
+    /// Brighter while thinking; how much a tap makes it flare.
+    static let thinking: Double = 1.3
+    static let flare: Double = 0.6
 }
 
 // MARK: - Geometry
