@@ -206,6 +206,21 @@ extension ComponentSnapshots {
             )
         }
 
+        /// 4.7.0: the still glyph at a tab icon's size and larger, and the tab label it makes.
+        @Test func creatureGlyph() async {
+            await assertComponentSnapshot(
+                HStack(spacing: AppSpacing.lg) {
+                    CreatureGlyph().fill(AppColors.accent).frame(width: 22, height: 22)
+                    CreatureGlyph().fill(AppColors.Text.primary).frame(width: 44, height: 44)
+                    CreatureGlyph().fill(AppColors.accent).frame(width: 88, height: 88)
+                    CreatureTabLabel(title: "Assistant")
+                        .foregroundStyle(AppColors.accent)
+                }
+                .padding(AppSpacing.lg),
+                appearances: [.light, .dark]
+            )
+        }
+
         @Test func chipPickerAll() async {
             await assertComponentSnapshot(
                 ChipPicker(

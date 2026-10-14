@@ -107,6 +107,27 @@ extension ComponentSnapshots {
                                 placeholder: "Add a comment…", limit: 36) {},
                 named: "overLimit"
             )
+            // 4.7.0: the attach slot and the microphone while the text is blank; the send button
+            // comes back with text.
+            await assertComponentSnapshot(
+                MessageComposer(
+                    text: .constant(""),
+                    placeholder: "Ask about your money…",
+                    leading: { MessageComposerAccessory(systemImage: "paperclip") },
+                    onVoice: {}
+                ) {},
+                named: "accessories",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                MessageComposer(
+                    text: .constant("How much did I spend on cafes?"),
+                    placeholder: "Ask about your money…",
+                    leading: { MessageComposerAccessory(systemImage: "paperclip") },
+                    onVoice: {}
+                ) {},
+                named: "accessoriesWithText"
+            )
         }
 
         /// FormTextField(limit:) (4.1.0): the count beside the help line from 80% of the limit,

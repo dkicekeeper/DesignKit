@@ -25,6 +25,7 @@ struct MediaScreen: View {
         AvatarGroupPage()
         HeroSymbolPage()
         ParticleCreaturePage()
+        CreatureGlyphPage()
         PackedCircleIconsPage()
         AchievementMedalPage()
         AchievementTilePage()
@@ -182,6 +183,31 @@ private struct ParticleCreaturePage: View {
             ToggleControl("Interactive", isOn: $interactive)
             SliderControl("Size", value: $size, in: 24...320, step: 4) { "\(Int($0)) pt" }
             SliderControl("Voice level", value: $level, in: 0...1)
+        }
+    }
+}
+
+private struct CreatureGlyphPage: View {
+    @State private var size = 44.0
+
+    var body: some View {
+        ComponentPage(
+            name: "CreatureGlyph",
+            summary: "ParticleCreature as a still, one-colour glyph: twelve dots in a ring and two capsule eyes.",
+            since: "4.7.0",
+            apps: [.tenra],
+            notes: [
+                "A Shape: fill it with any colour. For where the live creature cannot go: a tab bar item (CreatureTabLabel) and sizes under 24 pt.",
+                "CreatureGlyph.templateImage(size:) gives a template UIImage for a tab bar or a UIKit button.",
+            ]
+        ) {
+            HStack(spacing: AppSpacing.lg) {
+                CreatureGlyph().fill(AppColors.accent).frame(width: size, height: size)
+                CreatureGlyph().fill(AppColors.Text.primary).frame(width: size, height: size)
+            }
+            .frame(maxWidth: .infinity)
+        } controls: {
+            SliderControl("Size", value: $size, in: 16...160, step: 4) { "\(Int($0)) pt" }
         }
     }
 }

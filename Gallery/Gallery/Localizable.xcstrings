@@ -364,6 +364,17 @@
         }
       }
     },
+    "composer.voice" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dictate"
+          }
+        }
+      }
+    },
     "currency.all" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -1236,7 +1236,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `ShareCardFrame` (and `ShareCardSheet` while it loads), `LiveSessionBar`, `DownloadRow`, `ArticleBody` (2.8.0) | `…Skeleton` (`PhotoTileSkeleton(size:cornerRadius:)`, `PhotoStripSkeleton(count:size:)`, `PhotoGridSkeleton(count:columns:style:)`, `ShareCardSkeleton(format:)`, `ArticleBodySkeleton(paragraphs:)`) |
 | `TransactionRow`, `OptionCard`, `StreamingText`, `SnapCardPicker` (2.9.0) | `…Skeleton` (`TransactionRowSkeleton(showsDetails:)`, `StreamingTextSkeleton(font:)`, `SnapCardPickerSkeleton { the card's skeleton }`) |
 
-**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`, `CurrencyRow`, 3.6.0); `MetaLine` (3.6.0, a line inside a row that has the skeleton); `LoadMoreFooter` (4.1.0, the loading state itself); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); `ActionRowLabel` (3.1.0, a label); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
+**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`, `CurrencyRow`, 3.6.0); `MetaLine` (3.6.0, a line inside a row that has the skeleton); `LoadMoreFooter` (4.1.0, the loading state itself); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); `ActionRowLabel` (3.1.0, a label); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `CreatureTabLabel`, `CreatureGlyph`, `MessageComposerAccessory`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
 
 #### `SkeletonText` *(1.7.0)*
 A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `Skeleton`. For a component, use its skeleton (above); `.skeleton(isLoading:)` redacts a real view in place, with the system's placeholder shapes.
@@ -1659,7 +1659,26 @@ List { … }
   comment").
 - **Quote:** `MessageQuote(title: "Replying to Aida", text: …)`, the same type `CommentRow`
   shows in a reply; the × calls `onCancelQuote`.
-- VoiceOver: keys `composer.send` ("Send") and `composer.cancelQuote` ("Remove quote").
+- **Attach and voice** *(4.7.0)*: `leading:` puts a button or a menu inside the glass before the
+  text, with `MessageComposerAccessory(systemImage:)` as its label (an icon in a circle the size
+  of the send button, so they line up); `onVoice:` puts an accent microphone in the send
+  button's place while the text is blank, and the send button comes back with the first
+  character. An assistant's composer:
+
+```swift
+MessageComposer(text: $draft, placeholder: String(localized: "assistant.composer.placeholder"),
+                isSending: model.isWorking,
+                leading: {
+                    Menu { … } label: { MessageComposerAccessory(systemImage: "paperclip") }
+                        .accessibilityLabel(String(localized: "assistant.attach"))
+                },
+                onVoice: { showingVoice = true }) {
+    send(draft)
+}
+```
+
+- VoiceOver: keys `composer.send` ("Send"), `composer.cancelQuote` ("Remove quote") and
+  `composer.voice` ("Dictate", 4.7.0).
 - An input: no skeleton.
 
 #### `FlowLayout` *(0.7.0)*
@@ -2019,6 +2038,14 @@ faded for the chart, 45% deeper with a fainter glow; and a soft shadow under the
 of the light. As the glass fades the swarm on it passes from light to ink. `.compact` is clipped
 to its glass and looks the same in both. On a dark surface in light mode, set
 `.environment(\.colorScheme, .dark)` on it.
+
+#### `CreatureGlyph` and `CreatureTabLabel` *(4.7.0)*
+`CreatureGlyph()` is the creature as a still, one-colour `Shape`: twelve dots in a ring and two
+capsule eyes (`CreatureGlyphMetrics`). For where the live creature cannot go: a tab bar item and
+sizes under the compact style's 24 pt. `CreatureGlyph.templateImage(size:)` (26 pt by default)
+is the same as a template `UIImage`, tinted by whatever holds it. `CreatureTabLabel(title:)` is
+a tab item: that image over a title. A tab item takes only an image and a text, so the live
+creature waits inside the screen the tab opens. Decoration and a label: no skeleton.
 
 #### `MessageBubble`
 `MessageBubble(text, role: .outgoing)`: the person's message on the trailing side in the accent,

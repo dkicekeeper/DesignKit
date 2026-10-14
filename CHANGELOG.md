@@ -16,6 +16,52 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 4.7.0 - 2026-10-14
+
+The assistant moves into the tab bar and its field takes attachments and voice: a still glyph of
+`ParticleCreature` for a tab item, and an attach slot and a microphone in `MessageComposer`.
+[#63](https://github.com/dkicekeeper/DesignKit/pull/63)
+
+### Added
+
+- `CreatureGlyph`: the creature as a still, one-colour `Shape`, twelve dots in a ring and two
+  capsule eyes, for a tab item and sizes under 24 pt; `CreatureGlyph.templateImage(size:)` gives
+  it as a template `UIImage`; `CreatureGlyphMetrics` holds its proportions.
+- `CreatureTabLabel(title:)`: a tab item with that glyph over a title.
+- `MessageComposer(leading:)`: a button or a menu inside the glass before the text, and
+  `MessageComposerAccessory(systemImage:)` as its label, an icon in a circle the size of the
+  send button.
+- `MessageComposer(onVoice:)`: an accent microphone in the send button's place while the text is
+  blank; the send button comes back with the first character.
+- String `composer.voice` ("Dictate"), VoiceOver on the microphone.
+
+### Changed
+
+- `MessageComposer` is generic over its leading slot (`MessageComposer<Leading>`). A composer
+  without `leading:` is `MessageComposer<EmptyView>` and looks as before.
+
+### Migration
+
+- Nothing to change for a composer without the new parameters. Code that names the type
+  (`let composer: MessageComposer`) writes `MessageComposer<EmptyView>`. An assistant's field:
+
+```swift
+MessageComposer(text: $draft, placeholder: placeholder, isSending: isWorking,
+                leading: {
+                    Menu { … } label: { MessageComposerAccessory(systemImage: "paperclip") }
+                },
+                onVoice: { showingVoice = true }) {
+    send(draft)
+}
+```
+
+### Gallery and tooling
+
+- Gallery: a `CreatureGlyph` page in Media, a `CreatureTabLabel` page in Navigation, Attach and
+  Voice controls on the `MessageComposer` page.
+- Snapshot tests: `creatureGlyph`, and `MessageComposer`'s `accessories` and
+  `accessoriesWithText`.
+
 ## 4.6.1 - 2026-10-14
 
 `ParticleCreature` on a light page: the glass stays dark and what lies around it is drawn in
