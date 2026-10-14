@@ -25,6 +25,7 @@ struct NavigationScreen: View {
         UniversalCarouselPage()
         OnboardingStepIndicatorPage()
         PlusTabLabelPage()
+        CreatureTabLabelPage()
         LiveSessionBarPage()
         PagerArrowsPage()
     }
@@ -211,6 +212,28 @@ private struct PlusTabLabelPage: View {
                 .onTapGesture { withAnimation(AppAnimation.contentSpring) { isExpanded.toggle() } }
         } controls: {
             ToggleControl("Expanded", isOn: $isExpanded)
+        }
+    }
+}
+
+private struct CreatureTabLabelPage: View {
+    @State private var title = "Assistant"
+
+    var body: some View {
+        ComponentPage(
+            name: "CreatureTabLabel",
+            summary: "An assistant's tab: ParticleCreature's still glyph (twelve dots and two eyes) over a title, tinted by the bar.",
+            since: "4.8.0",
+            apps: [.tenra],
+            notes: [
+                "A tab item takes only an image and a text, so the live creature waits inside the screen the tab opens.",
+                "The glyph is CreatureGlyph.templateImage(): a template image, so the bar tints it like a symbol.",
+            ]
+        ) {
+            CreatureTabLabel(title: title)
+                .foregroundStyle(AppColors.accent)
+        } controls: {
+            TextControl("Title", text: $title)
         }
     }
 }

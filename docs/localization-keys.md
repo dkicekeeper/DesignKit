@@ -50,6 +50,7 @@ text, not keys. A new key goes there as well.
 | `common.startDate` | DatePickerRow | — |
 | `composer.cancelQuote` | MessageComposer (VoiceOver on the quote's ×) | `Remove quote` |
 | `composer.send` | MessageComposer (VoiceOver on the send button) | `Send` |
+| `composer.voice` | MessageComposer (VoiceOver on the microphone, 4.8.0) | `Dictate` |
 | `currency.all` | CurrencyList | `All Currencies` |
 | `currency.conversion.approximate` | CurrencyAmountInput | `≈` |
 | `currency.customizeAction` | CurrencyPickerMenu (with `onCustomize`) | `Customize…` |

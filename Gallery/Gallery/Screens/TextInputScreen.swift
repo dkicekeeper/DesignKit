@@ -124,44 +124,80 @@ private struct MessageComposerPage: View {
     @State private var isSending = false
     @State private var disabled = false
     @State private var limited = false
+    @State private var attach = false
+    @State private var voice = false
 
     var body: some View {
         ComponentPage(
             name: "MessageComposer",
-            summary: "The field at the bottom of a conversation: glass that grows to five lines, the send button inside, the quoted message, the send error.",
+            summary: "The field at the bottom of a conversation: glass that grows to five lines, the send button inside, the quoted message, the send error; an attach slot and a microphone for an assistant.",
             since: "1.12.0",
-            apps: [.dalada],
+            apps: [.dalada, .tenra],
             canvas: .fill,
             notes: [
                 "Put it in safeAreaBar(edge: .bottom) so the list scrolls under the glass; give it the screen margins.",
                 "Signed out: .disabled(true) with a placeholder that says why.",
                 "limit: (4.1.0) shows the count over the field from 80% of it; over it the count is red and sending is off.",
+                "leading: (4.8.0) puts an attach button or menu inside the glass, with MessageComposerAccessory as its label. onVoice: puts a microphone in the send button's place while the text is blank.",
             ]
         ) {
-            MessageComposer(
-                text: $text,
-                placeholder: disabled ? "Sign in to comment" : "Add a comment…",
-                quote: showsQuote ? MessageQuote(title: "Replying to Aida", text: "Was anyone on the lake this weekend?") : nil,
-                isSending: isSending,
-                errorMessage: showsError ? "No connection. Try again." : nil,
-                limit: limited ? 40 : nil,
-                onCancelQuote: { showsQuote = false }
-            ) {
-                isSending = true
-                Task {
-                    try? await Task.sleep(for: .seconds(1))
-                    text = ""
-                    isSending = false
+            Group {
+                if attach {
+                    MessageComposer(
+                        text: $text,
+                        placeholder: "Ask about your money…",
+                        quote: showsQuote ? MessageQuote(title: "Replying to Aida", text: "Was anyone on the lake this weekend?") : nil,
+                        isSending: isSending,
+                        errorMessage: showsError ? "No connection. Try again." : nil,
+                        limit: limited ? 40 : nil,
+                        leading: {
+                            Menu {
+                                Button("Receipt", systemImage: "camera") {}
+                                Button("Statement", systemImage: "doc") {}
+                            } label: {
+                                MessageComposerAccessory(systemImage: "paperclip")
+                            }
+                            .accessibilityLabel("Attach")
+                        },
+                        onVoice: voice ? {} : nil,
+                        onCancelQuote: { showsQuote = false }
+                    ) {
+                        send()
+                    }
+                } else {
+                    MessageComposer(
+                        text: $text,
+                        placeholder: disabled ? "Sign in to comment" : "Add a comment…",
+                        quote: showsQuote ? MessageQuote(title: "Replying to Aida", text: "Was anyone on the lake this weekend?") : nil,
+                        isSending: isSending,
+                        errorMessage: showsError ? "No connection. Try again." : nil,
+                        limit: limited ? 40 : nil,
+                        onVoice: voice ? {} : nil,
+                        onCancelQuote: { showsQuote = false }
+                    ) {
+                        send()
+                    }
                 }
             }
             .disabled(disabled)
         } controls: {
+            ToggleControl("Attach", isOn: $attach)
+            ToggleControl("Voice", isOn: $voice)
             ToggleControl("Quote", isOn: $showsQuote)
             ToggleControl("Error", isOn: $showsError)
             ToggleControl("Sending", isOn: $isSending)
             ToggleControl("Limit 40", isOn: $limited)
             ToggleControl("Disabled", isOn: $disabled)
             TextControl("Text", text: $text)
+        }
+    }
+
+    private func send() {
+        isSending = true
+        Task {
+            try? await Task.sleep(for: .seconds(1))
+            text = ""
+            isSending = false
         }
     }
 }
