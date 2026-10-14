@@ -716,10 +716,11 @@ In dark mode `\.heroTone` inside it is `.onColor`, and DesignKit's hero pieces d
     `.fan` (playing cards along an arc, where the cards behind the top one barely showed):
     `.fan` is deprecated and draws the shelf.
   - **`style: .orbit`** *(4.7.0, from an owner's reference)*: a carousel of coins. Coins of one
-    size (0.62 of the box's height, at most 0.3 of its width), the largest amount in front, the
-    rest round a ring seen from slightly above (the far side 0.2 of the height higher) that turns
-    to the right in front, once in 24 s. Depth is focus and size: a coin at the back is 0.62 of
-    the front one and out of focus (blur up to 0.11 of its diameter), a front one sharp with a
+    size (0.5 of the box's height, at most 0.3 of its width), the largest amount in front, the
+    rest round a ring seen from slightly above (the far side 0.38 of the height higher, so the far
+    coins show over the near ones; at rest turned 15°, so none stands straight behind another)
+    that turns to the right in front, once in 24 s. Depth is focus and size: a coin at the back
+    is 0.62 of the front one and out of focus (blur up to 0.07 of its diameter), a front one sharp with a
     soft shadow. A coin turns its face towards the side it is on (up to 55° at the sides, face on
     again at the back, so none shows its back), its rim (0.07 of the diameter, light plastic in
     light mode, darker in dark mode) showing out from behind it and along the bottom; a sheen

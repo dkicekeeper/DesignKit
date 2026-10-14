@@ -25,11 +25,11 @@ import DesignSupport
 
 enum PackedOrbitMetrics {
     /// A coin's diameter: this share of the box's height, at most `widthShare` of its width.
-    static let heightShare: CGFloat = 0.62
+    static let heightShare: CGFloat = 0.5
     static let widthShare: CGFloat = 0.3
     /// The ring seen from slightly above: the far side is this share of the box's height above
-    /// the near side.
-    static let rise: CGFloat = 0.2
+    /// the near side, so the far coins show over the near ones.
+    static let rise: CGFloat = 0.38
     /// The far side's scale.
     static let farScale: CGFloat = 0.62
     /// How far a coin at the side turns its face that way.
@@ -37,8 +37,11 @@ enum PackedOrbitMetrics {
     static let perspective: CGFloat = 0.5
     /// Out of focus behind `sharpUntil` (depth: 1 in front, −1 at the back), up to this share
     /// of the diameter at the back.
-    static let blurShare: CGFloat = 0.11
+    static let blurShare: CGFloat = 0.07
     static let sharpUntil: Double = 0.25
+    /// The ring at rest is turned this far (radians), so no coin stands straight behind
+    /// another and the first is still in front.
+    static let restTurn: Double = 0.26
     /// The coin's thickness, as a share of its diameter.
     static let thickness: CGFloat = 0.07
     /// The bob, up and down, as a share of the diameter, and one bob in seconds.
@@ -110,11 +113,12 @@ struct PackedOrbitGeometry: Equatable {
         )
     }
 
-    /// Where coin `index` of `count` stands when the ring is at rest: the first in front, the
-    /// next to its left, so the ring, turning right, brings them forward in order.
+    /// Where coin `index` of `count` stands when the ring is at rest: the first in front (a
+    /// little to the right, `restTurn`), the next to its left, so the ring, turning right,
+    /// brings them forward in order.
     static func angle(_ index: Int, of count: Int) -> Double {
         guard count > 0 else { return 0 }
-        return -2 * Double.pi * Double(index) / Double(count)
+        return PackedOrbitMetrics.restTurn - 2 * Double.pi * Double(index) / Double(count)
     }
 }
 
@@ -235,7 +239,7 @@ struct PackedOrbit: View {
     private func frontIndex(angle: Double) -> Int {
         guard count > 0 else { return 0 }
         let step = 2 * Double.pi / Double(count)
-        let turns = (angle / step).rounded()
+        let turns = ((angle + PackedOrbitMetrics.restTurn) / step).rounded()
         return ((Int(turns) % count) + count) % count
     }
 
