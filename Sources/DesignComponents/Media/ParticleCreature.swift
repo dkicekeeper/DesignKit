@@ -116,6 +116,7 @@ public struct ParticleCreature: View {
     let level: Double?
     let isInteractive: Bool
     let speech: CreatureSpeech?
+    let accessory: CreatureAccessory?
 
     @Environment(\.designKitMotion) private var designKitMotion
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -138,18 +139,23 @@ public struct ParticleCreature: View {
     ///   - speech: A line it says (4.10.0, hero only): the letters fly out of its mouth while
     ///     it talks, in its mood's colour, and move the way it feels. A new line replaces the
     ///     one on screen; `nil` takes it away.
+    ///   - accessory: What it wears (4.12.0), drawn in its own light: a change puts the new one
+    ///     on (its dots gather from the sphere) and takes the old one off (they scatter). The
+    ///     compact style wears hats only.
     public init(
         mood: Mood = .idle,
         style: Style = .hero,
         level: Double? = nil,
         isInteractive: Bool = false,
-        speech: CreatureSpeech? = nil
+        speech: CreatureSpeech? = nil,
+        accessory: CreatureAccessory? = nil
     ) {
         self.mood = mood
         self.style = style
         self.level = level.map { min(max($0, 0), 1) }
         self.isInteractive = isInteractive
         self.speech = speech
+        self.accessory = accessory
     }
 
     /// Motion of its own: off under Reduce Motion and `.designKitMotion(false)`.
@@ -339,9 +345,10 @@ public struct ParticleCreature: View {
         let still = time == nil ? gestureFrame : nil
         let isRTL = layoutDirection == .rightToLeft
         let ambience = moves ? ambience : .still
+        let accessory = accessory
         return Canvas { context, size in
             engine.render(in: &context, size: size, mood: mood, style: style, level: level, time: time,
-                          onLight: onLight, still: still, isRTL: isRTL, ambience: ambience)
+                          onLight: onLight, still: still, isRTL: isRTL, ambience: ambience, accessory: accessory)
         }
     }
 
@@ -500,7 +507,8 @@ final class ParticleCreatureEngine {
         onLight: Bool = false,
         still: CreatureGestureFrame? = nil,
         isRTL: Bool = false,
-        ambience: CreatureAmbience = .still
+        ambience: CreatureAmbience = .still,
+        accessory: CreatureAccessory? = nil
     ) {
         let geo = Geometry(size: size, style: style)
         guard geo.radius > 1 else { return }
@@ -509,6 +517,7 @@ final class ParticleCreatureEngine {
         let t = time.map { $0 - (origin ?? $0) } ?? 0
         build(style: style, radius: geo.radius)
         self.ambience = style == .hero ? ambience : .still
+        dress(accessory, t: t, animated: animated)
         if pointer != nil { quietSince = t }
 
         let mapped = Self.map(mood, style: style)
@@ -645,6 +654,163 @@ final class ParticleCreatureEngine {
 
         draw(in: &context, geo: geo, style: style, t: t, cy: cy, palette: palette, shell: shell,
              core: core, parts: parts, depth: depth, face: shownFace, tear: tear, motion: motion, onLight: onLight)
+    }
+
+    // MARK: Accessories
+
+    /// What it wears (4.12.0): the accessory on it and when it was put on, and the one being
+    /// taken off; the first frame dresses it without a change.
+    private var worn: CreatureAccessory?
+    private var wornAt: Double = -100
+    private var shed: CreatureAccessory?
+    private var shedAt: Double = -100
+    private var dressed = false
+
+    private func dress(_ accessory: CreatureAccessory?, t: Double, animated: Bool) {
+        guard accessory != worn || !dressed else { return }
+        if dressed && animated {
+            shed = worn
+            shedAt = t
+            worn = accessory
+            wornAt = t
+        } else {
+            shed = nil
+            worn = accessory
+            wornAt = -100
+        }
+        dressed = true
+    }
+
+    /// The pieces to draw now: the one worn (with how far it is on, `nil` all the way) and the one
+    /// leaving (with how far it has gone).
+    private func wardrobe(at t: Double) -> [(accessory: CreatureAccessory, on: Double?, off: Double?)] {
+        var pieces: [(accessory: CreatureAccessory, on: Double?, off: Double?)] = []
+        if let shed {
+            let off = (t - shedAt) / CreatureAccessoryMetrics.shed
+            if off < 1 { pieces.append((shed, nil, max(off, 0))) } else { self.shed = nil }
+        }
+        if let worn {
+            let on = (t - wornAt) / CreatureAccessoryMetrics.wear
+            pieces.append((worn, on < 1 ? max(on, 0) : nil, nil))
+        }
+        return pieces
+    }
+
+    /// One accessory: a soft fill and an outline in the mood's colours (light in the dark, ink on
+    /// a light page), its solid parts stronger, dots of light along the outline. `on`: its dots
+    /// gather from the sphere, then the outline and the fill come; `off`: they fade and the dots
+    /// scatter.
+    private func drawAccessory(
+        _ accessory: CreatureAccessory,
+        on: Double?,
+        off: Double?,
+        in context: GraphicsContext,
+        origin: CGPoint,
+        unit: Double,
+        sphere: CGPoint,
+        geo: Geometry,
+        face: CreatureFace,
+        palette: [RGB],
+        hero: Bool,
+        strength: Double,
+        t: Double,
+        onLight: Bool
+    ) {
+        let drawing = CreatureAccessoryDrawing.of(accessory, face: face)
+        let place: ([CGPoint]) -> [CGPoint] = { points in
+            points.map { CGPoint(x: origin.x + $0.x * unit, y: origin.y + $0.y * unit) }
+        }
+        func path(_ points: [CGPoint], closed: Bool) -> Path {
+            var path = Path()
+            path.addLines(place(points))
+            if closed { path.closeSubpath() }
+            return path
+        }
+        let lineTone = onLight ? deepen(palette[0], CreatureInk.depth) : whiten(palette[1], 0.35)
+        let fillTone = onLight ? deepen(palette[0], CreatureCore.depth) : palette[0]
+        let solidTone = onLight ? deepen(palette[2], 0.3) : whiten(palette[2], 0.15)
+        let formed = (on.map { smoothStep(($0 - 0.45) / 0.35) } ?? 1) * (off.map { 1 - smoothStep($0 / 0.35) } ?? 1) * strength
+        let filled = (on.map { smoothStep(($0 - 0.6) / 0.4) } ?? 1) * (off.map { 1 - smoothStep($0 / 0.3) } ?? 1) * strength
+        let lineWidth = hero ? max(1, 1.5 * geo.scale) : max(0.7, geo.radius / 22)
+
+        var light = context
+        if !onLight { light.blendMode = .plusLighter }
+        if filled > 0.01 {
+            var fill = light
+            fill.opacity = (onLight ? CreatureAccessoryMetrics.inkFill : CreatureAccessoryMetrics.lightFill) * filled
+            for shape in drawing.shapes { fill.fill(path(shape, closed: true), with: .color(color(fillTone, 1))) }
+        }
+        if formed > 0.01 {
+            var line = light
+            line.opacity = (onLight ? CreatureGlow.inkRimPeak : CreatureGlow.rimPeak) * formed
+            for shape in drawing.shapes {
+                line.stroke(path(shape, closed: true), with: .color(color(lineTone, 1)), lineWidth: lineWidth)
+            }
+            for stroke in drawing.lines {
+                line.stroke(path(stroke, closed: false), with: .color(color(lineTone, 1)),
+                            style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round))
+            }
+        }
+        // The dark lenses and the mask cover the eyes: drawn as they are, not added as light.
+        let covers = accessory == .sunglasses || accessory == .sleepMask
+        if filled > 0.01 && !drawing.solids.isEmpty {
+            var solid = covers ? context : light
+            if covers {
+                solid.opacity = 0.92 * filled
+                let tone = accessory == .sunglasses ? RGB(26, 24, 38) : deepen(palette[2], onLight ? 0.2 : 0.5)
+                for piece in drawing.solids { solid.fill(path(piece, closed: true), with: .color(color(tone, 1))) }
+                solid.opacity = (onLight ? 0.9 : 0.75) * filled
+                for piece in drawing.solids {
+                    solid.stroke(path(piece, closed: true), with: .color(color(lineTone, 1)), lineWidth: lineWidth)
+                }
+            } else {
+                solid.opacity = (onLight ? CreatureAccessoryMetrics.inkSolid : CreatureAccessoryMetrics.lightSolid) * filled
+                for piece in drawing.solids { solid.fill(path(piece, closed: true), with: .color(color(solidTone, 1))) }
+            }
+            var mark = context
+            mark.opacity = 0.85 * filled
+            let markTone = accessory == .sunglasses ? RGB(255, 255, 255) : whiten(palette[1], 0.6)
+            for stroke in drawing.marks {
+                mark.stroke(path(stroke, closed: false), with: .color(color(markTone, 1)),
+                            style: StrokeStyle(lineWidth: lineWidth * 0.9, lineCap: .round, lineJoin: .round))
+            }
+        }
+        // The dots of light along the outline: they gather from the sphere, twinkle, scatter.
+        guard hero else { return }
+        let spots = place(drawing.dots(spacing: CreatureAccessoryMetrics.dotSpacing * geo.radius / unit))
+        guard !spots.isEmpty else { return }
+        var dots = light
+        let size = 1.3 * geo.unit
+        let dotTone = onLight ? lineTone : whiten(lineTone, 0.4)
+        for (index, spot) in spots.enumerated() {
+            let i = Double(index)
+            let seed = fraction(sin(i * 12.9898 + 3.3) * 43758.5453)
+            var point = spot
+            var alpha = 0.55 + 0.45 * (0.5 + 0.5 * sin(t * 2.4 + i * 1.7))
+            if let on {
+                // Out of the sphere, staggered, on a little arc.
+                let local = min(max((on * CreatureAccessoryMetrics.wear - seed * CreatureAccessoryMetrics.spread)
+                    / CreatureAccessoryMetrics.flight, 0), 1)
+                guard local > 0 else { continue }
+                let angle = seed * 2 * .pi
+                let from = CGPoint(x: sphere.x + cos(angle) * geo.radius * 0.6, y: sphere.y + sin(angle) * geo.radius * 0.6)
+                let e = 1 - pow(1 - local, 3)
+                point = CGPoint(x: from.x + (spot.x - from.x) * e,
+                                y: from.y + (spot.y - from.y) * e - sin(.pi * local) * geo.radius * 0.15)
+                alpha *= min(1, local * 2)
+            }
+            if let off {
+                let dx = spot.x - sphere.x
+                let dy = spot.y - sphere.y
+                let d = max(hypot(dx, dy), 1)
+                let push = off * geo.radius * (0.3 + 0.3 * seed)
+                point = CGPoint(x: spot.x + dx / d * push, y: spot.y + dy / d * push + off * off * geo.radius * 0.2)
+                alpha *= 1 - off
+            }
+            dots.opacity = alpha * strength
+            dots.fill(Path(ellipseIn: CGRect(x: point.x - size, y: point.y - size, width: size * 2, height: size * 2)),
+                      with: .color(color(dotTone, 1)))
+        }
     }
 
     /// What a gesture does to the face: where the eyes look, how wide they are, a blink.
@@ -1283,6 +1449,18 @@ final class ParticleCreatureEngine {
                      lineWidth: max(1, 1.5 * geo.scale), onLight: onLight)
         }
 
+        // A hat (4.12.0) on the top of the sphere, moving with it; it goes with the sphere when
+        // the swarm pours into the chart.
+        let pieces = wardrobe(at: t)
+        // The avatar's hat is a little smaller, its brim still on the top of the sphere.
+        let hatScale = hero ? 1 : CreatureAccessoryMetrics.compactHat
+        let hatOrigin = CGPoint(x: center.x, y: center.y - shellRadius * CreatureAccessoryMetrics.brim * (1 - hatScale))
+        for piece in pieces where piece.accessory.isOnHead {
+            drawAccessory(piece.accessory, on: piece.on, off: piece.off, in: body, origin: hatOrigin,
+                          unit: shellRadius * hatScale, sphere: center, geo: geo, face: face, palette: palette,
+                          hero: hero, strength: shell, t: t, onLight: onLight)
+        }
+
         // The face, turned with the head; in ink on a light page.
         var faceLayer = body
         if !hero { faceLayer.clip(to: globe) }
@@ -1295,6 +1473,15 @@ final class ParticleCreatureEngine {
         let faceInk: Double = onLight ? 1 : 0
         CreatureFaceRenderer.draw(face, in: &faceLayer, radius: r0, hero: hero, time: t, ink: faceInk)
         if let tear { CreatureFaceRenderer.tear(at: tear, radius: r0, in: &faceLayer, ink: faceInk) }
+
+        // Glasses and masks (4.12.0) on the eyes, following the gaze; the hero only.
+        if hero {
+            for piece in pieces where !piece.accessory.isOnHead {
+                drawAccessory(piece.accessory, on: piece.on, off: piece.off, in: faceLayer, origin: face.anchor,
+                              unit: r0 * CreatureFace.scale, sphere: center, geo: geo, face: face, palette: palette,
+                              hero: hero, strength: 1, t: t, onLight: onLight)
+            }
+        }
 
         if hero { drawExtras(in: &body, geo: geo, t: t, cy: cy, onLight: onLight) }
     }

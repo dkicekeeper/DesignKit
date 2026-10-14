@@ -16,6 +16,24 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 4.12.0 - 2026-10-15
+
+`ParticleCreature` wears accessories of light: the last step of the assistant as a character.
+[#69](https://github.com/dkicekeeper/DesignKit/pull/69)
+
+### Added
+
+- `ParticleCreature(accessory:)` and `CreatureAccessory`: `.partyHat`, `.crown`, `.beanie`,
+  `.taqiya`, `.headphones` on the head (moving with the sphere), `.glasses`, `.sunglasses`,
+  `.sleepMask` on the eyes (following the gaze). Drawn in the creature's own light: a soft fill,
+  an outline and dots of light that gather from the sphere when it is put on and scatter when it
+  comes off. The compact style wears hats only. `CreatureAccessory.isOnHead`.
+
+### Gallery and tooling
+
+- Gallery: an accessory control on the creature's page.
+- Snapshot test: `particleCreatureAccessories` (light, dark).
+
 ## 4.11.0 - 2026-10-15
 
 `ParticleCreature` thinks pictures and lives on its own: the next step of the assistant as a

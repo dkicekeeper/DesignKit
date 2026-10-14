@@ -309,6 +309,29 @@ extension ComponentSnapshots {
             )
         }
 
+        /// 4.12.0: the eight accessories, worn by a happy hero (hats and headphones on the head,
+        /// glasses and masks on the eyes), and hats on the avatar.
+        @Test func particleCreatureAccessories() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.md) {
+                    LazyVGrid(columns: Array(repeating: GridItem(.fixed(76), spacing: AppSpacing.sm), count: 4), spacing: AppSpacing.sm) {
+                        ForEach(CreatureAccessory.allCases, id: \.self) { accessory in
+                            ParticleCreature(mood: accessory == .sleepMask ? .asleep : .happy, accessory: accessory)
+                                .frame(width: 76, height: 76)
+                        }
+                    }
+                    HStack(spacing: AppSpacing.lg) {
+                        ForEach([CreatureAccessory.partyHat, .crown, .beanie, .taqiya], id: \.self) { accessory in
+                            ParticleCreature(mood: .happy, style: .compact, accessory: accessory)
+                                .frame(width: 40, height: 40)
+                        }
+                    }
+                }
+                .padding(AppSpacing.lg),
+                appearances: [.light, .dark]
+            )
+        }
+
         /// 4.10.0: gestures held halfway in a still frame: the hand of particles waving and
         /// pointing each way, a nod, a hop in the air, a shrug, a perk.
         @Test func particleCreatureGestures() async {
