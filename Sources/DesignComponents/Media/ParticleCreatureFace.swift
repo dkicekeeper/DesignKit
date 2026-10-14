@@ -43,6 +43,8 @@ struct CreatureMouth: Equatable {
     var form: Form = .none
     var y: Double = 0.26
     var width: Double = 0.12
+    /// How far an `.open` mouth is open: its height, as a share of its width (talking, 4.10.0).
+    var open: Double = 0.8
 }
 
 struct CreatureFace: Equatable {
@@ -56,6 +58,8 @@ struct CreatureFace: Equatable {
     static let dimCyan: SIMD3<Double> = [70, 140, 200]
     /// The face is drawn this much larger than its numbers: big screen eyes.
     static let scale: Double = 1.3
+    /// The mouth's width while the creature talks (4.10.0).
+    static let talkWidth: Double = 0.1
 
     /// Both eyes the same, mirrored.
     private static func pair(_ eye: CreatureEye, mouth: CreatureMouth = CreatureMouth()) -> CreatureFace {
@@ -160,6 +164,7 @@ struct CreatureFace: Equatable {
         var mouth = b
         mouth.y = mix(a.y, b.y, t)
         mouth.width = mix(a.width, b.width, t)
+        mouth.open = mix(a.open, b.open, t)
         return mouth
     }
 
@@ -301,7 +306,8 @@ enum CreatureFaceRenderer {
             frown.addQuadCurve(to: CGPoint(x: center.x + w / 2, y: center.y + w * 0.2), control: CGPoint(x: center.x, y: center.y - w * 0.3))
             context.stroke(frown, with: .color(fill), style: stroke)
         case .open:
-            context.fill(Path(ellipseIn: CGRect(x: center.x - w / 2, y: center.y - w * 0.4, width: w, height: w * 0.8)), with: .color(fill))
+            let h = max(w * mouth.open, w * 0.1)
+            context.fill(Path(ellipseIn: CGRect(x: center.x - w / 2, y: center.y - h / 2, width: w, height: h)), with: .color(fill))
         }
     }
 

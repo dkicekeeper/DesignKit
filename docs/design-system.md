@@ -2076,6 +2076,31 @@ brighter while thinking, dims asleep (0.45) and sleepy (0.7), flares at a tap an
 sphere when it pours into the chart; a change of mood eases its strength like the colours.
 `.compact` has it at 0.7 of the hero's strength, inside its sphere.
 
+*(4.10.0, the owner's plan for the assistant as a character)* It speaks and gestures.
+`speech: CreatureSpeech("Hi!")` says a line in a comic bubble (`CreatureSpeechBubble`): white
+(`Background.elevation1`, dark in dark mode) with a 2 pt outline in the mood's first colour (ink
+on a light page, lighter and glowing in the dark), `bodySmall` medium, at most 240 pt wide, a tail
+to the creature. `placement:` `.above` (the tail down to the sphere) or `.trailing` / `.leading`
+(beside it, on the upper side of the rim); the creature's view does not grow for it, so the
+screen leaves room on that side. The bubble pops out of the creature (`AppAnimation.bouncy`), the
+line types in at about 35 letters a second with a pause after a comma (0.18 s) or a full stop
+(0.35 s), laid out whole from the start so the bubble keeps its size, and the mouth talks while
+it types (`CreatureSpeechTiming`: open and shut about four times a second, shut in a pause).
+`duration:` `.automatic` (the typing, then 2 to 5 s by length), `.seconds(_)` or `.untilChanged`.
+A new line (another text or `id:`) replaces the one on screen, `nil` takes it away; `action:`
+makes the bubble a button. VoiceOver reads the bubble; the creature stays hidden. Hero only.
+
+`.creatureGesture(_:trigger:)` plays a `CreatureGesture` each time `trigger` changes, like
+`sensoryFeedback`: `.nod` (two dips), `.shake` (twice, the eyes leading), `.hop` (crouch, jump,
+squash), `.shrug` (squashed, eyes up), `.flinch` (shrinks and blinks), `.perk` (stretches up,
+eyes wide), `.wave` and `.point(.leading / .trailing / .up / .down)`: about 32 particles leave the
+sphere, gather into a mitten beside it (no arm) with a soft fill and an outline of the mood's
+colours, wave three times or point and poke, and flow back. The sphere moves, turns and squashes
+round its bottom with all on it; its shadow stays on the ground and shrinks in a hop. 0.55 to
+2 s, then back to the mood. `.compact` hops for a wave and perks for a point. Nothing plays on
+appear, under Reduce Motion or with `.designKitMotion(false)`;
+`.creatureGestureFrame(_:progress:)` holds a gesture in a still frame (posters, snapshots).
+
 #### `CreatureGlyph` and `CreatureTabLabel` *(4.8.0)*
 `CreatureGlyph()` is the creature as a still, one-colour `Shape`: twelve dots in a ring and two
 capsule eyes (`CreatureGlyphMetrics`). For where the live creature cannot go: a tab bar item and

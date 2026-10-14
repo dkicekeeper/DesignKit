@@ -206,6 +206,50 @@ extension ComponentSnapshots {
             )
         }
 
+        /// 4.10.0: a line in a comic bubble over the creature and beside it, the whole line shown
+        /// (motion is off). `.untilChanged`, so the bubble cannot leave while it is captured.
+        @Test func particleCreatureSpeech() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.lg) {
+                    ParticleCreature(
+                        mood: .happy,
+                        speech: CreatureSpeech("Hi! Three payments are due this week.", duration: .untilChanged)
+                    )
+                    .frame(width: 140, height: 140)
+                    .padding(.top, 96)
+                    .frame(maxWidth: .infinity)
+                    ParticleCreature(
+                        mood: .idle,
+                        speech: CreatureSpeech("Done!", placement: .trailing, duration: .untilChanged)
+                    )
+                    .frame(width: 110, height: 110)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(AppSpacing.lg),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// 4.10.0: gestures held halfway in a still frame: the hand of particles waving and
+        /// pointing each way, a nod, a hop in the air, a shrug, a perk.
+        @Test func particleCreatureGestures() async {
+            let frames: [(CreatureGesture, Double)] = [
+                (.wave, 0.5), (.point(.trailing), 0.5), (.point(.up), 0.5),
+                (.nod, 0.25), (.hop, 0.45), (.shrug, 0.5),
+            ]
+            await assertComponentSnapshot(
+                LazyVGrid(columns: Array(repeating: GridItem(.fixed(100), spacing: AppSpacing.md), count: 3), spacing: AppSpacing.md) {
+                    ForEach(frames.indices, id: \.self) { index in
+                        ParticleCreature(mood: .happy)
+                            .creatureGestureFrame(frames[index].0, progress: frames[index].1)
+                            .frame(width: 100, height: 100)
+                    }
+                }
+                .padding(AppSpacing.lg),
+                appearances: [.light, .dark]
+            )
+        }
+
         /// 4.8.0: the still glyph at a tab icon's size and larger, and the tab label it makes.
         @Test func creatureGlyph() async {
             await assertComponentSnapshot(

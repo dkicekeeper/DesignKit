@@ -52,11 +52,14 @@ import DesignSupport
 /// ParticleCreature(mood: .happy, style: .compact)                 // avatar, tab icon
 ///     .frame(width: 40, height: 40)
 /// ParticleCreature(mood: .listening, level: voice.level, isInteractive: true)
+/// ParticleCreature(mood: .happy, speech: CreatureSpeech("Hi!"))      // says a line (4.10.0)
+///     .creatureGesture(.wave, trigger: greetedAt)                   // and waves
 /// ```
 ///
 /// Give it a square: the hero looks right from about 160 pt, the compact style from 24 pt.
 /// The hero's sphere takes about 70% of the square; the rest is room for the burst, the chart
-/// and the extras. Decorative: hidden from VoiceOver, say what it is doing in text.
+/// and the extras. Decorative: hidden from VoiceOver, say what it is doing in text. A line it
+/// says (`speech:`) is the exception: its bubble is read like any text.
 ///
 /// It follows the colour scheme (4.6.1): light on a dark page, in deeper colours (ink) on a light
 /// one; on a dark surface in light mode, set `.environment(\.colorScheme, .dark)` on it.
@@ -111,23 +114,42 @@ public struct ParticleCreature: View {
     let style: Style
     let level: Double?
     let isInteractive: Bool
+    let speech: CreatureSpeech?
 
     @Environment(\.designKitMotion) private var designKitMotion
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.layoutDirection) private var layoutDirection
+    @Environment(\.creatureGestureRequest) private var gestureRequest
+    @Environment(\.creatureGestureFrame) private var gestureFrame
     @State private var engine = ParticleCreatureEngine()
     @State private var isTouching = false
+    @State private var shownSpeech: CreatureSpeech?
+    @State private var speechStart = Date.distantPast
 
     /// - Parameters:
     ///   - mood: What the creature shows. A change moves the swarm into the new shape.
     ///   - style: `.hero` or `.compact`.
     ///   - level: The voice level, 0…1, for `.listening`; `nil` ripples on its own.
     ///   - isInteractive: Follows and reacts to touches (hero only).
-    public init(mood: Mood = .idle, style: Style = .hero, level: Double? = nil, isInteractive: Bool = false) {
+    ///   - speech: A line it says in a bubble beside it (4.10.0, hero only), its mouth talking
+    ///     while the line types in. A new line replaces the one on screen; `nil` takes it away.
+    public init(
+        mood: Mood = .idle,
+        style: Style = .hero,
+        level: Double? = nil,
+        isInteractive: Bool = false,
+        speech: CreatureSpeech? = nil
+    ) {
         self.mood = mood
         self.style = style
         self.level = level.map { min(max($0, 0), 1) }
         self.isInteractive = isInteractive
+        self.speech = speech
     }
+
+    /// Motion of its own: off under Reduce Motion and `.designKitMotion(false)`.
+    private var moves: Bool { designKitMotion && !reduceMotion }
 
     public var body: some View {
         AmbientMotionGate { allowsAmbientMotion in
@@ -144,6 +166,99 @@ public struct ParticleCreature: View {
         .contentShape(Rectangle())
         .gesture(touchGesture, including: isInteractive && style == .hero ? .all : .none)
         .accessibilityHidden(true)
+        .overlay {
+            if style == .hero {
+                GeometryReader { proxy in
+                    if let shownSpeech {
+                        speechBubble(shownSpeech, in: proxy.size)
+                    }
+                }
+                // The bubble is placed by the creature's own sides; its text keeps the app's
+                // direction.
+                .environment(\.layoutDirection, .leftToRight)
+            }
+        }
+        .onChange(of: speech, initial: true) { _, line in say(line) }
+        .onChange(of: gestureRequest) { _, request in
+            if let request, moves { engine.perform(request.gesture, date: Date()) }
+        }
+        .task(id: shownSpeech?.id) { await dismissSpeechWhenDone() }
+    }
+
+    // MARK: Speech
+
+    private func say(_ line: CreatureSpeech?) {
+        guard style == .hero else { return }
+        let now = Date()
+        speechStart = now
+        engine.speak(moves ? line?.text : nil, date: now)
+        withAnimation(AppAnimation.motion(AppAnimation.bouncy, reduceMotion: reduceMotion, isEnabled: designKitMotion)) {
+            shownSpeech = line
+        }
+    }
+
+    private func dismissSpeechWhenDone() async {
+        guard let line = shownSpeech, var duration = line.visibleDuration else { return }
+        if !moves, line.duration == .automatic {
+            duration -= CreatureSpeechTiming.typingDuration(of: line.text)
+        }
+        try? await Task.sleep(for: .seconds(duration))
+        guard !Task.isCancelled, shownSpeech?.id == line.id else { return }
+        withAnimation(AppAnimation.motion(AppAnimation.smooth, reduceMotion: reduceMotion, isEnabled: designKitMotion)) {
+            shownSpeech = nil
+        }
+    }
+
+    /// The bubble with its tail's tip just off the sphere's rim: over it, or beside it on the
+    /// upper side.
+    private func speechBubble(_ line: CreatureSpeech, in size: CGSize) -> some View {
+        let geo = Geometry(size: size, style: .hero)
+        let rim = geo.radius * 1.2 + CreatureSpeechMetrics.gap
+        let width = CreatureSpeechMetrics.maxWidth
+        let room = CreatureSpeechMetrics.room
+        let tailEdge: Edge
+        let alignment: Alignment
+        let anchor: UnitPoint
+        let center: CGPoint
+        switch line.placement {
+        case .above:
+            tailEdge = .bottom
+            alignment = .bottom
+            anchor = .bottom
+            center = CGPoint(x: geo.cx, y: geo.restY - rim - room / 2)
+        case .trailing, .leading:
+            let onRight = (line.placement == .trailing) != (layoutDirection == .rightToLeft)
+            let side: Double = onRight ? 1 : -1
+            let angle = CreatureSpeechMetrics.sideAngle
+            let tip = CGPoint(x: geo.cx + side * rim * cos(angle), y: geo.restY + rim * sin(angle))
+            tailEdge = onRight ? .leading : .trailing
+            alignment = onRight ? .leading : .trailing
+            anchor = onRight ? .leading : .trailing
+            center = CGPoint(x: tip.x + side * width / 2, y: tip.y)
+        }
+        return CreatureSpeechBubble(
+            speech: line,
+            start: speechStart,
+            isTyping: moves,
+            tailEdge: tailEdge,
+            outline: speechOutline,
+            glows: colorScheme == .dark,
+            textDirection: layoutDirection
+        )
+        .frame(width: width, height: line.placement == .above ? room : room * 2, alignment: alignment)
+        // Grows from the tail's tip: the anchor is on the box the bubble sits in.
+        .transition(.scale(scale: 0.4, anchor: anchor).combined(with: .opacity))
+        .position(center)
+        .id(line.id)
+    }
+
+    /// The bubble's outline: the mood's first colour, deeper on a light page, lighter in the dark.
+    private var speechOutline: Color {
+        let rgb = CreaturePalette.of(CreaturePose(mood))[0]
+        let tone = colorScheme == .dark
+            ? rgb + (SIMD3<Double>(repeating: 255) - rgb) * 0.2
+            : rgb * (1 - CreatureInk.depth)
+        return Color(.sRGB, red: tone.x / 255, green: tone.y / 255, blue: tone.z / 255, opacity: 1)
     }
 
     private func canvas(time: Double?) -> some View {
@@ -152,9 +267,11 @@ public struct ParticleCreature: View {
         let style = style
         let level = level
         let onLight = colorScheme == .light
+        let still = time == nil ? gestureFrame : nil
+        let isRTL = layoutDirection == .rightToLeft
         return Canvas { context, size in
             engine.render(in: &context, size: size, mood: mood, style: style, level: level, time: time,
-                          onLight: onLight)
+                          onLight: onLight, still: still, isRTL: isRTL)
         }
     }
 
@@ -241,6 +358,13 @@ final class ParticleCreatureEngine {
     private var pokes: [Double] = []
     private var dizzyUntil: Double = -1
 
+    /// A gesture playing (4.10.0) and a line being said, from their start (absolute time).
+    private var gesture: CreatureGesture?
+    private var gestureStart: Double = 0
+    private var speechLetters: [Character] = []
+    private var speechSchedule: [Double] = []
+    private var speechStart: Double = 0
+
     // MARK: Events
 
     func poke(at point: CGPoint, date: Date) {
@@ -255,6 +379,19 @@ final class ParticleCreatureEngine {
         }
     }
 
+    /// Plays `gesture` from `date` (4.10.0).
+    func perform(_ gesture: CreatureGesture, date: Date) {
+        self.gesture = gesture
+        gestureStart = date.timeIntervalSinceReferenceDate
+    }
+
+    /// Talks while `text` types in from `date` (4.10.0); `nil` stops.
+    func speak(_ text: String?, date: Date) {
+        speechLetters = text.map { Array($0) } ?? []
+        speechSchedule = text.map(CreatureSpeechTiming.schedule) ?? []
+        speechStart = date.timeIntervalSinceReferenceDate
+    }
+
     // MARK: Frame
 
     func render(
@@ -264,7 +401,9 @@ final class ParticleCreatureEngine {
         style: ParticleCreature.Style,
         level: Double?,
         time: Double?,
-        onLight: Bool = false
+        onLight: Bool = false,
+        still: CreatureGestureFrame? = nil,
+        isRTL: Bool = false
     ) {
         let geo = Geometry(size: size, style: style)
         guard geo.radius > 1 else { return }
@@ -299,6 +438,27 @@ final class ParticleCreatureEngine {
         let core = blending ? fromCore + (coreTarget - fromCore) * paletteMix : coreTarget
         let gaze = animated ? gazeDirection(geo, t: t) : (x: 0, y: 0)
 
+        // A gesture (4.10.0): its moment while it plays, or the frame a still asks for.
+        var motion = CreatureMotion.none
+        if let time, let gesture {
+            let shown = gesture.shown(in: style)
+            let progress = (time - gestureStart) / shown.duration
+            if progress >= 1 {
+                self.gesture = nil
+            } else if progress >= 0 {
+                motion = .of(shown, progress: progress, isRTL: isRTL)
+            }
+        } else if time == nil, let still {
+            motion = .of(still.gesture.shown(in: style), progress: still.progress, isRTL: isRTL)
+        }
+        // About thirty particles leave the sphere for the hand and come back after.
+        let handStride = max(2, particles.count / CreatureHandMetrics.particles)
+        var handPoints: [CGPoint] = []
+        if style == .hero, let hand = motion.hand, hand.reach > 0.001 {
+            handPoints = hand.points(count: (particles.count + handStride - 1) / handStride,
+                                     center: CGPoint(x: geo.cx, y: cy), radius: geo.radius)
+        }
+
         var parts = [CGPoint](repeating: .zero, count: particles.count)
         var depth = [Double](repeating: 0.5, count: particles.count)
         for n in particles.indices {
@@ -309,6 +469,14 @@ final class ParticleCreatureEngine {
                 z = fromDepth[n] + (z - fromDepth[n]) * e
             }
             if style == .hero && animated { point = displaced(point, geo, t: t) }
+            if !handPoints.isEmpty, particles[n].index % handStride == 0, let reach = motion.hand?.reach {
+                let k = particles[n].index / handStride
+                if k < handPoints.count {
+                    let e = smoothStep((reach - particles[n].delay * 0.35) / 0.65)
+                    point = blend(point, handPoints[k], e)
+                    z += (0.95 - z) * e
+                }
+            }
             parts[n] = point
             depth[n] = z
         }
@@ -321,7 +489,13 @@ final class ParticleCreatureEngine {
             if mt > ParticleCreatureMetrics.faceTransition + 0.2 { self.fromFace = nil }
         }
         lastFace = face
-        let shownFace = animated ? living(face, geo, t: t, gaze: gaze, level: level) : face
+        var shownFace = animated ? living(face, geo, t: t, gaze: gaze, level: level) : face
+        shownFace = Self.apply(motion, to: shownFace)
+        // Talking (4.10.0): the mouth opens and shuts while the line types in.
+        if let time, style == .hero,
+           let open = CreatureSpeechTiming.mouth(speechSchedule, letters: speechLetters, at: time - speechStart) {
+            shownFace.mouth = CreatureMouth(form: .open, y: shownFace.mouth.y, width: CreatureFace.talkWidth, open: open)
+        }
         var tear: CGPoint?
         if pose == .sad && animated && style == .hero {
             let progress = (t * 0.55).truncatingRemainder(dividingBy: 1)
@@ -341,7 +515,25 @@ final class ParticleCreatureEngine {
         lastCore = core
 
         draw(in: &context, geo: geo, style: style, t: t, cy: cy, palette: palette, shell: shell,
-             core: core, parts: parts, depth: depth, face: shownFace, tear: tear, onLight: onLight)
+             core: core, parts: parts, depth: depth, face: shownFace, tear: tear, motion: motion, onLight: onLight)
+    }
+
+    /// What a gesture does to the face: where the eyes look, how wide they are, a blink.
+    private static func apply(_ motion: CreatureMotion, to face: CreatureFace) -> CreatureFace {
+        guard motion.gazeWeight > 0 || motion.eyeScale != 1 || motion.blink > 0 else { return face }
+        var face = face
+        let shiftX = motion.gazeX * 0.1 * motion.gazeWeight
+        let shiftY = motion.gazeY * 0.07 * motion.gazeWeight
+        for side in [\CreatureFace.left, \CreatureFace.right] {
+            face[keyPath: side].x += shiftX
+            face[keyPath: side].y += shiftY
+            face[keyPath: side].width *= motion.eyeScale
+            face[keyPath: side].height *= motion.eyeScale
+            if motion.blink > 0, face[keyPath: side].form == .lens {
+                face[keyPath: side].height *= 1 - 0.92 * motion.blink
+            }
+        }
+        return face
     }
 
     // MARK: Building
@@ -770,6 +962,7 @@ final class ParticleCreatureEngine {
         depth: [Double],
         face: CreatureFace,
         tear: CGPoint?,
+        motion: CreatureMotion,
         onLight: Bool
     ) {
         let r0 = geo.radius
@@ -784,7 +977,7 @@ final class ParticleCreatureEngine {
         // swarm's colour in the dark, a shadow on a light page.
         if hero {
             let groundY = geo.restY + r0 * 1.34
-            let lift = pose == .happy || pose == .celebrating ? abs(sin(t * 4.2)) : 0
+            let lift = max(pose == .happy || pose == .celebrating ? abs(sin(t * 4.2)) : 0, motion.lift)
             let rx = r0 * 1.3 * (1 - lift * 0.2)
             let ry = r0 * 0.2
             let strength = (onLight ? CreatureInk.shadow : CreatureGlow.ground) * shell * (1 - lift * 0.4)
@@ -805,10 +998,21 @@ final class ParticleCreatureEngine {
             )
         }
 
+        // A gesture moves the sphere and all on it, turning and squashing it round its bottom
+        // (4.10.0); the shadow stays on the ground.
+        var body = context
+        if motion.movesSphere {
+            let pivot = CGPoint(x: cx, y: cy + r0)
+            body.translateBy(x: pivot.x + motion.dx * r0, y: pivot.y + motion.dy * r0)
+            body.rotate(by: .radians(motion.tilt))
+            body.scaleBy(x: motion.sx, y: motion.sy)
+            body.translateBy(x: -pivot.x, y: -pivot.y)
+        }
+
         // The glow round the sphere (4.7.0, where the glass was): light of its colour in the
         // dark, a faint haze on a light page; and the sweep of light while thinking.
         if shell > 0.02 {
-            var glow = context
+            var glow = body
             glow.opacity = shell
             if !onLight { glow.blendMode = .plusLighter }
             let pulse = 0.8 + 0.2 * sin(t * 2)
@@ -843,7 +1047,7 @@ final class ParticleCreatureEngine {
         // The swarm, bucketed by colour and depth: light added in the dark; in ink on a light
         // page (4.6.1), where light added to white is lost. The far half, the core, the near half.
         let dim: Double = pose == .asleep ? 0.45 : pose == .sleepy ? 0.7 : 1
-        var swarm = context
+        var swarm = body
         if !onLight { swarm.blendMode = .plusLighter }
         if !hero { swarm.clip(to: globe) }
         let levels = 6
@@ -876,7 +1080,7 @@ final class ParticleCreatureEngine {
             }
         }
         fillDots(0..<levels / 2)
-        drawCore(in: context, center: center, radius: r0, hero: hero, globe: globe, t: t,
+        drawCore(in: body, center: center, radius: r0, hero: hero, globe: globe, t: t,
                  palette: palette, strength: core * shell, onLight: onLight)
         fillDots(levels / 2..<levels)
         for tone in 0..<4 where !halos[tone].isEmpty {
@@ -929,7 +1133,7 @@ final class ParticleCreatureEngine {
                 angle: .radians(CreatureGlow.lightAngle + t * CreatureGlow.drift)
             )
             let lineWidth = hero ? max(1, 1.5 * geo.scale) : max(0.7, r0 / 22)
-            var rim = context
+            var rim = body
             rim.opacity = shell
             if !onLight {
                 rim.blendMode = .plusLighter
@@ -941,8 +1145,13 @@ final class ParticleCreatureEngine {
             rim.stroke(globe, with: light, lineWidth: lineWidth)
         }
 
+        if hero, let hand = motion.hand, hand.reach > 0.02 {
+            drawHand(hand, in: body, center: center, radius: r0, palette: palette,
+                     lineWidth: max(1, 1.5 * geo.scale), onLight: onLight)
+        }
+
         // The face, turned with the head; in ink on a light page.
-        var faceLayer = context
+        var faceLayer = body
         if !hero { faceLayer.clip(to: globe) }
         let lean = tilt(t)
         if lean != 0 {
@@ -954,7 +1163,42 @@ final class ParticleCreatureEngine {
         CreatureFaceRenderer.draw(face, in: &faceLayer, radius: r0, hero: hero, time: t, ink: faceInk)
         if let tear { CreatureFaceRenderer.tear(at: tear, radius: r0, in: &faceLayer, ink: faceInk) }
 
-        if hero { drawExtras(in: &context, geo: geo, t: t, cy: cy, onLight: onLight) }
+        if hero { drawExtras(in: &body, geo: geo, t: t, cy: cy, onLight: onLight) }
+    }
+
+    /// The hand of a wave or a point (4.10.0) once its particles have gathered: a soft fill and
+    /// an outline of the mood's colours, light in the dark, ink on a light page. The particles
+    /// themselves are drawn with the swarm, along the outline.
+    private func drawHand(
+        _ hand: CreatureHand,
+        in context: GraphicsContext,
+        center: CGPoint,
+        radius r0: Double,
+        palette: [RGB],
+        lineWidth: Double,
+        onLight: Bool
+    ) {
+        let formed = smoothStep((hand.reach - 0.35) / 0.65)
+        guard formed > 0.01 else { return }
+        let pieces = hand.paths(center: center, radius: r0)
+        let fillTone = onLight ? deepen(palette[0], CreatureCore.depth) : palette[0]
+        let lineTone = onLight ? deepen(palette[0], CreatureInk.depth) : whiten(palette[1], 0.35)
+        var layer = context
+        if !onLight { layer.blendMode = .plusLighter }
+        // Each in a layer of its own at full strength, faded as a whole: where the pieces
+        // overlap the fill is no denser, and the outline runs round the outside only.
+        var fill = layer
+        fill.opacity = (onLight ? CreatureHandMetrics.inkFill : CreatureHandMetrics.lightFill) * formed
+        fill.drawLayer { shape in
+            for piece in pieces { shape.fill(piece, with: .color(color(fillTone, 1))) }
+        }
+        var outline = layer
+        outline.opacity = (onLight ? CreatureGlow.inkRimPeak : CreatureGlow.rimPeak) * formed
+        outline.drawLayer { line in
+            for piece in pieces { line.stroke(piece, with: .color(color(lineTone, 1)), lineWidth: lineWidth * 2) }
+            line.blendMode = .destinationOut
+            for piece in pieces { line.fill(piece, with: .color(.black)) }
+        }
     }
 
     /// The core (4.9.1): a soft ball of the mood's colours inside the swarm, so the creature has
