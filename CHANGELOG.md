@@ -24,7 +24,7 @@ waves or points. [#67](https://github.com/dkicekeeper/DesignKit/pull/67)
 
 ### Added
 
-- `ParticleCreature(speech:)` with `CreatureSpeech(_:style:placement:duration:id:action:)`: a line
+- `ParticleCreature(speech:)` with `CreatureSpeech(_:style:placement:maxWidth:duration:id:action:)`: a line
   in a cartoon bubble over the creature (`.above`) or beside it (`.trailing`, `.leading`), white
   with a thick graphite outline in both colour schemes and rounded bold type. `style:` `.say` (an
   oval with a curved tail), `.shout` (a burst), `.think` (a cloud with bubbles; the eyes look up
@@ -37,7 +37,8 @@ waves or points. [#67](https://github.com/dkicekeeper/DesignKit/pull/67)
   back. The compact style hops for a wave and perks for a point.
 - `.creatureGestureFrame(_:progress:)`: a gesture held in the creature's still frame, for a
   poster, a preview or a snapshot.
-- `CreatureSpeechMetrics.maxWidth` (240 pt), the bubble's widest.
+- `CreatureSpeechMetrics.maxWidth` (240 pt), the bubble's widest by default; `maxWidth:` narrows
+  it where the creature has little room beside it.
 
 ### Gallery and tooling
 

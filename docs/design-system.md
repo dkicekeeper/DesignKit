@@ -2080,7 +2080,8 @@ sphere when it pours into the chart; a change of mood eases its strength like th
 `speech: CreatureSpeech("Hi!")` says a line in a cartoon bubble (`CreatureSpeechBubble`, after the
 owner's comic references): white with a 3 pt graphite outline and near-black type in both colour
 schemes (a sticker on a dark page), SF Rounded (semibold, scaling with Dynamic Type), offered
-240 pt and hugging its text, centred. `style:` gives the shape: `.say` a fat oval (a
+240 pt (`maxWidth:` narrows it, for a creature in a navigation bar) and hugging its text,
+centred. `style:` gives the shape: `.say` a fat oval (a
 superellipse, so a line fits) with a tail like a comma that leaves it to one side and bows to the
 creature; `.shout` a burst of 10 to 18 uneven spikes, one reaching to the creature, heavy
 `title3` type, the mouth opening wide; `.think` a cloud of bumps with two bubbles rising to it,

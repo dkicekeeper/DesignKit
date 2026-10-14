@@ -66,6 +66,9 @@ public struct CreatureSpeech: Equatable {
     public let text: String
     public let style: Style
     public let placement: Placement
+    /// The widest the bubble may be, its padding included: narrower where the creature has
+    /// little room beside it (a creature in a navigation bar).
+    public let maxWidth: CGFloat
     public let duration: Duration
     let id: AnyHashable
     let action: (() -> Void)?
@@ -78,6 +81,7 @@ public struct CreatureSpeech: Equatable {
         _ text: String,
         style: Style = .say,
         placement: Placement = .above,
+        maxWidth: CGFloat = CreatureSpeechMetrics.maxWidth,
         duration: Duration = .automatic,
         id: AnyHashable? = nil,
         action: (() -> Void)? = nil
@@ -85,6 +89,7 @@ public struct CreatureSpeech: Equatable {
         self.text = text
         self.style = style
         self.placement = placement
+        self.maxWidth = maxWidth
         self.duration = duration
         self.id = id ?? AnyHashable(text)
         self.action = action
@@ -92,7 +97,7 @@ public struct CreatureSpeech: Equatable {
 
     public static func == (a: CreatureSpeech, b: CreatureSpeech) -> Bool {
         a.id == b.id && a.text == b.text && a.style == b.style && a.placement == b.placement
-            && a.duration == b.duration
+            && a.maxWidth == b.maxWidth && a.duration == b.duration
     }
 
     /// How long the bubble stays, from when it appears; `nil` while the line stands.
@@ -112,7 +117,8 @@ public struct CreatureSpeech: Equatable {
 }
 
 public enum CreatureSpeechMetrics {
-    /// The widest a bubble is offered; its text wraps inside, less its padding.
+    /// The widest a bubble is offered by default (`CreatureSpeech(maxWidth:)`); its text wraps
+    /// inside, less its padding.
     public static let maxWidth: CGFloat = 240
     /// A cartoon bubble in both colour schemes: white, a graphite outline, near-black type.
     static let paper = Color.white

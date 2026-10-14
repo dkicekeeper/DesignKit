@@ -226,7 +226,7 @@ public struct ParticleCreature: View {
     private func speechBubble(_ line: CreatureSpeech, in size: CGSize) -> some View {
         let geo = Geometry(size: size, style: .hero)
         let rim = geo.radius * 1.2 + CreatureSpeechMetrics.gap
-        let width = CreatureSpeechMetrics.maxWidth
+        let width = line.maxWidth
         let room = CreatureSpeechMetrics.room
         let tailEdge: Edge
         let alignment: Alignment
