@@ -16,6 +16,34 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 4.11.0 - 2026-10-15
+
+`ParticleCreature` thinks pictures and lives on its own: the next step of the assistant as a
+character. [#68](https://github.com/dkicekeeper/DesignKit/pull/68)
+
+### Added
+
+- `CreatureSpeech(symbol:label:emotion:placement:duration:id:action:)`: a picture the creature
+  thinks, an SF Symbol drawn in dots of light that leave its head one after another and gather
+  over it or beside it, then bob and twinkle. The mouth stays still and the eyes look at it;
+  `label:` is what VoiceOver reads.
+- `.creatureAmbience(_:)` and `CreatureAmbience(fidgets:dozesAfter:daydreams:)`: an idle hero
+  looks round, stretches, rocks or bounces now and then (`fidgets`), dozes off after a quiet
+  spell (`dozesAfter:`, sleepy, then asleep), waking at a touch, a line, a gesture or a new
+  mood, and daydreams of the pictures it is given (`daydreams:`, about every 30 to 60 s).
+  `.still` (the default) and `.lively`.
+
+### Changed
+
+- A thought (`emotion: .thought`) comes out of the upper side of the creature's head instead of
+  its mouth, with three dots of light rising from there to the words.
+
+### Gallery and tooling
+
+- Gallery: the creature's page thinks a picture and has controls for fidgets and dozing.
+- Snapshot tests: `particleCreaturePicture` (light, dark); `particleCreatureThought` recorded
+  again with the dots.
+
 ## 4.10.0 - 2026-10-14
 
 `ParticleCreature` speaks and gestures, the first step of the assistant as a character: words of

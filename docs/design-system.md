@@ -2113,6 +2113,25 @@ round its bottom with all on it; its shadow stays on the ground and shrinks in a
 appear, under Reduce Motion or with `.designKitMotion(false)`;
 `.creatureGestureFrame(_:progress:)` holds a gesture in a still frame (posters, snapshots).
 
+*(4.11.0)* Thoughts and a life of its own. A thought (`emotion: .thought`) comes out of the upper
+side of the head towards the words, not out of the mouth, with three dots of light rising from
+there to it (1.5, 2.1 and 2.7 pt, each a moment after the other, pulsing softly): the cloud of a
+comic thought without the cloud. `CreatureSpeech(symbol:label:emotion:placement:duration:id:action:)`
+thinks a picture: an SF Symbol at a large title's size (scaling with Dynamic Type) drawn in about
+110 dots of light (`CreatureSymbolDots`, sampled once per symbol) that leave the head one after
+another over 0.7 s, fly to their places and bob and twinkle, in the mood's colour with the same
+halo and glow as words; `label:` is what VoiceOver reads. The mouth stays still and the eyes look
+at it; it goes after 2.6 s (`.automatic`). `.creatureAmbience(_:)` gives an idle hero a life of
+its own (`CreatureAmbience`, `.still` by default): with `fidgets` it looks round (to one side, then
+the other), stretches with its eyes shut, rocks as if humming or gives two little bounces, the
+first after 6 s of quiet and then one in about every 11 s; with `dozesAfter:` it turns sleepy
+after that many quiet seconds and falls asleep 5 s later; with `daydreams:` (SF Symbols, the app's
+choice of what is on the person's mind) it thinks one of them, taking turns, about every 30 to
+60 s while idle and awake with nothing said, for 3.5 s (a picture thought with no label, hidden
+from VoiceOver; a daydream does not end the quiet). A touch, a line, a gesture or a new mood ends
+the quiet and wakes it. Nothing under Reduce Motion or `.designKitMotion(false)`; a picture with an
+empty `label:` is hidden from VoiceOver.
+
 #### `CreatureGlyph` and `CreatureTabLabel` *(4.8.0)*
 `CreatureGlyph()` is the creature as a still, one-colour `Shape`: twelve dots in a ring and two
 capsule eyes (`CreatureGlyphMetrics`). For where the live creature cannot go: a tab bar item and

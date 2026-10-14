@@ -11,8 +11,13 @@
 //  a glow in the dark, with a soft halo of the page round each letter so they read over
 //  anything. Outside a chat: a greeting, a hint, a reaction. The conversation is `MessageBubble`.
 //
+//  Thoughts (4.11.0): a thought comes out of the top of the head, not the mouth, with three dots
+//  of light rising to it; and the creature can think a picture, an SF Symbol drawn in dots of
+//  light that gather from its head (`CreatureSpeech(symbol:label:)`).
+//
 
 import SwiftUI
+import UIKit
 import DesignTokens
 
 /// A line `ParticleCreature` says (4.10.0): words that fly out of its mouth and move the way it
@@ -22,6 +27,7 @@ import DesignTokens
 /// ParticleCreature(mood: .happy, speech: CreatureSpeech("Hi, Daulet!"))
 /// ParticleCreature(mood: .celebrating, speech: CreatureSpeech("Goal!"))          // joy, from the mood
 /// ParticleCreature(mood: .idle, speech: CreatureSpeech("Hmm…", emotion: .thought, placement: .trailing))
+/// ParticleCreature(mood: .idle, speech: CreatureSpeech(symbol: "cup.and.saucer.fill", label: "Coffee"))
 /// ```
 ///
 /// A new line (another text or `id`) replaces the one on screen; `nil` takes it away. Keep it
@@ -38,7 +44,8 @@ public struct CreatureSpeech: Equatable {
         /// Bigger and bolder; a wave of hops runs along the line now and then, sparkles round it;
         /// the mouth opens wide.
         case joy
-        /// Slanted and a little pale, swaying slowly. The mouth stays still and the eyes look at
+        /// Slanted and a little pale, swaying slowly; it comes out of the top of the head with
+        /// three dots of light rising to it (4.11.0). The mouth stays still and the eyes look at
         /// the words.
         case thought
         /// Small and pale, the letters come out of a blur and glimmer; the mouth barely moves.
@@ -72,6 +79,8 @@ public struct CreatureSpeech: Equatable {
     }
 
     public let text: String
+    /// The SF Symbol a picture thought draws (4.11.0); `nil` for words.
+    public let symbol: String?
     public let emotion: Emotion
     public let placement: Placement
     /// The widest the line may be: narrower where the creature has little room beside it (a
@@ -95,6 +104,7 @@ public struct CreatureSpeech: Equatable {
         action: (() -> Void)? = nil
     ) {
         self.text = text
+        self.symbol = nil
         self.emotion = emotion
         self.placement = placement
         self.maxWidth = maxWidth
@@ -103,15 +113,52 @@ public struct CreatureSpeech: Equatable {
         self.action = action
     }
 
+    /// A picture the creature thinks (4.11.0): `symbol` drawn in dots of light that gather from
+    /// the top of its head, with three dots rising to it. The mouth stays still and the eyes
+    /// look at it.
+    ///
+    /// - Parameters:
+    ///   - symbol: An SF Symbol's name; a filled one reads best.
+    ///   - label: What the picture is, for VoiceOver; empty hides it from VoiceOver.
+    ///   - emotion: How the dots move once they are in place: they bob and twinkle, and joy hops,
+    ///     worry trembles, sadness sinks… A thought by default.
+    public init(
+        symbol: String,
+        label: String,
+        emotion: Emotion = .thought,
+        placement: Placement = .above,
+        duration: Duration = .automatic,
+        id: AnyHashable? = nil,
+        action: (() -> Void)? = nil
+    ) {
+        self.text = label
+        self.symbol = symbol
+        self.emotion = emotion
+        self.placement = placement
+        self.maxWidth = CreatureSpeechMetrics.maxWidth
+        self.duration = duration
+        self.id = id ?? AnyHashable(symbol)
+        self.action = action
+    }
+
     public static func == (a: CreatureSpeech, b: CreatureSpeech) -> Bool {
-        a.id == b.id && a.text == b.text && a.emotion == b.emotion && a.placement == b.placement
-            && a.maxWidth == b.maxWidth && a.duration == b.duration
+        a.id == b.id && a.text == b.text && a.symbol == b.symbol && a.emotion == b.emotion
+            && a.placement == b.placement && a.maxWidth == b.maxWidth && a.duration == b.duration
+    }
+
+    /// The letters (or the picture's dots) come out of the head with a trail of dots, not out
+    /// of the mouth.
+    func isThought(_ emotion: Emotion) -> Bool {
+        symbol != nil || emotion == .thought
     }
 
     /// How long the words stay, from when they start; `nil` while the line stands.
     var visibleDuration: Double? {
         switch duration {
         case .automatic:
+            if symbol != nil {
+                return CreatureSpeechMetrics.pictureAssembly + CreatureSpeechMetrics.flight + CreatureSpeechMetrics.pictureDwell
+            }
             let typing = CreatureSpeechTiming.typingDuration(of: text) + CreatureSpeechMetrics.flight
             let dwell = min(max(1.6 + 0.045 * Double(text.count), CreatureSpeechMetrics.minimumDwell),
                             CreatureSpeechMetrics.maximumDwell)
@@ -134,6 +181,19 @@ public enum CreatureSpeechMetrics {
     static let rim: Double = 1.2
     /// The mouth under the sphere's centre, in its radius: where the letters come from.
     static let mouth: Double = 0.3
+    /// Where a thought comes from (4.11.0): the edge of the head (`head` × its radius from the
+    /// centre), turned from the top towards words over it, or a little under words beside it,
+    /// so the three dots rise to them.
+    static let head: Double = 1.1
+    static let headTurn: Double = 0.55
+    static let headDrop: Double = 0.3
+    static let trail: [(at: Double, radius: Double)] = [(0.2, 1.5), (0.45, 2.1), (0.7, 2.7)]
+    /// A picture (4.11.0): its dots gather over this long, then it stays this long; a dot's
+    /// radius, and about how many dots draw it.
+    static let pictureAssembly: Double = 0.7
+    static let pictureDwell: Double = 2.6
+    static let dotRadius: Double = 1.4
+    static let pictureDots: Int = 110
     /// How far the mood's colour is taken towards white for words in the dark.
     static let lightWords: Double = 0.45
     /// The height the words over the creature may take; words beside it are centred on their
@@ -148,6 +208,9 @@ public enum CreatureSpeechMetrics {
     /// The wait after the words are out, for `.automatic`.
     static let minimumDwell: Double = 2
     static let maximumDwell: Double = 5
+
+    /// The picture's size: a large title's symbol, scaling with Dynamic Type.
+    static let pictureFont: Font = .system(.largeTitle).weight(.bold)
 
     /// Rounded bold type that scales with Dynamic Type: bigger for joy, smaller for a whisper.
     static func font(_ emotion: CreatureSpeech.Emotion) -> Font {
@@ -219,8 +282,10 @@ enum CreatureSpeechTiming {
 
 /// The words of a line, flying out of the mouth from `start` when `moves` (all in place
 /// otherwise). `anchor` is the point of the text that touches its anchor by the creature (its
-/// bottom over it, its leading or trailing edge beside it); `mouth` is the mouth's offset from
-/// that point. Laid out left to right by the creature; the text keeps the app's direction.
+/// bottom over it, its leading or trailing edge beside it); `mouth` is the offset from that point
+/// of where the letters come from (the top of the head for a thought). Laid out left to right by
+/// the creature; the text keeps the app's direction. A picture is a symbol in the text that the
+/// renderer draws as dots.
 struct CreatureSpeechWords: View {
     let speech: CreatureSpeech
     let emotion: CreatureSpeech.Emotion
@@ -246,11 +311,15 @@ struct CreatureSpeechWords: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(speech.text)
         .accessibilityAddTraits(speech.action == nil ? [] : .isButton)
+        // A picture with no label (a daydream) is decoration, like the creature.
+        .accessibilityHidden(speech.text.isEmpty)
     }
 
     private func words(elapsed: Double?, schedule: [Double]) -> some View {
-        let line = Text(speech.text)
-            .font(CreatureSpeechMetrics.font(emotion))
+        let content = speech.symbol.map { Text(Image(systemName: $0)) } ?? Text(speech.text)
+        let line = content
+            .font(speech.symbol == nil ? CreatureSpeechMetrics.font(emotion) : CreatureSpeechMetrics.pictureFont)
+            .imageScale(.large)
             .foregroundStyle(color)
             .multilineTextAlignment(.center)
             .fixedSize(horizontal: false, vertical: true)
@@ -262,7 +331,9 @@ struct CreatureSpeechWords: View {
                 anchor: anchor,
                 mouth: mouth,
                 sparkle: color,
-                glow: glows ? color.opacity(0.55) : nil
+                glow: glows ? color.opacity(0.55) : nil,
+                trail: speech.isThought(emotion),
+                dots: speech.symbol.map { CreatureSymbolDots.shared.dots(for: $0) }
             ))
         return Group {
             if let action = speech.action {
@@ -286,6 +357,10 @@ struct CreatureSpeechRenderer: TextRenderer {
     let sparkle: Color
     /// A glow of the words' colour round them, in the dark.
     var glow: Color?
+    /// Three dots of light from the head to the words: a thought (4.11.0).
+    var trail = false
+    /// A picture's dots, 0…1 across the symbol's box, in the order they leave (4.11.0).
+    var dots: [CGPoint]?
 
     // The letters fly outside the text's bounds, so nothing here may make the text a layer of
     // its own (a view's shadow, `displayPadding`, which also moves the drawing): the halo and
@@ -311,6 +386,14 @@ struct CreatureSpeechRenderer: TextRenderer {
         }
         context.addFilter(.shadow(color: AppColors.Background.base, radius: CreatureSpeechMetrics.haloRadius))
         context.addFilter(.shadow(color: AppColors.Background.base, radius: CreatureSpeechMetrics.haloRadius))
+
+        if trail {
+            drawTrail(from: CGPoint(x: mouthX, y: mouthY), to: CGPoint(x: anchorX, y: anchorY), time: time, in: &context)
+        }
+        if let dots {
+            drawPicture(dots, layout: layout, from: CGPoint(x: mouthX, y: mouthY), time: time, in: &context)
+            return
+        }
 
         var index = 0
         for line in layout {
@@ -364,6 +447,57 @@ struct CreatureSpeechRenderer: TextRenderer {
                 star.opacity = 0.9 * twinkle * out
                 star.fill(Self.sparklePath(x: cx, y: cy, radius: size), with: .color(sparkle))
             }
+        }
+    }
+
+    /// Three dots of light from the head to the words, growing towards them, each a moment after
+    /// the other, pulsing softly.
+    private func drawTrail(from head: CGPoint, to words: CGPoint, time: Double, in context: inout GraphicsContext) {
+        for (k, step) in CreatureSpeechMetrics.trail.enumerated() {
+            let shown = elapsed == nil ? 1 : min(max((time - 0.1 * Double(k)) / 0.2, 0), 1)
+            guard shown > 0 else { continue }
+            let pulse = elapsed == nil ? 0.85 : 0.7 + 0.3 * sin(time * 2.6 - Double(k) * 0.9)
+            let x = Double(head.x) + Double(words.x - head.x) * step.at
+            let y = Double(head.y) + Double(words.y - head.y) * step.at
+            let r = step.radius * shown
+            var dot = context
+            dot.opacity = pulse
+            dot.fill(Path(ellipseIn: CGRect(x: x - r, y: y - r, width: 2 * r, height: 2 * r)), with: .color(sparkle))
+        }
+    }
+
+    /// A picture: its dots leave the head one after another, fly to their places in the
+    /// symbol's box and live with the emotion, twinkling.
+    private func drawPicture(_ dots: [CGPoint], layout: Text.Layout, from head: CGPoint, time: Double,
+                             in context: inout GraphicsContext) {
+        var box = CGRect.null
+        for line in layout {
+            for run in line {
+                for slice in run {
+                    box = box.union(slice.typographicBounds.rect)
+                }
+            }
+        }
+        guard !box.isNull, !dots.isEmpty else { return }
+        let flight = CreatureSpeechMetrics.flight
+        let count = Double(dots.count)
+        for (index, dot) in dots.enumerated() {
+            let leaves = Double(index) / count * CreatureSpeechMetrics.pictureAssembly
+            let landed = elapsed == nil ? 1 : min(max((time - leaves) / flight, 0), 1)
+            guard landed > 0 else { continue }
+            let slotX = Double(box.minX) + Double(dot.x) * Double(box.width)
+            let slotY = Double(box.minY) + Double(dot.y) * Double(box.height)
+            let since = elapsed == nil ? 10 : time - leaves - flight
+            let pose = Self.pose(emotion, index: index, since: since, time: time)
+            let e = Self.easeOut(landed)
+            let arc = -sin(Double.pi * landed) * 14
+            let x = Double(head.x) + (slotX - Double(head.x)) * e + pose.dx
+            let y = Double(head.y) + (slotY - Double(head.y)) * e + arc + pose.dy + 1.5 * sin(time * 1.6)
+            let twinkle = elapsed == nil ? 1 : 0.75 + 0.25 * sin(time * 3 + Double(index) * 1.3)
+            let r = CreatureSpeechMetrics.dotRadius * (0.5 + 0.5 * e) * pose.scale
+            var spot = context
+            spot.opacity = min(1, landed * 2.5) * pose.opacity * twinkle
+            spot.fill(Path(ellipseIn: CGRect(x: x - r, y: y - r, width: 2 * r, height: 2 * r)), with: .color(sparkle))
         }
     }
 
@@ -432,5 +566,68 @@ struct CreatureSpeechRenderer: TextRenderer {
         }
         path.closeSubpath()
         return path
+    }
+}
+
+// MARK: - Pictures
+
+/// The dots that draw an SF Symbol (4.11.0): sampled once per symbol from a rendering of it, as
+/// points 0…1 across its box, shuffled so they gather from all over the picture at once.
+final class CreatureSymbolDots: @unchecked Sendable {
+    static let shared = CreatureSymbolDots()
+
+    private var cache: [String: [CGPoint]] = [:]
+    private let lock = NSLock()
+
+    func dots(for symbol: String) -> [CGPoint] {
+        lock.lock()
+        defer { lock.unlock() }
+        if let dots = cache[symbol] { return dots }
+        let dots = Self.sample(symbol)
+        cache[symbol] = dots
+        return dots
+    }
+
+    private static func sample(_ symbol: String) -> [CGPoint] {
+        let configuration = UIImage.SymbolConfiguration(pointSize: 96, weight: .bold)
+        guard let image = UIImage(systemName: symbol, withConfiguration: configuration)?
+            .withTintColor(.black, renderingMode: .alwaysOriginal) else { return [] }
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        format.opaque = false
+        let rendered = UIGraphicsImageRenderer(size: image.size, format: format).image { _ in
+            image.draw(at: .zero)
+        }
+        guard let cgImage = rendered.cgImage else { return [] }
+        let width = cgImage.width
+        let height = cgImage.height
+        var pixels = [UInt8](repeating: 0, count: width * height * 4)
+        let drawn = pixels.withUnsafeMutableBytes { buffer -> Bool in
+            guard let base = buffer.baseAddress,
+                  let bitmap = CGContext(
+                    data: base, width: width, height: height, bitsPerComponent: 8, bytesPerRow: width * 4,
+                    space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+                  ) else { return false }
+            bitmap.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
+            return true
+        }
+        guard drawn else { return [] }
+        // A grid fine enough for about `pictureDots` dots inside the symbol.
+        var filled = 0
+        for i in stride(from: 3, to: pixels.count, by: 4) where pixels[i] > 128 { filled += 1 }
+        guard filled > 0 else { return [] }
+        let step = max(2, Int((Double(filled) / Double(CreatureSpeechMetrics.pictureDots)).squareRoot().rounded()))
+        var points: [CGPoint] = []
+        for y in stride(from: step / 2, to: height, by: step) {
+            for x in stride(from: step / 2, to: width, by: step) where pixels[(y * width + x) * 4 + 3] > 128 {
+                points.append(CGPoint(x: (Double(x) + 0.5) / Double(width), y: (Double(y) + 0.5) / Double(height)))
+            }
+        }
+        // A fixed shuffle: neighbours leave at different moments.
+        let order = points.indices.map { index -> (Double, Int) in
+            let v = sin(Double(index) * 12.9898 + 78.233) * 43758.5453
+            return (v - v.rounded(.down), index)
+        }
+        return order.sorted { $0.0 < $1.0 }.map { points[$0.1] }
     }
 }
