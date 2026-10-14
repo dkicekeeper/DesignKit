@@ -19,7 +19,7 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 ## 4.9.0 - 2026-10-14
 
 The message field reads over a busy screen: focused, `MessageComposer` fills almost opaque behind
-the text.
+the text. [#65](https://github.com/dkicekeeper/DesignKit/pull/65)
 
 ### Changed
 
