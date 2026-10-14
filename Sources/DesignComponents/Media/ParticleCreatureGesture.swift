@@ -255,10 +255,12 @@ struct CreatureHand {
                 CreatureHandPart(cx: -0.25, cy: 0.08, rx: 0.105, ry: 0.16, exponent: 2, turn: -0.5),
             ]
         case .pointing:
+            // The index finger rises next to the thumb, as a hand points: a finger from the
+            // middle of the fist reads as another gesture.
             return [
                 CreatureHandPart(cx: 0, cy: 0.07, rx: 0.2, ry: 0.18, exponent: 2.6, turn: 0),
-                CreatureHandPart(cx: 0.05, cy: -0.29, rx: 0.066, ry: 0.24, exponent: 2.2, turn: 0),
-                CreatureHandPart(cx: -0.2, cy: 0.02, rx: 0.072, ry: 0.1, exponent: 2, turn: -0.4),
+                CreatureHandPart(cx: -0.09, cy: -0.27, rx: 0.066, ry: 0.24, exponent: 2.2, turn: 0),
+                CreatureHandPart(cx: -0.2, cy: 0.06, rx: 0.072, ry: 0.1, exponent: 2, turn: -0.6),
             ]
         }
     }
