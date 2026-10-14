@@ -3,7 +3,7 @@
 //  DesignKit Gallery
 //
 //  Media and identity: icons and brand logos, avatars, hero symbols, packed icons,
-//  achievements, the picture placeholder.
+//  achievements, the picture placeholder, the particle creature.
 //
 
 import SwiftUI
@@ -24,6 +24,7 @@ struct MediaScreen: View {
         AvatarPage()
         AvatarGroupPage()
         HeroSymbolPage()
+        ParticleCreaturePage()
         PackedCircleIconsPage()
         AchievementMedalPage()
         AchievementTilePage()
@@ -124,6 +125,62 @@ private struct AvatarPage: View {
             TextControl("Name", text: $name)
             SliderControl("Size", value: $size, in: 24...96, step: 4) { "\(Int($0)) pt" }
             ToggleControl("Photo", isOn: $hasPhoto)
+        }
+    }
+}
+
+private struct ParticleCreaturePage: View {
+    @State private var mood = 0
+    @State private var compact = false
+    @State private var interactive = true
+    @State private var size = 280.0
+    @State private var level = 0.5
+    @State private var state: SpecimenState = .content
+
+    private static let moods: [(String, ParticleCreature.Mood)] = [
+        ("Idle", .idle), ("Listening", .listening), ("Thinking", .thinking), ("Answering", .answering),
+        ("Glyph ₸", .glyph("₸")), ("Celebrating", .celebrating), ("Happy", .happy), ("Surprised", .surprised),
+        ("Love", .love), ("Proud", .proud), ("Wink", .wink), ("Confused", .confused),
+        ("Determined", .determined), ("Worried", .worried), ("Sad", .sad), ("Sleepy", .sleepy), ("Asleep", .asleep),
+    ]
+
+    private var style: ParticleCreature.Style { compact ? .compact : .hero }
+
+    var body: some View {
+        ComponentPage(
+            name: "ParticleCreature",
+            summary: "A character made of light: a swarm of particles in a glass sphere with a glowing robot face. Its moods are shapes: a gyroscope while thinking, a chart for an answer, a coin; and faces: ^ ^, > <, hearts, slanted lids, a wink, a tear.",
+            since: "4.6.0",
+            apps: [.tenra],
+            canvas: .dark(minHeight: 340),
+            notes: [
+                "Hero from about 160 pt (the sphere takes 70% of the square, the rest is room for the burst, the chart and the extras); compact from 24 pt for an avatar or a tab icon.",
+                "Interactive: the eyes follow the finger, a tap scatters the swarm, three quick taps make it dizzy.",
+                "30 fps, positions from the time; one still frame under Reduce Motion. Decorative: say what it is doing in text.",
+            ],
+            styles: ["hero", "compact"]
+        ) {
+            Group {
+                if state == .loading {
+                    ParticleCreatureSkeleton(style: style)
+                } else {
+                    ParticleCreature(
+                        mood: Self.moods[mood].1,
+                        style: style,
+                        level: Self.moods[mood].1 == .listening ? level : nil,
+                        isInteractive: interactive
+                    )
+                }
+            }
+            .frame(width: compact ? min(size, 96) : size, height: compact ? min(size, 96) : size)
+            .frame(maxWidth: .infinity)
+        } controls: {
+            StateControl(state: $state)
+            ChoiceControl("Mood", selection: $mood, options: Self.moods.indices.map { (Self.moods[$0].0, $0) })
+            ToggleControl("Compact", isOn: $compact)
+            ToggleControl("Interactive", isOn: $interactive)
+            SliderControl("Size", value: $size, in: 24...320, step: 4) { "\(Int($0)) pt" }
+            SliderControl("Voice level", value: $level, in: 0...1)
         }
     }
 }

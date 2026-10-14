@@ -95,6 +95,12 @@ Insert with a spring: `withAnimation(AppAnimation.bouncy) { isShown = true }`.
 | `TypingIndicator` | three dots in a wave | 30 fps while allowed | a reply on its way, an assistant thinking |
 | `.borderGlow` (1.x) | a static halo round a card | see its docs | "working on it" |
 
+**4.6.0: a character**
+
+| Effect | What | Cost | Use |
+|---|---|---|---|
+| `ParticleCreature(mood:style:level:isInteractive:)` | a swarm of light in a glass sphere with a glowing robot face; each mood is a shape of the swarm (gyroscope rings while thinking, a bar chart, a coin, a burst) and of the face (lids, arcs, chevrons, hearts, a mouth, a tear), which morphs between moods; a change of mood carries every particle to the new shape in about 0.7 s, staggered, with a small overshoot | one Canvas, 30 fps (60 under a finger), positions from the time, particles bucketed into a few dozen fills | an assistant: its avatar, its state while it listens, thinks and answers |
+
 **2.9.0: text that arrives, cards that cascade, marbles**
 
 | Effect | What | Cost | Use |
@@ -186,7 +192,7 @@ on; the system's own switch turns them off.
   draw the final state, loops stop, amounts show their value without rolling or flashing,
   charts are there at once, parallax stops (`.scrollHero` keeps its stretch: it follows the
   finger).
-- **Ambient loops** (`AuroraBackground`, `TypingIndicator`, `.symbolPulse`, `LiveSessionBar`'s
+- **Ambient loops** (`AuroraBackground`, `TypingIndicator`, `ParticleCreature`, `.symbolPulse`, `LiveSessionBar`'s
   recording dot, `PackedCircleIcons`' swaying marbles, the light across its fan and its turning
   orbit, the 1.x beams and glows) run inside `AmbientMotionGate`: off under Reduce Motion and, on iOS 27, while the system
   prefers reduced resource usage. They draw one still frame instead, with the same layout.

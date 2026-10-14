@@ -94,6 +94,22 @@ extension ComponentSnapshots {
         /// The skeletons of 2.8.0: photos, share card, downloads, articles, the session bar.
         /// In two pictures: in one, the window would be taller than the screen.
         /// A photo loading by address (3.1.0): the grey with the shimmer, in a tile's corner.
+        /// 4.6.0: the assistant pieces: the creature (hero and compact), bubbles, chips.
+        @Test func assistantSkeletons() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    HStack(spacing: AppSpacing.lg) {
+                        ParticleCreatureSkeleton().frame(width: 150, height: 150)
+                        ParticleCreatureSkeleton(style: .compact).frame(width: 40, height: 40)
+                    }
+                    MessageBubbleSkeleton()
+                    MessageBubbleSkeleton(role: .outgoing)
+                    SuggestionChipsSkeleton()
+                }
+                .frame(width: 360, alignment: .leading)
+            )
+        }
+
         @Test func remotePhotoSkeleton() async {
             await assertComponentSnapshot(
                 HStack(spacing: AppSpacing.md) {
