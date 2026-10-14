@@ -715,15 +715,29 @@ In dark mode `\.heroTone` inside it is `.onColor`, and DesignKit's hero pieces d
     across them from the left, tile after tile, and again every 4.5 s. It replaced 3.3.0's
     `.fan` (playing cards along an arc, where the cards behind the top one barely showed):
     `.fan` is deprecated and draws the shelf.
-  - **`style: .orbit`**: the largest amount as a marble in the middle (0.42 of the box's shorter
+  - **`style: .orbit`** *(4.7.0, from an owner's reference)*: a carousel of coins. Coins of one
+    size (0.62 of the box's height, at most 0.3 of its width), the largest amount in front, the
+    rest round a ring seen from slightly above (the far side 0.2 of the height higher) that turns
+    to the right in front, once in 24 s. Depth is focus and size: a coin at the back is 0.62 of
+    the front one and out of focus (blur up to 0.11 of its diameter), a front one sharp with a
+    soft shadow. A coin turns its face towards the side it is on (up to 55° at the sides, face on
+    again at the back, so none shows its back), its rim (0.07 of the diameter, light plastic in
+    light mode, darker in dark mode) showing out from behind it and along the bottom; a sheen
+    crosses each face from the upper left. Each coin is tilted a few degrees and bobs on its own
+    beat. A logo fills its coin, a symbol is white on a coin of its tint, "+N" grey. A swipe
+    across spins the ring (up and down is left to a scroll view), it coasts with the fling's
+    speed and settles back to its pace in about a second, with a tick (`HapticCue.tick`) as each
+    coin passes the front. The coins come in one after another. Under Reduce Motion it stands
+    still and a swipe turns it without the coast. Reads from about 240 pt wide.
+    *(Before 4.7.0:)* the largest amount as a marble in the middle (0.42 of the box's shorter
     side), the rest as smaller marbles on an orbit seen at a slant (flatness 0.4, tilted −12°),
-    with its faint line. The orbit turns once in 28 s; a marble on the far side is
-    smaller (0.72) and darker and passes behind the middle one, a near one in front. The marbles
-    fly out of the middle onto it, then the turn starts. They do not sway.
+    with its faint line. The orbit turned once in 28 s; a marble on the far side was
+    smaller (0.72) and darker and passed behind the middle one, a near one in front. The marbles
+    flew out of the middle onto it, then the turn started.
 
   The deal, the flight, the light and the turn stand still under Reduce Motion, while the system
   saves resources and under `.designKitMotion(false)`, which draws the final picture.
-  `PackedCircleIconsSkeleton(containerWidth:style:)` draws grey circles, tiles on the shelf or an orbit.
+  `PackedCircleIconsSkeleton(containerWidth:style:)` draws grey circles, tiles on the shelf or grey coins on the carousel's ring.
 
 #### `RecommendationBox`
 Tinted "lightbulb + advice" callout (icon + text on `color.opacity(0.10)`, `AppRadius.md`). Shared by `CalculationCard` and `TargetProgressCard`. Use for any card-bottom recommendation line.

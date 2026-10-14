@@ -16,6 +16,30 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 4.7.0 - 2026-10-14
+
+`PackedCircleIcons(style: .orbit)` becomes a carousel of coins, from a reference the owner
+shared, and a swipe spins it.
+[#63](https://github.com/dkicekeeper/DesignKit/pull/63)
+
+### Changed
+
+- `PackedCircleIcons(style: .orbit)` is a carousel of coins instead of a marble in the middle
+  with the rest on a tilted orbit. Coins of one size, the largest amount in front, stand on a
+  ring seen from slightly above that turns once in 24 s; the far ones are smaller and out of
+  focus, the front ones sharp with a soft shadow. A coin turns its face towards its side and
+  shows its rim, and each is tilted a little and bobs on its own beat. A logo fills its coin, a
+  symbol is white on a coin of its tint, "+N" is grey. A swipe across spins the ring with
+  inertia and a tick as each coin passes the front, then it settles back to its pace. Under
+  Reduce Motion it stands still and a swipe turns it without the coast. It reads from about
+  240 pt wide. No app uses `.orbit`, so nothing changes in Tenra or Dalada.
+- `PackedCircleIconsSkeleton(style: .orbit)` draws grey coins on the ring.
+
+### Gallery and tooling
+
+- The PackedCircleIcons page shows the carousel 300 pt wide with six coins when the orbit is
+  chosen. Snapshot test `packedOrbitWide`; the orbit's references re-recorded.
+
 ## 4.6.1 - 2026-10-14
 
 `ParticleCreature` on a light page: the glass stays dark and what lies around it is drawn in

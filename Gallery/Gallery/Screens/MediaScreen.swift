@@ -275,12 +275,12 @@ private struct PackedCircleIconsPage: View {
     var body: some View {
         ComponentPage(
             name: "PackedCircleIcons",
-            summary: "Icons sized by their amounts: the accounts of a home card. Glossy marbles (2.9.0), flat circles, an orbit (3.3.0) or app icons on a shelf (4.4.0).",
+            summary: "Icons sized by their amounts: the accounts of a home card. Glossy marbles (2.9.0), flat circles, app icons on a shelf (4.4.0) or a carousel of coins (orbit, 4.7.0).",
             apps: [.tenra],
             notes: [
                 "glossy: marbles packed without overlap; they burst out of the middle and sway. 3.3.0: a softer gloss.",
                 "shelf (4.4.0): app icons in a row in a pocket, the largest amount on the left, each a little over the one before; every one reads. They rise out of the pocket; a light runs across them every few seconds. A logo fills its tile. As tall as its row; best across a card\u{2019}s width (choosing it sets 300 pt and four). It replaced 3.3.0\u{2019}s fan of cards (.fan is deprecated and draws the shelf).",
-                "orbit: the largest amount in the middle, the rest on a tilted orbit that turns once in 28 s; the far side is smaller and darker.",
+                "orbit (4.7.0): a carousel of coins of one size, the largest amount in front, on a ring that turns once in 24 s; the far coins smaller and out of focus, each turning its face to its side and showing its rim. Swipe to spin it, with inertia and a tick per coin. Reads from about 240 pt wide (choosing it sets 300 pt and six). Before 4.7.0: a marble in the middle with the rest on a tilted orbit.",
                 "Items past Visible fold into a \u{201C}+N\u{201D} circle or tile. Under Reduce Motion everything stands still.",
             ],
             styles: ["glossy", "flat", "shelf", "orbit"]
@@ -308,6 +308,12 @@ private struct PackedCircleIconsPage: View {
             if style == .shelf {
                 width = 300
                 maxVisible = 4
+                inCard = false
+            }
+            // The carousel needs room: wide, six coins, on its own.
+            if style == .orbit {
+                width = 300
+                maxVisible = 6
                 inCard = false
             }
         }
