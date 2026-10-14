@@ -193,6 +193,8 @@ public enum CreatureSpeechMetrics {
     static let pictureAssembly: Double = 0.7
     static let pictureDwell: Double = 2.6
     static let dotRadius: Double = 1.4
+    /// A dot's glow in the dark, in its radius.
+    static let dotGlow: Double = 2.6
     static let pictureDots: Int = 110
     /// How far the mood's colour is taken towards white for words in the dark.
     static let lightWords: Double = 0.45
@@ -379,14 +381,8 @@ struct CreatureSpeechRenderer: TextRenderer {
         let mouthY = anchorY + Double(mouth.height)
         let time = elapsed ?? 0
         let flight = CreatureSpeechMetrics.flight
-        // A halo of the page round each letter, so the words read over anything; in the dark,
-        // a glow of their colour too.
-        if let glow {
-            context.addFilter(.shadow(color: glow, radius: CreatureSpeechMetrics.glowRadius))
-        }
-        context.addFilter(.shadow(color: AppColors.Background.base, radius: CreatureSpeechMetrics.haloRadius))
-        context.addFilter(.shadow(color: AppColors.Background.base, radius: CreatureSpeechMetrics.haloRadius))
-
+        // The trail and a picture's dots are drawn plain: a halo round each dot would rub out
+        // its neighbours.
         if trail {
             drawTrail(from: CGPoint(x: mouthX, y: mouthY), to: CGPoint(x: anchorX, y: anchorY), time: time, in: &context)
         }
@@ -394,6 +390,13 @@ struct CreatureSpeechRenderer: TextRenderer {
             drawPicture(dots, layout: layout, from: CGPoint(x: mouthX, y: mouthY), time: time, in: &context)
             return
         }
+        // A halo of the page round each letter, so the words read over anything; in the dark,
+        // a glow of their colour too.
+        if let glow {
+            context.addFilter(.shadow(color: glow, radius: CreatureSpeechMetrics.glowRadius))
+        }
+        context.addFilter(.shadow(color: AppColors.Background.base, radius: CreatureSpeechMetrics.haloRadius))
+        context.addFilter(.shadow(color: AppColors.Background.base, radius: CreatureSpeechMetrics.haloRadius))
 
         var index = 0
         for line in layout {
@@ -488,7 +491,8 @@ struct CreatureSpeechRenderer: TextRenderer {
             let slotX = Double(box.minX) + Double(dot.x) * Double(box.width)
             let slotY = Double(box.minY) + Double(dot.y) * Double(box.height)
             let since = elapsed == nil ? 10 : time - leaves - flight
-            let pose = Self.pose(emotion, index: index, since: since, time: time)
+            // The picture moves as one: a dot of its own out of line would blur the drawing.
+            let pose = Self.pose(emotion, index: 0, since: since, time: time)
             let e = Self.easeOut(landed)
             let arc = -sin(Double.pi * landed) * 14
             let x = Double(head.x) + (slotX - Double(head.x)) * e + pose.dx
@@ -497,6 +501,14 @@ struct CreatureSpeechRenderer: TextRenderer {
             let r = CreatureSpeechMetrics.dotRadius * (0.5 + 0.5 * e) * pose.scale
             var spot = context
             spot.opacity = min(1, landed * 2.5) * pose.opacity * twinkle
+            if glow != nil {
+                // In the dark each dot is a little light: a faint glow round it.
+                let g = r * CreatureSpeechMetrics.dotGlow
+                var light = spot
+                light.opacity *= 0.22
+                light.blendMode = .plusLighter
+                light.fill(Path(ellipseIn: CGRect(x: x - g, y: y - g, width: 2 * g, height: 2 * g)), with: .color(sparkle))
+            }
             spot.fill(Path(ellipseIn: CGRect(x: x - r, y: y - r, width: 2 * r, height: 2 * r)), with: .color(sparkle))
         }
     }
