@@ -206,22 +206,22 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 4.10.0: cartoon bubbles, the whole line shown (motion is off): a line in an oval over
-        /// the creature and a shout in a burst beside it. `.untilChanged`, so a bubble cannot
-        /// leave while it is captured.
+        /// 4.10.0: words of light, every letter in place (motion is off): joy over a happy
+        /// creature (the emotion from its mood) and a calm line beside an idle one.
+        /// `.untilChanged`, so the words cannot leave while they are captured.
         @Test func particleCreatureSpeech() async {
             await assertComponentSnapshot(
                 VStack(spacing: AppSpacing.lg) {
                     ParticleCreature(
                         mood: .happy,
-                        speech: CreatureSpeech("Hi! Three payments are due this week.", duration: .untilChanged)
+                        speech: CreatureSpeech("Hi! Three payments this week.", duration: .untilChanged)
                     )
                     .frame(width: 140, height: 140)
-                    .padding(.top, 140)
+                    .padding(.top, 110)
                     .frame(maxWidth: .infinity)
                     ParticleCreature(
-                        mood: .celebrating,
-                        speech: CreatureSpeech("Goal!", style: .shout, placement: .trailing, duration: .untilChanged)
+                        mood: .idle,
+                        speech: CreatureSpeech("Ask me anything", placement: .trailing, duration: .untilChanged)
                     )
                     .frame(width: 110, height: 110)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -231,26 +231,55 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 4.10.0: a thought in a cloud over the creature and a whisper in a dashed oval beside it.
+        /// 4.10.0: a thought over the creature, slanted, and a whisper beside a sleepy one.
         @Test func particleCreatureThought() async {
             await assertComponentSnapshot(
                 VStack(spacing: AppSpacing.lg) {
                     ParticleCreature(
                         mood: .idle,
-                        speech: CreatureSpeech("Coffee again?", style: .think, duration: .untilChanged)
+                        speech: CreatureSpeech("Coffee again?", emotion: .thought, duration: .untilChanged)
                     )
                     .frame(width: 140, height: 140)
-                    .padding(.top, 170)
+                    .padding(.top, 90)
                     .frame(maxWidth: .infinity)
                     ParticleCreature(
-                        mood: .wink,
-                        speech: CreatureSpeech("Psst, a secret", style: .whisper, placement: .trailing, duration: .untilChanged)
+                        mood: .sleepy,
+                        speech: CreatureSpeech("Psst… it's late", placement: .trailing, duration: .untilChanged)
                     )
                     .frame(width: 110, height: 110)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(AppSpacing.lg),
                 appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// 4.10.0: the other emotions beside the creature: worried letters out of line, dizzy
+        /// ones tilted, sad ones sunk and paler.
+        @Test func particleCreatureFeelings() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.lg) {
+                    ParticleCreature(
+                        mood: .worried,
+                        speech: CreatureSpeech("No connection…", placement: .trailing, duration: .untilChanged)
+                    )
+                    .frame(width: 100, height: 100)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    ParticleCreature(
+                        mood: .idle,
+                        speech: CreatureSpeech("Whoa, I'm dizzy!", emotion: .dizzy, placement: .trailing, duration: .untilChanged)
+                    )
+                    .frame(width: 100, height: 100)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    ParticleCreature(
+                        mood: .sad,
+                        speech: CreatureSpeech("Not this time", placement: .trailing, duration: .untilChanged)
+                    )
+                    .frame(width: 100, height: 100)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(AppSpacing.lg),
+                appearances: [.light, .dark]
             )
         }
 

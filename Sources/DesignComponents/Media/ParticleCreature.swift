@@ -59,7 +59,7 @@ import DesignSupport
 /// Give it a square: the hero looks right from about 160 pt, the compact style from 24 pt.
 /// The hero's sphere takes about 70% of the square; the rest is room for the burst, the chart
 /// and the extras. Decorative: hidden from VoiceOver, say what it is doing in text. A line it
-/// says (`speech:`) is the exception: its bubble is read like any text.
+/// says (`speech:`) is the exception: its words are read like any text.
 ///
 /// It follows the colour scheme (4.6.1): light on a dark page, in deeper colours (ink) on a light
 /// one; on a dark surface in light mode, set `.environment(\.colorScheme, .dark)` on it.
@@ -125,6 +125,7 @@ public struct ParticleCreature: View {
     @State private var engine = ParticleCreatureEngine()
     @State private var isTouching = false
     @State private var shownSpeech: CreatureSpeech?
+    @State private var shownEmotion: CreatureSpeech.Emotion = .calm
     @State private var speechStart = Date.distantPast
 
     /// - Parameters:
@@ -132,8 +133,9 @@ public struct ParticleCreature: View {
     ///   - style: `.hero` or `.compact`.
     ///   - level: The voice level, 0…1, for `.listening`; `nil` ripples on its own.
     ///   - isInteractive: Follows and reacts to touches (hero only).
-    ///   - speech: A line it says in a bubble beside it (4.10.0, hero only), its mouth talking
-    ///     while the line types in. A new line replaces the one on screen; `nil` takes it away.
+    ///   - speech: A line it says (4.10.0, hero only): the letters fly out of its mouth while
+    ///     it talks, in its mood's colour, and move the way it feels. A new line replaces the
+    ///     one on screen; `nil` takes it away.
     public init(
         mood: Mood = .idle,
         style: Style = .hero,
@@ -170,10 +172,10 @@ public struct ParticleCreature: View {
             if style == .hero {
                 GeometryReader { proxy in
                     if let shownSpeech {
-                        speechBubble(shownSpeech, in: proxy.size)
+                        speechWords(shownSpeech, in: proxy.size)
                     }
                 }
-                // The bubble is placed by the creature's own sides; its text keeps the app's
+                // The words are placed by the creature's own sides; their text keeps the app's
                 // direction.
                 .environment(\.layoutDirection, .leftToRight)
             }
@@ -190,16 +192,30 @@ public struct ParticleCreature: View {
     private func say(_ line: CreatureSpeech?) {
         guard style == .hero else { return }
         let now = Date()
+        let emotion = line.map { Self.emotion(of: $0, mood: mood) } ?? .calm
         speechStart = now
-        engine.speak(moves ? line : nil, date: now, look: line.map { lookAtBubble($0) })
-        let pop = line?.style == .shout ? AppAnimation.expressive : AppAnimation.bouncy
-        withAnimation(AppAnimation.motion(pop, reduceMotion: reduceMotion, isEnabled: designKitMotion)) {
+        engine.speak(moves ? line : nil, emotion: emotion, date: now, look: line.map { lookAtWords($0) })
+        shownEmotion = emotion
+        withAnimation(AppAnimation.motion(AppAnimation.smooth, reduceMotion: reduceMotion, isEnabled: designKitMotion)) {
             shownSpeech = line
         }
     }
 
-    /// Where the eyes go while a thought hangs over the creature: up at the cloud.
-    private func lookAtBubble(_ line: CreatureSpeech) -> (x: Double, y: Double) {
+    /// The line's emotion, `.automatic` taken from the mood.
+    static func emotion(of line: CreatureSpeech, mood: Mood) -> CreatureSpeech.Emotion {
+        guard line.emotion == .automatic else { return line.emotion }
+        switch mood {
+        case .happy, .celebrating, .proud, .love: return .joy
+        case .thinking: return .thought
+        case .worried: return .worry
+        case .sad: return .sad
+        case .sleepy, .asleep: return .whisper
+        default: return .calm
+        }
+    }
+
+    /// Where the eyes go while the creature thinks a line: at the words.
+    private func lookAtWords(_ line: CreatureSpeech) -> (x: Double, y: Double) {
         switch line.placement {
         case .above: return (0.2, -0.85)
         case .trailing, .leading:
@@ -221,45 +237,58 @@ public struct ParticleCreature: View {
         }
     }
 
-    /// The bubble with its tail's tip just off the sphere's rim: over it, or beside it on the
-    /// upper side.
-    private func speechBubble(_ line: CreatureSpeech, in size: CGSize) -> some View {
+    /// The words just off the sphere's rim, the letters flying to them from the mouth: over
+    /// the creature, or beside it on the upper side.
+    private func speechWords(_ line: CreatureSpeech, in size: CGSize) -> some View {
         let geo = Geometry(size: size, style: .hero)
-        let rim = geo.radius * 1.2 + CreatureSpeechMetrics.gap
+        let rim = geo.radius * CreatureSpeechMetrics.rim + CreatureSpeechMetrics.gap
+        let mouth = CGPoint(x: geo.cx, y: geo.restY + geo.radius * CreatureSpeechMetrics.mouth)
         let width = line.maxWidth
         let room = CreatureSpeechMetrics.room
-        let tailEdge: Edge
         let alignment: Alignment
         let anchor: UnitPoint
+        let tip: CGPoint
         let center: CGPoint
         switch line.placement {
         case .above:
-            tailEdge = .bottom
             alignment = .bottom
             anchor = .bottom
-            center = CGPoint(x: geo.cx, y: geo.restY - rim - room / 2)
+            tip = CGPoint(x: geo.cx, y: geo.restY - rim)
+            center = CGPoint(x: tip.x, y: tip.y - room / 2)
         case .trailing, .leading:
             let onRight = (line.placement == .trailing) != (layoutDirection == .rightToLeft)
             let side: Double = onRight ? 1 : -1
             let angle = CreatureSpeechMetrics.sideAngle
-            let tip = CGPoint(x: geo.cx + side * rim * cos(angle), y: geo.restY + rim * sin(angle))
-            tailEdge = onRight ? .leading : .trailing
             alignment = onRight ? .leading : .trailing
             anchor = onRight ? .leading : .trailing
+            tip = CGPoint(x: geo.cx + side * rim * cos(angle), y: geo.restY + rim * sin(angle))
             center = CGPoint(x: tip.x + side * width / 2, y: tip.y)
         }
-        return CreatureSpeechBubble(
+        let onLight = colorScheme == .light
+        return CreatureSpeechWords(
             speech: line,
+            emotion: shownEmotion,
             start: speechStart,
-            isTyping: moves,
-            tailEdge: tailEdge,
+            moves: moves,
+            color: Self.wordColor(mood, onLight: onLight),
+            glows: !onLight,
+            anchor: anchor,
+            mouth: CGSize(width: mouth.x - tip.x, height: mouth.y - tip.y),
             textDirection: layoutDirection
         )
         .frame(width: width, height: line.placement == .above ? room : room * 2, alignment: alignment)
-        // Grows from the tail's tip: the anchor is on the box the bubble sits in.
-        .transition(.scale(scale: 0.4, anchor: anchor).combined(with: .opacity))
+        .transition(.opacity)
         .position(center)
         .id(line.id)
+    }
+
+    /// The mood's colour for its words: its main hue in ink on a light page, lighter in the dark.
+    static func wordColor(_ mood: Mood, onLight: Bool) -> Color {
+        let hue = CreaturePalette.of(CreaturePose(mood))[0]
+        let rgb = onLight
+            ? hue * (1 - CreatureInk.faceDepth)
+            : hue + (SIMD3<Double>(repeating: 255) - hue) * CreatureSpeechMetrics.lightWords
+        return Color(.sRGB, red: rgb.x / 255, green: rgb.y / 255, blue: rgb.z / 255)
     }
 
     private func canvas(time: Double?) -> some View {
@@ -365,7 +394,7 @@ final class ParticleCreatureEngine {
     private var speechLetters: [Character] = []
     private var speechSchedule: [Double] = []
     private var speechStart: Double = 0
-    private var speechStyle: CreatureSpeech.Style = .say
+    private var speechEmotion: CreatureSpeech.Emotion = .calm
     private var speechLook: (x: Double, y: Double)?
 
     // MARK: Events
@@ -388,14 +417,15 @@ final class ParticleCreatureEngine {
         gestureStart = date.timeIntervalSinceReferenceDate
     }
 
-    /// Talks while `line` types in from `date` (4.10.0): wide for a shout, barely for a whisper,
-    /// not at all for a thought, when the eyes go to `look` instead. `nil` stops.
-    func speak(_ line: CreatureSpeech?, date: Date, look: (x: Double, y: Double)? = nil) {
-        let talks = line.map { $0.style != .think } ?? false
+    /// Talks while the letters of `line` leave from `date` (4.10.0): wide for joy, barely for a
+    /// whisper, not at all for a thought, when the eyes go to `look` instead. `nil` stops.
+    func speak(_ line: CreatureSpeech?, emotion: CreatureSpeech.Emotion = .calm, date: Date,
+               look: (x: Double, y: Double)? = nil) {
+        let talks = line != nil && emotion != .thought
         speechLetters = talks ? Array(line?.text ?? "") : []
         speechSchedule = talks ? CreatureSpeechTiming.schedule(line?.text ?? "") : []
-        speechStyle = line?.style ?? .say
-        speechLook = line?.style == .think ? look : nil
+        speechEmotion = emotion
+        speechLook = line != nil && emotion == .thought ? look : nil
         speechStart = date.timeIntervalSinceReferenceDate
     }
 
@@ -498,20 +528,23 @@ final class ParticleCreatureEngine {
         lastFace = face
         var shownFace = animated ? living(face, geo, t: t, gaze: gaze, level: level) : face
         shownFace = Self.apply(motion, to: shownFace)
-        // Talking (4.10.0): the mouth opens and shuts while the line types in; a thought holds
-        // the eyes up at its cloud instead.
+        // Talking (4.10.0): the mouth opens and shuts while the letters leave; a thought holds
+        // the eyes on the words instead.
         if let time, style == .hero {
             if let open = CreatureSpeechTiming.mouth(speechSchedule, letters: speechLetters, at: time - speechStart) {
                 var width = CreatureFace.talkWidth
                 var opening = open
-                switch speechStyle {
-                case .shout:
+                switch speechEmotion {
+                case .joy:
                     width *= 1.3
                     opening = 0.35 + 0.65 * open
                 case .whisper:
                     width *= 0.7
                     opening = 0.55 * open
-                case .say, .think:
+                case .worry, .sad:
+                    width *= 0.85
+                    opening = 0.7 * open
+                case .automatic, .calm, .thought, .dizzy:
                     break
                 }
                 shownFace.mouth = CreatureMouth(form: .open, y: shownFace.mouth.y, width: width, open: opening)

@@ -2,50 +2,58 @@
 //  ParticleCreatureSpeech.swift
 //  DesignKit
 //
-//  The creature speaks (4.10.0): a short line in a cartoon bubble beside it, after the owner's
-//  comic references. White with a thick graphite outline in both colour schemes (a sticker on a
-//  dark page), rounded bold type, and a shape for each way of saying it: an oval with a curved
-//  tail for a line, a burst with a spike for an exclamation, a cloud with bubbles rising to it for
-//  a thought, a dashed oval for a whisper. The bubble pops out of the creature, the line types in
-//  letter by letter with a pause at a comma or a full stop, and the mouth talks while it types
-//  (a thought keeps the mouth still and the eyes on the cloud); then the bubble waits and goes.
-//  Outside a chat: a greeting, a hint, a reaction. The conversation itself is `MessageBubble`.
+//  The creature speaks (4.10.0): words of light, with no bubble (the owner's choice: a comic
+//  bubble was a flat sticker next to a creature made of light). Each letter leaves its mouth,
+//  flies to its place on an arc and lands, while the mouth talks; then the line lives the way
+//  the creature feels: calm letters rest, joyful ones hop in a wave with sparkles, a thought
+//  sways in a slant, a whisper glimmers small and pale, worried letters tremble, dizzy ones
+//  spin, sad ones sink. The words are in the mood's colour, ink on a light page and light with
+//  a glow in the dark, with a soft halo of the page round each letter so they read over
+//  anything. Outside a chat: a greeting, a hint, a reaction. The conversation is `MessageBubble`.
 //
 
 import SwiftUI
 import DesignTokens
 
-/// A line `ParticleCreature` says (4.10.0), in a cartoon bubble beside it.
+/// A line `ParticleCreature` says (4.10.0): words that fly out of its mouth and move the way it
+/// feels.
 ///
 /// ```swift
 /// ParticleCreature(mood: .happy, speech: CreatureSpeech("Hi, Daulet!"))
-/// ParticleCreature(mood: .celebrating, speech: CreatureSpeech("Goal!", style: .shout))
-/// ParticleCreature(mood: .idle, speech: CreatureSpeech("3 payments this week", placement: .trailing) {
-///     showPayments()
-/// })
+/// ParticleCreature(mood: .celebrating, speech: CreatureSpeech("Goal!"))          // joy, from the mood
+/// ParticleCreature(mood: .idle, speech: CreatureSpeech("Hmm…", emotion: .thought, placement: .trailing))
 /// ```
 ///
 /// A new line (another text or `id`) replaces the one on screen; `nil` takes it away. Keep it
-/// short: a bubble holds about two lines, a shout a few words. The hero style only: the compact
-/// sphere has no room.
+/// short: about two lines. The hero style only: the compact sphere has no room.
 public struct CreatureSpeech: Equatable {
-    /// How it is said, and so the bubble's shape.
-    public enum Style: Hashable, Sendable {
-        /// A line: an oval with a curved tail.
-        case say
-        /// An exclamation: a burst with one spike to the creature, bigger and bolder type, the
-        /// mouth opening wide. A few words.
-        case shout
-        /// A thought: a cloud with two bubbles rising to it. The mouth stays still and the eyes
-        /// look up at the cloud.
-        case think
-        /// A quiet word: an oval with a dashed outline, smaller type, the mouth barely moving.
+    /// How the words move once they land, and how the mouth talks.
+    public enum Emotion: Hashable, Sendable {
+        /// From the creature's mood when the line comes: joy when it is happy, celebrating,
+        /// proud or in love; a thought while thinking; worry when worried; sadness when sad; a
+        /// whisper when sleepy or asleep; calm otherwise.
+        case automatic
+        /// The letters land and rest.
+        case calm
+        /// Bigger and bolder; a wave of hops runs along the line now and then, sparkles round it;
+        /// the mouth opens wide.
+        case joy
+        /// Slanted and a little pale, swaying slowly. The mouth stays still and the eyes look at
+        /// the words.
+        case thought
+        /// Small and pale, the letters come out of a blur and glimmer; the mouth barely moves.
         case whisper
+        /// The letters tremble.
+        case worry
+        /// The letters spin and sway.
+        case dizzy
+        /// The letters sink and fade a little.
+        case sad
     }
 
-    /// Where the bubble hangs. The creature's view does not grow for it: leave room on that side.
+    /// Where the words hang. The creature's view does not grow for them: leave room on that side.
     public enum Placement: Hashable, Sendable {
-        /// Over the creature, the tail down to it.
+        /// Over the creature.
         case above
         /// Beside it, after it in the layout's direction.
         case trailing
@@ -53,21 +61,21 @@ public struct CreatureSpeech: Equatable {
         case leading
     }
 
-    /// How long the bubble stays.
+    /// How long the words stay.
     public enum Duration: Hashable, Sendable {
-        /// While it types, then about 2 s more, longer for a longer line (5 s at most).
+        /// While they come out, then about 2 s more, longer for a longer line (5 s at most).
         case automatic
-        /// This many seconds from when it appears.
+        /// This many seconds from when they start.
         case seconds(Double)
         /// Until the line changes or becomes `nil`.
         case untilChanged
     }
 
     public let text: String
-    public let style: Style
+    public let emotion: Emotion
     public let placement: Placement
-    /// The widest the bubble may be, its padding included: narrower where the creature has
-    /// little room beside it (a creature in a navigation bar).
+    /// The widest the line may be: narrower where the creature has little room beside it (a
+    /// creature in a navigation bar).
     public let maxWidth: CGFloat
     public let duration: Duration
     let id: AnyHashable
@@ -76,10 +84,10 @@ public struct CreatureSpeech: Equatable {
     /// - Parameters:
     ///   - id: Tells two lines with the same text apart, so the same words can be said again.
     ///     The text by default.
-    ///   - action: Runs on a tap on the bubble (the bubble is then a button for VoiceOver).
+    ///   - action: Runs on a tap on the words (they are then a button for VoiceOver).
     public init(
         _ text: String,
-        style: Style = .say,
+        emotion: Emotion = .automatic,
         placement: Placement = .above,
         maxWidth: CGFloat = CreatureSpeechMetrics.maxWidth,
         duration: Duration = .automatic,
@@ -87,7 +95,7 @@ public struct CreatureSpeech: Equatable {
         action: (() -> Void)? = nil
     ) {
         self.text = text
-        self.style = style
+        self.emotion = emotion
         self.placement = placement
         self.maxWidth = maxWidth
         self.duration = duration
@@ -96,15 +104,15 @@ public struct CreatureSpeech: Equatable {
     }
 
     public static func == (a: CreatureSpeech, b: CreatureSpeech) -> Bool {
-        a.id == b.id && a.text == b.text && a.style == b.style && a.placement == b.placement
+        a.id == b.id && a.text == b.text && a.emotion == b.emotion && a.placement == b.placement
             && a.maxWidth == b.maxWidth && a.duration == b.duration
     }
 
-    /// How long the bubble stays, from when it appears; `nil` while the line stands.
+    /// How long the words stay, from when they start; `nil` while the line stands.
     var visibleDuration: Double? {
         switch duration {
         case .automatic:
-            let typing = CreatureSpeechTiming.typingDuration(of: text)
+            let typing = CreatureSpeechTiming.typingDuration(of: text) + CreatureSpeechMetrics.flight
             let dwell = min(max(1.6 + 0.045 * Double(text.count), CreatureSpeechMetrics.minimumDwell),
                             CreatureSpeechMetrics.maximumDwell)
             return typing + dwell
@@ -117,73 +125,52 @@ public struct CreatureSpeech: Equatable {
 }
 
 public enum CreatureSpeechMetrics {
-    /// The widest a bubble is offered by default (`CreatureSpeech(maxWidth:)`); its text wraps
-    /// inside, less its padding.
+    /// The widest a line is by default (`CreatureSpeech(maxWidth:)`).
     public static let maxWidth: CGFloat = 240
-    /// A cartoon bubble in both colour schemes: white, a graphite outline, near-black type.
-    static let paper = Color.white
-    static let outline = Color(white: 0.2)
-    static let ink = Color(white: 0.1)
-    static let outlineWidth: CGFloat = 3
-    /// The whisper's dashes.
-    static let whisperDash: [CGFloat] = [7, 5]
-    /// The tail's base where it leaves an oval.
-    static let tailBase: CGFloat = 22
-    /// How far the cloud's bumps rise above its line.
-    static let cloudBump: CGFloat = 9
-    /// The gap between the tail's tip and the creature's rim.
-    static let gap: CGFloat = 2
-    /// The height a bubble over the creature may take; a bubble beside it is centred on its tail.
+    /// A letter's flight from the mouth to its place.
+    static let flight: Double = 0.4
+    /// The gap between the words and the creature's rim, its glow taken in (`rim` × its radius).
+    static let gap: CGFloat = 8
+    static let rim: Double = 1.1
+    /// The mouth under the sphere's centre, in its radius: where the letters come from.
+    static let mouth: Double = 0.3
+    /// How far the mood's colour is taken towards white for words in the dark.
+    static let lightWords: Double = 0.45
+    /// The height the words over the creature may take; words beside it are centred on their
+    /// anchor.
     static let room: CGFloat = 200
-    /// Where a bubble beside the creature meets it: the upper side of the rim (radians from the
+    /// Where words beside the creature meet it: the upper side of the rim (radians from the
     /// horizontal, up is negative).
     static let sideAngle: Double = -0.45
-    /// The wait after the line is typed, for `.automatic`.
+    /// The halo of the page round each letter, and the glow in the dark.
+    static let haloRadius: CGFloat = 2.5
+    static let glowRadius: CGFloat = 7
+    /// The wait after the words are out, for `.automatic`.
     static let minimumDwell: Double = 2
     static let maximumDwell: Double = 5
 
-    /// The room the tail (or a thought's bubbles) takes beside the bubble.
-    static func tailLength(_ style: CreatureSpeech.Style) -> CGFloat {
-        switch style {
-        case .say, .whisper: 20
-        case .shout: 18
-        case .think: 30
-        }
-    }
-
-    /// The text's distance from the bubble's frame: an oval, a cloud and a burst need more at
-    /// the sides than a box, or the corners of the text poke out.
-    static func padding(_ style: CreatureSpeech.Style) -> EdgeInsets {
-        switch style {
-        case .say: EdgeInsets(top: 16, leading: 22, bottom: 16, trailing: 22)
-        case .whisper: EdgeInsets(top: 14, leading: 20, bottom: 14, trailing: 20)
-        case .shout: EdgeInsets(top: 32, leading: 40, bottom: 32, trailing: 40)
-        case .think: EdgeInsets(top: 24, leading: 30, bottom: 24, trailing: 30)
-        }
-    }
-
-    /// Rounded bold type that scales with Dynamic Type; bigger for a shout, smaller for a whisper.
-    static func font(_ style: CreatureSpeech.Style) -> Font {
-        switch style {
-        case .say: .system(.body, design: .rounded).weight(.semibold)
-        case .shout: .system(.title3, design: .rounded).weight(.heavy)
-        case .think: .system(.body, design: .rounded).weight(.medium)
-        case .whisper: .system(.callout, design: .rounded).weight(.medium)
+    /// Rounded bold type that scales with Dynamic Type: bigger for joy, smaller for a whisper.
+    static func font(_ emotion: CreatureSpeech.Emotion) -> Font {
+        switch emotion {
+        case .joy: .system(.title2, design: .rounded).weight(.heavy)
+        case .whisper: .system(.callout, design: .rounded).weight(.semibold)
+        case .thought: .system(.body, design: .rounded).weight(.semibold)
+        case .automatic, .calm, .worry, .dizzy, .sad: .system(.title3, design: .rounded).weight(.bold)
         }
     }
 }
 
 // MARK: - Timing
 
-/// When each letter of a line appears, and what the mouth does meanwhile. The bubble and the
-/// creature's mouth read the same schedule, so the mouth stops when the letters do.
+/// When each letter of a line leaves the mouth, and what the mouth does meanwhile. The words
+/// and the creature's mouth read the same schedule, so the mouth stops when the letters do.
 enum CreatureSpeechTiming {
     /// About 35 letters a second, a longer pause after a full stop than after a comma.
     static let perLetter = 1.0 / 35
     static let sentencePause = 0.35
     static let clausePause = 0.18
 
-    /// The moment each letter appears, from the start.
+    /// The moment each letter leaves, from the start.
     static func schedule(_ text: String) -> [Double] {
         var times: [Double] = []
         times.reserveCapacity(text.count)
@@ -204,7 +191,7 @@ enum CreatureSpeechTiming {
         (schedule(text).last ?? 0) + perLetter
     }
 
-    /// How many letters show `elapsed` seconds in.
+    /// How many letters have left `elapsed` seconds in.
     static func shownCount(_ schedule: [Double], at elapsed: Double) -> Int {
         var low = 0
         var high = schedule.count
@@ -215,7 +202,7 @@ enum CreatureSpeechTiming {
         return low
     }
 
-    /// The mouth `elapsed` seconds in: 0 shut … 1 open; `nil` once the line is typed. Shut in
+    /// The mouth `elapsed` seconds in: 0 shut … 1 open; `nil` once the letters are out. Shut in
     /// the pause after a comma or a full stop, otherwise opening and closing about four times a
     /// second, like syllables.
     static func mouth(_ schedule: [Double], letters: [Character], at elapsed: Double) -> Double? {
@@ -228,28 +215,32 @@ enum CreatureSpeechTiming {
     }
 }
 
-// MARK: - The bubble
+// MARK: - The words
 
-/// A cartoon bubble for `speech`, its tail (or a thought's bubbles) on `tailEdge`, the line
-/// typed in from `start` when `isTyping`. It hugs its text and wraps at the width it is offered.
-/// Laid out left to right (the creature places it by its own sides); the text keeps the app's
-/// direction (`textDirection`).
-struct CreatureSpeechBubble: View {
+/// The words of a line, flying out of the mouth from `start` when `moves` (all in place
+/// otherwise). `anchor` is the point of the text that touches its anchor by the creature (its
+/// bottom over it, its leading or trailing edge beside it); `mouth` is the mouth's offset from
+/// that point. Laid out left to right by the creature; the text keeps the app's direction.
+struct CreatureSpeechWords: View {
     let speech: CreatureSpeech
+    let emotion: CreatureSpeech.Emotion
     let start: Date
-    let isTyping: Bool
-    let tailEdge: Edge
+    let moves: Bool
+    let color: Color
+    let glows: Bool
+    let anchor: UnitPoint
+    let mouth: CGSize
     let textDirection: LayoutDirection
 
     var body: some View {
         let schedule = CreatureSpeechTiming.schedule(speech.text)
         Group {
-            if isTyping, !schedule.isEmpty {
-                TimelineView(.explicit(schedule.map { start.addingTimeInterval($0) })) { context in
-                    line(shown: CreatureSpeechTiming.shownCount(schedule, at: context.date.timeIntervalSince(start)))
+            if moves {
+                TimelineView(.animation(minimumInterval: 1.0 / 30)) { context in
+                    words(elapsed: context.date.timeIntervalSince(start), schedule: schedule)
                 }
             } else {
-                line(shown: speech.text.count)
+                words(elapsed: nil, schedule: schedule)
             }
         }
         .accessibilityElement(children: .ignore)
@@ -257,244 +248,187 @@ struct CreatureSpeechBubble: View {
         .accessibilityAddTraits(speech.action == nil ? [] : .isButton)
     }
 
-    private func line(shown: Int) -> some View {
-        // The whole line is laid out from the start (the rest clear), so the bubble keeps its
-        // size while the letters come in.
-        var visible = AttributedString(String(speech.text.prefix(shown)))
-        visible.foregroundColor = CreatureSpeechMetrics.ink
-        var rest = AttributedString(String(speech.text.dropFirst(shown)))
-        rest.foregroundColor = Color.clear
-        let style = speech.style
-        let shape = CreatureSpeechBubbleShape(style: style, tailEdge: tailEdge)
-        let stroke = StrokeStyle(
-            lineWidth: CreatureSpeechMetrics.outlineWidth,
-            lineCap: .round,
-            lineJoin: .round,
-            dash: style == .whisper ? CreatureSpeechMetrics.whisperDash : []
-        )
-        let bubble = Text(visible + rest)
-            .font(CreatureSpeechMetrics.font(style))
+    private func words(elapsed: Double?, schedule: [Double]) -> some View {
+        let line = Text(speech.text)
+            .font(CreatureSpeechMetrics.font(emotion))
+            .foregroundStyle(color)
             .multilineTextAlignment(.center)
             .fixedSize(horizontal: false, vertical: true)
             .environment(\.layoutDirection, textDirection)
-            .padding(CreatureSpeechMetrics.padding(style))
-            .padding(tailEdge.set, CreatureSpeechMetrics.tailLength(style))
-            .background {
-                shape.fill(CreatureSpeechMetrics.paper)
-                shape.stroke(CreatureSpeechMetrics.outline, style: stroke)
-            }
+            .textRenderer(CreatureSpeechRenderer(
+                elapsed: elapsed,
+                schedule: schedule,
+                emotion: emotion,
+                anchor: anchor,
+                mouth: mouth,
+                sparkle: color
+            ))
+            // A halo of the page round each letter, so the words read over anything; in the
+            // dark, a glow of their colour too.
+            .shadow(color: AppColors.Background.base, radius: CreatureSpeechMetrics.haloRadius)
+            .shadow(color: AppColors.Background.base, radius: CreatureSpeechMetrics.haloRadius)
+            .shadow(color: glows ? color.opacity(0.55) : .clear, radius: glows ? CreatureSpeechMetrics.glowRadius : 0)
         return Group {
             if let action = speech.action {
-                Button(action: action) { bubble }
+                Button(action: action) { line }
                     .buttonStyle(.plain)
             } else {
-                bubble
+                line
             }
         }
     }
 }
 
-/// The bubble's outline: an oval with a curved tail, a burst with a long spike, or a cloud with
-/// two bubbles towards the creature. The tail's tip (or the last bubble) touches the middle of
-/// `tailEdge`. Leading is the left: the creature lays its bubble out left to right.
-struct CreatureSpeechBubbleShape: Shape {
-    let style: CreatureSpeech.Style
-    let tailEdge: Edge
+/// Draws each letter on its own: its flight from the mouth, then its emotion. With no time (a
+/// still frame) every letter is in place, in the emotion's resting pose.
+struct CreatureSpeechRenderer: TextRenderer {
+    let elapsed: Double?
+    let schedule: [Double]
+    let emotion: CreatureSpeech.Emotion
+    let anchor: UnitPoint
+    let mouth: CGSize
+    let sparkle: Color
 
-    func path(in rect: CGRect) -> Path {
-        let tail = CreatureSpeechMetrics.tailLength(style)
-        var body = rect
-        let tip: CGPoint
-        switch tailEdge {
-        case .top:
-            body.origin.y += tail
-            body.size.height -= tail
-            tip = CGPoint(x: rect.midX, y: rect.minY)
-        case .bottom:
-            body.size.height -= tail
-            tip = CGPoint(x: rect.midX, y: rect.maxY)
-        case .leading:
-            body.origin.x += tail
-            body.size.width -= tail
-            tip = CGPoint(x: rect.minX, y: rect.midY)
-        case .trailing:
-            body.size.width -= tail
-            tip = CGPoint(x: rect.maxX, y: rect.midY)
-        }
-        guard body.width > 4, body.height > 4 else { return Path() }
-        switch style {
-        case .say, .whisper: return Self.oval(body, tip: tip, vertical: tailEdge == .top || tailEdge == .bottom)
-        case .shout: return Self.burst(body, tip: tip)
-        case .think: return Self.cloud(body, tip: tip, vertical: tailEdge == .top || tailEdge == .bottom)
-        }
+    /// Room outside the text for the letters' flight from the mouth, their arc and the sparkles.
+    var displayPadding: EdgeInsets {
+        let around = 56.0
+        let side = abs(Double(mouth.width)) + around
+        return EdgeInsets(top: around, leading: side, bottom: max(0, Double(mouth.height)) + around, trailing: side)
     }
 
-    /// A fat oval (a superellipse, rounder at the corners than an ellipse, so a line of text fits)
-    /// with a tail like a comma: it leaves the oval a little to one side of the tip and bows on
-    /// its way there.
-    private static func oval(_ body: CGRect, tip: CGPoint, vertical: Bool) -> Path {
-        let outline = superellipse(body, exponent: 2.4, steps: 144)
-        // Where the tail leaves: off the straight line to the tip, so it curves in.
-        let toward = vertical
-            ? CGPoint(x: tip.x + body.width * 0.18, y: tip.y)
-            : CGPoint(x: tip.x, y: tip.y - body.height * 0.3)
-        let base = nearest(outline, to: toward)
-        let half = max(1, Int((CreatureSpeechMetrics.tailBase / 2) / step(outline)))
-        let count = outline.count
-        let start = (base + half) % count
-        let end = (base - half + count) % count
-        var path = Path()
-        path.move(to: outline[start])
-        var k = start
-        while k != end {
-            k = (k + 1) % count
-            path.addLine(to: outline[k])
+    func draw(layout: Text.Layout, in context: inout GraphicsContext) {
+        // The text's own bounds, to find the mouth in its coordinates.
+        var bounds = CGRect.null
+        for line in layout {
+            bounds = bounds.union(line.typographicBounds.rect)
         }
-        // Both edges bow the same way: a swoosh.
-        let from = outline[base]
-        let dx = tip.x - from.x
-        let dy = tip.y - from.y
-        let length = max(hypot(dx, dy), 1)
-        let bow = CGPoint(x: dy / length * length * 0.22, y: -dx / length * length * 0.22)
-        let near = outline[end]
-        let far = outline[start]
-        path.addQuadCurve(to: tip, control: CGPoint(x: (near.x + tip.x) / 2 + bow.x, y: (near.y + tip.y) / 2 + bow.y))
-        path.addQuadCurve(to: far, control: CGPoint(x: (tip.x + far.x) / 2 + bow.x, y: (tip.y + far.y) / 2 + bow.y))
-        path.closeSubpath()
-        return path
-    }
+        guard !bounds.isNull else { return }
+        let anchorX = Double(bounds.minX + bounds.width * anchor.x)
+        let anchorY = Double(bounds.minY + bounds.height * anchor.y)
+        let mouthX = anchorX + Double(mouth.width)
+        let mouthY = anchorY + Double(mouth.height)
+        let time = elapsed ?? 0
+        let flight = CreatureSpeechMetrics.flight
 
-    /// A burst: spikes round an ellipse, a little uneven like a hand-drawn one, the spike
-    /// nearest the creature reaching to the tip.
-    private static func burst(_ body: CGRect, tip: CGPoint) -> Path {
-        let cx = Double(body.midX)
-        let cy = Double(body.midY)
-        let a = Double(body.width / 2)
-        let b = Double(body.height / 2)
-        let spikes = max(10, min(18, Int((a + b) / 12)))
-        let toTip = atan2((Double(tip.y) - cy) / b, (Double(tip.x) - cx) / a)
-        var path = Path()
-        for i in 0..<(spikes * 2) {
-            let angle = toTip + Double.pi * Double(i) / Double(spikes)
-            let point: CGPoint
-            if i == 0 {
-                point = tip
-            } else {
-                // Fixed unevenness per spike: the same burst every time.
-                let wobble = fraction(sin(Double(i) * 12.9898) * 43758.5453)
-                let r = i.isMultiple(of: 2) ? 0.94 + 0.06 * wobble : 0.76 + 0.06 * wobble
-                point = CGPoint(x: cx + a * r * cos(angle), y: cy + b * r * sin(angle))
-            }
-            if i == 0 { path.move(to: point) } else { path.addLine(to: point) }
-        }
-        path.closeSubpath()
-        return path
-    }
+        var index = 0
+        for line in layout {
+            for run in line {
+                for glyph in run {
+                    defer { index += 1 }
+                    let leaves = index < schedule.count ? schedule[index] : (schedule.last ?? 0)
+                    // 0 at the mouth … 1 in place.
+                    let landed = elapsed == nil ? 1 : min(max((time - leaves) / flight, 0), 1)
+                    guard landed > 0 else { continue }
+                    let rect = glyph.typographicBounds.rect
+                    let slotX = Double(rect.midX)
+                    let slotY = Double(rect.midY)
+                    let since = elapsed == nil ? 10 : time - leaves - flight
+                    let pose = Self.pose(emotion, index: index, since: since, time: time)
 
-    /// A cloud: bumps along an ellipse, a little uneven, and two bubbles from its edge to the
-    /// tip, the far one smaller.
-    private static func cloud(_ body: CGRect, tip: CGPoint, vertical: Bool) -> Path {
-        let bump = Double(CreatureSpeechMetrics.cloudBump)
-        let inner = body.insetBy(dx: bump, dy: bump)
-        let cx = Double(inner.midX)
-        let cy = Double(inner.midY)
-        let a = Double(inner.width / 2)
-        let b = Double(inner.height / 2)
-        let perimeter = Double.pi * (3 * (a + b) - ((3 * a + b) * (a + 3 * b)).squareRoot())
-        let count = max(7, Int(perimeter / 26))
-        var points: [CGPoint] = []
-        for i in 0..<count {
-            let wobble = fraction(sin(Double(i) * 78.233) * 43758.5453) - 0.5
-            let angle = 2 * Double.pi * (Double(i) + wobble * 0.3) / Double(count)
-            points.append(CGPoint(x: cx + a * cos(angle), y: cy + b * sin(angle)))
-        }
-        var path = Path()
-        path.move(to: points[0])
-        for i in 0..<count {
-            let p = points[i]
-            let q = points[(i + 1) % count]
-            let mid = CGPoint(x: (p.x + q.x) / 2, y: (p.y + q.y) / 2)
-            // Outwards from the centre, in the ellipse's own proportions.
-            let nx = (Double(mid.x) - cx) / max(a, 1)
-            let ny = (Double(mid.y) - cy) / max(b, 1)
-            let norm = max(hypot(nx, ny), 0.001)
-            let lift = bump * 2.2
-            path.addQuadCurve(to: q, control: CGPoint(x: Double(mid.x) + nx / norm * lift, y: Double(mid.y) + ny / norm * lift))
-        }
-        path.closeSubpath()
-        // The thought's bubbles rise from the cloud's edge, a little to one side, to the tip.
-        let toward = vertical
-            ? CGPoint(x: tip.x + body.width * 0.2, y: tip.y)
-            : CGPoint(x: tip.x, y: tip.y - body.height * 0.3)
-        let angle = atan2((Double(toward.y) - cy) / b, (Double(toward.x) - cx) / a)
-        let edgeX = cx + (a + bump) * cos(angle)
-        let edgeY = cy + (b + bump) * sin(angle)
-        let tipX = Double(tip.x)
-        let tipY = Double(tip.y)
-        for (share, radius) in [(0.42, 6.5), (0.86, 3.6)] {
-            let x = edgeX + (tipX - edgeX) * share
-            let y = edgeY + (tipY - edgeY) * share
-            path.addEllipse(in: CGRect(x: x - radius, y: y - radius, width: radius * 2, height: radius * 2))
-        }
-        return path
-    }
+                    // The flight: out of the mouth on an arc that rises, growing as it goes.
+                    let e = Self.easeOut(landed)
+                    let lift = min(48, max(16, abs(slotY - mouthY) * 0.5 + 12))
+                    let arc = -sin(Double.pi * landed) * lift
+                    let x = mouthX + (slotX - mouthX) * e + pose.dx
+                    let y = mouthY + (slotY - mouthY) * e + arc * (1 - e * 0.3) + pose.dy
+                    let scale = (0.3 + 0.7 * e) * pose.scale
 
-    // MARK: Helpers
-
-    private static func superellipse(_ rect: CGRect, exponent: Double, steps: Int) -> [CGPoint] {
-        let cx = Double(rect.midX)
-        let cy = Double(rect.midY)
-        let a = Double(rect.width / 2)
-        let b = Double(rect.height / 2)
-        let power = 2 / exponent
-        return (0..<steps).map { k in
-            let t = 2 * Double.pi * Double(k) / Double(steps)
-            let c = cos(t)
-            let s = sin(t)
-            return CGPoint(
-                x: cx + a * (c < 0 ? -1 : 1) * pow(abs(c), power),
-                y: cy + b * (s < 0 ? -1 : 1) * pow(abs(s), power)
-            )
-        }
-    }
-
-    private static func nearest(_ points: [CGPoint], to target: CGPoint) -> Int {
-        var best = 0
-        var bestDistance = Double.infinity
-        for (index, point) in points.enumerated() {
-            let distance = hypot(point.x - target.x, point.y - target.y)
-            if distance < bestDistance {
-                bestDistance = distance
-                best = index
+                    var letter = context
+                    letter.opacity = min(1, landed * 2.5) * pose.opacity
+                    if pose.blur > 0.05 { letter.addFilter(.blur(radius: pose.blur)) }
+                    letter.translateBy(x: x, y: y)
+                    letter.rotate(by: .radians(pose.rotation))
+                    if pose.slant != 0 {
+                        letter.concatenate(CGAffineTransform(a: 1, b: 0, c: pose.slant, d: 1, tx: 0, ty: 0))
+                    }
+                    letter.scaleBy(x: scale, y: scale)
+                    letter.translateBy(x: -slotX, y: -slotY)
+                    letter.draw(glyph)
+                }
             }
         }
-        return best
-    }
 
-    /// The outline's average spacing.
-    private static func step(_ points: [CGPoint]) -> CGFloat {
-        guard points.count > 1 else { return 1 }
-        var total: CGFloat = 0
-        for index in points.indices {
-            let p = points[index]
-            let q = points[(index + 1) % points.count]
-            total += hypot(q.x - p.x, q.y - p.y)
+        // Joy: a few sparkles twinkle round the words once they are out.
+        if emotion == .joy {
+            let out: Double = elapsed.map { min(max(($0 - (schedule.last ?? 0) - flight) / 0.3, 0), 1) } ?? 1
+            guard out > 0 else { return }
+            let spots: [(Double, Double, Double)] = [(-0.08, 0.1, 0), (1.06, 0.25, 1.3), (0.2, -0.35, 2.1), (0.86, -0.3, 0.7), (0.55, 1.25, 1.7)]
+            for (sx, sy, phase) in spots {
+                let twinkle = elapsed == nil ? 0.8 : 0.5 + 0.5 * sin(time * 4 + phase * 2)
+                let size = (4 + 2.5 * twinkle) * out
+                let cx = Double(bounds.minX) + Double(bounds.width) * sx
+                let cy = Double(bounds.minY) + Double(bounds.height) * sy
+                var star = context
+                star.opacity = 0.9 * twinkle * out
+                star.fill(Self.sparklePath(x: cx, y: cy, radius: size), with: .color(sparkle))
+            }
         }
-        return max(total / CGFloat(points.count), 0.5)
     }
 
-    private static func fraction(_ x: Double) -> Double {
-        x - x.rounded(.down)
+    /// What an emotion does to a letter once it has landed, `since` seconds ago, `time` into
+    /// the line (a still frame passes a long `since` and no time: the resting pose).
+    private struct Pose {
+        var dx = 0.0
+        var dy = 0.0
+        var rotation = 0.0
+        var scale = 1.0
+        var slant = 0.0
+        var opacity = 1.0
+        var blur = 0.0
     }
-}
 
-private extension Edge {
-    var set: Edge.Set {
-        switch self {
-        case .top: .top
-        case .bottom: .bottom
-        case .leading: .leading
-        case .trailing: .trailing
+    private static func pose(_ emotion: CreatureSpeech.Emotion, index: Int, since: Double, time: Double) -> Pose {
+        var pose = Pose()
+        let i = Double(index)
+        switch emotion {
+        case .automatic, .calm:
+            break
+        case .joy:
+            // A landing bounce, then a wave of hops along the line every 1.8 s.
+            if since >= 0 && since < 0.35 { pose.scale = 1 + 0.25 * sin(Double.pi * since / 0.35) }
+            let wave = (time - i * 0.07).truncatingRemainder(dividingBy: 1.8)
+            if wave > 0 && wave < 0.3 { pose.dy = -6 * sin(Double.pi * wave / 0.3) }
+        case .thought:
+            pose.slant = -0.2
+            pose.opacity = 0.8
+            pose.dy = 2.5 * sin(time * 1.8 + i * 0.5)
+        case .whisper:
+            pose.opacity = 0.62 + 0.13 * sin(time * 3 + i * 0.9)
+            pose.blur = max(0, 3 * (1 - since / 0.5))
+        case .worry:
+            pose.dx = 0.9 * noise(time * 22 + i * 3.1)
+            pose.dy = 0.9 * noise(time * 19 + i * 5.3)
+        case .dizzy:
+            pose.rotation = 0.25 * sin(time * 4 + i * 0.7)
+            pose.dy = 4 * sin(time * 3 + i * 0.6)
+        case .sad:
+            let sink = min(1, max(since, 0) / 1.5)
+            pose.dy = 4 * sink * (0.6 + 0.4 * sin(i * 1.7))
+            pose.rotation = 0.06 * sink * sin(i * 2.3)
+            pose.opacity = 1 - 0.25 * sink
         }
+        return pose
+    }
+
+    private static func easeOut(_ x: Double) -> Double {
+        let c = min(max(x, 0), 1)
+        return 1 - pow(1 - c, 3)
+    }
+
+    /// A smooth value in -1…1, the same for the same input.
+    private static func noise(_ x: Double) -> Double {
+        sin(x) * 0.6 + sin(x * 2.3 + 1.7) * 0.4
+    }
+
+    private static func sparklePath(x: Double, y: Double, radius: Double) -> Path {
+        var path = Path()
+        for k in 0..<8 {
+            let angle = Double(k) * Double.pi / 4 - Double.pi / 2
+            let r = k.isMultiple(of: 2) ? radius : radius * 0.32
+            let point = CGPoint(x: x + r * cos(angle), y: y + r * sin(angle))
+            if k == 0 { path.move(to: point) } else { path.addLine(to: point) }
+        }
+        path.closeSubpath()
+        return path
     }
 }

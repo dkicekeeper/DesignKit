@@ -2077,24 +2077,30 @@ sphere when it pours into the chart; a change of mood eases its strength like th
 `.compact` has it at 0.7 of the hero's strength, inside its sphere.
 
 *(4.10.0, the owner's plan for the assistant as a character)* It speaks and gestures.
-`speech: CreatureSpeech("Hi!")` says a line in a cartoon bubble (`CreatureSpeechBubble`, after the
-owner's comic references): white with a 3 pt graphite outline and near-black type in both colour
-schemes (a sticker on a dark page), SF Rounded (semibold, scaling with Dynamic Type), offered
-240 pt (`maxWidth:` narrows it, for a creature in a navigation bar) and hugging its text,
-centred. `style:` gives the shape: `.say` a fat oval (a
-superellipse, so a line fits) with a tail like a comma that leaves it to one side and bows to the
-creature; `.shout` a burst of 10 to 18 uneven spikes, one reaching to the creature, heavy
-`title3` type, the mouth opening wide; `.think` a cloud of bumps with two bubbles rising to it,
-the mouth still and the eyes up at the cloud; `.whisper` the oval with a dashed outline, smaller
-type, the mouth barely moving. `placement:` `.above` (the tail down to the sphere) or `.trailing`
-/ `.leading` (beside it, on the upper side of the rim); the creature's view does not grow for
-it, so the screen leaves room on that side. The bubble pops out of the creature
-(`AppAnimation.bouncy`, `.expressive` for a shout), the line types in at about 35 letters a second with a pause after a comma (0.18 s) or a full stop
-(0.35 s), laid out whole from the start so the bubble keeps its size, and the mouth talks while
-it types (`CreatureSpeechTiming`: open and shut about four times a second, shut in a pause).
-`duration:` `.automatic` (the typing, then 2 to 5 s by length), `.seconds(_)` or `.untilChanged`.
-A new line (another text or `id:`) replaces the one on screen, `nil` takes it away; `action:`
-makes the bubble a button. VoiceOver reads the bubble; the creature stays hidden. Hero only.
+`speech: CreatureSpeech("Hi!")` says a line in words of light, with no bubble (the owner's
+choice: a comic bubble was a flat sticker beside a creature made of light). Each letter is drawn
+on its own (`CreatureSpeechWords` over a `TextRenderer`): it leaves the mouth when its turn comes
+(about 35 letters a second, a pause after a comma, 0.18 s, or a full stop, 0.35 s), flies to its
+place on a rising arc in 0.4 s, growing from 0.3 of its size, and lands; the mouth talks while
+the letters leave (`CreatureSpeechTiming`: open and shut about four times a second, shut in a
+pause). The type is SF Rounded bold, scaling with Dynamic Type, centred, offered 240 pt
+(`maxWidth:` narrows it, for a creature in a navigation bar), in the mood's main colour: ink on
+a light page (its colour 45% deeper, as the face), lighter in the dark (45% towards white) with
+a glow of its colour; a soft halo of the page round each letter keeps the words readable over
+anything. `emotion:` says how the words live once they land, `.automatic` taking it from the
+mood when the line comes (joy for happy, celebrating, proud and love; a thought while thinking;
+worry, sadness; a whisper when sleepy or asleep; calm otherwise): `.calm` rests; `.joy` is bigger
+and heavier (`title2`), bounces as it lands, a wave of hops runs along it every 1.8 s and
+sparkles twinkle round it, the mouth opening wide; `.thought` is slanted, a little pale and
+sways, the mouth still and the eyes on the words; `.whisper` is small (`callout`), pale and
+glimmers out of a blur, the mouth barely moving; `.worry` trembles; `.dizzy` tilts and sways;
+`.sad` sinks and fades a little. `placement:` `.above` (over the sphere) or `.trailing` /
+`.leading` (beside it, on the upper side of the rim); the creature's view does not grow for it,
+so the screen leaves room on that side. `duration:` `.automatic` (the letters out, then 2 to 5 s
+by length), `.seconds(_)` or `.untilChanged`; the words fade when they go. A new line (another
+text or `id:`) replaces the one on screen, `nil` takes it away; `action:` makes the words a
+button. VoiceOver reads them; the creature stays hidden. Under Reduce Motion the line stands
+whole and still. Hero only.
 
 `.creatureGesture(_:trigger:)` plays a `CreatureGesture` each time `trigger` changes, like
 `sensoryFeedback`: `.nod` (two dips), `.shake` (twice, the eyes leading), `.hop` (crouch, jump,

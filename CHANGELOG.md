@@ -18,33 +18,37 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 
 ## 4.10.0 - 2026-10-14
 
-`ParticleCreature` speaks and gestures, the first step of the assistant as a character: a line in
-a comic bubble with a talking mouth, and one-shot gestures, among them a hand of particles that
-waves or points. [#67](https://github.com/dkicekeeper/DesignKit/pull/67)
+`ParticleCreature` speaks and gestures, the first step of the assistant as a character: words of
+light that fly out of its mouth and move the way it feels, and one-shot gestures, among them a
+hand of particles that waves or points. [#67](https://github.com/dkicekeeper/DesignKit/pull/67)
 
 ### Added
 
-- `ParticleCreature(speech:)` with `CreatureSpeech(_:style:placement:maxWidth:duration:id:action:)`: a line
-  in a cartoon bubble over the creature (`.above`) or beside it (`.trailing`, `.leading`), white
-  with a thick graphite outline in both colour schemes and rounded bold type. `style:` `.say` (an
-  oval with a curved tail), `.shout` (a burst), `.think` (a cloud with bubbles; the eyes look up
-  at it) or `.whisper` (a dashed oval). The line types in while the creature's mouth talks; the
-  bubble goes after the typing and 2 to 5 s (`.automatic`), after `.seconds(_)`, or stays
-  (`.untilChanged`). `action:` makes it a button. Hero only.
+- `ParticleCreature(speech:)` with `CreatureSpeech(_:emotion:placement:maxWidth:duration:id:action:)`:
+  a line over the creature (`.above`) or beside it (`.trailing`, `.leading`), with no bubble.
+  Each letter flies out of the creature's mouth on an arc to its place while the mouth talks, in
+  rounded bold type in the mood's colour (ink on a light page, glowing in the dark) with a soft
+  halo of the page round it. `emotion:` `.automatic` (from the mood), `.calm`, `.joy` (hops and
+  sparkles), `.thought` (slanted and swaying, the mouth still, the eyes on the words),
+  `.whisper` (small, pale, glimmering), `.worry` (trembling), `.dizzy` (tilting) or `.sad`
+  (sinking). The words go after 2 to 5 s (`.automatic`), after `.seconds(_)`, or stay
+  (`.untilChanged`). `action:` makes them a button. Hero only.
 - `.creatureGesture(_:trigger:)` and `CreatureGesture`: `.nod`, `.shake`, `.hop`, `.shrug`,
   `.flinch`, `.perk`, `.wave` and `.point(_:)`, played each time `trigger` changes. For a wave or
   a point about 32 particles leave the sphere and gather into a small hand beside it, then flow
   back. The compact style hops for a wave and perks for a point.
 - `.creatureGestureFrame(_:progress:)`: a gesture held in the creature's still frame, for a
   poster, a preview or a snapshot.
-- `CreatureSpeechMetrics.maxWidth` (240 pt), the bubble's widest by default; `maxWidth:` narrows
+- `CreatureSpeechMetrics.maxWidth` (240 pt), the widest a line is by default; `maxWidth:` narrows
   it where the creature has little room beside it.
 
 ### Gallery and tooling
 
-- Gallery: the creature's page says a typed line above or beside it and plays each gesture.
-- Snapshot tests: `particleCreatureSpeech` and `particleCreatureThought` (the four bubbles; light,
-  dark, large text) and `particleCreatureGestures` (six gestures held halfway).
+- Gallery: the creature's page says a typed line above or beside it with any emotion and plays
+  each gesture.
+- Snapshot tests: `particleCreatureSpeech`, `particleCreatureThought` (light, dark, large text)
+  and `particleCreatureFeelings` (light, dark) for the emotions, and `particleCreatureGestures`
+  (six gestures held halfway).
 
 ## 4.9.1 - 2026-10-14
 
