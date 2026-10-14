@@ -231,7 +231,8 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 4.10.0: a thought over the creature, slanted, and a whisper beside a sleepy one.
+        /// 4.10.0: a thought over the creature, slanted (out of its head with three dots rising to
+        /// it since 4.11.0), and a whisper beside a sleepy one.
         @Test func particleCreatureThought() async {
             await assertComponentSnapshot(
                 VStack(spacing: AppSpacing.lg) {
@@ -276,6 +277,31 @@ extension ComponentSnapshots {
                         speech: CreatureSpeech("Not this time", placement: .trailing, duration: .untilChanged)
                     )
                     .frame(width: 100, height: 100)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(AppSpacing.lg),
+                appearances: [.light, .dark]
+            )
+        }
+
+        /// 4.11.0: a picture thought, a cup drawn in dots of light over the creature with the
+        /// three dots rising to it from its head, and a picture beside it.
+        @Test func particleCreaturePicture() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.lg) {
+                    ParticleCreature(
+                        mood: .idle,
+                        speech: CreatureSpeech(symbol: "cup.and.saucer.fill", label: "Coffee", duration: .untilChanged)
+                    )
+                    .frame(width: 140, height: 140)
+                    .padding(.top, 60)
+                    .frame(maxWidth: .infinity)
+                    ParticleCreature(
+                        mood: .happy,
+                        speech: CreatureSpeech(symbol: "chart.bar.fill", label: "A chart", emotion: .joy,
+                                               placement: .trailing, duration: .untilChanged)
+                    )
+                    .frame(width: 110, height: 110)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(AppSpacing.lg),

@@ -54,6 +54,7 @@ import DesignSupport
 /// ParticleCreature(mood: .listening, level: voice.level, isInteractive: true)
 /// ParticleCreature(mood: .happy, speech: CreatureSpeech("Hi!"))      // says a line (4.10.0)
 ///     .creatureGesture(.wave, trigger: greetedAt)                   // and waves
+///     .creatureAmbience(CreatureAmbience(dozesAfter: 40))           // a life of its own (4.11.0)
 /// ```
 ///
 /// Give it a square: the hero looks right from about 160 pt, the compact style from 24 pt.
@@ -122,6 +123,7 @@ public struct ParticleCreature: View {
     @Environment(\.layoutDirection) private var layoutDirection
     @Environment(\.creatureGestureRequest) private var gestureRequest
     @Environment(\.creatureGestureFrame) private var gestureFrame
+    @Environment(\.creatureAmbience) private var ambience
     @State private var engine = ParticleCreatureEngine()
     @State private var isTouching = false
     @State private var shownSpeech: CreatureSpeech?
@@ -185,16 +187,18 @@ public struct ParticleCreature: View {
             if let request, moves { engine.perform(request.gesture, date: Date()) }
         }
         .task(id: shownSpeech?.id) { await dismissSpeechWhenDone() }
+        .task(id: daydreams) { await daydream() }
     }
 
     // MARK: Speech
 
-    private func say(_ line: CreatureSpeech?) {
+    /// A new line, or `nil`. `stirs`: it ends the quiet (a daydream does not).
+    private func say(_ line: CreatureSpeech?, stirs: Bool = true) {
         guard style == .hero else { return }
         let now = Date()
         let emotion = line.map { Self.emotion(of: $0, mood: mood) } ?? .calm
         speechStart = now
-        engine.speak(moves ? line : nil, emotion: emotion, date: now, look: line.map { lookAtWords($0) })
+        engine.speak(moves ? line : nil, emotion: emotion, date: now, look: line.map { lookAtWords($0) }, stirs: stirs)
         shownEmotion = emotion
         withAnimation(AppAnimation.motion(AppAnimation.smooth, reduceMotion: reduceMotion, isEnabled: designKitMotion)) {
             shownSpeech = line
@@ -214,7 +218,7 @@ public struct ParticleCreature: View {
         }
     }
 
-    /// Where the eyes go while the creature thinks a line: at the words.
+    /// Where the eyes go while the creature thinks a line or a picture: at it.
     private func lookAtWords(_ line: CreatureSpeech) -> (x: Double, y: Double) {
         switch line.placement {
         case .above: return (0.2, -0.85)
@@ -224,9 +228,31 @@ public struct ParticleCreature: View {
         }
     }
 
+    /// The pictures it may daydream of now (4.11.0): while it moves, idle, in the hero style.
+    private var daydreams: [String] {
+        moves && style == .hero && mood == .idle ? ambience.daydreams : []
+    }
+
+    /// Now and then a picture it daydreams of, when nothing is said and it is awake.
+    private func daydream() async {
+        let symbols = daydreams
+        guard !symbols.isEmpty else { return }
+        var turn = 0
+        while !Task.isCancelled {
+            try? await Task.sleep(for: .seconds(CreatureAmbienceMetrics.daydreamWait(turn)))
+            guard !Task.isCancelled else { return }
+            if shownSpeech == nil, !engine.isDozing(at: Date()) {
+                say(CreatureSpeech(symbol: symbols[turn % symbols.count], label: "", emotion: .thought,
+                                   duration: .seconds(CreatureAmbienceMetrics.daydreamLength), id: "daydream-\(turn)"),
+                    stirs: false)
+            }
+            turn += 1
+        }
+    }
+
     private func dismissSpeechWhenDone() async {
         guard let line = shownSpeech, var duration = line.visibleDuration else { return }
-        if !moves, line.duration == .automatic {
+        if !moves, line.duration == .automatic, line.symbol == nil {
             duration -= CreatureSpeechTiming.typingDuration(of: line.text)
         }
         try? await Task.sleep(for: .seconds(duration))
@@ -242,27 +268,40 @@ public struct ParticleCreature: View {
     private func speechWords(_ line: CreatureSpeech, in size: CGSize) -> some View {
         let geo = Geometry(size: size, style: .hero)
         let rim = geo.radius * CreatureSpeechMetrics.rim + CreatureSpeechMetrics.gap
-        let mouth = CGPoint(x: geo.cx, y: geo.restY + geo.radius * CreatureSpeechMetrics.mouth)
         let width = line.maxWidth
         let room = CreatureSpeechMetrics.room
         let alignment: Alignment
         let anchor: UnitPoint
         let tip: CGPoint
         let center: CGPoint
+        // Words come out of the mouth; a thought out of the upper side of the head (4.11.0).
+        let headward: Double
         switch line.placement {
         case .above:
             alignment = .bottom
             anchor = .bottom
             tip = CGPoint(x: geo.cx, y: geo.restY - rim)
             center = CGPoint(x: tip.x, y: tip.y - room / 2)
+            headward = layoutDirection == .rightToLeft ? -1 : 1
         case .trailing, .leading:
             let onRight = (line.placement == .trailing) != (layoutDirection == .rightToLeft)
             let side: Double = onRight ? 1 : -1
+            headward = side
             let angle = CreatureSpeechMetrics.sideAngle
             alignment = onRight ? .leading : .trailing
             anchor = onRight ? .leading : .trailing
             tip = CGPoint(x: geo.cx + side * rim * cos(angle), y: geo.restY + rim * sin(angle))
             center = CGPoint(x: tip.x + side * width / 2, y: tip.y)
+        }
+        let source: CGPoint
+        if line.isThought(shownEmotion) {
+            let angle = line.placement == .above
+                ? -Double.pi / 2 + CreatureSpeechMetrics.headTurn
+                : CreatureSpeechMetrics.sideAngle + CreatureSpeechMetrics.headDrop
+            let reach = geo.radius * CreatureSpeechMetrics.head
+            source = CGPoint(x: geo.cx + headward * reach * cos(angle), y: geo.restY + reach * sin(angle))
+        } else {
+            source = CGPoint(x: geo.cx, y: geo.restY + geo.radius * CreatureSpeechMetrics.mouth)
         }
         let onLight = colorScheme == .light
         return CreatureSpeechWords(
@@ -273,7 +312,7 @@ public struct ParticleCreature: View {
             color: Self.wordColor(mood, onLight: onLight),
             glows: !onLight,
             anchor: anchor,
-            mouth: CGSize(width: mouth.x - tip.x, height: mouth.y - tip.y),
+            mouth: CGSize(width: source.x - tip.x, height: source.y - tip.y),
             textDirection: layoutDirection
         )
         .frame(width: width, height: line.placement == .above ? room : room * 2, alignment: alignment)
@@ -299,9 +338,10 @@ public struct ParticleCreature: View {
         let onLight = colorScheme == .light
         let still = time == nil ? gestureFrame : nil
         let isRTL = layoutDirection == .rightToLeft
+        let ambience = moves ? ambience : .still
         return Canvas { context, size in
             engine.render(in: &context, size: size, mood: mood, style: style, level: level, time: time,
-                          onLight: onLight, still: still, isRTL: isRTL)
+                          onLight: onLight, still: still, isRTL: isRTL, ambience: ambience)
         }
     }
 
@@ -396,6 +436,10 @@ final class ParticleCreatureEngine {
     private var speechStart: Double = 0
     private var speechEmotion: CreatureSpeech.Emotion = .calm
     private var speechLook: (x: Double, y: Double)?
+    /// Its life of its own (4.11.0), and when the quiet began (the creature's time): a touch, a
+    /// line, a gesture or a new mood ends it.
+    private var ambience = CreatureAmbience.still
+    private var quietSince: Double = 0
 
     // MARK: Events
 
@@ -404,6 +448,7 @@ final class ParticleCreatureEngine {
         let t = date.timeIntervalSinceReferenceDate - origin
         pokeAt = t
         pokePoint = point
+        quietSince = t
         pokes = pokes.filter { t - $0 < 2 } + [t]
         if pokes.count >= 3 {
             dizzyUntil = t + 2.4
@@ -415,18 +460,32 @@ final class ParticleCreatureEngine {
     func perform(_ gesture: CreatureGesture, date: Date) {
         self.gesture = gesture
         gestureStart = date.timeIntervalSinceReferenceDate
+        stir(date)
+    }
+
+    /// Whether it has dozed off by `date` (4.11.0).
+    func isDozing(at date: Date) -> Bool {
+        guard let origin, let doze = ambience.dozesAfter else { return false }
+        return date.timeIntervalSinceReferenceDate - origin - quietSince > doze
+    }
+
+    /// Something happened: the quiet starts again, and a dozing creature wakes.
+    private func stir(_ date: Date) {
+        if let origin { quietSince = date.timeIntervalSinceReferenceDate - origin }
     }
 
     /// Talks while the letters of `line` leave from `date` (4.10.0): wide for joy, barely for a
     /// whisper, not at all for a thought, when the eyes go to `look` instead. `nil` stops.
     func speak(_ line: CreatureSpeech?, emotion: CreatureSpeech.Emotion = .calm, date: Date,
-               look: (x: Double, y: Double)? = nil) {
-        let talks = line != nil && emotion != .thought
+               look: (x: Double, y: Double)? = nil, stirs: Bool = true) {
+        let thinks = line?.isThought(emotion) ?? false
+        let talks = line != nil && !thinks
         speechLetters = talks ? Array(line?.text ?? "") : []
         speechSchedule = talks ? CreatureSpeechTiming.schedule(line?.text ?? "") : []
         speechEmotion = emotion
-        speechLook = line != nil && emotion == .thought ? look : nil
+        speechLook = thinks ? look : nil
         speechStart = date.timeIntervalSinceReferenceDate
+        if line != nil, stirs { stir(date) }
     }
 
     // MARK: Frame
@@ -440,7 +499,8 @@ final class ParticleCreatureEngine {
         time: Double?,
         onLight: Bool = false,
         still: CreatureGestureFrame? = nil,
-        isRTL: Bool = false
+        isRTL: Bool = false,
+        ambience: CreatureAmbience = .still
     ) {
         let geo = Geometry(size: size, style: style)
         guard geo.radius > 1 else { return }
@@ -448,11 +508,14 @@ final class ParticleCreatureEngine {
         if let time, origin == nil { origin = time }
         let t = time.map { $0 - (origin ?? $0) } ?? 0
         build(style: style, radius: geo.radius)
+        self.ambience = style == .hero ? ambience : .still
+        if pointer != nil { quietSince = t }
 
         let mapped = Self.map(mood, style: style)
         var forced = false
         if mapped != requested {
             requested = mapped
+            quietSince = t
             if case .glyph(let text) = mapped, text != glyphText {
                 glyphText = text
                 glyphPoints = GlyphSampler.points(for: text)
@@ -487,6 +550,11 @@ final class ParticleCreatureEngine {
             }
         } else if time == nil, let still {
             motion = .of(still.gesture.shown(in: style), progress: still.progress, isRTL: isRTL)
+        }
+        // Its own life (4.11.0): now and then a fidget while it is idle and quiet.
+        if animated, self.ambience.fidgets, self.gesture == nil, pose == .idle, pointer == nil,
+           let fidget = CreatureFidget.at(quiet: t - quietSince) {
+            motion = .fidget(fidget.fidget, progress: fidget.progress, side: isRTL ? -fidget.side : fidget.side)
         }
         // About thirty particles leave the sphere for the hand and come back after.
         let handStride = max(2, particles.count / CreatureHandMetrics.particles)
@@ -670,6 +738,10 @@ final class ParticleCreatureEngine {
         if t < dizzyUntil { return .dizzy }
         let cheerable: [CreaturePose] = [.idle, .listening, .asleep, .sleepy, .sad, .worried]
         if t - pokeAt < 1.3 && cheerable.contains(base) { return .happy }
+        // Dozing off after a quiet spell (4.11.0): sleepy, then asleep.
+        if base == .idle, let doze = ambience.dozesAfter, t - quietSince > doze {
+            return t - quietSince > doze + CreatureAmbienceMetrics.drowse ? .asleep : .sleepy
+        }
         return base
     }
 
