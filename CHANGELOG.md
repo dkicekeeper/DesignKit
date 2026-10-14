@@ -18,11 +18,18 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 
 ## 4.7.0 - 2026-10-14
 
-`PackedCircleIcons(style: .orbit)` becomes a carousel of coins, from a reference the owner
-shared, and a swipe spins it.
+From two references the owner shared: `PackedCircleIcons(style: .orbit)` becomes a carousel of
+coins that a swipe spins, and `ParticleCreature` loses its glass, a sphere made of light.
 [#63](https://github.com/dkicekeeper/DesignKit/pull/63)
 
 ### Changed
+
+- `ParticleCreature` has no glass sphere: the swarm is the sphere, held together by a glow of
+  its colour round it and a thin rim of light along its outline, brightest where the light falls
+  and drifting round slowly, in both styles. The shadow (or the light) on the ground is soft all
+  round; it had a hard top and bottom. In light mode the whole creature is drawn in ink (the
+  swarm, its links, the rim, the face, a tear), the glow a faint haze; in dark mode it is light
+  on the page.
 
 - `PackedCircleIcons(style: .orbit)` is a carousel of coins instead of a marble in the middle
   with the rest on a tilted orbit. Coins of one size, the largest amount in front, stand on a

@@ -1991,7 +1991,8 @@ under it at the call site. Tenra: restoring a backup.
 Pieces of a conversation with an assistant. Tenra's assistant is the first user.
 
 #### `ParticleCreature`
-A character made of light: a swarm of particles in a dark glass sphere, with a desk-robot face
+A character made of light: a swarm of particles in the shape of a sphere, its outline a thin rim
+of light with a glow round it *(4.7.0; a dark glass sphere held the swarm before)*, with a desk-robot face
 (`ParticleCreatureFace.swift`). The two eyes are glowing solid shapes: a rounded lens with a top
 lid (its height and slant make it sleepy, cross or sad) and a cheek pushing up from below
 (smiling eyes), or an arc (^), a chevron (> <), a heart, a spiral; some moods add a small mouth
@@ -2021,18 +2022,23 @@ mood carries each particle from where it was to the new shape in about 0.7 s, st
 small overshoot. Ambient motion: behind `AmbientMotionGate`, one still frame of the mood under
 Reduce Motion, `.designKitMotion(false)` and reduced resource usage. Its colours are its own (its
 identity), not the accent. Decorative: hidden from VoiceOver, say what it is doing in text.
-`ParticleCreatureSkeleton(style:)`: a grey sphere where the glass will be.
+`ParticleCreatureSkeleton(style:)`: a grey sphere where the swarm will be.
 
-*(4.6.1)* It follows the colour scheme. In dark mode it is all light: the swarm glows (added
-light, `.plusLighter`) on the glass and on the page, with a light on the ground. In light mode
-the glass stays dark, an object on the page, and the swarm on it still glows; but light added to
-a white page is lost, so what lies on the page is drawn in ink, with normal blending: the
-particles outside the glass (the bar chart, a burst) 30% deeper and more opaque, without halos;
-the z's, hearts, sparkles and "?" in deeper colours (`CreatureInk`); the face, once its glass has
-faded for the chart, 45% deeper with a fainter glow; and a soft shadow under the sphere instead
-of the light. As the glass fades the swarm on it passes from light to ink. `.compact` is clipped
-to its glass and looks the same in both. On a dark surface in light mode, set
-`.environment(\.colorScheme, .dark)` on it.
+*(4.7.0, from the owner's references of a sphere made of light)* No glass: the sphere is the
+swarm itself, held together by a glow of its colour round it (`CreatureGlow`: 0.2 at the centre,
+out to 1.9 sphere radii, the square's edge at most) and a thin rim of light along its outline,
+brightest where the light falls (the lower right, drifting round once in about 25 s) with a
+blurred glow of its own. The shadow (or the light) on the ground is an ellipse of a round
+gradient, soft all round (it had a hard top and bottom). `.compact` has the same glow, inside
+its sphere, and the same rim.
+
+*(4.6.1)* It follows the colour scheme. In dark mode it is all light: the swarm, its links, the
+glow and the rim add light (`.plusLighter`), with a light on the ground. On a light page light
+added to white is lost, so everything is drawn in ink, with normal blending (`CreatureInk`): the
+particles 30% deeper and more opaque, without halos, the links and the rim deeper, the face
+and a tear 45% deeper with a fainter glow, the z's, hearts, sparkles and "?" in deeper colours,
+the glow a faint haze (0.08) and a soft shadow under the sphere. On a dark surface in light
+mode, set `.environment(\.colorScheme, .dark)` on it.
 
 #### `MessageBubble`
 `MessageBubble(text, role: .outgoing)`: the person's message on the trailing side in the accent,

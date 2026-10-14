@@ -149,7 +149,7 @@ private struct ParticleCreaturePage: View {
     var body: some View {
         ComponentPage(
             name: "ParticleCreature",
-            summary: "A character made of light: a swarm of particles in a glass sphere with a glowing robot face. Its moods are shapes: a gyroscope while thinking, a chart for an answer, a coin; and faces: ^ ^, > <, hearts, slanted lids, a wink, a tear.",
+            summary: "A character made of light: a swarm of particles in the shape of a sphere, a rim of light round it, with a glowing robot face. Its moods are shapes: a gyroscope while thinking, a chart for an answer, a coin; and faces: ^ ^, > <, hearts, slanted lids, a wink, a tear.",
             since: "4.6.0",
             apps: [.tenra],
             canvas: .tall(minHeight: 340),
@@ -157,7 +157,8 @@ private struct ParticleCreaturePage: View {
                 "Hero from about 160 pt (the sphere takes 70% of the square, the rest is room for the burst, the chart and the extras); compact from 24 pt for an avatar or a tab icon.",
                 "Interactive: the eyes follow the finger, a tap scatters the swarm, three quick taps make it dizzy.",
                 "30 fps, positions from the time; one still frame under Reduce Motion. Decorative: say what it is doing in text.",
-                "Light mode (4.6.1): the glass stays dark; what lies on the page (the chart, a burst, the z's, hearts, sparkles, the face without its glass) is drawn in deeper colours, and a shadow grounds the sphere. On a dark surface in light mode, set .environment(\\.colorScheme, .dark) on it.",
+                "No glass (4.7.0): the swarm is held by a glow of its colour and a thin rim of light along its outline, brightest where the light falls; the shadow on the ground is soft all round.",
+                "Light mode (4.6.1): everything in ink, deeper colours with normal blending (light added to white is lost); the glow a faint haze, a soft shadow under it. On a dark surface in light mode, set .environment(\\.colorScheme, .dark) on it.",
             ],
             styles: ["hero", "compact"]
         ) {
