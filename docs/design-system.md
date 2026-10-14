@@ -2077,13 +2077,18 @@ sphere when it pours into the chart; a change of mood eases its strength like th
 `.compact` has it at 0.7 of the hero's strength, inside its sphere.
 
 *(4.10.0, the owner's plan for the assistant as a character)* It speaks and gestures.
-`speech: CreatureSpeech("Hi!")` says a line in a comic bubble (`CreatureSpeechBubble`): white
-(`Background.elevation1`, dark in dark mode) with a 2 pt outline in the mood's first colour (ink
-on a light page, lighter and glowing in the dark), `bodySmall` medium, at most 240 pt wide, a tail
-to the creature. `placement:` `.above` (the tail down to the sphere) or `.trailing` / `.leading`
-(beside it, on the upper side of the rim); the creature's view does not grow for it, so the
-screen leaves room on that side. The bubble pops out of the creature (`AppAnimation.bouncy`), the
-line types in at about 35 letters a second with a pause after a comma (0.18 s) or a full stop
+`speech: CreatureSpeech("Hi!")` says a line in a cartoon bubble (`CreatureSpeechBubble`, after the
+owner's comic references): white with a 3 pt graphite outline and near-black type in both colour
+schemes (a sticker on a dark page), SF Rounded (semibold, scaling with Dynamic Type), offered
+240 pt and hugging its text, centred. `style:` gives the shape: `.say` a fat oval (a
+superellipse, so a line fits) with a tail like a comma that leaves it to one side and bows to the
+creature; `.shout` a burst of 10 to 18 uneven spikes, one reaching to the creature, heavy
+`title3` type, the mouth opening wide; `.think` a cloud of bumps with two bubbles rising to it,
+the mouth still and the eyes up at the cloud; `.whisper` the oval with a dashed outline, smaller
+type, the mouth barely moving. `placement:` `.above` (the tail down to the sphere) or `.trailing`
+/ `.leading` (beside it, on the upper side of the rim); the creature's view does not grow for
+it, so the screen leaves room on that side. The bubble pops out of the creature
+(`AppAnimation.bouncy`, `.expressive` for a shout), the line types in at about 35 letters a second with a pause after a comma (0.18 s) or a full stop
 (0.35 s), laid out whole from the start so the bubble keeps its size, and the mouth talks while
 it types (`CreatureSpeechTiming`: open and shut about four times a second, shut in a pause).
 `duration:` `.automatic` (the typing, then 2 to 5 s by length), `.seconds(_)` or `.untilChanged`.

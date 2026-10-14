@@ -24,11 +24,13 @@ waves or points. [#67](https://github.com/dkicekeeper/DesignKit/pull/67)
 
 ### Added
 
-- `ParticleCreature(speech:)` with `CreatureSpeech(_:placement:duration:id:action:)`: a line in a
-  comic bubble over the creature (`.above`) or beside it (`.trailing`, `.leading`), white with an
-  outline in the mood's colour (dark and glowing in dark mode). The line types in while the
-  creature's mouth talks; the bubble goes after the typing and 2 to 5 s (`.automatic`), after
-  `.seconds(_)`, or stays (`.untilChanged`). `action:` makes it a button. Hero only.
+- `ParticleCreature(speech:)` with `CreatureSpeech(_:style:placement:duration:id:action:)`: a line
+  in a cartoon bubble over the creature (`.above`) or beside it (`.trailing`, `.leading`), white
+  with a thick graphite outline in both colour schemes and rounded bold type. `style:` `.say` (an
+  oval with a curved tail), `.shout` (a burst), `.think` (a cloud with bubbles; the eyes look up
+  at it) or `.whisper` (a dashed oval). The line types in while the creature's mouth talks; the
+  bubble goes after the typing and 2 to 5 s (`.automatic`), after `.seconds(_)`, or stays
+  (`.untilChanged`). `action:` makes it a button. Hero only.
 - `.creatureGesture(_:trigger:)` and `CreatureGesture`: `.nod`, `.shake`, `.hop`, `.shrug`,
   `.flinch`, `.perk`, `.wave` and `.point(_:)`, played each time `trigger` changes. For a wave or
   a point about 32 particles leave the sphere and gather into a small hand beside it, then flow
@@ -40,8 +42,8 @@ waves or points. [#67](https://github.com/dkicekeeper/DesignKit/pull/67)
 ### Gallery and tooling
 
 - Gallery: the creature's page says a typed line above or beside it and plays each gesture.
-- Snapshot tests: `particleCreatureSpeech` (light, dark, large text) and
-  `particleCreatureGestures` (six gestures held halfway).
+- Snapshot tests: `particleCreatureSpeech` and `particleCreatureThought` (the four bubbles; light,
+  dark, large text) and `particleCreatureGestures` (six gestures held halfway).
 
 ## 4.9.1 - 2026-10-14
 

@@ -206,8 +206,9 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 4.10.0: a line in a comic bubble over the creature and beside it, the whole line shown
-        /// (motion is off). `.untilChanged`, so the bubble cannot leave while it is captured.
+        /// 4.10.0: cartoon bubbles, the whole line shown (motion is off): a line in an oval over
+        /// the creature and a shout in a burst beside it. `.untilChanged`, so a bubble cannot
+        /// leave while it is captured.
         @Test func particleCreatureSpeech() async {
             await assertComponentSnapshot(
                 VStack(spacing: AppSpacing.lg) {
@@ -216,11 +217,34 @@ extension ComponentSnapshots {
                         speech: CreatureSpeech("Hi! Three payments are due this week.", duration: .untilChanged)
                     )
                     .frame(width: 140, height: 140)
-                    .padding(.top, 130)
+                    .padding(.top, 140)
                     .frame(maxWidth: .infinity)
                     ParticleCreature(
+                        mood: .celebrating,
+                        speech: CreatureSpeech("Goal!", style: .shout, placement: .trailing, duration: .untilChanged)
+                    )
+                    .frame(width: 110, height: 110)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(AppSpacing.lg),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// 4.10.0: a thought in a cloud over the creature and a whisper in a dashed oval beside it.
+        @Test func particleCreatureThought() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.lg) {
+                    ParticleCreature(
                         mood: .idle,
-                        speech: CreatureSpeech("Done!", placement: .trailing, duration: .untilChanged)
+                        speech: CreatureSpeech("Coffee again?", style: .think, duration: .untilChanged)
+                    )
+                    .frame(width: 140, height: 140)
+                    .padding(.top, 120)
+                    .frame(maxWidth: .infinity)
+                    ParticleCreature(
+                        mood: .wink,
+                        speech: CreatureSpeech("Psst, a secret", style: .whisper, placement: .trailing, duration: .untilChanged)
                     )
                     .frame(width: 110, height: 110)
                     .frame(maxWidth: .infinity, alignment: .leading)

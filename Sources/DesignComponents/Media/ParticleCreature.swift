@@ -191,9 +191,20 @@ public struct ParticleCreature: View {
         guard style == .hero else { return }
         let now = Date()
         speechStart = now
-        engine.speak(moves ? line?.text : nil, date: now)
-        withAnimation(AppAnimation.motion(AppAnimation.bouncy, reduceMotion: reduceMotion, isEnabled: designKitMotion)) {
+        engine.speak(moves ? line : nil, date: now, look: line.map { lookAtBubble($0) })
+        let pop = line?.style == .shout ? AppAnimation.expressive : AppAnimation.bouncy
+        withAnimation(AppAnimation.motion(pop, reduceMotion: reduceMotion, isEnabled: designKitMotion)) {
             shownSpeech = line
+        }
+    }
+
+    /// Where the eyes go while a thought hangs over the creature: up at the cloud.
+    private func lookAtBubble(_ line: CreatureSpeech) -> (x: Double, y: Double) {
+        switch line.placement {
+        case .above: return (0.2, -0.85)
+        case .trailing, .leading:
+            let onRight = (line.placement == .trailing) != (layoutDirection == .rightToLeft)
+            return (onRight ? 0.7 : -0.7, -0.5)
         }
     }
 
@@ -204,6 +215,7 @@ public struct ParticleCreature: View {
         }
         try? await Task.sleep(for: .seconds(duration))
         guard !Task.isCancelled, shownSpeech?.id == line.id else { return }
+        engine.speak(nil, date: Date())
         withAnimation(AppAnimation.motion(AppAnimation.smooth, reduceMotion: reduceMotion, isEnabled: designKitMotion)) {
             shownSpeech = nil
         }
@@ -241,8 +253,6 @@ public struct ParticleCreature: View {
             start: speechStart,
             isTyping: moves,
             tailEdge: tailEdge,
-            outline: speechOutline,
-            glows: colorScheme == .dark,
             textDirection: layoutDirection
         )
         .frame(width: width, height: line.placement == .above ? room : room * 2, alignment: alignment)
@@ -250,15 +260,6 @@ public struct ParticleCreature: View {
         .transition(.scale(scale: 0.4, anchor: anchor).combined(with: .opacity))
         .position(center)
         .id(line.id)
-    }
-
-    /// The bubble's outline: the mood's first colour, deeper on a light page, lighter in the dark.
-    private var speechOutline: Color {
-        let rgb = CreaturePalette.of(CreaturePose(mood))[0]
-        let tone = colorScheme == .dark
-            ? rgb + (SIMD3<Double>(repeating: 255) - rgb) * 0.2
-            : rgb * (1 - CreatureInk.depth)
-        return Color(.sRGB, red: tone.x / 255, green: tone.y / 255, blue: tone.z / 255, opacity: 1)
     }
 
     private func canvas(time: Double?) -> some View {
@@ -364,6 +365,8 @@ final class ParticleCreatureEngine {
     private var speechLetters: [Character] = []
     private var speechSchedule: [Double] = []
     private var speechStart: Double = 0
+    private var speechStyle: CreatureSpeech.Style = .say
+    private var speechLook: (x: Double, y: Double)?
 
     // MARK: Events
 
@@ -385,10 +388,14 @@ final class ParticleCreatureEngine {
         gestureStart = date.timeIntervalSinceReferenceDate
     }
 
-    /// Talks while `text` types in from `date` (4.10.0); `nil` stops.
-    func speak(_ text: String?, date: Date) {
-        speechLetters = text.map { Array($0) } ?? []
-        speechSchedule = text.map(CreatureSpeechTiming.schedule) ?? []
+    /// Talks while `line` types in from `date` (4.10.0): wide for a shout, barely for a whisper,
+    /// not at all for a thought, when the eyes go to `look` instead. `nil` stops.
+    func speak(_ line: CreatureSpeech?, date: Date, look: (x: Double, y: Double)? = nil) {
+        let talks = line.map { $0.style != .think } ?? false
+        speechLetters = talks ? Array(line?.text ?? "") : []
+        speechSchedule = talks ? CreatureSpeechTiming.schedule(line?.text ?? "") : []
+        speechStyle = line?.style ?? .say
+        speechLook = line?.style == .think ? look : nil
         speechStart = date.timeIntervalSinceReferenceDate
     }
 
@@ -491,10 +498,31 @@ final class ParticleCreatureEngine {
         lastFace = face
         var shownFace = animated ? living(face, geo, t: t, gaze: gaze, level: level) : face
         shownFace = Self.apply(motion, to: shownFace)
-        // Talking (4.10.0): the mouth opens and shuts while the line types in.
-        if let time, style == .hero,
-           let open = CreatureSpeechTiming.mouth(speechSchedule, letters: speechLetters, at: time - speechStart) {
-            shownFace.mouth = CreatureMouth(form: .open, y: shownFace.mouth.y, width: CreatureFace.talkWidth, open: open)
+        // Talking (4.10.0): the mouth opens and shuts while the line types in; a thought holds
+        // the eyes up at its cloud instead.
+        if let time, style == .hero {
+            if let open = CreatureSpeechTiming.mouth(speechSchedule, letters: speechLetters, at: time - speechStart) {
+                var width = CreatureFace.talkWidth
+                var opening = open
+                switch speechStyle {
+                case .shout:
+                    width *= 1.3
+                    opening = 0.35 + 0.65 * open
+                case .whisper:
+                    width *= 0.7
+                    opening = 0.55 * open
+                case .say, .think:
+                    break
+                }
+                shownFace.mouth = CreatureMouth(form: .open, y: shownFace.mouth.y, width: width, open: opening)
+            }
+            if let look = speechLook {
+                var glance = CreatureMotion()
+                glance.gazeX = look.x
+                glance.gazeY = look.y
+                glance.gazeWeight = smoothStep((time - speechStart) / 0.35)
+                shownFace = Self.apply(glance, to: shownFace)
+            }
         }
         var tear: CGPoint?
         if pose == .sad && animated && style == .hero {

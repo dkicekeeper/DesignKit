@@ -139,11 +139,15 @@ private struct ParticleCreaturePage: View {
     @State private var state: SpecimenState = .content
     @State private var line = "Hi! Three payments are due this week."
     @State private var placement = 0
+    @State private var speechStyle = 0
     @State private var speech: CreatureSpeech?
     @State private var said = 0
     @State private var gesture = 0
     @State private var played = 0
 
+    private static let speechStyles: [(String, CreatureSpeech.Style)] = [
+        ("Say", .say), ("Shout", .shout), ("Think", .think), ("Whisper", .whisper),
+    ]
     private static let placements: [(String, CreatureSpeech.Placement)] = [
         ("Above", .above), ("Trailing", .trailing), ("Leading", .leading),
     ]
@@ -190,7 +194,7 @@ private struct ParticleCreaturePage: View {
                 "30 fps, positions from the time; one still frame under Reduce Motion. Decorative: say what it is doing in text.",
                 "No glass (4.7.0): the swarm is held by a glow of its colour and a thin rim of light along its outline, brightest where the light falls; the shadow on the ground is soft all round.",
                 "The core (4.9.1): a soft ball of the mood's colours that fills the sphere almost to its rim, the far particles behind it and the near ones in front. It breathes with the sphere, burns brighter while thinking, dims asleep and flares at a tap; fainter in the compact style.",
-                "Speech (4.10.0): speech: CreatureSpeech(\"Hi!\") says a line in a comic bubble, its outline in the mood's colour, above or beside it; the line types in while the mouth talks, then the bubble goes (or stays: duration .untilChanged). Hero only; leave room on the bubble's side.",
+                "Speech (4.10.0): speech: CreatureSpeech(\"Hi!\") says a line in a cartoon bubble, white with a thick graphite outline in both colour schemes, rounded bold type: .say an oval with a curved tail, .shout a burst, .think a cloud with bubbles (the eyes look up at it, the mouth stays still), .whisper a dashed oval. Above or beside it; the line types in while the mouth talks, then the bubble goes (or stays: duration .untilChanged). Hero only; leave room on the bubble's side.",
                 "Gestures (4.10.0): .creatureGesture(.nod, trigger: value) plays one each time the value changes: nod, shake, hop, shrug, flinch, perk, and a hand of particles that waves or points. The compact style hops for a wave and perks for a point.",
                 "Light mode (4.6.1): everything in ink, deeper colours with normal blending (light added to white is lost); the core a ball of colour that gives the swarm a body on white, the glow a faint haze, a soft shadow under it. On a dark surface in light mode, set .environment(\\.colorScheme, .dark) on it.",
             ],
@@ -222,10 +226,12 @@ private struct ParticleCreaturePage: View {
             SliderControl("Size", value: $size, in: 24...320, step: 4) { "\(Int($0)) pt" }
             SliderControl("Voice level", value: $level, in: 0...1)
             TextControl("Line", text: $line)
-            ChoiceControl("Bubble", selection: $placement, options: Self.placements.indices.map { (Self.placements[$0].0, $0) })
+            ChoiceControl("Bubble", selection: $speechStyle, options: Self.speechStyles.indices.map { (Self.speechStyles[$0].0, $0) })
+            ChoiceControl("Placement", selection: $placement, options: Self.placements.indices.map { (Self.placements[$0].0, $0) })
             ActionControl("Say it", systemImage: "text.bubble") {
                 said += 1
-                speech = CreatureSpeech(line, placement: Self.placements[placement].1, id: said)
+                speech = CreatureSpeech(line, style: Self.speechStyles[speechStyle].1,
+                                        placement: Self.placements[placement].1, id: said)
             }
             ChoiceControl("Gesture", selection: $gesture, options: Self.gestures.indices.map { (Self.gestures[$0].0, $0) })
             ActionControl("Play gesture") { played += 1 }
