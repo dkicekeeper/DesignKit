@@ -240,7 +240,7 @@ extension ComponentSnapshots {
                         speech: CreatureSpeech("Coffee again?", style: .think, duration: .untilChanged)
                     )
                     .frame(width: 140, height: 140)
-                    .padding(.top, 120)
+                    .padding(.top, 170)
                     .frame(maxWidth: .infinity)
                     ParticleCreature(
                         mood: .wink,
