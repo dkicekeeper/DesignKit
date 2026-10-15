@@ -2322,7 +2322,9 @@ Tenra builds every entity detail screen this way (its `EntityDetailScaffold`).
 
 - Loading: the component's `<Name>Skeleton` in its place, never a `ProgressView()`; the content
   replaces it with `.transition(.skeletonReveal)` ([motion.md](motion.md)).
-- Empty: `EmptyState` (`.standard` on a screen, `.compact` in a card, `.error` for a failure).
+- Empty: `EmptyState` (`.standard` on a screen, `.compact` in a card, `.error` for a failure);
+  an app's own picture in place of the icon with `EmptyState(…) { artwork }` (4.13.0), as Tenra's
+  empty lists show its mascot pointing at the button.
 - A card that switches between empty and loaded animates the switch (§9, "Card State
   Transitions").
 
