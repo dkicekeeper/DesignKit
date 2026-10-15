@@ -351,5 +351,36 @@ extension ComponentSnapshots {
                 appearances: [.light, .largeText]
             )
         }
+
+        /// PickerCarousel (4.13.0): the focused card in the middle (open, chosen), a closed one
+        /// beside it dim with a lock, its condition above.
+        @Test func pickerCarousel() async {
+            await assertComponentSnapshot(
+                PickerCarousel(
+                    items: SnapshotOption.samples,
+                    focused: .constant("sunglasses"),
+                    chosen: "glasses",
+                    title: { $0.name },
+                    condition: { $0.condition }
+                ) { option in
+                    Icon(source: .sfSymbol(option.symbol), size: AppIconSize.Tile.xxxl)
+                },
+                appearances: [.light, .dark, .largeText]
+            )
+        }
     }
+}
+
+/// Options for PickerCarousel's snapshot: symbols instead of the creature, open and closed.
+private struct SnapshotOption: Identifiable {
+    let id: String
+    let name: String
+    let symbol: String
+    let condition: String?
+
+    static let samples = [
+        SnapshotOption(id: "glasses", name: "Glasses", symbol: "eyeglasses", condition: nil),
+        SnapshotOption(id: "sunglasses", name: "Sunglasses", symbol: "sun.max.fill", condition: "Open the app 7 days in a row"),
+        SnapshotOption(id: "crown", name: "Crown", symbol: "crown.fill", condition: "Reach a savings goal"),
+    ]
 }

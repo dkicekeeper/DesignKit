@@ -34,6 +34,7 @@ struct FeedbackScreen: View {
         ImportProgressSheetPage()
         ProgressOverlayPage()
         PendingItemCardPage()
+        NoticeCardPage()
         LoadMoreFooterPage()
         SkeletonPrimitivesPage()
     }
@@ -533,6 +534,60 @@ private struct ProgressOverlayPage: View {
         } controls: {
             ToggleControl("Shown", isOn: $isPresented)
             ToggleControl("Message", isOn: $showsMessage)
+        }
+    }
+}
+
+private struct NoticeCardPage: View {
+    @State private var showsLeading = true
+    @State private var hasAction = true
+    @State private var canHide = true
+    @State private var state: SpecimenState = .content
+    @State private var log = ""
+
+    var body: some View {
+        ComponentPage(
+            name: "NoticeCard",
+            summary: "A message the app writes to the person: a picture, a title and a line or two, a hide button and an action under them.",
+            since: "4.13.0",
+            apps: [.tenra],
+            canvas: .fill,
+            notes: [
+                "What the message is, when it shows and what the action does stay in the app.",
+                "The leading view comes at its own size; hide it from VoiceOver when it says nothing.",
+                "Strings: common.hide (the hide button's VoiceOver name, unless hideLabel is given).",
+            ]
+        ) {
+            VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                if state == .loading {
+                    NoticeCardSkeleton(leadingSize: showsLeading ? AppIconSize.xl : nil, showsAction: hasAction)
+                } else {
+                    NoticeCard(
+                        title: "A payment is due tomorrow",
+                        message: "Internet, 12 000 ₸. There is enough on the card.",
+                        actionTitle: hasAction ? "Go through it" : nil,
+                        actionSystemImage: "sparkles",
+                        action: hasAction ? { log = "Go through it" } : nil,
+                        onHide: canHide ? { log = "Hidden" } : nil
+                    ) {
+                        if showsLeading {
+                            ParticleCreature(mood: .worried, style: .compact)
+                                .frame(width: AppIconSize.xl, height: AppIconSize.xl)
+                                .accessibilityHidden(true)
+                        }
+                    }
+                }
+                if !log.isEmpty {
+                    Text(log)
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppColors.Text.secondary)
+                }
+            }
+        } controls: {
+            StateControl(state: $state)
+            ToggleControl("Picture", isOn: $showsLeading)
+            ToggleControl("Action", isOn: $hasAction)
+            ToggleControl("Hide button", isOn: $canHide)
         }
     }
 }

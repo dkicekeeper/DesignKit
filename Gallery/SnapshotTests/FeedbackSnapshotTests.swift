@@ -193,5 +193,28 @@ extension ComponentSnapshots {
                 appearances: [.light, .dark, .largeText]
             )
         }
+
+        /// NoticeCard (4.13.0): a picture, the hide button and the action; then the text alone.
+        @Test func noticeCards() async {
+            await assertComponentSnapshot(
+                NoticeCard(
+                    title: "A payment is due tomorrow",
+                    message: "Internet, 12 000 ₸. There is enough on the card.",
+                    actionTitle: "Go through it",
+                    actionSystemImage: "sparkles",
+                    action: {},
+                    onHide: {}
+                ) {
+                    Icon(source: .sfSymbol("bell.fill"), size: AppIconSize.xl)
+                },
+                named: "full",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                NoticeCard(title: "Backup finished", message: "Every account and transaction is saved."),
+                named: "text",
+                appearances: [.light, .dark]
+            )
+        }
     }
 }

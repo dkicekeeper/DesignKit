@@ -413,5 +413,17 @@ extension ComponentSnapshots {
                 appearances: [.light, .dark]
             )
         }
+
+        /// ListCardSkeleton, NoticeCardSkeleton, PickerCarouselSkeleton (4.13.0).
+        @Test func portedViewSkeletons() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.lg) {
+                    ListCardSkeleton(rows: 2)
+                    NoticeCardSkeleton()
+                    PickerCarouselSkeleton()
+                },
+                appearances: [.light, .dark]
+            )
+        }
     }
 }

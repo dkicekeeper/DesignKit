@@ -103,6 +103,23 @@ extension ComponentSnapshots {
                 appearances: [.light, .dark, .largeText]
             )
         }
+
+        /// ListCard (4.13.0): rows under a title, and without one.
+        @Test func listCards() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.lg) {
+                    ListCard(title: "Payments") {
+                        ItemRow("Coffee House", meta: [MetaLine([.text("Cafés · 08:40")])], leading: .symbol("cup.and.saucer.fill"))
+                        ItemRow("Magnum", meta: [MetaLine([.text("Groceries · 12:15")])], leading: .symbol("cart.fill"))
+                    }
+                    ListCard {
+                        InfoRow(label: "Amount", value: "12 000 ₸")
+                        InfoRow(label: "Date", value: "15 October")
+                    }
+                },
+                appearances: [.light, .dark, .largeText]
+            )
+        }
     }
 }
 

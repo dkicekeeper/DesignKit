@@ -245,6 +245,7 @@ private struct NavigationPickerRowPage: View {
     @State private var species = "pike"
     @State private var showsIcon = true
     @State private var many = true
+    @State private var style: NavigationPickerRow<String>.Style = .form
     @State private var state: SpecimenState = .content
 
     private let fewOptions: [(label: String, value: String)] = [
@@ -260,17 +261,35 @@ private struct NavigationPickerRowPage: View {
             name: "NavigationPickerRow",
             summary: "A choice from a long list: the row shows the chosen value; a tap pushes the list, with a search field past 12 options.",
             since: "3.0.0",
-            apps: [.dalada],
+            apps: [.dalada, .tenra],
             canvas: .fill,
-            notes: ["Needs a NavigationStack around it (an EditSheetContainer has one). A few options: MenuPickerRow."]
+            notes: [
+                "Needs a NavigationStack around it (an EditSheetContainer has one). A few options: MenuPickerRow.",
+                "style: .list (4.13.0) is the row of a List, as iOS Settings draws it: the list adds the chevron.",
+            ],
+            styles: ["form", "list"]
         ) {
             NavigationStack {
-                InFormCard {
-                    if state == .loading {
-                        UniversalRowSkeleton.menuPicker
+                Group {
+                    if style == .list {
+                        List {
+                            if state == .loading {
+                                UniversalRowSkeleton.menuPicker
+                            } else {
+                                NavigationPickerRow(icon: showsIcon ? "waveform" : nil, title: "Voice language",
+                                                    selection: $species, options: many ? manyOptions : fewOptions,
+                                                    style: .list)
+                            }
+                        }
                     } else {
-                        NavigationPickerRow(icon: showsIcon ? "fish" : nil, title: "Species",
-                                            selection: $species, options: many ? manyOptions : fewOptions)
+                        InFormCard {
+                            if state == .loading {
+                                UniversalRowSkeleton.menuPicker
+                            } else {
+                                NavigationPickerRow(icon: showsIcon ? "fish" : nil, title: "Species",
+                                                    selection: $species, options: many ? manyOptions : fewOptions)
+                            }
+                        }
                     }
                 }
                 .toolbar(.hidden, for: .navigationBar)
@@ -278,6 +297,7 @@ private struct NavigationPickerRowPage: View {
             .frame(height: 220)
         } controls: {
             StateControl(state: $state)
+            ChoiceControl("Style", selection: $style, options: [("Form", .form), ("List", .list)])
             ToggleControl("Icon", isOn: $showsIcon)
             ToggleControl("Many options (search)", isOn: $many)
         }

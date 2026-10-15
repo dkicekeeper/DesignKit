@@ -209,5 +209,16 @@ extension ComponentSnapshots {
                 appearances: [.light, .dark]
             )
         }
+
+        /// VoiceOrbButton (4.13.0): the orb at a fixed level, still, with its stop glyph.
+        @Test func voiceOrbButton() async {
+            await assertComponentSnapshot(
+                VoiceOrbButton(level: 0.7, accessibilityLabel: "Stop recording") {}
+                    .frame(maxWidth: .infinity)
+                    .padding(AppSpacing.lg)
+                    .background(Color(white: 0.08), in: .rect(cornerRadius: AppRadius.xl)),
+                appearances: [.light, .dark]
+            )
+        }
     }
 }
