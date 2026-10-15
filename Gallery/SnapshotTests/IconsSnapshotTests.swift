@@ -171,8 +171,8 @@ extension ComponentSnapshots {
             }
         }
 
-        /// The shelf at its own 160 pt beside a long amount, as on Tenra's Loans card (4.14.0): a
-        /// 9-million amount with its decimals keeps its line beside four whole tiles.
+        /// The shelf beside a long amount, as on Tenra's Loans card (4.14.0): the 9-million amount
+        /// keeps its decimals and its line, and the shelf shows three tiles in what is left.
         @Test func packedShelfBesideLongAmount() async {
             await assertComponentSnapshot(
                 FinanceCard(title: "Loans", isEmpty: false, emptyTitle: "", subtitle: "14 active") {

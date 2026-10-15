@@ -10,7 +10,8 @@
 //  box is as wide and as tall as the row, up to the size it is given.
 //  4.14.0 (the owner's review on a device): the tiles are whole, 48 pt (36 pt before), and the
 //  shelf is 160 pt wide by default (120 pt before), four tiles; until then the box's lower edge
-//  cut them off as if they stood in a pocket.
+//  cut them off as if they stood in a pocket. Offered less than its row, it shows fewer tiles,
+//  down to two, at its trailing edge: a `FinanceCard` gives its amount the room first.
 //  They come up one after another on appear, and every few seconds a light runs across them
 //  from left to right. It replaced 3.3.0's fan of playing cards, where the cards behind the top
 //  one barely showed.
@@ -94,6 +95,15 @@ enum PackedShelfLayout {
         return max(0, min(side * (1 - metrics.targetOverlap), room / CGFloat(count - 1)))
     }
 
+    /// The narrowest box `count` tiles fit in, at their closest (`maxOverlap`); a hair over, so
+    /// `capacity` counts them all.
+    static func leastWidth(count: Int, in box: CGSize) -> CGFloat {
+        let metrics = PackedShelfMetrics.self
+        let side = side(in: box)
+        return side * (1 + metrics.tiltSlack) + CGFloat(max(count - 1, 0)) * side * (1 - metrics.maxOverlap)
+            + 2 * metrics.margin + 0.5
+    }
+
     /// The box the row of `count` tiles takes: as wide as the row and as tall as its turned
     /// tiles, up to the box it is given.
     static func fittedBox(count: Int, in box: CGSize) -> CGSize {
@@ -165,14 +175,34 @@ struct PackedShelf: View {
         return (Array(ranked.prefix(count)), ranked.count - count)
     }
 
+    /// The box the row takes in `size`.
+    static func box(_ items: [PackedCircleItem], maxVisible: Int, in size: CGSize) -> CGSize {
+        let shown = Self.shown(items, maxVisible: maxVisible, in: size)
+        return PackedShelfLayout.fittedBox(count: shown.items.count + (shown.overflow > 0 ? 1 : 0), in: size)
+    }
+
     var body: some View {
+        let full = Self.box(items, maxVisible: maxVisible, in: size)
+        let least = PackedShelfLayout.leastWidth(count: min(items.count, 2), in: size)
+        // As wide as its row when there is room; offered less (4.14.0: a card whose amount needs
+        // the room), fewer tiles, down to two, at the trailing edge.
+        GeometryReader { proxy in
+            row(in: CGSize(width: min(proxy.size.width, size.width), height: size.height))
+                .frame(width: proxy.size.width, height: proxy.size.height, alignment: .trailing)
+        }
+        .frame(minWidth: min(least, full.width), idealWidth: full.width, maxWidth: full.width)
+        .frame(height: full.height)
+    }
+
+    /// The row of tiles that fit `size`, the light running across it.
+    private func row(in size: CGSize) -> some View {
         let shown = Self.shown(items, maxVisible: maxVisible, in: size)
         let ranked = shown.items
         let overflowCount = shown.overflow
         let ids = ranked.map(\.id) + (overflowCount > 0 ? [Self.overflowID] : [])
         let box = PackedShelfLayout.fittedBox(count: ids.count, in: size)
         let slots = PackedShelfLayout.slots(ids: ids, in: box)
-        AmbientMotionGate { allowsAmbientMotion in
+        return AmbientMotionGate { allowsAmbientMotion in
             ZStack {
                 ForEach(slots) { slot in
                     PackedShelfTile(

@@ -27,8 +27,13 @@ a device. [#74](https://github.com/dkicekeeper/DesignKit/pull/74)
   (`containerWidth`, 120 pt before), in every style. A width given as before is kept.
 - `style: .shelf`: the tiles are whole and 48 pt (36 pt before); the box's lower edge no longer
   cuts them off as a pocket, and they no longer darken at the bottom. Four tiles fit the default
-  160 pt: three items and a "+N" when there are more. The row is 61 pt tall (34 pt before), and
-  in a `FinanceCard` it takes up to 40 pt more of the card's width.
+  160 pt: three items and a "+N" when there are more. The row is 61 pt tall (34 pt before).
+- `style: .shelf`: offered less than its row, it shows fewer tiles (down to two) at its trailing
+  edge, the tiles staying 48 pt.
+- `FinanceCard`: the amount comes first. The title, the hero and the subtitle keep the width
+  they need, and the trailing view takes the rest at the card's trailing edge, so a long amount
+  beside a shelf stays whole (a 9-million amount with its decimals showed as "9.1M" on a 393 pt
+  phone beside a 160 pt shelf) and the shelf shows three tiles there.
 - `style: .shelf`: the tiles come up one after another from a little lower, growing and fading
   in, in place of rising out of the pocket. The light that runs across them is unchanged.
 - `style: .orbit`: the coins are 48 pt in the default width (36 pt before).

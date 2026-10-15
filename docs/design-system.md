@@ -681,6 +681,7 @@ FinanceCard(
 - **`RedactableAmount`** — hero amount that shows a redacted placeholder while an async (FX) total computes, then cross-fades. Use for cards whose total needs conversion (accounts, deposits, subscriptions).
 - Don't reintroduce the inline `HStack(.top, md) → VStack(.leading, lg) → title → if isEmpty …` shell in a new finance card — wrap `FinanceCard`.
 - *(4.5.0)* The trailing icons stand in the middle of the card's height (`HStack(alignment: .center)`), so a short `PackedCircleIcons(style: .shelf)` row sits beside the amount, not beside the title.
+- *(4.14.0)* The amount comes first: the title, the hero and the subtitle take the width they need (`layoutPriority(1)`), and the trailing view the rest, at the trailing edge. A shelf there shows fewer tiles (down to two) rather than the amount shortening to "9.1M ₸" on a 393 pt phone; a view of a fixed width (the marbles, the orbit) keeps it, and the amount shortens as before.
 
 #### Hero background *(4.5.0)*
 
@@ -709,7 +710,9 @@ In dark mode `\.heroTone` inside it is `.onColor`, and DesignKit's hero pieces d
     tiles beside one with three. As many as fit the width stand in the row, closing up to 0.36
     over each other to fit one more (four in the default 160 pt): the largest amounts, at most
     `maxVisible`, the rest in the "+N" tile. The shelf is as wide and as tall as its row (61 pt),
-    so in a card's trailing slot it stands at the trailing edge. A logo fills its tile, as an app
+    so in a card's trailing slot it stands at the trailing edge. *(4.14.0)* Offered less than
+    its row (a `FinanceCard` gives its amount the room first), it shows fewer tiles, down to two,
+    at its trailing edge; its tiles stay 48 pt. A logo fills its tile, as an app
     icon does (white behind a logo that does not fill its square); a symbol is white on a tile of
     its tint, lit from the upper left; "+N" is a grey tile. A light catches each tile's upper
     edge, and each casts a shadow on the one to its left. The tiles come up one after another
