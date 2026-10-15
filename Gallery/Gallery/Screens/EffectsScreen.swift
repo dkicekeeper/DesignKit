@@ -475,26 +475,31 @@ private struct EdgeBackdropPage: View {
                 "Hide the system's scroll edge effect on that edge, .scrollEdgeEffectHidden(true, for: edge) (5.0.0): it fades the content out under the bar before the backing blurs it.",
             ]
         ) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: AppSpacing.md) {
-                    ForEach(rows, id: \.self) { row in
-                        Text(row)
-                            .font(AppTypography.body)
-                            .padding(AppSpacing.md)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(AppColors.accent.opacity(0.15), in: .rect(cornerRadius: AppRadius.lg))
+            // A screen of its own: in the page's scroll view, the bar drew the page's edge
+            // effect down to itself (5.0.0).
+            ScreenSpecimen {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: AppSpacing.md) {
+                        ForEach(rows, id: \.self) { row in
+                            Text(row)
+                                .font(AppTypography.body)
+                                .padding(AppSpacing.md)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(AppColors.accent.opacity(0.15), in: .rect(cornerRadius: AppRadius.lg))
+                        }
                     }
+                    .padding(AppSpacing.md)
                 }
-                .padding(AppSpacing.md)
+                .scrollEdgeEffectHidden(true, for: bottom ? .bottom : .top)
+                .safeAreaBar(edge: bottom ? .bottom : .top) {
+                    ParticleCreature(mood: .happy, style: .compact)
+                        .frame(width: AppIconSize.Tile.xxxl, height: AppIconSize.Tile.xxxl)
+                        .padding(.vertical, AppSpacing.lg)
+                        .frame(maxWidth: .infinity)
+                        .edgeBackdrop(bottom ? .bottom : .top)
+                }
             }
-            .scrollEdgeEffectHidden(true, for: bottom ? .bottom : .top)
-            .safeAreaBar(edge: bottom ? .bottom : .top) {
-                ParticleCreature(mood: .happy, style: .compact)
-                    .frame(width: AppIconSize.Tile.xxxl, height: AppIconSize.Tile.xxxl)
-                    .padding(.vertical, AppSpacing.lg)
-                    .frame(maxWidth: .infinity)
-                    .edgeBackdrop(bottom ? .bottom : .top)
-            }
+            .frame(maxWidth: .infinity)
             .frame(height: 340)
             .clipShape(.rect(cornerRadius: AppRadius.lg))
         } controls: {
