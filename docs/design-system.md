@@ -2335,7 +2335,11 @@ at three fifths (`EdgeBackdropMetrics`). *(5.0.0, the owner's review in Tenra's 
 was full over the half only, so the text under Ten stayed legible, and the colour was 25%; a
 heavier colour reads as a grey plate.)* It reaches past the
 safe area to the screen's edge, takes no touches and is hidden from VoiceOver. Put it behind the
-bar's content: `.safeAreaBar(edge: .top) { header.frame(maxWidth: .infinity).edgeBackdrop() }`.
+bar's content: `.safeAreaBar(edge: .top) { header.frame(maxWidth: .infinity).edgeBackdrop() }`,
+and hide the system's scroll edge effect on that edge of the scroll view,
+`.scrollEdgeEffectHidden(true, for: .top)` *(5.0.0)*: as it comes, or `.soft`, it fades the content
+out under the bar before the backing can blur it, so the top reads as an empty plate
+(`edgeBackdropUnderBar` snapshots).
 `color:` is the page's colour (`AppColors.bgBase` by default). Tenra: the chat's bar, Ten 120 pt
 over the thread.
 
@@ -2509,7 +2513,7 @@ Horizontal scroll?
 └── UniversalCarousel with appropriate preset
 
 A bar over scrolling content that needs a stronger backing than the scroll edge effect?
-└── .edgeBackdrop(edge) behind the bar's content (4.14.0)
+└── .edgeBackdrop(edge) behind the bar's content (4.14.0), the scroll view's edge effect hidden (5.0.0)
 
 Card-style container?
 ├── Rows under an optional title → FormSection(header:, style: .glass) (5.0.0; ListCard in 4.14.0)

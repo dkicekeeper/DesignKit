@@ -58,6 +58,10 @@ once (the owner's choice over deprecating them).
 
 - Tenra: its assistant's cards (`AssistantAttachmentCard`, `AssistantReplyView`). Dalada does not
   use `ListCard`. docs/migration-5.0.md has the details.
+- Under an `.edgeBackdrop`, hide the system's scroll edge effect on that edge of the scroll view:
+  as it comes, or `.soft`, it fades the content out before the backing blurs it, and the top
+  reads as an empty plate. Tenra's chat: `.scrollEdgeEffectStyle(.soft, for: .top)` →
+  `.scrollEdgeEffectHidden(true, for: .top)`.
 
 ```swift
 // Before

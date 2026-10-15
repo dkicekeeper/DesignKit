@@ -472,6 +472,7 @@ private struct EdgeBackdropPage: View {
             notes: [
                 "For a bar the system's scroll edge effect is too faint to carry (a large header over a chat).",
                 "Put it behind the bar's content with .edgeBackdrop(edge); it reaches to the screen's edge, takes no touches, and VoiceOver skips it.",
+                "Hide the system's scroll edge effect on that edge, .scrollEdgeEffectHidden(true, for: edge) (5.0.0): it fades the content out under the bar before the backing blurs it.",
             ]
         ) {
             ScrollView {
@@ -486,6 +487,7 @@ private struct EdgeBackdropPage: View {
                 }
                 .padding(AppSpacing.md)
             }
+            .scrollEdgeEffectHidden(true, for: bottom ? .bottom : .top)
             .safeAreaBar(edge: bottom ? .bottom : .top) {
                 ParticleCreature(mood: .happy, style: .compact)
                     .frame(width: AppIconSize.Tile.xxxl, height: AppIconSize.Tile.xxxl)

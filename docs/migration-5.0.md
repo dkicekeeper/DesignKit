@@ -32,6 +32,10 @@ FormSection(header: "Payments", style: .glass) { rows }
 - `NavigationSettingsRow(icon:title:value:)`: `value:` before the chevron, and the icon may be
   `nil`. `NavigationPickerRow(style: .list)` is that row.
 - `FormSection` leaves out an empty `header`.
+- `EdgeBackdrop`'s blur reaches four fifths of the backing and is deeper, under a lighter colour.
+  Hide the system's scroll edge effect on that edge of the scroll view: as it comes, or `.soft`,
+  it fades the content out under the bar before the backing blurs it. Tenra's chat:
+  `.scrollEdgeEffectStyle(.soft, for: .top)` → `.scrollEdgeEffectHidden(true, for: .top)`.
 
 ## Checking an app
 

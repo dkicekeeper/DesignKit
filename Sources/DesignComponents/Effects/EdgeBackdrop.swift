@@ -15,7 +15,10 @@
 //  top while the text under Ten stayed legible through it. The blur now stays full down to four
 //  fifths of the backing, under all of Ten, a second ultra-thin layer deepens it over the first
 //  three fifths, and the page's colour is 10% at the edge (25% before), so the backing is lighter
-//  and the blur stronger.
+//  and the blur stronger. Hide the system's scroll edge effect on that edge of the scroll view
+//  (`scrollEdgeEffectHidden(true, for: .top)`): as it comes, or `.soft`, it fades the content out
+//  under the bar before the backing can blur it, and the top reads as an empty plate
+//  (`edgeBackdropUnderBar` snapshots).
 //
 
 import SwiftUI
@@ -26,6 +29,7 @@ import DesignSupport
 ///
 /// ```swift
 /// ScrollView { … }
+///     .scrollEdgeEffectHidden(true, for: .top)
 ///     .safeAreaBar(edge: .top) {
 ///         Header()
 ///             .frame(maxWidth: .infinity)
@@ -34,7 +38,9 @@ import DesignSupport
 /// ```
 ///
 /// It reaches past the safe area to the screen's edge (under the status bar and the navigation
-/// bar), takes no touches and is hidden from VoiceOver.
+/// bar), takes no touches and is hidden from VoiceOver. Hide the system's scroll edge effect on
+/// that edge (`.scrollEdgeEffectHidden(true, for: .top)` on the scroll view, 5.0.0): it fades the
+/// content out under the bar before the backing can blur it.
 public struct EdgeBackdrop: View {
     let edge: VerticalEdge
     let color: Color
