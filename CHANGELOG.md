@@ -43,6 +43,10 @@ once (the owner's choice over deprecating them).
   before), and its save button plays the light haptic before the save's own.
 - `NavigationPickerRow(style: .list)` is `NavigationSettingsRow(value:)`; it looks the same.
 - `FormSection` leaves out an empty `header`.
+- `EdgeBackdrop` and `.edgeBackdrop`: the blur stays full down to four fifths of the backing (half
+  before), so all of a bar's content sits on it, a second ultra-thin layer deepens it over the
+  first three fifths, and the page's colour over it is 10% at the edge (25% before). Tenra's chat:
+  the thread under Ten blurs out and the backing is lighter.
 
 ### Removed
 
@@ -69,7 +73,7 @@ FormSection(header: "Payments", style: .glass) { rows }
 - Snapshot tests: `listCards` draws the glass `FormSection` against `ListCard`'s references, and
   `pickerCarousel` the carousel on `SnapCardPicker` against its own; `edgeBackdropUnderBar` (the
   backing under a `safeAreaBar`, the system's scroll edge effect as it comes, soft and hidden);
-  `OptionCard`'s and the ported skeletons' references re-recorded.
+  `OptionCard`'s, `EdgeBackdrop`'s and the ported skeletons' references re-recorded.
 - CI: the Changelog job refuses dingbats and emoji, which TestFlight's What to Test refuses.
 - docs/migration-5.0.md.
 

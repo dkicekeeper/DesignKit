@@ -2326,11 +2326,14 @@ Used in: `OnboardingWelcomeStep` (bottom), Account/Category/Subscription/Deposit
 
 #### `EdgeBackdrop`, `.edgeBackdrop(_:color:)` *(4.14.0)*
 The backing of a bar over scrolling content, drawn by hand where the system's scroll edge effect
-is too faint to carry a large bar: an `.ultraThinMaterial` blur, full over the half nearest the
-screen's edge and fading out at the inner edge (SwiftUI has no blur of varying radius, so the
-blurred content gives way to the sharp one), and the page's colour over it, light so the blurred
-content's colours show through: 25% at the edge, 10% at two fifths, clear at three quarters
-(`EdgeBackdropMetrics`). A second material or a heavier tint reads as a grey plate. It reaches past the
+is too faint to carry a large bar: an `.ultraThinMaterial` blur, full over the four fifths
+nearest the screen's edge and fading out at the inner edge (SwiftUI has no blur of varying
+radius, so the blurred content gives way to the sharp one), a second ultra-thin layer over the
+first three fifths that blurs it again where the bar's content sits, and the page's colour over
+them, light so the blurred content's colours show through: 10% at the edge, 4% at a third, clear
+at three fifths (`EdgeBackdropMetrics`). *(5.0.0, the owner's review in Tenra's chat: the blur
+was full over the half only, so the text under Ten stayed legible, and the colour was 25%; a
+heavier colour reads as a grey plate.)* It reaches past the
 safe area to the screen's edge, takes no touches and is hidden from VoiceOver. Put it behind the
 bar's content: `.safeAreaBar(edge: .top) { header.frame(maxWidth: .infinity).edgeBackdrop() }`.
 `color:` is the page's colour (`AppColors.bgBase` by default). Tenra: the chat's bar, Ten 120 pt
