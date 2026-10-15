@@ -40,7 +40,9 @@ import DesignSupport
 /// It reaches past the safe area to the screen's edge (under the status bar and the navigation
 /// bar), takes no touches and is hidden from VoiceOver. Hide the system's scroll edge effect on
 /// that edge (`.scrollEdgeEffectHidden(true, for: .top)` on the scroll view, 5.0.0): it fades the
-/// content out under the bar before the backing can blur it.
+/// content out under the bar before the backing can blur it. On a scroll view inside another one
+/// (a preview in a scrolling page), hold the bar in a `safeAreaInset`: a `safeAreaBar` there draws
+/// the outer scroll view's edge effect down to itself, and everything above it blurs.
 public struct EdgeBackdrop: View {
     let edge: VerticalEdge
     let color: Color

@@ -77,6 +77,13 @@ FormSection(header: "Payments", style: .glass) { rows }
   `pickerCarousel` the carousel on `SnapCardPicker` against its 4.14.0 ones; `edgeBackdropUnderBar` (the
   backing under a `safeAreaBar`, the system's scroll edge effect as it comes, soft and hidden);
   `OptionCard`'s, `EdgeBackdrop`'s and the ported skeletons' references re-recorded.
+- Gallery: the `EdgeBackdrop` page blurred everything above its preview, a 4.14.0 bug. A
+  `safeAreaBar` on a scroll view inside the page's draws the page's own edge effect down to
+  itself; the preview's bar is a `safeAreaInset` now (docs/gotchas.md).
+- Gallery: the `UniversalRow` page lists the rows built on it and what each is for.
+- Snapshot tests: `GalleryPagesSnapshotTests` draws whole Gallery pages in a phone-sized window
+  (`PickerCarousel`'s, a centred `SnapCardPicker`, `EdgeBackdrop`'s), and
+  `scripts/snapshot-tests.sh` prints the crash report when the Gallery crashes in a run.
 - CI: the Changelog job refuses dingbats and emoji, which TestFlight's What to Test refuses.
 - docs/migration-5.0.md.
 

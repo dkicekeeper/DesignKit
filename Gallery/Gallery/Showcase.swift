@@ -10,7 +10,6 @@
 //
 
 import SwiftUI
-import UIKit
 import DesignTokens
 import DesignComponents
 
@@ -390,36 +389,6 @@ private struct PreviewCanvas<Content: View>: View {
 
     private var canvasFill: Color {
         effectiveScheme == .dark ? Color(white: 0.11) : Color(white: 0.95)
-    }
-}
-
-// MARK: - Screen specimen
-
-/// A preview that is a screen of its own: a scroll view with a bar, as an app's screen holds it.
-/// It is drawn by a hosting controller of its own, so its safe area starts at its edges and its
-/// bar stays out of the page around it. Inside the page's scroll view, a bar whose scroll view
-/// hides its edge effect (`EdgeBackdrop`'s, 5.0.0) drew the page's own edge effect down to the
-/// bar: the page above the preview blurred. The environment (colour scheme, text size, motion)
-/// is the page's.
-struct ScreenSpecimen<Content: View>: UIViewControllerRepresentable {
-    @ViewBuilder var content: Content
-
-    func makeUIViewController(context: Context) -> UIHostingController<AnyView> {
-        let host = UIHostingController(rootView: root(context.environment))
-        host.safeAreaRegions = []
-        host.view.backgroundColor = .clear
-        host.view.clipsToBounds = true
-        host.overrideUserInterfaceStyle = context.environment.colorScheme == .dark ? .dark : .light
-        return host
-    }
-
-    func updateUIViewController(_ host: UIHostingController<AnyView>, context: Context) {
-        host.rootView = root(context.environment)
-        host.overrideUserInterfaceStyle = context.environment.colorScheme == .dark ? .dark : .light
-    }
-
-    private func root(_ environment: EnvironmentValues) -> AnyView {
-        AnyView(content.environment(\.self, environment))
     }
 }
 

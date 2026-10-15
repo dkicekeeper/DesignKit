@@ -473,33 +473,33 @@ private struct EdgeBackdropPage: View {
                 "For a bar the system's scroll edge effect is too faint to carry (a large header over a chat).",
                 "Put it behind the bar's content with .edgeBackdrop(edge); it reaches to the screen's edge, takes no touches, and VoiceOver skips it.",
                 "Hide the system's scroll edge effect on that edge, .scrollEdgeEffectHidden(true, for: edge) (5.0.0): it fades the content out under the bar before the backing blurs it.",
+                "A bar on a scroll view inside another (this preview in the page) is a safeAreaInset: a safeAreaBar there draws the outer scroll view's edge effect down to itself.",
             ]
         ) {
-            // A screen of its own: in the page's scroll view, the bar drew the page's edge
-            // effect down to itself (5.0.0).
-            ScreenSpecimen {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: AppSpacing.md) {
-                        ForEach(rows, id: \.self) { row in
-                            Text(row)
-                                .font(AppTypography.body)
-                                .padding(AppSpacing.md)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(AppColors.accent.opacity(0.15), in: .rect(cornerRadius: AppRadius.lg))
-                        }
+            ScrollView {
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    ForEach(rows, id: \.self) { row in
+                        Text(row)
+                            .font(AppTypography.body)
+                            .padding(AppSpacing.md)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(AppColors.accent.opacity(0.15), in: .rect(cornerRadius: AppRadius.lg))
                     }
-                    .padding(AppSpacing.md)
                 }
-                .scrollEdgeEffectHidden(true, for: bottom ? .bottom : .top)
-                .safeAreaBar(edge: bottom ? .bottom : .top) {
-                    ParticleCreature(mood: .happy, style: .compact)
-                        .frame(width: AppIconSize.Tile.xxxl, height: AppIconSize.Tile.xxxl)
-                        .padding(.vertical, AppSpacing.lg)
-                        .frame(maxWidth: .infinity)
-                        .edgeBackdrop(bottom ? .bottom : .top)
-                }
+                .padding(AppSpacing.md)
             }
-            .frame(maxWidth: .infinity)
+            .scrollEdgeEffectHidden(true, for: bottom ? .bottom : .top)
+            // An app's screen holds the bar in a safeAreaBar. Here the preview's scroll view is
+            // inside the page's, where a safeAreaBar draws the page's edge effect down to itself
+            // and the page above blurs (docs/gotchas.md); with the edge effect hidden, an inset
+            // looks the same.
+            .safeAreaInset(edge: bottom ? .bottom : .top, spacing: 0) {
+                ParticleCreature(mood: .happy, style: .compact)
+                    .frame(width: AppIconSize.Tile.xxxl, height: AppIconSize.Tile.xxxl)
+                    .padding(.vertical, AppSpacing.lg)
+                    .frame(maxWidth: .infinity)
+                    .edgeBackdrop(bottom ? .bottom : .top)
+            }
             .frame(height: 340)
             .clipShape(.rect(cornerRadius: AppRadius.lg))
         } controls: {

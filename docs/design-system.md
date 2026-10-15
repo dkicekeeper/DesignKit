@@ -2346,7 +2346,9 @@ bar's content: `.safeAreaBar(edge: .top) { header.frame(maxWidth: .infinity).edg
 and hide the system's scroll edge effect on that edge of the scroll view,
 `.scrollEdgeEffectHidden(true, for: .top)` *(5.0.0)*: as it comes, or `.soft`, it fades the content
 out under the bar before the backing can blur it, so the top reads as an empty plate
-(`edgeBackdropUnderBar` snapshots).
+(`edgeBackdropUnderBar` snapshots). On a scroll view inside another one (a preview in a
+scrolling page), the bar goes in a `safeAreaInset(edge:spacing: 0)`: a `safeAreaBar` there draws
+the outer scroll view's edge effect down to itself and everything above blurs (docs/gotchas.md).
 `color:` is the page's colour (`AppColors.bgBase` by default). Tenra: the chat's bar, Ten 120 pt
 over the thread.
 
