@@ -16,6 +16,22 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 4.13.0 - 2026-10-15
+
+`EmptyState` takes any picture in place of its icon, for a mascot in an app's empty lists.
+[#72](https://github.com/dkicekeeper/DesignKit/pull/72)
+
+### Added
+
+- `EmptyState(title:description:actionTitle:action:artwork:)`: the standard empty state with a
+  view of the app's own in place of the icon (a mascot, an illustration); the title, the
+  description and the button stay as they are.
+
+### Gallery and tooling
+
+- Gallery: a "Mascot artwork" control on the EmptyState page.
+- Snapshot test: `emptyStateArtwork` (light, dark).
+
 ## 4.12.0 - 2026-10-15
 
 `ParticleCreature` wears accessories of light: the last step of the assistant as a character.

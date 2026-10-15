@@ -1373,6 +1373,11 @@ EmptyState(
 |-------|---------|
 | `.standard` | Full-screen empty state (management views) |
 | `.compact` | Inside cards (home summary) |
+
+*(4.13.0)* `EmptyState(title:description:actionTitle:action:) { artwork }` puts any picture in
+place of the icon, in the standard style; the title, the description and the button stay as they
+are and the picture keeps its own size. Tenra's empty lists show its mascot there, saying a line
+and pointing down at the button (leave room over a creature for its words).
 | `.error` | Load failures (with pulse icon + retry) |
 
 #### `PromptSheet` *(1.5.0; 2.0.0 the one prompt and permission sheet)*

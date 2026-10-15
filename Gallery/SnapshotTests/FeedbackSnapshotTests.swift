@@ -51,6 +51,26 @@ extension ComponentSnapshots {
             )
         }
 
+        /// 4.13.0: a picture in place of the icon: a mascot saying a line and pointing down at
+        /// the button.
+        @Test func emptyStateArtwork() async {
+            await assertComponentSnapshot(
+                EmptyState(
+                    title: "No goals yet",
+                    description: "Save towards something and see how close it is.",
+                    actionTitle: "New goal",
+                    action: {}
+                ) {
+                    ParticleCreature(mood: .happy,
+                                     speech: CreatureSpeech("Shall we save for something?", duration: .untilChanged))
+                        .creatureGestureFrame(.point(.down), progress: 0.5)
+                        .frame(width: 140, height: 140)
+                        .padding(.top, 60)
+                },
+                appearances: [.light, .dark]
+            )
+        }
+
         @Test func bannersAndStatus() async {
             await assertComponentSnapshot(
                 VStack(spacing: AppSpacing.md) {
