@@ -66,7 +66,10 @@ private struct UniversalRowPage: View {
             summary: "The row every list row is built on: a leading icon, content, a trailing slot, a hint; padding from its RowConfiguration preset.",
             apps: [.tenra, .dalada],
             canvas: .fill,
-            notes: ["Presets: .standard, .settings, .info, .selectable, .sheetList (design-system §10 for their padding)."]
+            notes: [
+                "Presets: .standard, .settings, .info, .selectable, .sheetList (design-system §10 for their padding).",
+                "The rows on it, for what a row does: ToggleSettingsRow, ActionSettingsRow, NavigationSettingsRow, MenuPickerRow, NavigationPickerRow, DatePickerRow, StepperRow, CheckmarkRow, InfoRow. They fix the icon, the value's type and what VoiceOver hears; UniversalRow itself is for a row none of them is.",
+            ]
         ) {
             InFormCard {
                 if state == .loading {

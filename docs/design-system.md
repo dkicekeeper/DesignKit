@@ -464,6 +464,13 @@ UniversalRow(
 | `.sheetList` | 12 | 16 | Modal selection sheets |
 | `.info` | 8 | 0 | Read-only label+value (container owns H-padding) |
 
+**Rows built on it**: a row for what it does, each fixing the icon's size and colour, the value's
+type and what VoiceOver hears, so every settings screen reads the same. `ToggleSettingsRow` (a
+switch), `ActionSettingsRow` (a button), `NavigationSettingsRow` (opens a screen, with what is set),
+`MenuPickerRow` (one of a few, in a menu), `NavigationPickerRow` (one of many: a pushed list with
+checks, a search field past 12), `DatePickerRow`, `StepperRow`, `CheckmarkRow`, `InfoRow`,
+`ActionRowLabel`. `UniversalRow` itself is for a row none of them is.
+
 **IconConfig factories:**
 
 ```swift
