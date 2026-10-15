@@ -46,7 +46,7 @@ models stay in Tenra as thin adapters.
 - `NavigationPickerRow(style:)` with `.form` (the default, as before) and `.list`: the row of a
   `List`, as iOS Settings draws it.
 - `EdgeBackdrop(edge:color:)`, `.edgeBackdrop(_:color:)` and `EdgeBackdropMetrics`: the backing of
-  a bar over scrolling content, blur in two steps and the page's colour, strongest at the
+  a bar over scrolling content, a blur and a light wash of the page's colour, strongest at the
   screen's edge and fading out towards the content. For bars the system's scroll edge effect is
   too faint to carry (Tenra's chat, Ten over the thread).
 - Strings: `button.close`, `common.hide`, `common.locked`, `currency.error.conversionFailed`,

@@ -7,10 +7,10 @@
 //  bar's inner edge, so what the bar holds reads on any content without a solid plate. The iOS
 //  bar backing, drawn by hand where the system's scroll edge effect is too faint to carry a large
 //  bar (Tenra's chat: Ten hangs 120 pt over the thread). SwiftUI has no blur of varying radius,
-//  so the blur is built from two ultra-thin materials, one over most of the bar and one more
-//  over the part nearest the edge, each faded by its own gradient: the content blurs more the
-//  closer it is to the edge. The page's colour over them is light (45% at the edge), so the
-//  blurred content shows through (the owner's review: blur, not a plate).
+//  so one ultra-thin material, full near the edge, fades out towards the content: the blurred
+//  content gives way to the sharp one. The page's colour over it is light (25% at the edge), so
+//  the blurred content's colours show through (the owner's review: blur, not a plate; a second
+//  material and a 45% tint still read as a grey plate).
 //
 
 import SwiftUI
@@ -47,9 +47,6 @@ public struct EdgeBackdrop: View {
             Rectangle()
                 .fill(.ultraThinMaterial)
                 .mask { fade(EdgeBackdropMetrics.blurStops) }
-            Rectangle()
-                .fill(.ultraThinMaterial)
-                .mask { fade(EdgeBackdropMetrics.edgeBlurStops) }
             LinearGradient(
                 stops: EdgeBackdropMetrics.tintStops.map { .init(color: color.opacity($0.opacity), location: $0.location) },
                 startPoint: start,
@@ -81,13 +78,11 @@ public enum EdgeBackdropMetrics {
         public let opacity: Double
     }
 
-    /// The blur over most of the bar: full over three fifths, gone at the inner edge.
-    static let blurStops = [Stop(location: 0, opacity: 1), Stop(location: 0.6, opacity: 1), Stop(location: 1, opacity: 0)]
-    /// More blur near the edge, on top of the first: full over a third, gone by seven tenths.
-    static let edgeBlurStops = [Stop(location: 0, opacity: 1), Stop(location: 0.35, opacity: 1), Stop(location: 0.7, opacity: 0)]
-    /// The page's colour over the blur, light so the blurred content shows: 45% at the edge,
-    /// 20% half way, clear at the inner edge.
-    static let tintStops = [Stop(location: 0, opacity: 0.45), Stop(location: 0.5, opacity: 0.2), Stop(location: 1, opacity: 0)]
+    /// The blur: full over the half nearest the edge, gone at the inner edge.
+    static let blurStops = [Stop(location: 0, opacity: 1), Stop(location: 0.5, opacity: 1), Stop(location: 1, opacity: 0)]
+    /// The page's colour over the blur, light so the blurred content's colours show: 25% at the
+    /// edge, 10% at two fifths, clear at three quarters.
+    static let tintStops = [Stop(location: 0, opacity: 0.25), Stop(location: 0.4, opacity: 0.1), Stop(location: 0.75, opacity: 0)]
 }
 
 public extension View {
