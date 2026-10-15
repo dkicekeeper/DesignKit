@@ -56,6 +56,8 @@ public struct EmptyState: View {
     let actionTitle: String?
     let action: (() -> Void)?
     let style: Style
+    /// A picture in place of the icon (4.13.0).
+    let artwork: AnyView?
 
     public init(
         icon: String = "",
@@ -71,6 +73,33 @@ public struct EmptyState: View {
         self.actionTitle = actionTitle
         self.action = action
         self.style = style
+        self.artwork = nil
+    }
+
+    /// An empty state with any picture in place of the icon (4.13.0): an app's mascot, an
+    /// illustration. The standard style; the title, the description and the button stay as they
+    /// are. The picture keeps its own size.
+    ///
+    /// ```swift
+    /// EmptyState(title: "No goals yet", actionTitle: "New goal", action: add) {
+    ///     ParticleCreature(mood: .happy, speech: CreatureSpeech("Shall we save?"))
+    ///         .frame(width: 140, height: 140)
+    /// }
+    /// ```
+    public init<Artwork: View>(
+        title: String,
+        description: String? = nil,
+        actionTitle: String? = nil,
+        action: (() -> Void)? = nil,
+        @ViewBuilder artwork: () -> Artwork
+    ) {
+        self.icon = ""
+        self.title = title
+        self.description = description
+        self.actionTitle = actionTitle
+        self.action = action
+        self.style = .standard
+        self.artwork = AnyView(artwork())
     }
 
     public var body: some View {
@@ -88,14 +117,18 @@ public struct EmptyState: View {
 
     private var standardBody: some View {
         VStack(spacing: AppSpacing.lg) {
-            Icon(
-                source: .sfSymbol(icon.isEmpty ? "tray" : icon),
-                style: .emptyState()
-            )
-            // 2.3.0: SF Symbols 7 gradient, for depth.
-            .symbolColorRenderingMode(.gradient)
-            // 2.2.0: the symbol draws itself on (SF Symbols Draw).
-            .drawOnAppear(delay: 0.1)
+            if let artwork {
+                artwork
+            } else {
+                Icon(
+                    source: .sfSymbol(icon.isEmpty ? "tray" : icon),
+                    style: .emptyState()
+                )
+                // 2.3.0: SF Symbols 7 gradient, for depth.
+                .symbolColorRenderingMode(.gradient)
+                // 2.2.0: the symbol draws itself on (SF Symbols Draw).
+                .drawOnAppear(delay: 0.1)
+            }
 
             VStack(spacing: AppSpacing.sm) {
                 Text(title)

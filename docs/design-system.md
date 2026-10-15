@@ -1373,6 +1373,11 @@ EmptyState(
 |-------|---------|
 | `.standard` | Full-screen empty state (management views) |
 | `.compact` | Inside cards (home summary) |
+
+*(4.13.0)* `EmptyState(title:description:actionTitle:action:) { artwork }` puts any picture in
+place of the icon, in the standard style; the title, the description and the button stay as they
+are and the picture keeps its own size. Tenra's empty lists show its mascot there, saying a line
+and pointing down at the button (leave room over a creature for its words).
 | `.error` | Load failures (with pulse icon + retry) |
 
 #### `PromptSheet` *(1.5.0; 2.0.0 the one prompt and permission sheet)*
@@ -2317,7 +2322,9 @@ Tenra builds every entity detail screen this way (its `EntityDetailScaffold`).
 
 - Loading: the component's `<Name>Skeleton` in its place, never a `ProgressView()`; the content
   replaces it with `.transition(.skeletonReveal)` ([motion.md](motion.md)).
-- Empty: `EmptyState` (`.standard` on a screen, `.compact` in a card, `.error` for a failure).
+- Empty: `EmptyState` (`.standard` on a screen, `.compact` in a card, `.error` for a failure);
+  an app's own picture in place of the icon with `EmptyState(…) { artwork }` (4.13.0), as Tenra's
+  empty lists show its mascot pointing at the button.
 - A card that switches between empty and loaded animates the switch (§9, "Card State
   Transitions").
 
