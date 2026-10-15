@@ -8,7 +8,7 @@
 //  4.5.1: the tiles are one size in every shelf, whatever the count (they shrank with more items
 //  before); as many as fit the width stand in the row, the rest go into the "+N" tile, and the
 //  box is as wide and as tall as the row, up to the size it is given.
-//  4.14.0 (the owner's review on a device): the tiles are whole, 48 pt (36 pt before), and the
+//  4.15.0 (the owner's review on a device): the tiles are whole, 48 pt (36 pt before), and the
 //  shelf is 160 pt wide by default (120 pt before), four tiles; until then the box's lower edge
 //  cut them off as if they stood in a pocket. Offered less than its row, it shows fewer tiles,
 //  down to two, at its trailing edge: a `FinanceCard` gives its amount the room first.
@@ -25,7 +25,7 @@ import DesignTokens
 import DesignSupport
 
 enum PackedShelfMetrics {
-    /// A tile's side in every shelf (48 pt since 4.14.0, 36 pt in 4.5.1), less only in a box
+    /// A tile's side in every shelf (48 pt since 4.15.0, 36 pt in 4.5.1), less only in a box
     /// too small for one tile.
     static let side: CGFloat = 48
     /// How far a tile covers the one before it, in widths: when there is room, and the most
@@ -184,7 +184,7 @@ struct PackedShelf: View {
     var body: some View {
         let full = Self.box(items, maxVisible: maxVisible, in: size)
         let least = PackedShelfLayout.leastWidth(count: min(items.count, 2), in: size)
-        // As wide as its row when there is room; offered less (4.14.0: a card whose amount needs
+        // As wide as its row when there is room; offered less (4.15.0: a card whose amount needs
         // the room), fewer tiles, down to two, at the trailing edge.
         GeometryReader { proxy in
             row(in: CGSize(width: min(proxy.size.width, size.width), height: size.height))

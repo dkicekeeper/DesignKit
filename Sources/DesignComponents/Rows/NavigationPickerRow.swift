@@ -5,7 +5,8 @@
 //  A form row that opens a list to choose from (3.0.0): the title, the chosen value and a
 //  chevron; the list shows every option with a check by the chosen one, and a search field when
 //  there are many. For long lists a menu would make too tall (Dalada's fish species, the packing
-//  list to start from). A few options → `MenuPickerRow`.
+//  list to start from). A few options → `MenuPickerRow`. `style: .list` (4.14.0) is the same
+//  choice as a row of a `List`, as iOS Settings draws it (Tenra's voice language).
 //
 
 import SwiftUI
@@ -22,10 +23,21 @@ import DesignSupport
 ///
 /// Its skeleton is `UniversalRowSkeleton.menuPicker`: the same shape, a title and a value.
 public struct NavigationPickerRow<T: Hashable>: View {
+    /// Where the row lives.
+    public enum Style: Sendable {
+        /// A row of a form card (`FormSection`, `EditSheetContainer`): its own padding, a large
+        /// icon, the value and a chevron of its own.
+        case form
+        /// A row of a `List` (4.14.0): the settings row (`RowConfiguration.settings`), a
+        /// medium icon and the value in the small type; the list draws the chevron.
+        case list
+    }
+
     let icon: String?
     let title: String
     @Binding var selection: T
     let options: [(label: String, value: T)]
+    let style: Style
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -33,16 +45,19 @@ public struct NavigationPickerRow<T: Hashable>: View {
     ///   - icon: An SF Symbol before the title, in the accent; none by default.
     ///   - options: Shown in this order; more than `NavigationPickerMetrics.searchThreshold`
     ///     get a search field.
+    ///   - style: `.form` in a form card (the default), `.list` in a `List`.
     public init(
         icon: String? = nil,
         title: String,
         selection: Binding<T>,
-        options: [(label: String, value: T)]
+        options: [(label: String, value: T)],
+        style: Style = .form
     ) {
         self.icon = icon
         self.title = title
         self._selection = selection
         self.options = options
+        self.style = style
     }
 
     private var selectedLabel: String? {
@@ -50,10 +65,37 @@ public struct NavigationPickerRow<T: Hashable>: View {
     }
 
     private var leadingIcon: IconConfig? {
-        icon.map { .sfSymbol($0, color: AppColors.accent, size: AppIconSize.lg) }
+        icon.map { .sfSymbol($0, color: AppColors.accent, size: style == .list ? AppIconSize.md : AppIconSize.lg) }
     }
 
     public var body: some View {
+        switch style {
+        case .form: formRow
+        case .list: listRow
+        }
+    }
+
+    /// A row of a `List`: a plain NavigationLink, so the list adds its chevron.
+    private var listRow: some View {
+        NavigationLink {
+            NavigationPickerList(title: title, selection: $selection, options: options)
+        } label: {
+            UniversalRow(config: .settings, leadingIcon: leadingIcon, title: title) {
+                if let selectedLabel {
+                    Text(selectedLabel)
+                        .font(AppTypography.bodySmall)
+                        .foregroundStyle(AppColors.Text.secondary)
+                        .lineLimit(1)
+                }
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(title))
+        .accessibilityValue(Text(selectedLabel ?? ""))
+        .accessibilityAddTraits(.isButton)
+    }
+
+    private var formRow: some View {
         NavigationLink {
             NavigationPickerList(title: title, selection: $selection, options: options)
         } label: {

@@ -149,6 +149,22 @@ extension ComponentSnapshots {
                 .padding(.vertical, AppSpacing.md)
             )
         }
+
+        /// NavigationPickerRow(style: .list) (4.14.0): the row of a List, as in Settings.
+        @Test func navigationPickerRowList() async {
+            await assertComponentSnapshot(
+                NavigationStack {
+                    List {
+                        NavigationPickerRow(icon: "waveform", title: "Voice language", selection: .constant(""),
+                                            options: [(label: "App language", value: ""), (label: "English", value: "en-US")],
+                                            style: .list)
+                    }
+                    .toolbar(.hidden, for: .navigationBar)
+                }
+                .frame(height: 140),
+                appearances: [.light, .dark]
+            )
+        }
     }
 }
 

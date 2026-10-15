@@ -102,7 +102,7 @@ extension ComponentSnapshots {
 
         /// The shelf (4.4.0) and the orbit (a carousel since 4.7.0) with symbols: five items, the orbit showing
         /// four and a "+1", the shelf as many whole 48 pt tiles as fit its own 160 pt (three and a
-        /// "+2", 4.14.0). Drawn in their final state: the tiles coming up, the flight onto the
+        /// "+2", 4.15.0). Drawn in their final state: the tiles coming up, the flight onto the
         /// orbit, its turn and the light stand still in snapshots.
         @Test func packedCircleStyles() async {
             for (name, style) in [("shelf", PackedCircleIconsStyle.shelf), ("orbit", .orbit)] {
@@ -135,7 +135,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// The shelf (4.4.0) wide, four logos and no "+N": whole tiles at their 48 pt (4.14.0), a
+        /// The shelf (4.4.0) wide, four logos and no "+N": whole tiles at their 48 pt (4.15.0), a
         /// tenth over each other, the shelf as wide as its row.
         @Test func packedShelfWide() async {
             await assertComponentSnapshot(
@@ -150,7 +150,7 @@ extension ComponentSnapshots {
 
         /// Logos as the shelf's tiles and as the carousel's coins, in a FinanceCard on Liquid Glass
         /// as on Tenra's home: six items, the shelf's three whole tiles and a "+3" at the card's
-        /// trailing edge (4.14.0). One glass card per snapshot.
+        /// trailing edge (4.15.0). One glass card per snapshot.
         @Test func packedCircleStyleLogos() async {
             for (name, style) in [("shelf", PackedCircleIconsStyle.shelf), ("orbit", .orbit)] {
                 await assertComponentSnapshot(
@@ -171,7 +171,7 @@ extension ComponentSnapshots {
             }
         }
 
-        /// The shelf beside a long amount, as on Tenra's Loans card (4.14.0): the 9-million amount
+        /// The shelf beside a long amount, as on Tenra's Loans card (4.15.0): the 9-million amount
         /// keeps its decimals and its line, and the shelf shows three tiles in what is left.
         @Test func packedShelfBesideLongAmount() async {
             await assertComponentSnapshot(

@@ -15,7 +15,7 @@
 //  fan, whose cards behind the top one barely showed; `.fan` is deprecated and draws the shelf.
 //  4.5.1: the shelf's tiles are 36 pt whatever the count; the largest that fit the width show,
 //  the rest go into "+N", and the shelf is as wide as its row.
-//  4.14.0: the shelf's tiles are whole (no pocket) and 48 pt, and every style is 160 pt wide
+//  4.15.0: the shelf's tiles are whole (no pocket) and 48 pt, and every style is 160 pt wide
 //  unless given a width (120 pt before): four tiles, coins of 48 pt, more room for the marbles.
 //
 
@@ -49,11 +49,11 @@ public enum PackedCircleIconsStyle: Sendable {
     case glossy
     /// The look before 2.9.0: a symbol on a pale disc of its colour, a logo edge to edge.
     case flat
-    /// App icons standing in a row (4.4.0): square tiles of one size (48 pt since 4.14.0, 36 pt
-    /// in 4.5.1), whole (4.14.0; a pocket cut them off before), the largest amount on the left,
+    /// App icons standing in a row (4.4.0): square tiles of one size (48 pt since 4.15.0, 36 pt
+    /// in 4.5.1), whole (4.15.0; a pocket cut them off before), the largest amount on the left,
     /// each a little over the one before and turned a few degrees, so every one reads. As many
     /// as fit the width show (at most `maxVisible`), the rest in a "+N" tile, and the shelf is
-    /// as wide as its row (4.5.1), 160 pt at most by default (4.14.0): four tiles. A
+    /// as wide as its row (4.5.1), 160 pt at most by default (4.15.0): four tiles. A
     /// logo fills its tile. They come up one after another, and every few seconds a light runs
     /// across them (not under Reduce Motion).
     case shelf
@@ -99,7 +99,7 @@ public struct PackedCircleIcons: View {
     let style: PackedCircleIconsStyle
 
     /// - Parameters:
-    ///   - containerWidth: The most room it takes across, 160 pt by default (4.14.0; 120 pt
+    ///   - containerWidth: The most room it takes across, 160 pt by default (4.15.0; 120 pt
     ///     before): the shelf's four 48 pt tiles, the carousel's 48 pt coins.
     ///   - style: `.glossy` (2.9.0), `.flat` (the look before), `.shelf` or `.orbit`.
     public init(
@@ -548,13 +548,13 @@ private struct MarbleSway: ViewModifier {
 
 /// Placeholder of a `PackedCircleIcons` in its style: a few circles of falling sizes packed in
 /// the same box; for `.shelf` (4.4.0; and the deprecated `.fan`) four grey tiles in a row, whole
-/// since 4.14.0, for `.orbit` grey coins on the carousel's ring (4.7.0; 3.3.0: a grey middle
+/// since 4.15.0, for `.orbit` grey coins on the carousel's ring (4.7.0; 3.3.0: a grey middle
 /// circle with three on its orbit).
 public struct PackedCircleIconsSkeleton: View {
     let containerWidth: CGFloat
     let style: PackedCircleIconsStyle
 
-    /// - Parameter containerWidth: As the component's, 160 pt by default (4.14.0; 120 pt before).
+    /// - Parameter containerWidth: As the component's, 160 pt by default (4.15.0; 120 pt before).
     public init(containerWidth: CGFloat = 160, style: PackedCircleIconsStyle = .glossy) {
         self.containerWidth = containerWidth
         self.style = style

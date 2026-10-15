@@ -388,9 +388,9 @@ private struct PackedCircleIconsPage: View {
             apps: [.tenra],
             notes: [
                 "glossy: marbles packed without overlap; they burst out of the middle and sway. 3.3.0: a softer gloss.",
-                "shelf (4.4.0): app icons in a row, the largest amount on the left, each a little over the one before; every one reads. Whole 48 pt tiles, four in the default 160 pt (4.14.0; a pocket cut them off before). They come up one after another; a light runs across them every few seconds. A logo fills its tile. As tall as its row (choosing it shows it in a card at 160 pt, as on Tenra\u{2019}s home). It replaced 3.3.0\u{2019}s fan of cards (.fan is deprecated and draws the shelf).",
+                "shelf (4.4.0): app icons in a row, the largest amount on the left, each a little over the one before; every one reads. Whole 48 pt tiles, four in the default 160 pt (4.15.0; a pocket cut them off before). They come up one after another; a light runs across them every few seconds. A logo fills its tile. As tall as its row (choosing it shows it in a card at 160 pt, as on Tenra\u{2019}s home). It replaced 3.3.0\u{2019}s fan of cards (.fan is deprecated and draws the shelf).",
                 "orbit (4.7.0): a carousel of coins of one size, the largest amount in front, on a ring that turns once in 24 s; the far coins smaller and out of focus, each turning its face to its side and showing its rim. Swipe to spin it, with inertia and a tick per coin. Reads from about 240 pt wide (choosing it sets 300 pt and six). Before 4.7.0: a marble in the middle with the rest on a tilted orbit.",
-                "Every style is 160 pt wide by default (4.14.0; 120 pt before). Items past Visible fold into a \u{201C}+N\u{201D} circle or tile. Under Reduce Motion everything stands still.",
+                "Every style is 160 pt wide by default (4.15.0; 120 pt before). Items past Visible fold into a \u{201C}+N\u{201D} circle or tile. Under Reduce Motion everything stands still.",
             ],
             styles: ["glossy", "flat", "shelf", "orbit"]
         ) {
@@ -413,7 +413,7 @@ private struct PackedCircleIconsPage: View {
             SliderControl("Width", value: $width, in: 80...300, step: 10) { "\(Int($0)) pt" }
         }
         .onChange(of: style) { _, style in
-            // The shelf as on Tenra's home (4.14.0): in a card, at its own 160 pt and five.
+            // The shelf as on Tenra's home (4.15.0): in a card, at its own 160 pt and five.
             if style == .shelf {
                 width = 160
                 maxVisible = 5

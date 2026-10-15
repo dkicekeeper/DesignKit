@@ -9,7 +9,7 @@
 //  swap, padding and glass styling.
 //  4.5.0: the trailing icons stand in the middle of the card's height, not at its top
 //  (`PackedCircleIcons(style: .shelf)` is a short row).
-//  4.14.0: the amount comes first: the title, the hero and the subtitle keep the width they need,
+//  4.15.0: the amount comes first: the title, the hero and the subtitle keep the width they need,
 //  and the trailing view takes what is left, at the trailing edge (the shelf shows fewer tiles
 //  there rather than the amount shortening to "9.1M").
 //
@@ -66,7 +66,7 @@ public struct FinanceCard<Hero: View, Trailing: View>: View {
                     .transition(.opacity)
                 }
             }
-            // The amount first (4.14.0): it keeps its width, the trailing view gets the rest.
+            // The amount first (4.15.0): it keeps its width, the trailing view gets the rest.
             .layoutPriority(1)
 
             if !isEmpty {

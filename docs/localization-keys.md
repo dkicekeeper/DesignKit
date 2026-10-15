@@ -23,9 +23,10 @@ text, not keys. A new key goes there as well.
 | `bulk.deleteCount` | the apps' bulk-delete `DSButton` title (BulkDeleteButton's until 3.0.0 removed it) | — |
 | `button.apply` | DateRangePickerSheet (Apply) | `Apply` |
 | `button.cancel` | EditSheetContainer, ImportProgressSheet | — |
+| `button.close` | AmountEntrySheet (the close button, VoiceOver) | `Close` |
 | `button.copy` | AnimatedInputComponents | — |
 | `button.paste` | AnimatedInputComponents | — |
-| `button.save` | EditSheetContainer | — |
+| `button.save` | EditSheetContainer, AmountEntrySheet (VoiceOver) | — |
 | `calculator.add` | CalculatorKeypad | `Plus` |
 | `calculator.backspace` | CalculatorKeypad | `Delete` |
 | `calculator.clearHint` | CalculatorKeypad | `Press and hold to clear` |
@@ -45,6 +46,8 @@ text, not keys. A new key goes there as well.
 | `common.changeIcon` | EditableHero (VoiceOver on the icon) | `Change icon` |
 | `common.close` | PhotoViewer (default `closeTitle`), ShareCardSheet (the close button) | `Close` |
 | `common.color` | ColorPickerRow | — |
+| `common.hide` | NoticeCard (the hide button's VoiceOver name, default `hideLabel`) | `Hide` |
+| `common.locked` | PickerCarousel (a closed option, VoiceOver; default `lockedLabel`) | `Locked` |
 | `common.retry` | PendingItemCard (Retry, 3.6.0), LoadMoreFooter (4.1.0), MessageBubble (a message not sent, 4.6.0) | `Retry` |
 | `common.select` | DateButtons | — |
 | `common.startDate` | DatePickerRow | — |
@@ -54,6 +57,7 @@ text, not keys. A new key goes there as well.
 | `currency.all` | CurrencyList | `All Currencies` |
 | `currency.conversion.approximate` | CurrencyAmountInput | `≈` |
 | `currency.customizeAction` | CurrencyPickerMenu (with `onCustomize`) | `Customize…` |
+| `currency.error.conversionFailed` | AmountEntrySheet (no rate for the typed currency) | `Currency conversion failed. Please check your internet connection.` |
 | `currency.noResults.description` | CurrencyList (search found nothing) | `Try a different name or code.` |
 | `currency.noResults.title` | CurrencyList (search found nothing) | `No currencies found` |
 | `currency.popular` | CurrencyList | `Popular` |
@@ -108,6 +112,8 @@ text, not keys. A new key goes there as well.
 | `loadMore.failed` | LoadMoreFooter (`.failed` without a message, 4.1.0) | `Couldn’t load more` |
 | `menu.close` | GlassActionMenu (VoiceOver on the open menu's button) | `Close` |
 | `menu.open` | GlassActionMenu (VoiceOver on the closed button) | `Actions` |
+| `moneyEntry.invalidAmount` | AmountEntrySheet (Save with no amount) | `Enter an amount` |
+| `moneyEntry.notePlaceholder` | AmountEntrySheet (default `notePlaceholder`) | `Note` |
 | `notification.permission.allow` | NotificationPermissionPrompt | — |
 | `notification.permission.description` | NotificationPermissionPrompt | — |
 | `notification.permission.skip` | NotificationPermissionPrompt | — |

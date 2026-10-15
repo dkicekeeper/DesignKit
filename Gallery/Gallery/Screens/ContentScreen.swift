@@ -29,6 +29,7 @@ struct ContentScreen: View {
         EditableHeroPage()
         ArticleBodyPage()
         MessageBubblePage()
+        ListCardPage()
     }
 }
 
@@ -328,6 +329,47 @@ private struct ArticleBodyPage: View {
             }
         } controls: {
             StateControl(state: $state)
+        }
+    }
+}
+
+private struct ListCardPage: View {
+    @State private var showsTitle = true
+    @State private var rows = 3
+    @State private var state: SpecimenState = .content
+
+    private let samples: [(String, String, String)] = [
+        ("Coffee House", "Cafés · 08:40", "cup.and.saucer.fill"),
+        ("Magnum", "Groceries · 12:15", "cart.fill"),
+        ("Yandex Go", "Taxi · 19:02", "car.fill"),
+        ("Kaspi", "Transfer · 21:30", "arrow.left.arrow.right"),
+    ]
+
+    var body: some View {
+        ComponentPage(
+            name: "ListCard",
+            summary: "A card of rows under an optional section title: a short list in a reply or on a screen.",
+            since: "4.14.0",
+            apps: [.tenra],
+            canvas: .fill,
+            notes: [
+                "Rows pad themselves vertically (§10); the card pads them on every side.",
+                "A notice to the person is NoticeCard, which sits on a ListCard.",
+            ]
+        ) {
+            if state == .loading {
+                ListCardSkeleton(showsTitle: showsTitle, rows: rows)
+            } else {
+                ListCard(title: showsTitle ? "Payments" : nil) {
+                    ForEach(Array(samples.prefix(rows).enumerated()), id: \.offset) { _, sample in
+                        ItemRow(sample.0, meta: [MetaLine([.text(sample.1)])], leading: .symbol(sample.2))
+                    }
+                }
+            }
+        } controls: {
+            StateControl(state: $state)
+            ToggleControl("Title", isOn: $showsTitle)
+            StepperControl("Rows", value: $rows, in: 1...4)
         }
     }
 }
