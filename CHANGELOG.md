@@ -16,6 +16,43 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 4.15.0 - 2026-10-15
+
+`PackedCircleIcons` is larger and the shelf's app icons stand whole, after the owner's review on
+a device. [#74](https://github.com/dkicekeeper/DesignKit/pull/74)
+
+### Changed
+
+- `PackedCircleIcons` and `PackedCircleIconsSkeleton` are 160 pt wide by default
+  (`containerWidth`, 120 pt before), in every style. A width given as before is kept.
+- `style: .shelf`: the tiles are whole and 48 pt (36 pt before); the box's lower edge no longer
+  cuts them off as a pocket, and they no longer darken at the bottom. Four tiles fit the default
+  160 pt: three items and a "+N" when there are more. The row is 61 pt tall (34 pt before).
+- `style: .shelf`: offered less than its row, it shows fewer tiles (down to two) at its trailing
+  edge, the tiles staying 48 pt.
+- `FinanceCard`: the amount comes first. The title, the hero and the subtitle keep the width
+  they need, and the trailing view takes the rest at the card's trailing edge, so a long amount
+  beside a shelf stays whole (a 9-million amount with its decimals showed as "9.1M" on a 393 pt
+  phone beside a 160 pt shelf) and the shelf shows three tiles there.
+- `style: .shelf`: the tiles come up one after another from a little lower, growing and fading
+  in, in place of rising out of the pocket. The light that runs across them is unchanged.
+- `style: .orbit`: the coins are 48 pt in the default width (36 pt before).
+- `style: .glossy` and `.flat`: the marbles keep their sizes (28 to 56 pt by amount) and have
+  more room, so fewer shrink to fit.
+- `PackedCircleIconsSkeleton(style: .shelf)`: four whole grey tiles.
+
+### Migration
+
+- Nothing to change: a `PackedCircleIcons` with no `containerWidth` takes the new size. To keep
+  the old one, pass `containerWidth: 120` (two 48 pt tiles fit a shelf there).
+
+### Gallery and tooling
+
+- Gallery: the PackedCircleIcons page starts at 160 pt; choosing Shelf shows it in a card at
+  160 pt, as on Tenra's home.
+- Snapshot tests: the PackedCircleIcons references re-recorded; `packedShelfBesideLongAmount` (a
+  9-million amount beside the shelf in a `FinanceCard`).
+
 ## 4.14.0 - 2026-10-15
 
 The last generic views Tenra drew itself come to DesignKit (the owner's decision after Tenra's

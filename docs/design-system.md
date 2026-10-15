@@ -683,6 +683,7 @@ FinanceCard(
 - **`RedactableAmount`** — hero amount that shows a redacted placeholder while an async (FX) total computes, then cross-fades. Use for cards whose total needs conversion (accounts, deposits, subscriptions).
 - Don't reintroduce the inline `HStack(.top, md) → VStack(.leading, lg) → title → if isEmpty …` shell in a new finance card — wrap `FinanceCard`.
 - *(4.5.0)* The trailing icons stand in the middle of the card's height (`HStack(alignment: .center)`), so a short `PackedCircleIcons(style: .shelf)` row sits beside the amount, not beside the title.
+- *(4.15.0)* The amount comes first: the title, the hero and the subtitle take the width they need (`layoutPriority(1)`), and the trailing view the rest, at the trailing edge. A shelf there shows fewer tiles (down to two) rather than the amount shortening to "9.1M ₸" on a 393 pt phone; a view of a fixed width (the marbles, the orbit) keeps it, and the amount shortens as before.
 
 #### Hero background *(4.5.0)*
 
@@ -699,22 +700,27 @@ In dark mode `\.heroTone` inside it is `.onColor`, and DesignKit's hero pieces d
   is the look before: a symbol on a pale disc of its tint, a logo edge to edge with a thin ring of
   the background. 3.3.0: the gloss is softer (highlight 0.62, rim 0.42, coloured shadow 0.38, from
   0.9 / 0.7 / 0.5; `MarbleGlossMetrics`), and two more styles share the box and the "+N":
-  - **`style: .shelf`** *(4.4.0)*: app icons standing in a row in a pocket. Square tiles of one
-    size (corner 0.225 of the side), the largest amount on the left, the rest by amount, "+N"
-    last; each tile stands over the one on its left and covers a tenth of it, turned a few
-    degrees (−6°, 4°, −3°, 5°, …) and lifted a little, never two alike side by side. The box's
-    lower edge is the pocket: it cuts the tiles off flat with 0.74 of each above it, and they
-    darken a little where they go in. *(4.5.1)* The tiles are 36 pt in every shelf, whatever
-    the count (less only in a box too small for one); before, they shrank as the count grew, so
-    a card with six items drew tiny tiles beside one with three. As many as fit the width stand
-    in the row, closing up to 0.36 over each other to fit one more (four in the default 120 pt):
-    the largest amounts, at most `maxVisible`, the rest in the "+N" tile. The shelf is as wide
-    and as tall as its row, so in a card's trailing slot it stands at the trailing edge. A logo fills
-    its tile, as an app icon does (white behind a logo that does not fill its square); a symbol
-    is white on a tile of its tint, lit from the upper left; "+N" is a grey tile. A light catches
-    each tile's upper edge, and each casts a shadow on the one to its left. The tiles rise out of
-    the pocket one after another (a spring, 70 ms apart); a second later a light (`.shine`) runs
-    across them from the left, tile after tile, and again every 4.5 s. It replaced 3.3.0's
+  - **`style: .shelf`** *(4.4.0)*: app icons standing in a row. Square tiles of one size
+    (corner 0.225 of the side), the largest amount on the left, the rest by amount, "+N" last;
+    each tile stands over the one on its left and covers a tenth of it, turned a few degrees
+    (−6°, 4°, −3°, 5°, …) and lifted a little, never two alike side by side. *(4.15.0, the
+    owner's review on a device)* The tiles are whole and 48 pt, and the shelf is 160 pt wide
+    by default, as every style is now (`containerWidth`, 120 pt before); until then the box's
+    lower edge was a pocket that cut them off with 0.74 of each above it, at 36 pt in 120 pt.
+    *(4.5.1)* The tiles are one size in every shelf, whatever the count (less only in a box too
+    small for one); before, they shrank as the count grew, so a card with six items drew tiny
+    tiles beside one with three. As many as fit the width stand in the row, closing up to 0.36
+    over each other to fit one more (four in the default 160 pt): the largest amounts, at most
+    `maxVisible`, the rest in the "+N" tile. The shelf is as wide and as tall as its row (61 pt),
+    so in a card's trailing slot it stands at the trailing edge. *(4.15.0)* Offered less than
+    its row (a `FinanceCard` gives its amount the room first), it shows fewer tiles, down to two,
+    at its trailing edge; its tiles stay 48 pt. A logo fills its tile, as an app
+    icon does (white behind a logo that does not fill its square); a symbol is white on a tile of
+    its tint, lit from the upper left; "+N" is a grey tile. A light catches each tile's upper
+    edge, and each casts a shadow on the one to its left. The tiles come up one after another
+    (a spring, 70 ms apart, each from 0.3 of its side lower, at 0.9 of its size and clear); a
+    second later a light (`.shine`) runs across them from the left, tile after tile, and again
+    every 4.5 s. It replaced 3.3.0's
     `.fan` (playing cards along an arc, where the cards behind the top one barely showed):
     `.fan` is deprecated and draws the shelf.
   - **`style: .orbit`** *(4.7.0, from an owner's reference)*: a carousel of coins. Coins of one
@@ -731,13 +737,16 @@ In dark mode `\.heroTone` inside it is `.onColor`, and DesignKit's hero pieces d
     across spins the ring (up and down is left to a scroll view), it coasts with the fling's
     speed and settles back to its pace in about a second, with a tick (`HapticCue.tick`) as each
     coin passes the front. The coins come in one after another. Under Reduce Motion it stands
-    still and a swipe turns it without the coast. Reads from about 240 pt wide.
+    still and a swipe turns it without the coast. Reads from about 240 pt wide; in the default
+    160 pt *(4.15.0; 120 pt before)* the coins are 48 pt (36 pt before).
     *(Before 4.7.0:)* the largest amount as a marble in the middle (0.42 of the box's shorter
     side), the rest as smaller marbles on an orbit seen at a slant (flatness 0.4, tilted −12°),
     with its faint line. The orbit turned once in 28 s; a marble on the far side was
     smaller (0.72) and darker and passed behind the middle one, a near one in front. The marbles
     flew out of the middle onto it, then the turn started.
 
+  Every style takes 160 pt across by default *(4.15.0; 120 pt before)* and 100 pt down; the
+  marbles keep their sizes (28 to 56 pt by amount) and have more room, so fewer shrink to fit.
   The deal, the flight, the light and the turn stand still under Reduce Motion, while the system
   saves resources and under `.designKitMotion(false)`, which draws the final picture.
   `PackedCircleIconsSkeleton(containerWidth:style:)` draws grey circles, tiles on the shelf or grey coins on the carousel's ring.
