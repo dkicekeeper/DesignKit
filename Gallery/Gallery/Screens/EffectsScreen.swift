@@ -38,6 +38,7 @@ struct EffectsScreen: View {
         AccentGlowPage()
         BorderBeamPage()
         HeroBackgroundPage()
+        EdgeBackdropPage()
     }
 }
 
@@ -450,6 +451,52 @@ private struct BorderBeamPage: View {
             ToggleControl("Glow", isOn: $glow)
             StepperControl("Comets", value: $beams, in: 1...2)
             SliderControl("Revolution", value: $duration, in: 1.5...6, step: 0.5) { "\($0.formatted(.number.precision(.fractionLength(1)))) s" }
+        }
+    }
+}
+
+private struct EdgeBackdropPage: View {
+    @State private var bottom = false
+
+    private let rows = ["How much did I spend on cafés?", "Groceries went up 12% this month.", "Your next payment is the internet, tomorrow.",
+                        "You put 50 000 ₸ towards the car.", "The savings rate is 18%.", "Taxi: 14 trips, 42 000 ₸.",
+                        "Coffee House is your most frequent place.", "Spending is below last month."]
+
+    var body: some View {
+        ComponentPage(
+            name: "EdgeBackdrop",
+            summary: "A bar's backing over scrolling content: the content blurs and the page's colour lies over it, strongest at the screen's edge and fading out towards the content.",
+            since: "4.13.0",
+            apps: [.tenra],
+            canvas: .tall(minHeight: 360),
+            notes: [
+                "For a bar the system's scroll edge effect is too faint to carry (a large header over a chat).",
+                "Put it behind the bar's content with .edgeBackdrop(edge); it reaches to the screen's edge, takes no touches, and VoiceOver skips it.",
+            ]
+        ) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    ForEach(rows, id: \.self) { row in
+                        Text(row)
+                            .font(AppTypography.body)
+                            .padding(AppSpacing.md)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(AppColors.accent.opacity(0.15), in: .rect(cornerRadius: AppRadius.lg))
+                    }
+                }
+                .padding(AppSpacing.md)
+            }
+            .safeAreaBar(edge: bottom ? .bottom : .top) {
+                ParticleCreature(mood: .happy, style: .compact)
+                    .frame(width: AppIconSize.Tile.xxxl, height: AppIconSize.Tile.xxxl)
+                    .padding(.vertical, AppSpacing.lg)
+                    .frame(maxWidth: .infinity)
+                    .edgeBackdrop(bottom ? .bottom : .top)
+            }
+            .frame(height: 340)
+            .clipShape(.rect(cornerRadius: AppRadius.lg))
+        } controls: {
+            ToggleControl("Bottom edge", isOn: $bottom)
         }
     }
 }

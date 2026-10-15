@@ -2299,6 +2299,17 @@ EntityDetailScaffold(... hero: { HeroSection(icon: liveCategory.iconSource, ...)
 
 Used in: `OnboardingWelcomeStep` (bottom), Account/Category/Subscription/Deposit/Loan detail views (top).
 
+#### `EdgeBackdrop`, `.edgeBackdrop(_:color:)` *(4.13.0)*
+The backing of a bar over scrolling content, drawn by hand where the system's scroll edge effect
+is too faint to carry a large bar: a `.thinMaterial` blur over the half nearest the screen's edge
+fading out by four fifths, an `.ultraThinMaterial` blur fading out at the inner edge (SwiftUI has
+no blur of varying radius, so it comes in these two steps), and the page's colour over them, 85%
+at the edge, 55% half way, clear at the inner edge (`EdgeBackdropMetrics`). It reaches past the
+safe area to the screen's edge, takes no touches and is hidden from VoiceOver. Put it behind the
+bar's content: `.safeAreaBar(edge: .top) { header.frame(maxWidth: .infinity).edgeBackdrop() }`.
+`color:` is the page's colour (`AppColors.bgBase` by default). Tenra: the chat's bar, Ten 120 pt
+over the thread.
+
 ---
 
 ## 4. View Patterns
@@ -2465,6 +2476,9 @@ Grouping form rows?
 
 Horizontal scroll?
 └── UniversalCarousel with appropriate preset
+
+A bar over scrolling content that needs a stronger backing than the scroll edge effect?
+└── .edgeBackdrop(edge) behind the bar's content (4.13.0)
 
 Card-style container?
 ├── Rows under an optional title → ListCard (4.13.0)

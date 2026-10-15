@@ -220,5 +220,29 @@ extension ComponentSnapshots {
                 appearances: [.light, .dark]
             )
         }
+
+        /// EdgeBackdrop (4.13.0): rows under a top bar's backing, blurred and covered by the
+        /// page's colour near the edge, clear further down.
+        @Test func edgeBackdrop() async {
+            await assertComponentSnapshot(
+                ZStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                        ForEach(0..<6, id: \.self) { index in
+                            Text("Row \(index + 1): groceries, 12 400 ₸")
+                                .font(AppTypography.body)
+                                .padding(AppSpacing.md)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(AppColors.accent.opacity(0.2), in: .rect(cornerRadius: AppRadius.lg))
+                        }
+                    }
+                    Color.clear
+                        .frame(height: 160)
+                        .frame(maxWidth: .infinity)
+                        .edgeBackdrop(.top)
+                }
+                .clipShape(.rect(cornerRadius: AppRadius.lg)),
+                appearances: [.light, .dark]
+            )
+        }
     }
 }

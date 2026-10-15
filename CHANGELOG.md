@@ -20,7 +20,8 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 
 The last generic views Tenra drew itself come to DesignKit (the owner's decision after Tenra's
 design-system audit): a money entry sheet, a card of rows, a notice, the voice stop orb, a
-carousel of options to try on, and `NavigationPickerRow` for a `List`. Pixel-identical ports; the
+carousel of options to try on, and `NavigationPickerRow` for a `List`; and a bar's backing over
+scrolling content (`EdgeBackdrop`). Pixel-identical ports; the
 models stay in Tenra as thin adapters.
 [#72](https://github.com/dkicekeeper/DesignKit/pull/72)
 
@@ -44,6 +45,10 @@ models stay in Tenra as thin adapters.
   still. From Tenra's wardrobe for its assistant.
 - `NavigationPickerRow(style:)` with `.form` (the default, as before) and `.list`: the row of a
   `List`, as iOS Settings draws it.
+- `EdgeBackdrop(edge:color:)`, `.edgeBackdrop(_:color:)` and `EdgeBackdropMetrics`: the backing of
+  a bar over scrolling content, blur in two steps and the page's colour, strongest at the
+  screen's edge and fading out towards the content. For bars the system's scroll edge effect is
+  too faint to carry (Tenra's chat, Ten over the thread).
 - Strings: `button.close`, `common.hide`, `common.locked`, `currency.error.conversionFailed`,
   `moneyEntry.invalidAmount`, `moneyEntry.notePlaceholder` (all with English defaults).
 
@@ -63,10 +68,10 @@ NavigationPickerRow(icon: "waveform", title: title, selection: $language, option
 ### Gallery and tooling
 
 - Gallery: pages for `AmountEntrySheet` (Sheets), `ListCard` (Content), `NoticeCard` (Status),
-  `VoiceOrbButton` (Actions), `PickerCarousel` (Selection), and a style control on
-  `NavigationPickerRow`'s page.
+  `VoiceOrbButton` (Actions), `PickerCarousel` (Selection), `EdgeBackdrop` (Effects), and a
+  style control on `NavigationPickerRow`'s page.
 - Snapshot tests: `noticeCards`, `listCards`, `voiceOrbButton`, `pickerCarousel`,
-  `navigationPickerRowList`, `portedViewSkeletons`. `AmountEntrySheet` has none: its date
+  `navigationPickerRowList`, `portedViewSkeletons`, `edgeBackdrop`. `AmountEntrySheet` has none: its date
   buttons show today's date.
 
 ## 4.12.0 - 2026-10-15
