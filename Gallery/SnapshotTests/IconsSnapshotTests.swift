@@ -101,8 +101,8 @@ extension ComponentSnapshots {
         }
 
         /// The shelf (4.4.0) and the orbit (a carousel since 4.7.0) with symbols: five items, the orbit showing
-        /// four and a "+1", the shelf as many 36 pt tiles as fit its 120 pt (three and a "+2",
-        /// 4.5.1). Drawn in their final state: the rise out of the pocket, the flight onto the
+        /// four and a "+1", the shelf as many whole 48 pt tiles as fit its own 160 pt (three and a
+        /// "+2", 4.14.0). Drawn in their final state: the tiles coming up, the flight onto the
         /// orbit, its turn and the light stand still in snapshots.
         @Test func packedCircleStyles() async {
             for (name, style) in [("shelf", PackedCircleIconsStyle.shelf), ("orbit", .orbit)] {
@@ -135,7 +135,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// The shelf (4.4.0) wide, four logos and no "+N": the tiles at their 36 pt (4.5.1), a
+        /// The shelf (4.4.0) wide, four logos and no "+N": whole tiles at their 48 pt (4.14.0), a
         /// tenth over each other, the shelf as wide as its row.
         @Test func packedShelfWide() async {
             await assertComponentSnapshot(
@@ -149,8 +149,8 @@ extension ComponentSnapshots {
         }
 
         /// Logos as the shelf's tiles and as the carousel's coins, in a FinanceCard on Liquid Glass
-        /// as on Tenra's home: six items, the shelf's three tiles and a "+3" at the card's
-        /// trailing edge (4.5.1). One glass card per snapshot.
+        /// as on Tenra's home: six items, the shelf's three whole tiles and a "+3" at the card's
+        /// trailing edge (4.14.0). One glass card per snapshot.
         @Test func packedCircleStyleLogos() async {
             for (name, style) in [("shelf", PackedCircleIconsStyle.shelf), ("orbit", .orbit)] {
                 await assertComponentSnapshot(
@@ -169,6 +169,24 @@ extension ComponentSnapshots {
                     named: name
                 )
             }
+        }
+
+        /// The shelf at its own 160 pt beside a long amount, as on Tenra's Loans card (4.14.0): a
+        /// 9-million amount with its decimals keeps its line beside four whole tiles.
+        @Test func packedShelfBesideLongAmount() async {
+            await assertComponentSnapshot(
+                FinanceCard(title: "Loans", isEmpty: false, emptyTitle: "", subtitle: "14 active") {
+                    RedactableAmount(amount: 8_742_615.30, currency: "KZT", isLoading: false)
+                } trailing: {
+                    PackedCircleIcons(items: [
+                        PackedCircleItem(id: "1", iconSource: .sfSymbol("car.fill"), amount: 5_200_000, tint: AppColors.accent),
+                        PackedCircleItem(id: "2", iconSource: .sfSymbol("house.fill"), amount: 2_400_000, tint: AppColors.success),
+                        PackedCircleItem(id: "3", iconSource: .sfSymbol("iphone"), amount: 800_000, tint: AppColors.warning),
+                        PackedCircleItem(id: "4", iconSource: .sfSymbol("tv.fill"), amount: 400_000, tint: .purple),
+                        PackedCircleItem(id: "5", iconSource: .sfSymbol("laptopcomputer"), amount: 300_000, tint: .teal),
+                    ], style: .shelf)
+                }
+            )
         }
     }
 }

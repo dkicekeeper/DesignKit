@@ -15,6 +15,8 @@
 //  fan, whose cards behind the top one barely showed; `.fan` is deprecated and draws the shelf.
 //  4.5.1: the shelf's tiles are 36 pt whatever the count; the largest that fit the width show,
 //  the rest go into "+N", and the shelf is as wide as its row.
+//  4.14.0: the shelf's tiles are whole (no pocket) and 48 pt; with no width given, each style
+//  takes its own (160 pt for the shelf, 120 pt for the others, as before).
 //
 
 import SwiftUI
@@ -47,12 +49,13 @@ public enum PackedCircleIconsStyle: Sendable {
     case glossy
     /// The look before 2.9.0: a symbol on a pale disc of its colour, a logo edge to edge.
     case flat
-    /// App icons standing in a row in a pocket (4.4.0): square tiles of one size (36 pt in every
-    /// shelf since 4.5.1), the largest amount on the left, each a little over the one before and
-    /// turned a few degrees, cut off flat by the box's lower edge so every one reads. As many as
-    /// fit the width show (at most `maxVisible`), the rest in a "+N" tile, and the shelf is as
-    /// wide as its row (4.5.1). A logo fills its tile. They rise out of the pocket one after
-    /// another, and every few seconds a light runs across them (not under Reduce Motion).
+    /// App icons standing in a row (4.4.0): square tiles of one size (48 pt since 4.14.0, 36 pt
+    /// in 4.5.1), whole (4.14.0; a pocket cut them off before), the largest amount on the left,
+    /// each a little over the one before and turned a few degrees, so every one reads. As many
+    /// as fit the width show (at most `maxVisible`), the rest in a "+N" tile, and the shelf is
+    /// as wide as its row (4.5.1), 160 pt at most unless given a width (4.14.0): four tiles. A
+    /// logo fills its tile. They come up one after another, and every few seconds a light runs
+    /// across them (not under Reduce Motion).
     case shelf
     /// 3.3.0's playing cards fanned along an arc. Since 4.4.0 it draws the shelf.
     @available(*, deprecated, message: "The fan became the shelf in 4.4.0: app icons in a row in a pocket, every one readable. Use .shelf.")
@@ -75,6 +78,16 @@ enum PackedCircleMetrics {
     /// Where each marble starts its sway, so they never move together.
     static let swayPhase: Double = 0.9
 
+    /// The width a style takes when it is given none (4.14.0): the shelf's four tiles, 120 pt
+    /// for the others (every style's width before).
+    static func width(for style: PackedCircleIconsStyle) -> CGFloat {
+        switch style {
+        case .glossy, .flat, .orbit: 120
+        // `.shelf`, and the deprecated `.fan` (not named, so the package builds clean).
+        default: PackedShelfMetrics.width
+        }
+    }
+
     /// Room around a white symbol inside its circle. Icon's default curve gives ~10% on the
     /// 28-44pt bracket, which at these small diameters reads as no padding at all; the curve
     /// is bumped so a symbol always has visible breathing room inside its circle.
@@ -92,19 +105,22 @@ enum PackedCircleMetrics {
 public struct PackedCircleIcons: View {
     let items: [PackedCircleItem]
     var maxVisible: Int = 5
-    var containerWidth: CGFloat = 120
+    let containerWidth: CGFloat
     let style: PackedCircleIconsStyle
 
-    /// - Parameter style: `.glossy` (2.9.0) or `.flat` (the look before).
+    /// - Parameters:
+    ///   - containerWidth: The most room it takes across; `nil`, the style's own (4.14.0):
+    ///     160 pt for `.shelf`, 120 pt for the others.
+    ///   - style: `.glossy` (2.9.0), `.flat` (the look before), `.shelf` or `.orbit`.
     public init(
         items: [PackedCircleItem],
         maxVisible: Int = 5,
-        containerWidth: CGFloat = 120,
+        containerWidth: CGFloat? = nil,
         style: PackedCircleIconsStyle = .glossy
     ) {
         self.items = items
         self.maxVisible = maxVisible
-        self.containerWidth = containerWidth
+        self.containerWidth = containerWidth ?? PackedCircleMetrics.width(for: style)
         self.style = style
     }
 
@@ -541,15 +557,16 @@ private struct MarbleSway: ViewModifier {
 // MARK: - Skeleton
 
 /// Placeholder of a `PackedCircleIcons` in its style: a few circles of falling sizes packed in
-/// the same box; for `.shelf` (4.4.0; and the deprecated `.fan`) four grey tiles in a row in the
-/// pocket, for `.orbit` grey coins on the carousel's ring (4.7.0; 3.3.0: a grey middle circle
-/// with three on its orbit).
+/// the same box; for `.shelf` (4.4.0; and the deprecated `.fan`) four grey tiles in a row, whole
+/// since 4.14.0, for `.orbit` grey coins on the carousel's ring (4.7.0; 3.3.0: a grey middle
+/// circle with three on its orbit).
 public struct PackedCircleIconsSkeleton: View {
     let containerWidth: CGFloat
     let style: PackedCircleIconsStyle
 
-    public init(containerWidth: CGFloat = 120, style: PackedCircleIconsStyle = .glossy) {
-        self.containerWidth = containerWidth
+    /// - Parameter containerWidth: As the component's; `nil`, the style's own (4.14.0).
+    public init(containerWidth: CGFloat? = nil, style: PackedCircleIconsStyle = .glossy) {
+        self.containerWidth = containerWidth ?? PackedCircleMetrics.width(for: style)
         self.style = style
     }
 
@@ -597,7 +614,7 @@ public struct PackedCircleIconsSkeleton: View {
         min(4, PackedShelfLayout.capacity(in: CGSize(width: containerWidth, height: height)))
     }
 
-    /// Grey tiles standing in the pocket as the tiles do.
+    /// Grey tiles standing as the tiles do.
     private var shelf: some View {
         let box = boxSize
         let slots = PackedShelfLayout.slots(ids: (0..<shelfCount).map(String.init), in: box)
@@ -618,7 +635,6 @@ public struct PackedCircleIconsSkeleton: View {
             }
         }
         .frame(width: box.width, height: box.height)
-        .clipShape(PackedPocketShape())
     }
 
     /// Five grey coins on the carousel's ring, as it stands still (4.7.0).

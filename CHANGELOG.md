@@ -16,6 +16,40 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 4.14.0 - 2026-10-15
+
+The shelf of app icons stands whole and larger, after the owner's review on a device.
+[#74](https://github.com/dkicekeeper/DesignKit/pull/74)
+
+### Added
+
+- `PackedCircleIcons(containerWidth: nil)` and `PackedCircleIconsSkeleton(containerWidth: nil)`,
+  the new default: each style takes its own width, 160 pt for `.shelf` and 120 pt for the
+  others (every style's width before). A width given as before is kept.
+
+### Changed
+
+- `PackedCircleIcons(style: .shelf)`: the tiles are whole and 48 pt (36 pt before); the box's
+  lower edge no longer cuts them off as a pocket, and they no longer darken at the bottom.
+- The shelf is 160 pt wide when given no width (120 pt before): four tiles, three items and a
+  "+N" when there are more. In a `FinanceCard` it takes up to 40 pt more of the card's width,
+  and the row is 61 pt tall (34 pt before).
+- The tiles come up one after another from a little lower, growing and fading in, in place of
+  rising out of the pocket. The light that runs across them is unchanged.
+- `PackedCircleIconsSkeleton(style: .shelf)`: four whole grey tiles, 160 pt wide.
+
+### Migration
+
+- Nothing to change: a shelf with no `containerWidth` takes the new size. To keep a shelf at
+  120 pt, pass `containerWidth: 120` (two 48 pt tiles fit there).
+
+### Gallery and tooling
+
+- Gallery: choosing Shelf on the PackedCircleIcons page shows it in a card at 160 pt, as on
+  Tenra's home.
+- Snapshot tests: the shelf's references re-recorded; `packedShelfBesideLongAmount` (a
+  9-million amount beside the shelf in a `FinanceCard`).
+
 ## 4.13.0 - 2026-10-15
 
 `EmptyState` takes any picture in place of its icon, for a mascot in an app's empty lists.

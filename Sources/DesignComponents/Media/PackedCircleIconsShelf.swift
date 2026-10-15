@@ -2,15 +2,18 @@
 //  PackedCircleIconsShelf.swift
 //  DesignKit
 //
-//  `PackedCircleIcons(style: .shelf)` (4.4.0): the items as app icons standing in a row in a
-//  pocket. Square tiles of one size, the largest amount on the left, each a little over the one
-//  before it and turned a few degrees, cut off flat by the box's lower edge, so every icon reads.
-//  4.5.1: the tiles are 36 pt in every shelf, whatever the count (they shrank with more items
+//  `PackedCircleIcons(style: .shelf)` (4.4.0): the items as app icons standing in a row. Square
+//  tiles of one size, the largest amount on the left, each a little over the one before it and
+//  turned a few degrees, so every icon reads.
+//  4.5.1: the tiles are one size in every shelf, whatever the count (they shrank with more items
 //  before); as many as fit the width stand in the row, the rest go into the "+N" tile, and the
 //  box is as wide and as tall as the row, up to the size it is given.
-//  They rise out of the pocket one after another on appear, and every few seconds a light runs
-//  across them from left to right. It replaced 3.3.0's fan of playing cards, where the cards
-//  behind the top one barely showed.
+//  4.14.0 (the owner's review on a device): the tiles are whole, 48 pt (36 pt before), and the
+//  shelf is 160 pt wide unless told otherwise (120 pt), four tiles; until then the box's lower
+//  edge cut them off as if they stood in a pocket.
+//  They come up one after another on appear, and every few seconds a light runs across them
+//  from left to right. It replaced 3.3.0's fan of playing cards, where the cards behind the top
+//  one barely showed.
 //
 //  A logo fills its tile, as an app icon does; a symbol is white on a tile of its colour; the
 //  "+N" tile is grey.
@@ -21,15 +24,16 @@ import DesignTokens
 import DesignSupport
 
 enum PackedShelfMetrics {
-    /// A tile's side in every shelf (4.5.1), less only in a box too small for one tile.
-    static let side: CGFloat = 36
-    /// The share of a tile's height above the pocket.
-    static let exposure: CGFloat = 0.74
+    /// A tile's side in every shelf (48 pt since 4.14.0, 36 pt in 4.5.1), less only in a box
+    /// too small for one tile.
+    static let side: CGFloat = 48
+    /// The shelf's width when `PackedCircleIcons` is given none (4.14.0): four tiles.
+    static let width: CGFloat = 160
     /// How far a tile covers the one before it, in widths: when there is room, and the most
     /// they close up to fit one more tile in the width.
     static let targetOverlap: CGFloat = 0.1
     static let maxOverlap: CGFloat = 0.36
-    /// Room for the turned tiles' corners and lifts, in widths, and for their shadows.
+    /// Room for the turned tiles' corners and lifts, in sides, and for their shadows.
     static let tiltSlack: CGFloat = 0.1
     static let margin: CGFloat = 4
     /// An app icon's corner, as a share of its side.
@@ -38,12 +42,12 @@ enum PackedShelfMetrics {
     /// side by side, as if put in by hand.
     static let tilts: [Double] = [-6, 4, -3, 5, -4, 3, -5]
     static let lifts: [CGFloat] = [0, 0.03, 0.01, 0.04, 0.02, 0.035, 0.015]
-    /// The shade where the tiles go into the pocket, in sides above its edge.
-    static let shadeDepth: CGFloat = 0.22
-    static let shadeOpacity: Double = 0.16
-    /// The rise out of the pocket: tile after tile, from the left.
+    /// The entrance: tile after tile, from the left, each coming up from a little lower and
+    /// growing a little as it fades in.
     static let riseSpring = Animation.spring(response: 0.55, dampingFraction: 0.72)
     static let riseStagger: Double = 0.07
+    static let riseDrop: CGFloat = 0.3
+    static let riseHiddenScale: CGFloat = 0.9
     /// The light running across the tiles: once after the rise, then every few seconds, tile
     /// after tile from the left.
     static let firstShine: Double = 1.0
@@ -69,7 +73,7 @@ enum PackedShelfLayout {
     static func side(in box: CGSize) -> CGFloat {
         guard box.width > 0, box.height > 0 else { return 0 }
         let metrics = PackedShelfMetrics.self
-        let byHeight = (box.height - metrics.margin) / (metrics.exposure + metrics.tiltSlack)
+        let byHeight = (box.height - 2 * metrics.margin) / (1 + metrics.tiltSlack)
         let byWidth = (box.width - 2 * metrics.margin) / (1 + metrics.tiltSlack)
         return max(0, min(metrics.side, byHeight, byWidth))
     }
@@ -92,19 +96,19 @@ enum PackedShelfLayout {
         return max(0, min(side * (1 - metrics.targetOverlap), room / CGFloat(count - 1)))
     }
 
-    /// The box the row of `count` tiles takes: as wide as the row and as tall as the tiles
-    /// above the pocket need, up to the box it is given.
+    /// The box the row of `count` tiles takes: as wide as the row and as tall as its turned
+    /// tiles, up to the box it is given.
     static func fittedBox(count: Int, in box: CGSize) -> CGSize {
         let metrics = PackedShelfMetrics.self
         let side = side(in: box)
         let row = side * (1 + metrics.tiltSlack)
             + CGFloat(max(count - 1, 0)) * step(count: count, side: side, width: box.width)
         return CGSize(width: min(box.width, row + 2 * metrics.margin),
-                      height: min(box.height, side * (metrics.exposure + metrics.tiltSlack) + metrics.margin))
+                      height: min(box.height, side * (1 + metrics.tiltSlack) + 2 * metrics.margin))
     }
 
-    /// The row for `ids` (left to right) in `box` (`fittedBox`), the pocket's edge at the box's
-    /// lower edge, the row centred.
+    /// The row for `ids` (left to right) in `box` (`fittedBox`), centred, each tile lifted a
+    /// little by its position.
     static func slots(ids: [String], in box: CGSize) -> [PackedShelfSlot] {
         let count = ids.count
         guard count > 0, box.width > 0, box.height > 0 else { return [] }
@@ -113,7 +117,8 @@ enum PackedShelfLayout {
         let step = step(count: count, side: side, width: box.width)
         let gaps = CGFloat(count - 1)
         let row = side + step * gaps
-        let pocket = box.height / 2
+        // The lifts are centred in the box's room for them.
+        let middleLift = (metrics.lifts.max() ?? 0) / 2
 
         return ids.enumerated().map { position, id in
             let lift = side * metrics.lifts[position % metrics.lifts.count]
@@ -123,20 +128,11 @@ enum PackedShelfLayout {
                 angle: .degrees(metrics.tilts[position % metrics.tilts.count]),
                 offset: CGSize(
                     width: -row / 2 + side / 2 + CGFloat(position) * step,
-                    height: pocket - side * metrics.exposure - lift + side / 2
+                    height: side * middleLift - lift
                 ),
                 side: side
             )
         }
-    }
-}
-
-/// Clips to everything above the view's lower edge: the tiles' tops, turned corners and
-/// shadows stay whole, and below the edge they are in the pocket.
-struct PackedPocketShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        Path(CGRect(x: rect.minX - rect.width, y: rect.minY - rect.height,
-                    width: rect.width * 3, height: rect.height * 2))
     }
 }
 
@@ -178,7 +174,6 @@ struct PackedShelf: View {
         let ids = ranked.map(\.id) + (overflowCount > 0 ? [Self.overflowID] : [])
         let box = PackedShelfLayout.fittedBox(count: ids.count, in: size)
         let slots = PackedShelfLayout.slots(ids: ids, in: box)
-        let side = slots.first?.side ?? 0
         AmbientMotionGate { allowsAmbientMotion in
             ZStack {
                 ForEach(slots) { slot in
@@ -191,19 +186,8 @@ struct PackedShelf: View {
                     // Each tile stands over the one on its left.
                     .zIndex(Double(slot.position))
                 }
-                // The tiles darken where they go into the pocket.
-                LinearGradient(
-                    colors: [.black.opacity(0), .black.opacity(PackedShelfMetrics.shadeOpacity)],
-                    startPoint: UnitPoint(x: 0.5, y: max(0, 1 - side * PackedShelfMetrics.shadeDepth / max(box.height, 1))),
-                    endPoint: .bottom
-                )
-                .blendMode(.sourceAtop)
-                .zIndex(Double(slots.count))
-                .allowsHitTesting(false)
             }
             .frame(width: box.width, height: box.height)
-            .compositingGroup()
-            .clipShape(PackedPocketShape())
             .task(id: allowsAmbientMotion && designKitMotion) {
                 guard allowsAmbientMotion && designKitMotion else { return }
                 try? await Task.sleep(for: .seconds(PackedShelfMetrics.firstShine))
@@ -260,8 +244,11 @@ private struct PackedShelfTile: View {
             // Falls on the tile to the left, under this one.
             .shadow(color: .black.opacity(0.2), radius: max(2, side * 0.06), x: -side * 0.025, y: side * 0.01)
             .rotationEffect(slot.angle)
-            // Below the pocket's edge until it rises.
-            .offset(x: slot.offset.width, y: slot.offset.height + (hasRisen ? 0 : side * 1.2))
+            // A little lower, smaller and clear until it comes up.
+            .scaleEffect(hasRisen ? 1 : PackedShelfMetrics.riseHiddenScale)
+            .opacity(hasRisen ? 1 : 0)
+            .offset(x: slot.offset.width,
+                    y: slot.offset.height + (hasRisen ? 0 : side * PackedShelfMetrics.riseDrop))
             .animation(riseAnimation, value: hasRisen)
             // Position is layout, never animation (see PackedCircleEntrance).
             .animation(nil, value: slot)
@@ -291,8 +278,7 @@ private struct PackedShelfTile: View {
         }
     }
 
-    /// A white symbol on a tile of its colour, lit from the upper left, in the part of the tile
-    /// above the pocket.
+    /// A white symbol on a tile of its colour, lit from the upper left.
     private func symbolFace(tint: Color, symbolName: String) -> some View {
         ZStack {
             Rectangle().fill(
@@ -306,11 +292,10 @@ private struct PackedShelfTile: View {
                 .font(.system(size: side * 0.4, weight: .semibold))
                 .foregroundStyle(.white)
                 .shadow(color: .black.opacity(0.2), radius: 0.5, y: 0.5)
-                .offset(y: -side * 0.06)
         }
     }
 
-    /// "+N" on a grey tile, in the part above the pocket.
+    /// "+N" on a grey tile.
     private var overflowFace: some View {
         let grey = AppColors.Text.tertiary
         return ZStack {
@@ -320,7 +305,6 @@ private struct PackedShelfTile: View {
             )
             PackedOverflowLabel(count: overflowCount, size: side)
                 .foregroundStyle(.white)
-                .offset(y: -side * 0.08)
         }
     }
 }

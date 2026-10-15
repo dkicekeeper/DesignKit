@@ -697,22 +697,25 @@ In dark mode `\.heroTone` inside it is `.onColor`, and DesignKit's hero pieces d
   is the look before: a symbol on a pale disc of its tint, a logo edge to edge with a thin ring of
   the background. 3.3.0: the gloss is softer (highlight 0.62, rim 0.42, coloured shadow 0.38, from
   0.9 / 0.7 / 0.5; `MarbleGlossMetrics`), and two more styles share the box and the "+N":
-  - **`style: .shelf`** *(4.4.0)*: app icons standing in a row in a pocket. Square tiles of one
-    size (corner 0.225 of the side), the largest amount on the left, the rest by amount, "+N"
-    last; each tile stands over the one on its left and covers a tenth of it, turned a few
-    degrees (−6°, 4°, −3°, 5°, …) and lifted a little, never two alike side by side. The box's
-    lower edge is the pocket: it cuts the tiles off flat with 0.74 of each above it, and they
-    darken a little where they go in. *(4.5.1)* The tiles are 36 pt in every shelf, whatever
-    the count (less only in a box too small for one); before, they shrank as the count grew, so
-    a card with six items drew tiny tiles beside one with three. As many as fit the width stand
-    in the row, closing up to 0.36 over each other to fit one more (four in the default 120 pt):
-    the largest amounts, at most `maxVisible`, the rest in the "+N" tile. The shelf is as wide
-    and as tall as its row, so in a card's trailing slot it stands at the trailing edge. A logo fills
-    its tile, as an app icon does (white behind a logo that does not fill its square); a symbol
-    is white on a tile of its tint, lit from the upper left; "+N" is a grey tile. A light catches
-    each tile's upper edge, and each casts a shadow on the one to its left. The tiles rise out of
-    the pocket one after another (a spring, 70 ms apart); a second later a light (`.shine`) runs
-    across them from the left, tile after tile, and again every 4.5 s. It replaced 3.3.0's
+  - **`style: .shelf`** *(4.4.0)*: app icons standing in a row. Square tiles of one size
+    (corner 0.225 of the side), the largest amount on the left, the rest by amount, "+N" last;
+    each tile stands over the one on its left and covers a tenth of it, turned a few degrees
+    (−6°, 4°, −3°, 5°, …) and lifted a little, never two alike side by side. *(4.14.0, the
+    owner's review on a device)* The tiles are whole and 48 pt, and the shelf is 160 pt wide
+    when given no `containerWidth` (the other styles keep 120 pt); until then the box's lower
+    edge was a pocket that cut them off with 0.74 of each above it, at 36 pt in 120 pt.
+    *(4.5.1)* The tiles are one size in every shelf, whatever the count (less only in a box too
+    small for one); before, they shrank as the count grew, so a card with six items drew tiny
+    tiles beside one with three. As many as fit the width stand in the row, closing up to 0.36
+    over each other to fit one more (four in the default 160 pt): the largest amounts, at most
+    `maxVisible`, the rest in the "+N" tile. The shelf is as wide and as tall as its row (61 pt),
+    so in a card's trailing slot it stands at the trailing edge. A logo fills its tile, as an app
+    icon does (white behind a logo that does not fill its square); a symbol is white on a tile of
+    its tint, lit from the upper left; "+N" is a grey tile. A light catches each tile's upper
+    edge, and each casts a shadow on the one to its left. The tiles come up one after another
+    (a spring, 70 ms apart, each from 0.3 of its side lower, at 0.9 of its size and clear); a
+    second later a light (`.shine`) runs across them from the left, tile after tile, and again
+    every 4.5 s. It replaced 3.3.0's
     `.fan` (playing cards along an arc, where the cards behind the top one barely showed):
     `.fan` is deprecated and draws the shelf.
   - **`style: .orbit`** *(4.7.0, from an owner's reference)*: a carousel of coins. Coins of one
