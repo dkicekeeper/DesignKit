@@ -27,6 +27,7 @@ struct ActionsScreen: View {
         AmountVisibilityTogglePage()
         UniversalFilterButtonPage()
         SuggestionChipsPage()
+        VoiceOrbButtonPage()
     }
 }
 
@@ -277,6 +278,39 @@ private struct UniversalFilterButtonPage: View {
             ToggleControl("Selected", isOn: $isSelected)
             ToggleControl("Chevron", isOn: $showsChevron)
             ToggleControl("Menu", isOn: $asMenu)
+        }
+    }
+}
+
+private struct VoiceOrbButtonPage: View {
+    @State private var level = 0.3
+    @State private var followsLevel = true
+    @State private var taps = 0
+
+    var body: some View {
+        ComponentPage(
+            name: "VoiceOrbButton",
+            summary: "The stop button while the voice records: VoiceWave's orb swelling with the voice, a glyph in the middle. Only the resting circle takes the tap.",
+            since: "4.14.0",
+            apps: [.tenra],
+            canvas: .dark(minHeight: 220),
+            notes: [
+                "Read the level in a small view of its own, so its updates redraw the orb only.",
+                "restingDiameter is the circle to anchor a hint (.spotlight) to.",
+            ]
+        ) {
+            VStack(spacing: AppSpacing.sm) {
+                VoiceOrbButton(level: followsLevel ? level : nil, accessibilityLabel: "Stop recording") {
+                    taps += 1
+                }
+                Text(verbatim: "Taps: \(taps)")
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.Text.secondary)
+            }
+            .frame(maxWidth: .infinity)
+        } controls: {
+            ToggleControl("Follows the level", isOn: $followsLevel)
+            SliderControl("Level", value: $level, in: 0...1)
         }
     }
 }

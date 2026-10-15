@@ -27,6 +27,7 @@ struct SelectionScreen: View {
         IconPickerPage()
         SnapCardPickerPage()
         OptionCardPickerPage()
+        PickerCarouselPage()
     }
 }
 
@@ -293,6 +294,62 @@ private struct OptionCardPickerPage: View {
                     case .gradient: AuroraBackground(motion: .still)
                     case .photo: GalleryPhotoView(photo: GalleryPhoto.samples[0])
                     }
+                }
+            }
+        } controls: {
+            StateControl(state: $state)
+        }
+    }
+}
+
+private struct PickerCarouselPage: View {
+    private struct Hat: Identifiable {
+        let id: String
+        let accessory: CreatureAccessory?
+        let name: String
+        let condition: String?
+    }
+
+    private let hats: [Hat] = [
+        Hat(id: "none", accessory: nil, name: "Nothing", condition: nil),
+        Hat(id: "glasses", accessory: .glasses, name: "Glasses", condition: nil),
+        Hat(id: "headphones", accessory: .headphones, name: "Headphones", condition: nil),
+        Hat(id: "sunglasses", accessory: .sunglasses, name: "Sunglasses", condition: "Open the app 7 days in a row"),
+        Hat(id: "crown", accessory: .crown, name: "Crown", condition: "Reach a savings goal"),
+        Hat(id: "partyHat", accessory: .partyHat, name: "Party hat", condition: "Create your first goal"),
+    ]
+
+    @State private var focused: String? = "glasses"
+    @State private var chosen: String? = "glasses"
+    @State private var state: SpecimenState = .content
+
+    var body: some View {
+        ComponentPage(
+            name: "PickerCarousel",
+            summary: "Options to try on, side by side: the middle card is the focused one; closed ones are dim with a lock, and what opens the focused one shows above.",
+            since: "4.14.0",
+            apps: [.tenra],
+            canvas: .fill,
+            notes: [
+                "Scrolling and a tap on a card change focused; the app decides what that does (Ten tries the accessory on, an open one is put on at once).",
+                "Pictures are drawn still; draw the focused option large above the carousel.",
+                "Strings: common.locked (VoiceOver), unless lockedLabel is given.",
+            ]
+        ) {
+            if state == .loading {
+                PickerCarouselSkeleton()
+            } else {
+                PickerCarousel(
+                    items: hats,
+                    focused: $focused,
+                    chosen: chosen,
+                    title: { $0.name },
+                    condition: { $0.condition }
+                ) { hat in
+                    ParticleCreature(mood: .idle, accessory: hat.accessory)
+                }
+                .onChange(of: focused) { _, id in
+                    if let hat = hats.first(where: { $0.id == id }), hat.condition == nil { chosen = id }
                 }
             }
         } controls: {

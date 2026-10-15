@@ -525,7 +525,9 @@ A choice from a long list: the title (with an optional accent symbol), the chose
 `NavigationPickerMetrics.searchThreshold` options), and a choice goes back. Needs a
 `NavigationStack` around it (an `EditSheetContainer` has one). At accessibility sizes the value
 moves under the title. A few options: `MenuPickerRow`. Dalada: the fish species, the packing
-list to start from.
+list to start from. `style: .list` (4.14.0) is the same choice as a row of a `List`, as iOS
+Settings draws it: the settings row (`RowConfiguration.settings`), a medium accent symbol, the
+value in `bodySmall` and the list's own chevron. Tenra: Settings' voice language.
 
 ```swift
 NavigationPickerRow(icon: "fish", title: "Species", selection: $speciesID,
@@ -1235,6 +1237,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `SliderRow` (1.15.0) | `SliderRowSkeleton(showsHint:)` |
 | `ItemRow` (3.6.0) | `ItemRowSkeleton(style:showsLeading:showsDetail:metaLines:)` |
 | `PendingItemCard` (3.6.0) | `PendingItemCardSkeleton(contentLines:)` |
+| `ListCard`, `NoticeCard`, `PickerCarousel` (4.14.0) | `ListCardSkeleton(showsTitle:rows:)`, `NoticeCardSkeleton(leadingSize:showsAction:)`, `PickerCarouselSkeleton(pictureSize:)` |
 | `RatingSummary` (4.1.0) | `RatingSummarySkeleton(maximum:)` |
 | `SearchSuggestionRow` (3.5.0), drawn by `.dsSearchSuggestions` while `isLoading` | `SearchSuggestionRowSkeleton(showsSubtitle:)` |
 | `AmountRow` (2.1.0) | `AmountRowSkeleton(style:showsRing:showsDetail:)` |
@@ -1251,7 +1254,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `ShareCardFrame` (and `ShareCardSheet` while it loads), `LiveSessionBar`, `DownloadRow`, `ArticleBody` (2.8.0) | `…Skeleton` (`PhotoTileSkeleton(size:cornerRadius:)`, `PhotoStripSkeleton(count:size:)`, `PhotoGridSkeleton(count:columns:style:)`, `ShareCardSkeleton(format:)`, `ArticleBodySkeleton(paragraphs:)`) |
 | `TransactionRow`, `OptionCard`, `StreamingText`, `SnapCardPicker` (2.9.0) | `…Skeleton` (`TransactionRowSkeleton(showsDetails:)`, `StreamingTextSkeleton(font:)`, `SnapCardPickerSkeleton { the card's skeleton }`) |
 
-**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`, `CurrencyRow`, 3.6.0); `MetaLine` (3.6.0, a line inside a row that has the skeleton); `LoadMoreFooter` (4.1.0, the loading state itself); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); `ActionRowLabel` (3.1.0, a label); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `CreatureTabLabel`, `CreatureGlyph`, `MessageComposerAccessory`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
+**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`, `CurrencyRow`, 3.6.0); `MetaLine` (3.6.0, a line inside a row that has the skeleton); `LoadMoreFooter` (4.1.0, the loading state itself); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); `AmountEntrySheet` and `VoiceOrbButton` (4.14.0: an input and a control); `ActionRowLabel` (3.1.0, a label); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `CreatureTabLabel`, `CreatureGlyph`, `MessageComposerAccessory`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
 
 #### `SkeletonText` *(1.7.0)*
 A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `Skeleton`. For a component, use its skeleton (above); `.skeleton(isLoading:)` redacts a real view in place, with the system's placeholder shapes.
@@ -2014,6 +2017,63 @@ The screen dims (black 45%) and an `.ultraThinMaterial` panel (`AppRadius.lg`) s
 spinner in the accent, the title (bodyEmphasis) and a message (secondary). Disable the screen
 under it at the call site. Tenra: restoring a backup.
 
+### From Tenra's last audit *(4.14.0)*
+
+The generic views Tenra still drew itself after its design-system audit (2026-10-15), ported
+pixel for pixel; Tenra keeps adapters under the old names.
+
+#### `AmountEntrySheet`
+Money put towards something: a sheet with `HeroSection(icon:title:subtitle:)` of what it goes
+to, `CurrencyAmountInput` over the `CalculatorKeypad` (the keypad hides while the note is
+focused), a multiline `FormTextField` note and `.dateButtonsSafeArea` (today or earlier) with
+Save; ✕ and ✓ in the toolbar. An amount typed in another currency shows the "≈" line in
+`currency` and converts on save through `DesignKitCurrencyConverter.convertSync`; no rate shows
+`currency.error.conversionFailed`, no amount `moneyEntry.invalidAmount`, each with the error
+haptic. `onSave(amount, date, note)` gets the amount in `currency` and the trimmed note (nil when
+empty); the sheet dismisses itself with the success haptic. `suggestedAmount` fills the amount in
+(what is left of a debt). `onCustomizeCurrencies` is the currency menu's Edit row: the app
+presents its own sheet. Tenra: money towards a savings goal, a debt paid back.
+
+```swift
+AmountEntrySheet(title: goal.name, icon: goal.icon, subtitle: left, currency: goal.currency,
+                 baseCurrency: base, currencies: quickAccess) { amount, date, note in
+    store.contribute(amount, on: date, note: note)
+}
+```
+
+#### `ListCard`
+A card of rows: an optional `SectionHeader` over a `cardStyle()` card that pads its content
+`lg` on every side and spaces it `sm`. Rows pad themselves vertically (§10). Tenra: its
+assistant's cards (payments in a reply, a draft to confirm, an attachment). Skeleton:
+`ListCardSkeleton(showsTitle:rows:)`.
+
+#### `NoticeCard`
+A message the app writes to the person, on a `ListCard`: the `leading` picture at its own size
+(a mascot, an icon; hide it from VoiceOver when it says nothing), the title (`bodyEmphasis`) and
+the message (`bodySmall`, secondary), the ✕ hide button on the trailing edge (`DSButton`, icon
+only, flat, neutral, small; `hideLabel` for VoiceOver, `common.hide` by default; none without
+`onHide`) and the action under them (`DSButton`, flat, small; none without `action`). What the
+message is, when it shows and what the action does stay in the app. Tenra: "Ten writes" on Home.
+Skeleton: `NoticeCardSkeleton(leadingSize:showsAction:)`.
+
+#### `VoiceOrbButton`
+The stop button while the voice records: `VoiceWave(style: .orb)` on a 144 pt canvas, swelling
+with `level` (nil lets it breathe on its own), a white glyph in the middle ("stop.fill"), the
+bounce press style. Only the resting circle (`VoiceOrbButton.restingDiameter`, 80 pt) takes the
+tap; anchor a hint to that circle. Read the level in a small view of its own, so its updates
+(about 47 a second) redraw the orb only. Tenra: the voice input and its assistant's voice sheet.
+
+#### `PickerCarousel`
+Options to try on: the focused option's name (`h4`) and, when it is closed, what opens it
+(`bodyEmphasis`, accent, a lock, wrapping in full over two kept lines), then cards side by side
+(`PickerCarouselMetrics.cardWidth` 150 pt, the middle one full size, the others at 90 % and
+75 % opacity, snapping to the middle). A card is the option's picture (`pictureSize`, 96 pt,
+drawn still, at 40 % when closed), its name kept to two lines, a lock in the corner when closed
+and an accent outline and name when it is `chosen`. Scrolling and a tap change `focused`; the
+app decides what that does (Tenra: Ten tries the accessory on and puts an open one on at once)
+and draws the focused option large above. VoiceOver: the name, and `lockedLabel` with the
+condition for a closed one. Skeleton: `PickerCarouselSkeleton(pictureSize:)`.
+
 ### Assistant *(4.6.0)*
 
 Pieces of a conversation with an assistant. Tenra's assistant is the first user.
@@ -2244,6 +2304,18 @@ EntityDetailScaffold(... hero: { HeroSection(icon: liveCategory.iconSource, ...)
 
 Used in: `OnboardingWelcomeStep` (bottom), Account/Category/Subscription/Deposit/Loan detail views (top).
 
+#### `EdgeBackdrop`, `.edgeBackdrop(_:color:)` *(4.14.0)*
+The backing of a bar over scrolling content, drawn by hand where the system's scroll edge effect
+is too faint to carry a large bar: an `.ultraThinMaterial` blur, full over the half nearest the
+screen's edge and fading out at the inner edge (SwiftUI has no blur of varying radius, so the
+blurred content gives way to the sharp one), and the page's colour over it, light so the blurred
+content's colours show through: 25% at the edge, 10% at two fifths, clear at three quarters
+(`EdgeBackdropMetrics`). A second material or a heavier tint reads as a grey plate. It reaches past the
+safe area to the screen's edge, takes no touches and is hidden from VoiceOver. Put it behind the
+bar's content: `.safeAreaBar(edge: .top) { header.frame(maxWidth: .infinity).edgeBackdrop() }`.
+`color:` is the page's colour (`AppColors.bgBase` by default). Tenra: the chat's bar, Ten 120 pt
+over the thread.
+
 ---
 
 ## 4. View Patterns
@@ -2285,7 +2357,8 @@ ScrollView
 ```
 
 Tenra's add and edit transaction sheets and loan payments. The focus rule between the keypad and
-a text field is in §6 ("Calculator amount input").
+a text field is in §6 ("Calculator amount input"). Money put towards something with only a note
+and a date (a goal, a debt) is `AmountEntrySheet` (4.14.0), this layout ready-made.
 
 ### Detail screen
 
@@ -2412,8 +2485,13 @@ Grouping form rows?
 Horizontal scroll?
 └── UniversalCarousel with appropriate preset
 
+A bar over scrolling content that needs a stronger backing than the scroll edge effect?
+└── .edgeBackdrop(edge) behind the bar's content (4.14.0)
+
 Card-style container?
-└── VStack { ... }.cardStyle()
+├── Rows under an optional title → ListCard (4.14.0)
+├── A message to the person with a hide button and an action → NoticeCard (4.14.0)
+└── Anything else → VStack { ... }.padding(AppSpacing.lg).cardStyle()
 ```
 
 ### "Which icon approach?"

@@ -16,6 +16,64 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 4.14.0 - 2026-10-15
+
+The last generic views Tenra drew itself come to DesignKit (the owner's decision after Tenra's
+design-system audit): a money entry sheet, a card of rows, a notice, the voice stop orb, a
+carousel of options to try on, and `NavigationPickerRow` for a `List`; and a bar's backing over
+scrolling content (`EdgeBackdrop`). Pixel-identical ports; the
+models stay in Tenra as thin adapters.
+[#72](https://github.com/dkicekeeper/DesignKit/pull/72)
+
+### Added
+
+- `AmountEntrySheet(title:icon:subtitle:currency:baseCurrency:currencies:suggestedAmount:notePlaceholder:onCustomizeCurrencies:onSave:)`:
+  money put towards something, the hero of what it goes to, the amount on the calculator keypad,
+  a note, the date buttons and Save; an amount typed in another currency converts to `currency`
+  on save through `DesignKitCurrencyConverter.convertSync`. From Tenra's `MoneyEntrySheet`.
+- `ListCard(title:content:)` and `ListCardSkeleton`: a card of rows under an optional
+  `SectionHeader`. From Tenra's `AssistantCard`.
+- `NoticeCard(title:message:actionTitle:actionSystemImage:action:hideLabel:onHide:leading:)` and
+  `NoticeCardSkeleton`: a message the app writes to the person, a picture, a hide button and an
+  action. From Tenra's `AssistantNoticeCard`.
+- `VoiceOrbButton(level:systemImage:accessibilityLabel:action:)`: `VoiceWave`'s orb as the stop
+  button while the voice records; only the resting circle (`VoiceOrbButton.restingDiameter`)
+  takes the tap. From Tenra's `VoiceStopOrb`.
+- `PickerCarousel(items:focused:chosen:title:condition:lockedLabel:pictureSize:picture:)`,
+  `PickerCarouselSkeleton` and `PickerCarouselMetrics`: options side by side, the focused one in
+  the middle, closed ones dim with a lock and what opens the focused one above; pictures drawn
+  still. From Tenra's wardrobe for its assistant.
+- `NavigationPickerRow(style:)` with `.form` (the default, as before) and `.list`: the row of a
+  `List`, as iOS Settings draws it.
+- `EdgeBackdrop(edge:color:)`, `.edgeBackdrop(_:color:)` and `EdgeBackdropMetrics`: the backing of
+  a bar over scrolling content, a blur and a light wash of the page's colour, strongest at the
+  screen's edge and fading out towards the content. For bars the system's scroll edge effect is
+  too faint to carry (Tenra's chat, Ten over the thread).
+- Strings: `button.close`, `common.hide`, `common.locked`, `currency.error.conversionFailed`,
+  `moneyEntry.invalidAmount`, `moneyEntry.notePlaceholder` (all with English defaults).
+
+### Migration
+
+- Tenra: `MoneyEntrySheet`, `AssistantCard`, `AssistantNoticeCard`, `VoiceStopOrb`, the
+  wardrobe's carousel and `VoiceLanguagePickerView` become adapters over the new components;
+  nothing changes on screen.
+
+```swift
+// Before: Tenra's own list for a List row
+NavigationLink { VoiceLanguagePickerView(selection: $language, options: options) } label: { … }
+// After
+NavigationPickerRow(icon: "waveform", title: title, selection: $language, options: options, style: .list)
+```
+
+### Gallery and tooling
+
+- Gallery: pages for `AmountEntrySheet` (Sheets), `ListCard` (Content), `NoticeCard` (Status),
+  `VoiceOrbButton` (Actions), `PickerCarousel` (Selection), `EdgeBackdrop` (Effects), and a
+  style control on `NavigationPickerRow`'s page.
+- Snapshot tests: `noticeCards`, `listCards`, `voiceOrbButton`, `pickerCarousel`,
+  `navigationPickerRowList`, `portedViewSkeletons`, `edgeBackdrop`. `AmountEntrySheet` has none: its date
+  buttons show today's date.
+
 ## 4.13.0 - 2026-10-15
 
 `EmptyState` takes any picture in place of its icon, for a mascot in an app's empty lists.

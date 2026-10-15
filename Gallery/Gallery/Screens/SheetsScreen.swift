@@ -27,6 +27,7 @@ struct SheetsScreen: View {
         LoopOnboardingHeroPage()
         ShareCardSheetPage()
         DateRangePickerSheetPage()
+        AmountEntrySheetPage()
     }
 }
 
@@ -328,6 +329,48 @@ private struct DateRangePickerSheetPage: View {
             }
         } controls: {
             EmptyView()
+        }
+    }
+}
+
+private struct AmountEntrySheetPage: View {
+    @State private var isPresented = false
+    @State private var suggests = false
+    @State private var saved = ""
+
+    var body: some View {
+        ComponentPage(
+            name: "AmountEntrySheet",
+            summary: "Money put towards something: its hero, the amount on the calculator keypad, a note, the date buttons and Save. Another currency converts on save.",
+            since: "4.14.0",
+            apps: [.tenra],
+            notes: [
+                "onSave gets the amount in the sheet's currency (through DesignKitCurrencyConverter.convertSync), the date and the trimmed note; the sheet dismisses itself.",
+                "Strings: moneyEntry.notePlaceholder, moneyEntry.invalidAmount, currency.error.conversionFailed, button.close, button.save.",
+            ]
+        ) {
+            VStack(spacing: AppSpacing.md) {
+                if !saved.isEmpty {
+                    Text(saved)
+                        .font(AppTypography.bodyEmphasis)
+                }
+                PresentButton(title: "Put money towards the car") { isPresented = true }
+            }
+            .sheet(isPresented: $isPresented) {
+                AmountEntrySheet(
+                    title: "Car",
+                    icon: .sfSymbol("car.fill"),
+                    subtitle: "1 800 000 ₸ left",
+                    currency: "KZT",
+                    baseCurrency: "KZT",
+                    currencies: ["KZT", "USD", "EUR"],
+                    suggestedAmount: suggests ? 50_000 : nil
+                ) { amount, date, note in
+                    saved = "\(Int(amount)) KZT · \(date.formatted(date: .abbreviated, time: .omitted))" + (note.map { " · \($0)" } ?? "")
+                }
+            }
+        } controls: {
+            ToggleControl("Suggested amount", isOn: $suggests)
         }
     }
 }
