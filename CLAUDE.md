@@ -230,8 +230,8 @@ rather than importing an app type.
 - The assistant as a character (2026-10, the owner's plan): 4.10.0 speech and gestures (words of
   light that fly out of the mouth with an emotion; a comic bubble was tried and dropped by the
   owner), 4.11.0 thoughts in pictures and a life of its own, 4.12.0 eight accessories of light.
-  Follow-ups in Tenra: daydreams from its data (the next payment, a goal) and accessories unlocked
-  by streaks and goals.
+  In Tenra (its #62) Ten daydreams of the person's data (the next payment, a goal, rising
+  spending, a debt due) and earns its accessories by days in a row in Tenra and by goals.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.
