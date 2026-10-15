@@ -2,7 +2,7 @@
 //  PickerCarousel.swift
 //  DesignKit
 //
-//  Options to try on, side by side (4.13.0): the card in the middle is the focused one, full
+//  Options to try on, side by side (4.14.0): the card in the middle is the focused one, full
 //  size, the others a little smaller and paler. Each card is a picture, a name kept to two
 //  lines, a lock when the option is closed, and an accent outline on the one chosen. Above the
 //  cards, the focused option's name and, when it is closed, what opens it, in the accent with a

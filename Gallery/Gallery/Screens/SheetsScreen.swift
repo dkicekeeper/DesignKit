@@ -342,7 +342,7 @@ private struct AmountEntrySheetPage: View {
         ComponentPage(
             name: "AmountEntrySheet",
             summary: "Money put towards something: its hero, the amount on the calculator keypad, a note, the date buttons and Save. Another currency converts on save.",
-            since: "4.13.0",
+            since: "4.14.0",
             apps: [.tenra],
             notes: [
                 "onSave gets the amount in the sheet's currency (through DesignKitCurrencyConverter.convertSync), the date and the trimmed note; the sheet dismisses itself.",

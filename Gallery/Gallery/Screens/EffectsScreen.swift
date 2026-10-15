@@ -466,7 +466,7 @@ private struct EdgeBackdropPage: View {
         ComponentPage(
             name: "EdgeBackdrop",
             summary: "A bar's backing over scrolling content: the content blurs and the page's colour lies over it, strongest at the screen's edge and fading out towards the content.",
-            since: "4.13.0",
+            since: "4.14.0",
             apps: [.tenra],
             canvas: .tall(minHeight: 360),
             notes: [

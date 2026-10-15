@@ -150,7 +150,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// NavigationPickerRow(style: .list) (4.13.0): the row of a List, as in Settings.
+        /// NavigationPickerRow(style: .list) (4.14.0): the row of a List, as in Settings.
         @Test func navigationPickerRowList() async {
             await assertComponentSnapshot(
                 NavigationStack {

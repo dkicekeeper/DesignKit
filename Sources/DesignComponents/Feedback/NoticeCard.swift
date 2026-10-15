@@ -2,7 +2,7 @@
 //  NoticeCard.swift
 //  DesignKit
 //
-//  A message the app writes to the person (4.13.0): a picture on the leading edge (a mascot,
+//  A message the app writes to the person (4.14.0): a picture on the leading edge (a mascot,
 //  an icon), a title and a line or two of text, a button that hides it, and an action under
 //  them ("Go through it"). On a `ListCard`. Ported from Tenra's AssistantNoticeCard; what the
 //  message is, when it shows and what the action does stay in the app.

@@ -291,7 +291,7 @@ private struct VoiceOrbButtonPage: View {
         ComponentPage(
             name: "VoiceOrbButton",
             summary: "The stop button while the voice records: VoiceWave's orb swelling with the voice, a glyph in the middle. Only the resting circle takes the tap.",
-            since: "4.13.0",
+            since: "4.14.0",
             apps: [.tenra],
             canvas: .dark(minHeight: 220),
             notes: [

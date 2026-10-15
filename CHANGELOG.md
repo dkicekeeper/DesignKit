@@ -16,7 +16,7 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
-## 4.13.0 - 2026-10-15
+## 4.14.0 - 2026-10-15
 
 The last generic views Tenra drew itself come to DesignKit (the owner's decision after Tenra's
 design-system audit): a money entry sheet, a card of rows, a notice, the voice stop orb, a
@@ -73,6 +73,22 @@ NavigationPickerRow(icon: "waveform", title: title, selection: $language, option
 - Snapshot tests: `noticeCards`, `listCards`, `voiceOrbButton`, `pickerCarousel`,
   `navigationPickerRowList`, `portedViewSkeletons`, `edgeBackdrop`. `AmountEntrySheet` has none: its date
   buttons show today's date.
+
+## 4.13.0 - 2026-10-15
+
+`EmptyState` takes any picture in place of its icon, for a mascot in an app's empty lists.
+[#73](https://github.com/dkicekeeper/DesignKit/pull/73)
+
+### Added
+
+- `EmptyState(title:description:actionTitle:action:artwork:)`: the standard empty state with a
+  view of the app's own in place of the icon (a mascot, an illustration); the title, the
+  description and the button stay as they are.
+
+### Gallery and tooling
+
+- Gallery: a "Mascot artwork" control on the EmptyState page.
+- Snapshot test: `emptyStateArtwork` (light, dark).
 
 ## 4.12.0 - 2026-10-15
 

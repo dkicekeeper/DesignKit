@@ -525,7 +525,7 @@ A choice from a long list: the title (with an optional accent symbol), the chose
 `NavigationPickerMetrics.searchThreshold` options), and a choice goes back. Needs a
 `NavigationStack` around it (an `EditSheetContainer` has one). At accessibility sizes the value
 moves under the title. A few options: `MenuPickerRow`. Dalada: the fish species, the packing
-list to start from. `style: .list` (4.13.0) is the same choice as a row of a `List`, as iOS
+list to start from. `style: .list` (4.14.0) is the same choice as a row of a `List`, as iOS
 Settings draws it: the settings row (`RowConfiguration.settings`), a medium accent symbol, the
 value in `bodySmall` and the list's own chevron. Tenra: Settings' voice language.
 
@@ -1237,7 +1237,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `SliderRow` (1.15.0) | `SliderRowSkeleton(showsHint:)` |
 | `ItemRow` (3.6.0) | `ItemRowSkeleton(style:showsLeading:showsDetail:metaLines:)` |
 | `PendingItemCard` (3.6.0) | `PendingItemCardSkeleton(contentLines:)` |
-| `ListCard`, `NoticeCard`, `PickerCarousel` (4.13.0) | `ListCardSkeleton(showsTitle:rows:)`, `NoticeCardSkeleton(leadingSize:showsAction:)`, `PickerCarouselSkeleton(pictureSize:)` |
+| `ListCard`, `NoticeCard`, `PickerCarousel` (4.14.0) | `ListCardSkeleton(showsTitle:rows:)`, `NoticeCardSkeleton(leadingSize:showsAction:)`, `PickerCarouselSkeleton(pictureSize:)` |
 | `RatingSummary` (4.1.0) | `RatingSummarySkeleton(maximum:)` |
 | `SearchSuggestionRow` (3.5.0), drawn by `.dsSearchSuggestions` while `isLoading` | `SearchSuggestionRowSkeleton(showsSubtitle:)` |
 | `AmountRow` (2.1.0) | `AmountRowSkeleton(style:showsRing:showsDetail:)` |
@@ -1254,7 +1254,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `ShareCardFrame` (and `ShareCardSheet` while it loads), `LiveSessionBar`, `DownloadRow`, `ArticleBody` (2.8.0) | `…Skeleton` (`PhotoTileSkeleton(size:cornerRadius:)`, `PhotoStripSkeleton(count:size:)`, `PhotoGridSkeleton(count:columns:style:)`, `ShareCardSkeleton(format:)`, `ArticleBodySkeleton(paragraphs:)`) |
 | `TransactionRow`, `OptionCard`, `StreamingText`, `SnapCardPicker` (2.9.0) | `…Skeleton` (`TransactionRowSkeleton(showsDetails:)`, `StreamingTextSkeleton(font:)`, `SnapCardPickerSkeleton { the card's skeleton }`) |
 
-**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`, `CurrencyRow`, 3.6.0); `MetaLine` (3.6.0, a line inside a row that has the skeleton); `LoadMoreFooter` (4.1.0, the loading state itself); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); `AmountEntrySheet` and `VoiceOrbButton` (4.13.0: an input and a control); `ActionRowLabel` (3.1.0, a label); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `CreatureTabLabel`, `CreatureGlyph`, `MessageComposerAccessory`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
+**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`, `CurrencyRow`, 3.6.0); `MetaLine` (3.6.0, a line inside a row that has the skeleton); `LoadMoreFooter` (4.1.0, the loading state itself); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); `AmountEntrySheet` and `VoiceOrbButton` (4.14.0: an input and a control); `ActionRowLabel` (3.1.0, a label); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `CreatureTabLabel`, `CreatureGlyph`, `MessageComposerAccessory`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
 
 #### `SkeletonText` *(1.7.0)*
 A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `Skeleton`. For a component, use its skeleton (above); `.skeleton(isLoading:)` redacts a real view in place, with the system's placeholder shapes.
@@ -1376,6 +1376,11 @@ EmptyState(
 |-------|---------|
 | `.standard` | Full-screen empty state (management views) |
 | `.compact` | Inside cards (home summary) |
+
+*(4.13.0)* `EmptyState(title:description:actionTitle:action:) { artwork }` puts any picture in
+place of the icon, in the standard style; the title, the description and the button stay as they
+are and the picture keeps its own size. Tenra's empty lists show its mascot there, saying a line
+and pointing down at the button (leave room over a creature for its words).
 | `.error` | Load failures (with pulse icon + retry) |
 
 #### `PromptSheet` *(1.5.0; 2.0.0 the one prompt and permission sheet)*
@@ -2012,7 +2017,7 @@ The screen dims (black 45%) and an `.ultraThinMaterial` panel (`AppRadius.lg`) s
 spinner in the accent, the title (bodyEmphasis) and a message (secondary). Disable the screen
 under it at the call site. Tenra: restoring a backup.
 
-### From Tenra's last audit *(4.13.0)*
+### From Tenra's last audit *(4.14.0)*
 
 The generic views Tenra still drew itself after its design-system audit (2026-10-15), ported
 pixel for pixel; Tenra keeps adapters under the old names.
@@ -2299,7 +2304,7 @@ EntityDetailScaffold(... hero: { HeroSection(icon: liveCategory.iconSource, ...)
 
 Used in: `OnboardingWelcomeStep` (bottom), Account/Category/Subscription/Deposit/Loan detail views (top).
 
-#### `EdgeBackdrop`, `.edgeBackdrop(_:color:)` *(4.13.0)*
+#### `EdgeBackdrop`, `.edgeBackdrop(_:color:)` *(4.14.0)*
 The backing of a bar over scrolling content, drawn by hand where the system's scroll edge effect
 is too faint to carry a large bar: an `.ultraThinMaterial` blur over three fifths of it fading out
 at the inner edge, a second one over the third nearest the screen's edge fading out by seven
@@ -2353,7 +2358,7 @@ ScrollView
 
 Tenra's add and edit transaction sheets and loan payments. The focus rule between the keypad and
 a text field is in §6 ("Calculator amount input"). Money put towards something with only a note
-and a date (a goal, a debt) is `AmountEntrySheet` (4.13.0), this layout ready-made.
+and a date (a goal, a debt) is `AmountEntrySheet` (4.14.0), this layout ready-made.
 
 ### Detail screen
 
@@ -2390,7 +2395,9 @@ Tenra builds every entity detail screen this way (its `EntityDetailScaffold`).
 
 - Loading: the component's `<Name>Skeleton` in its place, never a `ProgressView()`; the content
   replaces it with `.transition(.skeletonReveal)` ([motion.md](motion.md)).
-- Empty: `EmptyState` (`.standard` on a screen, `.compact` in a card, `.error` for a failure).
+- Empty: `EmptyState` (`.standard` on a screen, `.compact` in a card, `.error` for a failure);
+  an app's own picture in place of the icon with `EmptyState(…) { artwork }` (4.13.0), as Tenra's
+  empty lists show its mascot pointing at the button.
 - A card that switches between empty and loaded animates the switch (§9, "Card State
   Transitions").
 
@@ -2479,11 +2486,11 @@ Horizontal scroll?
 └── UniversalCarousel with appropriate preset
 
 A bar over scrolling content that needs a stronger backing than the scroll edge effect?
-└── .edgeBackdrop(edge) behind the bar's content (4.13.0)
+└── .edgeBackdrop(edge) behind the bar's content (4.14.0)
 
 Card-style container?
-├── Rows under an optional title → ListCard (4.13.0)
-├── A message to the person with a hide button and an action → NoticeCard (4.13.0)
+├── Rows under an optional title → ListCard (4.14.0)
+├── A message to the person with a hide button and an action → NoticeCard (4.14.0)
 └── Anything else → VStack { ... }.padding(AppSpacing.lg).cardStyle()
 ```
 

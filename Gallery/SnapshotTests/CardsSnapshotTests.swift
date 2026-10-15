@@ -104,7 +104,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// ListCard (4.13.0): rows under a title, and without one.
+        /// ListCard (4.14.0): rows under a title, and without one.
         @Test func listCards() async {
             await assertComponentSnapshot(
                 VStack(spacing: AppSpacing.lg) {

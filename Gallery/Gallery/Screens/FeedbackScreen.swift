@@ -406,6 +406,8 @@ private struct EmptyStatePage: View {
     @State private var style: EmptyState.Style = .standard
     @State private var hasAction = true
     @State private var hasDescription = true
+    @State private var mascot = false
+    @State private var greeted = 0
 
     var body: some View {
         ComponentPage(
@@ -415,21 +417,38 @@ private struct EmptyStatePage: View {
             canvas: .tall(minHeight: 280),
             notes: [
                 "The icon draws itself on (2.2.0) in an SF Symbols 7 gradient (2.3.0); the error icon wiggles once.",
+                "Artwork (4.13.0): EmptyState(title:description:actionTitle:action:) { … } puts any picture in place of the icon, such as an app's mascot pointing at the button.",
             ],
             styles: ["standard", "compact", "error"]
         ) {
-            EmptyState(
-                icon: style == .error ? "wifi.slash" : "tray",
-                title: style == .error ? "Couldn't load" : "No transactions yet",
-                description: hasDescription ? (style == .error ? "Check the connection and try again." : "Add the first one with +.") : nil,
-                actionTitle: hasAction ? (style == .error ? "Retry" : "Add") : nil,
-                action: hasAction ? {} : nil,
-                style: style
-            )
+            if mascot {
+                EmptyState(
+                    title: "No goals yet",
+                    description: hasDescription ? "Save towards something and see how close it is." : nil,
+                    actionTitle: hasAction ? "New goal" : nil,
+                    action: hasAction ? {} : nil
+                ) {
+                    ParticleCreature(mood: .happy, speech: CreatureSpeech("Shall we save for something?", id: greeted))
+                        .creatureGesture(.point(.down), trigger: greeted)
+                        .frame(width: 140, height: 140)
+                        .padding(.top, 60)
+                        .task { greeted += 1 }
+                }
+            } else {
+                EmptyState(
+                    icon: style == .error ? "wifi.slash" : "tray",
+                    title: style == .error ? "Couldn't load" : "No transactions yet",
+                    description: hasDescription ? (style == .error ? "Check the connection and try again." : "Add the first one with +.") : nil,
+                    actionTitle: hasAction ? (style == .error ? "Retry" : "Add") : nil,
+                    action: hasAction ? {} : nil,
+                    style: style
+                )
+            }
         } controls: {
             ChoiceControl("Style", selection: $style, options: [("Standard", .standard), ("Compact", .compact), ("Error", .error)])
             ToggleControl("Description", isOn: $hasDescription)
             ToggleControl("Action", isOn: $hasAction)
+            ToggleControl("Mascot artwork", isOn: $mascot)
         }
     }
 }
@@ -549,7 +568,7 @@ private struct NoticeCardPage: View {
         ComponentPage(
             name: "NoticeCard",
             summary: "A message the app writes to the person: a picture, a title and a line or two, a hide button and an action under them.",
-            since: "4.13.0",
+            since: "4.14.0",
             apps: [.tenra],
             canvas: .fill,
             notes: [

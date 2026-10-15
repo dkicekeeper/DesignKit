@@ -265,7 +265,7 @@ private struct NavigationPickerRowPage: View {
             canvas: .fill,
             notes: [
                 "Needs a NavigationStack around it (an EditSheetContainer has one). A few options: MenuPickerRow.",
-                "style: .list (4.13.0) is the row of a List, as iOS Settings draws it: the list adds the chevron.",
+                "style: .list (4.14.0) is the row of a List, as iOS Settings draws it: the list adds the chevron.",
             ],
             styles: ["form", "list"]
         ) {

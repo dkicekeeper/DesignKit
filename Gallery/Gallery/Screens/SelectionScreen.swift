@@ -327,7 +327,7 @@ private struct PickerCarouselPage: View {
         ComponentPage(
             name: "PickerCarousel",
             summary: "Options to try on, side by side: the middle card is the focused one; closed ones are dim with a lock, and what opens the focused one shows above.",
-            since: "4.13.0",
+            since: "4.14.0",
             apps: [.tenra],
             canvas: .fill,
             notes: [

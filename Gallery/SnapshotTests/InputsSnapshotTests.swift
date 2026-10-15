@@ -352,7 +352,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// PickerCarousel (4.13.0): the focused card in the middle (open, chosen), a closed one
+        /// PickerCarousel (4.14.0): the focused card in the middle (open, chosen), a closed one
         /// beside it dim with a lock, its condition above.
         @Test func pickerCarousel() async {
             await assertComponentSnapshot(

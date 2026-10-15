@@ -2,7 +2,7 @@
 //  AmountEntrySheet.swift
 //  DesignKit
 //
-//  Money put towards something (4.13.0): the hero of what it goes to, the amount on the
+//  Money put towards something (4.14.0): the hero of what it goes to, the amount on the
 //  calculator keypad, a note, and the date buttons with Save. The amount may be typed in
 //  another currency; on save it is converted to `currency` through
 //  `DesignKitCurrencyConverter.convertSync`. Ported from Tenra's MoneyEntrySheet (money towards

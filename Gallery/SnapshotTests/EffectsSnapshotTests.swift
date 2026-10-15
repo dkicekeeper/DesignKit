@@ -210,7 +210,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// VoiceOrbButton (4.13.0): the orb at a fixed level, still, with its stop glyph.
+        /// VoiceOrbButton (4.14.0): the orb at a fixed level, still, with its stop glyph.
         @Test func voiceOrbButton() async {
             await assertComponentSnapshot(
                 VoiceOrbButton(level: 0.7, accessibilityLabel: "Stop recording") {}
@@ -221,7 +221,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// EdgeBackdrop (4.13.0): rows under a top bar's backing, blurred and covered by the
+        /// EdgeBackdrop (4.14.0): rows under a top bar's backing, blurred and covered by the
         /// page's colour near the edge, clear further down.
         @Test func edgeBackdrop() async {
             await assertComponentSnapshot(

@@ -349,7 +349,7 @@ private struct ListCardPage: View {
         ComponentPage(
             name: "ListCard",
             summary: "A card of rows under an optional section title: a short list in a reply or on a screen.",
-            since: "4.13.0",
+            since: "4.14.0",
             apps: [.tenra],
             canvas: .fill,
             notes: [

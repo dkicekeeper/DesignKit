@@ -5,7 +5,7 @@
 //  A form row that opens a list to choose from (3.0.0): the title, the chosen value and a
 //  chevron; the list shows every option with a check by the chosen one, and a search field when
 //  there are many. For long lists a menu would make too tall (Dalada's fish species, the packing
-//  list to start from). A few options → `MenuPickerRow`. `style: .list` (4.13.0) is the same
+//  list to start from). A few options → `MenuPickerRow`. `style: .list` (4.14.0) is the same
 //  choice as a row of a `List`, as iOS Settings draws it (Tenra's voice language).
 //
 
@@ -28,7 +28,7 @@ public struct NavigationPickerRow<T: Hashable>: View {
         /// A row of a form card (`FormSection`, `EditSheetContainer`): its own padding, a large
         /// icon, the value and a chevron of its own.
         case form
-        /// A row of a `List` (4.13.0): the settings row (`RowConfiguration.settings`), a
+        /// A row of a `List` (4.14.0): the settings row (`RowConfiguration.settings`), a
         /// medium icon and the value in the small type; the list draws the chevron.
         case list
     }

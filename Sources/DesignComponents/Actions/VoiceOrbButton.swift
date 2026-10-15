@@ -2,7 +2,7 @@
 //  VoiceOrbButton.swift
 //  DesignKit
 //
-//  The stop button while something records the voice (4.13.0): `VoiceWave`'s orb, swelling
+//  The stop button while something records the voice (4.14.0): `VoiceWave`'s orb, swelling
 //  with the voice, with a small glyph in the middle. At rest the orb is about an 80 pt button;
 //  only that circle takes the tap. Ported from Tenra's VoiceStopOrb; the recording, its level
 //  and the feature tour's hint stay in the app.

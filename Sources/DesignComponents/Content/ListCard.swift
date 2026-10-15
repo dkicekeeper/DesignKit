@@ -2,7 +2,7 @@
 //  ListCard.swift
 //  DesignKit
 //
-//  A card of rows under an optional section title (4.13.0): what an assistant's reply shows (a
+//  A card of rows under an optional section title (4.14.0): what an assistant's reply shows (a
 //  list of payments, a draft to confirm, an attachment), a short list on a screen. The rows pad
 //  themselves vertically (docs/design-system.md §10); the card pads them on every side and
 //  spaces them by `AppSpacing.sm`. Ported from Tenra's AssistantCard.

@@ -2,7 +2,7 @@
 //  EdgeBackdrop.swift
 //  DesignKit
 //
-//  The backing of a bar over scrolling content (4.13.0): the content under it blurs and the
+//  The backing of a bar over scrolling content (4.14.0): the content under it blurs and the
 //  page's colour lies over it, both strongest at the screen's edge and fading to nothing at the
 //  bar's inner edge, so what the bar holds reads on any content without a solid plate. The iOS
 //  bar backing, drawn by hand where the system's scroll edge effect is too faint to carry a large
