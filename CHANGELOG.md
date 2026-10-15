@@ -19,7 +19,7 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 ## 4.13.0 - 2026-10-15
 
 `EmptyState` takes any picture in place of its icon, for a mascot in an app's empty lists.
-[#72](https://github.com/dkicekeeper/DesignKit/pull/72)
+[#73](https://github.com/dkicekeeper/DesignKit/pull/73)
 
 ### Added
 
