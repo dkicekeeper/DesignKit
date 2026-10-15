@@ -23,8 +23,8 @@ FormSection(header: "Payments", style: .glass) { rows }
 
 ## Changed in the same release
 
-- `PickerCarousel` runs on `SnapCardPicker(style: .centered(width:))`. Its look and API are as
-  before; it waits for a measured row before scrolling to a focus that arrives after it appears.
+- `PickerCarousel` runs on `SnapCardPicker(style: .centered(width:))`, its own row moved there as
+  it was. Its look, behaviour and API are as before.
 - `OptionCard`'s outline is 2 pt (3 pt before), as `PickerCarousel`'s and `IconPicker`'s: one
   `.selectionOutline(_:cornerRadius:)` for every option a person picks.
 - `AmountEntrySheet`'s bar is `EditSheetContainer`'s: its close button is read as Cancel (it was

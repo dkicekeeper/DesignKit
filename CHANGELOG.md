@@ -36,9 +36,8 @@ once (the owner's choice over deprecating them).
 ### Changed
 
 - `OptionCard`: its outline is 2 pt (3 pt before).
-- `PickerCarousel` runs on `SnapCardPicker(style: .centered(width:))`: it waits for a measured row
-  before its first scroll, so a focused option set before it appears is centred. A tap on a card
-  scrolls it to the middle with the carousel's spring.
+- `PickerCarousel` runs on `SnapCardPicker(style: .centered(width:))`, its own row moved there as
+  it was: it looks and behaves the same (`pickerCarousel` snapshots unchanged).
 - `AmountEntrySheet`'s bar is `EditSheetContainer`'s: its close button is read as Cancel (Close
   before), and its save button plays the light haptic before the save's own.
 - `NavigationPickerRow(style: .list)` is `NavigationSettingsRow(value:)`; it looks the same.
@@ -75,7 +74,7 @@ FormSection(header: "Payments", style: .glass) { rows }
 - Gallery: `FormSection` has a style control (Card, Glass) and took the `ListCard` page;
   `SnapCardPicker` has a style control; `NavigationSettingsRow` has Value and Icon controls.
 - Snapshot tests: `listCards` draws the glass `FormSection` against `ListCard`'s references, and
-  `pickerCarousel` the carousel on `SnapCardPicker` against its own; `edgeBackdropUnderBar` (the
+  `pickerCarousel` the carousel on `SnapCardPicker` against its 4.14.0 ones; `edgeBackdropUnderBar` (the
   backing under a `safeAreaBar`, the system's scroll edge effect as it comes, soft and hidden);
   `OptionCard`'s, `EdgeBackdrop`'s and the ported skeletons' references re-recorded.
 - CI: the Changelog job refuses dingbats and emoji, which TestFlight's What to Test refuses.

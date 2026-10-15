@@ -1999,10 +1999,11 @@ after it appears still scrolls into place; it re-aligns when the selection drops
 items (a sibling picker filtered them). `SnapCardPicker(items, id:selection:) { item, isSelected, select in … }`.
 Tenra: `AccountSelectorView` (with `SelectableBalanceCard`) and `CategoryCardSelectorView`.
 *(5.0.0)* `style: .centered(width:)`: cards of one width side by side, the centred one full size,
-the others at 90 % and 75 % opacity (`scrollTransition`), the row's margins centring a card, no
-vertical padding; the selection follows the centre while the person moves the row (a drag and its
-coast; an animated scroll to a tapped card does not pass its selection through the cards on the
-way). `PickerCarousel`'s row; the default `.fill` is as before.
+the others at 90 % and 75 % opacity (`scrollTransition`), the row's margins centring a card. The
+scroll position is the selection itself, so the first layout stands on it and the selection
+follows the centre as the row scrolls: the cards have their width before the row is measured, so
+the write `.fill` waits for is not lost here. `PickerCarousel`'s row of 4.14.0, moved here as it
+was; the default `.fill` is unchanged.
 
 #### `OptionCard`, `OptionCardPicker`
 An option as a picture: an 80 × 120 artwork (`AppRadius.lg`) with a check on it when chosen, the
@@ -2086,8 +2087,7 @@ tap; anchor a hint to that circle. Read the level in a small view of its own, so
 Options to try on: the focused option's name (`h4`) and, when it is closed, what opens it
 (`bodyEmphasis`, accent, a lock, wrapping in full over two kept lines), then cards side by side
 (`PickerCarouselMetrics.cardWidth` 150 pt, the middle one full size, the others at 90 % and
-75 % opacity, snapping to the middle: `SnapCardPicker(style: .centered(width:))` since 5.0.0,
-which also waits for a measured row before its first scroll). A card is the option's picture
+75 % opacity, snapping to the middle: `SnapCardPicker(style: .centered(width:))` since 5.0.0). A card is the option's picture
 (`pictureSize`, 96 pt, drawn still, at 40 % when closed), its name kept to two lines, a lock in
 the corner when closed and an accent outline (`.selectionOutline`) and name when it is `chosen`. Scrolling and a tap change `focused`; the
 app decides what that does (Tenra: Ten tries the accessory on and puts an open one on at once)

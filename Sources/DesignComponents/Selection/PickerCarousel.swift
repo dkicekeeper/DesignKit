@@ -9,9 +9,8 @@
 //  lock, wrapping in full; two lines are kept for it so the cards do not move. Ported from
 //  Tenra's wardrobe for Ten (AssistantWardrobeView); what the options are, what opens them and
 //  what a focused option does (Ten tries it on) stay in the app.
-//  5.0.0: the row is `SnapCardPicker(style: .centered(width:))` (it drew its own carousel, without
-//  the picker's wait for a measured row before the first scroll), and the chosen card's outline is
-//  `.selectionOutline`.
+//  5.0.0: the row is `SnapCardPicker(style: .centered(width:))`, which took this file's own
+//  carousel as it was, and the chosen card's outline is `.selectionOutline`.
 //
 
 import SwiftUI
