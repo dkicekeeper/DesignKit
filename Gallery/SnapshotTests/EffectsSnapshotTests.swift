@@ -223,7 +223,6 @@ extension ComponentSnapshots {
 
         /// EdgeBackdrop (4.14.0): a chat's rows under a top bar's backing (questions in the accent,
         /// replies on a pale card), blurred and lightly washed near the edge, sharp further down.
-        /// The view itself over the rows in one stack (4.14.0's `.edgeBackdrop` drew the same).
         @Test func edgeBackdrop() async {
             await assertComponentSnapshot(
                 ZStack(alignment: .top) {
@@ -239,22 +238,24 @@ extension ComponentSnapshots {
                                 .frame(maxWidth: .infinity, alignment: question ? .trailing : .leading)
                         }
                     }
-                    EdgeBackdrop(edge: .top)
+                    Color.clear
                         .frame(height: 160)
                         .frame(maxWidth: .infinity)
+                        .edgeBackdrop(.top)
                 }
                 .clipShape(.rect(cornerRadius: AppRadius.lg)),
                 appearances: [.light, .dark]
             )
         }
 
-        /// `.scrollEdgeBackdrop` (5.0.0) on a scroll view scrolled to its end, the thread's top
-        /// under a `safeAreaBar`, beside 4.14.0's way (the backing behind the bar's content) for
-        /// comparison: the material blurs the rows only where it lies over them.
-        @Test func scrollEdgeBackdrop() async {
-            for (name, onScrollView) in [("onScrollView", true), ("insideBar", false)] {
+        /// EdgeBackdrop behind a `safeAreaBar`'s content over a thread scrolled to its end, as in
+        /// Tenra's chat, with the system's scroll edge effect on that edge as it comes
+        /// (`automatic`), `.soft` (Tenra's), and hidden: whether the effect fades the rows out
+        /// before the backing blurs them (5.0.0, the owner saw no blur on a device).
+        @Test func edgeBackdropUnderBar() async {
+            for (name, effect) in [("automatic", EdgeBackdropSample.Effect.automatic), ("soft", .soft), ("hidden", .hidden)] {
                 await assertComponentSnapshot(
-                    EdgeBackdropSample(onScrollView: onScrollView),
+                    EdgeBackdropSample(effect: effect),
                     named: name,
                     appearances: [.light]
                 )
@@ -263,9 +264,12 @@ extension ComponentSnapshots {
     }
 }
 
-/// A thread scrolled to its end under a top bar, its backing on the scroll view or in the bar.
+/// A thread scrolled to its end under a top bar with an `EdgeBackdrop`, the system's scroll edge
+/// effect as given.
 private struct EdgeBackdropSample: View {
-    let onScrollView: Bool
+    enum Effect { case automatic, soft, hidden }
+
+    let effect: Effect
 
     var body: some View {
         let thread = ScrollView {
@@ -285,10 +289,10 @@ private struct EdgeBackdropSample: View {
         .defaultScrollAnchor(.bottom)
 
         Group {
-            if onScrollView {
-                thread.scrollEdgeBackdrop(.top)
-            } else {
-                thread
+            switch effect {
+            case .automatic: thread
+            case .soft: thread.scrollEdgeEffectStyle(.soft, for: .top)
+            case .hidden: thread.scrollEdgeEffectHidden(true, for: .top)
             }
         }
         .safeAreaBar(edge: .top) {
@@ -296,9 +300,7 @@ private struct EdgeBackdropSample: View {
                 .font(AppTypography.h3)
                 .padding(.vertical, AppSpacing.xxl)
                 .frame(maxWidth: .infinity)
-                .background {
-                    if !onScrollView { EdgeBackdrop(edge: .top) }
-                }
+                .edgeBackdrop(.top)
         }
         .frame(height: 320)
         .clipShape(.rect(cornerRadius: AppRadius.lg))

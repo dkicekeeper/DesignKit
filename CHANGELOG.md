@@ -19,7 +19,7 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 ## 5.0.0 - 2026-10-15
 
 4.14.0's ports from Tenra folded into the components they repeated, the duplicates removed at
-once (the owner's choice over deprecating them), and the bar backing's blur put where it works.
+once (the owner's choice over deprecating them).
 [#75](https://github.com/dkicekeeper/DesignKit/pull/75)
 
 ### Added
@@ -32,8 +32,6 @@ once (the owner's choice over deprecating them), and the bar backing's blur put 
   chosen option, one look for `OptionCard`, `PickerCarousel` and `IconPicker`.
 - `NavigationSettingsRow(icon:title:value:iconColor:destination:)`: what is set, before the
   chevron; the icon may be `nil`.
-- `.scrollEdgeBackdrop(_:color:)` on a scroll view: `EdgeBackdrop` over the scrolling content, from
-  the screen's edge to the end of the bars, in place of the system's scroll edge effect there.
 
 ### Changed
 
@@ -41,8 +39,8 @@ once (the owner's choice over deprecating them), and the bar backing's blur put 
 - `PickerCarousel` runs on `SnapCardPicker(style: .centered(width:))`: it waits for a measured row
   before its first scroll, so a focused option set before it appears is centred. A tap on a card
   scrolls it to the middle with the carousel's spring.
-- `AmountEntrySheet`'s bar is `EditSheetContainer`'s: the ✕ is read as Cancel (Close before), and
-  the ✓ plays the light haptic before the save's own.
+- `AmountEntrySheet`'s bar is `EditSheetContainer`'s: its close button is read as Cancel (Close
+  before), and its save button plays the light haptic before the save's own.
 - `NavigationPickerRow(style: .list)` is `NavigationSettingsRow(value:)`; it looks the same.
 - `FormSection` leaves out an empty `header`.
 
@@ -50,36 +48,29 @@ once (the owner's choice over deprecating them), and the bar backing's blur put 
 
 - `ListCard` and `ListCardSkeleton`: use `FormSection(header:style: .glass)`, with the rows'
   skeletons inside while they load.
-- `.edgeBackdrop(_:color:)`: use `.scrollEdgeBackdrop(_:color:)` on the scroll view. Behind a
-  `safeAreaBar`'s content the material lay apart from the scrolling content, and on a device it
-  showed no blur.
 - The `button.close` string (`AmountEntrySheet` uses `button.cancel` now).
 
 ### Migration
 
-- Tenra: its assistant's cards (`AssistantAttachmentCard`, `AssistantReplyView`) and its chat's
-  bar (`AssistantChatView`). Dalada uses neither. docs/migration-5.0.md has the details.
+- Tenra: its assistant's cards (`AssistantAttachmentCard`, `AssistantReplyView`). Dalada does not
+  use `ListCard`. docs/migration-5.0.md has the details.
 
 ```swift
 // Before
 ListCard(title: "Payments") { rows }
-ScrollView { thread }
-    .safeAreaBar(edge: .top) { header.edgeBackdrop(.top) }
 // After
 FormSection(header: "Payments", style: .glass) { rows }
-ScrollView { thread }
-    .scrollEdgeBackdrop(.top)
-    .safeAreaBar(edge: .top) { header }
 ```
 
 ### Gallery and tooling
 
 - Gallery: `FormSection` has a style control (Card, Glass) and took the `ListCard` page;
-  `SnapCardPicker` has a style control; `NavigationSettingsRow` has Value and Icon controls;
-  `EdgeBackdrop` puts the backing on the scroll view, with "Inside the bar (4.14.0)" to compare.
-- Snapshot tests: `listCards` draws the glass `FormSection` against `ListCard`'s references;
-  `scrollEdgeBackdrop` (on the scroll view and inside the bar); `OptionCard`'s and the ported
-  skeletons' references re-recorded.
+  `SnapCardPicker` has a style control; `NavigationSettingsRow` has Value and Icon controls.
+- Snapshot tests: `listCards` draws the glass `FormSection` against `ListCard`'s references, and
+  `pickerCarousel` the carousel on `SnapCardPicker` against its own; `edgeBackdropUnderBar` (the
+  backing under a `safeAreaBar`, the system's scroll edge effect as it comes, soft and hidden);
+  `OptionCard`'s and the ported skeletons' references re-recorded.
+- CI: the Changelog job refuses dingbats and emoji, which TestFlight's What to Test refuses.
 - docs/migration-5.0.md.
 
 ## 4.15.0 - 2026-10-15

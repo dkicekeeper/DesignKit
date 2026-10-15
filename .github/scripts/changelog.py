@@ -55,6 +55,9 @@ def check():
             errors.append(f"line {number}: no headings below ###")
         elif "—" in line:
             errors.append(f"line {number}: an em dash; use a colon, a comma or two sentences")
+        elif any(0x2700 <= ord(c) <= 0x27BF or ord(c) >= 0x1F000 for c in line):
+            # App Store Connect refuses them in TestFlight's What to Test (✓ and ✕ did, 5.0.0).
+            errors.append(f"line {number}: a dingbat or an emoji, which TestFlight's What to Test refuses; use words")
     if in_code:
         errors.append("a code block is not closed")
 

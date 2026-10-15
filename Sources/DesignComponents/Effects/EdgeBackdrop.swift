@@ -11,11 +11,6 @@
 //  content gives way to the sharp one. The page's colour over it is light (25% at the edge), so
 //  the blurred content's colours show through (the owner's review: blur, not a plate; a second
 //  material and a 45% tint still read as a grey plate).
-//  5.0.0: `.scrollEdgeBackdrop(_:color:)` goes on the scroll view, not behind the bar. Behind a
-//  `safeAreaBar`'s content (4.14.0's `.edgeBackdrop`) the owner saw no blur on a device: the bar
-//  does not lie over the scrolling content in one layer, so the material had nothing to blur. On
-//  the scroll view it lies over the content, from the screen's edge to the end of the bars, and
-//  the system's scroll edge effect on that edge is hidden (it fades the content out first).
 //
 
 import SwiftUI
@@ -24,9 +19,14 @@ import DesignSupport
 
 /// Blur and the page's colour under a bar, fading out towards the content.
 ///
-/// Over a scroll view, use `.scrollEdgeBackdrop(_:)` on the scroll view (5.0.0): it sizes the
-/// backing to its bars and lies over the content. The view itself is for a bar laid over content
-/// in the same stack (a `ZStack`), where the material sees the content under it.
+/// ```swift
+/// ScrollView { … }
+///     .safeAreaBar(edge: .top) {
+///         Header()
+///             .frame(maxWidth: .infinity)
+///             .edgeBackdrop(.top)
+///     }
+/// ```
 ///
 /// It reaches past the safe area to the screen's edge (under the status bar and the navigation
 /// bar), takes no touches and is hidden from VoiceOver.
@@ -43,18 +43,6 @@ public struct EdgeBackdrop: View {
     }
 
     public var body: some View {
-        EdgeBackdropFill(edge: edge, color: color)
-            .ignoresSafeArea(edges: edge == .top ? .top : .bottom)
-    }
-}
-
-/// The backing's layers in the frame they are given: the blur and the colour, both fading out
-/// from `edge`. Takes no touches and is hidden from VoiceOver.
-struct EdgeBackdropFill: View {
-    let edge: VerticalEdge
-    let color: Color
-
-    var body: some View {
         ZStack {
             Rectangle()
                 .fill(.ultraThinMaterial)
@@ -65,6 +53,7 @@ struct EdgeBackdropFill: View {
                 endPoint: end
             )
         }
+        .ignoresSafeArea(edges: edge == .top ? .top : .bottom)
         .allowsHitTesting(false)
         .accessibilityHidden(true)
     }
@@ -97,31 +86,11 @@ public enum EdgeBackdropMetrics {
 }
 
 public extension View {
-    /// The backing of the bars at a scroll view's `edge` (5.0.0): over the scrolling content,
-    /// from the screen's edge to the end of the bars there (the status bar, the navigation bar,
-    /// a `safeAreaBar`), the content blurs and the page's colour lies over it, fading out towards
-    /// the content. It takes the place of the system's scroll edge effect on that edge, which it
-    /// hides. Put it on the scroll view, before its `safeAreaBar`:
-    ///
-    /// ```swift
-    /// ScrollView { … }
-    ///     .scrollEdgeBackdrop(.top)
-    ///     .safeAreaBar(edge: .top) { Header() }
-    /// ```
-    ///
-    /// 4.14.0's `.edgeBackdrop`, behind the bar's content, is gone: there the material lay apart
-    /// from the scrolling content and had nothing to blur.
-    func scrollEdgeBackdrop(_ edge: VerticalEdge = .top, color: Color = AppColors.bgBase) -> some View {
-        scrollEdgeEffectHidden(true, for: edge == .top ? .top : .bottom)
-            .overlay {
-                // The bars are the scroll view's safe area at that edge: the backing fills it.
-                GeometryReader { proxy in
-                    EdgeBackdropFill(edge: edge, color: color)
-                        .frame(height: edge == .top ? proxy.safeAreaInsets.top : proxy.safeAreaInsets.bottom)
-                        .frame(maxHeight: .infinity, alignment: edge == .top ? .top : .bottom)
-                }
-                .ignoresSafeArea()
-                .allowsHitTesting(false)
-            }
+    /// Puts an `EdgeBackdrop` behind the view: a bar's backing over scrolling content, blur and
+    /// the page's colour fading out towards the content.
+    func edgeBackdrop(_ edge: VerticalEdge = .top, color: Color = AppColors.bgBase) -> some View {
+        background {
+            EdgeBackdrop(edge: edge, color: color)
+        }
     }
 }

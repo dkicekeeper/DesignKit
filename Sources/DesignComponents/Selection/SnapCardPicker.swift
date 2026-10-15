@@ -78,6 +78,13 @@ public struct SnapCardPicker<Item, ID: Hashable, Card: View>: View {
         self.style = style
         self.onSelectionChange = onSelectionChange
         self.card = card
+        // `.centered`'s cards have their width before the row is measured, so the first layout
+        // can stand on the selection: the side cards are smaller and paler from the start (an
+        // alignment after it left them full until the first scroll). `.fill`'s cards are
+        // zero-wide until then, so it waits (`performInitialAlignment`).
+        if case .centered = style {
+            _scrollPosition = State(initialValue: selection.wrappedValue)
+        }
     }
 
     public var body: some View {

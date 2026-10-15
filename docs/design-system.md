@@ -47,9 +47,8 @@
 `EmptyState`, `Avatar`, `Badge`, `Icon`, `DSButton`. The names before 2.0 were deprecated
 typealiases until 3.0.0, which removed them ([migration-2.0.md](migration-2.0.md),
 [migration-3.0.md](migration-3.0.md)); 4.0.0 removed the last deprecated name,
-`SectionHeader.Style.list` ([migration-4.0.md](migration-4.0.md)); 5.0.0 removed `ListCard` and
-`.edgeBackdrop`, folded into `FormSection(style: .glass)` and `.scrollEdgeBackdrop`
-([migration-5.0.md](migration-5.0.md)).
+`SectionHeader.Style.list` ([migration-4.0.md](migration-4.0.md)); 5.0.0 removed `ListCard`,
+folded into `FormSection(style: .glass)` ([migration-5.0.md](migration-5.0.md)).
 The tokens keep their prefix (`AppColors`, `AppSpacing`, `AppIconSize`, …): a token namespace
 is not a view, and `Color` / `Font` would clash with SwiftUI. The button is `DSButton` because
 `Button` is SwiftUI's.
@@ -2325,24 +2324,17 @@ EntityDetailScaffold(... hero: { HeroSection(icon: liveCategory.iconSource, ...)
 
 Used in: `OnboardingWelcomeStep` (bottom), Account/Category/Subscription/Deposit/Loan detail views (top).
 
-#### `EdgeBackdrop` *(4.14.0)*, `.scrollEdgeBackdrop(_:color:)` *(5.0.0)*
+#### `EdgeBackdrop`, `.edgeBackdrop(_:color:)` *(4.14.0)*
 The backing of a bar over scrolling content, drawn by hand where the system's scroll edge effect
 is too faint to carry a large bar: an `.ultraThinMaterial` blur, full over the half nearest the
 screen's edge and fading out at the inner edge (SwiftUI has no blur of varying radius, so the
 blurred content gives way to the sharp one), and the page's colour over it, light so the blurred
 content's colours show through: 25% at the edge, 10% at two fifths, clear at three quarters
 (`EdgeBackdropMetrics`). A second material or a heavier tint reads as a grey plate. It reaches past the
-safe area to the screen's edge, takes no touches and is hidden from VoiceOver. `color:` is the
-page's colour (`AppColors.bgBase` by default). Tenra: the chat's bar, Ten 120 pt over the thread.
-
-*(5.0.0)* Over a scroll view it goes **on the scroll view**, before its `safeAreaBar`:
-`ScrollView { … }.scrollEdgeBackdrop(.top).safeAreaBar(edge: .top) { header }`. It fills the scroll
-view's safe area at that edge (the status bar, the navigation bar and the `safeAreaBar`, read from
-a `GeometryReader` that ignores the safe area), lies over the scrolling content and hides the
-system's scroll edge effect there (`scrollEdgeEffectHidden`), which faded the content out under
-the bars first. 4.14.0's `.edgeBackdrop`, behind the bar's content, is removed: there the material
-lay apart from the scrolling content, and the owner saw no blur on a device. `EdgeBackdrop` on its
-own is for a bar over content in the same stack (a `ZStack`).
+safe area to the screen's edge, takes no touches and is hidden from VoiceOver. Put it behind the
+bar's content: `.safeAreaBar(edge: .top) { header.frame(maxWidth: .infinity).edgeBackdrop() }`.
+`color:` is the page's colour (`AppColors.bgBase` by default). Tenra: the chat's bar, Ten 120 pt
+over the thread.
 
 ---
 
@@ -2514,7 +2506,7 @@ Horizontal scroll?
 └── UniversalCarousel with appropriate preset
 
 A bar over scrolling content that needs a stronger backing than the scroll edge effect?
-└── .scrollEdgeBackdrop(edge) on the scroll view, before its safeAreaBar (5.0.0)
+└── .edgeBackdrop(edge) behind the bar's content (4.14.0)
 
 Card-style container?
 ├── Rows under an optional title → FormSection(header:, style: .glass) (5.0.0; ListCard in 4.14.0)

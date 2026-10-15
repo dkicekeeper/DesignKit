@@ -457,8 +457,6 @@ private struct BorderBeamPage: View {
 
 private struct EdgeBackdropPage: View {
     @State private var bottom = false
-    /// 4.14.0's way, behind the bar's content, for a side-by-side look on a device.
-    @State private var insideBar = false
 
     private let rows = ["How much did I spend on cafés?", "Groceries went up 12% this month.", "Your next payment is the internet, tomorrow.",
                         "You put 50 000 ₸ towards the car.", "The savings rate is 18%.", "Taxi: 14 trips, 42 000 ₸.",
@@ -473,8 +471,7 @@ private struct EdgeBackdropPage: View {
             canvas: .tall(minHeight: 360),
             notes: [
                 "For a bar the system's scroll edge effect is too faint to carry (a large header over a chat).",
-                "Put .scrollEdgeBackdrop(edge) on the scroll view, before its safeAreaBar (5.0.0): it fills the bars' height from the screen's edge, hides the system's scroll edge effect there, takes no touches, and VoiceOver skips it.",
-                "Inside the bar (4.14.0's .edgeBackdrop) the material lies apart from the scrolling content: no blur on a device. The control shows it for comparison.",
+                "Put it behind the bar's content with .edgeBackdrop(edge); it reaches to the screen's edge, takes no touches, and VoiceOver skips it.",
             ]
         ) {
             ScrollView {
@@ -489,35 +486,17 @@ private struct EdgeBackdropPage: View {
                 }
                 .padding(AppSpacing.md)
             }
-            .modifier(EdgeBackdropPlacement(edge: bottom ? .bottom : .top, onScrollView: !insideBar))
             .safeAreaBar(edge: bottom ? .bottom : .top) {
                 ParticleCreature(mood: .happy, style: .compact)
                     .frame(width: AppIconSize.Tile.xxxl, height: AppIconSize.Tile.xxxl)
                     .padding(.vertical, AppSpacing.lg)
                     .frame(maxWidth: .infinity)
-                    .background {
-                        if insideBar { EdgeBackdrop(edge: bottom ? .bottom : .top) }
-                    }
+                    .edgeBackdrop(bottom ? .bottom : .top)
             }
             .frame(height: 340)
             .clipShape(.rect(cornerRadius: AppRadius.lg))
         } controls: {
             ToggleControl("Bottom edge", isOn: $bottom)
-            ChoiceControl("Backing", selection: $insideBar, options: [("On the scroll view", false), ("Inside the bar (4.14.0)", true)])
-        }
-    }
-}
-
-/// `.scrollEdgeBackdrop` on the scroll view, or nothing there (the backing then goes in the bar).
-private struct EdgeBackdropPlacement: ViewModifier {
-    let edge: VerticalEdge
-    let onScrollView: Bool
-
-    func body(content: Content) -> some View {
-        if onScrollView {
-            content.scrollEdgeBackdrop(edge)
-        } else {
-            content
         }
     }
 }
