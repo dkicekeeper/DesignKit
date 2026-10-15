@@ -15,8 +15,8 @@
 //  fan, whose cards behind the top one barely showed; `.fan` is deprecated and draws the shelf.
 //  4.5.1: the shelf's tiles are 36 pt whatever the count; the largest that fit the width show,
 //  the rest go into "+N", and the shelf is as wide as its row.
-//  4.14.0: the shelf's tiles are whole (no pocket) and 48 pt; with no width given, each style
-//  takes its own (160 pt for the shelf, 120 pt for the others, as before).
+//  4.14.0: the shelf's tiles are whole (no pocket) and 48 pt, and every style is 160 pt wide
+//  unless given a width (120 pt before): four tiles, coins of 48 pt, more room for the marbles.
 //
 
 import SwiftUI
@@ -53,7 +53,7 @@ public enum PackedCircleIconsStyle: Sendable {
     /// in 4.5.1), whole (4.14.0; a pocket cut them off before), the largest amount on the left,
     /// each a little over the one before and turned a few degrees, so every one reads. As many
     /// as fit the width show (at most `maxVisible`), the rest in a "+N" tile, and the shelf is
-    /// as wide as its row (4.5.1), 160 pt at most unless given a width (4.14.0): four tiles. A
+    /// as wide as its row (4.5.1), 160 pt at most by default (4.14.0): four tiles. A
     /// logo fills its tile. They come up one after another, and every few seconds a light runs
     /// across them (not under Reduce Motion).
     case shelf
@@ -78,16 +78,6 @@ enum PackedCircleMetrics {
     /// Where each marble starts its sway, so they never move together.
     static let swayPhase: Double = 0.9
 
-    /// The width a style takes when it is given none (4.14.0): the shelf's four tiles, 120 pt
-    /// for the others (every style's width before).
-    static func width(for style: PackedCircleIconsStyle) -> CGFloat {
-        switch style {
-        case .glossy, .flat, .orbit: 120
-        // `.shelf`, and the deprecated `.fan` (not named, so the package builds clean).
-        default: PackedShelfMetrics.width
-        }
-    }
-
     /// Room around a white symbol inside its circle. Icon's default curve gives ~10% on the
     /// 28-44pt bracket, which at these small diameters reads as no padding at all; the curve
     /// is bumped so a symbol always has visible breathing room inside its circle.
@@ -109,18 +99,18 @@ public struct PackedCircleIcons: View {
     let style: PackedCircleIconsStyle
 
     /// - Parameters:
-    ///   - containerWidth: The most room it takes across; `nil`, the style's own (4.14.0):
-    ///     160 pt for `.shelf`, 120 pt for the others.
+    ///   - containerWidth: The most room it takes across, 160 pt by default (4.14.0; 120 pt
+    ///     before): the shelf's four 48 pt tiles, the carousel's 48 pt coins.
     ///   - style: `.glossy` (2.9.0), `.flat` (the look before), `.shelf` or `.orbit`.
     public init(
         items: [PackedCircleItem],
         maxVisible: Int = 5,
-        containerWidth: CGFloat? = nil,
+        containerWidth: CGFloat = 160,
         style: PackedCircleIconsStyle = .glossy
     ) {
         self.items = items
         self.maxVisible = maxVisible
-        self.containerWidth = containerWidth ?? PackedCircleMetrics.width(for: style)
+        self.containerWidth = containerWidth
         self.style = style
     }
 
@@ -564,9 +554,9 @@ public struct PackedCircleIconsSkeleton: View {
     let containerWidth: CGFloat
     let style: PackedCircleIconsStyle
 
-    /// - Parameter containerWidth: As the component's; `nil`, the style's own (4.14.0).
-    public init(containerWidth: CGFloat? = nil, style: PackedCircleIconsStyle = .glossy) {
-        self.containerWidth = containerWidth ?? PackedCircleMetrics.width(for: style)
+    /// - Parameter containerWidth: As the component's, 160 pt by default (4.14.0; 120 pt before).
+    public init(containerWidth: CGFloat = 160, style: PackedCircleIconsStyle = .glossy) {
+        self.containerWidth = containerWidth
         self.style = style
     }
 

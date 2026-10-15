@@ -9,8 +9,8 @@
 //  before); as many as fit the width stand in the row, the rest go into the "+N" tile, and the
 //  box is as wide and as tall as the row, up to the size it is given.
 //  4.14.0 (the owner's review on a device): the tiles are whole, 48 pt (36 pt before), and the
-//  shelf is 160 pt wide unless told otherwise (120 pt), four tiles; until then the box's lower
-//  edge cut them off as if they stood in a pocket.
+//  shelf is 160 pt wide by default (120 pt before), four tiles; until then the box's lower edge
+//  cut them off as if they stood in a pocket.
 //  They come up one after another on appear, and every few seconds a light runs across them
 //  from left to right. It replaced 3.3.0's fan of playing cards, where the cards behind the top
 //  one barely showed.
@@ -27,8 +27,6 @@ enum PackedShelfMetrics {
     /// A tile's side in every shelf (48 pt since 4.14.0, 36 pt in 4.5.1), less only in a box
     /// too small for one tile.
     static let side: CGFloat = 48
-    /// The shelf's width when `PackedCircleIcons` is given none (4.14.0): four tiles.
-    static let width: CGFloat = 160
     /// How far a tile covers the one before it, in widths: when there is room, and the most
     /// they close up to fit one more tile in the width.
     static let targetOverlap: CGFloat = 0.1

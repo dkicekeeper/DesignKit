@@ -18,36 +18,34 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 
 ## 4.14.0 - 2026-10-15
 
-The shelf of app icons stands whole and larger, after the owner's review on a device.
-[#74](https://github.com/dkicekeeper/DesignKit/pull/74)
-
-### Added
-
-- `PackedCircleIcons(containerWidth: nil)` and `PackedCircleIconsSkeleton(containerWidth: nil)`,
-  the new default: each style takes its own width, 160 pt for `.shelf` and 120 pt for the
-  others (every style's width before). A width given as before is kept.
+`PackedCircleIcons` is larger and the shelf's app icons stand whole, after the owner's review on
+a device. [#74](https://github.com/dkicekeeper/DesignKit/pull/74)
 
 ### Changed
 
-- `PackedCircleIcons(style: .shelf)`: the tiles are whole and 48 pt (36 pt before); the box's
-  lower edge no longer cuts them off as a pocket, and they no longer darken at the bottom.
-- The shelf is 160 pt wide when given no width (120 pt before): four tiles, three items and a
-  "+N" when there are more. In a `FinanceCard` it takes up to 40 pt more of the card's width,
-  and the row is 61 pt tall (34 pt before).
-- The tiles come up one after another from a little lower, growing and fading in, in place of
-  rising out of the pocket. The light that runs across them is unchanged.
-- `PackedCircleIconsSkeleton(style: .shelf)`: four whole grey tiles, 160 pt wide.
+- `PackedCircleIcons` and `PackedCircleIconsSkeleton` are 160 pt wide by default
+  (`containerWidth`, 120 pt before), in every style. A width given as before is kept.
+- `style: .shelf`: the tiles are whole and 48 pt (36 pt before); the box's lower edge no longer
+  cuts them off as a pocket, and they no longer darken at the bottom. Four tiles fit the default
+  160 pt: three items and a "+N" when there are more. The row is 61 pt tall (34 pt before), and
+  in a `FinanceCard` it takes up to 40 pt more of the card's width.
+- `style: .shelf`: the tiles come up one after another from a little lower, growing and fading
+  in, in place of rising out of the pocket. The light that runs across them is unchanged.
+- `style: .orbit`: the coins are 48 pt in the default width (36 pt before).
+- `style: .glossy` and `.flat`: the marbles keep their sizes (28 to 56 pt by amount) and have
+  more room, so fewer shrink to fit.
+- `PackedCircleIconsSkeleton(style: .shelf)`: four whole grey tiles.
 
 ### Migration
 
-- Nothing to change: a shelf with no `containerWidth` takes the new size. To keep a shelf at
-  120 pt, pass `containerWidth: 120` (two 48 pt tiles fit there).
+- Nothing to change: a `PackedCircleIcons` with no `containerWidth` takes the new size. To keep
+  the old one, pass `containerWidth: 120` (two 48 pt tiles fit a shelf there).
 
 ### Gallery and tooling
 
-- Gallery: choosing Shelf on the PackedCircleIcons page shows it in a card at 160 pt, as on
-  Tenra's home.
-- Snapshot tests: the shelf's references re-recorded; `packedShelfBesideLongAmount` (a
+- Gallery: the PackedCircleIcons page starts at 160 pt; choosing Shelf shows it in a card at
+  160 pt, as on Tenra's home.
+- Snapshot tests: the PackedCircleIcons references re-recorded; `packedShelfBesideLongAmount` (a
   9-million amount beside the shelf in a `FinanceCard`).
 
 ## 4.13.0 - 2026-10-15

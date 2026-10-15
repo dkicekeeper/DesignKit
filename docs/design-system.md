@@ -702,8 +702,8 @@ In dark mode `\.heroTone` inside it is `.onColor`, and DesignKit's hero pieces d
     each tile stands over the one on its left and covers a tenth of it, turned a few degrees
     (−6°, 4°, −3°, 5°, …) and lifted a little, never two alike side by side. *(4.14.0, the
     owner's review on a device)* The tiles are whole and 48 pt, and the shelf is 160 pt wide
-    when given no `containerWidth` (the other styles keep 120 pt); until then the box's lower
-    edge was a pocket that cut them off with 0.74 of each above it, at 36 pt in 120 pt.
+    by default, as every style is now (`containerWidth`, 120 pt before); until then the box's
+    lower edge was a pocket that cut them off with 0.74 of each above it, at 36 pt in 120 pt.
     *(4.5.1)* The tiles are one size in every shelf, whatever the count (less only in a box too
     small for one); before, they shrank as the count grew, so a card with six items drew tiny
     tiles beside one with three. As many as fit the width stand in the row, closing up to 0.36
@@ -732,13 +732,16 @@ In dark mode `\.heroTone` inside it is `.onColor`, and DesignKit's hero pieces d
     across spins the ring (up and down is left to a scroll view), it coasts with the fling's
     speed and settles back to its pace in about a second, with a tick (`HapticCue.tick`) as each
     coin passes the front. The coins come in one after another. Under Reduce Motion it stands
-    still and a swipe turns it without the coast. Reads from about 240 pt wide.
+    still and a swipe turns it without the coast. Reads from about 240 pt wide; in the default
+    160 pt *(4.14.0; 120 pt before)* the coins are 48 pt (36 pt before).
     *(Before 4.7.0:)* the largest amount as a marble in the middle (0.42 of the box's shorter
     side), the rest as smaller marbles on an orbit seen at a slant (flatness 0.4, tilted −12°),
     with its faint line. The orbit turned once in 28 s; a marble on the far side was
     smaller (0.72) and darker and passed behind the middle one, a near one in front. The marbles
     flew out of the middle onto it, then the turn started.
 
+  Every style takes 160 pt across by default *(4.14.0; 120 pt before)* and 100 pt down; the
+  marbles keep their sizes (28 to 56 pt by amount) and have more room, so fewer shrink to fit.
   The deal, the flight, the light and the turn stand still under Reduce Motion, while the system
   saves resources and under `.designKitMotion(false)`, which draws the final picture.
   `PackedCircleIconsSkeleton(containerWidth:style:)` draws grey circles, tiles on the shelf or grey coins on the carousel's ring.
