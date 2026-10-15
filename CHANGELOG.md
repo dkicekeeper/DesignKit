@@ -16,6 +16,72 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 5.0.0 - 2026-10-15
+
+4.14.0's ports from Tenra folded into the components they repeated, the duplicates removed at
+once (the owner's choice over deprecating them), and the bar backing's blur put where it works.
+[#75](https://github.com/dkicekeeper/DesignKit/pull/75)
+
+### Added
+
+- `FormSection(header:footer:style: .glass)`: a Liquid Glass card that pads its rows by `lg` and
+  spaces them by `sm`, for content that is not a form. It is `ListCard`, pixel for pixel.
+- `SnapCardPicker(style: .centered(width:))`: cards of one width side by side, the centred one full
+  size, the others smaller and paler, the selection following the centre as the row scrolls.
+- `.selectionOutline(_:cornerRadius:)` and `AppSelection.outline` (2 pt): the accent outline of a
+  chosen option, one look for `OptionCard`, `PickerCarousel` and `IconPicker`.
+- `NavigationSettingsRow(icon:title:value:iconColor:destination:)`: what is set, before the
+  chevron; the icon may be `nil`.
+- `.scrollEdgeBackdrop(_:color:)` on a scroll view: `EdgeBackdrop` over the scrolling content, from
+  the screen's edge to the end of the bars, in place of the system's scroll edge effect there.
+
+### Changed
+
+- `OptionCard`: its outline is 2 pt (3 pt before).
+- `PickerCarousel` runs on `SnapCardPicker(style: .centered(width:))`: it waits for a measured row
+  before its first scroll, so a focused option set before it appears is centred. A tap on a card
+  scrolls it to the middle with the carousel's spring.
+- `AmountEntrySheet`'s bar is `EditSheetContainer`'s: the ✕ is read as Cancel (Close before), and
+  the ✓ plays the light haptic before the save's own.
+- `NavigationPickerRow(style: .list)` is `NavigationSettingsRow(value:)`; it looks the same.
+- `FormSection` leaves out an empty `header`.
+
+### Removed
+
+- `ListCard` and `ListCardSkeleton`: use `FormSection(header:style: .glass)`, with the rows'
+  skeletons inside while they load.
+- `.edgeBackdrop(_:color:)`: use `.scrollEdgeBackdrop(_:color:)` on the scroll view. Behind a
+  `safeAreaBar`'s content the material lay apart from the scrolling content, and on a device it
+  showed no blur.
+- The `button.close` string (`AmountEntrySheet` uses `button.cancel` now).
+
+### Migration
+
+- Tenra: its assistant's cards (`AssistantAttachmentCard`, `AssistantReplyView`) and its chat's
+  bar (`AssistantChatView`). Dalada uses neither. docs/migration-5.0.md has the details.
+
+```swift
+// Before
+ListCard(title: "Payments") { rows }
+ScrollView { thread }
+    .safeAreaBar(edge: .top) { header.edgeBackdrop(.top) }
+// After
+FormSection(header: "Payments", style: .glass) { rows }
+ScrollView { thread }
+    .scrollEdgeBackdrop(.top)
+    .safeAreaBar(edge: .top) { header }
+```
+
+### Gallery and tooling
+
+- Gallery: `FormSection` has a style control (Card, Glass) and took the `ListCard` page;
+  `SnapCardPicker` has a style control; `NavigationSettingsRow` has Value and Icon controls;
+  `EdgeBackdrop` puts the backing on the scroll view, with "Inside the bar (4.14.0)" to compare.
+- Snapshot tests: `listCards` draws the glass `FormSection` against `ListCard`'s references;
+  `scrollEdgeBackdrop` (on the scroll view and inside the bar); `OptionCard`'s and the ported
+  skeletons' references re-recorded.
+- docs/migration-5.0.md.
+
 ## 4.15.0 - 2026-10-15
 
 `PackedCircleIcons` is larger and the shelf's app icons stand whole, after the owner's review on

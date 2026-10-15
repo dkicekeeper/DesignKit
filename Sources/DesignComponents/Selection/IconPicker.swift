@@ -220,10 +220,7 @@ private struct IconPickerLogosTab: View {
                             .frame(width: AppIconSize.Tile.xl, height: AppIconSize.Tile.xl)
                             .background(isSelected ? AppColors.pale(AppColors.accent) : AppColors.Background.neutral1)
                             .clipShape(.rect(cornerRadius: AppRadius.lg))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: AppRadius.lg)
-                                    .stroke(isSelected ? AppColors.accent : Color.clear, lineWidth: 2)
-                            )
+                            .selectionOutline(isSelected, cornerRadius: AppRadius.lg)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(Text(verbatim: entry.name))

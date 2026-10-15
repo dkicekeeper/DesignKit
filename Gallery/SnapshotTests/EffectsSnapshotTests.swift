@@ -223,6 +223,7 @@ extension ComponentSnapshots {
 
         /// EdgeBackdrop (4.14.0): a chat's rows under a top bar's backing (questions in the accent,
         /// replies on a pale card), blurred and lightly washed near the edge, sharp further down.
+        /// The view itself over the rows in one stack (4.14.0's `.edgeBackdrop` drew the same).
         @Test func edgeBackdrop() async {
             await assertComponentSnapshot(
                 ZStack(alignment: .top) {
@@ -238,14 +239,68 @@ extension ComponentSnapshots {
                                 .frame(maxWidth: .infinity, alignment: question ? .trailing : .leading)
                         }
                     }
-                    Color.clear
+                    EdgeBackdrop(edge: .top)
                         .frame(height: 160)
                         .frame(maxWidth: .infinity)
-                        .edgeBackdrop(.top)
                 }
                 .clipShape(.rect(cornerRadius: AppRadius.lg)),
                 appearances: [.light, .dark]
             )
         }
+
+        /// `.scrollEdgeBackdrop` (5.0.0) on a scroll view scrolled to its end, the thread's top
+        /// under a `safeAreaBar`, beside 4.14.0's way (the backing behind the bar's content) for
+        /// comparison: the material blurs the rows only where it lies over them.
+        @Test func scrollEdgeBackdrop() async {
+            for (name, onScrollView) in [("onScrollView", true), ("insideBar", false)] {
+                await assertComponentSnapshot(
+                    EdgeBackdropSample(onScrollView: onScrollView),
+                    named: name,
+                    appearances: [.light]
+                )
+            }
+        }
+    }
+}
+
+/// A thread scrolled to its end under a top bar, its backing on the scroll view or in the bar.
+private struct EdgeBackdropSample: View {
+    let onScrollView: Bool
+
+    var body: some View {
+        let thread = ScrollView {
+            VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                ForEach(0..<10, id: \.self) { index in
+                    let question = index.isMultiple(of: 2)
+                    Text(question ? "How much on cafés?" : "Row \(index + 1): groceries, 12 400 ₸")
+                        .font(AppTypography.body)
+                        .foregroundStyle(question ? AppColors.staticWhite : AppColors.Text.primary)
+                        .padding(AppSpacing.md)
+                        .background(question ? AppColors.accent : AppColors.accent.opacity(0.2),
+                                    in: .rect(cornerRadius: AppRadius.lg))
+                        .frame(maxWidth: .infinity, alignment: question ? .trailing : .leading)
+                }
+            }
+        }
+        .defaultScrollAnchor(.bottom)
+
+        Group {
+            if onScrollView {
+                thread.scrollEdgeBackdrop(.top)
+            } else {
+                thread
+            }
+        }
+        .safeAreaBar(edge: .top) {
+            Text(verbatim: "Ten")
+                .font(AppTypography.h3)
+                .padding(.vertical, AppSpacing.xxl)
+                .frame(maxWidth: .infinity)
+                .background {
+                    if !onScrollView { EdgeBackdrop(edge: .top) }
+                }
+        }
+        .frame(height: 320)
+        .clipShape(.rect(cornerRadius: AppRadius.lg))
     }
 }

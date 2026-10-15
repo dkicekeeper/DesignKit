@@ -4,8 +4,9 @@
 //
 //  A message the app writes to the person (4.14.0): a picture on the leading edge (a mascot,
 //  an icon), a title and a line or two of text, a button that hides it, and an action under
-//  them ("Go through it"). On a `ListCard`. Ported from Tenra's AssistantNoticeCard; what the
-//  message is, when it shows and what the action does stay in the app.
+//  them ("Go through it"). On a glass card (`FormSection(style: .glass)` since 5.0.0, `ListCard`
+//  before). Ported from Tenra's AssistantNoticeCard; what the message is, when it shows and what
+//  the action does stay in the app.
 //
 
 import SwiftUI
@@ -62,7 +63,7 @@ public struct NoticeCard<Leading: View>: View {
     }
 
     public var body: some View {
-        ListCard {
+        FormSection(style: .glass) {
             HStack(alignment: .top, spacing: AppSpacing.md) {
                 leading
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {

@@ -9,6 +9,9 @@
 //  lock, wrapping in full; two lines are kept for it so the cards do not move. Ported from
 //  Tenra's wardrobe for Ten (AssistantWardrobeView); what the options are, what opens them and
 //  what a focused option does (Ten tries it on) stay in the app.
+//  5.0.0: the row is `SnapCardPicker(style: .centered(width:))` (it drew its own carousel, without
+//  the picker's wait for a measured row before the first scroll), and the chosen card's outline is
+//  `.selectionOutline`.
 //
 
 import SwiftUI
@@ -42,8 +45,6 @@ public struct PickerCarousel<Item: Identifiable, Picture: View>: View {
     let lockedLabel: String
     let pictureSize: CGFloat
     let picture: (Item) -> Picture
-
-    @State private var width: CGFloat = 0
 
     /// - Parameters:
     ///   - focused: The card in the middle; scrolling and a tap on a card change it.
@@ -109,35 +110,18 @@ public struct PickerCarousel<Item: Identifiable, Picture: View>: View {
     }
 
     /// The cards side by side, the one in the middle full size, the others a little smaller
-    /// and paler.
+    /// and paler: `SnapCardPicker`'s centred row.
     private var carousel: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            LazyHStack(spacing: AppSpacing.md) {
-                ForEach(items) { item in
-                    card(item)
-                        .id(item.id)
-                        .scrollTransition(.interactive, axis: .horizontal) { content, phase in
-                            content
-                                .scaleEffect(phase.isIdentity ? 1 : PickerCarouselMetrics.sideScale)
-                                .opacity(phase.isIdentity ? 1 : PickerCarouselMetrics.sideOpacity)
-                        }
-                }
-            }
-            .scrollTargetLayout()
+        SnapCardPicker(items, selection: $focused, style: .centered(width: PickerCarouselMetrics.cardWidth)) { item, _, focus in
+            card(item, focus: focus)
         }
-        .contentMargins(.horizontal, max(0, (width - PickerCarouselMetrics.cardWidth) / 2), for: .scrollContent)
-        .scrollTargetBehavior(.viewAligned)
-        .scrollPosition(id: $focused, anchor: .center)
-        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
     }
 
-    private func card(_ item: Item) -> some View {
+    private func card(_ item: Item, focus: @escaping () -> Void) -> some View {
         let isChosen = item.id == chosen
         let opensWith = condition(item)
         let isOpen = opensWith == nil
-        return Button {
-            withAnimation(AppAnimation.contentSpring) { focused = item.id }
-        } label: {
+        return Button(action: focus) {
             VStack(spacing: AppSpacing.sm) {
                 picture(item)
                     .frame(width: pictureSize, height: pictureSize)
@@ -155,10 +139,7 @@ public struct PickerCarousel<Item: Identifiable, Picture: View>: View {
             .padding(AppSpacing.md)
             .frame(width: PickerCarouselMetrics.cardWidth)
             .background(RoundedRectangle(cornerRadius: AppRadius.lg).fill(AppColors.Background.elevation1))
-            .overlay(
-                RoundedRectangle(cornerRadius: AppRadius.lg)
-                    .stroke(isChosen ? AppColors.accent : Color.clear, lineWidth: PickerCarouselMetrics.outline)
-            )
+            .selectionOutline(isChosen, cornerRadius: AppRadius.lg)
             .overlay(alignment: .topTrailing) {
                 if !isOpen {
                     Image(systemName: "lock.fill")
@@ -183,11 +164,9 @@ public enum PickerCarouselMetrics {
     /// A card's width; two lines kept for its name and for the condition above the cards.
     public static let cardWidth: CGFloat = 150
     static let lines = 2
-    /// The cards beside the middle one.
-    static let sideScale: CGFloat = 0.9
-    static let sideOpacity: Double = 0.75
-    /// The chosen card's outline.
-    static let outline: CGFloat = 2
+    /// The cards beside the middle one: `SnapCardPicker`'s `.centered` row.
+    static var sideScale: CGFloat { SnapCardPickerMetrics.sideScale }
+    static var sideOpacity: Double { SnapCardPickerMetrics.sideOpacity }
     /// A closed option's picture.
     static let lockedOpacity: Double = 0.4
 

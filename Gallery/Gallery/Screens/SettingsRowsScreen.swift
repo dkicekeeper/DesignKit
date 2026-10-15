@@ -132,26 +132,33 @@ private struct InfoRowPage: View {
 }
 
 private struct NavigationSettingsRowPage: View {
+    @State private var showsValue = true
+    @State private var showsIcon = true
     @State private var state: SpecimenState = .content
 
     var body: some View {
         ComponentPage(
             name: "NavigationSettingsRow",
-            summary: "A settings row that opens a screen: a small icon, the title, a chevron.",
+            summary: "A settings row that opens a screen: a small icon, the title, what is set, a chevron.",
             apps: [.tenra, .dalada],
-            canvas: .fill
+            canvas: .fill,
+            notes: [
+                "value: what is set, before the chevron, as iOS Settings shows it (5.0.0). NavigationPickerRow(style: .list) is this row with the chosen option.",
+            ]
         ) {
             InFormCard {
                 if state == .loading {
                     UniversalRowSkeleton.navigationSettings
                 } else {
-                    NavigationSettingsRow(icon: "globe", title: "Language") {
+                    NavigationSettingsRow(icon: showsIcon ? "globe" : nil, title: "Language", value: showsValue ? "English" : nil) {
                         Text("Language settings").navigationTitle("Language")
                     }
                 }
             }
         } controls: {
             StateControl(state: $state)
+            ToggleControl("Value", isOn: $showsValue)
+            ToggleControl("Icon", isOn: $showsIcon)
         }
     }
 }

@@ -29,7 +29,6 @@ struct ContentScreen: View {
         EditableHeroPage()
         ArticleBodyPage()
         MessageBubblePage()
-        ListCardPage()
     }
 }
 
@@ -171,38 +170,67 @@ private struct FlowLayoutPage: View {
 }
 
 private struct FormSectionPage: View {
+    @State private var style = FormSection<EmptyView>.Style.card
     @State private var showsHeader = true
     @State private var showsFooter = true
+    @State private var rows = 3
     @State private var title = "Groceries"
     @State private var note = ""
+    @State private var state: SpecimenState = .content
+
+    private let samples: [(String, String, String)] = [
+        ("Coffee House", "Cafés · 08:40", "cup.and.saucer.fill"),
+        ("Magnum", "Groceries · 12:15", "cart.fill"),
+        ("Yandex Go", "Taxi · 19:02", "car.fill"),
+        ("Kaspi", "Transfer · 21:30", "arrow.left.arrow.right"),
+    ]
 
     var body: some View {
         ComponentPage(
             name: "FormSection",
-            summary: "A titled group of form rows on a material card, with a footer.",
-            apps: [.tenra],
+            summary: "A titled group of rows on a card: a form's rows on Material (card), or a short list on Liquid Glass (glass, 5.0.0; ListCard in 4.14.0).",
+            apps: [.tenra, .dalada],
             canvas: .fill,
             notes: [
-                "Material, not glass: native menus in it morph from it otherwise.",
-                "The section adds no padding: its rows pad themselves (docs/design-system.md §10). A field goes in a row's trailing slot, UniversalRow(config: .standard), with a Divider between rows.",
-            ]
+                "card: Material, not glass, since native menus in it morph from it otherwise. The section adds no padding: its rows pad themselves (docs/design-system.md §10). A field goes in a row's trailing slot, UniversalRow(config: .standard), with a Divider between rows.",
+                "glass: the card pads its rows on every side and spaces them by sm, no dividers: a reply's list, a draft to confirm, a notice (NoticeCard sits on one).",
+            ],
+            styles: ["card", "glass"]
         ) {
-            FormSection(header: showsHeader ? "Transaction" : nil, footer: showsFooter ? "Shown on the transaction detail." : nil) {
-                UniversalRow(config: .standard) {
-                    Text("Title").font(AppTypography.body)
-                } trailing: {
-                    FormTextField(text: $title, placeholder: "Title", style: .inline)
+            switch style {
+            case .card:
+                FormSection(header: showsHeader ? "Transaction" : nil, footer: showsFooter ? "Shown on the transaction detail." : nil) {
+                    UniversalRow(config: .standard) {
+                        Text("Title").font(AppTypography.body)
+                    } trailing: {
+                        FormTextField(text: $title, placeholder: "Title", style: .inline)
+                    }
+                    Divider().padding(.leading, AppSpacing.lg)
+                    UniversalRow(config: .standard) {
+                        Text("Note").font(AppTypography.body)
+                    } trailing: {
+                        FormTextField(text: $note, placeholder: "Optional", style: .inline)
+                    }
                 }
-                Divider().padding(.leading, AppSpacing.lg)
-                UniversalRow(config: .standard) {
-                    Text("Note").font(AppTypography.body)
-                } trailing: {
-                    FormTextField(text: $note, placeholder: "Optional", style: .inline)
+            case .glass:
+                FormSection(header: showsHeader ? "Payments" : nil, footer: showsFooter ? "This month." : nil, style: .glass) {
+                    if state == .loading {
+                        ForEach(0..<rows, id: \.self) { _ in ItemRowSkeleton() }
+                    } else {
+                        ForEach(Array(samples.prefix(rows).enumerated()), id: \.offset) { _, sample in
+                            ItemRow(sample.0, meta: [MetaLine([.text(sample.1)])], leading: .symbol(sample.2))
+                        }
+                    }
                 }
             }
         } controls: {
+            ChoiceControl("Style", selection: $style, options: [("Card", .card), ("Glass", .glass)])
             ToggleControl("Header", isOn: $showsHeader)
             ToggleControl("Footer", isOn: $showsFooter)
+            if style == .glass {
+                StateControl(state: $state)
+                StepperControl("Rows", value: $rows, in: 1...4)
+            }
         }
     }
 }
@@ -329,47 +357,6 @@ private struct ArticleBodyPage: View {
             }
         } controls: {
             StateControl(state: $state)
-        }
-    }
-}
-
-private struct ListCardPage: View {
-    @State private var showsTitle = true
-    @State private var rows = 3
-    @State private var state: SpecimenState = .content
-
-    private let samples: [(String, String, String)] = [
-        ("Coffee House", "Cafés · 08:40", "cup.and.saucer.fill"),
-        ("Magnum", "Groceries · 12:15", "cart.fill"),
-        ("Yandex Go", "Taxi · 19:02", "car.fill"),
-        ("Kaspi", "Transfer · 21:30", "arrow.left.arrow.right"),
-    ]
-
-    var body: some View {
-        ComponentPage(
-            name: "ListCard",
-            summary: "A card of rows under an optional section title: a short list in a reply or on a screen.",
-            since: "4.14.0",
-            apps: [.tenra],
-            canvas: .fill,
-            notes: [
-                "Rows pad themselves vertically (§10); the card pads them on every side.",
-                "A notice to the person is NoticeCard, which sits on a ListCard.",
-            ]
-        ) {
-            if state == .loading {
-                ListCardSkeleton(showsTitle: showsTitle, rows: rows)
-            } else {
-                ListCard(title: showsTitle ? "Payments" : nil) {
-                    ForEach(Array(samples.prefix(rows).enumerated()), id: \.offset) { _, sample in
-                        ItemRow(sample.0, meta: [MetaLine([.text(sample.1)])], leading: .symbol(sample.2))
-                    }
-                }
-            }
-        } controls: {
-            StateControl(state: $state)
-            ToggleControl("Title", isOn: $showsTitle)
-            StepperControl("Rows", value: $rows, in: 1...4)
         }
     }
 }

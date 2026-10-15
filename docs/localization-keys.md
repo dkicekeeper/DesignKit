@@ -22,11 +22,10 @@ text, not keys. A new key goes there as well.
 | `amount.show` | AmountVisibilityToggle (VoiceOver, amounts hidden) | `Show amounts` |
 | `bulk.deleteCount` | the apps' bulk-delete `DSButton` title (BulkDeleteButton's until 3.0.0 removed it) | — |
 | `button.apply` | DateRangePickerSheet (Apply) | `Apply` |
-| `button.cancel` | EditSheetContainer, ImportProgressSheet | — |
-| `button.close` | AmountEntrySheet (the close button, VoiceOver) | `Close` |
+| `button.cancel` | EditSheetContainer (AmountEntrySheet's ✕ since 5.0.0), ImportProgressSheet | — |
 | `button.copy` | AnimatedInputComponents | — |
 | `button.paste` | AnimatedInputComponents | — |
-| `button.save` | EditSheetContainer, AmountEntrySheet (VoiceOver) | — |
+| `button.save` | EditSheetContainer (and AmountEntrySheet on it, 5.0.0) | — |
 | `calculator.add` | CalculatorKeypad | `Plus` |
 | `calculator.backspace` | CalculatorKeypad | `Delete` |
 | `calculator.clearHint` | CalculatorKeypad | `Press and hold to clear` |

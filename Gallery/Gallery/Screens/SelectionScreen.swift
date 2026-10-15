@@ -230,6 +230,7 @@ private struct SnapCardPickerPage: View {
     }
 
     @State private var selection: String? = "gold"
+    @State private var centered = false
     @State private var state: SpecimenState = .content
 
     private let wallets = [
@@ -241,17 +242,25 @@ private struct SnapCardPickerPage: View {
     var body: some View {
         ComponentPage(
             name: "SnapCardPicker",
-            summary: "Pick one by swiping cards: full-width cards that snap, the neighbours peeking in; the centred card is the selection, a tap selects too.",
+            summary: "Pick one by swiping cards: full-width cards that snap, the neighbours peeking in (fill), or cards of one width with the centred one full size (centered, 5.0.0); the centred card is the selection, a tap selects too.",
             since: "2.9.0",
             apps: [.tenra],
             canvas: .bleed,
             notes: [
                 "The card is the app's (SelectableBalanceCard, a category card); the picker passes it isSelected and the action that selects it.",
                 "It aligns only once its container is measured, so a selection that arrives after it appears still scrolls into place.",
-            ]
+                "centered(width:): the neighbours a little smaller and paler, the selection following the centre as the row scrolls. PickerCarousel is built on it.",
+            ],
+            styles: ["fill", "centered"]
         ) {
             if state == .loading {
                 SnapCardPickerSkeleton { SelectableBalanceCardSkeleton() }
+            } else if centered {
+                SnapCardPicker(wallets, selection: $selection, style: .centered(width: 220)) { wallet, isSelected, select in
+                    SelectableBalanceCard(iconSource: .sfSymbol(wallet.symbol), title: wallet.name,
+                                          amount: wallet.balance, currency: "KZT",
+                                          isSelected: isSelected, action: select)
+                }
             } else {
                 SnapCardPicker(wallets, selection: $selection) { wallet, isSelected, select in
                     SelectableBalanceCard(iconSource: .sfSymbol(wallet.symbol), title: wallet.name,
@@ -261,6 +270,7 @@ private struct SnapCardPickerPage: View {
             }
         } controls: {
             StateControl(state: $state)
+            ChoiceControl("Style", selection: $centered, options: [("Fill", false), ("Centered", true)])
             ChoiceControl("Selection", selection: $selection, options: wallets.map { ($0.name, Optional($0.id)) })
         }
     }

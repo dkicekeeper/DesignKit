@@ -346,7 +346,7 @@ private struct AmountEntrySheetPage: View {
             apps: [.tenra],
             notes: [
                 "onSave gets the amount in the sheet's currency (through DesignKitCurrencyConverter.convertSync), the date and the trimmed note; the sheet dismisses itself.",
-                "Strings: moneyEntry.notePlaceholder, moneyEntry.invalidAmount, currency.error.conversionFailed, button.close, button.save.",
+                "Strings: moneyEntry.notePlaceholder, moneyEntry.invalidAmount, currency.error.conversionFailed; the bar is EditSheetContainer's (button.cancel, button.save; 5.0.0).",
             ]
         ) {
             VStack(spacing: AppSpacing.md) {

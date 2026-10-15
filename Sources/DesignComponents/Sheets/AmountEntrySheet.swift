@@ -8,6 +8,7 @@
 //  `DesignKitCurrencyConverter.convertSync`. Ported from Tenra's MoneyEntrySheet (money towards
 //  a savings goal, a debt paid back); what the money is for and where it is saved stay in the
 //  app, as does the sheet that edits the quick-access currencies (`onCustomizeCurrencies`).
+//  5.0.0: the sheet's chrome (✕ and ✓ in the bar) is `EditSheetContainer`'s.
 //
 
 import SwiftUI
@@ -83,7 +84,13 @@ public struct AmountEntrySheet: View {
     }
 
     public var body: some View {
-        NavigationStack {
+        EditSheetContainer(
+            title: "",
+            isSaveDisabled: !isValid,
+            wrapInForm: false,
+            onSave: save,
+            onCancel: { dismiss() }
+        ) {
             ScrollView {
                 VStack(spacing: AppSpacing.lg) {
                     HeroSection(icon: icon, title: title, subtitle: subtitle)
@@ -115,28 +122,6 @@ public struct AmountEntrySheet: View {
                     .screenPadding()
                 }
                 .animation(AppAnimation.gentleSpring, value: validationError)
-            }
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                    }
-                    .accessibilityLabel(String(localized: "button.close", defaultValue: "Close"))
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        save()
-                    } label: {
-                        Image(systemName: "checkmark")
-                    }
-                    .dsButton()
-                    .disabled(!isValid)
-                    .accessibilityLabel(String(localized: "button.save", defaultValue: "Save"))
-                }
             }
             .dateButtonsSafeArea(selectedDate: $date, isDisabled: !isValid, maxDate: Date()) { _ in
                 save()
