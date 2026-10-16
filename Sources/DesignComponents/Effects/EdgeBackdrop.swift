@@ -18,7 +18,8 @@
 //  and the blur stronger. Hide the system's scroll edge effect on that edge of the scroll view
 //  (`scrollEdgeEffectHidden(true, for: .top)`): as it comes, or `.soft`, it fades the content out
 //  under the bar before the backing can blur it, and the top reads as an empty plate
-//  (`edgeBackdropUnderBar` snapshots).
+//  (`edgeBackdropUnderBar` snapshots). `colorOpacity:` sets how strong the page's colour is at the
+//  edge (10% by default), so an app can make the backing more or less see-through.
 //
 
 import SwiftUI
@@ -46,13 +47,22 @@ import DesignSupport
 public struct EdgeBackdrop: View {
     let edge: VerticalEdge
     let color: Color
+    let colorOpacity: Double
 
     /// - Parameters:
     ///   - edge: The screen edge the bar sits on: the backing is strongest there.
     ///   - color: The page's colour, laid over the blur (the system background by default).
-    public init(edge: VerticalEdge = .top, color: Color = AppColors.bgBase) {
+    ///   - colorOpacity: The colour's opacity at the edge, 0 to 1 (5.0.0): lower is more
+    ///     see-through, higher reads as a plate. It fades to 40% of that at a third of the
+    ///     backing and to nothing at three fifths.
+    public init(
+        edge: VerticalEdge = .top,
+        color: Color = AppColors.bgBase,
+        colorOpacity: Double = EdgeBackdropMetrics.colorOpacity
+    ) {
         self.edge = edge
         self.color = color
+        self.colorOpacity = min(max(colorOpacity, 0), 1)
     }
 
     public var body: some View {
@@ -66,7 +76,9 @@ public struct EdgeBackdrop: View {
                 .fill(.ultraThinMaterial)
                 .mask { fade(EdgeBackdropMetrics.deepBlurStops) }
             LinearGradient(
-                stops: EdgeBackdropMetrics.tintStops.map { .init(color: color.opacity($0.opacity), location: $0.location) },
+                stops: EdgeBackdropMetrics.tintStops.map {
+                    .init(color: color.opacity($0.opacity * colorOpacity), location: $0.location)
+                },
                 startPoint: start,
                 endPoint: end
             )
@@ -102,17 +114,25 @@ public enum EdgeBackdropMetrics {
     /// The second layer that deepens the blur: full over the three fifths nearest the edge, gone
     /// at 85% (5.0.0).
     static let deepBlurStops = [Stop(location: 0, opacity: 1), Stop(location: 0.6, opacity: 1), Stop(location: 0.85, opacity: 0)]
-    /// The page's colour over the blur, light so the blurred content's colours show: 10% at the
-    /// edge, 4% at a third, clear at three fifths (5.0.0; 25%, 10% and three quarters before).
-    static let tintStops = [Stop(location: 0, opacity: 0.1), Stop(location: 0.35, opacity: 0.04), Stop(location: 0.6, opacity: 0)]
+    /// The page's colour at the edge by default: light, so the blurred content's colours show
+    /// (5.0.0; 25% before).
+    public static let colorOpacity: Double = 0.1
+    /// The page's colour over the blur, as shares of `colorOpacity`: all of it at the edge, 40% at
+    /// a third, clear at three fifths (5.0.0: 10%, 4% and clear by default; 25%, 10% and three
+    /// quarters before).
+    static let tintStops = [Stop(location: 0, opacity: 1), Stop(location: 0.35, opacity: 0.4), Stop(location: 0.6, opacity: 0)]
 }
 
 public extension View {
     /// Puts an `EdgeBackdrop` behind the view: a bar's backing over scrolling content, blur and
     /// the page's colour fading out towards the content.
-    func edgeBackdrop(_ edge: VerticalEdge = .top, color: Color = AppColors.bgBase) -> some View {
+    func edgeBackdrop(
+        _ edge: VerticalEdge = .top,
+        color: Color = AppColors.bgBase,
+        colorOpacity: Double = EdgeBackdropMetrics.colorOpacity
+    ) -> some View {
         background {
-            EdgeBackdrop(edge: edge, color: color)
+            EdgeBackdrop(edge: edge, color: color, colorOpacity: colorOpacity)
         }
     }
 }

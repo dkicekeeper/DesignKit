@@ -2349,8 +2349,10 @@ out under the bar before the backing can blur it, so the top reads as an empty p
 (`edgeBackdropUnderBar` snapshots). On a scroll view inside another one (a preview in a
 scrolling page), the bar goes in a `safeAreaInset(edge:spacing: 0)`: a `safeAreaBar` there draws
 the outer scroll view's edge effect down to itself and everything above blurs (docs/gotchas.md).
-`color:` is the page's colour (`AppColors.bgBase` by default). Tenra: the chat's bar, Ten 120 pt
-over the thread.
+`color:` is the page's colour (`AppColors.bgBase` by default), and `colorOpacity:` *(5.0.0)* its
+opacity at the edge, 0 to 1 (`EdgeBackdropMetrics.colorOpacity`, 10%): lower is more see-through,
+higher reads as a plate, the blur stays the same; it fades to 40% of that at a third of the
+backing and to nothing at three fifths. Tenra: the chat's bar, Ten 120 pt over the thread.
 
 ---
 

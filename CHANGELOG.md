@@ -32,6 +32,9 @@ once (the owner's choice over deprecating them).
   chosen option, one look for `OptionCard`, `PickerCarousel` and `IconPicker`.
 - `NavigationSettingsRow(icon:title:value:iconColor:destination:)`: what is set, before the
   chevron; the icon may be `nil`.
+- `EdgeBackdrop(colorOpacity:)` and `.edgeBackdrop(_:color:colorOpacity:)`: how strong the page's
+  colour is at the edge, 0 to 1 (`EdgeBackdropMetrics.colorOpacity`, 10%, by default): lower is
+  more see-through, higher reads as a plate; the blur stays the same.
 
 ### Changed
 
@@ -80,7 +83,8 @@ FormSection(header: "Payments", style: .glass) { rows }
 - Gallery: the `EdgeBackdrop` page blurred everything above its preview, a 4.14.0 bug. A
   `safeAreaBar` on a scroll view inside the page's draws the page's own edge effect down to
   itself; the preview's bar is a `safeAreaInset` now (docs/gotchas.md).
-- Gallery: the `UniversalRow` page lists the rows built on it and what each is for.
+- Gallery: the `UniversalRow` page lists the rows built on it and what each is for; the
+  `EdgeBackdrop` page has a Colour opacity slider.
 - Snapshot tests: `GalleryPagesSnapshotTests` draws whole Gallery pages in a phone-sized window
   (`PickerCarousel`'s, a centred `SnapCardPicker`, `EdgeBackdrop`'s), and
   `scripts/snapshot-tests.sh` prints the crash report when the Gallery crashes in a run.

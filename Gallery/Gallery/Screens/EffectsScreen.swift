@@ -457,6 +457,7 @@ private struct BorderBeamPage: View {
 
 private struct EdgeBackdropPage: View {
     @State private var bottom = false
+    @State private var colorOpacity = EdgeBackdropMetrics.colorOpacity
 
     private let rows = ["How much did I spend on cafés?", "Groceries went up 12% this month.", "Your next payment is the internet, tomorrow.",
                         "You put 50 000 ₸ towards the car.", "The savings rate is 18%.", "Taxi: 14 trips, 42 000 ₸.",
@@ -472,6 +473,7 @@ private struct EdgeBackdropPage: View {
             notes: [
                 "For a bar the system's scroll edge effect is too faint to carry (a large header over a chat).",
                 "Put it behind the bar's content with .edgeBackdrop(edge); it reaches to the screen's edge, takes no touches, and VoiceOver skips it.",
+                "colorOpacity: the page's colour at the edge (10% by default, 5.0.0): lower is more see-through, higher reads as a plate. The blur stays the same.",
                 "Hide the system's scroll edge effect on that edge, .scrollEdgeEffectHidden(true, for: edge) (5.0.0): it fades the content out under the bar before the backing blurs it.",
                 "A bar on a scroll view inside another (this preview in the page) is a safeAreaInset: a safeAreaBar there draws the outer scroll view's edge effect down to itself.",
             ]
@@ -498,12 +500,13 @@ private struct EdgeBackdropPage: View {
                     .frame(width: AppIconSize.Tile.xxxl, height: AppIconSize.Tile.xxxl)
                     .padding(.vertical, AppSpacing.lg)
                     .frame(maxWidth: .infinity)
-                    .edgeBackdrop(bottom ? .bottom : .top)
+                    .edgeBackdrop(bottom ? .bottom : .top, colorOpacity: colorOpacity)
             }
             .frame(height: 340)
             .clipShape(.rect(cornerRadius: AppRadius.lg))
         } controls: {
             ToggleControl("Bottom edge", isOn: $bottom)
+            SliderControl("Colour opacity", value: $colorOpacity, in: 0...1, step: 0.05) { "\(Int(($0 * 100).rounded()))%" }
         }
     }
 }

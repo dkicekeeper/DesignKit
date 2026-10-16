@@ -222,30 +222,11 @@ extension ComponentSnapshots {
         }
 
         /// EdgeBackdrop (4.14.0): a chat's rows under a top bar's backing (questions in the accent,
-        /// replies on a pale card), blurred and lightly washed near the edge, sharp further down.
+        /// replies on a pale card), blurred and lightly washed near the edge, sharp further down;
+        /// and with the page's colour at 50% at the edge (`colorOpacity:`, 5.0.0).
         @Test func edgeBackdrop() async {
-            await assertComponentSnapshot(
-                ZStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                        ForEach(0..<6, id: \.self) { index in
-                            let question = index.isMultiple(of: 2)
-                            Text(question ? "How much on cafés?" : "Row \(index + 1): groceries, 12 400 ₸")
-                                .font(AppTypography.body)
-                                .foregroundStyle(question ? AppColors.staticWhite : AppColors.Text.primary)
-                                .padding(AppSpacing.md)
-                                .background(question ? AppColors.accent : AppColors.accent.opacity(0.2),
-                                            in: .rect(cornerRadius: AppRadius.lg))
-                                .frame(maxWidth: .infinity, alignment: question ? .trailing : .leading)
-                        }
-                    }
-                    Color.clear
-                        .frame(height: 160)
-                        .frame(maxWidth: .infinity)
-                        .edgeBackdrop(.top)
-                }
-                .clipShape(.rect(cornerRadius: AppRadius.lg)),
-                appearances: [.light, .dark]
-            )
+            await assertComponentSnapshot(edgeBackdropOverRows(), appearances: [.light, .dark])
+            await assertComponentSnapshot(edgeBackdropOverRows(colorOpacity: 0.5), named: "colorOpacity", appearances: [.light, .dark])
         }
 
         /// EdgeBackdrop behind a `safeAreaBar`'s content over a thread scrolled to its end, as in
@@ -262,6 +243,30 @@ extension ComponentSnapshots {
             }
         }
     }
+}
+
+/// Six chat rows under a 160 pt top backing.
+@MainActor
+private func edgeBackdropOverRows(colorOpacity: Double = EdgeBackdropMetrics.colorOpacity) -> some View {
+    ZStack(alignment: .top) {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            ForEach(0..<6, id: \.self) { index in
+                let question = index.isMultiple(of: 2)
+                Text(question ? "How much on cafés?" : "Row \(index + 1): groceries, 12 400 ₸")
+                    .font(AppTypography.body)
+                    .foregroundStyle(question ? AppColors.staticWhite : AppColors.Text.primary)
+                    .padding(AppSpacing.md)
+                    .background(question ? AppColors.accent : AppColors.accent.opacity(0.2),
+                                in: .rect(cornerRadius: AppRadius.lg))
+                    .frame(maxWidth: .infinity, alignment: question ? .trailing : .leading)
+            }
+        }
+        Color.clear
+            .frame(height: 160)
+            .frame(maxWidth: .infinity)
+            .edgeBackdrop(.top, colorOpacity: colorOpacity)
+    }
+    .clipShape(.rect(cornerRadius: AppRadius.lg))
 }
 
 /// A thread scrolled to its end under a top bar with an `EdgeBackdrop`, the system's scroll edge
