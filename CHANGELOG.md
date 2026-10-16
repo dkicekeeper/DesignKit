@@ -16,6 +16,37 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 5.1.1 - 2026-10-16
+
+`StreamingText` draws every character of its text in every script, punctuation included, with a
+gap only where the text has a space.
+[#77](https://github.com/dkicekeeper/DesignKit/pull/77)
+
+### Fixed
+
+- `StreamingText` split its text with the system's word finder and put a gap between the
+  pieces: Japanese and Chinese, written without spaces, showed gaps inside a sentence
+  ("コンビニ で 500 円 使っ た"), a Korean amount lost its counter word to a gap ("12,000 원"),
+  and punctuation, quotes and emoji vanished in every language ("Сколько я потратил" without
+  its "?"). A word is now what the text has between spaces, with its punctuation. A line in a
+  script written without spaces (Japanese, Chinese, Thai, Lao, Khmer, Myanmar) is cut into its
+  words, drawn with no gap between them, so it still wraps at the width it has; its 、。」！ stay
+  with the word before them and an opening bracket with the word after it. A no-break space
+  ("2 500") stays inside its word. Words still arrive one by one and keep their identities (a
+  word the recogniser only adds a "?" to does not enter again), and a highlight tints every word
+  it overlaps. Text with spaces and no punctuation is drawn as
+  before (the `streamingText` snapshot is unchanged).
+
+### Gallery and tooling
+
+- Gallery: the `StreamingText` page takes a language (English, Russian, Japanese, Korean), each
+  a phrase with punctuation and amounts.
+- Snapshot tests: `streamingTextScripts`, a phrase with punctuation and a tinted amount in
+  English, Russian, Japanese (on two lines) and Korean. Unit tests: every script's text drawn
+  character for character, punctuation, Korean counter words, Japanese words and brackets,
+  no-break spaces, and identities kept when a word only gains punctuation or joins its
+  neighbour.
+
 ## 5.1.0 - 2026-10-16
 
 The bars DesignKit draws over scrolling content name their scroll edge style, so building an app
