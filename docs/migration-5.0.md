@@ -1,11 +1,13 @@
 # Moving to DesignKit 5.0
 
-5.0.0 (2026-10) is a major release for one removal. 4.14.0 brought a few views from Tenra that
-repeat what DesignKit already had. The owner chose to fold them in and drop the duplicate at once
-rather than deprecate it. Nothing else is removed or renamed.
+5.0.0 (2026-10) is a major release for two removals. 4.14.0 brought a few views from Tenra that
+repeat what DesignKit already had; the owner chose to fold them in and drop the duplicate at once
+rather than deprecate it. And `EdgeBackdrop` goes: compared on a device with the system's scroll
+edge effect, the owner chose the system's hard one for a bar over a chat. Nothing else is removed
+or renamed.
 
-Dalada does not use `ListCard`, so it moves to 5.0 by changing the pin. Tenra changes its
-assistant's cards.
+Dalada uses neither, so it moves to 5.0 by changing the pin. Tenra changes its assistant's cards
+and its chat's bar.
 
 ## Removed
 
@@ -13,13 +15,24 @@ assistant's cards.
 |---|---|---|
 | `ListCard(title:content:)` | `FormSection(header:style: .glass)` | The same thing: an optional `SectionHeader` over a card of rows. The glass style draws it pixel for pixel (the `listCards` snapshots are unchanged), and it has `FormSection`'s `footer:` |
 | `ListCardSkeleton(showsTitle:rows:)` | `FormSection(style: .glass) { ItemRowSkeleton() … }` | A container shows its rows' skeletons |
+| `EdgeBackdrop`, `.edgeBackdrop(_:color:)`, `EdgeBackdropMetrics` | The system's scroll edge effect, `.scrollEdgeEffectStyle(.hard, for: .top)` on the scroll view under the bar | The owner compared them in Tenra's chat layout on an iOS 27 device and chose the system's hard one; the hand-drawn blur and colour are not needed |
 
 ```swift
 // 4.14
 ListCard(title: "Payments") { rows }
+thread
+    .scrollEdgeEffectStyle(.soft, for: .top)
+    .safeAreaBar(edge: .top) { ten.frame(maxWidth: .infinity).edgeBackdrop(.top) }
 // 5.0
 FormSection(header: "Payments", style: .glass) { rows }
+thread
+    .scrollEdgeEffectStyle(.hard, for: .top)
+    .safeAreaBar(edge: .top) { ten.frame(maxWidth: .infinity) }
 ```
+
+Present the chat from the screen, not from a row inside a scroll view: a screen presented with
+`.fullScreenCover` from inside a scroll view draws no scroll edge effect under its own bar
+(docs/gotchas.md).
 
 ## Changed in the same release
 
@@ -32,17 +45,12 @@ FormSection(header: "Payments", style: .glass) { rows }
 - `NavigationSettingsRow(icon:title:value:)`: `value:` before the chevron, and the icon may be
   `nil`. `NavigationPickerRow(style: .list)` is that row.
 - `FormSection` leaves out an empty `header`.
-- `EdgeBackdrop`'s blur reaches four fifths of the backing and is deeper, under a lighter colour.
-  Hide the system's scroll edge effect on that edge of the scroll view: on iOS 26, as it comes or
-  `.soft`, it fades the content out under the bar before the backing blurs it, and built with
-  Xcode 27 it is `.hard` as it comes, a plate (docs/gotchas.md). Tenra's chat:
-  `.scrollEdgeEffectStyle(.soft, for: .top)` → `.scrollEdgeEffectHidden(true, for: .top)`.
 
 ## Checking an app
 
 ```bash
-grep -rn "ListCard" --include=*.swift .
+grep -rnE "ListCard|EdgeBackdrop|edgeBackdrop" --include=*.swift .
 ```
 
 No output means the app builds on 5.0 unchanged. In Tenra (2026-10) it lists its assistant's
-cards (`AssistantAttachmentCard`, `AssistantReplyView`).
+cards (`AssistantAttachmentCard`, `AssistantReplyView`) and its chat (`AssistantChatView`).

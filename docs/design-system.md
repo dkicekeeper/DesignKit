@@ -2331,30 +2331,6 @@ EntityDetailScaffold(... hero: { HeroSection(icon: liveCategory.iconSource, ...)
 
 Used in: `OnboardingWelcomeStep` (bottom), Account/Category/Subscription/Deposit/Loan detail views (top).
 
-#### `EdgeBackdrop`, `.edgeBackdrop(_:color:)` *(4.14.0)*
-The backing of a bar over scrolling content, drawn by hand where the system's scroll edge effect
-is too faint to carry a large bar: an `.ultraThinMaterial` blur, full over the four fifths
-nearest the screen's edge and fading out at the inner edge (SwiftUI has no blur of varying
-radius, so the blurred content gives way to the sharp one), a second ultra-thin layer over the
-first three fifths that blurs it again where the bar's content sits, and the page's colour over
-them, light so the blurred content's colours show through: 10% at the edge, 4% at a third, clear
-at three fifths (`EdgeBackdropMetrics`). *(5.0.0, the owner's review in Tenra's chat: the blur
-was full over the half only, so the text under Ten stayed legible, and the colour was 25%; a
-heavier colour reads as a grey plate.)* It reaches past the
-safe area to the screen's edge, takes no touches and is hidden from VoiceOver. Put it behind the
-bar's content: `.safeAreaBar(edge: .top) { header.frame(maxWidth: .infinity).edgeBackdrop() }`,
-and hide the system's scroll edge effect on that edge of the scroll view,
-`.scrollEdgeEffectHidden(true, for: .top)` *(5.0.0)*: on iOS 26, as it comes or `.soft`, it fades
-the content out under the bar before the backing can blur it, so the top reads as an empty plate
-(`edgeBackdropUnderBar` snapshots); built with Xcode 27 it is `.hard` as it comes, a plate
-(docs/gotchas.md). On a scroll view inside another one (a preview in a
-scrolling page), the bar goes in a `safeAreaInset(edge:spacing: 0)`: a `safeAreaBar` there draws
-the outer scroll view's edge effect down to itself and everything above blurs (docs/gotchas.md).
-`color:` is the page's colour (`AppColors.bgBase` by default), and `colorOpacity:` *(5.0.0)* its
-opacity at the edge, 0 to 1 (`EdgeBackdropMetrics.colorOpacity`, 10%): lower is more see-through,
-higher reads as a plate, the blur stays the same; it fades to 40% of that at a third of the
-backing and to nothing at three fifths. Tenra: the chat's bar, Ten 120 pt over the thread.
-
 ---
 
 ## 4. View Patterns
@@ -2524,8 +2500,10 @@ Grouping form rows?
 Horizontal scroll?
 └── UniversalCarousel with appropriate preset
 
-A bar over scrolling content that needs a stronger backing than the scroll edge effect?
-└── .edgeBackdrop(edge) behind the bar's content (4.14.0), the scroll view's edge effect hidden (5.0.0)
+A bar over a chat's thread (a header, Ten)?
+└── .safeAreaBar(edge: .top) on the thread, with .scrollEdgeEffectStyle(.hard, for: .top)
+    (5.0.0, the owner's choice; EdgeBackdrop in 4.14.0). Present the chat from the screen,
+    not from inside a scroll view (docs/gotchas.md)
 
 Card-style container?
 ├── Rows under an optional title → FormSection(header:, style: .glass) (5.0.0; ListCard in 4.14.0)

@@ -26,7 +26,6 @@ struct ShowcasePage<Content: View>: View {
 
     @State private var selection = 0
     @State private var openedInitialPage = false
-    @State private var presentedScreen: PresentedScreen?
     @Environment(\.showcaseInitialPage) private var initialPage
 
     var body: some View {
@@ -61,10 +60,6 @@ struct ShowcasePage<Content: View>: View {
                 page(ForEach(pages) { $0 })
             }
         }
-        // Screens a page opens are presented from here, outside the pages' scroll views
-        // (`presentShowcaseScreen`).
-        .environment(\.presentShowcaseScreen, PresentShowcaseScreenAction { presentedScreen = PresentedScreen(view: $0) })
-        .fullScreenCover(item: $presentedScreen) { $0.view }
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -79,30 +74,6 @@ struct ShowcasePage<Content: View>: View {
         }
         .scrollDismissesKeyboard(.interactively)
     }
-}
-
-/// A screen a page opens over its showcase screen.
-private struct PresentedScreen: Identifiable {
-    let id = UUID()
-    let view: AnyView
-}
-
-/// Opens a screen of its own, full screen, over a `ShowcasePage`: a page calls it to show a
-/// component as an app's screen holds it. The screen is presented from the showcase screen, outside
-/// its pages' scroll views: presented from inside a page (a `fullScreenCover` in its controls), a
-/// screen's own `safeAreaBar` drew no scroll edge effect, soft or hard (5.0.0, EdgeBackdrop's
-/// comparison, the `edgeBackdropComparisonFromPage` snapshot; docs/gotchas.md).
-struct PresentShowcaseScreenAction {
-    let present: (AnyView) -> Void
-
-    func callAsFunction(_ screen: some View) {
-        present(AnyView(screen))
-    }
-}
-
-extension EnvironmentValues {
-    /// Set by `ShowcasePage` for its pages.
-    @Entry var presentShowcaseScreen: PresentShowcaseScreenAction? = nil
 }
 
 /// The page switcher of a `ShowcasePage`: one chip per page, the current one selected and

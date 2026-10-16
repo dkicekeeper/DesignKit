@@ -16,10 +16,11 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
-## 5.0.0 - 2026-10-15
+## 5.0.0 - 2026-10-16
 
 4.14.0's ports from Tenra folded into the components they repeated, the duplicates removed at
-once (the owner's choice over deprecating them).
+once (the owner's choice over deprecating them), and `EdgeBackdrop` removed: a bar over a chat
+takes the system's hard scroll edge effect.
 [#75](https://github.com/dkicekeeper/DesignKit/pull/75)
 
 ### Added
@@ -32,9 +33,6 @@ once (the owner's choice over deprecating them).
   chosen option, one look for `OptionCard`, `PickerCarousel` and `IconPicker`.
 - `NavigationSettingsRow(icon:title:value:iconColor:destination:)`: what is set, before the
   chevron; the icon may be `nil`.
-- `EdgeBackdrop(colorOpacity:)` and `.edgeBackdrop(_:color:colorOpacity:)`: how strong the page's
-  colour is at the edge, 0 to 1 (`EdgeBackdropMetrics.colorOpacity`, 10%, by default): lower is
-  more see-through, higher reads as a plate; the blur stays the same.
 
 ### Changed
 
@@ -45,32 +43,34 @@ once (the owner's choice over deprecating them).
   before), and its save button plays the light haptic before the save's own.
 - `NavigationPickerRow(style: .list)` is `NavigationSettingsRow(value:)`; it looks the same.
 - `FormSection` leaves out an empty `header`.
-- `EdgeBackdrop` and `.edgeBackdrop`: the blur stays full down to four fifths of the backing (half
-  before), so all of a bar's content sits on it, a second ultra-thin layer deepens it over the
-  first three fifths, and the page's colour over it is 10% at the edge (25% before). Tenra's chat:
-  the thread under Ten blurs out and the backing is lighter.
 
 ### Removed
 
 - `ListCard` and `ListCardSkeleton`: use `FormSection(header:style: .glass)`, with the rows'
   skeletons inside while they load.
 - The `button.close` string (`AmountEntrySheet` uses `button.cancel` now).
+- `EdgeBackdrop`, `.edgeBackdrop(_:color:)` and `EdgeBackdropMetrics`: a bar over a chat takes the
+  system's hard scroll edge effect, `.scrollEdgeEffectStyle(.hard, for: .top)`, the owner's choice
+  after comparing them on a device.
 
 ### Migration
 
 - Tenra: its assistant's cards (`AssistantAttachmentCard`, `AssistantReplyView`). Dalada does not
   use `ListCard`. docs/migration-5.0.md has the details.
-- Under an `.edgeBackdrop`, hide the system's scroll edge effect on that edge of the scroll view.
-  On iOS 26, as it comes or `.soft`, it fades the content out before the backing blurs it, and
-  the top reads as an empty plate; built with Xcode 27, as it comes it is `.hard`, a plate.
-  Tenra's chat: `.scrollEdgeEffectStyle(.soft, for: .top)` →
-  `.scrollEdgeEffectHidden(true, for: .top)`.
+- Tenra's chat: the bar's content loses its `.edgeBackdrop(.top)`, and the thread's
+  `.scrollEdgeEffectStyle(.soft, for: .top)` becomes `.hard`.
 
 ```swift
 // Before
 ListCard(title: "Payments") { rows }
+thread
+    .scrollEdgeEffectStyle(.soft, for: .top)
+    .safeAreaBar(edge: .top) { ten.frame(maxWidth: .infinity).edgeBackdrop(.top) }
 // After
 FormSection(header: "Payments", style: .glass) { rows }
+thread
+    .scrollEdgeEffectStyle(.hard, for: .top)
+    .safeAreaBar(edge: .top) { ten.frame(maxWidth: .infinity) }
 ```
 
 ### Gallery and tooling
@@ -78,22 +78,16 @@ FormSection(header: "Payments", style: .glass) { rows }
 - Gallery: `FormSection` has a style control (Card, Glass) and took the `ListCard` page;
   `SnapCardPicker` has a style control; `NavigationSettingsRow` has Value and Icon controls.
 - Snapshot tests: `listCards` draws the glass `FormSection` against `ListCard`'s references, and
-  `pickerCarousel` the carousel on `SnapCardPicker` against its 4.14.0 ones; `edgeBackdropUnderBar` (the
-  backing under a `safeAreaBar`, the system's scroll edge effect as it comes, soft and hidden);
-  `OptionCard`'s, `EdgeBackdrop`'s and the ported skeletons' references re-recorded.
-- Gallery: the `EdgeBackdrop` page blurred everything above its preview, a 4.14.0 bug. A
-  `safeAreaBar` on a scroll view inside the page's draws the page's own edge effect down to
-  itself; the preview's bar is a `safeAreaInset` now (docs/gotchas.md).
+  `pickerCarousel` the carousel on `SnapCardPicker` against its 4.14.0 ones; `OptionCard`'s and
+  the ported skeletons' references re-recorded; `EdgeBackdrop`'s are gone with it.
 - Gallery: the `UniversalRow` page lists the rows built on it and what each is for; the
-  `EdgeBackdrop` page has a Colour opacity slider and "Compare on a screen": a chat under Ten in a
-  top `safeAreaBar`, full screen, with `EdgeBackdrop` or the system's soft or hard scroll edge
-  effect, and a title and button under Ten to switch on. A page opens such a screen through
-  `presentShowcaseScreen`, from above the pages' scroll views: opened from inside a page, the
-  screen's bar drew no system effect (docs/gotchas.md).
+  `EdgeBackdrop` page is gone with the component.
 - Snapshot tests: `GalleryPagesSnapshotTests` draws whole Gallery pages in a phone-sized window
-  (`PickerCarousel`'s, a centred `SnapCardPicker`, `EdgeBackdrop`'s and its comparison screen in
-  each backing and opened from a page), and
-  `scripts/snapshot-tests.sh` prints the crash report when the Gallery crashes in a run.
+  (`PickerCarousel`'s, a centred `SnapCardPicker`), and `scripts/snapshot-tests.sh` prints the
+  crash report when the Gallery crashes in a run.
+- docs/gotchas.md: what the comparison on a device taught about the system's scroll edge effect
+  (a `safeAreaBar` in a scroll view inside another, a screen presented from inside a scroll view,
+  iOS 27).
 - CI: the Changelog job refuses dingbats and emoji, which TestFlight's What to Test refuses.
 - docs/migration-5.0.md.
 
