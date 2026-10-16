@@ -16,9 +16,10 @@
 //  fifths of the backing, under all of Ten, a second ultra-thin layer deepens it over the first
 //  three fifths, and the page's colour is 10% at the edge (25% before), so the backing is lighter
 //  and the blur stronger. Hide the system's scroll edge effect on that edge of the scroll view
-//  (`scrollEdgeEffectHidden(true, for: .top)`): as it comes, or `.soft`, it fades the content out
-//  under the bar before the backing can blur it, and the top reads as an empty plate
-//  (`edgeBackdropUnderBar` snapshots). `colorOpacity:` sets how strong the page's colour is at the
+//  (`scrollEdgeEffectHidden(true, for: .top)`): on iOS 26, as it comes or `.soft`, it fades the
+//  content out under the bar before the backing can blur it, and the top reads as an empty plate
+//  (`edgeBackdropUnderBar` snapshots); built with Xcode 27 it is `.hard` as it comes, a plate.
+//  On an iOS 27 device it drew nothing under a bar holding only Ten (docs/gotchas.md). `colorOpacity:` sets how strong the page's colour is at the
 //  edge (10% by default), so an app can make the backing more or less see-through.
 //
 
@@ -40,8 +41,9 @@ import DesignSupport
 ///
 /// It reaches past the safe area to the screen's edge (under the status bar and the navigation
 /// bar), takes no touches and is hidden from VoiceOver. Hide the system's scroll edge effect on
-/// that edge (`.scrollEdgeEffectHidden(true, for: .top)` on the scroll view, 5.0.0): it fades the
-/// content out under the bar before the backing can blur it. On a scroll view inside another one
+/// that edge (`.scrollEdgeEffectHidden(true, for: .top)` on the scroll view, 5.0.0): on iOS 26 it
+/// fades the content out under the bar before the backing can blur it, and built with Xcode 27 it
+/// is a hard plate as it comes. On a scroll view inside another one
 /// (a preview in a scrolling page), hold the bar in a `safeAreaInset`: a `safeAreaBar` there draws
 /// the outer scroll view's edge effect down to itself, and everything above it blurs.
 public struct EdgeBackdrop: View {

@@ -33,8 +33,9 @@ FormSection(header: "Payments", style: .glass) { rows }
   `nil`. `NavigationPickerRow(style: .list)` is that row.
 - `FormSection` leaves out an empty `header`.
 - `EdgeBackdrop`'s blur reaches four fifths of the backing and is deeper, under a lighter colour.
-  Hide the system's scroll edge effect on that edge of the scroll view: as it comes, or `.soft`,
-  it fades the content out under the bar before the backing blurs it. Tenra's chat:
+  Hide the system's scroll edge effect on that edge of the scroll view: on iOS 26, as it comes or
+  `.soft`, it fades the content out under the bar before the backing blurs it, and built with
+  Xcode 27 it is `.hard` as it comes, a plate (docs/gotchas.md). Tenra's chat:
   `.scrollEdgeEffectStyle(.soft, for: .top)` → `.scrollEdgeEffectHidden(true, for: .top)`.
 
 ## Checking an app

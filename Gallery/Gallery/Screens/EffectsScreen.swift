@@ -475,7 +475,7 @@ private struct EdgeBackdropPage: View {
                 "For a bar the system's scroll edge effect is too faint to carry (a large header over a chat).",
                 "Put it behind the bar's content with .edgeBackdrop(edge); it reaches to the screen's edge, takes no touches, and VoiceOver skips it.",
                 "colorOpacity: the page's colour at the edge (10% by default, 5.0.0): lower is more see-through, higher reads as a plate. The blur stays the same.",
-                "Hide the system's scroll edge effect on that edge, .scrollEdgeEffectHidden(true, for: edge) (5.0.0): it fades the content out under the bar before the backing blurs it.",
+                "Hide the system's scroll edge effect on that edge, .scrollEdgeEffectHidden(true, for: edge) (5.0.0): on iOS 26 it fades the content out under the bar before the backing blurs it; built with Xcode 27 it is a hard plate as it comes. On iOS 27 it draws only under a bar's text and controls, nothing under Ten alone.",
                 "A bar on a scroll view inside another (this preview in the page) is a safeAreaInset: a safeAreaBar there draws the outer scroll view's edge effect down to itself.",
                 "Compare on a screen: a chat under Ten, 120 pt, in a safeAreaBar as an app holds it, with EdgeBackdrop or the system's scroll edge effect (soft, hard). The preview here cannot show the system's effect: its scroll view is inside the page's.",
             ]
@@ -532,6 +532,9 @@ struct EdgeBackdropComparison: View {
 
     @State var backing: Backing = .edgeBackdrop
     @Binding var colorOpacity: Double
+    /// A title and a button under Ten. On iOS 27 the system's effect draws only under a bar's text
+    /// and controls: under Ten alone it draws nothing (the owner's device, build 80).
+    @State var showsTitleRow = false
 
     @Environment(\.dismiss) private var dismiss
 
@@ -567,15 +570,33 @@ struct EdgeBackdropComparison: View {
         .scrollEdgeEffectHidden(backing == .edgeBackdrop, for: .top)
         .scrollEdgeEffectStyle(backing == .hard ? .hard : .soft, for: .top)
         .safeAreaBar(edge: .top) {
-            ParticleCreature(mood: .happy)
-                .frame(width: 120, height: 120)
-                .padding(.vertical, AppSpacing.sm)
-                .frame(maxWidth: .infinity)
-                .background {
-                    if backing == .edgeBackdrop {
-                        EdgeBackdrop(edge: .top, colorOpacity: colorOpacity)
+            VStack(spacing: AppSpacing.sm) {
+                ParticleCreature(mood: .happy)
+                    .frame(width: 120, height: 120)
+                if showsTitleRow {
+                    HStack {
+                        Text(verbatim: "Ten")
+                            .font(AppTypography.h4)
+                            .foregroundStyle(AppColors.Text.primary)
+                        Spacer()
+                        Button {} label: {
+                            Image(systemName: "ellipsis")
+                                .font(AppTypography.bodyEmphasis)
+                        }
+                        .buttonStyle(.bordered)
+                        .buttonBorderShape(.circle)
+                        .accessibilityLabel("More")
                     }
+                    .padding(.horizontal, AppSpacing.lg)
                 }
+            }
+            .padding(.vertical, AppSpacing.sm)
+            .frame(maxWidth: .infinity)
+            .background {
+                if backing == .edgeBackdrop {
+                    EdgeBackdrop(edge: .top, colorOpacity: colorOpacity)
+                }
+            }
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             panel
@@ -605,11 +626,17 @@ struct EdgeBackdropComparison: View {
             if backing == .edgeBackdrop {
                 SliderControl("Colour opacity", value: $colorOpacity, in: 0...1, step: 0.05) { "\(Int(($0 * 100).rounded()))%" }
             } else {
-                Text(verbatim: "The system's scroll edge effect, .scrollEdgeEffectStyle(.\(backing.rawValue.lowercased()), for: .top): no colour of its own to set.")
+                Text(verbatim: "The system's scroll edge effect, .scrollEdgeEffectStyle(.\(backing.rawValue.lowercased()), for: .top): no colour of its own to set. On iOS 27 it draws only under the bar's text and controls.")
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
+            Toggle(isOn: $showsTitleRow) {
+                Text(verbatim: "Title and button under Ten")
+                    .font(AppTypography.bodySmall)
+                    .foregroundStyle(AppColors.textPrimary)
+            }
+            .tint(AppColors.accent)
         }
         .padding(AppSpacing.lg)
         .cardStyle()
