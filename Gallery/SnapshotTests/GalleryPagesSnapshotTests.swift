@@ -50,6 +50,38 @@ extension ComponentSnapshots {
                 )
             }
         }
+
+        // DIAGNOSTIC (removed before merge): the comparison in Hard presented with
+        // fullScreenCover, as the Gallery opens it, from a bare root and from a page's controls.
+        // On the owner's device neither soft nor hard showed anything (build 80).
+        @Test func edgeBackdropComparisonPresented() async {
+            await assertPageSnapshot(
+                Color.clear.fullScreenCover(isPresented: .constant(true)) {
+                    EdgeBackdropComparison(backing: .hard, colorOpacity: .constant(EdgeBackdropMetrics.colorOpacity))
+                },
+                named: "root"
+            )
+            await assertPageSnapshot(NavigationStack { PresentingSection() }, page: "Page", named: "page")
+        }
+    }
+}
+
+/// A paging section whose page presents the comparison from its controls, as the Gallery does.
+private struct PresentingSection: View {
+    var body: some View {
+        ShowcasePage(title: "Effects") {
+            ComponentPage(name: "Page", summary: "Presents the comparison.", canvas: .tall(minHeight: 200)) {
+                Text(verbatim: "Preview")
+            } controls: {
+                ActionControl("Compare on a screen") {}
+                    .fullScreenCover(isPresented: .constant(true)) {
+                        EdgeBackdropComparison(backing: .hard, colorOpacity: .constant(EdgeBackdropMetrics.colorOpacity))
+                    }
+            }
+            ComponentPage(name: "Other", summary: "A second page.") {
+                Text(verbatim: "Other")
+            }
+        }
     }
 }
 
