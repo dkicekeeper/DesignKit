@@ -1673,22 +1673,24 @@ final class ParticleCreatureEngine {
                 extras.fill(spark, with: .color(color(onLight ? CreatureInk.sparkle : CreaturePalette.sparkle, 1)))
             }
         case .answering:
-            // Waves of light leave the rim as it talks (5.3.0), fading as they spread.
+            // Waves of light leave the rim as it talks (5.3.0): thin lines of light, unlike the
+            // ring's dots, fading and thinning as they spread.
             if !onLight { extras.blendMode = .plusLighter }
-            let tone = onLight ? deepen(CreaturePalette.answering[0], CreatureInk.depth) : whiten(CreaturePalette.answering[3], 0.2)
-            let dot = max(0.8, 1.6 * geo.unit)
+            let tone = onLight ? deepen(CreaturePalette.answering[0], CreatureInk.depth) : whiten(CreaturePalette.answering[3], 0.3)
+            let width = max(0.8, CreatureAnswer.waveWidth * geo.unit)
             for k in 0..<CreatureAnswer.waves {
                 let progress = (t / CreatureAnswer.wavePeriod + Double(k) / Double(CreatureAnswer.waves))
                     .truncatingRemainder(dividingBy: 1)
                 let radius = shellRadius * (1.02 + CreatureAnswer.waveReach * progress)
-                var ring = Path()
-                for n in 0..<CreatureAnswer.waveDots {
-                    let a = Double(n) / Double(CreatureAnswer.waveDots) * 2 * .pi + Double(k) * 0.4
-                    let point = CGPoint(x: cx + cos(a) * radius, y: cy + sin(a) * radius)
-                    ring.addEllipse(in: CGRect(x: point.x - dot, y: point.y - dot, width: dot * 2, height: dot * 2))
-                }
+                let wave = Path(ellipseIn: CGRect(x: cx - radius, y: cy - radius, width: radius * 2, height: radius * 2))
                 extras.opacity = CreatureAnswer.waveAlpha * pow(1 - progress, 1.6) * min(1, progress * 6)
-                extras.fill(ring, with: .color(color(tone, 1)))
+                if !onLight {
+                    extras.drawLayer { halo in
+                        halo.addFilter(.blur(radius: width * 2))
+                        halo.stroke(wave, with: .color(color(tone, 0.8)), lineWidth: width * 2.5)
+                    }
+                }
+                extras.stroke(wave, with: .color(color(tone, 1)), lineWidth: width * (1 - 0.5 * progress))
             }
         case .confused:
             extras.opacity = 0.9
@@ -1817,16 +1819,16 @@ enum CreatureAnswer {
     /// The ring's radius (the rim is at 1.2), its tilt (its front under the face), how far below
     /// the centre it sits, and its speed (radians a second).
     static let ringRadius: Double = 1.42
-    static let ringTilt: Double = 0.42
+    static let ringTilt: Double = 0.5
     static let ringDrop: Double = 0.06
     static let ringSpeed: Double = 0.9
     /// A wave leaves the rim this often (seconds), three on their way at once, and goes this far
-    /// (rim radii) as it fades; the dots of one.
+    /// (rim radii) as it fades; its line's width (particle units) and strength.
     static let wavePeriod: Double = 1.2
     static let waves = 3
     static let waveReach: Double = 0.42
-    static let waveDots = 44
-    static let waveAlpha: Double = 0.55
+    static let waveWidth: Double = 1.4
+    static let waveAlpha: Double = 0.6
     /// Phrases of this length (seconds) with a pause at their end; the syllables' rate.
     static let phrase: Double = 1.6
     static let pause: Double = 0.35
@@ -1848,11 +1850,11 @@ enum CreatureWork {
     static let follow: Double = 5
     /// Above the line the swarm keeps this much of its light; below it every particle comes this
     /// much nearer (brighter and larger).
-    static let dim: Double = 0.45
-    static let lift: Double = 0.35
+    static let dim: Double = 0.25
+    static let lift: Double = 0.5
     /// The line's soft edge and its shining crest (sphere radii), and its ripple.
     static let edge: Double = 0.18
-    static let crest: Double = 0.07
+    static let crest: Double = 0.1
     static let ripple: Double = 0.03
     /// The core at no work done (it reaches the thinking glow when the work is done).
     static let coreFloor: Double = 0.75
