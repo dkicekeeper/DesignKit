@@ -506,13 +506,15 @@ private struct EdgeBackdropPage: View {
             }
             .frame(height: 340)
             .clipShape(.rect(cornerRadius: AppRadius.lg))
-            .fullScreenCover(isPresented: $isComparing) {
-                EdgeBackdropComparison(colorOpacity: $colorOpacity)
-            }
         } controls: {
             ToggleControl("Bottom edge", isOn: $bottom)
             SliderControl("Colour opacity", value: $colorOpacity, in: 0...1, step: 0.05) { "\(Int(($0 * 100).rounded()))%" }
+            // Presented from the controls, not from the preview: a screen presented from it takes
+            // its environment, and the preview's hidden edge effect hid the system's on it.
             ActionControl("Compare on a screen", systemImage: "rectangle.on.rectangle") { isComparing = true }
+                .fullScreenCover(isPresented: $isComparing) {
+                    EdgeBackdropComparison(colorOpacity: $colorOpacity)
+                }
         }
     }
 }
