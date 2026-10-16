@@ -16,6 +16,56 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 5.3.0 - 2026-10-16
+
+Ten answers in light and works in light: a ring round the sphere and waves from its rim while it
+talks, light that fills it as a long task goes, eyes that follow the phone's tilt, haptics with its
+gestures, and a still picture of it for widgets and notifications.
+[#79](https://github.com/dkicekeeper/DesignKit/pull/79)
+
+### Added
+
+- `ParticleCreature.Mood.working(progress:)`: the sphere fills with light from the bottom up as
+  `progress` (0…1) grows, the line shining and rippling, the eyes on the rising light, the core
+  brighter as it fills. For an import, a sync, any long piece of work.
+- `.creatureFollowsTilt()`: when no finger is on it, the hero's eyes look to the side the phone
+  dips to, and back to the middle when the phone rests in a new way; its glances go on on top.
+  One motion manager for every creature, running only while one that follows is on screen and
+  moving; off under Reduce Motion, nothing in the Simulator.
+- `.creatureGesture(_:trigger:haptic:)` and `CreatureGesture.hapticCue`: `haptic: true` plays the
+  gesture's haptic with it (a tap for a nod, a wave or a perk, a confirm for a hop, a warning for
+  a shake or a flinch, a selection for a shrug or a point), under Reduce Motion too.
+- `ParticleCreature.image(mood:style:accessory:side:colorScheme:scale:)`: the still frame of a mood
+  as a `UIImage`, for a widget, a notification's attachment or a share image.
+
+### Changed
+
+- `ParticleCreature(mood: .answering)` keeps its sphere and face: it talks in phrases with open,
+  friendly eyes while a third of the swarm flows in a tilted ring round the sphere and waves of
+  light leave its rim (the owner's choice of two sketches, together). It poured into a bar chart
+  with the face on the tallest bar before. The compact style talks (it showed happy before).
+
+### Migration
+
+- Nothing has to change. Tenra's assistant answers in the new shape on the bump. Its import or
+  sync can show `.working(progress:)`, its chat can give Ten's gestures `haptic: true`, its home
+  can let Ten's eyes follow the tilt.
+
+```swift
+ParticleCreature(mood: importer.isRunning ? .working(progress: importer.progress) : .happy)
+    .creatureGesture(.hop, trigger: savedAt, haptic: true)
+    .creatureFollowsTilt()
+```
+
+### Gallery and tooling
+
+- Gallery: the `ParticleCreature` page has Working with a Work done slider, Follows tilt,
+  Gesture haptic and Still image (the picture `ParticleCreature.image` gives).
+- Snapshot tests: `particleCreature` draws working too; `particleCreatureWorkAndImage` the
+  sphere at three amounts of work and the still picture; the answering references are
+  re-recorded. `searchSuggestions` draws its "Clear" as `.dsSearchSuggestions` does, in the
+  accent (it drew a plain button of its own).
+
 ## 5.2.0 - 2026-10-16
 
 The owner's review of the Gallery: messages that move, one calendar for a period, a filled tab icon

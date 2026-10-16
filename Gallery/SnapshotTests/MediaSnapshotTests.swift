@@ -175,7 +175,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 4.6.0: the creature's still frames, every mood, on the page: all light in dark mode,
+        /// 4.6.0: the creature's still frames, every mood (working since 5.3.0), on the page: all light in dark mode,
         /// all ink in light mode (4.6.1); without its glass since 4.7.0, a glow and a rim of
         /// light round the swarm, a soft shadow under it.
         @Test func particleCreature() async {
@@ -185,7 +185,7 @@ extension ComponentSnapshots {
                 .celebrating, .surprised, .love,
                 .proud, .wink, .confused,
                 .determined, .worried, .sad,
-                .sleepy, .asleep,
+                .sleepy, .asleep, .working(progress: 0.6),
             ]
             await assertComponentSnapshot(
                 VStack(spacing: AppSpacing.md) {
@@ -202,6 +202,24 @@ extension ComponentSnapshots {
                     }
                 }
                 .padding(AppSpacing.lg),
+                appearances: [.light, .dark]
+            )
+        }
+
+        /// 5.3.0: working at a fifth, three fifths and all of the work done (the sphere filling
+        /// with light), and the still picture `ParticleCreature.image(…)` gives, answering.
+        @Test func particleCreatureWorkAndImage() async {
+            await assertComponentSnapshot(
+                HStack(spacing: AppSpacing.md) {
+                    ForEach([0.2, 0.6, 1.0], id: \.self) { progress in
+                        ParticleCreature(mood: .working(progress: progress)).frame(width: 96, height: 96)
+                    }
+                    if let image = ParticleCreature.image(mood: .answering, side: 96, colorScheme: .light) {
+                        Image(uiImage: image).resizable().frame(width: 96, height: 96)
+                    }
+                }
+                .padding(AppSpacing.lg),
+                width: 440,
                 appearances: [.light, .dark]
             )
         }

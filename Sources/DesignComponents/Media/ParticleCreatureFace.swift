@@ -83,7 +83,11 @@ struct CreatureFace: Equatable {
             face.right.lidAngle = 0.18
             return face
         case .answering:
-            return pair(CreatureEye(form: .arc, x: 0.08, width: 0.12, height: 0.11))
+            // Talking to the person (5.3.0): open, friendly eyes; the mouth talks on its own.
+            return pair(CreatureEye(width: 0.26, height: 0.3, cheek: 0.3), mouth: CreatureMouth(form: .open, width: CreatureFace.talkWidth))
+        case .working:
+            // On the work (5.3.0): steady, a little lowered lids.
+            return pair(CreatureEye(width: 0.27, height: 0.26, roundness: 0.55, lid: 0.26, lidAngle: 0.2))
         case .glyph:
             return pair(CreatureEye(form: .arc, x: 0.2, width: 0.16, height: 0.12))
         case .happy:

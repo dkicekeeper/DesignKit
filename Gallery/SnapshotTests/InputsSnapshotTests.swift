@@ -150,7 +150,10 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.md) {
                     SectionHeader("Recent", style: .compact) {
+                        // As `.dsSearchSuggestions` draws it: in the accent (5.2.0).
                         Button("Clear") {}
+                            .buttonStyle(.borderless)
+                            .tint(AppColors.accent)
                     }
                     SearchSuggestionRow.recent("Kapchagay", highlighting: "ka") {}
                     SearchSuggestionRow.recent("pike") {}

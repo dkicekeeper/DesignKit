@@ -2148,17 +2148,20 @@ eyes and the voice in listening eyes.
 
 `mood:` is also a shape of the swarm: `.listening` ripples with `level:` (the voice, 0…1),
 `.thinking` gathers into a small core inside three gyroscope rings (each spins in its own plane
-while the plane turns round the centre), `.answering` pours into a bar chart with the face on
-the tallest bar, `.glyph("₸")` draws a sign in a ring like a coin, `.celebrating` bursts and
-gathers back. The face: `.happy` (^ ^, a smile, a bounce), `.celebrating` (> <, an open mouth),
+while the plane turns round the centre; the core turns as one ball since 5.2.0, a half circle
+before), `.answering` talks in phrases while a third of the swarm flows in a tilted ring round
+the sphere and waves of light leave its rim *(5.3.0; a bar chart with the face on the tallest
+bar before)*, `.working(progress:)` fills the sphere with light from the bottom up as the work
+goes, the line shining and rippling, the eyes on it, the core brighter as it fills *(5.3.0)*,
+`.glyph("₸")` draws a sign in a ring like a coin, `.celebrating` bursts and gathers back. The face: `.happy` (^ ^, a smile, a bounce), `.celebrating` (> <, an open mouth),
 `.surprised` (round eyes, an "o", a swell), `.love` (hearts, a heartbeat), `.proud` (smiling eyes,
 sparkles), `.wink` (a tongue, a tilt), `.confused` (one lid lower, a tilt, "?"), `.determined`
 (lids slanted down to the middle), `.worried` (lids slanted up, amber), `.sad` (a frown, a tear),
 `.sleepy` (half-closed lids, a yawn), `.asleep` (closed, dim, z's).
 
 `style: .hero` from about 160 pt: the sphere takes 70% of the square, the rest is room for the
-burst, the chart and the extras. `.compact` from 24 pt (an avatar, a tab icon): fewer particles
-clipped to the glass; the chart, coin and burst show as happy. `isInteractive:` (hero): the eyes
+burst, the ring, the waves and the extras. `.compact` from 24 pt (an avatar, a tab icon): fewer
+particles clipped to the glass; the coin and burst show as happy, an answer only talks. `isInteractive:` (hero): the eyes
 follow the finger and squint near it, the particles move aside, a tap scatters them and cheers
 the creature up, three quick taps make it dizzy (with a light haptic).
 
@@ -2168,6 +2171,17 @@ small overshoot. Ambient motion: behind `AmbientMotionGate`, one still frame of 
 Reduce Motion, `.designKitMotion(false)` and reduced resource usage. Its colours are its own (its
 identity), not the accent. Decorative: hidden from VoiceOver, say what it is doing in text.
 `ParticleCreatureSkeleton(style:)`: a grey sphere where the swarm will be.
+
+*(5.3.0)* `.creatureFollowsTilt()`: when no finger is on it, the hero's eyes look to the side the
+phone dips to (the in-plane pull of gravity, its slow mean taken away so a new way of holding the
+phone becomes the middle in about 3 s), its glances going on on top; one motion manager for all
+creatures, running only while one that follows is on screen and moving; no permission, nothing
+in the Simulator. `.creatureGesture(_:trigger:haptic: true)` plays the gesture's
+`CreatureGesture.hapticCue` with it (a tap for a nod, a wave, a perk; a confirm for a hop; a
+warning for a shake, a flinch; a selection for a shrug, a point), under Reduce Motion too.
+`ParticleCreature.image(mood:style:accessory:side:colorScheme:scale:)` renders the still frame as
+a `UIImage` for a widget, a notification's attachment or a share image (in a widget the view with
+`.designKitMotion(false)` draws the same frame).
 
 *(4.7.0, from the owner's references of a sphere made of light)* No glass: the sphere is the
 swarm itself, held together by a glow of its colour round it (`CreatureGlow`: 0.2 at the centre,
