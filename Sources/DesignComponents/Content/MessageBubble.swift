@@ -178,7 +178,7 @@ public enum MessageBubbleMetrics {
     static let failedOpacity: Double = 0.6
     /// The shake of a failed message: how far the bubble swings (then less each way), and how
     /// long each swing takes.
-    static let shake: CGFloat = 7
+    static let shake: Double = 7
     static let shakeStep: Double = 0.07
     /// The person's own message starts this small at its corner, this far down (by the field).
     static let outgoingScale: CGFloat = 0.5
