@@ -40,3 +40,29 @@ Also unused, without a place proposed yet: `AmountVisibilityToggle` (Tenra hides
 way), `AmountDigitDisplay`, `AmountPercentage`, `AnimatedTitleInput` (inside `EditableHero`),
 `.attentionPulse`, `.grain`, `.accentGlow`, `.ripple`, `.dissolve`, `.textReveal`,
 `.scrollReveal`, `.staggeredEntrance`, `.hapticCue`, `ScrambleText`.
+
+## Ten (ParticleCreature) in Tenra
+
+What Tenra's code uses of the creature (October 2026): both styles, `CreatureGlyph` (tab,
+toolbar, menu), every accessory, `.creatureAmbience`, touches; the moods `idle`, `thinking`,
+`answering`, `happy`, `celebrating`, `worried`, `sad`, `confused`, `asleep`; the emotions `calm`,
+`joy`, `thought`, `whisper`, `worry`, `dizzy`; the gestures `nod`, `hop`, `wave`, `point`,
+`flinch`, `shrug`. Where the rest could go:
+
+| Unused | Where |
+|---|---|
+| `.listening` (with `level:`) | while the person dictates to Ten from the field's microphone |
+| `.love` | when the person thanks Ten (a reply mood the assistant does not have yet) |
+| `.proud` | a contribution to a goal, days in a row, a budget kept |
+| `.surprised` | an unusually large expense, an anomaly |
+| `.determined` | a long run of tools, in place of `.thinking` |
+| `.wink` | a tip, a joke |
+| `.glyph("₸")` | an answer about a total, the import |
+| `.sleepy` | late in the evening, with the whisper it already uses |
+| `.working(progress:)` (5.3.0) | the CSV import, a sync |
+| `.shake` | "found nothing" |
+| `.perk` | a new notice from Ten |
+| emotion `.sad` | a line about a loss |
+| `haptic: true` (5.3.0) | the gestures of the chat's reactions |
+| `.creatureFollowsTilt()` (5.3.0) | Ten's home |
+| `ParticleCreature.image` (5.3.0) | a widget, a notification from Ten |
