@@ -70,6 +70,9 @@ Gallery badges that follow the apps' code.
 
 - `StatusIndicatorBadge(status: .archived)` drew nothing: its symbol, `archive.circle.fill`, does
   not exist. It draws `archivebox.circle.fill`.
+- `ParticleCreature(mood: .thinking)`: the small core inside the rings spun as a half circle (every
+  particle of it turned by its own longitude, so all of them stood on one meridian). It turns as
+  one ball.
 
 ### Migration
 

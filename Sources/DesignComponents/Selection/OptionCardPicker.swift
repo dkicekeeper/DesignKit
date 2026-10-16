@@ -252,6 +252,9 @@ private struct OptionCarouselCard<Artwork: View>: View {
                 .frame(width: OptionCardMetrics.carouselArtworkWidth, height: OptionCardMetrics.carouselArtworkHeight)
                 .designKitMotion(false)
                 .clipShape(.rect(cornerRadius: AppRadius.md))
+                // A hairline, as the preview's: an artwork the colour of the card (a plain
+                // background) still shows its shape.
+                .overlay(RoundedRectangle(cornerRadius: AppRadius.md).strokeBorder(AppColors.Border.normal, lineWidth: 0.5))
                 .overlay(alignment: .topTrailing) {
                     if isSelected {
                         OptionCardCheck()

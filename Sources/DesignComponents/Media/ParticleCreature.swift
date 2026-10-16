@@ -993,7 +993,9 @@ final class ParticleCreatureEngine {
         switch pose {
         case .thinking:
             if p.index % 5 == 0 {
-                let a = t * 2.2 + p.theta
+                // The core turns as one ball (5.2.0): an angle per particle (its own longitude
+                // added) set every one of them on the same meridian, a spinning half circle.
+                let a = t * 2.2
                 let x = p.ux * cos(a) + p.uz * sin(a)
                 let z = -p.ux * sin(a) + p.uz * cos(a)
                 return (CGPoint(x: cx + x * r0 * 0.28, y: cy + p.uy * r0 * 0.28), (z + 1) / 2)

@@ -234,8 +234,10 @@ public struct SearchSuggestionsContent: View {
                     Button(String(localized: "search.recent.clear", defaultValue: "Clear")) {
                         recent?.wrappedValue.removeAll()
                     }
-                    // The accent, not the list's own blue (5.2.0).
-                    .foregroundStyle(AppColors.accent)
+                    // The accent, not the list's own blue (5.2.0): a header's button takes its
+                    // colour from the tint, not the foreground style.
+                    .buttonStyle(.borderless)
+                    .tint(AppColors.accent)
                 }
             }
         }
