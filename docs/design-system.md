@@ -1739,6 +1739,8 @@ MessageComposer(text: $draft, placeholder: String(localized: "assistant.composer
 A `Layout` that wraps subviews to new lines like words: tags, badges, chips that should not
 scroll. `FlowLayout(spacing:lineSpacing:) { ForEach(tags, id: \.self) { Badge($0) } }`.
 `alignment:` *(2.9.0)* centres or right-aligns each row (`StreamingText` passes its own).
+Inside the module a subview can join the one before it with no spacing (`FlowJoinsPrevious`,
+5.1.1): `StreamingText`'s words of a line written without spaces.
 
 #### `HeroSymbol` *(0.7.0)*
 Large SF Symbol on a disc of its tint at 12%: the picture of `OnboardingPage` and
@@ -2024,7 +2026,10 @@ photo option sits in a `PhotosPicker`). Tenra: `HomeBackgroundPicker`.
 
 #### `StreamingText`
 Text that arrives word by word: words in a `FlowLayout` (`sm` apart, 6 pt between lines), each
-new one with `.blurSlideWord`. A word in the same place with the same text keeps its identity,
+new one with `.blurSlideWord`. A word is what the text has between spaces, with its punctuation
+(5.1.1), so every character is drawn and the gaps fall where the spaces are; a line in a script
+written without spaces (Japanese, Chinese, Thai) is cut into its words, which join with no gap
+and wrap between them. A word in the same place with the same text keeps its identity,
 so the recogniser's refinements do not replay the entrance. `highlights` tint every word that
 overlaps a range (UTF-16, as `NSString` and Speech count). VoiceOver reads the whole text.
 Tenra: `AnimatedTranscriptionText` (recognised entities by confidence → highlights).

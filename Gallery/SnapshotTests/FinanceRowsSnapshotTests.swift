@@ -93,6 +93,28 @@ extension ComponentSnapshots {
             )
         }
 
+        /// 5.1.1: every character of the text, punctuation included, with a gap only where the text
+        /// has a space; Japanese without gaps, wrapping between its words.
+        @Test func streamingTextScripts() async {
+            let samples: [(name: String, text: String, amount: String)] = [
+                ("en", "\"Coffee,\" 2500 tenge. And a taxi?", "2500"),
+                ("ru", "Сколько я потратил на «кофе»? 2500 тенге.", "2500"),
+                ("ja", "コンビニで500円使って、タクシーに1,800円払った。", "500円"),
+                ("ko", "점심 12,000원, 택시 8,000원 썼어?", "12,000원"),
+            ]
+            for sample in samples {
+                await assertComponentSnapshot(
+                    StreamingText(
+                        sample.text,
+                        highlights: [.init(range: (sample.text as NSString).range(of: sample.amount), color: AppColors.success)]
+                    )
+                    .frame(maxWidth: .infinity, alignment: .leading),
+                    named: sample.name,
+                    appearances: [.light]
+                )
+            }
+        }
+
         @Test func flowLayoutCentered() async {
             await assertComponentSnapshot(
                 FlowLayout(alignment: .center) {

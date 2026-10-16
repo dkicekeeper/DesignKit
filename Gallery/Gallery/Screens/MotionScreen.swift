@@ -464,19 +464,35 @@ private struct BlurSlidePage: View {
 }
 
 private struct StreamingTextPage: View {
+    private enum Language: Hashable { case english, russian, japanese, korean }
+
     @State private var count = 3
+    @State private var language = Language.english
     @State private var highlights = true
     @State private var state: SpecimenState = .content
 
-    private let words = ["Coffee", "2500", "tenge", "and", "taxi", "1800", "from", "Kaspi"]
+    /// Eight pieces of a phrase in each language, the way a recogniser grows it; Japanese has no
+    /// spaces between them.
+    private var sample: (parts: [String], separator: String, amounts: [String]) {
+        switch language {
+        case .english:
+            (["Coffee,", "2500", "tenge.", "Taxi", "1800", "from", "\"Kaspi\"", "too?"], " ", ["2500", "1800"])
+        case .russian:
+            (["Кофе,", "2500", "тенге.", "Такси", "1800", "с", "«Kaspi»,", "верно?"], " ", ["2500", "1800"])
+        case .japanese:
+            (["コンビニで", "500円", "使って、", "タクシーに", "1,800円", "払った。", "合計は", "いくら？"], "", ["500円", "1,800円"])
+        case .korean:
+            (["커피", "4,500원,", "점심", "12,000원,", "택시", "8,000원", "썼어.", "합계는?"], " ", ["4,500원", "12,000원", "8,000원"])
+        }
+    }
 
-    private var text: String { words.prefix(count).joined(separator: " ") }
+    private var text: String { sample.parts.prefix(count).joined(separator: sample.separator) }
 
     /// The amounts, tinted as a recogniser would its confident matches.
     private var tints: [StreamingText.Highlight] {
         guard highlights else { return [] }
         let string = text as NSString
-        return ["2500", "1800"].compactMap { amount in
+        return sample.amounts.compactMap { amount in
             let range = string.range(of: amount)
             return range.location == NSNotFound ? nil : .init(range: range, color: AppColors.success)
         }
@@ -492,6 +508,7 @@ private struct StreamingTextPage: View {
             notes: [
                 "A word in the same place with the same text keeps its identity, so a recogniser's refinements do not replay the entrance.",
                 "highlights tint every word overlapping a range (UTF-16, as NSString and Speech count).",
+                "Every character of the text is drawn, punctuation included, with a gap only where the text has a space. A Japanese, Chinese or Thai line is cut into its words with no gap between them, so it still wraps (5.1.1).",
             ]
         ) {
             if state == .loading {
@@ -502,7 +519,10 @@ private struct StreamingTextPage: View {
             }
         } controls: {
             StateControl(state: $state)
-            StepperControl("Words", value: $count, in: 0...words.count)
+            ChoiceControl("Language", selection: $language, options: [
+                ("English", .english), ("Русский", .russian), ("日本語", .japanese), ("한국어", .korean),
+            ])
+            StepperControl("Words", value: $count, in: 0...sample.parts.count)
             ToggleControl("Highlights", isOn: $highlights)
         }
     }
