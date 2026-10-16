@@ -34,6 +34,7 @@ public struct MessageQuote: Equatable, Sendable {
 ///
 /// ```swift
 /// List { … }
+///     .scrollEdgeEffectStyle(.soft, for: .bottom)
 ///     .safeAreaBar(edge: .bottom) {
 ///         MessageComposer(text: $text, placeholder: "Add a comment…",
 ///                         isSending: isSending, errorMessage: sendError) {
@@ -45,7 +46,9 @@ public struct MessageQuote: Equatable, Sendable {
 /// ```
 ///
 /// The glass floats over the content: put it in `safeAreaBar` (the scroll edge blurs under
-/// it), not on a `.bar` background, and give it the screen's side margins. Focused, it fills
+/// it), not on a `.bar` background, and give it the screen's side margins. Name the soft edge,
+/// `.scrollEdgeEffectStyle(.soft, for: .bottom)` (5.1.0): built with Xcode 27 the style as it
+/// comes is hard, a plate with a line under the glass. Focused, it fills
 /// with the raised surface colour almost to opaque (4.9.0), so the text never mixes with the
 /// content behind it; unfocused it is clear glass again. `.disabled(true)`
 /// greys it out, with the placeholder saying why (e.g. "Sign in to comment").

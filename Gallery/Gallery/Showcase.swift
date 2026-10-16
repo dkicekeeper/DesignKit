@@ -60,6 +60,9 @@ struct ShowcasePage<Content: View>: View {
                 page(ForEach(pages) { $0 })
             }
         }
+        // The soft edge under the chips and the navigation bar, named: built with Xcode 27 the
+        // style as it comes is hard (docs/gotchas.md).
+        .scrollEdgeEffectStyle(.soft, for: .top)
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
     }

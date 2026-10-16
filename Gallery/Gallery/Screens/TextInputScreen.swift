@@ -135,7 +135,7 @@ private struct MessageComposerPage: View {
             apps: [.dalada, .tenra],
             canvas: .fill,
             notes: [
-                "Put it in safeAreaBar(edge: .bottom) so the list scrolls under the glass; give it the screen margins.",
+                "Put it in safeAreaBar(edge: .bottom) so the list scrolls under the glass, with .scrollEdgeEffectStyle(.soft, for: .bottom) (built with Xcode 27 the edge as it comes is hard); give it the screen margins.",
                 "Signed out: .disabled(true) with a placeholder that says why.",
                 "limit: (4.1.0) shows the count over the field from 80% of it; over it the count is red and sending is off.",
                 "leading: (4.8.0) puts an attach button or menu inside the glass, with MessageComposerAccessory as its label. onVoice: puts a microphone in the send button's place while the text is blank.",

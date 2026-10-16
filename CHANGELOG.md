@@ -16,6 +16,37 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 5.1.0 - 2026-10-16
+
+The bars DesignKit draws over scrolling content name their scroll edge style, so building an app
+with Xcode 27 keeps the soft edge it has now.
+[#76](https://github.com/dkicekeeper/DesignKit/pull/76)
+
+### Changed
+
+- `.dateButtonsSafeArea`, `IconPicker` and `.heroScrollEdge()` set
+  `.scrollEdgeEffectStyle(.soft, for:)` on their edge. Built with Xcode 26 nothing changes (soft
+  is what iOS 26 draws as it comes, and the snapshots are the same); built with Xcode 27, where
+  the style as it comes resolves to hard, a plate with a line, they keep the soft edge.
+
+### Migration
+
+- A `MessageComposer` in a `safeAreaBar`: name the soft edge on the scroll view, as the example
+  now does. Each app's own bars over scrolling content too, before it moves to Xcode 27: soft
+  where it is soft now, hard where the owner chose it (a bar over a chat).
+
+```swift
+List { … }
+    .scrollEdgeEffectStyle(.soft, for: .bottom)
+    .safeAreaBar(edge: .bottom) { MessageComposer(…) }
+```
+
+### Gallery and tooling
+
+- Gallery: the chips over each section's pages name the soft edge too; the `MessageComposer`
+  page says to name it.
+- docs/design-system.md: every bar over scrolling content names its edge style.
+
 ## 5.0.0 - 2026-10-16
 
 4.14.0's ports from Tenra folded into the components they repeated, the duplicates removed at
