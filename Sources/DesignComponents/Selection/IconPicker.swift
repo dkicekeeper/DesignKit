@@ -59,6 +59,9 @@ public struct IconPicker: View {
                     IconPickerLogosTab(selection: $selection)
                 }
             }
+            // The soft edge under the tabs and the navigation bar, named (5.1.0): built with
+            // Xcode 27 the style as it comes is hard (docs/gotchas.md).
+            .scrollEdgeEffectStyle(.soft, for: .top)
             .safeAreaBar(edge: .top) {
                 if showsLogos {
                     SegmentedPicker(

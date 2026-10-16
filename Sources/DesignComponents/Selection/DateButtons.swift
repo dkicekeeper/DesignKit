@@ -172,14 +172,18 @@ public extension View {
         maxDate: Date? = nil,
         onSave: @escaping (Date) -> Void
     ) -> some View {
-        self.safeAreaBar(edge: .bottom) {
-            DateButtonsContentWrapper(
-                selectedDate: selectedDate,
-                isDisabled: isDisabled,
-                maxDate: maxDate,
-                onSave: onSave
-            )
-        }
+        // The soft edge under the buttons, named (5.1.0): built with Xcode 27 the style as it
+        // comes is hard, a plate with a line (docs/gotchas.md).
+        self
+            .scrollEdgeEffectStyle(.soft, for: .bottom)
+            .safeAreaBar(edge: .bottom) {
+                DateButtonsContentWrapper(
+                    selectedDate: selectedDate,
+                    isDisabled: isDisabled,
+                    maxDate: maxDate,
+                    onSave: onSave
+                )
+            }
     }
 }
 

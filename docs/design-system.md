@@ -1687,6 +1687,7 @@ red and sending is off.
 
 ```swift
 List { … }
+    .scrollEdgeEffectStyle(.soft, for: .bottom)
     .safeAreaBar(edge: .bottom) {
         MessageComposer(text: $text, placeholder: String(localized: "comments.placeholder"),
                         quote: quote, isSending: isSending, canSend: draft.isValid,
@@ -1702,7 +1703,9 @@ List { … }
 - **Send button:** an accent circle with an arrow; grey while the text is blank (or `canSend` is
   false), a spinner while `isSending`. The glass corner is concentric with it (radius 20).
 - **Placement:** the glass floats over the content, so use `safeAreaBar` (the scroll edge
-  blurs under it), not a `.bar` background; the caller gives the side margins.
+  blurs under it), not a `.bar` background; the caller gives the side margins. Name the soft
+  edge, `.scrollEdgeEffectStyle(.soft, for: .bottom)` *(5.1.0, the owner's choice)*: built with
+  Xcode 27 the style as it comes is hard, a plate with a line under the glass.
 - **Focused** *(4.9.0)*: the glass fills with `AppColors.Background.elevation1` at 94% while the
   field has focus, so what is typed reads over any content scrolling under it; unfocused it is
   clear glass again.
@@ -2500,10 +2503,14 @@ Grouping form rows?
 Horizontal scroll?
 └── UniversalCarousel with appropriate preset
 
-A bar over a chat's thread (a header, Ten)?
-└── .safeAreaBar(edge: .top) on the thread, with .scrollEdgeEffectStyle(.hard, for: .top)
-    (5.0.0, the owner's choice; EdgeBackdrop in 4.14.0). Present the chat from the screen,
-    not from inside a scroll view (docs/gotchas.md)
+A bar over scrolling content? Name its edge style on the scroll view (5.1.0): built with
+Xcode 27 the style as it comes is hard, a plate with a line (docs/gotchas.md)
+├── Over a chat's thread (a header, Ten) → .safeAreaBar(edge: .top) on the thread, with
+│   .scrollEdgeEffectStyle(.hard, for: .top) (5.0.0, the owner's choice; EdgeBackdrop in 4.14.0).
+│   Present the chat from the screen, not from inside a scroll view (docs/gotchas.md)
+└── Anything else (a form's date buttons, picker tabs, a MessageComposer, a toolbar of chips)
+    → .scrollEdgeEffectStyle(.soft, for: edge), what iOS 26 draws as it comes; DesignKit's
+    own bars (.dateButtonsSafeArea, IconPicker, .heroScrollEdge()) name it themselves
 
 Card-style container?
 ├── Rows under an optional title → FormSection(header:, style: .glass) (5.0.0; ListCard in 4.14.0)

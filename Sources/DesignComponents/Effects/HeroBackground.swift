@@ -227,6 +227,9 @@ private struct HeroScrollEdgeModifier: ViewModifier {
                 barInset = inset
             }
             .scrollEdgeEffectHidden(colourIsUnderBar, for: .top)
+            // Once the cards are under the bar, its edge is the soft one, named (5.1.0): built
+            // with Xcode 27 the style as it comes is hard (docs/gotchas.md).
+            .scrollEdgeEffectStyle(.soft, for: .top)
             // The hero's gradient starts at the screen's top edge.
             .environment(\.heroBarInset, barInset)
     }
