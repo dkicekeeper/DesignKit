@@ -84,7 +84,6 @@ private struct SparkleBurstPage: View {
             name: ".sparkleBurst",
             summary: "A small ring of sparkles around a control when something is added: a like, a reaction, a favourite. ReactionButton plays it on its own.",
             since: "2.2.0",
-            apps: [.dalada],
             canvas: .tall(minHeight: 160)
         ) {
             ReactionButton(systemImage: "heart", selectedSystemImage: "heart.fill", count: isSelected ? 13 : 12,
@@ -108,6 +107,7 @@ private struct ShinePage: View {
             name: ".shine",
             summary: "A band of light sweeps once across a shape: a card just added, a premium badge, an achievement unlocked.",
             since: "2.2.0",
+            apps: [.tenra],
             canvas: .fill,
             notes: ["0.8 s; clipped to the shape you pass (the card's AppRadius.xl by default). Off under Reduce Motion."]
         ) {
@@ -167,7 +167,7 @@ private struct AuroraBackgroundPage: View {
             name: "AuroraBackground",
             summary: "A slowly drifting mesh-gradient aurora behind a premium screen, a paywall, an onboarding; or, still, weighted pools of colour behind a home screen.",
             since: "2.2.0",
-            apps: [.tenra],
+            apps: [.tenra, .dalada],
             canvas: .bleed,
             notes: [
                 "MeshGradient in one GPU pass, no blur, 30 fps only while AmbientMotionGate allows; otherwise one still frame.",
@@ -337,6 +337,7 @@ private struct ThinkingShimmerPage: View {
             name: ".thinkingShimmer",
             summary: "A band of aurora colour runs through the words while the app works on what was asked: “Listening…”, “Analysing…”, an insight on its way.",
             since: "2.4.0",
+            apps: [.tenra],
             notes: [
                 "A skeleton's shimmer says content is coming; this one says the app is working on your request.",
                 "One gradient masked by the text, 30 fps while active. Under Reduce Motion the text is drawn in the still aurora gradient.",
@@ -396,7 +397,6 @@ private struct AccentGlowPage: View {
         ComponentPage(
             name: ".accentGlow",
             summary: "A wash of colour from one edge: onboarding backgrounds, a hero's light.",
-            apps: [.tenra],
             canvas: .bleed,
             notes: [
                 "style: .aurora (2.5.0, the default): a band of mesh-gradient light in the tint and its neighbours, fading inwards, with a fine grain. No blur, so lighter than .soft, the blurred circle of before.",
@@ -466,7 +466,7 @@ private struct CompletionMomentPage: View {
             name: ".completionMoment",
             summary: "When something is done, a soft glow of its shape flares and fades behind it and the success haptic plays. Only the change plays it: a view that appears complete stays quiet.",
             since: "2.3.0",
-            apps: [.tenra, .dalada],
+            apps: [.dalada],
             notes: [
                 "Built in: ProgressRing(celebratesCompletion: true) also draws a checkmark in; ChecklistSummaryRow's bar and TargetProgressCard's bar glow when they reach the end.",
                 "On your own view: .completionMoment(isComplete: goal.progress >= 1, in: RoundedRectangle(cornerRadius: AppRadius.xl)).",
@@ -548,7 +548,7 @@ private struct HolographicPage: View {
             name: ".holographic",
             summary: "A holographic foil: rainbow bands slide across the surface as your finger moves over it, with a sheen where the light falls. Drag over the medal and the card.",
             since: "2.6.0",
-            apps: [.dalada],
+            apps: [.tenra, .dalada],
             notes: [
                 "Pairs with .interactiveTilt(in:), which tilts the same surface towards the finger.",
                 "One Metal colour effect, redrawn only while the finger moves or the light settles back.",

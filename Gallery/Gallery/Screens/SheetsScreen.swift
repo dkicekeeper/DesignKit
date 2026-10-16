@@ -311,10 +311,14 @@ private struct DateRangePickerSheetPage: View {
     var body: some View {
         ComponentPage(
             name: "DateRangePickerSheet",
-            summary: "A period of days on two calendars, From and To; the start never passes the end. Cancel or Apply.",
+            summary: "A period of days on one calendar: the period written on top, its ends in filled circles and the days between on a band. Cancel or Apply.",
             since: "2.9.0",
             apps: [.tenra],
-            notes: ["Apply hands the range to onApply; the app dismisses the sheet there."]
+            notes: [
+                "A tap sets From, the next one To; a day before the start starts the period there. Tapping a field on top picks which end the next tap sets.",
+                "5.2.0: DesignKit's own calendar in place of the system's two, which showed neither the period nor which end was picked.",
+                "Apply hands the range (both ends at the start of their day) to onApply; the app dismisses the sheet there.",
+            ]
         ) {
             VStack(spacing: AppSpacing.md) {
                 Text("\(range.lowerBound.formatted(date: .abbreviated, time: .omitted)) – \(range.upperBound.formatted(date: .abbreviated, time: .omitted))")

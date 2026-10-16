@@ -121,7 +121,7 @@ public struct CurrencyList: View {
 
 // MARK: - Row
 
-/// One currency: the code over its name, the symbol, and a check when chosen (3.6.0; the
+/// One currency: the code over its name, the symbol, and a `SelectionIndicator` (3.6.0; the
 /// row `CurrencyList` draws). No padding of its own: a `List` insets it, `CurrencyList` pads
 /// it in its cards. Wrap it in a `Button` (`.buttonStyle(.plain)`) to make it pick.
 ///
@@ -159,11 +159,12 @@ public struct CurrencyRow: View {
             Text(verbatim: currency.symbol)
                 .font(AppTypography.body)
                 .foregroundStyle(AppColors.Text.secondary)
-            if isSelected || isLocked {
-                Image(systemName: "checkmark")
-                    .font(AppTypography.bodySmall)
-                    .foregroundStyle(isLocked ? AppColors.Text.tertiary : AppColors.accent)
-            }
+            // 5.2.0: a filled check on a chosen one, an empty circle on the rest (a bare
+            // checkmark on the chosen ones before).
+            SelectionIndicator(
+                isSelected: isSelected || isLocked,
+                tint: isLocked ? AppColors.Text.tertiary : AppColors.accent
+            )
         }
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(isSelected || isLocked ? .isSelected : [])

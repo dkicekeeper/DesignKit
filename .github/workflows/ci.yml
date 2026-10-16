@@ -39,6 +39,29 @@ jobs:
       - name: Check CHANGELOG.md
         run: python3 .github/scripts/changelog.py check
 
+  # The Gallery's app badges (`apps:` on each ComponentPage) name the apps whose code uses the
+  # component, read from Tenra's and Dalada's sources (5.2.0), so they follow the apps.
+  gallery-badges:
+    name: Gallery badges
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: DesignKit
+      - uses: actions/checkout@v5
+        with:
+          repository: dkicekeeper/Tenra
+          ref: ${{ inputs.tenra_ref || 'main' }}
+          path: Tenra
+      - uses: actions/checkout@v5
+        with:
+          repository: dkicekeeper/Dalada
+          ref: ${{ inputs.dalada_ref || 'main' }}
+          path: Dalada
+      - name: Compare the badges with the apps' code
+        run: python3 DesignKit/.github/scripts/gallery_badges.py check --root DesignKit --tenra Tenra --dalada Dalada
+
   package:
     name: Package + Gallery
     runs-on: macos-26

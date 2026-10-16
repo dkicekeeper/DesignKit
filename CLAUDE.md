@@ -147,7 +147,8 @@ rather than importing an app type.
    if it has one) in its section's screen's `pages` (`Gallery/Gallery/Screens/`, by
    what the component does), with a control for each parameter and a `StateControl` whose
    "Loading" shows its skeleton (plus Empty / Error / Disabled when it has them); a new screen
-   needs `xcodegen generate`. Add a snapshot test in `Gallery/SnapshotTests` (the skeleton's in
+   needs `xcodegen generate`. Its `apps:` names the apps whose code uses it: CI's `Gallery
+   badges` job compares them with Tenra's and Dalada's sources (5.2.0). Add a snapshot test in `Gallery/SnapshotTests` (the skeleton's in
    `SkeletonsSnapshotTests`; one Liquid Glass card per snapshot; `named:` tells them apart),
    then record it with a manual CI run, `record_snapshots: missing` (docs/snapshots.md).
 5. Add any new `String(localized:)` key to `docs/localization-keys.md` and its English value
@@ -262,5 +263,6 @@ rather than importing an app type.
 | Moving an app to 4.0 (`SectionHeader.Style.list` removed) | [docs/migration-4.0.md](docs/migration-4.0.md) |
 | Moving an app to 5.0 (`ListCard` removed, `FormSection(style: .glass)` in its place) | [docs/migration-5.0.md](docs/migration-5.0.md) |
 | What exists vs Apple HIG / Material / Fluent / Carbon / Polaris / Atlassian, next candidates | [docs/benchmark.md](docs/benchmark.md) |
+| Components no app uses yet and where they could go (for the app sessions) | [docs/adoption.md](docs/adoption.md) |
 | Where a component goes (Gallery sections, source folders), how its Gallery page is built | [docs/gallery-structure.md](docs/gallery-structure.md) |
 | How an app uses DesignKit (its adapters, screens, effects in use) | Tenra's `docs/design-system.md`, Dalada's `CLAUDE.md` («Компоненты интерфейса») |

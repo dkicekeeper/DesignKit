@@ -318,6 +318,19 @@ extension ComponentSnapshots {
             )
         }
 
+        /// DateRangePickerSheet's own calendar (5.2.0): the period on top, its ends filled, the
+        /// days between on the band. A month long past, so today never shows on it.
+        @Test func dateRangePickerSheet() async {
+            let calendar = Calendar(identifier: .gregorian)
+            let start = calendar.date(from: DateComponents(year: 2025, month: 9, day: 8)) ?? .now
+            let end = calendar.date(from: DateComponents(year: 2025, month: 9, day: 19)) ?? .now
+            await assertComponentSnapshot(
+                DateRangePickerSheet(range: start...end) { _ in }
+                    .frame(height: 640),
+                width: 400
+            )
+        }
+
         /// One row of glass buttons per snapshot.
         @Test func dateButtons() async {
             await assertComponentSnapshot(

@@ -16,6 +16,99 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 5.2.0 - 2026-10-16
+
+The owner's review of the Gallery: messages that move, one calendar for a period, a filled tab icon
+for Ten, options in a carousel under a preview, a `SelectionIndicator` in every choice list, and
+Gallery badges that follow the apps' code.
+[#78](https://github.com/dkicekeeper/DesignKit/pull/78)
+
+### Added
+
+- `.transition(.messageBubble(role))` (`MessageBubbleTransition`): a new message grows from its
+  bottom trailing corner (the person's own, by the field) with a light spring, a reply comes into
+  focus from its bottom leading corner; only a fade under Reduce Motion or
+  `.designKitMotion(false)`. The history a chat opens with does not take it.
+- `OptionCardPicker(style: .carousel)` (`OptionCardPickerStyle`), as Ten's wardrobe: the chosen
+  option's artwork large on top in a phone's shape, the options in a centred row of cards under
+  it, and under the row what the app sets for the chosen option (`settings:`, under the cards in
+  `.list`). Skeleton: `OptionCardCarouselSkeleton`.
+- `NoticeCardMetrics.leadingSize` (48 pt): the size of a notice's picture.
+- `UniversalRowSkeleton.Trailing.selection`: the empty circle of a choice row.
+- `CreatureGlyphMetrics.coreDiameter`.
+
+### Changed
+
+- `MessageBubble`: a message that fails to send shakes once, its failure line rises in under it,
+  and the error haptic plays.
+- `.borderBeam`: the comet has no ball of light at its head; the bright head of the line, the tail
+  and the spill stay.
+- `.heroBackground`: the hero takes the full width, its content centred, so the colour spans the
+  screen however narrow the hero is (Tenra's insight details already framed it so).
+- `PromptSheet` and `NotificationPermissionPrompt`: 48 pt above the symbol (24 pt before).
+- `DateRangePickerSheet`: one calendar of DesignKit's own in place of the system's two, which showed
+  neither the period nor which end was picked. On top the period and its length ("22 days") over a
+  field for each end, the one the next tap sets outlined; on the calendar the ends are filled
+  accent circles and the days between lie on a pale band. A tap sets From, the next one To; the
+  arrows turn the month. Apply hands both ends at the start of their day.
+- `CreatureGlyph` and `CreatureTabLabel`: a filled core with the eyes cut out, in a ring of twelve
+  dots (the owner's variant B), so Ten's tab weighs as much as the bar's filled symbols.
+- `NoticeCard`: the action sits in the text's column, where the text starts (under the picture
+  before); `NoticeCardSkeleton`'s picture is 48 pt by default (32 pt before).
+- `CheckmarkRow` and `CurrencyRow`: a `SelectionIndicator` on every row, the filled check on the
+  picked one and an empty circle on the others (a bare checkmark on the picked one before);
+  `UniversalRowSkeleton.checkmark` shows the circle.
+- `SnapCardPicker(style: .fill)`: the selection follows the centre during a drag, as in
+  `.centered` (it waited for the row to stop). `.centered` no longer clips its cards' outline and
+  shadow at the top and bottom.
+- Search suggestions (`.dsSearchSuggestions`, `SearchSuggestionRow`): a symbol sits in a 32 pt
+  circle tile as in DesignKit's other rows, a suggestion's in a pale tint of its colour (the accent
+  by default; a bare grey symbol before), a recent query's clock on grey; "Clear" is in the accent
+  (the list's blue before).
+
+### Fixed
+
+- `StatusIndicatorBadge(status: .archived)` drew nothing: its symbol, `archive.circle.fill`, does
+  not exist. It draws `archivebox.circle.fill`.
+
+### Migration
+
+- Nothing has to change. Tenra's notice mascot (`AssistantView.headerMascot`, 32 pt) can take
+  `NoticeCardMetrics.leadingSize`; its chat can give new messages `.transition(.messageBubble(_:))`;
+  its home background picker can move to the carousel. docs/adoption.md lists components the apps
+  do not use yet and where they could go.
+
+```swift
+// A new message
+ForEach(messages) { message in
+    MessageBubble(message.text, role: message.role)
+        .transition(.messageBubble(message.role))
+}
+.animation(AppAnimation.bouncy, value: messages.count)
+
+// The home background
+OptionCardPicker(HomeBackground.allCases, selection: $background, style: .carousel,
+                 title: { $0.name }) { background in
+    BackgroundPreview(background)
+} settings: { background in
+    if background == .photo { PhotosPicker(selection: $photo) { Text("Choose a photo") } }
+}
+```
+
+### Gallery and tooling
+
+- CI: a `Gallery badges` job (`.github/scripts/gallery_badges.py`) compares every page's app badges
+  with Tenra's and Dalada's code and fails when one is wrong; 53 pages' badges are corrected
+  (`SkeletonReveal`, used by both apps, had none).
+- Gallery: `MessageBubble` has Send and Clear (a conversation to watch the motion in);
+  `OptionCardPicker` has a style control and settings; the `DateRangePickerSheet`, `NoticeCard`,
+  `CheckmarkRow`, `CreatureGlyph` and `SnapCardPicker` pages describe their changes.
+- Snapshot tests: `dateRangePickerSheet`, `optionCardCarousel` and the carousel's skeleton are new;
+  `badges` draws every `StatusIndicatorBadge` status; the references of the changed components
+  are re-recorded.
+- docs/adoption.md: components no app uses yet and screens without `.skeletonReveal`, for the app
+  sessions.
+
 ## 5.1.1 - 2026-10-16
 
 `StreamingText` draws every character of its text in every script, punctuation included, with a

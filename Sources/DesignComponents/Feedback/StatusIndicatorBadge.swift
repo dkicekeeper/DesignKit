@@ -26,7 +26,8 @@ public enum EntityStatus {
         switch self {
         case .active:   return "checkmark.circle.fill"
         case .paused:   return "pause.circle.fill"
-        case .archived: return "archive.circle.fill"
+        // 5.2.0: "archive.circle.fill" is no symbol, the badge drew nothing.
+        case .archived: return "archivebox.circle.fill"
         case .pending:  return "clock.badge.fill"
         }
     }

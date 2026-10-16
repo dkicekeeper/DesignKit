@@ -105,8 +105,7 @@ private struct AnimatedTitleInputPage: View {
     var body: some View {
         ComponentPage(
             name: "AnimatedTitleInput",
-            summary: "A large title typed in place, each letter animating in: the name in an edit sheet's hero.",
-            apps: [.tenra]
+            summary: "A large title typed in place, each letter animating in: the name in an edit sheet's hero."
         ) {
             AnimatedTitleInput(text: $title, placeholder: "Untitled",
                                alignment: alignment == 0 ? .center : .leading)
@@ -211,7 +210,6 @@ private struct TagInputPage: View {
             name: "TagInput",
             summary: "Free-form tags as removable chips, a field for the next one and matching suggestions.",
             since: "0.7.0",
-            apps: [.dalada],
             canvas: .fill,
             notes: ["Return or a comma adds a tag; duplicates and blanks are dropped. A fixed set of options → ChipPicker."]
         ) {

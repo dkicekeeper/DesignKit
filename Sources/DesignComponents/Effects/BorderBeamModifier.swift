@@ -2,8 +2,8 @@
 //  BorderBeamModifier.swift
 //  Tenra
 //
-//  A comet of light travelling round a card's border (2.4.0: along the path, with a bloom),
-//  for highlights and focus states; and a static halo to pair with it.
+//  A comet of light travelling round a card's border (2.4.0: along the path; 5.2.0: no bloom
+//  at its head), for highlights and focus states; and a static halo to pair with it.
 //
 
 import SwiftUI
@@ -15,9 +15,9 @@ import DesignSupport
 /// Overlays a comet of light that travels around the view's border.
 ///
 /// 2.4.0: the comet runs along the border itself (a trimmed path), so it keeps one speed and
-/// one length on every side and round every corner. Its head is bright with a small bloom,
-/// its tail fades and thins, and a wide faint spill lights the edge it is passing. One or two
-/// comets (the second opposite the first).
+/// one length on every side and round every corner. Its head is the brightest, widest part of
+/// the line (5.2.0: without the ball of light it had), its tail fades and thins, and a wide
+/// faint spill lights the edge it is passing. One or two comets (the second opposite the first).
 ///
 /// Driven by `TimelineView(.animation)` so it ticks only while the overlay is visible —
 /// flipping `isActive` to `false` stops the work entirely (no orphan animation).
@@ -118,18 +118,6 @@ enum BorderComet {
                 stroke(border, from: from, to: to, in: &context,
                        with: .color(color.opacity(strength)),
                        style: StrokeStyle(lineWidth: lineWidth * CGFloat(0.5 + 0.5 * (1 - near)), lineCap: .butt))
-            }
-
-            // The head's bloom.
-            if let point = border.trimmedPath(from: 0, to: max(tip, 0.0001)).currentPoint {
-                let bloom = lineWidth * 4 + 4
-                context.fill(
-                    Path(ellipseIn: CGRect(x: point.x - bloom, y: point.y - bloom, width: bloom * 2, height: bloom * 2)),
-                    with: .radialGradient(
-                        Gradient(colors: [.white.opacity(0.9), colors[0].opacity(0.5), colors[0].opacity(0)]),
-                        center: point, startRadius: 0, endRadius: bloom
-                    )
-                )
             }
         }
     }

@@ -40,7 +40,7 @@ private struct ChartSwitcherPage: View {
             name: "ChartSwitcher",
             summary: "A LineChart and a BarChart of the same data with a switch between them; zoom and tap a point.",
             since: "0.5.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra],
             canvas: .bleed
         ) {
             switch state {
@@ -98,7 +98,7 @@ private struct BarChartPage: View {
             name: "BarChart",
             summary: "Bars per period, one or several series side by side.",
             since: "0.5.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra],
             canvas: .bleed
         ) {
             if state == .loading {
@@ -164,7 +164,7 @@ private struct SparklinePage: View {
             name: "Sparkline",
             summary: "A tiny trend for cards and feeds, drawn on a Canvas.",
             since: "0.5.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra],
             canvas: .fill
         ) {
             if state == .loading {
@@ -223,7 +223,6 @@ private struct ChartSelectionBannerPage: View {
             name: "ChartSelectionBanner",
             summary: "What a tapped point holds: its title and one or more values with colour dots.",
             since: "0.5.0",
-            apps: [.tenra],
             canvas: .fill
         ) {
             if twoValues {
@@ -248,8 +247,7 @@ private struct ChartZoomControlsPage: View {
     var body: some View {
         ComponentPage(
             name: "ChartZoomControls",
-            summary: "Glass − and + to zoom a chart's time axis within a range.",
-            apps: [.tenra]
+            summary: "Glass − and + to zoom a chart's time axis within a range."
         ) {
             VStack(spacing: AppSpacing.sm) {
                 ChartZoomControls(zoomScale: $zoom, range: 1...4)

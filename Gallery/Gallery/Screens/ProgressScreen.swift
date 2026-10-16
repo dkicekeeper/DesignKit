@@ -124,7 +124,6 @@ private struct AmountComparisonBarPage: View {
         ComponentPage(
             name: "AmountComparisonBar",
             summary: "Expenses against income as two bars with their amounts.",
-            apps: [.tenra],
             canvas: .fill
         ) {
             if state == .loading {

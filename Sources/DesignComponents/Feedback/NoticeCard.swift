@@ -3,8 +3,9 @@
 //  DesignKit
 //
 //  A message the app writes to the person (4.14.0): a picture on the leading edge (a mascot,
-//  an icon), a title and a line or two of text, a button that hides it, and an action under
-//  them ("Go through it"). On a glass card (`FormSection(style: .glass)` since 5.0.0, `ListCard`
+//  an icon, `NoticeCardMetrics.leadingSize` since 5.2.0), a title and a line or two of text, a
+//  button that hides it, and an action under the text, in line with it ("Go through it"; 5.2.0,
+//  under the picture before). On a glass card (`FormSection(style: .glass)` since 5.0.0, `ListCard`
 //  before). Ported from Tenra's AssistantNoticeCard; what the message is, when it shows and what
 //  the action does stay in the app.
 //
@@ -23,7 +24,7 @@ import DesignSupport
 ///     onHide: { markRead() }
 /// ) {
 ///     ParticleCreature(mood: .worried, style: .compact)
-///         .frame(width: AppIconSize.xl, height: AppIconSize.xl)
+///         .frame(width: NoticeCardMetrics.leadingSize, height: NoticeCardMetrics.leadingSize)
 /// }
 /// ```
 public struct NoticeCard<Leading: View>: View {
@@ -37,11 +38,13 @@ public struct NoticeCard<Leading: View>: View {
     let leading: Leading
 
     /// - Parameters:
-    ///   - actionTitle: The flat button under the text; it shows only with `action`.
+    ///   - actionTitle: The flat button under the text, in line with it; it shows only with
+    ///     `action`.
     ///   - hideLabel: VoiceOver's name of the hide button ("Hide").
     ///   - onHide: The ✕ on the trailing edge; none leaves it out.
-    ///   - leading: The picture before the text, at the size it should be (hidden from VoiceOver
-    ///     by the caller when it says nothing).
+    ///   - leading: The picture before the text, at the size it should be
+    ///     (`NoticeCardMetrics.leadingSize` for a mascot or an icon; hidden from VoiceOver by the
+    ///     caller when it says nothing).
     public init(
         title: String,
         message: String,
@@ -73,6 +76,11 @@ public struct NoticeCard<Leading: View>: View {
                     Text(message)
                         .font(AppTypography.bodySmall)
                         .foregroundStyle(AppColors.Text.secondary)
+                    // In the text's column, so it starts where the text does (5.2.0).
+                    if let actionTitle, let action {
+                        DSButton(actionTitle, systemImage: actionSystemImage, appearance: .flat, size: .small, action: action)
+                            .padding(.top, AppSpacing.xs)
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 if let onHide {
@@ -86,9 +94,6 @@ public struct NoticeCard<Leading: View>: View {
                         action: onHide
                     )
                 }
-            }
-            if let actionTitle, let action {
-                DSButton(actionTitle, systemImage: actionSystemImage, appearance: .flat, size: .small, action: action)
             }
         }
         .accessibilityElement(children: .contain)
@@ -114,15 +119,20 @@ public extension NoticeCard where Leading == EmptyView {
     }
 }
 
+public enum NoticeCardMetrics {
+    /// The picture before the text: a mascot or an icon (5.2.0; 32 pt in 4.14.0's example).
+    public static let leadingSize: CGFloat = AppIconSize.Tile.md
+}
+
 // MARK: - Skeleton
 
 /// Placeholder of a `NoticeCard`: the same card, a grey circle of `leadingSize` (or none), the
-/// title and two lines of text, and the action's line under them.
+/// title and two lines of text, and the action's line under them, in the text's column.
 public struct NoticeCardSkeleton: View {
     let leadingSize: CGFloat?
     let showsAction: Bool
 
-    public init(leadingSize: CGFloat? = AppIconSize.xl, showsAction: Bool = true) {
+    public init(leadingSize: CGFloat? = NoticeCardMetrics.leadingSize, showsAction: Bool = true) {
         self.leadingSize = leadingSize
         self.showsAction = showsAction
     }
@@ -136,11 +146,12 @@ public struct NoticeCardSkeleton: View {
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     SkeletonText(AppTypography.bodyEmphasis, width: 180)
                     SkeletonText(AppTypography.bodySmall, lines: 2)
+                    if showsAction {
+                        SkeletonText(AppTypography.bodySmall, width: 120)
+                            .padding(.top, AppSpacing.xs)
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            if showsAction {
-                SkeletonText(AppTypography.bodySmall, width: 120)
             }
         }
         .shimmer()

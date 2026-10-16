@@ -119,8 +119,8 @@ text, not keys. A new key goes there as well.
 | `notification.permission.title` | NotificationPermissionPrompt | — |
 | `onboarding.cta.skip` | OnboardingPageContainer; OnboardingPager (default `skipTitle`) | `Skip` (OnboardingPager) |
 | `onboarding.stepIndicator.label` | OnboardingStepIndicator | — |
-| `pager.next` | PagerArrows (default `nextLabel`, VoiceOver) | `Next` |
-| `pager.previous` | PagerArrows (default `previousLabel`, VoiceOver) | `Previous` |
+| `pager.next` | PagerArrows (default `nextLabel`, VoiceOver), DateRangePickerSheet's next month (5.2.0) | `Next` |
+| `pager.previous` | PagerArrows (default `previousLabel`, VoiceOver), DateRangePickerSheet's previous month (5.2.0) | `Previous` |
 | `pending.discard` | PendingItemCard (Delete and its confirmation button) | `Delete` |
 | `pending.discard.confirm` | PendingItemCard (the confirmation's title) | `Delete it? It won’t reach the server.` |
 | `pending.failed` | PendingItemCard (status) | `Couldn’t upload` |

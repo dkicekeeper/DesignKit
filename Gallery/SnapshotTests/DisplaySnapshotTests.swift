@@ -27,8 +27,11 @@ extension ComponentSnapshots {
                         TrendBadge(direction: .up, changePercent: 12.5)
                         TrendBadge(direction: .down, changePercent: -3.2, style: .inline)
                         TrendBadge(direction: .flat, changePercent: 0, style: .changeIndicator)
+                        // Every status: an unknown symbol draws nothing (archived did until 5.2.0).
                         StatusIndicatorBadge(status: .active)
                         StatusIndicatorBadge(status: .paused)
+                        StatusIndicatorBadge(status: .archived)
+                        StatusIndicatorBadge(status: .pending)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),

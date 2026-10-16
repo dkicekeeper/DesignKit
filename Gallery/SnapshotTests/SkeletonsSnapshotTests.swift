@@ -163,6 +163,12 @@ extension ComponentSnapshots {
                 named: "snapCardPicker",
                 appearances: [.light]
             )
+            // OptionCardPicker(style: .carousel)'s skeleton (5.2.0).
+            await assertComponentSnapshot(
+                OptionCardCarouselSkeleton(),
+                named: "optionCardCarousel",
+                appearances: [.light]
+            )
         }
 
         @Test func personRowCardSkeleton() async {
