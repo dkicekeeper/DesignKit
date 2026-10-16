@@ -458,7 +458,7 @@ private struct BorderBeamPage: View {
 private struct EdgeBackdropPage: View {
     @State private var bottom = false
     @State private var colorOpacity = EdgeBackdropMetrics.colorOpacity
-    @State private var isComparing = false
+    @Environment(\.presentShowcaseScreen) private var presentScreen
 
     private let rows = ["How much did I spend on cafés?", "Groceries went up 12% this month.", "Your next payment is the internet, tomorrow.",
                         "You put 50 000 ₸ towards the car.", "The savings rate is 18%.", "Taxi: 14 trips, 42 000 ₸.",
@@ -475,7 +475,7 @@ private struct EdgeBackdropPage: View {
                 "For a bar the system's scroll edge effect is too faint to carry (a large header over a chat).",
                 "Put it behind the bar's content with .edgeBackdrop(edge); it reaches to the screen's edge, takes no touches, and VoiceOver skips it.",
                 "colorOpacity: the page's colour at the edge (10% by default, 5.0.0): lower is more see-through, higher reads as a plate. The blur stays the same.",
-                "Hide the system's scroll edge effect on that edge, .scrollEdgeEffectHidden(true, for: edge) (5.0.0): on iOS 26 it fades the content out under the bar before the backing blurs it; built with Xcode 27 it is a hard plate as it comes. On iOS 27 it draws only under a bar's text and controls, nothing under Ten alone.",
+                "Hide the system's scroll edge effect on that edge, .scrollEdgeEffectHidden(true, for: edge) (5.0.0): on iOS 26 it fades the content out under the bar before the backing blurs it; built with Xcode 27 it is a hard plate as it comes. On iOS 27 the soft one is reported to stop below a bar's text and controls.",
                 "A bar on a scroll view inside another (this preview in the page) is a safeAreaInset: a safeAreaBar there draws the outer scroll view's edge effect down to itself.",
                 "Compare on a screen: a chat under Ten, 120 pt, in a safeAreaBar as an app holds it, with EdgeBackdrop or the system's scroll edge effect (soft, hard). The preview here cannot show the system's effect: its scroll view is inside the page's.",
             ]
@@ -509,12 +509,11 @@ private struct EdgeBackdropPage: View {
         } controls: {
             ToggleControl("Bottom edge", isOn: $bottom)
             SliderControl("Colour opacity", value: $colorOpacity, in: 0...1, step: 0.05) { "\(Int(($0 * 100).rounded()))%" }
-            // Presented from the controls, not from the preview: a screen presented from it takes
-            // its environment, and the preview's hidden edge effect hid the system's on it.
-            ActionControl("Compare on a screen", systemImage: "rectangle.on.rectangle") { isComparing = true }
-                .fullScreenCover(isPresented: $isComparing) {
-                    EdgeBackdropComparison(colorOpacity: $colorOpacity)
-                }
+            // Presented by the showcase screen, outside the page's scroll view: presented from
+            // the page, the comparison's bar drew no system edge effect (docs/gotchas.md).
+            ActionControl("Compare on a screen", systemImage: "rectangle.on.rectangle") {
+                presentScreen?(EdgeBackdropComparison(colorOpacity: $colorOpacity))
+            }
         }
     }
 }
@@ -532,8 +531,8 @@ struct EdgeBackdropComparison: View {
 
     @State var backing: Backing = .edgeBackdrop
     @Binding var colorOpacity: Double
-    /// A title and a button under Ten. On iOS 27 the system's effect draws only under a bar's text
-    /// and controls: under Ten alone it draws nothing (the owner's device, build 80).
+    /// A title and a button under Ten: on iOS 27 the system's soft effect is reported to follow a
+    /// bar's text and controls, so it can be seen with and without them.
     @State var showsTitleRow = false
 
     @Environment(\.dismiss) private var dismiss
@@ -626,7 +625,7 @@ struct EdgeBackdropComparison: View {
             if backing == .edgeBackdrop {
                 SliderControl("Colour opacity", value: $colorOpacity, in: 0...1, step: 0.05) { "\(Int(($0 * 100).rounded()))%" }
             } else {
-                Text(verbatim: "The system's scroll edge effect, .scrollEdgeEffectStyle(.\(backing.rawValue.lowercased()), for: .top): no colour of its own to set. On iOS 27 it draws only under the bar's text and controls.")
+                Text(verbatim: "The system's scroll edge effect, .scrollEdgeEffectStyle(.\(backing.rawValue.lowercased()), for: .top): no colour of its own to set.")
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)

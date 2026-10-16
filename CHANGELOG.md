@@ -62,9 +62,9 @@ once (the owner's choice over deprecating them).
   use `ListCard`. docs/migration-5.0.md has the details.
 - Under an `.edgeBackdrop`, hide the system's scroll edge effect on that edge of the scroll view.
   On iOS 26, as it comes or `.soft`, it fades the content out before the backing blurs it, and
-  the top reads as an empty plate; built with Xcode 27, as it comes it is `.hard`, a plate. On an
-  iOS 27 device under a bar that holds only a picture (Ten) it drew nothing, soft or hard. Tenra's
-  chat: `.scrollEdgeEffectStyle(.soft, for: .top)` → `.scrollEdgeEffectHidden(true, for: .top)`.
+  the top reads as an empty plate; built with Xcode 27, as it comes it is `.hard`, a plate.
+  Tenra's chat: `.scrollEdgeEffectStyle(.soft, for: .top)` →
+  `.scrollEdgeEffectHidden(true, for: .top)`.
 
 ```swift
 // Before
@@ -87,10 +87,12 @@ FormSection(header: "Payments", style: .glass) { rows }
 - Gallery: the `UniversalRow` page lists the rows built on it and what each is for; the
   `EdgeBackdrop` page has a Colour opacity slider and "Compare on a screen": a chat under Ten in a
   top `safeAreaBar`, full screen, with `EdgeBackdrop` or the system's soft or hard scroll edge
-  effect.
+  effect, and a title and button under Ten to switch on. A page opens such a screen through
+  `presentShowcaseScreen`, from above the pages' scroll views: opened from inside a page, the
+  screen's bar drew no system effect (docs/gotchas.md).
 - Snapshot tests: `GalleryPagesSnapshotTests` draws whole Gallery pages in a phone-sized window
   (`PickerCarousel`'s, a centred `SnapCardPicker`, `EdgeBackdrop`'s and its comparison screen in
-  each backing), and
+  each backing and opened from a page), and
   `scripts/snapshot-tests.sh` prints the crash report when the Gallery crashes in a run.
 - CI: the Changelog job refuses dingbats and emoji, which TestFlight's What to Test refuses.
 - docs/migration-5.0.md.

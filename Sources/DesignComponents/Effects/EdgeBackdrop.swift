@@ -18,8 +18,8 @@
 //  and the blur stronger. Hide the system's scroll edge effect on that edge of the scroll view
 //  (`scrollEdgeEffectHidden(true, for: .top)`): on iOS 26, as it comes or `.soft`, it fades the
 //  content out under the bar before the backing can blur it, and the top reads as an empty plate
-//  (`edgeBackdropUnderBar` snapshots); built with Xcode 27 it is `.hard` as it comes, a plate.
-//  On an iOS 27 device it drew nothing under a bar holding only Ten (docs/gotchas.md). `colorOpacity:` sets how strong the page's colour is at the
+//  (`edgeBackdropUnderBar` snapshots); built with Xcode 27 it is `.hard` as it comes, a plate
+//  (docs/gotchas.md). `colorOpacity:` sets how strong the page's colour is at the
 //  edge (10% by default), so an app can make the backing more or less see-through.
 //
 

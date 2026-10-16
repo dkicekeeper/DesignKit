@@ -2346,10 +2346,8 @@ bar's content: `.safeAreaBar(edge: .top) { header.frame(maxWidth: .infinity).edg
 and hide the system's scroll edge effect on that edge of the scroll view,
 `.scrollEdgeEffectHidden(true, for: .top)` *(5.0.0)*: on iOS 26, as it comes or `.soft`, it fades
 the content out under the bar before the backing can blur it, so the top reads as an empty plate
-(`edgeBackdropUnderBar` snapshots); built with Xcode 27 it is `.hard` as it comes, a plate. On an
-iOS 27 device it drew nothing under a bar holding only Ten, soft or hard: it draws under a bar's
-text and controls, as developers report (docs/gotchas.md), so for a picture in a bar the backing is
-the only effect. On a scroll view inside another one (a preview in a
+(`edgeBackdropUnderBar` snapshots); built with Xcode 27 it is `.hard` as it comes, a plate
+(docs/gotchas.md). On a scroll view inside another one (a preview in a
 scrolling page), the bar goes in a `safeAreaInset(edge:spacing: 0)`: a `safeAreaBar` there draws
 the outer scroll view's edge effect down to itself and everything above blurs (docs/gotchas.md).
 `color:` is the page's colour (`AppColors.bgBase` by default), and `colorOpacity:` *(5.0.0)* its
