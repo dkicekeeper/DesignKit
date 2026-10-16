@@ -233,8 +233,7 @@ private struct AmountVisibilityTogglePage: View {
         ComponentPage(
             name: "AmountVisibilityToggle",
             summary: "The eye that hides every amount below it (.amountsHidden). Tenra puts it in the Home toolbar.",
-            since: "1.7.0",
-            apps: [.tenra]
+            since: "1.7.0"
         ) {
             HStack(spacing: AppSpacing.md) {
                 FormattedAmountText(amount: 1_284_500, currency: "KZT", fontSize: AppTypography.h2,
@@ -327,6 +326,7 @@ private struct GlassActionMenuPage: View {
             name: "GlassActionMenu",
             summary: "A floating glass button that flows open into its actions and melts them back in, the way iOS 26's toolbars morph. For the add button of a screen.",
             since: "2.3.0",
+            apps: [.dalada],
             canvas: .tall(minHeight: 340),
             notes: [
                 "The morph is the system's: each glass shape has a glassEffectID in one GlassEffectContainer. Nothing of ours runs per frame.",

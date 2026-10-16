@@ -188,8 +188,7 @@ private struct OnboardingStepIndicatorPage: View {
     var body: some View {
         ComponentPage(
             name: "OnboardingStepIndicator",
-            summary: "Where onboarding is: a symbol per step, the current one in the accent.",
-            apps: [.tenra, .dalada]
+            summary: "Where onboarding is: a symbol per step, the current one in the accent."
         ) {
             OnboardingStepIndicator(currentStep: step, symbols: ["map", "tent.fill", "person.2.fill", "checkmark.seal.fill"])
         } controls: {
@@ -205,7 +204,7 @@ private struct PlusTabLabelPage: View {
         ComponentPage(
             name: "PlusTabLabel",
             summary: "The tab bar's “+” that turns into × while its menu is open.",
-            apps: [.dalada]
+            apps: [.tenra]
         ) {
             PlusTabLabel(isExpanded: isExpanded)
                 .font(AppTypography.bodyEmphasis)

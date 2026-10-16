@@ -72,6 +72,25 @@ extension ComponentSnapshots {
             )
         }
 
+        /// OptionCardPicker(style: .carousel) (5.2.0): the chosen option large on top, the row
+        /// under it with the chosen card in the middle, the chosen option's settings under it.
+        @Test func optionCardCarousel() async {
+            await assertComponentSnapshot(
+                OptionCardPicker(["None", "Gradient", "Photo"], selection: .constant("Gradient"), style: .carousel,
+                                 title: { $0 }) { option in
+                    switch option {
+                    case "Gradient": LinearGradient(colors: [.orange, .pink], startPoint: .top, endPoint: .bottom)
+                    case "Photo": LinearGradient(colors: [.teal, .blue], startPoint: .top, endPoint: .bottom)
+                    default: Rectangle().fill(AppColors.bgBase)
+                    }
+                } settings: { _ in
+                    DSButton("Animate", systemImage: "sparkles", appearance: .secondary) {}
+                },
+                width: 400,
+                appearances: [.light, .dark]
+            )
+        }
+
         @Test func snapCardPicker() async {
             await assertComponentSnapshot(
                 SnapCardPicker(["Kaspi Gold", "Cash"], id: \.self, selection: .constant("Kaspi Gold")) { name, isSelected, select in

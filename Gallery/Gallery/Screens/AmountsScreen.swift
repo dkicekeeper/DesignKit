@@ -57,7 +57,7 @@ private struct FormattedAmountTextPage: View {
         ComponentPage(
             name: "FormattedAmountText",
             summary: "An amount with its currency: grouped digits, decimals hidden when zero, the sign and the unit as you choose. Every amount in DesignKit is one.",
-            apps: [.tenra, .dalada],
+            apps: [.tenra],
             notes: [
                 "Hidden amounts: .amountsHidden() above it turns it into •••• ₸.",
                 "Loading: FormattedAmountTextSkeleton(font:width:).",
@@ -99,8 +99,7 @@ private struct AmountInputPage: View {
     var body: some View {
         ComponentPage(
             name: "AmountInput",
-            summary: "An amount typed in large digits that animate as they change; the size shrinks to fit.",
-            apps: [.tenra]
+            summary: "An amount typed in large digits that animate as they change; the size shrinks to fit."
         ) {
             AmountInput(amount: $amount, baseFontSize: size)
         } controls: {
@@ -117,8 +116,7 @@ private struct AmountDigitDisplayPage: View {
     var body: some View {
         ComponentPage(
             name: "AmountDigitDisplay",
-            summary: "The digits of an amount being typed, grouped, with a BlinkingCursor while focused: what AmountInput and the calculator draw.",
-            apps: [.tenra]
+            summary: "The digits of an amount being typed, grouped, with a BlinkingCursor while focused: what AmountInput and the calculator draw."
         ) {
             AmountDigitDisplay(rawAmount: raw, baseFontSize: 48, isFocused: isFocused)
         } controls: {
@@ -289,8 +287,7 @@ private struct SpentBudgetTextPage: View {
     var body: some View {
         ComponentPage(
             name: "SpentBudgetText",
-            summary: "“Spent / budget” on one line.",
-            apps: [.tenra]
+            summary: "“Spent / budget” on one line."
         ) {
             SpentBudgetText(spent: spent, budget: budget, currency: "KZT")
         } controls: {
@@ -306,8 +303,7 @@ private struct AmountPercentagePage: View {
     var body: some View {
         ComponentPage(
             name: "AmountPercentage",
-            summary: "An amount with its share under it: the trailing side of a breakdown row.",
-            apps: [.tenra]
+            summary: "An amount with its share under it: the trailing side of a breakdown row."
         ) {
             AmountPercentage(amount: 42_000, currency: "KZT", percentage: percentage)
         } controls: {

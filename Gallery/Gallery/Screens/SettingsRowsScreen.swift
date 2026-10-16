@@ -143,7 +143,7 @@ private struct NavigationSettingsRowPage: View {
         ComponentPage(
             name: "NavigationSettingsRow",
             summary: "A settings row that opens a screen: a small icon, the title, what is set, a chevron.",
-            apps: [.tenra, .dalada],
+            apps: [.tenra],
             canvas: .fill,
             notes: [
                 "value: what is set, before the chevron, as iOS Settings shows it (5.0.0). NavigationPickerRow(style: .list) is this row with the chosen option.",
@@ -233,7 +233,7 @@ private struct MenuPickerRowPage: View {
         ComponentPage(
             name: "MenuPickerRow",
             summary: "A form row whose value opens a menu of a few options.",
-            apps: [.tenra],
+            apps: [.tenra, .dalada],
             canvas: .fill
         ) {
             InFormCard {
@@ -358,7 +358,7 @@ private struct SliderRowPage: View {
             name: "SliderRow",
             summary: "A setting set with a slider: the title, the current value on the right, the slider, an optional hint.",
             since: "1.15.0",
-            apps: [.tenra],
+            apps: [.tenra, .dalada],
             canvas: .fill,
             notes: [
                 "The app formats the value (per cent, metres, minutes) and passes it as valueText.",
@@ -398,7 +398,7 @@ private struct DatePickerRowPage: View {
         ComponentPage(
             name: "DatePickerRow",
             summary: "A form row with a date (and time) in a compact picker.",
-            apps: [.tenra],
+            apps: [.tenra, .dalada],
             canvas: .fill
         ) {
             InFormCard {
@@ -458,9 +458,9 @@ private struct CheckmarkRowPage: View {
     var body: some View {
         ComponentPage(
             name: "CheckmarkRow",
-            summary: "A row of a choice list (a filter or picker sheet): the picked one gets the accent checkmark.",
+            summary: "A row of a choice list (a filter or picker sheet): a SelectionIndicator on every row, the accent filled check on the picked one.",
             since: "1.10.0",
-            apps: [.tenra],
+            apps: [.tenra, .dalada],
             canvas: .fill
         ) {
             InFormCard {

@@ -318,7 +318,7 @@ The 1.x tokens, still used by the components that have them:
 | `.chartAppear(delay:)` | Scale(0.94→1.0) + opacity entrance from bottom | Outermost chart container, scrollable list cards |
 | `.staggeredEntrance(delay:)` | Scale(0.5→1.0) + opacity pop-in with spring | Facepile icons, overlapping avatar stacks |
 | `.contentReveal(isReady:delay:)` | Opacity fade-in when ready | Staggered section reveals during initialization |
-| `.borderBeam(isActive:colors:cornerRadius:lineWidth:duration:beams:)` | A comet of light running along the border itself (2.4.0): one speed and length on every side, a bloom at the head, a fading tail, a faint spill on the edge; one or two comets. `TimelineView`-driven; ticks only while `isActive == true`. Off under Reduce Motion and `.designKitMotion(false)` | Highlighting cards during transient active states (voice recognition preview, focus, processing). Match `cornerRadius` to the underlying card |
+| `.borderBeam(isActive:colors:cornerRadius:lineWidth:duration:beams:)` | A comet of light running along the border itself (2.4.0): one speed and length on every side, a bright head (5.2.0: no bloom), a fading tail, a faint spill on the edge; one or two comets. `TimelineView`-driven; ticks only while `isActive == true`. Off under Reduce Motion and `.designKitMotion(false)` | Highlighting cards during transient active states (voice recognition preview, focus, processing). Match `cornerRadius` to the underlying card |
 
 **`.fadeTruncation(fadeLength:)`** *(1.7.0)*: one line that fades out over 24 pt at its trailing edge instead of ending in "…", only when it does not fit. For names in carousels and tiles. RTL-aware.
 
@@ -518,7 +518,7 @@ InfoRow(icon: "calendar", label: "Next Payment", value: "March 15, 2026")
 Use in: detail views for metadata display. NOT for editable fields.
 
 #### `CheckmarkRow` *(1.10.0)*
-A row of a choice list (a filter or picker sheet): `UniversalRow(.settings)` with an optional icon (`IconConfig`), the title in h4 medium, an optional trailing value (secondary h4, e.g. a balance), and the accent checkmark on the picked row. A tap plays the selection haptic and runs the action; VoiceOver hears a button, "Selected" on the picked one (`.selectableRow`). `CheckmarkRow("All accounts", isSelected: selection == nil) { selection = nil }`. In a `FormSection` card pass `config: .standard` (3.0.0), which pads it as the card's other rows (Dalada's report reasons). Tenra: the rows of its account, category and time filters. Skeleton: `UniversalRowSkeleton.checkmark(iconStyle:)`.
+A row of a choice list (a filter or picker sheet): `UniversalRow(.settings)` with an optional icon (`IconConfig`), the title in h4 medium, an optional trailing value (secondary h4, e.g. a balance), and a `SelectionIndicator`: the accent filled check on the picked row, an empty circle on the others (5.2.0; a bare checkmark on the picked row before). A tap plays the selection haptic and runs the action; VoiceOver hears a button, "Selected" on the picked one (`.selectableRow`). `CheckmarkRow("All accounts", isSelected: selection == nil) { selection = nil }`. In a `FormSection` card pass `config: .standard` (3.0.0), which pads it as the card's other rows (Dalada's report reasons). Tenra: the rows of its account, category and time filters. Skeleton: `UniversalRowSkeleton.checkmark(iconStyle:)` (with the empty circle since 5.2.0).
 
 #### `MenuPickerRow`
 In-form single-select picker with dropdown menu.
@@ -987,7 +987,7 @@ The logic is `CurrencyEquivalent.swift` (internal), unit-tested in `CurrencyEqui
 Every `CurrencyInfo` currency to pick from: "Popular", then all, in cards (a `ScrollView`, so the screen's background shows through), each row code, name and symbol, the chosen one checked, with a search in the navigation bar's drawer. `CurrencyList(selection: code) { code in … }`; the screen around it is the caller's. Tenra: `CurrencyListContent` (Settings, onboarding) is an adapter.
 
 #### `CurrencyRow` *(3.6.0)*
-One currency: the code (bodyEmphasis) over its name (bodySmall), the symbol, and a check in the accent when chosen; `isLocked: true` (an account's own currency, not for this list to change) shows the check in the tertiary grey. The row `CurrencyList` draws; no padding of its own (a `List` insets it). Wrap it in a `Button` with `.buttonStyle(.plain)` to make it pick. Tenra: the quick-access currency list. No skeleton: local data.
+One currency: the code (bodyEmphasis) over its name (bodySmall), the symbol, and a `SelectionIndicator` (5.2.0): the filled check in the accent when chosen, an empty circle otherwise; `isLocked: true` (an account's own currency, not for this list to change) shows the check in the tertiary grey. The row `CurrencyList` draws; no padding of its own (a `List` insets it). Wrap it in a `Button` with `.buttonStyle(.plain)` to make it pick. Tenra: the quick-access currency list. No skeleton: local data.
 
 #### `IconPicker` / `IconCatalog` *(1.10.0)*
 An icon picker sheet with its own navigation bar: SF Symbols from `IconCatalog` (DesignSupport; about 550 symbols available on iOS 26 in 18 groups, "Frequently Used" first, a search across 11 languages through concepts, group titles and Apple's keywords; data generated by `scripts/generate_icon_catalog.py`), and, when the app sets `DesignKitLogoCatalog`, a logos tab (sections, search, the typed name tried as a domain). Picking closes it. `IconPicker(selection: $icon, allowsLogos: false)` for symbols only. Tenra: `IconPickerView` is an adapter; its brand registry feeds the hook.
@@ -1102,8 +1102,9 @@ VoiceOver reads the slider with the title as its label and `valueText` as its va
 `SliderRowSkeleton(showsHint:)`. Tenra's background-intensity row is its adapter.
 
 #### `SelectionIndicator(isSelected:tint:)`
-Check circle for multi-select and checklist rows; the row carries the label and the
-`.isSelected` trait. `tint` (0.4.0, default accent) colours the filled check: `AppColors.success`
+Check circle for multi-select and checklist rows, and since 5.2.0 the trailing mark of every
+choice list (`CheckmarkRow`, `CurrencyRow`): a filled check on the picked one, an empty circle on
+the others. The row carries the label and the `.isSelected` trait. `tint` (0.4.0, default accent) colours the filled check: `AppColors.success`
 for a done checklist item, `textTertiary` for one that is already owned and disabled.
 
 #### `SelectableBalanceCard` *(1.5.0)*
@@ -1277,7 +1278,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `PersonRow`, `CommentRow`, `ThreadCard`, `ReviewCard`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.12.0) | `…Skeleton` (`StatsStripSkeleton(count:)`, `AchievementTileSkeleton(medalSize:)`, `ThumbnailCardSkeleton(width:)`, `PersonRowSkeleton(showsSubtitle:style:)`) |
 | `RemotePhoto` (3.1.0) | `RemotePhotoSkeleton()`: fills the frame; the container gives the corner |
 | `PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `ShareCardFrame` (and `ShareCardSheet` while it loads), `LiveSessionBar`, `DownloadRow`, `ArticleBody` (2.8.0) | `…Skeleton` (`PhotoTileSkeleton(size:cornerRadius:)`, `PhotoStripSkeleton(count:size:)`, `PhotoGridSkeleton(count:columns:style:)`, `ShareCardSkeleton(format:)`, `ArticleBodySkeleton(paragraphs:)`) |
-| `TransactionRow`, `OptionCard`, `StreamingText`, `SnapCardPicker` (2.9.0) | `…Skeleton` (`TransactionRowSkeleton(showsDetails:)`, `StreamingTextSkeleton(font:)`, `SnapCardPickerSkeleton { the card's skeleton }`) |
+| `TransactionRow`, `OptionCard`, `StreamingText`, `SnapCardPicker` (2.9.0) | `…Skeleton` (`TransactionRowSkeleton(showsDetails:)`, `StreamingTextSkeleton(font:)`, `SnapCardPickerSkeleton { the card's skeleton }`); `OptionCardPicker(style: .carousel)`: `OptionCardCarouselSkeleton()` (5.2.0) |
 
 **No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`, `CurrencyRow`, 3.6.0); `MetaLine` (3.6.0, a line inside a row that has the skeleton); `LoadMoreFooter` (4.1.0, the loading state itself); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); `AmountEntrySheet` and `VoiceOrbButton` (4.14.0: an input and a control); `ActionRowLabel` (3.1.0, a label); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `CreatureTabLabel`, `CreatureGlyph`, `MessageComposerAccessory`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
 
@@ -1666,11 +1667,13 @@ List { … }
 - `RecentSearches` is a value: newest first, no duplicates, 8 by default
   (`record(_:limit:)`), `RawRepresentable` as a JSON array for `@AppStorage` under the screen's
   own key. DesignKit keeps nothing itself.
-- `SearchSuggestion(title, subtitle:, icon:, tint:, completion:, id:)`: `icon` is a symbol drawn
-  in `tint` (secondary grey by default) or a brand logo. The title and the subtitle take up to two
-  lines each (the subtitle since 3.5.1); the icon's slot grows with the text size. `SearchSuggestionRow` is the line,
-  `.recent(_:)` with the clock; `SearchSuggestionsContent` is the two sections for a container of
-  the app's own.
+- `SearchSuggestion(title, subtitle:, icon:, tint:, completion:, id:)`: `icon` is a symbol in a
+  32 pt circle tile, drawn in `tint` (the accent by default) on a pale tint of it, or a brand logo
+  (5.2.0, as DesignKit's other rows; a bare symbol in the secondary grey before). The title and
+  the subtitle take up to two lines each (the subtitle since 3.5.1); the tile grows with the text
+  size. `SearchSuggestionRow` is the line, `.recent(_:)` with the clock on a grey tile;
+  `SearchSuggestionsContent` is the two sections for a container of the app's own. "Clear" is in
+  the accent (5.2.0; the list's blue before).
 - Strings: `search.recent`, `search.recent.clear`, `search.recent.remove`, `search.suggestions`,
   `search.fill` ([localization-keys.md](localization-keys.md)).
 
@@ -2004,8 +2007,9 @@ go under the text, leading, so the title keeps its width. Tenra: `TransactionCar
 
 #### `SnapCardPicker`
 Full-width cards in a snapping row (`containerRelativeFrame`, `.viewAligned`), `md` apart with
-`lg` of the neighbours showing; the centred card is the selection. A drag selects where it
-settles (only at `.idle`, not during an animated scroll), a tap calls the card's `select`. It
+`lg` of the neighbours showing; the centred card is the selection. A drag selects the card at
+the centre as it passes (5.2.0, as `.centered` does; it waited for `.idle` before), never during
+an animated scroll, and where the row settles is the backstop; a tap calls the card's `select`. It
 writes the scroll position only after its container is measured, so a selection that arrives
 after it appears still scrolls into place; it re-aligns when the selection drops out of its
 items (a sibling picker filtered them). `SnapCardPicker(items, id:selection:) { item, isSelected, select in … }`.
@@ -2015,7 +2019,7 @@ the others at 90 % and 75 % opacity (`scrollTransition`), the row's margins cent
 scroll position is the selection itself, so the first layout stands on it and the selection
 follows the centre as the row scrolls: the cards have their width before the row is measured, so
 the write `.fill` waits for is not lost here. `PickerCarousel`'s row of 4.14.0, moved here as it
-was; the default `.fill` is unchanged.
+was; the default `.fill` is unchanged. Its cards' outline and shadow are not clipped at the row's top and bottom (5.2.0).
 
 #### `OptionCard`, `OptionCardPicker`
 An option as a picture: an 80 × 120 artwork (`AppRadius.lg`) with a check on it when chosen, the
@@ -2023,6 +2027,15 @@ title beside it (accent when chosen), on the grouped-list card colour (`AppRadiu
 accent outline when chosen (`.selectionOutline`, 2 pt since 5.0.0, 3 pt before). `OptionCardPicker(options, selection:title:artwork:)` lays plain
 options out; `OptionCard` alone for a list that mixes them with one that opens a picker (Tenra's
 photo option sits in a `PhotosPicker`). Tenra: `HomeBackgroundPicker`.
+*(5.2.0)* `style: .carousel` (`OptionCardPickerStyle`), as Ten's wardrobe: the chosen option's
+artwork large on top in a phone's shape (160 × 240, `AppRadius.xl`, fading from one to the next),
+the options in a row of cards under it (`SnapCardPicker(style: .centered(width: 112))`: a 64 × 96
+artwork over the name, the outline, the check and the accent name on the chosen one; the centred
+card is the choice, a swipe or a tap changes it, with the selection haptic), and under the row
+what the app sets for the chosen option: `OptionCardPicker(options, selection:, style:, title:,
+artwork:, settings:)` ("Choose a photo" for a photo; under the cards in `.list`). The artwork
+must fill the frame it is given. Skeleton: `OptionCardCarouselSkeleton()`. `.list` is the default
+and draws as before.
 
 #### `StreamingText`
 Text that arrives word by word: words in a `FlowLayout` (`sm` apart, 6 pt between lines), each
@@ -2035,11 +2048,17 @@ overlaps a range (UTF-16, as `NSString` and Speech count). VoiceOver reads the w
 Tenra: `AnimatedTranscriptionText` (recognised entities by confidence → highlights).
 
 #### `DateRangePickerSheet`
-Two graphical calendars, From and To, `xl` apart with a divider; moving the start past the end
-moves the end along, and the other way round. Cancel (`common.cancel`) dismisses, Apply
-(`button.apply`) hands the range to `onApply`. Title `timeFilter.customPeriod`, labels
-`timeFilter.from` / `timeFilter.to`, or the parameters. Large detent. Tenra: the time filter's
-custom period.
+One calendar of DesignKit's own (5.2.0; the system's two graphical calendars before, which
+showed neither the period nor which end was picked). On top the period ("Sep 12 – Oct 3, 2026",
+h3) and its length ("22 days", the system's words for the locale), over a field for each end
+(neutral1, `md` corners), the one the next tap sets outlined (`.selectionOutline`). Under it the
+month (h4, arrows to turn it; VoiceOver `pager.previous` / `pager.next`), the weekdays from the
+calendar's first one, and the days: the ends in 40 pt filled accent circles with white numbers,
+the days between on a pale accent band, today in the accent. A tap sets From (a one-day period),
+the next To; a day before the start starts the period there. Cancel (`common.cancel`) dismisses,
+Apply (`button.apply`) hands the range, both ends at the start of their day, to `onApply`. Title
+`timeFilter.customPeriod`, labels `timeFilter.from` / `timeFilter.to`, or the parameters. Large
+detent. Tenra: the time filter's custom period.
 
 #### `.cascadeIn(index:)`
 Cards that arrive together: each fades in and rises 12 pt into place `index × 80 ms` after it
@@ -2084,10 +2103,12 @@ AmountEntrySheet(title: goal.name, icon: goal.icon, subtitle: left, currency: go
 #### `NoticeCard`
 A message the app writes to the person, on a glass card (`FormSection(style: .glass)` since 5.0.0,
 `ListCard` in 4.14.0): the `leading` picture at its own size
-(a mascot, an icon; hide it from VoiceOver when it says nothing), the title (`bodyEmphasis`) and
-the message (`bodySmall`, secondary), the ✕ hide button on the trailing edge (`DSButton`, icon
-only, flat, neutral, small; `hideLabel` for VoiceOver, `common.hide` by default; none without
-`onHide`) and the action under them (`DSButton`, flat, small; none without `action`). What the
+(a mascot, an icon: `NoticeCardMetrics.leadingSize`, 48 pt, since 5.2.0; hide it from VoiceOver
+when it says nothing), the title (`bodyEmphasis`) and the message (`bodySmall`, secondary), the ✕
+hide button on the trailing edge (`DSButton`, icon only, flat, neutral, small; `hideLabel` for
+VoiceOver, `common.hide` by default; none without `onHide`) and the action under the message in
+the text's column, so it starts where the text does (`DSButton`, flat, small; none without
+`action`; 5.2.0, under the picture before). What the
 message is, when it shows and what the action does stay in the app. Tenra: "Ten writes" on Home.
 Skeleton: `NoticeCardSkeleton(leadingSize:showsAction:)`.
 
@@ -2248,8 +2269,9 @@ pours into the chart. The compact style wears hats only, a little smaller, witho
 decides what it wears and when (Tenra: holidays, a crown on a day it celebrates, a wardrobe).
 
 #### `CreatureGlyph` and `CreatureTabLabel` *(4.8.0)*
-`CreatureGlyph()` is the creature as a still, one-colour `Shape`: twelve dots in a ring and two
-capsule eyes (`CreatureGlyphMetrics`). For where the live creature cannot go: a tab bar item and
+`CreatureGlyph()` is the creature as a still, one-colour `Shape`: a filled core with two capsule
+eyes cut out of it, in a ring of twelve dots (`CreatureGlyphMetrics`; 5.2.0, the owner's variant
+B: the ring and the eyes alone were too light beside a tab bar's filled symbols). For where the live creature cannot go: a tab bar item and
 sizes under the compact style's 24 pt. `CreatureGlyph.templateImage(size:)` (26 pt by default)
 is the same as a template `UIImage`, tinted by whatever holds it. `CreatureTabLabel(title:)` is
 a tab item: that image over a title. A tab item takes only an image and a text, so the live

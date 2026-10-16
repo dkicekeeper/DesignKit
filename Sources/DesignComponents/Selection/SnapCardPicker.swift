@@ -14,6 +14,8 @@
 //  5.0.0: `style: .centered(width:)`, cards of one width side by side, the centred one full size,
 //  the others smaller and paler, the selection following the centre as the row scrolls: the row of
 //  `PickerCarousel`, which drew its own carousel in 4.14.0.
+//  5.2.0: `.fill` follows the centre during a drag as well (it waited for the row to stop), and
+//  `.centered` no longer clips its cards' outline and shadow at the top and bottom.
 //
 
 import SwiftUI
@@ -30,14 +32,15 @@ import DesignSupport
 /// ```
 ///
 /// With `.fill` (the default) each card fills the row's width (`containerRelativeFrame`);
-/// `AppSpacing.md` between cards and `AppSpacing.lg` of the neighbours show. A drag selects the
-/// card it settles on; a tap on a card calls `select`, which selects it and scrolls it to the
-/// centre.
+/// `AppSpacing.md` between cards and `AppSpacing.lg` of the neighbours show. In both styles the
+/// selection follows the centre while a drag moves the row (5.2.0; `.fill` waited for the row to
+/// settle before); a tap on a card calls `select`, which selects it and scrolls it to the centre.
 public struct SnapCardPicker<Item, ID: Hashable, Card: View>: View {
     /// How the cards stand in the row.
     public enum Style: Equatable, Sendable {
-        /// Each card fills the row, the neighbours peeking in at the edges; the selection is the
-        /// card a drag settles on (2.9.0): an account or a category in a form.
+        /// Each card fills the row, the neighbours peeking in at the edges; the selection follows
+        /// the centre while a drag moves the row (5.2.0; 2.9.0 waited for it to settle): an
+        /// account or a category in a form.
         case fill
         /// Cards `width` wide side by side, the centred one full size, the others a little smaller
         /// and paler; the selection follows the centre while the row scrolls (5.0.0): options to
@@ -87,7 +90,8 @@ public struct SnapCardPicker<Item, ID: Hashable, Card: View>: View {
         }
     }
 
-    /// `.fill`: full-width cards; the selection is where a drag settles (2.9.0, as it was).
+    /// `.fill`: full-width cards; the selection follows the centre during a drag (5.2.0), and
+    /// where the row settles is the backstop.
     private var fillRow: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: SnapCardPickerMetrics.cardSpacing) {
@@ -131,15 +135,22 @@ public struct SnapCardPicker<Item, ID: Hashable, Card: View>: View {
             guard let selection, !newIDs.contains(selection) else { return }
             syncScrollToSelected(animated: false)
         }
-        // A drag selects where it settles; during an animated scroll the position passes over
-        // other cards, so only the idle position counts.
+        // A drag selects the card at the centre as it passes (5.2.0, as `.centered` does). An
+        // animated scroll (a tap, a new selection) passes over other cards, so the position
+        // counts only while the person moves the row; where it settles is the backstop.
         .onScrollPhaseChange { _, newPhase in
+            isScrolledByHand = newPhase == .tracking || newPhase == .interacting || newPhase == .decelerating
             guard newPhase == .idle,
                   let landed = scrollPosition,
                   landed != selection
             else { return }
             selection = landed
             onSelectionChange?(landed)
+        }
+        .onChange(of: scrollPosition) { _, centred in
+            guard isScrolledByHand, let centred, centred != selection else { return }
+            selection = centred
+            onSelectionChange?(centred)
         }
     }
 
@@ -170,6 +181,9 @@ public struct SnapCardPicker<Item, ID: Hashable, Card: View>: View {
             .scrollTargetLayout()
         }
         .contentMargins(.horizontal, max(0, (containerWidth - width) / 2), for: .scrollContent)
+        // The cards' outline and shadow reach past the row (5.2.0: they were cut at the top and
+        // bottom), as in `.fill`.
+        .scrollClipDisabled()
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition(id: $selection, anchor: .center)
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { containerWidth = $0 }

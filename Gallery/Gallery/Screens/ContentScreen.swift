@@ -152,7 +152,6 @@ private struct FlowLayoutPage: View {
             name: "FlowLayout",
             summary: "A layout that wraps its views to new lines like words: tags, badges, chips.",
             since: "0.7.0",
-            apps: [.dalada],
             canvas: .fill,
             notes: ["alignment (2.9.0): each row leading, centred or trailing."]
         ) {
@@ -244,7 +243,7 @@ private struct EditSheetContainerPage: View {
         ComponentPage(
             name: "EditSheetContainer",
             summary: "The shell of an edit sheet: navigation bar with Cancel and Save, a form inside.",
-            apps: [.tenra]
+            apps: [.tenra, .dalada]
         ) {
             DSButton("Open the sheet", appearance: .secondary, fullWidth: true) { isPresented = true }
             .sheet(isPresented: $isPresented) {
@@ -346,7 +345,7 @@ private struct ArticleBodyPage: View {
             name: "ArticleBody",
             summary: "The text of an article: headings, paragraphs, bulleted and numbered lists, notes in a card; bold, italic and links inside a line.",
             since: "2.8.0",
-            apps: [.dalada],
+            apps: [.tenra, .dalada],
             canvas: .fill,
             notes: ["The app parses its article format into blocks; inline Markdown inside a block is DesignKit's."]
         ) {
@@ -364,10 +363,24 @@ private struct ArticleBodyPage: View {
 #Preview { NavigationStack { ContentScreen() } }
 
 private struct MessageBubblePage: View {
+    private struct Sent: Identifiable {
+        let id: Int
+        let text: String
+        let role: MessageBubble.Role
+    }
+
+    /// What Send adds: the person's question, then the reply.
+    private static let exchange: [(String, String)] = [
+        ("And on taxis?", "Taxis: 18,400 ₸, four rides."),
+        ("Compared with September?", "A little less: September was 21,000 ₸."),
+        ("Thanks!", "Any time."),
+    ]
+
     @State private var text = "How much did I spend on cafés this month?"
     @State private var incoming = false
     @State private var failed = false
     @State private var state: SpecimenState = .content
+    @State private var sent: [Sent] = []
 
     var body: some View {
         ComponentPage(
@@ -378,24 +391,46 @@ private struct MessageBubblePage: View {
             canvas: .fill,
             notes: [
                 "The bubble grows to about 80% of the width; the text is selectable.",
+                "A new message enters with .transition(.messageBubble(role)): the person's own grows from the field's corner, a reply comes into focus on the left. The history a chat opens with does not move.",
+                "Not sent: the bubble shakes once, the failure line rises in, the error haptic plays. Under Reduce Motion only the fades stay.",
                 "Rich replies (cards, charts) are the app's own views under an incoming bubble or in its place.",
             ]
         ) {
             if state == .loading {
                 MessageBubbleSkeleton(role: incoming ? .incoming : .outgoing)
             } else {
-                MessageBubble(
-                    text,
-                    role: incoming ? .incoming : .outgoing,
-                    failure: failed ? "No connection" : nil,
-                    onRetry: failed ? {} : nil
-                )
+                VStack(spacing: AppSpacing.sm) {
+                    MessageBubble(
+                        text,
+                        role: incoming ? .incoming : .outgoing,
+                        failure: failed ? "No connection" : nil,
+                        onRetry: failed ? { failed = false } : nil
+                    )
+                    ForEach(sent.suffix(4)) { message in
+                        MessageBubble(message.text, role: message.role)
+                            .transition(.messageBubble(message.role))
+                    }
+                }
+                .animation(AppAnimation.bouncy, value: sent.count)
             }
         } controls: {
             StateControl(state: $state)
             TextControl("Text", text: $text)
             ToggleControl("Incoming", isOn: $incoming)
             ToggleControl("Not sent", isOn: $failed)
+            ActionControl("Send", systemImage: "arrow.up.circle.fill", action: send)
+            ActionControl("Clear the conversation", systemImage: "xmark.circle") { sent = [] }
+        }
+    }
+
+    /// Adds the next question, and its reply a moment later.
+    private func send() {
+        let (question, reply) = Self.exchange[(sent.count / 2) % Self.exchange.count]
+        let id = (sent.last?.id ?? 0) + 1
+        sent.append(Sent(id: id, text: question, role: .outgoing))
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(0.9))
+            sent.append(Sent(id: id + 1, text: reply, role: .incoming))
         }
     }
 }

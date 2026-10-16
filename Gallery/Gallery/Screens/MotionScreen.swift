@@ -59,6 +59,7 @@ private struct MotionSpringsPage: View {
             name: "Springs by purpose",
             summary: "Pick a spring by what the motion says: snappy answers a touch, smooth moves content, bouncy confirms, expressive celebrates.",
             since: "2.2.0",
+            apps: [.tenra, .dalada],
             canvas: .fill,
             notes: [
                 "AppAnimation.motion(_:reduceMotion:) returns nil under Reduce Motion: pair movement with a fade so the change still reads.",
@@ -107,7 +108,7 @@ private struct SymbolMotionPage: View {
             name: "Symbol motion",
             summary: "SF Symbols animate themselves: drawn on as they appear, a bounce or a wiggle when something happens, a loop while a state lasts, Magic Replace between two states.",
             since: "2.2.0",
-            apps: [.tenra, .dalada],
+            apps: [.dalada],
             canvas: .fill,
             notes: [
                 ".drawOnAppear() — empty states, heroes, a completed step or checklist (iOS 26 Draw; symbols without draw data just appear).",
@@ -190,6 +191,7 @@ private struct MotionTransitionsPage: View {
             name: ".popIn · .riseIn",
             summary: "Transitions that know Reduce Motion: they move a little and fade, and under Reduce Motion they only fade.",
             since: "2.2.0",
+            apps: [.tenra, .dalada],
             canvas: .tall(minHeight: 160),
             notes: [
                 ".popIn: grows from 92 % — a chip, a badge, a toast, a tooltip, TypingIndicator.",
@@ -303,6 +305,7 @@ private struct SpringsPage: View {
         ComponentPage(
             name: "Springs",
             summary: "The named animations: tap Play to run every ball with its own curve and compare them.",
+            apps: [.tenra, .dalada],
             canvas: .fill,
             notes: [
                 "Never a hard-coded spring: pick a token. AppAnimation.adaptiveSpring and fastAnimation respect Reduce Motion.",
@@ -400,6 +403,7 @@ private struct ChartAppearPage: View {
         ComponentPage(
             name: ".chartAppear",
             summary: "A chart's entrance: it grows and fades in from the bottom.",
+            apps: [.tenra],
             canvas: .tall(minHeight: 160)
         ) {
             HStack(alignment: .bottom, spacing: AppSpacing.sm) {
@@ -425,6 +429,7 @@ private struct ContentRevealPage: View {
         ComponentPage(
             name: ".contentReveal",
             summary: "Loaded content fades in once it is ready; a delay staggers sections.",
+            apps: [.tenra],
             canvas: .fill,
             notes: ["Prefer a component's skeleton while it loads; contentReveal is for the moment it is replaced."]
         ) {
@@ -450,6 +455,7 @@ private struct BlurSlidePage: View {
         ComponentPage(
             name: ".blurSlideHero",
             summary: "The canonical text change of a hero: the old text slides and blurs out, the new one in.",
+            apps: [.tenra],
             canvas: .tall(minHeight: 120)
         ) {
             Text(titles[phase])
@@ -572,7 +578,6 @@ private struct ChartDrawInPage: View {
             name: ".chartDrawIn",
             summary: "A chart drawn in from its leading edge as it first appears: the line is traced, the bars rise one after another. LineChart, BarChart and HeroSparkline do it on their own.",
             since: "2.3.0",
-            apps: [.tenra, .dalada],
             notes: [
                 "One mask whose width animates once, with a soft front edge; the chart's marks and data are untouched.",
                 "For your own chart: Chart { … }.chartDrawIn(). Under Reduce Motion the chart is simply there.",
@@ -605,6 +610,7 @@ private struct SkeletonRevealPage: View {
             name: "SkeletonReveal",
             summary: "Loading ends softly: the skeleton fades out while the content comes into focus from a light blur in the same place, instead of a jump.",
             since: "2.3.0",
+            apps: [.tenra, .dalada],
             canvas: .fill,
             notes: [
                 "SkeletonReveal(isLoading:) { content } skeleton: { <Name>Skeleton() }. Give both the same size; a component and its skeleton already have it.",
@@ -634,6 +640,7 @@ private struct ScrollHeroPage: View {
             name: ".scrollHero",
             summary: "The image or header at the top of a detail screen lives with the scroll: pulled down it stretches to fill the gap, scrolled away it drifts slower than the content and fades. Scroll and pull inside the canvas.",
             since: "2.3.0",
+            apps: [.tenra],
             canvas: .tall(minHeight: 380),
             notes: [
                 "For the first view in a vertical ScrollView. One visualEffect; nothing re-renders while scrolling.",
@@ -695,7 +702,6 @@ private struct HapticCuesPage: View {
             name: "HapticCue",
             summary: "Haptics named by what they mean, to play with the motion that says the same thing: a selection with the segment that moves, a tick with each step, the celebration pattern with the confetti. Try it on a device.",
             since: "2.3.0",
-            apps: [.tenra, .dalada],
             notes: [
                 ".hapticCue(.select, trigger: selection) in a view; HapticManager.play(.confirm) in an action.",
                 "Built in: SegmentedPicker (select), SliderRow (a tick per step, or at either end), .celebration (celebrate), .completionMoment (confirm).",

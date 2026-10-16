@@ -53,7 +53,8 @@ public extension View {
     /// fading out below it (4.5.0): deep with DesignKit's hero pieces in white in dark mode, a
     /// pale tint with the pieces as on the page in light mode (4.5.1). Put it on the hero at the
     /// top of a scroll view, edge to edge (no `.screenPadding()` on it; pad what is inside), and
-    /// `.heroScrollEdge()` on the scroll view.
+    /// `.heroScrollEdge()` on the scroll view. The hero takes the full width (5.2.0), its
+    /// content centred in it.
     ///
     /// ```swift
     /// ScrollView {
@@ -101,6 +102,9 @@ private struct HeroBackgroundModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
+            // Edge to edge however narrow the hero is (5.2.0): the colour is the screen's top,
+            // not a block behind the hero's widest piece.
+            .frame(maxWidth: .infinity)
             // White on the deep gradient; as on the page, in black, on the pale one.
             .environment(\.heroTone, colorScheme == .dark ? .onColor : .onSurface)
             .environment(\.heroOnPale, colorScheme != .dark)

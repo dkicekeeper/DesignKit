@@ -196,7 +196,7 @@ private struct RecommendationBoxPage: View {
         ComponentPage(
             name: "RecommendationBox",
             summary: "A piece of advice in a pale box of its colour, with an icon.",
-            apps: [.tenra, .dalada],
+            apps: [.dalada],
             canvas: .fill
         ) {
             if state == .loading {

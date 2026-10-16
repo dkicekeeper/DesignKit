@@ -7,6 +7,8 @@
 //  the system's own suggestion list (`.searchSuggestions`), so the search stays the system's:
 //  `.searchable` places the field, DesignKit draws the lines. What to suggest, and where the
 //  recent queries are kept, stays in the app.
+//  5.2.0: a symbol sits in a circle tile, as in DesignKit's other rows (a suggestion's in a pale
+//  tint of its colour, a recent query's clock in grey), and "Clear" is in the accent.
 //
 
 import SwiftUI
@@ -18,7 +20,8 @@ public struct SearchSuggestion: Identifiable, Hashable {
     public let id: String
     public let title: String
     public let subtitle: String?
-    /// A symbol (drawn in `tint`) or a brand logo before the title; none by default.
+    /// A symbol (drawn in `tint` on a pale tile of it) or a brand logo before the title; none
+    /// by default.
     public let icon: IconSource?
     public let tint: Color?
     /// What a tap puts in the search field; the title by default.
@@ -26,7 +29,8 @@ public struct SearchSuggestion: Identifiable, Hashable {
 
     /// - Parameters:
     ///   - subtitle: What the suggestion is ("Category", "Lake · 12 km"); it is matched too.
-    ///   - tint: The symbol's colour; the secondary grey by default.
+    ///   - tint: The symbol's colour, its tile a pale tint of it; the accent by default (5.2.0,
+    ///     the secondary grey without a tile before).
     ///   - completion: What a tap puts in the search field; `title` by default.
     ///   - id: Tells equal titles apart; `completion` by default.
     public init(
@@ -230,6 +234,10 @@ public struct SearchSuggestionsContent: View {
                     Button(String(localized: "search.recent.clear", defaultValue: "Clear")) {
                         recent?.wrappedValue.removeAll()
                     }
+                    // The accent, not the list's own blue (5.2.0): a header's button takes its
+                    // colour from the tint, not the foreground style.
+                    .buttonStyle(.borderless)
+                    .tint(AppColors.accent)
                 }
             }
         }
@@ -272,31 +280,36 @@ public struct SearchSuggestionsContent: View {
 enum SearchSuggestionsMetrics {
     /// Skeleton lines while the suggestions load.
     static let skeletonLines = 3
+    /// A line's icon tile (5.2.0), at the default text size.
+    static let iconSide: CGFloat = AppIconSize.xl
 }
 
 // MARK: - Row
 
-/// One line of search suggestions: a symbol or a logo, the title with the typed part in bold,
-/// a subtitle, and a ↖ button that puts the text in the field to keep typing. No padding of
-/// its own: it lives in a list, whose insets give it.
+/// One line of search suggestions: a symbol in a circle tile or a logo, the title with the typed
+/// part in bold, a subtitle, and a ↖ button that puts the text in the field to keep typing. No
+/// padding of its own: it lives in a list, whose insets give it.
 public struct SearchSuggestionRow: View {
     let title: String
     let subtitle: String?
     let icon: IconSource?
     let tint: Color?
+    /// The symbol's tile; a pale tint of the symbol's colour when `nil`.
+    let tileFill: Color?
     let query: String
     let onFill: (() -> Void)?
 
-    /// The icon's slot grows with the text, so a large symbol never runs into the title and
-    /// the titles of all lines stay aligned.
-    @ScaledMetric(relativeTo: .body) private var iconSide: CGFloat = AppIconSize.lg
+    /// The icon's tile grows with the text, so a large symbol never runs into the title and
+    /// the titles of all lines stay aligned (5.2.0: a 32 pt tile, a bare 24 pt symbol before).
+    @ScaledMetric(relativeTo: .body) private var iconSide: CGFloat = SearchSuggestionsMetrics.iconSide
 
     static var fillTitle: String {
         String(localized: "search.fill", defaultValue: "Edit in search field")
     }
 
     /// - Parameters:
-    ///   - icon: A symbol (in `tint`, the secondary grey by default) or a brand logo.
+    ///   - icon: A symbol (in `tint`, on a pale tile of it) or a brand logo.
+    ///   - tint: The symbol's colour; the accent by default (5.2.0).
     ///   - query: The typed text, drawn in bold where the title contains it.
     ///   - onFill: The ↖ button; none without it.
     public init(
@@ -307,15 +320,28 @@ public struct SearchSuggestionRow: View {
         highlighting query: String = "",
         onFill: (() -> Void)? = nil
     ) {
+        self.init(title, subtitle: subtitle, icon: icon, tint: tint, tileFill: nil, highlighting: query, onFill: onFill)
+    }
+
+    init(
+        _ title: String,
+        subtitle: String?,
+        icon: IconSource?,
+        tint: Color?,
+        tileFill: Color?,
+        highlighting query: String,
+        onFill: (() -> Void)?
+    ) {
         self.title = title
         self.subtitle = subtitle
         self.icon = icon
         self.tint = tint
+        self.tileFill = tileFill
         self.query = query
         self.onFill = onFill
     }
 
-    /// A recent query: the clock symbol in the tertiary grey.
+    /// A recent query: the clock symbol on a grey tile (5.2.0; a bare tertiary clock before).
     public static func recent(
         _ query: String,
         highlighting typed: String = "",
@@ -323,8 +349,10 @@ public struct SearchSuggestionRow: View {
     ) -> SearchSuggestionRow {
         SearchSuggestionRow(
             query,
+            subtitle: nil,
             icon: .sfSymbol("clock.arrow.circlepath"),
-            tint: AppColors.Text.tertiary,
+            tint: AppColors.Text.secondary,
+            tileFill: AppColors.Background.neutral1,
             highlighting: typed,
             onFill: onFill
         )
@@ -366,15 +394,15 @@ public struct SearchSuggestionRow: View {
     @ViewBuilder
     private var leadingIcon: some View {
         switch icon {
-        case .sfSymbol(let name):
-            Image(systemName: name)
-                .font(AppTypography.body)
-                .foregroundStyle(tint ?? AppColors.Text.secondary)
-                .frame(width: iconSide, height: iconSide)
-                .accessibilityHidden(true)
+        case .sfSymbol:
+            let color = tint ?? AppColors.accent
+            Icon(source: icon, style: .circle(
+                size: iconSide,
+                tint: .monochrome(color),
+                backgroundColor: tileFill ?? AppColors.pale(color)
+            ))
         case .brandService:
-            Icon(source: icon, size: AppIconSize.lg)
-                .frame(width: iconSide, height: iconSide)
+            Icon(source: icon, size: iconSide)
         case nil:
             EmptyView()
         }
@@ -405,7 +433,7 @@ public struct SearchSuggestionRowSkeleton: View {
 
     public var body: some View {
         HStack(spacing: AppSpacing.md) {
-            Skeleton.circle(AppIconSize.lg)
+            Skeleton.circle(SearchSuggestionsMetrics.iconSide)
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
                 SkeletonText(AppTypography.body, width: 150)
                 if showsSubtitle {

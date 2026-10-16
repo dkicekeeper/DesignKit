@@ -454,6 +454,8 @@ public struct UniversalRowSkeleton: View {
         case toggle
         /// A compact control in a capsule: a date, a menu's value.
         case capsule
+        /// The empty circle of a choice (`SelectionIndicator`, 5.2.0).
+        case selection
     }
 
     let config: RowConfiguration
@@ -499,10 +501,10 @@ public struct UniversalRowSkeleton: View {
         UniversalRowSkeleton(iconStyle: .circle(size: AppIconSize.md), trailing: .value)
     }
 
-    /// `CheckmarkRow`: the row of a choice list, its title in `h4`; pass the icon's style
-    /// when the rows have one.
+    /// `CheckmarkRow`: the row of a choice list, its title in `h4` and its empty circle (5.2.0);
+    /// pass the icon's style when the rows have one.
     public static func checkmark(iconStyle: IconStyle? = nil) -> UniversalRowSkeleton {
-        UniversalRowSkeleton(config: .settings, iconStyle: iconStyle, titleFont: AppTypography.h4)
+        UniversalRowSkeleton(config: .settings, iconStyle: iconStyle, titleFont: AppTypography.h4, trailing: .selection)
     }
 
     /// `DatePickerRow`: a small icon, the title and the date in its capsule.
@@ -543,6 +545,8 @@ public struct UniversalRowSkeleton: View {
             Skeleton.capsule(height: 31, width: 51)
         case .capsule:
             Skeleton.capsule(height: 34, width: 110)
+        case .selection:
+            SelectionIndicator(isSelected: false)
         }
     }
 }

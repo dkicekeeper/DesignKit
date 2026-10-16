@@ -258,7 +258,6 @@ private struct StatusBannerPage: View {
             name: "StatusBanner",
             summary: "A status message in a pale box of its colour, or inline; an optional action.",
             since: "1.7.0",
-            apps: [.tenra, .dalada],
             canvas: .fill,
             styles: ["standard", "compact"]
         ) {
@@ -311,7 +310,7 @@ private struct InlineStatusTextPage: View {
         ComponentPage(
             name: "InlineStatusText",
             summary: "A one-line status under a form or a field: error, warning, info, success.",
-            apps: [.tenra],
+            apps: [.tenra, .dalada],
             canvas: .fill
         ) {
             InlineStatusText(message: "Amount must be positive", type: type)
@@ -333,7 +332,6 @@ private struct TooltipPage: View {
             name: "Tooltip",
             summary: "A short value or hint in an opaque bubble with a tail pointing at its target: the amount over a tapped bar.",
             since: "2.0.0",
-            apps: [.tenra],
             notes: [
                 "Put it in an overlay of its target with .tooltipAnchor(.top) (or .bottom with arrowEdge: .top), so it never moves the layout.",
                 "Give the target a higher zIndex than its neighbours while the tooltip shows.",
@@ -379,7 +377,6 @@ private struct TypingIndicatorPage: View {
             name: "TypingIndicator",
             summary: "Three dots rising in a wave in a bubble: a reply is on its way, an assistant is thinking.",
             since: "2.2.0",
-            apps: [.dalada],
             canvas: .tall(minHeight: 120),
             notes: [
                 "Insert it with .transition(.popIn) under the last message.",
@@ -462,7 +459,6 @@ private struct StepTrackerPage: View {
             name: "StepTracker",
             summary: "Where a multi-step process is: done, current, upcoming.",
             since: "0.6.0",
-            apps: [.dalada],
             canvas: .fill
         ) {
             StepTracker(steps: ["Place", "Details", "Photos", "Publish"], current: current, showsLabels: showsLabels)
@@ -567,19 +563,20 @@ private struct NoticeCardPage: View {
     var body: some View {
         ComponentPage(
             name: "NoticeCard",
-            summary: "A message the app writes to the person: a picture, a title and a line or two, a hide button and an action under them.",
+            summary: "A message the app writes to the person: a picture, a title and a line or two, a hide button and an action under the text, in line with it.",
             since: "4.14.0",
             apps: [.tenra],
             canvas: .fill,
             notes: [
                 "What the message is, when it shows and what the action does stay in the app.",
-                "The leading view comes at its own size; hide it from VoiceOver when it says nothing.",
+                "The leading view comes at its own size, NoticeCardMetrics.leadingSize (48 pt) for a mascot or an icon; hide it from VoiceOver when it says nothing.",
+                "5.2.0: the action moved into the text's column, so it starts where the text does.",
                 "Strings: common.hide (the hide button's VoiceOver name, unless hideLabel is given).",
             ]
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 if state == .loading {
-                    NoticeCardSkeleton(leadingSize: showsLeading ? AppIconSize.xl : nil, showsAction: hasAction)
+                    NoticeCardSkeleton(leadingSize: showsLeading ? NoticeCardMetrics.leadingSize : nil, showsAction: hasAction)
                 } else {
                     NoticeCard(
                         title: "A payment is due tomorrow",
@@ -591,7 +588,7 @@ private struct NoticeCardPage: View {
                     ) {
                         if showsLeading {
                             ParticleCreature(mood: .worried, style: .compact)
-                                .frame(width: AppIconSize.xl, height: AppIconSize.xl)
+                                .frame(width: NoticeCardMetrics.leadingSize, height: NoticeCardMetrics.leadingSize)
                                 .accessibilityHidden(true)
                         }
                     }
@@ -634,6 +631,7 @@ private struct SpotlightPage: View {
             name: ".spotlight",
             summary: "A coach mark: everything dims except a cut-out round one view, with a message beside it. For a new feature or the steps of a tour on the real screen.",
             since: "2.6.0",
+            apps: [.tenra],
             canvas: .tall(minHeight: 340),
             notes: [
                 "Mark views with .spotlightAnchor(id); put .spotlight($current, message:) on the screen. Another id moves the cut-out there on a spring; nil lifts it.",

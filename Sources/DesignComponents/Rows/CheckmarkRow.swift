@@ -3,8 +3,9 @@
 //  DesignKit
 //
 //  A row you pick from a list: an optional icon, the title, an optional value on the trailing
-//  side, and the accent checkmark when it is the picked one. The rows of a filter or choice
-//  sheet ("All accounts", each account, each category). Ported from Tenra's account,
+//  side, and a `SelectionIndicator` (5.2.0): the accent filled check on the picked one, an
+//  empty circle on the others (a bare checkmark on the picked one before). The rows of a filter
+//  or choice sheet ("All accounts", each account, each category). Ported from Tenra's account,
 //  category and time filters; the sheets themselves (lists of the app's models) stay there.
 //
 
@@ -12,7 +13,7 @@ import SwiftUI
 import DesignTokens
 import DesignSupport
 
-/// "Kaspi Gold ……… 120 000 ₸ ✓": a row of a choice list, built on `UniversalRow(.settings)`.
+/// "Kaspi Gold ……… 120 000 ₸ ◉": a row of a choice list, built on `UniversalRow(.settings)`.
 ///
 /// ```swift
 /// CheckmarkRow("All accounts", isSelected: selection == nil) { selection = nil }
@@ -34,7 +35,7 @@ public struct CheckmarkRow: View {
 
     /// - Parameters:
     ///   - icon: The leading icon; none by default.
-    ///   - value: Text on the trailing side, before the checkmark (a balance, a count).
+    ///   - value: Text on the trailing side, before the indicator (a balance, a count).
     ///   - config: `.settings` (default) for a `List` row, which pads it; `.standard` in a
     ///     `FormSection` card (3.0.0).
     public init(
@@ -69,10 +70,8 @@ public struct CheckmarkRow: View {
                 }
             }
         } trailing: {
-            if isSelected {
-                Image(systemName: "checkmark")
-                    .foregroundStyle(AppColors.accent)
-            }
+            // Every row shows its circle, so the list reads as a choice before anything is picked.
+            SelectionIndicator(isSelected: isSelected)
         }
         .selectableRow(isSelected: isSelected) {
             HapticManager.selection()

@@ -81,7 +81,7 @@ private struct IconPage: View {
         ComponentPage(
             name: "Icon",
             summary: "Every icon: an SF Symbol or a brand logo (loaded by the app's DesignKitLogoLoader), in a shape, a size, a tint, on glass or not.",
-            apps: [.tenra, .dalada],
+            apps: [.tenra],
             notes: [
                 "A brand logo is Icon(source: .brandService(\"netflix.com\")); BrandLogoView, its view of its own, was removed in 2.0.0.",
                 "Sizes: AppIconSize (glyphs, xs 12 to xxl 40) and AppIconSize.Tile (icons with a backing, sm 44 to xxxl 80).",
@@ -276,12 +276,13 @@ private struct CreatureGlyphPage: View {
     var body: some View {
         ComponentPage(
             name: "CreatureGlyph",
-            summary: "ParticleCreature as a still, one-colour glyph: twelve dots in a ring and two capsule eyes.",
+            summary: "ParticleCreature as a still, one-colour glyph: a filled core with its eyes cut out, in a ring of twelve dots.",
             since: "4.8.0",
             apps: [.tenra],
             notes: [
                 "A Shape: fill it with any colour. For where the live creature cannot go: a tab bar item (CreatureTabLabel) and sizes under 24 pt.",
                 "CreatureGlyph.templateImage(size:) gives a template UIImage for a tab bar or a UIKit button.",
+                "5.2.0: filled (the owner's variant B), so it weighs as much as the tab bar's filled symbols; the ring and the eyes alone before.",
             ]
         ) {
             HStack(spacing: AppSpacing.lg) {
@@ -306,8 +307,7 @@ private struct AvatarGroupPage: View {
         ComponentPage(
             name: "AvatarGroup",
             summary: "Overlapping avatars with “+N” for the rest: the people on a trip.",
-            since: "0.6.0",
-            apps: [.dalada]
+            since: "0.6.0"
         ) {
             if state == .loading {
                 AvatarGroupSkeleton(count: min(count, maxVisible))
@@ -332,7 +332,6 @@ private struct HeroSymbolPage: View {
             name: "HeroSymbol",
             summary: "A large SF Symbol on a disc of its tint: the picture of an onboarding page or a permission primer.",
             since: "0.7.0",
-            apps: [.tenra, .dalada],
             notes: [
                 "The symbol draws itself on as it appears (2.2.0) and is drawn in an SF Symbols 7 gradient of its tint, for depth (2.3.0).",
                 "In an OnboardingPager the symbol lags behind its page as you swipe (2.3.0).",

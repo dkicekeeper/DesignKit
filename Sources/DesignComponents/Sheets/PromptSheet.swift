@@ -83,7 +83,7 @@ public struct PromptSheet: View {
     private var content: some View {
         VStack(spacing: AppSpacing.lg) {
             HeroSymbol(systemImage: systemImage, size: PromptSheetMetrics.symbolSize)
-                .padding(.top, AppSpacing.xxl)
+                .padding(.top, PromptSheetMetrics.topInset)
 
             VStack(spacing: AppSpacing.sm) {
                 Text(verbatim: title)
@@ -124,6 +124,8 @@ public struct PromptSheet: View {
 enum PromptSheetMetrics {
     /// The symbol's disc.
     static let symbolSize: CGFloat = 104
+    /// Above the symbol: the sheet's top edge and grabber get room (5.2.0, twice `xxl`).
+    static let topInset: CGFloat = AppSpacing.xxl * 2
 }
 
 private struct PromptSheetDetent: ViewModifier {
