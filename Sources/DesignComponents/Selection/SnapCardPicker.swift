@@ -11,6 +11,9 @@
 //  The scroll position is written only once the scroll view has measured its container: before
 //  that, SwiftUI drops the write while keeping the state, and the carousel never catches up with
 //  a selection that arrives after it appears.
+//  5.0.0: `style: .centered(width:)`, cards of one width side by side, the centred one full size,
+//  the others smaller and paler, the selection following the centre as the row scrolls: the row of
+//  `PickerCarousel`, which drew its own carousel in 4.14.0.
 //
 
 import SwiftUI
@@ -26,38 +29,66 @@ import DesignSupport
 /// }
 /// ```
 ///
-/// Each card fills the row's width (`containerRelativeFrame`); `AppSpacing.md` between cards and
-/// `AppSpacing.lg` of the neighbours show. A drag selects the card it settles on; a tap on a card
-/// calls `select`, which selects it and scrolls it to the centre.
+/// With `.fill` (the default) each card fills the row's width (`containerRelativeFrame`);
+/// `AppSpacing.md` between cards and `AppSpacing.lg` of the neighbours show. A drag selects the
+/// card it settles on; a tap on a card calls `select`, which selects it and scrolls it to the
+/// centre.
 public struct SnapCardPicker<Item, ID: Hashable, Card: View>: View {
+    /// How the cards stand in the row.
+    public enum Style: Equatable, Sendable {
+        /// Each card fills the row, the neighbours peeking in at the edges; the selection is the
+        /// card a drag settles on (2.9.0): an account or a category in a form.
+        case fill
+        /// Cards `width` wide side by side, the centred one full size, the others a little smaller
+        /// and paler; the selection follows the centre while the row scrolls (5.0.0): options to
+        /// try on (`PickerCarousel`).
+        case centered(width: CGFloat)
+    }
+
     let items: [Item]
     let id: KeyPath<Item, ID>
     @Binding var selection: ID?
+    let style: Style
     let onSelectionChange: ((ID) -> Void)?
     let card: (Item, Bool, @escaping () -> Void) -> Card
 
     @State private var scrollPosition: ID?
     /// `false` until the scroll view has a measured container and the first position is written.
     @State private var hasAlignedInitialScroll = false
+    /// The row's visible width, for `.centered`'s margins.
+    @State private var containerWidth: CGFloat = 0
+    /// Whether the person is moving the row (a drag and its coast), not an animated scroll.
+    @State private var isScrolledByHand = false
 
     /// - Parameters:
+    ///   - style: `.fill` (the default) or `.centered(width:)` (5.0.0).
     ///   - onSelectionChange: Called when a tap or a drag picks another item.
     ///   - card: The card for an item, whether it is selected, and the action that selects it.
     public init(
         _ items: [Item],
         id: KeyPath<Item, ID>,
         selection: Binding<ID?>,
+        style: Style = .fill,
         onSelectionChange: ((ID) -> Void)? = nil,
         @ViewBuilder card: @escaping (_ item: Item, _ isSelected: Bool, _ select: @escaping () -> Void) -> Card
     ) {
         self.items = items
         self.id = id
         self._selection = selection
+        self.style = style
         self.onSelectionChange = onSelectionChange
         self.card = card
     }
 
     public var body: some View {
+        switch style {
+        case .fill: fillRow
+        case .centered(let width): centeredRow(width: width)
+        }
+    }
+
+    /// `.fill`: full-width cards; the selection is where a drag settles (2.9.0, as it was).
+    private var fillRow: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: SnapCardPickerMetrics.cardSpacing) {
                 ForEach(items, id: id) { item in
@@ -112,6 +143,46 @@ public struct SnapCardPicker<Item, ID: Hashable, Card: View>: View {
         }
     }
 
+    /// `.centered` (5.0.0, `PickerCarousel`'s row of 4.14.0 as it was): cards of one width, the
+    /// scroll position bound to the selection itself, so the first layout stands on it and the
+    /// selection follows the centre as the row scrolls; the side cards smaller and paler. The
+    /// cards have their width before the row is measured, so the write the full-width cards lose
+    /// does not happen here; the margins centre a card once the row's width is known.
+    private func centeredRow(width: CGFloat) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            LazyHStack(spacing: SnapCardPickerMetrics.cardSpacing) {
+                ForEach(items, id: id) { item in
+                    let itemID = item[keyPath: id]
+                    card(item, selection == itemID) {
+                        guard selection != itemID else { return }
+                        withAnimation(AppAnimation.contentSpring) { selection = itemID }
+                        onSelectionChange?(itemID)
+                    }
+                    .frame(width: width)
+                    .id(itemID)
+                    .scrollTransition(.interactive, axis: .horizontal) { content, phase in
+                        content
+                            .scaleEffect(phase.isIdentity ? 1 : SnapCardPickerMetrics.sideScale)
+                            .opacity(phase.isIdentity ? 1 : SnapCardPickerMetrics.sideOpacity)
+                    }
+                }
+            }
+            .scrollTargetLayout()
+        }
+        .contentMargins(.horizontal, max(0, (containerWidth - width) / 2), for: .scrollContent)
+        .scrollTargetBehavior(.viewAligned)
+        .scrollPosition(id: $selection, anchor: .center)
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { containerWidth = $0 }
+        // A drag moves the selection with the centre: tell the app as it lands on each card.
+        .onScrollPhaseChange { _, newPhase in
+            isScrolledByHand = newPhase == .tracking || newPhase == .interacting || newPhase == .decelerating
+        }
+        .onChange(of: selection) { _, newValue in
+            guard isScrolledByHand, let newValue else { return }
+            onSelectionChange?(newValue)
+        }
+    }
+
     /// The one first `scrollPosition` write, a tick after the container is measured. Idempotent.
     private func performInitialAlignment() {
         guard !hasAlignedInitialScroll else { return }
@@ -146,10 +217,11 @@ public extension SnapCardPicker where Item: Identifiable, ID == Item.ID {
     init(
         _ items: [Item],
         selection: Binding<ID?>,
+        style: Style = .fill,
         onSelectionChange: ((ID) -> Void)? = nil,
         @ViewBuilder card: @escaping (_ item: Item, _ isSelected: Bool, _ select: @escaping () -> Void) -> Card
     ) {
-        self.init(items, id: \.id, selection: selection, onSelectionChange: onSelectionChange, card: card)
+        self.init(items, id: \.id, selection: selection, style: style, onSelectionChange: onSelectionChange, card: card)
     }
 }
 
@@ -160,6 +232,9 @@ enum SnapCardPickerMetrics {
     static let neighborPeek: CGFloat = AppSpacing.lg
     /// The centred card's margin on each side.
     static var contentMargin: CGFloat { cardSpacing + neighborPeek }
+    /// `.centered`: the cards beside the middle one (5.0.0, `PickerCarousel`'s in 4.14.0).
+    static let sideScale: CGFloat = 0.9
+    static let sideOpacity: Double = 0.75
 }
 
 // MARK: - Skeleton

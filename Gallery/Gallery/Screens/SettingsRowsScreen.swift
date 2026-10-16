@@ -66,7 +66,10 @@ private struct UniversalRowPage: View {
             summary: "The row every list row is built on: a leading icon, content, a trailing slot, a hint; padding from its RowConfiguration preset.",
             apps: [.tenra, .dalada],
             canvas: .fill,
-            notes: ["Presets: .standard, .settings, .info, .selectable, .sheetList (design-system §10 for their padding)."]
+            notes: [
+                "Presets: .standard, .settings, .info, .selectable, .sheetList (design-system §10 for their padding).",
+                "The rows on it, for what a row does: ToggleSettingsRow, ActionSettingsRow, NavigationSettingsRow, MenuPickerRow, NavigationPickerRow, DatePickerRow, StepperRow, CheckmarkRow, InfoRow. They fix the icon, the value's type and what VoiceOver hears; UniversalRow itself is for a row none of them is.",
+            ]
         ) {
             InFormCard {
                 if state == .loading {
@@ -132,26 +135,33 @@ private struct InfoRowPage: View {
 }
 
 private struct NavigationSettingsRowPage: View {
+    @State private var showsValue = true
+    @State private var showsIcon = true
     @State private var state: SpecimenState = .content
 
     var body: some View {
         ComponentPage(
             name: "NavigationSettingsRow",
-            summary: "A settings row that opens a screen: a small icon, the title, a chevron.",
+            summary: "A settings row that opens a screen: a small icon, the title, what is set, a chevron.",
             apps: [.tenra, .dalada],
-            canvas: .fill
+            canvas: .fill,
+            notes: [
+                "value: what is set, before the chevron, as iOS Settings shows it (5.0.0). NavigationPickerRow(style: .list) is this row with the chosen option.",
+            ]
         ) {
             InFormCard {
                 if state == .loading {
                     UniversalRowSkeleton.navigationSettings
                 } else {
-                    NavigationSettingsRow(icon: "globe", title: "Language") {
+                    NavigationSettingsRow(icon: showsIcon ? "globe" : nil, title: "Language", value: showsValue ? "English" : nil) {
                         Text("Language settings").navigationTitle("Language")
                     }
                 }
             }
         } controls: {
             StateControl(state: $state)
+            ToggleControl("Value", isOn: $showsValue)
+            ToggleControl("Icon", isOn: $showsIcon)
         }
     }
 }

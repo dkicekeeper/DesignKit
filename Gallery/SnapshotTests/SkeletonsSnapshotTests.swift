@@ -414,11 +414,15 @@ extension ComponentSnapshots {
             )
         }
 
-        /// ListCardSkeleton, NoticeCardSkeleton, PickerCarouselSkeleton (4.14.0).
+        /// A glass `FormSection` of row skeletons (5.0.0; `ListCardSkeleton` in 4.14.0),
+        /// NoticeCardSkeleton, PickerCarouselSkeleton (4.14.0).
         @Test func portedViewSkeletons() async {
             await assertComponentSnapshot(
                 VStack(spacing: AppSpacing.lg) {
-                    ListCardSkeleton(rows: 2)
+                    FormSection(style: .glass) {
+                        ItemRowSkeleton()
+                        ItemRowSkeleton()
+                    }
                     NoticeCardSkeleton()
                     PickerCarouselSkeleton()
                 },

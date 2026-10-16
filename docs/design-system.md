@@ -47,7 +47,8 @@
 `EmptyState`, `Avatar`, `Badge`, `Icon`, `DSButton`. The names before 2.0 were deprecated
 typealiases until 3.0.0, which removed them ([migration-2.0.md](migration-2.0.md),
 [migration-3.0.md](migration-3.0.md)); 4.0.0 removed the last deprecated name,
-`SectionHeader.Style.list` ([migration-4.0.md](migration-4.0.md)).
+`SectionHeader.Style.list` ([migration-4.0.md](migration-4.0.md)); 5.0.0 removed `ListCard`,
+folded into `FormSection(style: .glass)` ([migration-5.0.md](migration-5.0.md)).
 The tokens keep their prefix (`AppColors`, `AppSpacing`, `AppIconSize`, …): a token namespace
 is not a view, and `Color` / `Font` would clash with SwiftUI. The button is `DSButton` because
 `Button` is SwiftUI's.
@@ -394,9 +395,16 @@ FormSection(header: "Settings", footer: nil, style: .card) {
 
 | Style | Background | Use For |
 |-------|-----------|---------|
-| `.card` (the only style) | `.formCardStyle()` (Material; **not** Liquid Glass) | Every form card. Material is intentional — iOS 26 `glassEffect` would become the morph-source for any `Picker(.menu)` / `MenuPickerRow` inside, collapsing single-row sections into the popover at tap |
+| `.card` (the default) | `.formCardStyle()` (Material; **not** Liquid Glass); the rows pad themselves, the caller's `Divider()` between them | Every form card. Material is intentional — iOS 26 `glassEffect` would become the morph-source for any `Picker(.menu)` / `MenuPickerRow` inside, collapsing single-row sections into the popover at tap |
+| `.glass` *(5.0.0)* | `.cardStyle()` (Liquid Glass); the card pads its rows `lg` on every side and spaces them `sm`, no dividers | Content that is not a form: an assistant's reply (payments, a draft to confirm, an attachment), a short list on a screen, a `NoticeCard`. It was `ListCard` in 4.14.0 (removed in 5.0.0, docs/migration-5.0.md) |
 
-Inside a `List`, group rows with `Section(header: SectionHeader(title, style: .compact))` instead.
+An empty `header` is left out *(5.0.0)*. Inside a `List`, group rows with `Section(header: SectionHeader(title, style: .compact))` instead.
+
+```swift
+FormSection(header: "Payments", style: .glass) {
+    ForEach(payments) { TransactionRow(…) }
+}
+```
 
 #### `EditableHero` *(1.10.0)*
 The top of an edit sheet: a glass hero icon (entrance spring) that opens `IconPicker`, the name typed in place (`AnimatedTitleInput`), and with `.amountAndCurrency` an amount (`AmountInput`, 48 pt) and a currency chip that pushes `CurrencyList` (so put the hero in a `NavigationStack`). `iconTint` draws a symbol in that colour on glass (a category); `.symbolsOnly` hides the logos tab. Tenra: `EditableHeroSection` (its `HeroConfig` presets, the category hex colour) is an adapter.
@@ -456,6 +464,13 @@ UniversalRow(
 | `.sheetList` | 12 | 16 | Modal selection sheets |
 | `.info` | 8 | 0 | Read-only label+value (container owns H-padding) |
 
+**Rows built on it**: a row for what it does, each fixing the icon's size and colour, the value's
+type and what VoiceOver hears, so every settings screen reads the same. `ToggleSettingsRow` (a
+switch), `ActionSettingsRow` (a button), `NavigationSettingsRow` (opens a screen, with what is set),
+`MenuPickerRow` (one of a few, in a menu), `NavigationPickerRow` (one of many: a pushed list with
+checks, a search field past 12), `DatePickerRow`, `StepperRow`, `CheckmarkRow`, `InfoRow`,
+`ActionRowLabel`. `UniversalRow` itself is for a row none of them is.
+
 **IconConfig factories:**
 
 ```swift
@@ -481,7 +496,7 @@ Every row in `Views/Components/Rows/` follows these token rules. New rows MUST c
 |------|-------|-------|
 | **Leading icon — content rows** | `AppIconSize.Tile.sm` (44); a limit row keeps the ring's `Tile.lg` (52) slot with or without a limit | AmountRow, LimitProgressCard |
 | **Leading icon — form rows** | `AppIconSize.lg` (24) | InfoRow, MenuPickerRow, DatePickerRow |
-| **Leading icon — settings rows** | `AppIconSize.md` (20) | ActionSettingsRow, NavigationSettingsRow |
+| **Leading icon — settings rows** | `AppIconSize.md` (20) | ActionSettingsRow, NavigationSettingsRow (its `value:` before the chevron since 5.0.0) |
 | **HStack spacing (icon ↔ content)** | `AppSpacing.md` (12) | All rows |
 | **Inner VStack (title ↔ subtitle)** | `AppSpacing.xs` (4) | Never `xxs` |
 | **Title — management lists** | `AppTypography.h4` (20 semibold) | AmountRow `.list` (larger touch lists) |
@@ -527,7 +542,8 @@ A choice from a long list: the title (with an optional accent symbol), the chose
 moves under the title. A few options: `MenuPickerRow`. Dalada: the fish species, the packing
 list to start from. `style: .list` (4.14.0) is the same choice as a row of a `List`, as iOS
 Settings draws it: the settings row (`RowConfiguration.settings`), a medium accent symbol, the
-value in `bodySmall` and the list's own chevron. Tenra: Settings' voice language.
+value in `bodySmall` and the list's own chevron; since 5.0.0 it is `NavigationSettingsRow(value:)`.
+Tenra: Settings' voice language.
 
 ```swift
 NavigationPickerRow(icon: "fish", title: "Species", selection: $speciesID,
@@ -1246,7 +1262,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `SliderRow` (1.15.0) | `SliderRowSkeleton(showsHint:)` |
 | `ItemRow` (3.6.0) | `ItemRowSkeleton(style:showsLeading:showsDetail:metaLines:)` |
 | `PendingItemCard` (3.6.0) | `PendingItemCardSkeleton(contentLines:)` |
-| `ListCard`, `NoticeCard`, `PickerCarousel` (4.14.0) | `ListCardSkeleton(showsTitle:rows:)`, `NoticeCardSkeleton(leadingSize:showsAction:)`, `PickerCarouselSkeleton(pictureSize:)` |
+| `NoticeCard`, `PickerCarousel` (4.14.0); a glass `FormSection` (5.0.0) | `NoticeCardSkeleton(leadingSize:showsAction:)`, `PickerCarouselSkeleton(pictureSize:)`; `FormSection(style: .glass)` of its rows' skeletons (`ItemRowSkeleton`, …; `ListCardSkeleton` until 5.0.0) |
 | `RatingSummary` (4.1.0) | `RatingSummarySkeleton(maximum:)` |
 | `SearchSuggestionRow` (3.5.0), drawn by `.dsSearchSuggestions` while `isLoading` | `SearchSuggestionRowSkeleton(showsSubtitle:)` |
 | `AmountRow` (2.1.0) | `AmountRowSkeleton(style:showsRing:showsDetail:)` |
@@ -1989,11 +2005,17 @@ writes the scroll position only after its container is measured, so a selection 
 after it appears still scrolls into place; it re-aligns when the selection drops out of its
 items (a sibling picker filtered them). `SnapCardPicker(items, id:selection:) { item, isSelected, select in … }`.
 Tenra: `AccountSelectorView` (with `SelectableBalanceCard`) and `CategoryCardSelectorView`.
+*(5.0.0)* `style: .centered(width:)`: cards of one width side by side, the centred one full size,
+the others at 90 % and 75 % opacity (`scrollTransition`), the row's margins centring a card. The
+scroll position is the selection itself, so the first layout stands on it and the selection
+follows the centre as the row scrolls: the cards have their width before the row is measured, so
+the write `.fill` waits for is not lost here. `PickerCarousel`'s row of 4.14.0, moved here as it
+was; the default `.fill` is unchanged.
 
 #### `OptionCard`, `OptionCardPicker`
 An option as a picture: an 80 × 120 artwork (`AppRadius.lg`) with a check on it when chosen, the
-title beside it (accent when chosen), on the grouped-list card colour (`AppRadius.xl`), a 3 pt
-accent outline when chosen. `OptionCardPicker(options, selection:title:artwork:)` lays plain
+title beside it (accent when chosen), on the grouped-list card colour (`AppRadius.xl`), the
+accent outline when chosen (`.selectionOutline`, 2 pt since 5.0.0, 3 pt before). `OptionCardPicker(options, selection:title:artwork:)` lays plain
 options out; `OptionCard` alone for a list that mixes them with one that opens a picker (Tenra's
 photo option sits in a `PhotosPicker`). Tenra: `HomeBackgroundPicker`.
 
@@ -2035,7 +2057,8 @@ pixel for pixel; Tenra keeps adapters under the old names.
 Money put towards something: a sheet with `HeroSection(icon:title:subtitle:)` of what it goes
 to, `CurrencyAmountInput` over the `CalculatorKeypad` (the keypad hides while the note is
 focused), a multiline `FormTextField` note and `.dateButtonsSafeArea` (today or earlier) with
-Save; ✕ and ✓ in the toolbar. An amount typed in another currency shows the "≈" line in
+Save; ✕ and ✓ in the toolbar (`EditSheetContainer(wrapInForm: false)` since 5.0.0, its ✕ read as
+Cancel). An amount typed in another currency shows the "≈" line in
 `currency` and converts on save through `DesignKitCurrencyConverter.convertSync`; no rate shows
 `currency.error.conversionFailed`, no amount `moneyEntry.invalidAmount`, each with the error
 haptic. `onSave(amount, date, note)` gets the amount in `currency` and the trimmed note (nil when
@@ -2050,14 +2073,9 @@ AmountEntrySheet(title: goal.name, icon: goal.icon, subtitle: left, currency: go
 }
 ```
 
-#### `ListCard`
-A card of rows: an optional `SectionHeader` over a `cardStyle()` card that pads its content
-`lg` on every side and spaces it `sm`. Rows pad themselves vertically (§10). Tenra: its
-assistant's cards (payments in a reply, a draft to confirm, an attachment). Skeleton:
-`ListCardSkeleton(showsTitle:rows:)`.
-
 #### `NoticeCard`
-A message the app writes to the person, on a `ListCard`: the `leading` picture at its own size
+A message the app writes to the person, on a glass card (`FormSection(style: .glass)` since 5.0.0,
+`ListCard` in 4.14.0): the `leading` picture at its own size
 (a mascot, an icon; hide it from VoiceOver when it says nothing), the title (`bodyEmphasis`) and
 the message (`bodySmall`, secondary), the ✕ hide button on the trailing edge (`DSButton`, icon
 only, flat, neutral, small; `hideLabel` for VoiceOver, `common.hide` by default; none without
@@ -2076,9 +2094,9 @@ tap; anchor a hint to that circle. Read the level in a small view of its own, so
 Options to try on: the focused option's name (`h4`) and, when it is closed, what opens it
 (`bodyEmphasis`, accent, a lock, wrapping in full over two kept lines), then cards side by side
 (`PickerCarouselMetrics.cardWidth` 150 pt, the middle one full size, the others at 90 % and
-75 % opacity, snapping to the middle). A card is the option's picture (`pictureSize`, 96 pt,
-drawn still, at 40 % when closed), its name kept to two lines, a lock in the corner when closed
-and an accent outline and name when it is `chosen`. Scrolling and a tap change `focused`; the
+75 % opacity, snapping to the middle: `SnapCardPicker(style: .centered(width:))` since 5.0.0). A card is the option's picture
+(`pictureSize`, 96 pt, drawn still, at 40 % when closed), its name kept to two lines, a lock in
+the corner when closed and an accent outline (`.selectionOutline`) and name when it is `chosen`. Scrolling and a tap change `focused`; the
 app decides what that does (Tenra: Ten tries the accessory on and puts an open one on at once)
 and draws the focused option large above. VoiceOver: the name, and `lockedLabel` with the
 condition for a closed one. Skeleton: `PickerCarouselSkeleton(pictureSize:)`.
@@ -2313,18 +2331,6 @@ EntityDetailScaffold(... hero: { HeroSection(icon: liveCategory.iconSource, ...)
 
 Used in: `OnboardingWelcomeStep` (bottom), Account/Category/Subscription/Deposit/Loan detail views (top).
 
-#### `EdgeBackdrop`, `.edgeBackdrop(_:color:)` *(4.14.0)*
-The backing of a bar over scrolling content, drawn by hand where the system's scroll edge effect
-is too faint to carry a large bar: an `.ultraThinMaterial` blur, full over the half nearest the
-screen's edge and fading out at the inner edge (SwiftUI has no blur of varying radius, so the
-blurred content gives way to the sharp one), and the page's colour over it, light so the blurred
-content's colours show through: 25% at the edge, 10% at two fifths, clear at three quarters
-(`EdgeBackdropMetrics`). A second material or a heavier tint reads as a grey plate. It reaches past the
-safe area to the screen's edge, takes no touches and is hidden from VoiceOver. Put it behind the
-bar's content: `.safeAreaBar(edge: .top) { header.frame(maxWidth: .infinity).edgeBackdrop() }`.
-`color:` is the page's colour (`AppColors.bgBase` by default). Tenra: the chat's bar, Ten 120 pt
-over the thread.
-
 ---
 
 ## 4. View Patterns
@@ -2494,11 +2500,13 @@ Grouping form rows?
 Horizontal scroll?
 └── UniversalCarousel with appropriate preset
 
-A bar over scrolling content that needs a stronger backing than the scroll edge effect?
-└── .edgeBackdrop(edge) behind the bar's content (4.14.0)
+A bar over a chat's thread (a header, Ten)?
+└── .safeAreaBar(edge: .top) on the thread, with .scrollEdgeEffectStyle(.hard, for: .top)
+    (5.0.0, the owner's choice; EdgeBackdrop in 4.14.0). Present the chat from the screen,
+    not from inside a scroll view (docs/gotchas.md)
 
 Card-style container?
-├── Rows under an optional title → ListCard (4.14.0)
+├── Rows under an optional title → FormSection(header:, style: .glass) (5.0.0; ListCard in 4.14.0)
 ├── A message to the person with a hide button and an action → NoticeCard (4.14.0)
 └── Anything else → VStack { ... }.padding(AppSpacing.lg).cardStyle()
 ```

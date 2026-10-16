@@ -75,19 +75,11 @@ public struct NavigationPickerRow<T: Hashable>: View {
         }
     }
 
-    /// A row of a `List`: a plain NavigationLink, so the list adds its chevron.
+    /// A row of a `List`: `NavigationSettingsRow` with the chosen value (5.0.0), so the list adds
+    /// its chevron.
     private var listRow: some View {
-        NavigationLink {
+        NavigationSettingsRow(icon: icon, title: title, value: selectedLabel) {
             NavigationPickerList(title: title, selection: $selection, options: options)
-        } label: {
-            UniversalRow(config: .settings, leadingIcon: leadingIcon, title: title) {
-                if let selectedLabel {
-                    Text(selectedLabel)
-                        .font(AppTypography.bodySmall)
-                        .foregroundStyle(AppColors.Text.secondary)
-                        .lineLimit(1)
-                }
-            }
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(title))

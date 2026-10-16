@@ -104,15 +104,16 @@ extension ComponentSnapshots {
             )
         }
 
-        /// ListCard (4.14.0): rows under a title, and without one.
+        /// `FormSection(style: .glass)` (5.0.0): rows under a title, and without one. It was
+        /// `ListCard` in 4.14.0, whose references these are: the same pixels.
         @Test func listCards() async {
             await assertComponentSnapshot(
                 VStack(spacing: AppSpacing.lg) {
-                    ListCard(title: "Payments") {
+                    FormSection(header: "Payments", style: .glass) {
                         ItemRow("Coffee House", meta: [MetaLine([.text("Cafés · 08:40")])], leading: .symbol("cup.and.saucer.fill"))
                         ItemRow("Magnum", meta: [MetaLine([.text("Groceries · 12:15")])], leading: .symbol("cart.fill"))
                     }
-                    ListCard {
+                    FormSection(style: .glass) {
                         InfoRow(label: "Amount", value: "12 000 ₸")
                         InfoRow(label: "Date", value: "15 October")
                     }

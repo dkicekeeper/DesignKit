@@ -220,32 +220,5 @@ extension ComponentSnapshots {
                 appearances: [.light, .dark]
             )
         }
-
-        /// EdgeBackdrop (4.14.0): a chat's rows under a top bar's backing (questions in the accent,
-        /// replies on a pale card), blurred and lightly washed near the edge, sharp further down.
-        @Test func edgeBackdrop() async {
-            await assertComponentSnapshot(
-                ZStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                        ForEach(0..<6, id: \.self) { index in
-                            let question = index.isMultiple(of: 2)
-                            Text(question ? "How much on cafés?" : "Row \(index + 1): groceries, 12 400 ₸")
-                                .font(AppTypography.body)
-                                .foregroundStyle(question ? AppColors.staticWhite : AppColors.Text.primary)
-                                .padding(AppSpacing.md)
-                                .background(question ? AppColors.accent : AppColors.accent.opacity(0.2),
-                                            in: .rect(cornerRadius: AppRadius.lg))
-                                .frame(maxWidth: .infinity, alignment: question ? .trailing : .leading)
-                        }
-                    }
-                    Color.clear
-                        .frame(height: 160)
-                        .frame(maxWidth: .infinity)
-                        .edgeBackdrop(.top)
-                }
-                .clipShape(.rect(cornerRadius: AppRadius.lg)),
-                appearances: [.light, .dark]
-            )
-        }
     }
 }

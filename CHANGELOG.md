@@ -16,6 +16,81 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 5.0.0 - 2026-10-16
+
+4.14.0's ports from Tenra folded into the components they repeated, the duplicates removed at
+once (the owner's choice over deprecating them), and `EdgeBackdrop` removed: a bar over a chat
+takes the system's hard scroll edge effect.
+[#75](https://github.com/dkicekeeper/DesignKit/pull/75)
+
+### Added
+
+- `FormSection(header:footer:style: .glass)`: a Liquid Glass card that pads its rows by `lg` and
+  spaces them by `sm`, for content that is not a form. It is `ListCard`, pixel for pixel.
+- `SnapCardPicker(style: .centered(width:))`: cards of one width side by side, the centred one full
+  size, the others smaller and paler, the selection following the centre as the row scrolls.
+- `.selectionOutline(_:cornerRadius:)` and `AppSelection.outline` (2 pt): the accent outline of a
+  chosen option, one look for `OptionCard`, `PickerCarousel` and `IconPicker`.
+- `NavigationSettingsRow(icon:title:value:iconColor:destination:)`: what is set, before the
+  chevron; the icon may be `nil`.
+
+### Changed
+
+- `OptionCard`: its outline is 2 pt (3 pt before).
+- `PickerCarousel` runs on `SnapCardPicker(style: .centered(width:))`, its own row moved there as
+  it was: it looks and behaves the same (`pickerCarousel` snapshots unchanged).
+- `AmountEntrySheet`'s bar is `EditSheetContainer`'s: its close button is read as Cancel (Close
+  before), and its save button plays the light haptic before the save's own.
+- `NavigationPickerRow(style: .list)` is `NavigationSettingsRow(value:)`; it looks the same.
+- `FormSection` leaves out an empty `header`.
+
+### Removed
+
+- `ListCard` and `ListCardSkeleton`: use `FormSection(header:style: .glass)`, with the rows'
+  skeletons inside while they load.
+- The `button.close` string (`AmountEntrySheet` uses `button.cancel` now).
+- `EdgeBackdrop`, `.edgeBackdrop(_:color:)` and `EdgeBackdropMetrics`: a bar over a chat takes the
+  system's hard scroll edge effect, `.scrollEdgeEffectStyle(.hard, for: .top)`, the owner's choice
+  after comparing them on a device.
+
+### Migration
+
+- Tenra: its assistant's cards (`AssistantAttachmentCard`, `AssistantReplyView`). Dalada does not
+  use `ListCard`. docs/migration-5.0.md has the details.
+- Tenra's chat: the bar's content loses its `.edgeBackdrop(.top)`, and the thread's
+  `.scrollEdgeEffectStyle(.soft, for: .top)` becomes `.hard`.
+
+```swift
+// Before
+ListCard(title: "Payments") { rows }
+thread
+    .scrollEdgeEffectStyle(.soft, for: .top)
+    .safeAreaBar(edge: .top) { ten.frame(maxWidth: .infinity).edgeBackdrop(.top) }
+// After
+FormSection(header: "Payments", style: .glass) { rows }
+thread
+    .scrollEdgeEffectStyle(.hard, for: .top)
+    .safeAreaBar(edge: .top) { ten.frame(maxWidth: .infinity) }
+```
+
+### Gallery and tooling
+
+- Gallery: `FormSection` has a style control (Card, Glass) and took the `ListCard` page;
+  `SnapCardPicker` has a style control; `NavigationSettingsRow` has Value and Icon controls.
+- Snapshot tests: `listCards` draws the glass `FormSection` against `ListCard`'s references, and
+  `pickerCarousel` the carousel on `SnapCardPicker` against its 4.14.0 ones; `OptionCard`'s and
+  the ported skeletons' references re-recorded; `EdgeBackdrop`'s are gone with it.
+- Gallery: the `UniversalRow` page lists the rows built on it and what each is for; the
+  `EdgeBackdrop` page is gone with the component.
+- Snapshot tests: `GalleryPagesSnapshotTests` draws whole Gallery pages in a phone-sized window
+  (`PickerCarousel`'s, a centred `SnapCardPicker`), and `scripts/snapshot-tests.sh` prints the
+  crash report when the Gallery crashes in a run.
+- docs/gotchas.md: what the comparison on a device taught about the system's scroll edge effect
+  (a `safeAreaBar` in a scroll view inside another, a screen presented from inside a scroll view,
+  iOS 27).
+- CI: the Changelog job refuses dingbats and emoji, which TestFlight's What to Test refuses.
+- docs/migration-5.0.md.
+
 ## 4.15.0 - 2026-10-15
 
 `PackedCircleIcons` is larger and the shelf's app icons stand whole, after the owner's review on

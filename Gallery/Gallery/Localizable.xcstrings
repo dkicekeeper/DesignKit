@@ -67,17 +67,6 @@
         }
       }
     },
-    "button.close" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Close"
-          }
-        }
-      }
-    },
     "button.copy" : {
       "extractionState" : "manual",
       "localizations" : {

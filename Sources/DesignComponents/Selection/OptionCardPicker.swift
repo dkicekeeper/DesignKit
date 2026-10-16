@@ -64,10 +64,8 @@ public struct OptionCard<Artwork: View>: View {
             RoundedRectangle(cornerRadius: AppRadius.xl)
                 .fill(Color(.secondarySystemGroupedBackground))
         }
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.xl)
-                .stroke(isSelected ? AppColors.accent : Color.clear, lineWidth: OptionCardMetrics.outline)
-        )
+        // 2 pt since 5.0.0 (3 pt before), as every option a person picks from.
+        .selectionOutline(isSelected, cornerRadius: AppRadius.xl)
         .animation(AppAnimation.contentSpring, value: isSelected)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(verbatim: title))
@@ -121,8 +119,6 @@ enum OptionCardMetrics {
     /// The artwork: a phone's shape.
     static let artworkWidth: CGFloat = 80
     static let artworkHeight: CGFloat = 120
-    /// The selected card's outline.
-    static let outline: CGFloat = 3
 }
 
 // MARK: - Skeleton

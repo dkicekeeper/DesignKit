@@ -40,6 +40,9 @@ for runtime in runtimes:
 DEVICE_ID="${DEVICE%%|*}"
 echo "Snapshot device: ${DEVICE#*|} · $(xcodebuild -version | awk 'NR == 1') · record=$RECORD"
 
+# Crash reports newer than this file are the run's own (printed below when the run fails).
+STARTED=$(mktemp)
+
 set +e
 TEST_RUNNER_SNAPSHOT_TESTING_RECORD="$RECORD" \
 TEST_RUNNER_SNAPSHOT_ARTIFACTS="$ARTIFACTS" \
@@ -50,12 +53,35 @@ xcodebuild test \
   -derivedDataPath build \
   -parallel-testing-enabled NO \
   CODE_SIGNING_ALLOWED=NO \
-  2>&1 | tee snapshot-test.log | grep -aE "error:|failed|recorded|SNAPSHOT-UNSETTLED|SNAPSHOT-RESIZED|SNAPSHOT-RETRY|Test run with|\*\* TEST (SUCCEEDED|FAILED)"
+  2>&1 | tee snapshot-test.log | grep -aE "error:|failed|[Cc]rash|Fatal error|precondition|recorded|SNAPSHOT-UNSETTLED|SNAPSHOT-RESIZED|SNAPSHOT-RETRY|Test run with|\*\* TEST (SUCCEEDED|FAILED)"
 set -e
 
 if grep -aq "\*\* TEST SUCCEEDED \*\*" snapshot-test.log; then
   exit 0
 fi
+
+# A component that crashes the Gallery (the test host) stops the run: its crash report, the
+# reason and the crashed thread, so the job log names the line.
+find "$HOME/Library/Logs/DiagnosticReports" -name 'DesignKitGallery*' -newer "$STARTED" -type f 2>/dev/null | sort |
+while read -r report; do
+  echo "::group::Crash ${report##*/}"
+  python3 - "$report" <<'PY' || head -c 20000 "$report"
+import json, sys
+header, _, body = open(sys.argv[1]).read().partition("\n")
+report = json.loads(body)
+images = report.get("usedImages", [])
+print("exception:", report.get("exception"))
+print("termination:", report.get("termination"))
+print("asi:", report.get("asi"))
+thread = report["threads"][report.get("faultingThread", 0)]
+for frame in thread.get("frames", [])[:80]:
+    index = frame.get("imageIndex")
+    image = images[index].get("name", "?") if index is not None and index < len(images) else "?"
+    print(f"  {image}  {frame.get('symbol', '?')}")
+PY
+  echo "::endgroup::"
+done
+
 # Recording reports every written image as a failure: nothing to diagnose.
 [ "$RECORD" = never ] || exit 1
 
