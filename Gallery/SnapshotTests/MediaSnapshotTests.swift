@@ -210,16 +210,15 @@ extension ComponentSnapshots {
         /// with light), and the still picture `ParticleCreature.image(…)` gives, answering.
         @Test func particleCreatureWorkAndImage() async {
             await assertComponentSnapshot(
+                // Four 80 pt squares fit the 360 pt snapshot (a wider window leaves the screen).
                 HStack(spacing: AppSpacing.md) {
                     ForEach([0.2, 0.6, 1.0], id: \.self) { progress in
-                        ParticleCreature(mood: .working(progress: progress)).frame(width: 96, height: 96)
+                        ParticleCreature(mood: .working(progress: progress)).frame(width: 80, height: 80)
                     }
-                    if let image = ParticleCreature.image(mood: .answering, side: 96, colorScheme: .light) {
-                        Image(uiImage: image).resizable().frame(width: 96, height: 96)
+                    if let image = ParticleCreature.image(mood: .answering, side: 80, colorScheme: .light) {
+                        Image(uiImage: image).resizable().frame(width: 80, height: 80)
                     }
-                }
-                .padding(AppSpacing.lg),
-                width: 440,
+                },
                 appearances: [.light, .dark]
             )
         }

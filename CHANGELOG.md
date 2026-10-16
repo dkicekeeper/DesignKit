@@ -64,7 +64,9 @@ ParticleCreature(mood: importer.isRunning ? .working(progress: importer.progress
 - Snapshot tests: `particleCreature` draws working too; `particleCreatureWorkAndImage` the
   sphere at three amounts of work and the still picture; the answering references are
   re-recorded. `searchSuggestions` draws its "Clear" as `.dsSearchSuggestions` does, in the
-  accent (it drew a plain button of its own).
+  accent (it drew a plain button of its own). `dateRangePickerSheet` and `optionCardCarousel`
+  (5.2.0) take the standard 360 pt width: wider, their window left the screen and the tests
+  failed on `main`.
 
 ## 5.2.0 - 2026-10-16
 
