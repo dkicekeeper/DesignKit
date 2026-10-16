@@ -84,9 +84,12 @@ FormSection(header: "Payments", style: .glass) { rows }
   `safeAreaBar` on a scroll view inside the page's draws the page's own edge effect down to
   itself; the preview's bar is a `safeAreaInset` now (docs/gotchas.md).
 - Gallery: the `UniversalRow` page lists the rows built on it and what each is for; the
-  `EdgeBackdrop` page has a Colour opacity slider.
+  `EdgeBackdrop` page has a Colour opacity slider and "Compare on a screen": a chat under Ten in a
+  top `safeAreaBar`, full screen, with `EdgeBackdrop` or the system's soft or hard scroll edge
+  effect.
 - Snapshot tests: `GalleryPagesSnapshotTests` draws whole Gallery pages in a phone-sized window
-  (`PickerCarousel`'s, a centred `SnapCardPicker`, `EdgeBackdrop`'s), and
+  (`PickerCarousel`'s, a centred `SnapCardPicker`, `EdgeBackdrop`'s and its comparison screen in
+  each backing), and
   `scripts/snapshot-tests.sh` prints the crash report when the Gallery crashes in a run.
 - CI: the Changelog job refuses dingbats and emoji, which TestFlight's What to Test refuses.
 - docs/migration-5.0.md.

@@ -38,6 +38,18 @@ extension ComponentSnapshots {
         @Test func edgeBackdropPage() async {
             await assertPageSnapshot(NavigationStack { EffectsScreen() }, page: "EdgeBackdrop")
         }
+
+        /// EdgeBackdrop's comparison screen, a thread under Ten in a top safeAreaBar as Tenra's
+        /// chat holds it, with each backing: EdgeBackdrop, the system's soft and hard scroll edge
+        /// effects (5.0.0).
+        @Test func edgeBackdropComparison() async {
+            for backing in EdgeBackdropComparison.Backing.allCases {
+                await assertPageSnapshot(
+                    EdgeBackdropComparison(backing: backing, colorOpacity: .constant(EdgeBackdropMetrics.colorOpacity)),
+                    named: backing.rawValue
+                )
+            }
+        }
     }
 }
 
@@ -75,11 +87,12 @@ private struct CenteredPickerSection: View {
 }
 
 /// Renders `screen` opened on `page` in a 440 × 956 pt window (the iPhone 17 Pro Max the tests
-/// run on) and compares it with `<test>.png`.
+/// run on) and compares it with `<test>.png` (`<test>.<named>.png`).
 @MainActor
 private func assertPageSnapshot<V: View>(
     _ screen: V,
-    page: String,
+    page: String? = nil,
+    named: String? = nil,
     fileID: StaticString = #fileID,
     file: StaticString = #filePath,
     testName: String = #function,
@@ -117,6 +130,7 @@ private func assertPageSnapshot<V: View>(
     assertSnapshot(
         of: image,
         as: .image(precision: 0.98, perceptualPrecision: 0.98),
+        named: named,
         fileID: fileID,
         file: file,
         testName: testName,

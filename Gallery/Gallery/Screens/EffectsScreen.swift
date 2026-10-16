@@ -458,6 +458,7 @@ private struct BorderBeamPage: View {
 private struct EdgeBackdropPage: View {
     @State private var bottom = false
     @State private var colorOpacity = EdgeBackdropMetrics.colorOpacity
+    @State private var isComparing = false
 
     private let rows = ["How much did I spend on cafés?", "Groceries went up 12% this month.", "Your next payment is the internet, tomorrow.",
                         "You put 50 000 ₸ towards the car.", "The savings rate is 18%.", "Taxi: 14 trips, 42 000 ₸.",
@@ -476,6 +477,7 @@ private struct EdgeBackdropPage: View {
                 "colorOpacity: the page's colour at the edge (10% by default, 5.0.0): lower is more see-through, higher reads as a plate. The blur stays the same.",
                 "Hide the system's scroll edge effect on that edge, .scrollEdgeEffectHidden(true, for: edge) (5.0.0): it fades the content out under the bar before the backing blurs it.",
                 "A bar on a scroll view inside another (this preview in the page) is a safeAreaInset: a safeAreaBar there draws the outer scroll view's edge effect down to itself.",
+                "Compare on a screen: a chat under Ten, 120 pt, in a safeAreaBar as an app holds it, with EdgeBackdrop or the system's scroll edge effect (soft, hard). The preview here cannot show the system's effect: its scroll view is inside the page's.",
             ]
         ) {
             ScrollView {
@@ -504,10 +506,113 @@ private struct EdgeBackdropPage: View {
             }
             .frame(height: 340)
             .clipShape(.rect(cornerRadius: AppRadius.lg))
+            .fullScreenCover(isPresented: $isComparing) {
+                EdgeBackdropComparison(colorOpacity: $colorOpacity)
+            }
         } controls: {
             ToggleControl("Bottom edge", isOn: $bottom)
             SliderControl("Colour opacity", value: $colorOpacity, in: 0...1, step: 0.05) { "\(Int(($0 * 100).rounded()))%" }
+            ActionControl("Compare on a screen", systemImage: "rectangle.on.rectangle") { isComparing = true }
         }
+    }
+}
+
+/// EdgeBackdrop next to the system's scroll edge effect, on a screen of its own as Tenra's chat
+/// holds it: a thread under Ten, 120 pt, in a top `safeAreaBar` (5.0.0, the owner asked to
+/// compare). The page's preview cannot show the system's effect: its scroll view is inside the
+/// page's (docs/gotchas.md).
+struct EdgeBackdropComparison: View {
+    enum Backing: String, CaseIterable, Hashable {
+        case edgeBackdrop = "EdgeBackdrop"
+        case soft = "Soft"
+        case hard = "Hard"
+    }
+
+    @State var backing: Backing = .edgeBackdrop
+    @Binding var colorOpacity: Double
+
+    @Environment(\.dismiss) private var dismiss
+
+    private let rows = [
+        "How much did I spend on cafés?", "18 400 ₸ this week: Coffee House four times, a lunch on Friday.",
+        "And groceries?", "Groceries went up 12% this month, mostly the weekend shops.",
+        "When is my next payment?", "The internet, tomorrow: 7 990 ₸ from the card.",
+        "How is the car fund?", "You put 50 000 ₸ towards the car. 62% of the goal is there.",
+        "What about taxis?", "Taxi: 14 trips, 42 000 ₸. Most of them in the evening.",
+        "Am I spending less than last month?", "Yes: spending is below last month by 9%.",
+        "What is my savings rate?", "The savings rate is 18%, two points above September.",
+    ]
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: AppSpacing.md) {
+                ForEach(rows.indices, id: \.self) { index in
+                    let question = index.isMultiple(of: 2)
+                    Text(rows[index])
+                        .font(AppTypography.body)
+                        .foregroundStyle(question ? AppColors.staticWhite : AppColors.Text.primary)
+                        .padding(AppSpacing.md)
+                        .background(question ? AppColors.accent : AppColors.accent.opacity(0.15),
+                                    in: .rect(cornerRadius: AppRadius.lg))
+                        .frame(maxWidth: .infinity, alignment: question ? .trailing : .leading)
+                }
+            }
+            .padding(AppSpacing.lg)
+        }
+        .defaultScrollAnchor(.bottom)
+        .background(AppColors.bgBase)
+        // EdgeBackdrop hides the system's effect (5.0.0); the others are the system's own.
+        .scrollEdgeEffectHidden(backing == .edgeBackdrop, for: .top)
+        .scrollEdgeEffectStyle(backing == .hard ? .hard : .soft, for: .top)
+        .safeAreaBar(edge: .top) {
+            ParticleCreature(mood: .happy)
+                .frame(width: 120, height: 120)
+                .padding(.vertical, AppSpacing.sm)
+                .frame(maxWidth: .infinity)
+                .background {
+                    if backing == .edgeBackdrop {
+                        EdgeBackdrop(edge: .top, colorOpacity: colorOpacity)
+                    }
+                }
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            panel
+        }
+    }
+
+    /// What is compared, the colour's opacity for EdgeBackdrop, and the way back.
+    private var panel: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
+            HStack(spacing: AppSpacing.md) {
+                Picker("Backing", selection: $backing) {
+                    ForEach(Backing.allCases, id: \.self) { backing in
+                        Text(backing.rawValue).tag(backing)
+                    }
+                }
+                .pickerStyle(.segmented)
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(AppTypography.bodyEmphasis)
+                }
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.circle)
+                .accessibilityLabel("Close")
+            }
+            if backing == .edgeBackdrop {
+                SliderControl("Colour opacity", value: $colorOpacity, in: 0...1, step: 0.05) { "\(Int(($0 * 100).rounded()))%" }
+            } else {
+                Text(verbatim: "The system's scroll edge effect, .scrollEdgeEffectStyle(.\(backing.rawValue.lowercased()), for: .top): no colour of its own to set.")
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(AppSpacing.lg)
+        .cardStyle()
+        .padding(.horizontal, AppSpacing.lg)
+        .padding(.bottom, AppSpacing.sm)
     }
 }
 
