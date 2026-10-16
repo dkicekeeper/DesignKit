@@ -9,15 +9,16 @@
 //  with a top lid and a cheek, an arc, a chevron, a heart, a spiral) and, for some moods, a small
 //  mouth (ParticleCreatureFace.swift). The swarm's moods are shapes: listening, it ripples with
 //  the voice; thinking, it gathers into a small core with three rings that spin in their own
-//  planes while the planes turn round the centre, like a gyroscope; answering, it pours into a
-//  bar chart with the face on the tallest bar; `.glyph("₸")`, it draws a sign in a ring like a
-//  coin. The face carries the rest: ^ ^ for happy, > < for a celebration, hearts, slanted lids
+//  planes while the planes turn round the centre, like a gyroscope; answering (5.3.0), a third of
+//  it flows in a tilted ring round the sphere while it talks and waves of light leave its rim
+//  with each phrase (a bar chart until 5.2.0); working (5.3.0), the sphere fills with light from
+//  the bottom up as the work goes; `.glyph("₸")`, it draws a sign in a ring like a coin. The face carries the rest: ^ ^ for happy, > < for a celebration, hearts, slanted lids
 //  for cross, worried and sad, half-closed lids for sleepy, a wink with a tongue, a tear.
 //
 //  Two styles: `.hero`, the full creature with its glow, the links between the nearest
 //  particles and its extras (z's, hearts, sparkles, a question mark); `.compact`, a small
-//  sphere for an avatar or a tab icon, with fewer particles kept inside the sphere and the chart,
-//  coin and burst moods shown as happy.
+//  sphere for an avatar or a tab icon, with fewer particles kept inside the sphere, the coin and
+//  burst moods shown as happy and an answer only talking (no ring, no waves).
 //
 //  Interactive (`isInteractive:`, hero): the eyes follow the finger and squint when it comes
 //  close, the particles move out of its way, a tap scatters them and cheers the creature up,
@@ -58,9 +59,9 @@ import DesignSupport
 /// ```
 ///
 /// Give it a square: the hero looks right from about 160 pt, the compact style from 24 pt.
-/// The hero's sphere takes about 70% of the square; the rest is room for the burst, the chart
-/// and the extras. Decorative: hidden from VoiceOver, say what it is doing in text. A line it
-/// says (`speech:`) is the exception: its words are read like any text.
+/// The hero's sphere takes about 70% of the square; the rest is room for the burst, the answer's
+/// ring and waves, and the extras. Decorative: hidden from VoiceOver, say what it is doing in
+/// text. A line it says (`speech:`) is the exception: its words are read like any text.
 ///
 /// It follows the colour scheme (4.6.1): light on a dark page, in deeper colours (ink) on a light
 /// one; on a dark surface in light mode, set `.environment(\.colorScheme, .dark)` on it.
@@ -73,8 +74,12 @@ public struct ParticleCreature: View {
         case listening
         /// Thinking: a small core inside three gyroscope rings, the eyes look up and aside.
         case thinking
-        /// An answer is ready: the swarm pours into a bar chart.
+        /// Answering (5.3.0): it talks, a third of the swarm flows in a tilted ring round the
+        /// sphere and waves of light leave its rim with each phrase (a bar chart until 5.2.0).
         case answering
+        /// A long piece of work (5.3.0): the sphere fills with light from the bottom up as
+        /// `progress` (0…1) grows, the eyes on the rising light. For an import, a sync.
+        case working(progress: Double)
         /// Pleased: ^ ^ eyes and a smile, the sphere bounces.
         case happy
         /// A goal reached: the swarm bursts out and gathers back, > < eyes and an open mouth.
@@ -125,7 +130,10 @@ public struct ParticleCreature: View {
     @Environment(\.creatureGestureRequest) private var gestureRequest
     @Environment(\.creatureGestureFrame) private var gestureFrame
     @Environment(\.creatureAmbience) private var ambience
+    @Environment(\.creatureFollowsTilt) private var followsTilt
     @State private var engine = ParticleCreatureEngine()
+    /// Whether this creature holds the shared tilt sensor (5.3.0).
+    @State private var holdsTilt = false
     @State private var isTouching = false
     @State private var shownSpeech: CreatureSpeech?
     @State private var shownEmotion: CreatureSpeech.Emotion = .calm
@@ -156,6 +164,36 @@ public struct ParticleCreature: View {
         self.isInteractive = isInteractive
         self.speech = speech
         self.accessory = accessory
+    }
+
+    /// The creature as a still picture (5.3.0), for where a view cannot move or live: a
+    /// widget, a notification's attachment, a share image, an app's launch screen. The still
+    /// frame of `mood`, as Reduce Motion shows it, `side` points square.
+    ///
+    /// ```swift
+    /// let picture = ParticleCreature.image(mood: .happy, side: 120, colorScheme: .dark)
+    /// ```
+    ///
+    /// In a widget the view itself draws the same frame: `ParticleCreature(mood:)` with
+    /// `.designKitMotion(false)`.
+    @MainActor
+    public static func image(
+        mood: Mood = .idle,
+        style: Style = .hero,
+        accessory: CreatureAccessory? = nil,
+        side: CGFloat,
+        colorScheme: ColorScheme = .light,
+        scale: CGFloat = 3
+    ) -> UIImage? {
+        let renderer = ImageRenderer(content:
+            ParticleCreature(mood: mood, style: style, accessory: accessory)
+                .frame(width: side, height: side)
+                .designKitMotion(false)
+                .environment(\.colorScheme, colorScheme)
+        )
+        renderer.scale = scale
+        renderer.isOpaque = false
+        return renderer.uiImage
     }
 
     /// Motion of its own: off under Reduce Motion and `.designKitMotion(false)`.
@@ -189,11 +227,28 @@ public struct ParticleCreature: View {
             }
         }
         .onChange(of: speech, initial: true) { _, line in say(line) }
+        .onChange(of: wantsTilt) { _, wants in holdTilt(wants) }
+        .onAppear { holdTilt(wantsTilt) }
+        .onDisappear { holdTilt(false) }
         .onChange(of: gestureRequest) { _, request in
-            if let request, moves { engine.perform(request.gesture, date: Date()) }
+            guard let request else { return }
+            if moves { engine.perform(request.gesture, date: Date()) }
+            // Not motion: it plays under Reduce Motion too (5.3.0).
+            if request.haptic { HapticManager.play(request.gesture.hapticCue) }
         }
         .task(id: shownSpeech?.id) { await dismissSpeechWhenDone() }
         .task(id: daydreams) { await daydream() }
+    }
+
+    // MARK: Tilt
+
+    /// The eyes follow the phone's tilt (5.3.0): while it moves, in the hero style.
+    private var wantsTilt: Bool { followsTilt && moves && style == .hero }
+
+    private func holdTilt(_ holds: Bool) {
+        guard holds != holdsTilt else { return }
+        holdsTilt = holds
+        if holds { CreatureTilt.shared.start() } else { CreatureTilt.shared.stop() }
     }
 
     // MARK: Speech
@@ -346,7 +401,9 @@ public struct ParticleCreature: View {
         let isRTL = layoutDirection == .rightToLeft
         let ambience = moves ? ambience : .still
         let accessory = accessory
+        let tilt = holdsTilt && time != nil ? CreatureTilt.shared.gaze : nil
         return Canvas { context, size in
+            engine.tilt = tilt
             engine.render(in: &context, size: size, mood: mood, style: style, level: level, time: time,
                           onLight: onLight, still: still, isRTL: isRTL, ambience: ambience, accessory: accessory)
         }
@@ -403,6 +460,8 @@ final class ParticleCreatureEngine {
 
     /// The finger, in the view's coordinates; set by the gesture.
     var pointer: CGPoint?
+    /// The phone's tilt for the eyes (5.3.0, `.creatureFollowsTilt()`), -1…1; set each frame.
+    var tilt: (x: Double, y: Double)?
 
     private var particles: [Particle] = []
     private var builtStyle: ParticleCreature.Style?
@@ -416,6 +475,10 @@ final class ParticleCreatureEngine {
     private var blending = false
     private var glyphText = ""
     private var glyphPoints: [CGPoint] = [.zero]
+    /// Working (5.3.0): the work done that was asked for, and the light shown, which follows it.
+    private var workTarget: Double = 0
+    private var workShown: Double = 0
+    private var workClock: Double = 0
 
     private var fromParts: [CGPoint] = []
     private var fromDepth: [Double] = []
@@ -521,6 +584,11 @@ final class ParticleCreatureEngine {
         if pointer != nil { quietSince = t }
 
         let mapped = Self.map(mood, style: style)
+        if case .working(let progress) = mapped { workTarget = clampValue(progress, 0, 1) }
+        // The light rises to the work done in about a fifth of a second; a still frame shows it.
+        let step = animated ? clampValue((t - workClock) * CreatureWork.follow, 0, 1) : 1
+        workShown += (workTarget - workShown) * step
+        workClock = t
         var forced = false
         if mapped != requested {
             requested = mapped
@@ -541,9 +609,9 @@ final class ParticleCreatureEngine {
         let cy = centerY(geo, t: t, mt: mt)
         let paletteMix = blending ? smoothStep(mt / 0.9) : 1
         let palette = (0..<4).map { fromPalette[$0] + (CreaturePalette.of(pose)[$0] - fromPalette[$0]) * paletteMix }
-        let shellTarget: Double = pose == .answering ? 0 : 1
+        let shellTarget: Double = 1
         let shell = blending ? fromShell + (shellTarget - fromShell) * smoothStep(mt / 0.6) : shellTarget
-        let coreTarget = Self.coreStrength(pose)
+        let coreTarget = coreStrength(pose)
         let core = blending ? fromCore + (coreTarget - fromCore) * paletteMix : coreTarget
         let gaze = animated ? gazeDirection(geo, t: t) : (x: 0, y: 0)
 
@@ -605,6 +673,11 @@ final class ParticleCreatureEngine {
         lastFace = face
         var shownFace = animated ? living(face, geo, t: t, gaze: gaze, level: level) : face
         shownFace = Self.apply(motion, to: shownFace)
+        // Answering (5.3.0): it talks on its own, in phrases; a line being said takes over.
+        if pose == .answering {
+            shownFace.mouth = CreatureMouth(form: .open, y: shownFace.mouth.y, width: CreatureFace.talkWidth,
+                                            open: animated ? CreatureAnswer.mouth(at: t) : CreatureAnswer.stillMouth)
+        }
         // Talking (4.10.0): the mouth opens and shuts while the letters leave; a thought holds
         // the eyes on the words instead.
         if let time, style == .hero {
@@ -872,29 +945,31 @@ final class ParticleCreatureEngine {
             blending = true
         } else {
             fromPalette = CreaturePalette.of(next)
-            fromShell = next == .answering ? 0 : 1
-            fromCore = Self.coreStrength(next)
+            fromShell = 1
+            fromCore = coreStrength(next)
             blending = false
         }
         pose = next
         poseAt = t
     }
 
-    /// How strongly the core burns in a mood (4.9.1): brighter while thinking, dim asleep.
-    private static func coreStrength(_ pose: CreaturePose) -> Double {
+    /// How strongly the core burns in a mood (4.9.1): brighter while thinking, dim asleep; while
+    /// working (5.3.0), from dim to bright with the work done.
+    private func coreStrength(_ pose: CreaturePose) -> Double {
         switch pose {
         case .thinking: CreatureCore.thinking
+        case .working: CreatureWork.coreFloor + (CreatureCore.thinking - CreatureWork.coreFloor) * workTarget
         case .asleep: 0.45
         case .sleepy: 0.7
         default: 1
         }
     }
 
-    /// The compact sphere has no room for the chart, the coin or the burst.
+    /// The compact sphere has no room for the coin or the burst; an answer only talks there.
     private static func map(_ mood: ParticleCreature.Mood, style: ParticleCreature.Style) -> ParticleCreature.Mood {
         guard style == .compact else { return mood }
         switch mood {
-        case .answering, .celebrating, .glyph: return .happy
+        case .celebrating, .glyph: return .happy
         default: return mood
         }
     }
@@ -958,28 +1033,19 @@ final class ParticleCreatureEngine {
         let now = Self.saccade(k)
         let before = Self.saccade(k - 1)
         let s = smoothStep((t - k * period) / 0.14)
-        return (before.x + (now.x - before.x) * s, before.y + (now.y - before.y) * s)
+        let glance = (x: before.x + (now.x - before.x) * s, y: before.y + (now.y - before.y) * s)
+        // The phone's tilt (5.3.0), the glances going on on top of it.
+        if let tilt {
+            return (clampValue(tilt.x + glance.x * CreatureTiltMetrics.glance, -1, 1),
+                    clampValue(tilt.y + glance.y * CreatureTiltMetrics.glance, -1, 1))
+        }
+        return glance
     }
 
     private static func saccade(_ k: Double) -> (x: Double, y: Double) {
         let a = fraction(sin(k * 91.7 + 3.1) * 43758.5453)
         let b = fraction(sin(k * 57.3 + 1.7) * 24634.6345)
         return a < 0.25 ? (0, 0) : ((a - 0.5) * 1.5, (b - 0.5) * 0.9)
-    }
-
-    private struct Bars {
-        let x0: Double
-        let width: Double
-        let gap: Double
-        let base: Double
-        static let values: [Double] = [0.38, 0.58, 0.34, 0.74, 0.5, 0.95]
-    }
-
-    private func bars(_ geo: Geometry) -> Bars {
-        let span = min(geo.width * 0.8, geo.radius * 3.52)
-        let count = Double(Bars.values.count)
-        let width = span / count * 0.62
-        return Bars(x0: geo.cx - span / 2, width: width, gap: (span - count * width) / (count - 1), base: geo.restY + geo.radius * 1.02)
     }
 
     private static let ringRadius: [Double] = [0.66, 0.88, 1.06]
@@ -1017,20 +1083,28 @@ final class ParticleCreatureEngine {
             let z3 = y1 * sin(view) + z2 * cos(view)
             return (CGPoint(x: cx + x2, y: cy + y3), clampValue(0.5 + 0.5 * z3 / (r0 * 1.1), 0, 1))
 
-        case .answering:
-            let g = bars(geo)
-            let count = Bars.values.count
-            let bar = p.index % count
-            let j = p.index / count
-            let perBar = (particles.count + count - 1) / count
-            let columns = 4
-            let rows = (perBar + columns - 1) / columns
-            let left = g.x0 + Double(bar) * (g.width + g.gap)
-            let height = Bars.values[bar] * r0 * 1.9
-            return (CGPoint(
-                x: left + g.width * (Double(j % columns) + 0.5) / Double(columns),
-                y: g.base - height * (Double(j / columns) + 0.5) / Double(rows)
-            ), 0.55 + 0.45 * Bars.values[bar])
+        case .answering where builtStyle == .hero && p.index % CreatureAnswer.ringShare == 0:
+            // A third of the swarm flows in a tilted ring round the sphere (5.3.0), its front
+            // passing under the face, its back behind the sphere.
+            let count = (particles.count + CreatureAnswer.ringShare - 1) / CreatureAnswer.ringShare
+            let k = p.index / CreatureAnswer.ringShare
+            let a = Double(k) / Double(count) * 2 * .pi + t * CreatureAnswer.ringSpeed
+            let rr = r0 * CreatureAnswer.ringRadius * (1 + (p.phase - 0.5) * 0.05)
+            let x = cos(a) * rr
+            let z = sin(a) * rr
+            let y = z * sin(CreatureAnswer.ringTilt) + sin(t * 2 + p.phase * 6) * r0 * 0.012
+            let depth = z * cos(CreatureAnswer.ringTilt) / (rr * 1.1)
+            return (CGPoint(x: cx + x, y: cy + y + r0 * CreatureAnswer.ringDrop), clampValue(0.5 + 0.5 * depth, 0, 1))
+
+        case .working:
+            // The sphere fills with light from the bottom up (5.3.0): below the line the swarm
+            // burns bright and large, above it dim; the line itself shines and ripples.
+            let (point, z) = sphere(p, geo, t: t, mt: mt, cy: cy, level: level)
+            let line = cy + r0 * (1 - 2 * workShown) + sin((point.x - cx) / r0 * 4 + t * 3) * r0 * CreatureWork.ripple
+            let below = smoothStep((point.y - line) / (r0 * CreatureWork.edge) + 0.5)
+            let crest = max(0, 1 - abs(point.y - line) / (r0 * CreatureWork.crest))
+            let lit = CreatureWork.dim + (1 - CreatureWork.dim) * below
+            return (point, clampValue(max(z * lit + CreatureWork.lift * below, crest), 0, 1))
 
         case .glyph:
             let wobble = cos(0.5 * sin(t * 2.2))
@@ -1070,6 +1144,7 @@ final class ParticleCreatureEngine {
         case .asleep: 0.12
         case .sleepy, .sad: 0.15
         case .determined: 0.8
+        case .working: 0.5
         case .confused: 0.25
         case .dizzy: 1.2
         default: 0.35
@@ -1165,15 +1240,10 @@ final class ParticleCreatureEngine {
         return 1 + (s + 1) * m * m * m + s * m * m
     }
 
-    /// Where the face sits: on the sphere, over the chart's tallest bar, or over the coin.
+    /// Where the face sits: on the sphere, or over the coin.
     private func faceAnchor(_ geo: Geometry, cy: Double) -> CGPoint {
         let r0 = geo.radius
         switch pose {
-        case .answering:
-            let g = bars(geo)
-            let last = Bars.values.count - 1
-            let left = g.x0 + Double(last) * (g.width + g.gap)
-            return CGPoint(x: left + g.width / 2, y: g.base - Bars.values[last] * r0 * 1.9 - r0 * 0.15)
         case .glyph:
             return CGPoint(x: geo.cx, y: cy - r0 * 0.55)
         default:
@@ -1191,6 +1261,10 @@ final class ParticleCreatureEngine {
         case .thinking:
             lx = 0.45 + 0.15 * sin(t * 0.9)
             ly = -0.6
+        case .working:
+            // On the light as it rises.
+            lx = 0.12 * sin(t * 0.8)
+            ly = 0.55 - 0.9 * workShown
         case .asleep, .dizzy, .answering, .glyph:
             lx = 0
             ly = 0
@@ -1451,8 +1525,7 @@ final class ParticleCreatureEngine {
                      lineWidth: max(1, 1.5 * geo.scale), onLight: onLight)
         }
 
-        // A hat (4.12.0) on the top of the sphere, moving with it; it goes with the sphere when
-        // the swarm pours into the chart.
+        // A hat (4.12.0) on the top of the sphere, moving with it.
         let pieces = wardrobe(at: t)
         // The avatar's hat is a little smaller, its brim still on the top of the sphere.
         let hatScale = hero ? 1 : CreatureAccessoryMetrics.compactHat
@@ -1599,6 +1672,26 @@ final class ParticleCreatureEngine {
                 let spark = Self.sparkle(at: CGPoint(x: cx + spot.x * shellRadius, y: cy + spot.y * shellRadius), radius: (7 + Double(k)) * s)
                 extras.fill(spark, with: .color(color(onLight ? CreatureInk.sparkle : CreaturePalette.sparkle, 1)))
             }
+        case .answering:
+            // Waves of light leave the rim as it talks (5.3.0): thin lines of light, unlike the
+            // ring's dots, fading and thinning as they spread.
+            if !onLight { extras.blendMode = .plusLighter }
+            let tone = onLight ? deepen(CreaturePalette.answering[0], CreatureInk.depth) : whiten(CreaturePalette.answering[3], 0.3)
+            let width = max(0.8, CreatureAnswer.waveWidth * geo.unit)
+            for k in 0..<CreatureAnswer.waves {
+                let progress = (t / CreatureAnswer.wavePeriod + Double(k) / Double(CreatureAnswer.waves))
+                    .truncatingRemainder(dividingBy: 1)
+                let radius = shellRadius * (1.02 + CreatureAnswer.waveReach * progress)
+                let wave = Path(ellipseIn: CGRect(x: cx - radius, y: cy - radius, width: radius * 2, height: radius * 2))
+                extras.opacity = CreatureAnswer.waveAlpha * pow(1 - progress, 1.6) * min(1, progress * 6)
+                if !onLight {
+                    extras.drawLayer { halo in
+                        halo.addFilter(.blur(radius: width * 2))
+                        halo.stroke(wave, with: .color(color(tone, 0.8)), lineWidth: width * 2.5)
+                    }
+                }
+                extras.stroke(wave, with: .color(color(tone, 1)), lineWidth: width * (1 - 0.5 * progress))
+            }
         case .confused:
             extras.opacity = 0.9
             let mark = extras.resolve(Text(verbatim: "?")
@@ -1719,6 +1812,54 @@ enum CreatureCore {
     static let flare: Double = 0.6
 }
 
+/// Answering (5.3.0): the ring round the sphere, the waves from its rim, the talking mouth.
+enum CreatureAnswer {
+    /// Every third particle flows in the ring.
+    static let ringShare = 3
+    /// The ring's radius (the rim is at 1.2), its tilt (its front under the face), how far below
+    /// the centre it sits, and its speed (radians a second).
+    static let ringRadius: Double = 1.42
+    static let ringTilt: Double = 0.5
+    static let ringDrop: Double = 0.06
+    static let ringSpeed: Double = 0.9
+    /// A wave leaves the rim this often (seconds), three on their way at once, and goes this far
+    /// (rim radii) as it fades; its line's width (particle units) and strength.
+    static let wavePeriod: Double = 1.2
+    static let waves = 3
+    static let waveReach: Double = 0.42
+    static let waveWidth: Double = 1.4
+    static let waveAlpha: Double = 0.6
+    /// Phrases of this length (seconds) with a pause at their end; the syllables' rate.
+    static let phrase: Double = 1.6
+    static let pause: Double = 0.35
+    static let syllables: Double = 11
+    /// The mouth in a still frame.
+    static let stillMouth: Double = 0.5
+
+    /// How far the mouth is open at `t`: syllables in phrases, nearly shut in the pauses.
+    static func mouth(at t: Double) -> Double {
+        let inPhrase = t.truncatingRemainder(dividingBy: phrase) < phrase - pause
+        guard inPhrase else { return 0.15 }
+        return 0.25 + 0.75 * max(0, sin(t * syllables)) * (0.6 + 0.4 * sin(t * 2.3))
+    }
+}
+
+/// Working (5.3.0): the light that fills the sphere with the work done.
+enum CreatureWork {
+    /// How quickly the light follows the progress (a share of the gap a second, times 5).
+    static let follow: Double = 5
+    /// Above the line the swarm keeps this much of its light; below it every particle comes this
+    /// much nearer (brighter and larger).
+    static let dim: Double = 0.25
+    static let lift: Double = 0.5
+    /// The line's soft edge and its shining crest (sphere radii), and its ripple.
+    static let edge: Double = 0.18
+    static let crest: Double = 0.1
+    static let ripple: Double = 0.03
+    /// The core at no work done (it reaches the thinking glow when the work is done).
+    static let coreFloor: Double = 0.75
+}
+
 // MARK: - Geometry
 
 private struct Geometry {
@@ -1756,7 +1897,7 @@ private struct Geometry {
 
 /// The mood on screen: a requested mood, or a short reaction to a touch.
 enum CreaturePose: Equatable {
-    case idle, listening, thinking, answering, glyph, celebrating, happy, surprised, love, proud
+    case idle, listening, thinking, answering, working, glyph, celebrating, happy, surprised, love, proud
     case wink, confused, determined, worried, sad, sleepy, asleep, dizzy
 
     init(_ mood: ParticleCreature.Mood) {
@@ -1765,6 +1906,7 @@ enum CreaturePose: Equatable {
         case .listening: self = .listening
         case .thinking: self = .thinking
         case .answering: self = .answering
+        case .working: self = .working
         case .happy: self = .happy
         case .celebrating: self = .celebrating
         case .surprised: self = .surprised
@@ -1791,6 +1933,7 @@ private enum CreaturePalette {
     static let listening: [RGB] = [[96, 150, 255], [64, 228, 255], [150, 124, 255], [205, 196, 255]]
     static let thinking: [RGB] = [[124, 108, 255], [70, 200, 255], [230, 110, 220], [176, 160, 255]]
     static let answering: [RGB] = [[124, 108, 255], [150, 140, 255], [106, 92, 255], [176, 170, 255]]
+    static let working: [RGB] = [[96, 130, 255], [70, 210, 255], [130, 120, 255], [150, 230, 255]]
     static let happy: [RGB] = [[46, 214, 150], [255, 214, 90], [90, 236, 180], [60, 200, 230]]
     static let coin: [RGB] = [[255, 212, 94], [255, 188, 58], [255, 236, 160], [240, 168, 40]]
     static let worried: [RGB] = [[245, 158, 40], [255, 186, 80], [255, 138, 70], [255, 214, 130]]
@@ -1809,6 +1952,7 @@ private enum CreaturePalette {
         case .listening: listening
         case .thinking: thinking
         case .answering: answering
+        case .working: working
         case .happy, .celebrating: happy
         case .glyph: coin
         case .worried: worried

@@ -149,6 +149,10 @@ private struct ParticleCreaturePage: View {
     @State private var dreams = false
     @State private var accessory = 0
     @State private var doze = 0
+    @State private var work = 0.4
+    @State private var followsTilt = true
+    @State private var haptic = true
+    @State private var still = false
 
     private static let emotions: [(String, CreatureSpeech.Emotion)] = [
         ("From mood", .automatic), ("Calm", .calm), ("Joy", .joy), ("Thought", .thought), ("Whisper", .whisper),
@@ -174,12 +178,18 @@ private struct ParticleCreaturePage: View {
 
     private static let moods: [(String, ParticleCreature.Mood)] = [
         ("Idle", .idle), ("Listening", .listening), ("Thinking", .thinking), ("Answering", .answering),
-        ("Glyph ₸", .glyph("₸")), ("Celebrating", .celebrating), ("Happy", .happy), ("Surprised", .surprised),
+        ("Working", .working(progress: 0)), ("Glyph ₸", .glyph("₸")), ("Celebrating", .celebrating), ("Happy", .happy), ("Surprised", .surprised),
         ("Love", .love), ("Proud", .proud), ("Wink", .wink), ("Confused", .confused),
         ("Determined", .determined), ("Worried", .worried), ("Sad", .sad), ("Sleepy", .sleepy), ("Asleep", .asleep),
     ]
 
     private var style: ParticleCreature.Style { compact ? .compact : .hero }
+
+    /// The chosen mood, Working at the slider's work done.
+    private var currentMood: ParticleCreature.Mood {
+        if case .working = Self.moods[mood].1 { return .working(progress: work) }
+        return Self.moods[mood].1
+    }
 
     /// Words beside the creature need the canvas's width: the creature gets smaller.
     private var side: CGFloat {
@@ -199,12 +209,17 @@ private struct ParticleCreaturePage: View {
     var body: some View {
         ComponentPage(
             name: "ParticleCreature",
-            summary: "A character made of light: a swarm of particles in the shape of a sphere, a rim of light round it and a soft core of its colours inside, with a glowing robot face. Its moods are shapes: a gyroscope while thinking, a chart for an answer, a coin; and faces: ^ ^, > <, hearts, slanted lids, a wink, a tear.",
+            summary: "A character made of light: a swarm of particles in the shape of a sphere, a rim of light round it and a soft core of its colours inside, with a glowing robot face. Its moods are shapes: a gyroscope while thinking, a ring and waves of light while it answers, light filling it while it works, a coin; and faces: ^ ^, > <, hearts, slanted lids, a wink, a tear.",
             since: "4.6.0",
             apps: [.tenra],
             canvas: .tall(minHeight: 340),
             notes: [
-                "Hero from about 160 pt (the sphere takes 70% of the square, the rest is room for the burst, the chart and the extras); compact from 24 pt for an avatar or a tab icon.",
+                "Hero from about 160 pt (the sphere takes 70% of the square, the rest is room for the burst, the ring, the waves and the extras); compact from 24 pt for an avatar or a tab icon.",
+                "Answering (5.3.0): it talks in phrases, a third of the swarm flows in a tilted ring round the sphere and waves of light leave its rim (a bar chart until 5.2.0). The compact style only talks.",
+                "Working (5.3.0): .working(progress:) fills the sphere with light from the bottom up as the work goes, the eyes on the rising light, the core brighter as it fills. For an import, a sync.",
+                "Tilt (5.3.0): .creatureFollowsTilt() turns the hero's eyes to the side the phone dips to when no finger is on it, back to the middle when it rests in a new way. Hero only, off under Reduce Motion; nothing in the Simulator.",
+                "Haptics (5.3.0): .creatureGesture(_:trigger:haptic: true) plays each gesture's haptic with it (a tap, a confirm for a hop, a warning for a shake or a flinch, a selection), under Reduce Motion too.",
+                "A still picture (5.3.0): ParticleCreature.image(mood:style:accessory:side:colorScheme:) gives a UIImage of the still frame for a widget, a notification or a share image.",
                 "Interactive: the eyes follow the finger, a tap scatters the swarm, three quick taps make it dizzy.",
                 "30 fps, positions from the time; one still frame under Reduce Motion. Decorative: say what it is doing in text.",
                 "No glass (4.7.0): the swarm is held by a glow of its colour and a thin rim of light along its outline, brightest where the light falls; the shadow on the ground is soft all round.",
@@ -221,18 +236,21 @@ private struct ParticleCreaturePage: View {
             Group {
                 if state == .loading {
                     ParticleCreatureSkeleton(style: style)
+                } else if still {
+                    StillCreature(mood: currentMood, style: style, accessory: Self.accessories[accessory].1, side: side)
                 } else {
                     ParticleCreature(
-                        mood: Self.moods[mood].1,
+                        mood: currentMood,
                         style: style,
                         level: Self.moods[mood].1 == .listening ? level : nil,
                         isInteractive: interactive,
                         speech: speech,
                         accessory: Self.accessories[accessory].1
                     )
-                    .creatureGesture(Self.gestures[gesture].1, trigger: played)
+                    .creatureGesture(Self.gestures[gesture].1, trigger: played, haptic: haptic)
                     .creatureAmbience(CreatureAmbience(fidgets: fidgets, dozesAfter: Self.dozes[doze].1,
                                                        daydreams: dreams ? Self.pictures.map(\.1) : []))
+                    .creatureFollowsTilt(followsTilt)
                 }
             }
             .frame(width: side, height: side)
@@ -246,6 +264,9 @@ private struct ParticleCreaturePage: View {
             ToggleControl("Interactive", isOn: $interactive)
             SliderControl("Size", value: $size, in: 24...320, step: 4) { "\(Int($0)) pt" }
             SliderControl("Voice level", value: $level, in: 0...1)
+            SliderControl("Work done", value: $work, in: 0...1) { "\(Int(($0 * 100).rounded())) %" }
+            ToggleControl("Follows tilt", isOn: $followsTilt)
+            ToggleControl("Still image", isOn: $still)
             TextControl("Line", text: $line)
             ChoiceControl("Emotion", selection: $emotion, options: Self.emotions.indices.map { (Self.emotions[$0].0, $0) })
             ChoiceControl("Placement", selection: $placement, options: Self.placements.indices.map { (Self.placements[$0].0, $0) })
@@ -255,6 +276,7 @@ private struct ParticleCreaturePage: View {
                                         placement: Self.placements[placement].1, id: said)
             }
             ChoiceControl("Gesture", selection: $gesture, options: Self.gestures.indices.map { (Self.gestures[$0].0, $0) })
+            ToggleControl("Gesture haptic", isOn: $haptic)
             ActionControl("Play gesture") { played += 1 }
             ChoiceControl("Picture", selection: $picture, options: Self.pictures.indices.map { (Self.pictures[$0].0, $0) })
             ActionControl("Think it", systemImage: "cloud") {
@@ -266,6 +288,25 @@ private struct ParticleCreaturePage: View {
             ToggleControl("Daydreams", isOn: $dreams)
             ChoiceControl("Accessory", selection: $accessory, options: Self.accessories.indices.map { (Self.accessories[$0].0, $0) })
             ChoiceControl("Dozes after", selection: $doze, options: Self.dozes.indices.map { (Self.dozes[$0].0, $0) })
+        }
+    }
+}
+
+/// `ParticleCreature.image(…)` drawn as a picture, in the page's colour scheme.
+private struct StillCreature: View {
+    let mood: ParticleCreature.Mood
+    let style: ParticleCreature.Style
+    let accessory: CreatureAccessory?
+    let side: CGFloat
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        if let image = ParticleCreature.image(mood: mood, style: style, accessory: accessory, side: side, colorScheme: colorScheme) {
+            Image(uiImage: image)
+                .resizable()
+                .frame(width: side, height: side)
+                .accessibilityHidden(true)
         }
     }
 }

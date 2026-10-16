@@ -150,7 +150,10 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.md) {
                     SectionHeader("Recent", style: .compact) {
+                        // As `.dsSearchSuggestions` draws it: in the accent (5.2.0).
                         Button("Clear") {}
+                            .buttonStyle(.borderless)
+                            .tint(AppColors.accent)
                     }
                     SearchSuggestionRow.recent("Kapchagay", highlighting: "ka") {}
                     SearchSuggestionRow.recent("pike") {}
@@ -326,8 +329,7 @@ extension ComponentSnapshots {
             let end = calendar.date(from: DateComponents(year: 2025, month: 9, day: 19)) ?? .now
             await assertComponentSnapshot(
                 DateRangePickerSheet(range: start...end) { _ in }
-                    .frame(height: 640),
-                width: 400
+                    .frame(height: 640)
             )
         }
 

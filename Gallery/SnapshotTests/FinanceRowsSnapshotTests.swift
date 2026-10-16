@@ -86,7 +86,6 @@ extension ComponentSnapshots {
                 } settings: { _ in
                     DSButton("Animate", systemImage: "sparkles", appearance: .secondary) {}
                 },
-                width: 400,
                 appearances: [.light, .dark]
             )
         }

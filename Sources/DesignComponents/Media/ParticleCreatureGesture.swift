@@ -10,6 +10,7 @@
 //
 
 import SwiftUI
+import DesignSupport
 
 /// A one-shot movement of `ParticleCreature` (4.10.0). Play it with
 /// `.creatureGesture(_:trigger:)`; the creature goes back to its mood after.
@@ -63,15 +64,21 @@ public enum CreatureGesture: Hashable, Sendable {
 
 public extension View {
     /// Plays `gesture` on the `ParticleCreature` inside this view each time `trigger` changes
-    /// (4.10.0), as `sensoryFeedback(_:trigger:)` does. Nothing plays when the view appears,
+    /// (4.10.0), as `sensoryFeedback(_:trigger:)` does. Nothing moves when the view appears,
     /// under Reduce Motion or with `.designKitMotion(false)`.
+    ///
+    /// `haptic: true` (5.3.0) plays the gesture's haptic with it (`CreatureGesture.hapticCue`: a
+    /// tap for a nod, a wave or a perk, a confirm for a hop, a warning for a shake or a flinch, a
+    /// selection for a shrug or a point); haptics are not motion, so they play under Reduce Motion
+    /// too.
     ///
     /// ```swift
     /// ParticleCreature(mood: .happy, speech: CreatureSpeech("Hi!"))
-    ///     .creatureGesture(.wave, trigger: greetedAt)
+    ///     .creatureGesture(.wave, trigger: greetedAt, haptic: true)
     /// ```
-    func creatureGesture(_ gesture: CreatureGesture, trigger: some Hashable) -> some View {
-        environment(\.creatureGestureRequest, CreatureGestureRequest(gesture: gesture, trigger: AnyHashable(trigger)))
+    func creatureGesture(_ gesture: CreatureGesture, trigger: some Hashable, haptic: Bool = false) -> some View {
+        environment(\.creatureGestureRequest,
+                    CreatureGestureRequest(gesture: gesture, trigger: AnyHashable(trigger), haptic: haptic))
     }
 
     /// Holds `gesture` at `progress` (0…1) in the creature's still frame: a poster, a preview, a
@@ -84,6 +91,19 @@ public extension View {
 struct CreatureGestureRequest: Equatable {
     let gesture: CreatureGesture
     let trigger: AnyHashable
+    var haptic = false
+}
+
+public extension CreatureGesture {
+    /// What the gesture feels like (5.3.0), for `.creatureGesture(_:trigger:haptic: true)`.
+    var hapticCue: HapticCue {
+        switch self {
+        case .nod, .wave, .perk: .tap
+        case .hop: .confirm
+        case .shake, .flinch: .warn
+        case .shrug, .point: .select
+        }
+    }
 }
 
 struct CreatureGestureFrame: Equatable {
