@@ -338,6 +338,7 @@ private struct TooltipPage: View {
             notes: [
                 "Put it in an overlay of its target with .tooltipAnchor(.top) (or .bottom with arrowEdge: .top), so it never moves the layout.",
                 "A target by the edge of the screen takes arrowAlignment: .leading or .trailing (5.5.0): the tail sits by that corner, still over the target's middle, and the bubble runs on to the side with room.",
+                "A hint longer than 280 pt wraps into lines (5.5.0); a value stays on one line.",
                 "Give the target a higher zIndex than its neighbours while the tooltip shows.",
                 "It shows a value already on screen, on a tap, so it has no skeleton.",
             ]
@@ -633,7 +634,7 @@ private struct SpotlightPage: View {
 
         var message: String {
             switch self {
-            case .filter: "Filter by account or period."
+            case .filter: "Filter by account or period. Here too: which transfers count and which accounts the totals take."
             case .balance: "Your balance across every account."
             case .add: "Add an expense or an income here."
             case .insights: "See where the money went."
@@ -653,7 +654,7 @@ private struct SpotlightPage: View {
             notes: [
                 "Mark views with .spotlightAnchor(id); put .spotlight($current, message:) on the screen. Another id moves the cut-out there on a spring; nil lifts it.",
                 "A tap anywhere calls onTap (the next step), or lifts it. VoiceOver reads the message; the escape gesture dismisses it.",
-                "By the edge of the screen the message keeps off it and its tail moves to stay over the view (5.5.0): the filter button in the corner.",
+                "By the edge of the screen the message keeps off it and its tail moves to stay over the view (5.5.0): the filter button in the corner. A long message wraps inside the screen's margins.",
             ]
         ) {
             VStack(spacing: AppSpacing.md) {

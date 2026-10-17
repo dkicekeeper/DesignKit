@@ -135,6 +135,23 @@ extension ComponentSnapshots {
             )
         }
 
+        /// A long hint wraps at the bubble's widest, 280 pt (5.5.0; it ran on in one line).
+        @Test func tooltipWraps() async {
+            await assertComponentSnapshot(
+                RoundedRectangle(cornerRadius: AppRadius.md)
+                    .fill(AppColors.accent)
+                    .frame(width: 44, height: 44)
+                    .overlay(alignment: .top) {
+                        Tooltip("National parks, the border zone and your tracks. Here too: which places to show.")
+                            .tooltipAnchor(.top)
+                    }
+                    // Room above for the wrapped lines, at accessibility sizes too.
+                    .padding(.top, 280)
+                    .frame(maxWidth: .infinity),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
         /// Tooltip tails by a corner (5.5.0): a target at each edge, the tail over its middle,
         /// the bubble running on to the side with room.
         @Test func tooltipArrowAlignments() async {

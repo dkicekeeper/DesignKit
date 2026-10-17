@@ -115,7 +115,8 @@ private struct SpotlightOverlay<ID: Hashable>: View {
 
     /// The message under the cut-out, or over it when the cut-out sits low. Centred on the
     /// cut-out; by the edge of the screen it keeps `margin` off it and its tail moves (5.5.0) to
-    /// stay over the cut-out's middle.
+    /// stay over the cut-out's middle. A long one wraps at the tooltip's widest or the screen's
+    /// width less the margins.
     @ViewBuilder
     private func bubble(_ text: String, hole: CGRect, in size: CGSize) -> some View {
         let below = hole.midY < size.height * 0.6
@@ -124,6 +125,8 @@ private struct SpotlightOverlay<ID: Hashable>: View {
                 .font(AppTypography.bodySmall)
                 .fixedSize(horizontal: false, vertical: true)
         }
+        // Inside the screen's margins, so a long message wraps there.
+        .maxWidth(min(TooltipMetrics.maxWidth, size.width - SpotlightMetrics.margin * 2))
         .arrowShift(Self.arrowShift(hole: hole, width: bubbleWidth, in: size))
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { bubbleWidth = $0 }
         .alignmentGuide(.top) { dimensions in

@@ -19,7 +19,7 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 ## 5.5.0 - 2026-10-17
 
 What Dalada asked for once it took its part of docs/adoption.md: a tooltip that can point at a
-button in a corner, and photos in a group of avatars.
+button in a corner and wraps a long message, and photos in a group of avatars.
 [#82](https://github.com/dkicekeeper/DesignKit/pull/82)
 
 ### Added
@@ -40,6 +40,12 @@ button in a corner, and photos in a group of avatars.
   is about (it pointed at the bubble's middle, beside a button in a corner). Away from the edges
   nothing changes.
 
+### Fixed
+
+- `Tooltip` and `.spotlight`: a long message ran on in one line past the screen's edges (Dalada's
+  map tour). A tooltip now grows to 280 pt and wraps its text there; `.spotlight`'s message wraps
+  inside the screen's margins too. A value or a short hint stays on one line, as before.
+
 ### Migration
 
 - A tooltip over a button by the screen's edge: give it the tail of that side.
@@ -58,7 +64,8 @@ AvatarGroup(participants, size: 32) { person in
 - Gallery: Tooltip's page has a "Tail position" control that moves the target to that edge;
   `.spotlight`'s tour starts at a filter button in the corner; AvatarGroup's page shows photos
   (every other person, through the Gallery's photo loader).
-- Snapshots: `tooltipArrowAlignments`, `spotlightCorner` and `avatarGroupPhotos`.
+- Snapshots: `tooltipArrowAlignments`, `tooltipWraps`, `spotlightCorner` (a long message by a corner) and
+  `avatarGroupPhotos`.
 
 ## 5.4.0 - 2026-10-17
 

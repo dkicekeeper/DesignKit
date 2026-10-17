@@ -1184,7 +1184,9 @@ skeleton: it shows a value already on screen, on a tap. *(5.5.0)* `arrowAlignmen
 by the bubble's `.leading` or `.trailing` corner (12 pt in, past the corner's curve) for a target
 by that edge of the screen: the bubble runs on to the side with room, and a centred overlay
 (`.overlay(alignment: .top)` / `.bottom`) still puts the tail over the target's middle. A tour
-over the real screen is `.spotlight`, which keeps its message off the edges by itself.
+over the real screen is `.spotlight`, which keeps its message off the edges by itself. A hint
+longer than the bubble's widest, 280 pt, wraps into lines (5.5.0; it ran on in one line past the
+screen); a value in one line stays one line.
 
 #### `MessageBanner`
 Transient animated feedback banner.

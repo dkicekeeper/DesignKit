@@ -52,6 +52,8 @@ public struct Tooltip<Content: View>: View {
     let content: Content
     /// How far the tail sits from the middle of a centred one (`arrowShift(_:)`).
     private var shift: CGFloat = 0
+    /// The widest the bubble grows before its text wraps (`maxWidth(_:)`).
+    private var widest: CGFloat = TooltipMetrics.maxWidth
 
     /// - Parameters:
     ///   - arrowEdge: the edge of the bubble the tail sticks out of: `.bottom` for a tooltip
@@ -74,17 +76,21 @@ public struct Tooltip<Content: View>: View {
                 tail(pointsUp: true)
                     .padding(.bottom, -TooltipMetrics.tailOverlap)
             }
-            content
-                .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.Text.primary)
-                .padding(.horizontal, AppSpacing.md)
-                .padding(.vertical, AppSpacing.sm)
-                // A tail by a corner needs the room between it and the corner on both sides.
-                .frame(minWidth: arrowAlignment == .center ? nil : TooltipMetrics.tailInset * 2 + TooltipMetrics.tailWidth)
-                .background(
-                    AppColors.Background.elevation3,
-                    in: RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
-                )
+            // As wide as its content up to `widest`, then the text wraps (5.5.0; it ran on in
+            // one line past the screen's edge).
+            TooltipContentLayout(maxWidth: max(0, widest - AppSpacing.md * 2)) {
+                content
+                    .font(AppTypography.bodySmall)
+                    .foregroundStyle(AppColors.Text.primary)
+            }
+            .padding(.horizontal, AppSpacing.md)
+            .padding(.vertical, AppSpacing.sm)
+            // A tail by a corner needs the room between it and the corner on both sides.
+            .frame(minWidth: arrowAlignment == .center ? nil : TooltipMetrics.tailInset * 2 + TooltipMetrics.tailWidth)
+            .background(
+                AppColors.Background.elevation3,
+                in: RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
+            )
             if arrowEdge == .bottom {
                 tail(pointsUp: false)
                     .padding(.top, -TooltipMetrics.tailOverlap)
@@ -121,6 +127,31 @@ public struct Tooltip<Content: View>: View {
         var tooltip = self
         tooltip.shift = shift
         return tooltip
+    }
+
+    /// The bubble's widest: `.spotlight` keeps it inside the screen's margins.
+    func maxWidth(_ width: CGFloat) -> Tooltip {
+        var tooltip = self
+        tooltip.widest = width
+        return tooltip
+    }
+}
+
+/// Its content at its own width up to `maxWidth`, and wrapped to `maxWidth` past it: a line of
+/// text stays one line, a long one breaks into lines instead of running on. A tooltip is laid out
+/// at its ideal size (`fixedSize`), where a frame's `maxWidth` would not make text wrap.
+private struct TooltipContentLayout: Layout {
+    let maxWidth: CGFloat
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        guard let content = subviews.first else { return .zero }
+        let ideal = content.sizeThatFits(.unspecified)
+        guard ideal.width > maxWidth else { return ideal }
+        return content.sizeThatFits(ProposedViewSize(width: maxWidth, height: nil))
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        subviews.first?.place(at: bounds.origin, proposal: ProposedViewSize(bounds.size))
     }
 }
 
@@ -184,6 +215,8 @@ private struct TooltipTail: Shape {
 }
 
 enum TooltipMetrics {
+    /// The widest bubble (5.5.0): a longer hint wraps.
+    static let maxWidth: CGFloat = 280
     static let tailWidth: CGFloat = 14
     /// From a corner tail to its side of the bubble: past the corner's curve (`AppRadius.md`).
     static let tailInset: CGFloat = AppSpacing.md

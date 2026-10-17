@@ -211,7 +211,7 @@ extension ComponentSnapshots {
         }
 
         /// 5.5.0: a spotlight on a button in the trailing corner: the message keeps off the
-        /// edge and its tail stays over the button.
+        /// edge, wraps inside the screen's margins and its tail stays over the button.
         @Test func spotlightCorner() async {
             await assertComponentSnapshot(
                 VStack(spacing: AppSpacing.md) {
@@ -226,7 +226,9 @@ extension ComponentSnapshots {
                     Color.clear.frame(height: 120)
                 }
                 .padding(AppSpacing.md)
-                .spotlight(.constant(Optional("filter")), message: { _ in "Filter by account or period." }),
+                .spotlight(.constant(Optional("filter")), message: { _ in
+                    "Filter by account or period. Here too: which transfers count and which accounts the totals take."
+                }),
                 appearances: [.light, .dark]
             )
         }
