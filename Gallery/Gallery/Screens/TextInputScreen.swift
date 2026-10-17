@@ -210,6 +210,7 @@ private struct TagInputPage: View {
             name: "TagInput",
             summary: "Free-form tags as removable chips, a field for the next one and matching suggestions.",
             since: "0.7.0",
+            apps: [.dalada],
             canvas: .fill,
             notes: ["Return or a comma adds a tag; duplicates and blanks are dropped. A fixed set of options → ChipPicker."]
         ) {

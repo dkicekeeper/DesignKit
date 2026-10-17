@@ -152,6 +152,7 @@ private struct FlowLayoutPage: View {
             name: "FlowLayout",
             summary: "A layout that wraps its views to new lines like words: tags, badges, chips.",
             since: "0.7.0",
+            apps: [.dalada],
             canvas: .fill,
             notes: ["alignment (2.9.0): each row leading, centred or trailing."]
         ) {

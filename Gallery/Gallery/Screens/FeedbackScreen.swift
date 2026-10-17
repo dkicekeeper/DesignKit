@@ -258,7 +258,7 @@ private struct StatusBannerPage: View {
             name: "StatusBanner",
             summary: "A status message in a pale box of its colour, or inline; an optional action.",
             since: "1.7.0",
-            apps: [.tenra],
+            apps: [.tenra, .dalada],
             canvas: .fill,
             styles: ["standard", "compact"]
         ) {
@@ -462,7 +462,7 @@ private struct StepTrackerPage: View {
             name: "StepTracker",
             summary: "Where a multi-step process is: done, current, upcoming.",
             since: "0.6.0",
-            apps: [.tenra],
+            apps: [.tenra, .dalada],
             canvas: .fill
         ) {
             StepTracker(steps: ["Place", "Details", "Photos", "Publish"], current: current, showsLabels: showsLabels)
@@ -635,7 +635,7 @@ private struct SpotlightPage: View {
             name: ".spotlight",
             summary: "A coach mark: everything dims except a cut-out round one view, with a message beside it. For a new feature or the steps of a tour on the real screen.",
             since: "2.6.0",
-            apps: [.tenra],
+            apps: [.tenra, .dalada],
             canvas: .tall(minHeight: 340),
             notes: [
                 "Mark views with .spotlightAnchor(id); put .spotlight($current, message:) on the screen. Another id moves the cut-out there on a spring; nil lifts it.",
