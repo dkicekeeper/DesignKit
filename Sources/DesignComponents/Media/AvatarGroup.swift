@@ -17,18 +17,24 @@ import DesignSupport
 /// AvatarGroup(names: trip.members.map(\.displayName))
 /// AvatarGroup(names: names, maxVisible: 3, size: 28,
 ///             accessibilityLabel: "Ayan, Dana and 4 more")
+/// AvatarGroup(trip.members, size: 32) { member in            // photos (5.5.0)
+///     AppAvatar(name: member.displayName, path: member.avatarPath, size: 32)
+/// }
 /// ```
 ///
 /// Each avatar gets a ring in the background colour so the overlap reads on any surface, and
 /// an opaque disc under its pale tint (2.0.0) so the avatar under it does not show through.
 public struct AvatarGroup: View {
-    let names: [String?]
-    let maxVisible: Int
+    /// The visible people's avatars, in order.
+    let avatars: [AnyView]
+    let overflow: Int
     let size: CGFloat
     let label: String?
 
+    /// Initials (`Avatar.initials`) for each person.
+    ///
     /// - Parameters:
-    ///   - names: one entry per person (initials come from `Avatar.initials`).
+    ///   - names: one entry per person.
     ///   - maxVisible: avatars shown before the "+N" bubble.
     ///   - accessibilityLabel: what VoiceOver reads for the whole group; hidden when `nil`.
     public init(
@@ -37,23 +43,44 @@ public struct AvatarGroup: View {
         size: CGFloat = 32,
         accessibilityLabel: String? = nil
     ) {
-        self.names = names
-        self.maxVisible = max(1, maxVisible)
+        self.init(names, maxVisible: maxVisible, size: size, accessibilityLabel: accessibilityLabel) { name in
+            Avatar(name: name, size: size)
+        }
+    }
+
+    /// Each person drawn by `avatar` (5.5.0): the app's own view over `Avatar`, which loads the
+    /// person's photo its way (its cache, its signed links) and shows the initials until then.
+    /// The group cuts each one to a circle of `size` and rings it; draw it at `size`.
+    ///
+    /// - Parameters:
+    ///   - people: one entry per person, in the order they overlap (the first on top).
+    ///   - maxVisible: avatars shown before the "+N" bubble; `avatar` runs for these only.
+    ///   - accessibilityLabel: what VoiceOver reads for the whole group; hidden when `nil`.
+    public init<Person, Face: View>(
+        _ people: [Person],
+        maxVisible: Int = 4,
+        size: CGFloat = 32,
+        accessibilityLabel: String? = nil,
+        @ViewBuilder avatar: (Person) -> Face
+    ) {
+        let maxVisible = max(1, maxVisible)
+        self.avatars = people.prefix(maxVisible).map { AnyView(avatar($0)) }
+        self.overflow = max(0, people.count - maxVisible)
         self.size = size
         self.label = accessibilityLabel
     }
 
-    private var visible: ArraySlice<String?> { names.prefix(maxVisible) }
-    private var overflow: Int { max(0, names.count - maxVisible) }
     private var ring: CGFloat { max(1.5, size / 16) }
 
     public var body: some View {
         HStack(spacing: -size / 3) {
-            ForEach(Array(visible.enumerated()), id: \.offset) { index, name in
-                Avatar(name: name, size: size)
+            ForEach(avatars.indices, id: \.self) { index in
+                avatars[index]
+                    .frame(width: size, height: size)
+                    .clipShape(Circle())
                     .background(AppColors.Background.base, in: Circle())
                     .overlay(Circle().stroke(AppColors.Background.base, lineWidth: ring))
-                    .zIndex(Double(visible.count - index))
+                    .zIndex(Double(avatars.count - index))
             }
             if overflow > 0 {
                 Text(verbatim: "+\(overflow)")

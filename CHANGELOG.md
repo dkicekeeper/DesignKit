@@ -16,6 +16,58 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 5.5.0 - 2026-10-17
+
+What Dalada asked for once it took its part of docs/adoption.md: a tooltip that can point at a
+button in a corner and wraps a long message, and photos in a group of avatars.
+[#82](https://github.com/dkicekeeper/DesignKit/pull/82)
+
+### Added
+
+- `Tooltip(arrowAlignment:)` (`TooltipArrowAlignment`: `.leading`, `.center`, `.trailing`): the
+  tail by the bubble's leading or trailing corner, for a target by that edge of the screen. The
+  bubble runs on to the side with room, and a centred overlay with `.tooltipAnchor` still puts
+  the tail over the target's middle. `.center` is the default and draws as before.
+- `AvatarGroup(_:maxVisible:size:accessibilityLabel:avatar:)`: each person drawn by the app's own
+  avatar view, as `PersonRow` takes one, so the group shows their photos (the app loads them its
+  way and shows the initials until then). The group cuts each to a circle of its size and rings
+  it. `AvatarGroup(names:)` stays.
+
+### Changed
+
+- `.spotlight`: by the edge of the screen its message now sits 16 pt off it (a short one sat
+  further in, centred in a 280 pt box) and its tail moves along the bubble to stay over the view it
+  is about (it pointed at the bubble's middle, beside a button in a corner). Its message wraps
+  at 280 pt, the width it was meant to have: a one-line message wider than that (a tour step of
+  about 300 pt) now shows in two lines.
+
+### Fixed
+
+- `Tooltip` and `.spotlight`: a long message ran on in one line past the screen's edges (Dalada's
+  map tour). A tooltip now grows to 280 pt and wraps its text there; `.spotlight`'s message wraps
+  inside the screen's margins too. A value or a short hint stays on one line, as before.
+
+### Migration
+
+- A tooltip over a button by the screen's edge: give it the tail of that side.
+- A group of people with photos: pass the app's avatar view.
+
+```swift
+Tooltip("Map layers", arrowEdge: .top, arrowAlignment: .trailing).tooltipAnchor(.bottom)
+
+AvatarGroup(participants, size: 32) { person in
+    PersonAvatar(name: person.displayName, path: person.avatarPath, size: 32)
+}
+```
+
+### Gallery and tooling
+
+- Gallery: Tooltip's page has a "Tail position" control that moves the target to that edge;
+  `.spotlight`'s tour starts at a filter button in the corner; AvatarGroup's page shows photos
+  (every other person, through the Gallery's photo loader).
+- Snapshots: `tooltipArrowAlignments`, `tooltipWraps`, `spotlightCorner` (a long message by a corner) and
+  `avatarGroupPhotos`.
+
 ## 5.4.0 - 2026-10-17
 
 The soft scroll edge under the navigation bar and the tab bar, kept in an app built with Xcode 27.

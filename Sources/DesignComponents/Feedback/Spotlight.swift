@@ -69,8 +69,8 @@ enum SpotlightMetrics {
     static let dim: Double = 0.55
     /// Room between the cut-out and the message.
     static let gap: CGFloat = AppSpacing.sm
-    /// The message's widest line.
-    static let messageWidth: CGFloat = 280
+    /// Room between the message and the edge of the screen.
+    static let margin: CGFloat = AppSpacing.lg
 }
 
 private struct SpotlightOverlay<ID: Hashable>: View {
@@ -82,6 +82,8 @@ private struct SpotlightOverlay<ID: Hashable>: View {
     let onTap: (() -> Void)?
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// The message's width, for the tail's place once the bubble keeps off the screen's edge.
+    @State private var bubbleWidth: CGFloat = 0
 
     var body: some View {
         GeometryReader { proxy in
@@ -111,7 +113,10 @@ private struct SpotlightOverlay<ID: Hashable>: View {
         if let onTap { onTap() } else { current = nil }
     }
 
-    /// The message under the cut-out, or over it when the cut-out sits low.
+    /// The message under the cut-out, or over it when the cut-out sits low. Centred on the
+    /// cut-out; by the edge of the screen it keeps `margin` off it and its tail moves (5.5.0) to
+    /// stay over the cut-out's middle. A long one wraps at the tooltip's widest or the screen's
+    /// width less the margins.
     @ViewBuilder
     private func bubble(_ text: String, hole: CGRect, in size: CGSize) -> some View {
         let below = hole.midY < size.height * 0.6
@@ -120,17 +125,31 @@ private struct SpotlightOverlay<ID: Hashable>: View {
                 .font(AppTypography.bodySmall)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .frame(maxWidth: SpotlightMetrics.messageWidth)
-        .fixedSize(horizontal: false, vertical: true)
+        // Inside the screen's margins, so a long message wraps there.
+        .maxWidth(min(TooltipMetrics.maxWidth, size.width - SpotlightMetrics.margin * 2))
+        .arrowShift(Self.arrowShift(hole: hole, width: bubbleWidth, in: size))
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { bubbleWidth = $0 }
         .alignmentGuide(.top) { dimensions in
             below ? -(hole.maxY + SpotlightMetrics.gap) : -(hole.minY - SpotlightMetrics.gap - dimensions.height)
         }
         .alignmentGuide(.leading) { dimensions in
-            let x = min(max(hole.midX - dimensions.width / 2, AppSpacing.lg), size.width - dimensions.width - AppSpacing.lg)
-            return -x
+            -Self.bubbleX(hole: hole, width: dimensions.width, in: size)
         }
         .allowsHitTesting(false)
         .transition(.opacity)
+    }
+
+    /// The bubble's leading edge: centred on the cut-out, `margin` off the screen's edges.
+    static func bubbleX(hole: CGRect, width: CGFloat, in size: CGSize) -> CGFloat {
+        min(max(hole.midX - width / 2, SpotlightMetrics.margin), size.width - width - SpotlightMetrics.margin)
+    }
+
+    /// How far the tail moves from the bubble's middle to the cut-out's, short of the corners.
+    static func arrowShift(hole: CGRect, width: CGFloat, in size: CGSize) -> CGFloat {
+        guard width > 0 else { return 0 }
+        let shift = hole.midX - (bubbleX(hole: hole, width: width, in: size) + width / 2)
+        let reach = max(0, width / 2 - TooltipMetrics.tailInset - TooltipMetrics.tailWidth / 2)
+        return min(max(shift, -reach), reach)
     }
 }
 

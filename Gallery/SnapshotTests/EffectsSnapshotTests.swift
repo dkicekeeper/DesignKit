@@ -210,6 +210,29 @@ extension ComponentSnapshots {
             )
         }
 
+        /// 5.5.0: a spotlight on a button in the trailing corner: the message keeps off the
+        /// edge, wraps inside the screen's margins and its tail stays over the button.
+        @Test func spotlightCorner() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.md) {
+                    HStack {
+                        Text(verbatim: "Home").font(AppTypography.h3)
+                        Spacer()
+                        Image(systemName: "line.3.horizontal.decrease")
+                            .frame(width: 44, height: 44)
+                            .background(AppColors.Background.neutral1, in: Circle())
+                            .spotlightAnchor("filter")
+                    }
+                    Color.clear.frame(height: 120)
+                }
+                .padding(AppSpacing.md)
+                .spotlight(.constant(Optional("filter")), message: { _ in
+                    "Filter by account or period. Here too: which transfers count and which accounts the totals take."
+                }),
+                appearances: [.light, .dark]
+            )
+        }
+
         /// VoiceOrbButton (4.14.0): the orb at a fixed level, still, with its stop glyph.
         @Test func voiceOrbButton() async {
             await assertComponentSnapshot(

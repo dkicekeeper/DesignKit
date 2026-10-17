@@ -6,44 +6,39 @@ decision; the app's session decides and does the work in the app. When an app st
 component, CI's `Gallery badges` job asks for the Gallery page's `apps:` to name it
 ([gallery-structure.md](gallery-structure.md)).
 
-Tenra took its part of the list on 2026-10-17
-([Tenra#79](https://github.com/dkicekeeper/Tenra/pull/79)); what is left below is Dalada's, and
-what neither app has a place for yet.
+Both apps took their part of the list in October 2026: Tenra on 2026-10-17
+([Tenra#79](https://github.com/dkicekeeper/Tenra/pull/79)), Dalada the same day (its `main`,
+0919342, TestFlight build 140). What is left is what neither app has a place for yet.
 
 ## Skeleton to content without `.skeletonReveal`
 
-Both apps put `.transition(.skeletonReveal)` on about ten screens where a skeleton gives way to the
-content. These load without it (found in October 2026):
+None known. Tenra's `LinkPaymentsView` and `InsightsView` (its feed's first load) and Dalada's
+achievements, the photos of its catch and check-in forms, close friends, comments and community
+(reviews, threads, a thread's page, the review form) reveal since then.
 
-- **Dalada:** achievements, the catch and check-in forms, close friends, comments, community.
+## Where the list's components went
 
-Tenra's `LinkPaymentsView` and `InsightsView` (its feed's first load) reveal since Tenra#79.
+| Component | Tenra | Dalada |
+|---|---|---|
+| `StatusBanner` | import, saving and backup errors | offline maps: no network, areas that failed to download (a tap retries), mobile data |
+| `Tooltip` | Home's categories on the first launch | the map's buttons on the first open, through `.spotlight` (a `Tooltip`'s tail was always at its centre; 5.5.0 adds `arrowAlignment:`, and `.spotlight`'s tail now stays over a corner button) |
+| `StepTracker` | the CSV import | a new place in three steps |
+| `HeroSymbol` | the import tab, the CSV result | its placeholder screens (`EmptyState { HeroSymbol }`, seven screens) |
+| `OnboardingStepIndicator` | inside DesignKit's onboarding containers | after the first sign-in: consent, then the username |
+| `TypingIndicator` | Ten until the first word of a reply | |
+| `LiveAmountText`, `SpentBudgetText` | the balance after a transaction, a category's budget | |
+| `.sparkleBurst` | money put towards a goal | |
+| `AvatarGroup` | | a trip's members in one row with their names, a tap opens the list (initials; with 5.5.0 its `PersonAvatar` can go in the group's `avatar:` slot for photos) |
+| `TagInput`, `FlowLayout` | | gear tags with suggestions and `maxTags: 10`; the gear filter's chips and a place's badges |
+
+`ChartSelectionBanner`, `ChartZoomControls`, `.chartDrawIn` and `AmountComparisonBar` reach
+Tenra's screens inside DesignKit's charts and `CashFlowCard`.
 
 ## Components no app uses
 
 Some are used inside other DesignKit components (`AmountInput` in `EditableHero`, `VoiceWave` in
 `VoiceOrbButton`): an app gets them there and needs them on their own only for a screen of its
-own.
-
-| Component | Dalada |
-|---|---|
-| `StatusBanner` | offline maps |
-| `Tooltip` | the map's buttons |
-| `StepTracker` | adding a place |
-| `HeroSymbol` | empty screens |
-| `OnboardingStepIndicator` | the introduction |
-| `AvatarGroup` | a trip's members |
-| `TagInput`, `FlowLayout` | gear and place tags |
-
-Tenra uses `StatusBanner` (import, saving and backup errors), `HeroSymbol` (the import tab and
-the CSV result), `StepTracker` (the CSV import), `Tooltip` (Home's categories on the first
-launch), `TypingIndicator` (Ten until the first word of a reply), `LiveAmountText` (the balance
-after a transaction), `SpentBudgetText` (a category's budget) and `.sparkleBurst` (money put
-towards a goal). `ChartSelectionBanner`, `ChartZoomControls`, `.chartDrawIn`,
-`AmountComparisonBar` and `OnboardingStepIndicator` reach its screens inside DesignKit's charts,
-`CashFlowCard` and onboarding containers.
-
-Also unused, without a place proposed yet: `AmountVisibilityToggle` (Tenra hides amounts its own
+own. Unused, without a place proposed yet: `AmountVisibilityToggle` (Tenra hides amounts its own
 way), `AmountDigitDisplay`, `AmountPercentage`, `AnimatedTitleInput` (inside `EditableHero`),
 `.attentionPulse`, `.grain`, `.accentGlow`, `.ripple`, `.dissolve`, `.textReveal`,
 `.scrollReveal`, `.staggeredEntrance`, `.hapticCue`, `ScrambleText`.

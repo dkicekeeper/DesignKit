@@ -340,6 +340,7 @@ private struct CreatureGlyphPage: View {
 private struct AvatarGroupPage: View {
     @State private var count = 6
     @State private var maxVisible = 4
+    @State private var photos = true
     @State private var state: SpecimenState = .content
 
     private let names = ["Aida", "Timur", "Askar", "Dana", "Ernar", "Zhanna", "Marat", "Saule"]
@@ -348,10 +349,24 @@ private struct AvatarGroupPage: View {
         ComponentPage(
             name: "AvatarGroup",
             summary: "Overlapping avatars with “+N” for the rest: the people on a trip.",
-            since: "0.6.0"
+            since: "0.6.0",
+            apps: [.dalada],
+            notes: [
+                "AvatarGroup(names:) draws initials. With photos (5.5.0), AvatarGroup(people) { person in … } takes the app's own avatar view, which loads the photo its way and shows the initials until then; the group cuts it to a circle of its size and rings it.",
+                "Here every other person has a photo, through the Gallery's DesignKitPhotoLoader.",
+            ]
         ) {
             if state == .loading {
                 AvatarGroupSkeleton(count: min(count, maxVisible))
+            } else if photos {
+                AvatarGroup(Array(0..<count), maxVisible: maxVisible) { index in
+                    if index.isMultiple(of: 2) {
+                        let sample = index % GalleryPhoto.samples.count
+                        RemotePhoto(key: GalleryPhotos.key(sample), url: GalleryPhotos.url(sample))
+                    } else {
+                        Avatar(name: names[index], size: 32)
+                    }
+                }
             } else {
                 AvatarGroup(names: Array(names.prefix(count)), maxVisible: maxVisible)
             }
@@ -359,6 +374,7 @@ private struct AvatarGroupPage: View {
             StateControl(state: $state)
             StepperControl("People", value: $count, in: 1...8)
             StepperControl("Visible", value: $maxVisible, in: 1...6)
+            ToggleControl("Photos", isOn: $photos)
         }
     }
 }
@@ -373,7 +389,7 @@ private struct HeroSymbolPage: View {
             name: "HeroSymbol",
             summary: "A large SF Symbol on a disc of its tint: the picture of an onboarding page or a permission primer.",
             since: "0.7.0",
-            apps: [.tenra],
+            apps: [.tenra, .dalada],
             notes: [
                 "The symbol draws itself on as it appears (2.2.0) and is drawn in an SF Symbols 7 gradient of its tint, for depth (2.3.0).",
                 "In an OnboardingPager the symbol lags behind its page as you swipe (2.3.0).",

@@ -34,56 +34,151 @@ import DesignSupport
 ///     .zIndex(isSelected ? 1 : 0)
 /// ```
 ///
+/// A target by the edge of the screen (a button in a corner) takes a tail by the bubble's corner
+/// (5.5.0), so the bubble runs on to the side that has room; `.tooltipAnchor` still puts the tail
+/// over the target's middle:
+///
+/// ```swift
+/// cornerButton
+///     .overlay(alignment: .bottom) {
+///         Tooltip("Map layers", arrowEdge: .top, arrowAlignment: .trailing).tooltipAnchor(.bottom)
+///     }
+/// ```
+///
 /// It shows a value that is already loaded, on a tap, so it has no skeleton.
 public struct Tooltip<Content: View>: View {
     let arrowEdge: VerticalEdge
+    let arrowAlignment: TooltipArrowAlignment
     let content: Content
+    /// How far the tail sits from the middle of a centred one (`arrowShift(_:)`).
+    private var shift: CGFloat = 0
+    /// The widest the bubble grows before its text wraps (`maxWidth(_:)`).
+    private var widest: CGFloat = TooltipMetrics.maxWidth
 
-    /// - Parameter arrowEdge: the edge of the bubble the tail sticks out of: `.bottom` for a
-    ///   tooltip above its target, `.top` for one below it.
-    public init(arrowEdge: VerticalEdge = .bottom, @ViewBuilder content: () -> Content) {
+    /// - Parameters:
+    ///   - arrowEdge: the edge of the bubble the tail sticks out of: `.bottom` for a tooltip
+    ///     above its target, `.top` for one below it.
+    ///   - arrowAlignment: where the tail sits along that edge (5.5.0): in the middle, or by the
+    ///     leading or trailing corner for a target by that edge of the screen.
+    public init(
+        arrowEdge: VerticalEdge = .bottom,
+        arrowAlignment: TooltipArrowAlignment = .center,
+        @ViewBuilder content: () -> Content
+    ) {
         self.arrowEdge = arrowEdge
+        self.arrowAlignment = arrowAlignment
         self.content = content()
     }
 
     public var body: some View {
-        VStack(spacing: 0) {
+        VStack(alignment: arrowAlignment.stackAlignment, spacing: 0) {
             if arrowEdge == .top {
-                tail
-                    .rotationEffect(.degrees(180))
+                tail(pointsUp: true)
                     .padding(.bottom, -TooltipMetrics.tailOverlap)
             }
-            content
-                .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.Text.primary)
-                .padding(.horizontal, AppSpacing.md)
-                .padding(.vertical, AppSpacing.sm)
-                .background(
-                    AppColors.Background.elevation3,
-                    in: RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
-                )
+            // As wide as its content up to `widest`, then the text wraps (5.5.0; it ran on in
+            // one line past the screen's edge).
+            TooltipContentLayout(maxWidth: max(0, widest - AppSpacing.md * 2)) {
+                content
+                    .font(AppTypography.bodySmall)
+                    .foregroundStyle(AppColors.Text.primary)
+            }
+            .padding(.horizontal, AppSpacing.md)
+            .padding(.vertical, AppSpacing.sm)
+            // A tail by a corner needs the room between it and the corner on both sides.
+            .frame(minWidth: arrowAlignment == .center ? nil : TooltipMetrics.tailInset * 2 + TooltipMetrics.tailWidth)
+            .background(
+                AppColors.Background.elevation3,
+                in: RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
+            )
             if arrowEdge == .bottom {
-                tail
+                tail(pointsUp: false)
                     .padding(.top, -TooltipMetrics.tailOverlap)
             }
         }
         .compositingGroup()
         .shadow(color: TooltipMetrics.shadowColor, radius: TooltipMetrics.shadowRadius, y: TooltipMetrics.shadowY)
         .fixedSize()
+        // The middle a centred overlay lines up with the target's is the tail's.
+        .alignmentGuide(HorizontalAlignment.center) { dimensions in
+            switch arrowAlignment {
+            case .leading: TooltipMetrics.tailInset + TooltipMetrics.tailWidth / 2
+            case .center: dimensions.width / 2
+            case .trailing: dimensions.width - TooltipMetrics.tailInset - TooltipMetrics.tailWidth / 2
+            }
+        }
     }
 
-    private var tail: some View {
+    /// The triangle turns on its own, so its place along the edge stays on the side it is set.
+    private func tail(pointsUp: Bool) -> some View {
         TooltipTail()
             .fill(AppColors.Background.elevation3)
             // Its base reaches into the bubble so no seam shows between them.
             .frame(width: TooltipMetrics.tailWidth, height: TooltipMetrics.tailHeight + TooltipMetrics.tailOverlap)
+            .rotationEffect(.degrees(pointsUp ? 180 : 0))
+            .padding(.leading, arrowAlignment == .leading ? TooltipMetrics.tailInset : 0)
+            .padding(.trailing, arrowAlignment == .trailing ? TooltipMetrics.tailInset : 0)
+            .offset(x: shift)
+    }
+
+    /// The tail moved off the middle: `.spotlight` puts it back over a target it had to move the
+    /// bubble away from, by the edge of the screen. Layout stays the centred one's.
+    func arrowShift(_ shift: CGFloat) -> Tooltip {
+        var tooltip = self
+        tooltip.shift = shift
+        return tooltip
+    }
+
+    /// The bubble's widest: `.spotlight` keeps it inside the screen's margins.
+    func maxWidth(_ width: CGFloat) -> Tooltip {
+        var tooltip = self
+        tooltip.widest = width
+        return tooltip
+    }
+}
+
+/// Its content at its own width up to `maxWidth`, and wrapped to `maxWidth` past it: a line of
+/// text stays one line, a long one breaks into lines instead of running on. A tooltip is laid out
+/// at its ideal size (`fixedSize`), where a frame's `maxWidth` would not make text wrap.
+private struct TooltipContentLayout: Layout {
+    let maxWidth: CGFloat
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        guard let content = subviews.first else { return .zero }
+        let ideal = content.sizeThatFits(.unspecified)
+        guard ideal.width > maxWidth else { return ideal }
+        return content.sizeThatFits(ProposedViewSize(width: maxWidth, height: nil))
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        subviews.first?.place(at: bounds.origin, proposal: ProposedViewSize(bounds.size))
+    }
+}
+
+/// Where a `Tooltip`'s tail sits along its edge (5.5.0).
+public enum TooltipArrowAlignment: Hashable, Sendable {
+    /// By the bubble's leading corner: the bubble runs on to the trailing side of its target (a
+    /// button at the screen's leading edge).
+    case leading
+    /// In the middle.
+    case center
+    /// By the bubble's trailing corner: the bubble runs on to the leading side (a button in the
+    /// trailing corner).
+    case trailing
+
+    var stackAlignment: HorizontalAlignment {
+        switch self {
+        case .leading: .leading
+        case .center: .center
+        case .trailing: .trailing
+        }
     }
 }
 
 public extension Tooltip where Content == Text {
     /// A tooltip with a line of text.
-    init(_ text: String, arrowEdge: VerticalEdge = .bottom) {
-        self.init(arrowEdge: arrowEdge) { Text(verbatim: text) }
+    init(_ text: String, arrowEdge: VerticalEdge = .bottom, arrowAlignment: TooltipArrowAlignment = .center) {
+        self.init(arrowEdge: arrowEdge, arrowAlignment: arrowAlignment) { Text(verbatim: text) }
     }
 }
 
@@ -120,7 +215,11 @@ private struct TooltipTail: Shape {
 }
 
 enum TooltipMetrics {
+    /// The widest bubble (5.5.0): a longer hint wraps.
+    static let maxWidth: CGFloat = 280
     static let tailWidth: CGFloat = 14
+    /// From a corner tail to its side of the bubble: past the corner's curve (`AppRadius.md`).
+    static let tailInset: CGFloat = AppSpacing.md
     static let tailHeight: CGFloat = 7
     static let tailOverlap: CGFloat = 1
     static let shadowRadius: CGFloat = 8
