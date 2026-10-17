@@ -2295,8 +2295,13 @@ creature waits inside the screen the tab opens. Decoration and a label: no skele
 `MessageBubble(text, role: .outgoing)`: the person's message on the trailing side in the accent,
 white text; `.incoming` on the leading side in `Background.neutral1`. `AppRadius.xl`, body text,
 selectable, at most the width minus 56 pt on the far side. `failure:` fades the bubble and says
-why under it in red; `onRetry:` adds Retry (`common.retry`). Rich replies are the app's own views.
-`MessageBubbleSkeleton(role:)`.
+why under it in red; `onRetry:` adds Retry (`common.retry`). *(5.2.0)* A failure shakes the bubble
+once, its line rises in under it and the error haptic plays. `.transition(.messageBubble(role))`
+(`MessageBubbleTransition`) brings a new message in: the person's grows from its bottom trailing
+corner (half size, 12 pt lower) with a light spring, a reply comes into focus from its bottom
+leading corner (85%, a 6 pt blur); only a fade under Reduce Motion and `.designKitMotion(false)`.
+Give it to messages that arrive while the chat is open, not to the history it opens with. Rich
+replies are the app's own views. `MessageBubbleSkeleton(role:)`.
 
 #### `SuggestionChips`
 Prompts a person can send with a tap: `SuggestionChips(suggestions, systemImage:, layout:) {

@@ -84,6 +84,7 @@ private struct SparkleBurstPage: View {
             name: ".sparkleBurst",
             summary: "A small ring of sparkles around a control when something is added: a like, a reaction, a favourite. ReactionButton plays it on its own.",
             since: "2.2.0",
+            apps: [.tenra],
             canvas: .tall(minHeight: 160)
         ) {
             ReactionButton(systemImage: "heart", selectedSystemImage: "heart.fill", count: isSelected ? 13 : 12,

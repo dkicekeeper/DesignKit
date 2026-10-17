@@ -73,6 +73,7 @@ Loops go through `AmbientMotionGate`; all of them stop under Reduce Motion and
 |---|---|---|---|
 | `.popIn` | grows from 92 % + fade | fade | a chip, a badge, a toast, a tooltip, `TypingIndicator` |
 | `.riseIn` | rises 12 pt, sharpens from a 4 pt blur + fade | fade | a card, a section, a banner |
+| `.messageBubble(role)` (5.2.0) | the person's message grows from half size at its bottom trailing corner and rises 12 pt (light spring); a reply comes into focus from 85 % and a 6 pt blur at its bottom leading corner | fade | a message that arrives while a chat is open (not the history); a failed one shakes once with the error haptic |
 | `.textReveal` | glyph by glyph: rise, sharpen, fade | whole-text fade | text that arrives: an insight, an answer |
 | `.skeletonReveal` / `SkeletonReveal(isLoading:)` (2.3.0) | comes into focus from an 8 pt blur, 98 % → 100 % + fade, while the skeleton fades out | cross-fade | content replacing its skeleton; `FinanceCard`'s amount |
 | `.blurSlideHero` / `.blurSlideWord` | slide + blur (1.x) | — | a block of text replacing another; streaming words |
