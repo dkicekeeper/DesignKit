@@ -37,8 +37,9 @@ button in a corner and wraps a long message, and photos in a group of avatars.
 
 - `.spotlight`: by the edge of the screen its message now sits 16 pt off it (a short one sat
   further in, centred in a 280 pt box) and its tail moves along the bubble to stay over the view it
-  is about (it pointed at the bubble's middle, beside a button in a corner). Away from the edges
-  nothing changes.
+  is about (it pointed at the bubble's middle, beside a button in a corner). Its message wraps
+  at 280 pt, the width it was meant to have: a one-line message wider than that (a tour step of
+  about 300 pt) now shows in two lines.
 
 ### Fixed
 
