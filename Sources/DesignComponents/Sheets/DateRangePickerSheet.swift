@@ -107,6 +107,7 @@ public struct DateRangePickerSheet: View {
                 }
             }
         }
+        .softScrollEdges()
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
     }

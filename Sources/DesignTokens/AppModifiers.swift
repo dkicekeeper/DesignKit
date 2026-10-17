@@ -185,6 +185,33 @@ public extension View {
     }
 }
 
+// MARK: - Scroll edges
+
+public extension View {
+    /// The soft scroll edge effect, top and bottom, for the scroll views in this hierarchy
+    /// (5.4.0): what iOS 26 draws under the navigation bar, the tab bar and a `safeAreaBar`.
+    /// Built with Xcode 27 the effect as it comes on iOS 27 is hard, an almost opaque plate
+    /// with a line, under the navigation bar too. Put it on every `NavigationStack`, a sheet's
+    /// included: a sheet's stack does not take it from the screen under it (docs/gotchas.md).
+    /// A scroll view that names its own style keeps it (a chat's hard top).
+    ///
+    /// On iOS 26 it sets nothing (the effect as it comes is soft there). Built with Xcode 26
+    /// it sets nothing either: on iOS 27 such a build blurs only the status bar with a soft
+    /// top and leaves the title on sharp content, so the system's own bar stays.
+    @ViewBuilder
+    func softScrollEdges() -> some View {
+        #if compiler(>=6.4) // iOS 27 SDK (Xcode 27); Xcode 26 builds keep the system's edge
+        if #available(iOS 27, *) {
+            scrollEdgeEffectStyle(.soft, for: [.top, .bottom])
+        } else {
+            self
+        }
+        #else
+        self
+        #endif
+    }
+}
+
 /// The chosen option's outline (`selectionOutline`, 5.0.0).
 public enum AppSelection {
     /// 2 pt: `OptionCard` drew 3 pt before 5.0.0, `PickerCarousel` and `IconPicker` 2 pt.

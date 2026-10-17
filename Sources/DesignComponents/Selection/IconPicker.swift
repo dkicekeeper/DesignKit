@@ -87,6 +87,7 @@ public struct IconPicker: View {
                 }
             }
         }
+        .softScrollEdges()
     }
 }
 

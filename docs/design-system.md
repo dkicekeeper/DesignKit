@@ -39,7 +39,7 @@
 
 | Module | Contents |
 |---|---|
-| `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases, `Palette` 3.7.0), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, inline field styles), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
+| `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases, `Palette` 3.7.0), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, `softScrollEdges` 5.4.0, inline field styles), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
 | `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `Icon` (a brand logo is `Icon(source: .brandService(name))`; `BrandLogoView` was removed in 2.0.0), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `RecentSearches` and `SearchMatch` (search suggestions, 3.5.0), `HapticManager`, `HapticCue` (haptics by meaning, 2.3.0), `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitPhotoLoader` (3.1.0), `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
 | `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons") |
 
@@ -317,6 +317,7 @@ The 1.x tokens, still used by the components that have them:
 | `.futureTransactionStyle(isFuture:)` | `.opacity(0.55)` when future | Planned/future transaction rows |
 | `.chartAppear(delay:)` | Scale(0.94→1.0) + opacity entrance from bottom | Outermost chart container, scrollable list cards |
 | `.staggeredEntrance(delay:)` | Scale(0.5→1.0) + opacity pop-in with spring | Facepile icons, overlapping avatar stacks |
+| `.softScrollEdges()` *(5.4.0)* | The soft scroll edge effect, top and bottom, on iOS 27 in an Xcode 27 build; nothing on iOS 26 or in an Xcode 26 build | Every `NavigationStack`, a sheet's included (DesignKit's sheets carry it); a scroll view that names its own style keeps it |
 | `.contentReveal(isReady:delay:)` | Opacity fade-in when ready | Staggered section reveals during initialization |
 | `.borderBeam(isActive:colors:cornerRadius:lineWidth:duration:beams:)` | A comet of light running along the border itself (2.4.0): one speed and length on every side, a bright head (5.2.0: no bloom), a fading tail, a faint spill on the edge; one or two comets. `TimelineView`-driven; ticks only while `isActive == true`. Off under Reduce Motion and `.designKitMotion(false)` | Highlighting cards during transient active states (voice recognition preview, focus, processing). Match `cornerRadius` to the underlying card |
 
@@ -2549,6 +2550,9 @@ Grouping form rows?
 Horizontal scroll?
 └── UniversalCarousel with appropriate preset
 
+A NavigationStack? → .softScrollEdges() on it (5.4.0), a sheet's too: built with Xcode 27 the
+edge under the navigation bar and the tab bar as it comes on iOS 27 is hard (docs/gotchas.md)
+
 A bar over scrolling content? Name its edge style on the scroll view (5.1.0): built with
 Xcode 27 the style as it comes is hard, a plate with a line (docs/gotchas.md)
 ├── Over a chat's thread (a header, Ten) → .safeAreaBar(edge: .top) on the thread, with
@@ -2557,6 +2561,11 @@ Xcode 27 the style as it comes is hard, a plate with a line (docs/gotchas.md)
 └── Anything else (a form's date buttons, picker tabs, a MessageComposer, a toolbar of chips)
     → .scrollEdgeEffectStyle(.soft, for: edge), what iOS 26 draws as it comes; DesignKit's
     own bars (.dateButtonsSafeArea, IconPicker, .heroScrollEdge()) name it themselves
+
+A control that switches the whole screen (Expenses / Income over a list)? → a .safeAreaBar(edge: .top)
+under the navigation bar, with .scrollEdgeEffectStyle(.soft, for: .top): the bar's blur goes on
+under it, so it reads as part of the bar and stays while the list scrolls. A picker that is a
+form's field stays in the form.
 
 Card-style container?
 ├── Rows under an optional title → FormSection(header:, style: .glass) (5.0.0; ListCard in 4.14.0)

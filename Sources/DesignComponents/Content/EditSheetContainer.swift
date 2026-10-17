@@ -87,6 +87,7 @@ public struct EditSheetContainer<Content: View>: View {
                     }
             }
         }
+        .softScrollEdges()
     }
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
