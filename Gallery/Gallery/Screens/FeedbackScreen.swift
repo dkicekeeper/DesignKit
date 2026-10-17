@@ -258,6 +258,7 @@ private struct StatusBannerPage: View {
             name: "StatusBanner",
             summary: "A status message in a pale box of its colour, or inline; an optional action.",
             since: "1.7.0",
+            apps: [.tenra],
             canvas: .fill,
             styles: ["standard", "compact"]
         ) {
@@ -332,6 +333,7 @@ private struct TooltipPage: View {
             name: "Tooltip",
             summary: "A short value or hint in an opaque bubble with a tail pointing at its target: the amount over a tapped bar.",
             since: "2.0.0",
+            apps: [.tenra],
             notes: [
                 "Put it in an overlay of its target with .tooltipAnchor(.top) (or .bottom with arrowEdge: .top), so it never moves the layout.",
                 "Give the target a higher zIndex than its neighbours while the tooltip shows.",
@@ -377,6 +379,7 @@ private struct TypingIndicatorPage: View {
             name: "TypingIndicator",
             summary: "Three dots rising in a wave in a bubble: a reply is on its way, an assistant is thinking.",
             since: "2.2.0",
+            apps: [.tenra],
             canvas: .tall(minHeight: 120),
             notes: [
                 "Insert it with .transition(.popIn) under the last message.",
@@ -459,6 +462,7 @@ private struct StepTrackerPage: View {
             name: "StepTracker",
             summary: "Where a multi-step process is: done, current, upcoming.",
             since: "0.6.0",
+            apps: [.tenra],
             canvas: .fill
         ) {
             StepTracker(steps: ["Place", "Details", "Photos", "Publish"], current: current, showsLabels: showsLabels)

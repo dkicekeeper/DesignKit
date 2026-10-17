@@ -287,7 +287,8 @@ private struct SpentBudgetTextPage: View {
     var body: some View {
         ComponentPage(
             name: "SpentBudgetText",
-            summary: "“Spent / budget” on one line."
+            summary: "“Spent / budget” on one line.",
+            apps: [.tenra]
         ) {
             SpentBudgetText(spent: spent, budget: budget, currency: "KZT")
         } controls: {
@@ -348,6 +349,7 @@ private struct LiveAmountTextPage: View {
             name: "LiveAmountText",
             summary: "A hero amount that arrives and changes visibly: the digits roll up from zero when it first appears, and a change flashes green (up) or red (down) while the digits roll to the new value.",
             since: "2.3.0",
+            apps: [.tenra],
             notes: [
                 "Built on FormattedAmountText, whose digits already roll; no timers. Hidden amounts stay hidden.",
                 "Loading: LiveAmountTextSkeleton (the FormattedAmountText line). With SkeletonReveal the amount comes into focus, then rolls up.",

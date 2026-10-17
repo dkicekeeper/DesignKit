@@ -6,13 +6,18 @@ decision; the app's session decides and does the work in the app. When an app st
 component, CI's `Gallery badges` job asks for the Gallery page's `apps:` to name it
 ([gallery-structure.md](gallery-structure.md)).
 
+Tenra took its part of the list on 2026-10-17
+([Tenra#79](https://github.com/dkicekeeper/Tenra/pull/79)); what is left below is Dalada's, and
+what neither app has a place for yet.
+
 ## Skeleton to content without `.skeletonReveal`
 
 Both apps put `.transition(.skeletonReveal)` on about ten screens where a skeleton gives way to the
 content. These load without it (found in October 2026):
 
-- **Tenra:** `LinkPaymentsView`, `InsightsView` (it fades in with `.contentReveal` instead).
 - **Dalada:** achievements, the catch and check-in forms, close friends, comments, community.
+
+Tenra's `LinkPaymentsView` and `InsightsView` (its feed's first load) reveal since Tenra#79.
 
 ## Components no app uses
 
@@ -20,21 +25,23 @@ Some are used inside other DesignKit components (`AmountInput` in `EditableHero`
 `VoiceOrbButton`): an app gets them there and needs them on their own only for a screen of its
 own.
 
-| Component | Tenra | Dalada |
-|---|---|---|
-| `TypingIndicator` | Ten "types" until the first word of a reply | |
-| `StatusBanner` | import and sync errors | offline maps |
-| `Tooltip` | hints on the first launch | the map's buttons |
-| `StepTracker` | the CSV import's steps | adding a place |
-| `ChartSelectionBanner`, `ChartZoomControls` | the insights' charts | |
-| `AmountComparisonBar`, `SpentBudgetText` | a budget against what was spent | |
-| `LiveAmountText` | the balance after a transaction | |
-| `HeroSymbol` | "Import finished" | empty screens |
-| `OnboardingStepIndicator` | onboarding | the introduction |
-| `.chartDrawIn` | the first appearance of a chart | |
-| `.sparkleBurst` | a contribution to a goal | |
-| `AvatarGroup` | | a trip's members |
-| `TagInput`, `FlowLayout` | | gear and place tags |
+| Component | Dalada |
+|---|---|
+| `StatusBanner` | offline maps |
+| `Tooltip` | the map's buttons |
+| `StepTracker` | adding a place |
+| `HeroSymbol` | empty screens |
+| `OnboardingStepIndicator` | the introduction |
+| `AvatarGroup` | a trip's members |
+| `TagInput`, `FlowLayout` | gear and place tags |
+
+Tenra uses `StatusBanner` (import, saving and backup errors), `HeroSymbol` (the import tab and
+the CSV result), `StepTracker` (the CSV import), `Tooltip` (Home's categories on the first
+launch), `TypingIndicator` (Ten until the first word of a reply), `LiveAmountText` (the balance
+after a transaction), `SpentBudgetText` (a category's budget) and `.sparkleBurst` (money put
+towards a goal). `ChartSelectionBanner`, `ChartZoomControls`, `.chartDrawIn`,
+`AmountComparisonBar` and `OnboardingStepIndicator` reach its screens inside DesignKit's charts,
+`CashFlowCard` and onboarding containers.
 
 Also unused, without a place proposed yet: `AmountVisibilityToggle` (Tenra hides amounts its own
 way), `AmountDigitDisplay`, `AmountPercentage`, `AnimatedTitleInput` (inside `EditableHero`),
@@ -43,26 +50,19 @@ way), `AmountDigitDisplay`, `AmountPercentage`, `AnimatedTitleInput` (inside `Ed
 
 ## Ten (ParticleCreature) in Tenra
 
-What Tenra's code uses of the creature (October 2026): both styles, `CreatureGlyph` (tab,
-toolbar, menu), every accessory, `.creatureAmbience`, touches; the moods `idle`, `thinking`,
-`answering`, `happy`, `celebrating`, `worried`, `sad`, `confused`, `asleep`; the emotions `calm`,
-`joy`, `thought`, `whisper`, `worry`, `dizzy`; the gestures `nod`, `hop`, `wave`, `point`,
-`flinch`, `shrug`. Where the rest could go:
+Since Tenra#79 Tenra's code uses all of the creature: both styles, `CreatureGlyph` (tab, toolbar,
+menu), every accessory, `.creatureAmbience`, touches, every mood, every emotion of its speech and
+every gesture. Where the 5.3.0 additions went:
 
-| Unused | Where |
+| Added | In Tenra |
 |---|---|
-| `.listening` (with `level:`) | while the person dictates to Ten from the field's microphone |
-| `.love` | when the person thanks Ten (a reply mood the assistant does not have yet) |
-| `.proud` | a contribution to a goal, days in a row, a budget kept |
-| `.surprised` | an unusually large expense, an anomaly |
-| `.determined` | a long run of tools, in place of `.thinking` |
-| `.wink` | a tip, a joke |
-| `.glyph("₸")` | an answer about a total, the import |
-| `.sleepy` | late in the evening, with the whisper it already uses |
-| `.working(progress:)` (5.3.0) | the CSV import, a sync |
-| `.shake` | "found nothing" |
-| `.perk` | a new notice from Ten |
-| emotion `.sad` | a line about a loss |
-| `haptic: true` (5.3.0) | the gestures of the chat's reactions |
-| `.creatureFollowsTilt()` (5.3.0) | Ten's home |
-| `ParticleCreature.image` (5.3.0) | a widget, a notification from Ten |
+| `.working(progress:)` | while a statement is read, from the importer's pages |
+| `haptic: true` | the gestures of the chat's reactions |
+| `.creatureFollowsTilt()` | Ten on Home |
+| `ParticleCreature.image` | insight notifications and the weekly digest (Tenra has no widget) |
+
+And the moods the list proposed: `.listening` with the voice level in the voice sheet's title,
+`.proud`, `.surprised`, `.love` and `.wink` for the assistant's new reply moods (a shake for an
+empty answer; `.surprised` also at a spending spike or a large expense), `.glyph` with a money
+card's currency sign, `.determined` after three tools, `.sleepy` late at night, `.perk` at a new
+"Ten writes" card.

@@ -373,6 +373,7 @@ private struct HeroSymbolPage: View {
             name: "HeroSymbol",
             summary: "A large SF Symbol on a disc of its tint: the picture of an onboarding page or a permission primer.",
             since: "0.7.0",
+            apps: [.tenra],
             notes: [
                 "The symbol draws itself on as it appears (2.2.0) and is drawn in an SF Symbols 7 gradient of its tint, for depth (2.3.0).",
                 "In an OnboardingPager the symbol lags behind its page as you swipe (2.3.0).",
