@@ -1173,10 +1173,18 @@ bar
 
 Tooltip("Last month", arrowEdge: .top).tooltipAnchor(.bottom) // below its target
 Tooltip { Text(amount).font(AppTypography.numbers(AppTypography.bodySmall.bold())).foregroundStyle(tint) }
+
+cornerButton.overlay(alignment: .bottom) {                    // a button in the trailing corner
+    Tooltip("Map layers", arrowEdge: .top, arrowAlignment: .trailing).tooltipAnchor(.bottom)
+}
 ```
 
 Opaque so it reads over whatever it covers; in an overlay so it never moves the layout. No
-skeleton: it shows a value already on screen, on a tap.
+skeleton: it shows a value already on screen, on a tap. *(5.5.0)* `arrowAlignment:` puts the tail
+by the bubble's `.leading` or `.trailing` corner (12 pt in, past the corner's curve) for a target
+by that edge of the screen: the bubble runs on to the side with room, and a centred overlay
+(`.overlay(alignment: .top)` / `.bottom`) still puts the tail over the target's middle. A tour
+over the real screen is `.spotlight`, which keeps its message off the edges by itself.
 
 #### `MessageBanner`
 Transient animated feedback banner.
@@ -1577,9 +1585,16 @@ since 2.0.0, an opaque disc under its pale initials, so the avatar behind does n
 ```swift
 AvatarGroup(names: trip.members.map(\.displayName), accessibilityLabel: "Ayan, Dana and 4 more")
 AvatarGroup(names: names, maxVisible: 3, size: 28)
+AvatarGroup(trip.members, size: 32) { member in                // photos (5.5.0)
+    AppAvatar(name: member.displayName, path: member.avatarPath, size: 32)
+}
 ```
 
-Hidden from VoiceOver unless you pass `accessibilityLabel`.
+*(5.5.0)* With photos the group takes the app's own avatar view for each person, as `PersonRow`
+does: a view over `Avatar(name:image:)` that loads the photo its way (its cache, its signed links)
+and shows the initials until then. The group cuts each one to a circle of `size` and rings it;
+`avatar` runs only for the visible ones. Hidden from VoiceOver unless you pass
+`accessibilityLabel`.
 
 #### `ExpandableText` *(0.6.0)*
 Long text clamped to `lineLimit` lines; a More / Less button appears only when it overflows.

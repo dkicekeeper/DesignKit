@@ -62,6 +62,22 @@ extension ComponentSnapshots {
             )
         }
 
+        /// AvatarGroup with photos (5.5.0): the app's own avatar views, photos (the Gallery's
+        /// DesignKitPhotoLoader holds them) and initials mixed, then "+2".
+        @Test func avatarGroupPhotos() async {
+            let names = ["Ayan", "Dana", "Marat", "Aru", "Timur", "Saule"]
+            await assertComponentSnapshot(
+                AvatarGroup(Array(names.indices), size: 40) { index in
+                    if index.isMultiple(of: 2) {
+                        RemotePhoto(key: "gallery-photo-\(index)", url: URL(string: "https://gallery.invalid/photo/\(index).jpg"))
+                    } else {
+                        Avatar(name: names[index], size: 40)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            )
+        }
+
         @Test func activityTimeline() async {
             await assertComponentSnapshot(
                 ActivityTimeline(TimelineSample.events) { event in

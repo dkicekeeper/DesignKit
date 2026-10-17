@@ -135,6 +135,33 @@ extension ComponentSnapshots {
             )
         }
 
+        /// Tooltip tails by a corner (5.5.0): a target at each edge, the tail over its middle,
+        /// the bubble running on to the side with room.
+        @Test func tooltipArrowAlignments() async {
+            await assertComponentSnapshot(
+                HStack {
+                    RoundedRectangle(cornerRadius: AppRadius.md)
+                        .fill(AppColors.accent)
+                        .frame(width: 44, height: 44)
+                        .overlay(alignment: .top) {
+                            Tooltip("Map layers", arrowAlignment: .leading)
+                                .tooltipAnchor(.top)
+                        }
+                    Spacer()
+                    RoundedRectangle(cornerRadius: AppRadius.md)
+                        .fill(AppColors.Text.secondary.opacity(0.25))
+                        .frame(width: 44, height: 44)
+                        .overlay(alignment: .bottom) {
+                            Tooltip("Add a place", arrowEdge: .top, arrowAlignment: .trailing)
+                                .tooltipAnchor(.bottom)
+                        }
+                }
+                .padding(.vertical, AppSpacing.xxxl * 3)
+                .frame(maxWidth: .infinity),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
         /// A permission primer is a PromptSheet since 2.0.0 (PermissionPrimerView before).
         @Test func permissionPrimer() async {
             await assertComponentSnapshot(

@@ -21,14 +21,14 @@ achievements, the photos of its catch and check-in forms, close friends, comment
 | Component | Tenra | Dalada |
 |---|---|---|
 | `StatusBanner` | import, saving and backup errors | offline maps: no network, areas that failed to download (a tap retries), mobile data |
-| `Tooltip` | Home's categories on the first launch | the map's buttons on the first open, through `.spotlight` (a `Tooltip`'s tail is always at its centre, so it cannot point at a corner button) |
+| `Tooltip` | Home's categories on the first launch | the map's buttons on the first open, through `.spotlight` (a `Tooltip`'s tail was always at its centre; 5.5.0 adds `arrowAlignment:`, and `.spotlight`'s tail now stays over a corner button) |
 | `StepTracker` | the CSV import | a new place in three steps |
 | `HeroSymbol` | the import tab, the CSV result | its placeholder screens (`EmptyState { HeroSymbol }`, seven screens) |
 | `OnboardingStepIndicator` | inside DesignKit's onboarding containers | after the first sign-in: consent, then the username |
 | `TypingIndicator` | Ten until the first word of a reply | |
 | `LiveAmountText`, `SpentBudgetText` | the balance after a transaction, a category's budget | |
 | `.sparkleBurst` | money put towards a goal | |
-| `AvatarGroup` | | a trip's members in one row with their names, a tap opens the list (initials only: `AvatarGroup` takes names) |
+| `AvatarGroup` | | a trip's members in one row with their names, a tap opens the list (initials; with 5.5.0 its `PersonAvatar` can go in the group's `avatar:` slot for photos) |
 | `TagInput`, `FlowLayout` | | gear tags with suggestions and `maxTags: 10`; the gear filter's chips and a place's badges |
 
 `ChartSelectionBanner`, `ChartZoomControls`, `.chartDrawIn` and `AmountComparisonBar` reach

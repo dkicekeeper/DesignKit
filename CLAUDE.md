@@ -250,8 +250,9 @@ rather than importing an app type.
   the components no app uses and where they could go. 5.3.0 gave Ten its answering ring and
   waves, `.working(progress:)`, its eyes on the phone's tilt, gesture haptics and a still
   picture. Both apps took their part of the list (Tenra's #79, which uses every mood, emotion and
-  gesture of Ten; Dalada's 0919342). Dalada asked for a `Tooltip` whose tail can sit off centre
-  (to point at a corner button) and photos in `AvatarGroup`: open, for the owner.
+  gesture of Ten; Dalada's 0919342). What Dalada then asked for is 5.5.0: `Tooltip(arrowAlignment:)`
+  for a corner button (and `.spotlight`'s tail over its view by the screen's edge), and
+  `AvatarGroup(_:avatar:)`, a slot for the app's own avatar view with the photo.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.

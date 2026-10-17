@@ -340,6 +340,7 @@ private struct CreatureGlyphPage: View {
 private struct AvatarGroupPage: View {
     @State private var count = 6
     @State private var maxVisible = 4
+    @State private var photos = true
     @State private var state: SpecimenState = .content
 
     private let names = ["Aida", "Timur", "Askar", "Dana", "Ernar", "Zhanna", "Marat", "Saule"]
@@ -349,10 +350,23 @@ private struct AvatarGroupPage: View {
             name: "AvatarGroup",
             summary: "Overlapping avatars with “+N” for the rest: the people on a trip.",
             since: "0.6.0",
-            apps: [.dalada]
+            apps: [.dalada],
+            notes: [
+                "AvatarGroup(names:) draws initials. With photos (5.5.0), AvatarGroup(people) { person in … } takes the app's own avatar view, which loads the photo its way and shows the initials until then; the group cuts it to a circle of its size and rings it.",
+                "Here every other person has a photo, through the Gallery's DesignKitPhotoLoader.",
+            ]
         ) {
             if state == .loading {
                 AvatarGroupSkeleton(count: min(count, maxVisible))
+            } else if photos {
+                AvatarGroup(Array(0..<count), maxVisible: maxVisible) { index in
+                    if index.isMultiple(of: 2) {
+                        let sample = index % GalleryPhoto.samples.count
+                        RemotePhoto(key: GalleryPhotos.key(sample), url: GalleryPhotos.url(sample))
+                    } else {
+                        Avatar(name: names[index], size: 32)
+                    }
+                }
             } else {
                 AvatarGroup(names: Array(names.prefix(count)), maxVisible: maxVisible)
             }
@@ -360,6 +374,7 @@ private struct AvatarGroupPage: View {
             StateControl(state: $state)
             StepperControl("People", value: $count, in: 1...8)
             StepperControl("Visible", value: $maxVisible, in: 1...6)
+            ToggleControl("Photos", isOn: $photos)
         }
     }
 }

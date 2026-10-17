@@ -119,7 +119,7 @@ Insert with a spring: `withAnimation(AppAnimation.bouncy) { isShown = true }`.
 | `.holographic(strength:)` | a holographic foil: rainbow bands slide as the finger moves, a sheen where the light falls | one Metal colour effect, redrawn only while the finger moves | a medal, a premium card; with `.interactiveTilt` |
 | `.transition(.dissolve)` | the view breaks into dust as it is removed, its edge glowing; inserted, the dust gathers | one Metal layer effect, only during the transition | deleting something the person owned |
 | `ScrambleText(_:)` | each character flickers through random ones of its kind and settles, left to right | 30 fps for 0.7 s, then paused | a result just worked out: a total, a code, a score (`ScoreGaugeCard`/`ScoreCard(decodesScore:)`, 2.7.0) |
-| `.spotlightAnchor(_:)` + `.spotlight(_:message:)` | the screen dims except a cut-out round one view, with a `Tooltip` beside it; the cut-out moves on a spring | one shape, animated only when it moves | a new feature, the steps of a tour |
+| `.spotlightAnchor(_:)` + `.spotlight(_:message:)` | the screen dims except a cut-out round one view, with a `Tooltip` beside it (off the screen's edges, its tail over the view, 5.5.0); the cut-out moves on a spring | one shape, animated only when it moves | a new feature, the steps of a tour |
 
 **2.5.0: still light for backgrounds**
 

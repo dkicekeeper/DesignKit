@@ -327,6 +327,7 @@ private struct TooltipPage: View {
     @State private var text = "1 250 000 ₸"
     @State private var below = false
     @State private var amountStyle = true
+    @State private var arrowAlignment: TooltipArrowAlignment = .center
 
     var body: some View {
         ComponentPage(
@@ -336,6 +337,7 @@ private struct TooltipPage: View {
             apps: [.tenra],
             notes: [
                 "Put it in an overlay of its target with .tooltipAnchor(.top) (or .bottom with arrowEdge: .top), so it never moves the layout.",
+                "A target by the edge of the screen takes arrowAlignment: .leading or .trailing (5.5.0): the tail sits by that corner, still over the target's middle, and the bubble runs on to the side with room.",
                 "Give the target a higher zIndex than its neighbours while the tooltip shows.",
                 "It shows a value already on screen, on a tap, so it has no skeleton.",
             ]
@@ -348,24 +350,34 @@ private struct TooltipPage: View {
                         .tooltipAnchor(below ? .bottom : .top)
                 }
                 .padding(.vertical, AppSpacing.xxxl + AppSpacing.lg)
-                .frame(maxWidth: .infinity)
+                // A corner tail is for a target by that edge: the target goes there.
+                .frame(maxWidth: .infinity, alignment: targetAlignment)
         } controls: {
             ChoiceControl("Tail", selection: $below, options: [("Bottom (above the target)", false), ("Top (below the target)", true)])
+            ChoiceControl("Tail position", selection: $arrowAlignment, options: [("Leading", .leading), ("Center", .center), ("Trailing", .trailing)])
             ToggleControl("Amount style", isOn: $amountStyle)
             TextControl("Text", text: $text)
+        }
+    }
+
+    private var targetAlignment: Alignment {
+        switch arrowAlignment {
+        case .leading: .leading
+        case .center: .center
+        case .trailing: .trailing
         }
     }
 
     @ViewBuilder
     private var tooltip: some View {
         if amountStyle {
-            Tooltip(arrowEdge: below ? .top : .bottom) {
+            Tooltip(arrowEdge: below ? .top : .bottom, arrowAlignment: arrowAlignment) {
                 Text(text)
                     .font(AppTypography.numbers(AppTypography.bodySmall.bold()))
                     .foregroundStyle(AppColors.accent)
             }
         } else {
-            Tooltip(text, arrowEdge: below ? .top : .bottom)
+            Tooltip(text, arrowEdge: below ? .top : .bottom, arrowAlignment: arrowAlignment)
         }
     }
 }
@@ -617,10 +629,11 @@ private struct NoticeCardPage: View {
 /// A coach mark: the screen dims except one view (2.6.0).
 private struct SpotlightPage: View {
     private enum Step: Int, CaseIterable {
-        case balance, add, insights
+        case filter, balance, add, insights
 
         var message: String {
             switch self {
+            case .filter: "Filter by account or period."
             case .balance: "Your balance across every account."
             case .add: "Add an expense or an income here."
             case .insights: "See where the money went."
@@ -640,9 +653,17 @@ private struct SpotlightPage: View {
             notes: [
                 "Mark views with .spotlightAnchor(id); put .spotlight($current, message:) on the screen. Another id moves the cut-out there on a spring; nil lifts it.",
                 "A tap anywhere calls onTap (the next step), or lifts it. VoiceOver reads the message; the escape gesture dismisses it.",
+                "By the edge of the screen the message keeps off it and its tail moves to stay over the view (5.5.0): the filter button in the corner.",
             ]
         ) {
             VStack(spacing: AppSpacing.md) {
+                HStack {
+                    Text(verbatim: "Home")
+                        .font(AppTypography.h3)
+                    Spacer()
+                    DSButton("Filter", systemImage: "line.3.horizontal.decrease", iconPlacement: .only, appearance: .secondary) {}
+                        .spotlightAnchor(Step.filter)
+                }
                 BalanceCard(iconSource: .sfSymbol("creditcard.fill"), title: "Kaspi Gold", amount: 1_250_000, currency: "KZT")
                     .spotlightAnchor(Step.balance)
                 HStack(spacing: AppSpacing.md) {
@@ -658,7 +679,7 @@ private struct SpotlightPage: View {
             }
         } controls: {
             ActionControl(step == nil ? "Start the tour" : "End the tour", systemImage: "lightbulb") {
-                step = step == nil ? .balance : nil
+                step = step == nil ? .filter : nil
             }
         }
     }
