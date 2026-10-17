@@ -110,6 +110,7 @@ public struct ShareCardSheet<Model, Card: View>: View {
             }
             .onChange(of: format) { _, _ in render() }
         }
+        .softScrollEdges()
     }
 
     @ViewBuilder

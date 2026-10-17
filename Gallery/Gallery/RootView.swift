@@ -104,6 +104,7 @@ struct RootView: View {
             }
             .background { ComponentIndexReader(index: $componentIndex) }
         }
+        .softScrollEdges()
         .environment(\.componentIndex, componentIndex)
         .tint(AppColors.accent)
         // Tokens are static reads: a new identity re-renders every screen with the new accent.

@@ -110,6 +110,7 @@ public struct PhotoViewer<Item: Identifiable, Photo: View, Caption: View, Action
                 }
             }
         }
+        .softScrollEdges()
         .preferredColorScheme(.dark)
     }
 

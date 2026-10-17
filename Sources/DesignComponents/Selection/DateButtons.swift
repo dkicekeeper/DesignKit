@@ -157,6 +157,7 @@ private struct DateButtonsDatePickerSheet: View {
                 }
             }
         }
+        .softScrollEdges()
         .presentationDetents([.medium])
         .presentationDragIndicator(.visible)
     }

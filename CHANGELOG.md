@@ -16,6 +16,46 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 5.4.0 - 2026-10-17
+
+The soft scroll edge under the navigation bar and the tab bar, kept in an app built with Xcode 27.
+[#81](https://github.com/dkicekeeper/DesignKit/pull/81)
+
+### Added
+
+- `.softScrollEdges()`: names the soft scroll edge effect, top and bottom, for the scroll views
+  under it. Built with Xcode 27 the effect as it comes on iOS 27 is hard, an almost opaque plate
+  with a line, under the navigation bar too, on every screen and sheet; this keeps what iOS 26
+  draws. On iOS 26, and in an Xcode 26 build, it sets nothing. A scroll view that names its own
+  style keeps it.
+
+### Changed
+
+- `EditSheetContainer`, `DateRangePickerSheet`, `ShareCardSheet`, `IconPicker`, `PhotoViewer`
+  and the `.dateButtonsSafeArea` date sheet put `.softScrollEdges()` on their own
+  `NavigationStack`. Built with Xcode 26 nothing changes, and the snapshots are the same.
+
+### Migration
+
+- Put `.softScrollEdges()` on each of the app's `NavigationStack`s, every sheet's and full screen
+  cover's included: on the app's root it is reported not to reach a sheet's stack. A bar the
+  owner chose hard keeps its `.scrollEdgeEffectStyle(.hard, for:)` on its scroll view.
+
+```swift
+NavigationStack {
+    List { … }
+}
+.softScrollEdges()
+```
+
+### Gallery and tooling
+
+- Gallery: the root `NavigationStack` puts `.softScrollEdges()` on, for the day CI builds it with
+  Xcode 27.
+- docs/gotchas.md: the hard edge under the navigation bar itself, and why an Xcode 26 build names
+  nothing. docs/design-system.md: `.softScrollEdges()` on every `NavigationStack`; a control that
+  switches the whole screen goes in a `safeAreaBar` under the navigation bar.
+
 ## 5.3.0 - 2026-10-16
 
 Ten answers in light and works in light: a ring round the sphere and waves from its rim while it
