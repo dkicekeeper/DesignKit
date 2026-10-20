@@ -10,6 +10,7 @@
 
 import SwiftUI
 import DesignTokens
+import DesignSupport
 
 /// A chevron on each side of `content`, stepping `index` through `count` pages.
 ///

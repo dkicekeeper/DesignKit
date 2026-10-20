@@ -11,6 +11,7 @@
 import SwiftUI
 import UIKit
 import DesignTokens
+import DesignSupport
 
 public enum PhotoTileMetrics {
     /// The side of a tile in a row of photos.
