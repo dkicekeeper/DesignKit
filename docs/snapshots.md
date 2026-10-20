@@ -18,7 +18,7 @@ appearances it lists:
 |---|---|
 | `FoundationsSnapshotTests` | typography scale, `AppTypography.numbers` (proportional since 3.4.0) next to tabular figures, primary / secondary buttons (enabled, disabled), the `.dsButton` matrix, `.fadeTruncation()`, `cardStyle`, filter chips, Dalada's accent through `DesignKitTheme.accent`, `AppColors.Palette` as markers (3.7.0) |
 | `RowsSnapshotTests` | `UniversalRow` and its accessories (settings rows, choice rows, details, a colour row, sliders; a settings card of form rows, `settingsCard`, 6.1.0; a card and a `List` of every kind, `universalRowAccessories`, `universalRowList`, 7.0.0), `SectionHeader` (with an action, 1.15.0), `SelectionIndicator`, `SectionHeader(style: .card)` (a day's header), `ItemRow` in both styles with `MetaLine` (3.6.0) |
-| `FormsSnapshotTests` | `EditableHero` (amount, no currency chip), `FormSection`, `DatePickerRow`, `MenuPickerRow`, `SectionHeader(style: .list)`, `HeroSection`; 3.0.0: `StepperRow`, `ToggleSettingsRow` and `ActionSettingsRow` without icons, `FormTextField` `.row` / `.rowMultiline`, `NavigationPickerRow` (in a `NavigationStack`, light and dark; `style: .list` in a `List`, 4.14.0) |
+| `FormsSnapshotTests` | `EditableHero` (amount, no currency chip), `FormSection` with date and menu rows, `SectionHeader(style: .list)`, `HeroSection`; 3.0.0: stepper, toggle and action rows without icons, `FormTextField` `.row` / `.rowMultiline`, a picker row (in a `NavigationStack`, light and dark; `config: .settings` in a `List`, 4.14.0); all of them `UniversalRow` with an accessory since 7.0.0 |
 | `IconsSnapshotTests` | `Icon` (category, circle, rounded square, glass hero, placeholder, brand fallback, a brand logo), `PackedCircleIcons` (glossy symbols; `.flat`; glossy logos with an overflow marble in a `FinanceCard`, from the Gallery's invented brands, 2.9.0; 3.3.0: `.orbit`, and since 4.4.0 `.shelf`, with symbols and with logos in a `FinanceCard`; the shelf wide with four logos, `packedShelfWide`; 36 pt tiles and a "+N" for what does not fit since 4.5.1; whole 48 pt tiles, every style 160 pt wide by default, and a 9-million amount beside the shelf in a `FinanceCard` since 4.15.0, `packedShelfBesideLongAmount`) |
 | `CardsSnapshotTests` | `FinanceCard`, `RedactableAmount`, `EmptyCard`, `InsightsStatCard`, `AmountRow` (an insight's item), `UniversalCarousel`, `UniversalFilterButton`, `FormSection(style: .glass)` with and without a title (`listCards`: `ListCard`'s 4.14.0 references, the same pixels in 5.0.0) |
 | `FeedbackSnapshotTests` | `StatusBanner` (5 statuses, compact, with an action), `EmptyState` (3 styles; with a mascot for artwork, 4.13.0), `MessageBanner`, `InlineStatusText`, `RecommendationBox`, `StepTracker`, `OnboardingStepIndicator`, `Tooltip` (2.0.0), `PromptSheet` as a permission primer, `OnboardingPage`, `ImportProgressSheet`, `TypingIndicator` (2.2.0, still), `PendingItemCard` waiting and failed (3.6.0), `LoadMoreFooter` failed, with and without a reason (4.1.0), `NoticeCard` full and text only (4.14.0); 5.5.0: `Tooltip` tails by a corner, a long hint wrapped |
@@ -176,8 +176,8 @@ extension ComponentSnapshots.Display {
   `CalendarRange(today:calendar:)` in `monthCalendar()` and the chart points without dates.
 - No system compact date picker showing a date: even with a fixed date its label took the short
   style ("6/17/26") in some runs and the medium one ("Jun 17, 2026") in others, on the same
-  image, simulator and Xcode (October 2026). `formSection()` shows `DatePickerRow` with a time
-  (`displayedComponents: .hourAndMinute`), which has one style.
+  image, simulator and Xcode (October 2026). `formSection()` shows a date row with a time
+  (`.date(_, components: .hourAndMinute)`), which has one style.
 - Turn off entrance animations where the component has a switch (`animatesOnAppear: false`).
 - Texts are passed in. Keys from the host bundle would render as raw keys.
 - Then run CI with `record_snapshots: missing`.

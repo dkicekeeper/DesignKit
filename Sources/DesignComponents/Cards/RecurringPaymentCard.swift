@@ -91,7 +91,7 @@ public struct RecurringPaymentCard: View {
 
             // Status indicator
             if let status {
-                StatusIndicatorBadge(status: status, font: AppTypography.h4)
+                StatusIndicatorBadge(status: status)
             }
         }
         .padding(AppSpacing.lg)
