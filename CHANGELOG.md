@@ -29,7 +29,7 @@ Tenra's background screen after a look on a device: the carousel's chosen card l
 
 ### Gallery and tooling
 
-- The carousel's snapshot references are recorded again without the check.
+- The Gallery's Selection page describes the carousel without the check.
 
 ## 5.5.0 - 2026-10-17
 
