@@ -1,49 +1,14 @@
 //
-//  ColorPickerRow.swift
-//  Tenra
+//  ColorSwatch.swift
+//  DesignKit
 //
-//  Reusable color picker with preset palette
-//  Used for category customization
+//  A palette's swatch for `UniversalRow(accessory: .colors)` (ColorPickerRow's until 7.0.0),
+//  and the placeholder of that row.
 //
 
 import SwiftUI
 import DesignTokens
 import DesignSupport
-
-/// Color picker row with preset palette and custom color option
-/// Shows horizontal scrollable color swatches
-@available(*, deprecated, message: "Use UniversalRow(_:accessory: .colors(_:palette:)) (6.2.0).")
-public struct ColorPickerRow: View {
-    @Binding var selectedColorHex: String
-    let title: String
-    let palette: [String]
-
-    public init(
-        selectedColorHex: Binding<String>,
-        title: String = String(localized: "common.color"),
-        palette: [String] = CategoryColors.pickerPalette
-    ) {
-        self._selectedColorHex = selectedColorHex
-        self.title = title
-        self.palette = palette
-    }
-
-    public var body: some View {
-        // No padding of its own, as before 6.2.0: the container placed it.
-        UniversalRow(title, config: ColorPickerRowMetrics.unpadded, accessory: .colors($selectedColorHex, palette: palette))
-    }
-}
-
-enum ColorPickerRowMetrics {
-    /// The deprecated row's padding: none, its container placed it.
-    static let unpadded = RowConfiguration(
-        spacing: AppSpacing.md,
-        verticalPadding: 0,
-        horizontalPadding: 0,
-        backgroundColor: .clear,
-        cornerRadius: 0
-    )
-}
 
 // MARK: - Color Swatch
 
@@ -101,15 +66,11 @@ private func colorFromHex(_ hex: String) -> Color {
 
 // MARK: - Skeleton
 
-/// Placeholder of a `ColorPickerRow`: the title, then a row of round swatches.
-public struct ColorPickerRowSkeleton: View {
+/// Placeholder of a colour row (`accessory: .colors`): the title, then a row of round swatches.
+struct RowColorsSkeleton: View {
     let swatches: Int
 
-    public init(swatches: Int = 6) {
-        self.swatches = max(1, swatches)
-    }
-
-    public var body: some View {
+    var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             SkeletonText(AppTypography.bodyEmphasis, width: 100)
             HStack(spacing: AppSpacing.sm) {

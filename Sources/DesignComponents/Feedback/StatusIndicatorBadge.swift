@@ -58,8 +58,8 @@ public enum EntityStatus {
 /// Use inside a row, card, or chip where you need a compact visual status signal.
 ///
 /// ```swift
-/// StatusIndicatorBadge(status: .active, font: AppTypography.h4)
-/// StatusIndicatorBadge(status: .paused, iconSize: AppIconSize.md)
+/// StatusIndicatorBadge(status: .active)
+/// StatusIndicatorBadge(status: .paused, size: AppIconSize.lg)
 /// ```
 public struct StatusIndicatorBadge: View {
     let status: EntityStatus
@@ -71,12 +71,6 @@ public struct StatusIndicatorBadge: View {
     public init(status: EntityStatus, size: CGFloat = AppIconSize.md) {
         self.status = status
         self.size = size
-    }
-
-    /// The symbol at the size of a text style (before 6.2.0).
-    @available(*, deprecated, message: "Use init(status:size:) with an AppIconSize (6.2.0).")
-    public init(status: EntityStatus, font: Font) {
-        self.init(status: status, size: AppIconSize.matching(font))
     }
 
     public var body: some View {
@@ -99,30 +93,11 @@ public struct StatusIndicatorBadgeSkeleton: View {
         self.size = size
     }
 
-    /// A circle the size of a text style's symbol (before 6.2.0).
-    @available(*, deprecated, message: "Use init(size:) with an AppIconSize (6.2.0).")
-    public init(font: Font) {
-        self.init(size: AppIconSize.matching(font))
-    }
-
     public var body: some View {
         Circle()
             .fill(Skeleton.fill)
             .frame(width: size, height: size)
             .shimmer()
             .skeletonLoadingLabel()
-    }
-}
-
-extension AppIconSize {
-    /// The glyph size of a symbol set in `font` before 6.2.0, for the inits that took a font:
-    /// the nearest size of the scale to the text style's, `md` for any other font.
-    static func matching(_ font: Font) -> CGFloat {
-        let sizes: [(Font, CGFloat)] = [
-            (AppTypography.h1, xl), (AppTypography.h2, xl), (AppTypography.h3, lg), (AppTypography.h4, md),
-            (AppTypography.bodyEmphasis, md), (AppTypography.body, md), (AppTypography.bodySmall, sm),
-            (AppTypography.caption, xs), (AppTypography.caption2, xs),
-        ]
-        return sizes.first { $0.0 == font }?.1 ?? md
     }
 }

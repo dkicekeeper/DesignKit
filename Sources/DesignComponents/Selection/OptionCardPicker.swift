@@ -27,7 +27,7 @@ import DesignSupport
 /// } settings: { background in
 ///     if background == .photo {
 ///         FormSection {
-///             PhotosPicker(…) { ActionRowLabel("Choose a photo", systemImage: "photo.on.rectangle") }
+///             PhotosPicker(…) { UniversalRow("Choose a photo", icon: "photo.on.rectangle", titleColor: AppColors.accent) }
 ///         }
 ///     }
 /// }
@@ -57,8 +57,8 @@ public struct OptionCardPicker<Option: Hashable, Artwork: View>: View {
     /// Options with settings of their own (5.2.0), shown under the carousel for the chosen option.
     ///
     /// - Parameter settings: What the app sets for the chosen option, in DesignKit's form rows
-    ///   (a `FormSection` of `ActionRowLabel`, `ToggleSettingsRow`, `SliderRow`,
-    ///   `ActionSettingsRow`); empty for one with nothing to set.
+    ///   (a `FormSection` of `UniversalRow`s: a photo picker's label, `.toggle`, `.slider`, a
+    ///   destructive `.action`); empty for one with nothing to set.
     public init<Settings: View>(
         _ options: [Option],
         selection: Binding<Option>,

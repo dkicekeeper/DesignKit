@@ -121,7 +121,7 @@ public struct CategoryColors {
         )
     }
 
-    /// The colours a user can pick for a category (`ColorPickerRow`'s default), as the
+    /// The colours a user can pick for a category (`UniversalRow(accessory: .colors)`'s default), as the
     /// lowercase `#rrggbb` strings apps store: the 14 palette colours first, in palette order,
     /// so every fallback colour can also be chosen explicitly, then 16 deeper and neutral shades.
     public nonisolated static let pickerPalette: [String] = (hashPaletteRGB + pickerExtraRGB).map { rgb in
