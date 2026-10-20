@@ -41,6 +41,12 @@ Tenra's background screen). [docs/migration-6.0.md](docs/migration-6.0.md).
 - `OptionCard` and `OptionCardSkeleton`, the list's card; no app used them.
 - `OptionCardCarouselSkeleton`, renamed `OptionCardPickerSkeleton`.
 
+### Fixed
+
+- `SnapCardPicker(style: .centered(width:))`: once the row is measured it puts the selection back
+  in the middle. A first position taken before the row had its margins could be lost when the
+  cards overflow the row, and the carousel opened on its first card (seen with 180 pt previews).
+
 ### Migration
 
 - Drop `style: .carousel` from `OptionCardPicker`; a picker in `.list` becomes the carousel.
