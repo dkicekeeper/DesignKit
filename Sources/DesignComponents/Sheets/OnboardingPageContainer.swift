@@ -51,7 +51,7 @@ public struct OnboardingPageContainer<Content: View>: View {
                 if let onSkip {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button(action: onSkip) {
-                            // A system bar's item: iOS draws its symbol (6.2.0, outside the Icon rule).
+                            // A system bar's item: iOS draws its symbol (7.0.0, outside the Icon rule).
                             Image(systemName: "xmark")
                         }
                         .accessibilityLabel(String(localized: "onboarding.cta.skip"))

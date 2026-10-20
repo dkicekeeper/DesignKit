@@ -51,7 +51,7 @@ public struct CurrencyPickerMenu: View {
                         Text(verbatim: "\(currency.code) \(currency.symbol)")
                         Spacer()
                         if selection == currency.code {
-                            // A system menu's item: iOS draws its symbol (6.2.0, outside the Icon rule).
+                            // A system menu's item: iOS draws its symbol (7.0.0, outside the Icon rule).
                             Image(systemName: "checkmark")
                         }
                     }

@@ -73,7 +73,7 @@ public struct UniversalRow<Content: View, Trailing: View>: View {
 
     @ViewBuilder let content: () -> Content
     @ViewBuilder let trailing: () -> Trailing
-    /// A row made of a title and an accessory (6.2.0), laid out by `RowControlView`.
+    /// A row made of a title and an accessory (7.0.0), laid out by `RowControlView`.
     var control: RowControl? = nil
 
     /// The hint starts under the title: past the icon and the gap after it.
@@ -432,7 +432,7 @@ public extension UniversalRow where Content == Text {
     }
 }
 
-// MARK: - One row for every form and settings list (6.2.0)
+// MARK: - One row for every form and settings list (7.0.0)
 
 public extension UniversalRow where Content == Text, Trailing == EmptyView {
     /// A row of a form card or a settings list: an SF Symbol in the accent (24 pt, a glyph),

@@ -89,7 +89,7 @@ component it maps onto), Dalada in its `CLAUDE.md`.
 - **Tenra models** (`Transaction`, `Account`, `CustomCategory`, `RecurringSeries`, loans, deposits): `TransactionCard`, `BudgetSettingsSection`, `EntityDetailScaffold`, `GroupedTransactionList`, `CategoryStyleHelper` / `CategoryStyleCache`, `TransactionDisplayHelper`, `CategoryDisplay`.
 - **`PeriodDataPoint` adapters** (Tenra): `PeriodDataPoint: ChartPoint`, `PeriodChartSeries` → `ChartSeries`, and convenience inits keeping the old call sites (`granularity:`, `currency:`). `PeriodBreakdownRow` and `ChartAxisHelpers`' period labels stay app-side.
 - **Tenra services**: `DateFormatters`, `FastDateParser`. (`EditableHeroSection`, `IconPickerView`, `CurrencySelectorView`, `AmountInputView` and `CurrencyListContent` became `EditableHero`, `IconPicker`, `CurrencyPickerMenu`, `CurrencyAmountInput` and `CurrencyList` in 1.10.0, behind the `DesignKitLogoCatalog` and `convertSync` hooks.)
-- **Screens over Tenra models**: the account, category and time filter sheets (built from `CheckmarkRow`), the home sections (`FinanceCard` + `PackedCircleIcons`).
+- **Screens over Tenra models**: the account, category and time filter sheets (built from `UniversalRow(accessory: .checkmark)`), the home sections (`FinanceCard` + `PackedCircleIcons`).
 - **Domain convenience inits / adapters**: `MenuPickerRow where T == RecurringFrequency / LoanType / ReminderOption`, `StatusIndicatorBadge`'s `RecurringSeries.entityStatus`, `DonutSlice.from([CategoryBreakdownItem])`, Tenra's `InsightTrendBadge` (`InsightTrend` → `TrendBadge`), Tenra's adapters under the old names of the components ported in 1.1.0–1.5.0 (`AccountRow` and `CategoryRow` → `AmountRow` since 2.1.0, `CategoryChip` → `ProgressRingTile`, `BudgetProgressRow` → `LimitProgressCard`, …), Dalada's `RuleStatusBadge` (`RuleStatus` → `Badge`).
 
 ---
@@ -192,7 +192,7 @@ their own backing (a circle or rounded square, an avatar, a coin). A tile starts
 below it the backing leaves the symbol no room for `Icon`'s padding, so 40 pt is a glyph
 (2.0.0).
 
-**The rule (6.2.0, the owner's):** every icon is an `Icon`, and its size says what it is
+**The rule (7.0.0, the owner's):** every icon is an `Icon`, and its size says what it is
 (`IconKind`). Under 44 pt a **glyph**: the symbol at its size, edge to edge, no plate, growing
 with the text size (`scalesWithText: false` for a symbol in a control of a fixed size). From
 44 pt a **tile**: the symbol on a plate (the style's colour, else `Background.neutral1`, or its
@@ -399,7 +399,7 @@ EditSheetContainer(
 FormSection(header: "Settings", footer: nil, style: .card) {
     UniversalRow(config: .standard) { ... }
     Divider()
-    MenuPickerRow(...)
+    UniversalRow("Repeat", icon: "repeat", accessory: .menu($period, options: periods))
 }
 ```
 
@@ -435,7 +435,7 @@ EditableHero(icon: $icon, title: $name, titlePlaceholder: "Account name",
 ### Row Components
 
 #### `UniversalRow`
-**The one row of every form card and settings list (6.2.0).** `UniversalRow(_:icon:value:hint:
+**The one row of every form card and settings list (7.0.0).** `UniversalRow(_:icon:value:hint:
 role:config:accessory:)` takes what the row carries and lays it out, pads it and draws its icon
 (a glyph in the accent, 24 pt in every row), so every row of a card lines up:
 
@@ -448,7 +448,7 @@ FormSection {
 }
 ```
 
-| `accessory:` | What the row is | Replaces (deprecated in 6.2.0) |
+| `accessory:` | What the row is | Replaced (removed in 7.0.0) |
 |---|---|---|
 | `.none` (default) | the title, `value` in grey on the trailing edge | |
 | `.info(_:)`, `.amount(_:currency:prefix:)` | a detail: the title as the grey label, the value emphasised (`config: .info` in a padded container) | `InfoRow` |
@@ -467,8 +467,9 @@ FormSection {
 `config:` is `.standard` (a `FormSection` card, the default), `.settings` (a `List`, which pads
 the row and draws a navigation chevron) or `.info` (a detail inside a padded container). A
 disabled row (`.disabled(true)`) greys its title and icon. `UniversalRow(_:leadingIcon:…)` takes
-any icon (a logo, a coloured tile). The deprecated rows are thin wrappers over this row, so they
-look the same; move to `UniversalRow` when you touch them.
+any icon (a logo, a coloured tile). The twelve rows it replaced are gone in 7.0.0
+([migration-7.0.md](migration-7.0.md)). Skeletons: `UniversalRowSkeleton(config:iconStyle:trailing:)`
+and its presets, `.slider(showsHint:config:)`, `.info(showsIcon:)`, `.colors(swatches:)`.
 
 The generic form below stays for a row none of the accessories is: its own content and trailing
 views.
@@ -510,7 +511,7 @@ UniversalRow(
 | `.sheetList` | 12 | 16 | Modal selection sheets |
 | `.info` | 8 | 0 | Read-only label+value (container owns H-padding) |
 
-**Rows built on it** before 6.2.0 (`ToggleSettingsRow`, `ActionSettingsRow`,
+**Rows built on it** before 7.0.0 (`ToggleSettingsRow`, `ActionSettingsRow`,
 `NavigationSettingsRow`, `MenuPickerRow`, `NavigationPickerRow`, `DatePickerRow`, `StepperRow`,
 `CheckmarkRow`, `InfoRow`, `ActionRowLabel`, `SliderRow`, `ColorPickerRow`) are its accessories
 now, in the table above.
@@ -539,7 +540,7 @@ Every row in `Views/Components/Rows/` follows these token rules. New rows MUST c
 | Slot | Token | Notes |
 |------|-------|-------|
 | **Leading icon — content rows** | `AppIconSize.Tile.sm` (44); a limit row keeps the ring's `Tile.lg` (52) slot with or without a limit | AmountRow, LimitProgressCard |
-| **Leading icon — form and settings rows** | `AppIconSize.lg` (24), a glyph | `UniversalRow(icon:)` in a card and in a `List` alike (6.2.0; settings rows had 20 before) |
+| **Leading icon — form and settings rows** | `AppIconSize.lg` (24), a glyph | `UniversalRow(icon:)` in a card and in a `List` alike (7.0.0; settings rows had 20 before) |
 | **HStack spacing (icon ↔ content)** | `AppSpacing.md` (12) | All rows |
 | **Inner VStack (title ↔ subtitle)** | `AppSpacing.xs` (4) | Never `xxs` |
 | **Title — management lists** | `AppTypography.h4` (20 semibold) | AmountRow `.list` (larger touch lists) |
@@ -550,65 +551,6 @@ Every row in `Views/Components/Rows/` follows these token rules. New rows MUST c
 | **Navigation chevron (outside `List`)** | `DisclosureChevron` | `chevron.forward` (RTL-aware) + tertiary. Never hand-roll `chevron.right` |
 
 **Shared row sub-components:** `AmountPercentage` (amount + %), `SpentBudgetText` (spent / budget), `DisclosureChevron`, `NetAmountRow`, `LimitProgressCard`. Reuse before building a new row.
-
-#### `InfoRow`
-*Deprecated in 6.2.0: `UniversalRow(_:icon:config: .info, accessory: .info(_:))` or `.amount(_:currency:prefix:)`, the same row.*
-Read-only label + value. Wrapper for `UniversalRow(config: .info)`.
-
-```swift
-InfoRow(icon: "calendar", label: "Next Payment", value: "March 15, 2026")
-```
-
-Use in: detail views for metadata display. NOT for editable fields.
-
-#### `CheckmarkRow` *(1.10.0)*
-*Deprecated in 6.2.0: `UniversalRow(_:leadingIcon:value:config:accessory: .checkmark(isSelected:action:))`, the same row.*
-A row of a choice list (a filter or picker sheet): `UniversalRow(.settings)` with an optional icon (`IconConfig`), the title in h4 medium, an optional trailing value (secondary h4, e.g. a balance), and a `SelectionIndicator`: the accent filled check on the picked row, an empty circle on the others (5.2.0; a bare checkmark on the picked row before). A tap plays the selection haptic and runs the action; VoiceOver hears a button, "Selected" on the picked one (`.selectableRow`). `CheckmarkRow("All accounts", isSelected: selection == nil) { selection = nil }`. In a `FormSection` card pass `config: .standard` (3.0.0), which pads it as the card's other rows (Dalada's report reasons). Tenra: the rows of its account, category and time filters. Skeleton: `UniversalRowSkeleton.checkmark(iconStyle:)` (with the empty circle since 5.2.0).
-
-#### `MenuPickerRow`
-*Deprecated in 6.2.0: `UniversalRow(_:icon:accessory: .menu(_:options:))`, the same row.*
-In-form single-select picker with dropdown menu.
-
-```swift
-MenuPickerRow(
-    icon: "arrow.triangle.2.circlepath",
-    title: "Frequency",
-    selection: $frequency,
-    options: [("Monthly", .monthly), ("Weekly", .weekly)]
-)
-```
-
-Use in: form sections for frequency, period, reminder, etc.
-
-#### `NavigationPickerRow` *(3.0.0)*
-*Deprecated in 6.2.0: `UniversalRow(_:icon:config:accessory: .picker(_:options:))`, the same row.*
-A choice from a long list: the title (with an optional accent symbol), the chosen value
-(secondary) and a chevron; a tap pushes the list (`CheckmarkRow`s, a search field past
-`NavigationPickerMetrics.searchThreshold` options), and a choice goes back. Needs a
-`NavigationStack` around it (an `EditSheetContainer` has one). At accessibility sizes the value
-moves under the title. A few options: `MenuPickerRow`. Dalada: the fish species, the packing
-list to start from. `style: .list` (4.14.0) is the same choice as a row of a `List`, as iOS
-Settings draws it: the settings row (`RowConfiguration.settings`), a medium accent symbol, the
-value in `bodySmall` and the list's own chevron; since 5.0.0 it is `NavigationSettingsRow(value:)`.
-Tenra: Settings' voice language.
-
-```swift
-NavigationPickerRow(icon: "fish", title: "Species", selection: $speciesID,
-                    options: species.map { (label: $0.name, value: $0.id) })
-```
-
-#### `StepperRow` *(3.0.0)*
-*Deprecated in 6.2.0: `UniversalRow(_:icon:accessory: .stepper(_:in:step:format:))`, the same row.*
-A whole number in a form: the title (body, with an optional accent symbol), the value (body,
-secondary, tabular digits, rolling as it changes) and a system stepper on the trailing edge; at
-accessibility sizes the value and the stepper move under the title. `in:` bounds it, `step:`
-sets the increment, `format:` writes the value ("3 pcs") and is what VoiceOver reads. Each step
-plays the selection haptic. Dalada: the fish caught, the spare items of its gear.
-
-```swift
-StepperRow(icon: "fish", title: "Fish caught", value: $count, in: 0...99)
-StepperRow(title: "Spares", value: $spares, in: 0...20) { "\($0) pcs" }
-```
 
 #### `NetAmountRow` *(1.1.0)*
 A label with a net amount (destructive when negative) and "+inflow −outflow" under it, or one amount (`singleValue`, `singleColor`) with no second line. Vertical padding of the `.info` preset (8; `AppSpacing.md` before 1.4.0); separate rows with `Divider()`. Tenra: `PeriodBreakdownRow` (period lists of the insights) is an adapter.
@@ -658,16 +600,6 @@ AmountRow(account.name, leading: .icon(account.iconSource), value: .amount(balan
 - Skeleton: `AmountRowSkeleton(style:showsRing:showsDetail:)`.
 - Tenra: `AccountRow`, `CategoryRow` (the over-budget haptic), `CategoryBreakdownRow` and the
   insight lists are adapters. `AmountPercentage` (the amount over its share) stays public.
-
-#### `DatePickerRow`
-*Deprecated in 6.2.0: `UniversalRow(_:icon:accessory: .date(_:components:from:through:))`, the same row.*
-Inline `DatePicker` inside `UniversalRow`. `maxDate:` stops it after a date (a payment cannot be
-in the future), `minDate:` *(3.0.0)* before one (a trip day from today on).
-
-```swift
-DatePickerRow(icon: "calendar", title: "Start Date", selection: $startDate)
-DatePickerRow(title: "Trip day", selection: $day, minDate: Calendar.current.startOfDay(for: .now))
-```
 
 #### `FormTextField`
 **The single text-field component for the whole app.** Four styles — pick by context:
@@ -880,7 +812,7 @@ Icon(source: .sfSymbol("star.fill"), size: AppIconSize.xl)
 Icon(source: .bankLogo(.kaspi), style: .bankLogo(size: AppIconSize.xl))
 ```
 
-**When to use `Icon`:** for every icon (6.2.0, the owner's rule): an entity's (accounts,
+**When to use `Icon`:** for every icon (7.0.0, the owner's rule): an entity's (accounts,
 categories, subscriptions, logos) and every symbol of a component (a row's, a banner's, a badge's,
 a button's, a chevron, a check, a close). `Icon("checkmark", size: AppIconSize.sm)` is a glyph in
 the colour around it (`tint: .inherit`); its size says glyph or tile (Icon Sizes above).
@@ -1013,7 +945,7 @@ Yesterday / Today / Calendar picker for transaction forms.
 .dateButtonsSafeArea(selectedDate: $date, onSave: { saveDate($0) })
 ```
 
-Use for: transaction entry/edit forms only. For other date fields use `DatePickerRow`.
+Use for: transaction entry/edit forms only. For other date fields use `UniversalRow(accessory: .date)`.
 
 #### `CurrencyPickerMenu` *(1.10.0)*
 The currency of an amount as a filter chip, "₸ ⌄", that opens a menu of the given currencies (sorted by name, the chosen one checked) and, with `onCustomize`, a "Customize…" item (`currency.customizeAction`) under a divider. Which currencies to offer stays the caller's. Tenra: `CurrencySelectorView` (account currencies + quick picks, the customize sheet) is an adapter.
@@ -1112,63 +1044,9 @@ HStack(spacing: AppSpacing.md) {
 - The label takes the font around it, like a SwiftUI `Button`.
 - Replaced `LoadingButtonLabel`, `BulkDeleteButton` and `EntityActionButton` (removed in 3.0.0).
 
-#### `ToggleSettingsRow` *(0.6.0)*
-*Deprecated in 6.2.0: `UniversalRow(_:icon:hint:config:accessory: .toggle(_:))`, the same row.*
-The settings row with a switch, next to `NavigationSettingsRow` and `ActionSettingsRow`.
-
-```swift
-ToggleSettingsRow(icon: "bell", title: "Reminders", isOn: $remindersOn)
-ToggleSettingsRow(icon: "location", title: "Share location", hint: "Friends see your trip", isOn: $shares)
-ToggleSettingsRow(title: "Released", isOn: $released)   // 3.0.0: no icon, a form row
-```
-
-VoiceOver focuses the switch (title as label, `hint` as hint). The icon is optional since
-3.0.0, and so is `ActionSettingsRow`'s, for rows in a form that carry no symbol. Both are `List`
-rows (`config: .settings`, no side padding); in a `FormSection` card pass `config: .standard`
-(3.0.0) so they pad like the rows around them.
-
-#### `ActionRowLabel` *(3.1.0)*
-*Deprecated in 6.2.0: `UniversalRow(_:icon:iconColor:titleColor:)` as the label`, the same row.*
-The look of an action row as a label, for a control that is not a `Button`: the label of a
-`PhotosPicker`, a `ShareLink`, a `Link`. A symbol (`AppIconSize.lg`) and a title, both in `tint`
-(the accent) unless `titleColor` gives the title another colour; `config: .standard` by default
-(a `FormSection` card), `.settings` for a `List` row.
-
-```swift
-PhotosPicker(selection: $items, matching: .images) {
-    ActionRowLabel("Add photos", systemImage: "photo.on.rectangle.angled")
-}
-.buttonStyle(.plain)
-```
-
-Its init is `nonisolated`: `PhotosPicker` builds its label off the main actor, where the
-initialisers of DesignKit's rows cannot run (Swift 6 warns). `ActionSettingsRow` is the same
-row with its own button. No skeleton: it shows no data. Dalada: "Add photos" in its forms.
-
-#### `SliderRow` *(1.15.0)*
-*Deprecated in 6.2.0: `UniversalRow(_:icon:hint:config:accessory: .slider(_:in:step:valueText:))`, the same row.*
-A setting set with a slider: the title (body, with an optional symbol), the value on the trailing
-edge (bodySmall, secondary, tabular digits), the slider in the accent, an optional hint (caption).
-The app formats the value. The symbol is a row icon in the accent at 24 pt, like the other form
-rows' (6.1.0; the system `Label`'s black glyph before). `config:` *(6.1.0)* is its padding, as for `ToggleSettingsRow`:
-`.settings` (the default, a `List` row) pads it only vertically, `.standard` in a `FormSection`
-card pads it like the rows around it (§10). Before 6.1.0 it had only the vertical padding, so in
-a card it touched the card's edges unless the app padded it.
-
-```swift
-FormSection(header: "Background") {
-    SliderRow("Colour intensity", systemImage: "circle.lefthalf.filled",
-              value: $opacity, in: 0.05...1, valueText: "\(Int((opacity * 100).rounded()))%",
-              config: .standard)
-}
-```
-
-VoiceOver reads the slider with the title as its label and `valueText` as its value. Skeleton:
-`SliderRowSkeleton(showsHint:config:)`. Tenra's background-intensity row is its adapter.
-
 #### `SelectionIndicator(isSelected:tint:)`
 Check circle for multi-select and checklist rows, and since 5.2.0 the trailing mark of every
-choice list (`CheckmarkRow`, `CurrencyRow`): a filled check on the picked one, an empty circle on
+choice list (`UniversalRow(accessory: .checkmark)`, `CurrencyRow`): a filled check on the picked one, an empty circle on
 the others. The row carries the label and the `.isSelected` trait. `tint` (0.4.0, default accent) colours the filled check: `AppColors.success`
 for a done checklist item, `textTertiary` for one that is already owned and disabled.
 
@@ -1334,15 +1212,14 @@ SkeletonReveal(isLoading: balance == nil) {
 | `BalanceCard`, `SelectableBalanceCard`, `FinanceCard`, `CashFlowCard` (also its own loading state), `TotalsCard`, `ComparisonCard`, `InsightsStatCard`, `StatTile`, `RecurringPaymentCard`, `RecommendationBox` | `…Skeleton` (`TotalsCardSkeleton(count:showsTitle:amountFont:)`, `FinanceCardSkeleton(showsTrailing:)`, `RecommendationBoxSkeleton(lines:)`) |
 | `LimitProgressCard`, `TargetProgressCard`, `PayoffProgressCard`, `ScoreCard`, `ScoreGaugeCard`, `MetricCard`, `WeightBreakdownCard`, `CalculationCard`, `ProgressRingTile`, `ProgressRingTileGrid` | `…Skeleton` (`ScoreGaugeCardSkeleton(style:)`, `MetricCardSkeleton(chartPlacement:)`, `WeightBreakdownCardSkeleton(segments:)`, `CalculationCardSkeleton(rows:showsHero:)`) |
 | `UniversalRow` | `UniversalRowSkeleton(config:iconStyle:titleFont:showsSubtitle:trailing:)` |
-| `NavigationSettingsRow`, `ToggleSettingsRow`, `ActionSettingsRow`, `MenuPickerRow`, `DatePickerRow`, `CheckmarkRow`, `StepperRow`, `NavigationPickerRow` (3.0.0) | `UniversalRowSkeleton.navigationSettings`, `.toggleSettings`, `.actionSettings`, `.menuPicker`, `.datePicker`, `.checkmark(iconStyle:)`; a stepper row and a navigation picker row are `.menuPicker` (the same shape) |
-| `SliderRow` (1.15.0) | `SliderRowSkeleton(showsHint:)` |
+| `UniversalRow`'s accessories (7.0.0) | `UniversalRowSkeleton.navigationSettings`, `.toggleSettings`, `.actionSettings`, `.menuPicker`, `.datePicker`, `.checkmark(iconStyle:)` (a stepper or picker row is `.menuPicker`, the same shape), `.slider(showsHint:config:)`, `.info(showsIcon:)`, `.colors(swatches:)` |
 | `ItemRow` (3.6.0) | `ItemRowSkeleton(style:showsLeading:showsDetail:metaLines:)` |
 | `PendingItemCard` (3.6.0) | `PendingItemCardSkeleton(contentLines:)` |
 | `NoticeCard`, `PickerCarousel` (4.14.0); a glass `FormSection` (5.0.0) | `NoticeCardSkeleton(leadingSize:showsAction:)`, `PickerCarouselSkeleton(pictureSize:)`; `FormSection(style: .glass)` of its rows' skeletons (`ItemRowSkeleton`, …; `ListCardSkeleton` until 5.0.0) |
 | `RatingSummary` (4.1.0) | `RatingSummarySkeleton(maximum:)` |
 | `SearchSuggestionRow` (3.5.0), drawn by `.dsSearchSuggestions` while `isLoading` | `SearchSuggestionRowSkeleton(showsSubtitle:)` |
 | `AmountRow` (2.1.0) | `AmountRowSkeleton(style:showsRing:showsDetail:)` |
-| `NetAmountRow`, `ScheduleRow`, `InfoRow`, `ColorPickerRow` | `…Skeleton` |
+| `NetAmountRow`, `ScheduleRow` | `…Skeleton` |
 | `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `OrbChart` | `…Skeleton` |
 | `LinearProgressBar`, `ProportionBar`, `MiniProportionBar`, `AmountComparisonBar`, `HeroProportionBar`, `ProgressRing`, `MiniDonut`, `MiniHalfGauge`, `HeroHalfGauge`, `MiniMilestoneGauge`, `HeroMilestoneGauge`, `MiniBarPair`, `HeroBarPair` | `…Skeleton`, with the component's size parameters (`HeroHalfGaugeSkeleton(style: .bleed)`, 4.2.0) |
 | `Icon` | `IconSkeleton(style:)` / `IconSkeleton(size:)` |
@@ -2118,11 +1995,11 @@ OptionCardPicker(HomeBackground.allCases, selection: $background, title: { $0.na
     if background == .photo {
         FormSection {
             PhotosPicker(selection: $item, matching: .images) {
-                ActionRowLabel("Choose a photo", systemImage: "photo.on.rectangle")
+                UniversalRow("Choose a photo", icon: "photo.on.rectangle", titleColor: AppColors.accent)
             }
             .buttonStyle(.plain)
             Divider().padding(.leading, AppSpacing.lg)
-            ActionSettingsRow(icon: "trash", title: "Remove photo", isDestructive: true, config: .standard) { … }
+            UniversalRow("Remove photo", icon: "trash", role: .destructive, accessory: .action { … })
         }
         .screenPadding()
     }
@@ -2130,9 +2007,8 @@ OptionCardPicker(HomeBackground.allCases, selection: $background, title: { $0.na
 ```
 
 `settings:` *(5.2.0)* is what the app sets for the chosen option, under the carousel, fading from
-one option's to the next: DesignKit's form rows in a `FormSection` (`ActionRowLabel` as a
-`PhotosPicker`'s label, `ToggleSettingsRow`, `SliderRow`, `ActionSettingsRow`, each with the
-`.standard` config, inset dividers), empty for an option with nothing to set. Skeleton:
+one option's to the next: `UniversalRow`s in a `FormSection` (a `PhotosPicker`'s label,
+`.toggle`, `.slider`, a destructive `.action`, inset dividers), empty for an option with nothing to set. Skeleton:
 `OptionCardPickerSkeleton()`. Tenra: `HomeBackgroundPicker` (Settings → Background). Before
 6.0.0 it also had `style: .list` (`OptionCard`s one under another) and, in `.carousel`, a row of
 small cards under one preview ([migration-6.0.md](migration-6.0.md)).
@@ -2498,7 +2374,7 @@ EditSheetContainer(title:, wrapInForm: false, isSaving:, onSave:, onCancel:)   �
         │   FormTextField(style: .row)  or  UniversalRow { FormTextField(style: .inline) }
         │   Divider().padding(.leading, AppSpacing.lg)
         │   UniversalRow(title, icon:, accessory: .menu / .picker / .date / .stepper /
-        │                .slider / .toggle / .action)   (6.2.0)
+        │                .slider / .toggle / .action)   (7.0.0)
         │   }
         ├── FormSection(…) { … }
         └── InlineStatusText(…)              validation under the cards
@@ -2531,7 +2407,7 @@ ScrollView
 └── VStack(spacing: AppSpacing.lg)
     ├── HeroSection(…).screenPadding().scrollHero()
     ├── HStack { DSButton(…); DSButton(…, appearance: .secondary) }
-    ├── VStack { InfoRow … }.padding(AppSpacing.lg).cardStyle()
+    ├── VStack { UniversalRow(…, config: .info, accessory: .info(…)) … }.padding(AppSpacing.lg).cardStyle()
     ├── the screen's own cards
     └── history: day sections, SectionHeader(day) over TransactionRow rows
 .heroAccentGlow(icon:tint:)        a glow tinted from the hero icon
@@ -2587,18 +2463,18 @@ Text input?
 └── A message sent at once (comment, reply) → MessageComposer
 
 Number?
-├── Small steps (people, days) → StepperRow
-└── A value on a range (radius, distance) → SliderRow
+├── Small steps (people, days) → UniversalRow(accessory: .stepper)
+└── A value on a range (radius, distance) → UniversalRow(accessory: .slider)
 
 Date input?
 ├── Transaction (needs Yesterday/Today shortcuts) → DateButtons / .dateButtonsSafeArea()
-└── Other (subscription start, deposit posting) → DatePickerRow
+└── Other (subscription start, deposit posting) → UniversalRow(accessory: .date)
 
 Single-select picker?
-├── Few options (2-5) in form → MenuPickerRow
+├── Few options (2-5) in form → UniversalRow(accessory: .menu)
 ├── 2-4 exclusive modes → SegmentedPicker
 ├── Chips (filters, tags, "All") → ChipPicker
-└── Many options (a long list, with search) → NavigationPickerRow
+└── Many options (a long list, with search) → UniversalRow(accessory: .picker)
 
 Currency?
 └── CurrencyPickerMenu (inside EditableHero and CurrencyAmountInput, automatic);
@@ -2608,7 +2484,7 @@ Currency?
 ### "Which row component?"
 
 ```
-A row of a form card or a settings list? (6.2.0)
+A row of a form card or a settings list? (7.0.0)
 └── UniversalRow(title, icon:, value:, hint:, role:, config:, accessory:)
     ├── In a FormSection card → config: .standard (the default)
     ├── In a List → config: .settings
@@ -2671,7 +2547,7 @@ Card-style container?
 ### "Which icon approach?"
 
 ```
-Any icon? → Icon (6.2.0); the size decides glyph (< 44 pt, no plate) or tile (≥ 44 pt, a plate)
+Any icon? → Icon (7.0.0); the size decides glyph (< 44 pt, no plate) or tile (≥ 44 pt, a plate)
 ├── A component's symbol (a check, a chevron, a close, a row's, a banner's)
 │   → Icon("checkmark", size: AppIconSize.sm) — a glyph in the colour around it
 ├── An entity's icon
@@ -2724,8 +2600,8 @@ Rendering a money amount?
 ├── Standalone view (card, header, list row's trailing amount, chart label)?
 │   └── → FormattedAmountText(amount:currency:prefix:fontSize:fontWeight:color:)
 │
-├── Inside InfoRow / InfoRowConfig (label-value row in detail screens)?
-│   ├── Single amount → InfoRow(... amount: X, currency: Y, prefix: "")
+├── A detail row (label-value row in detail screens)?
+│   ├── Single amount → UniversalRow(label, config: .info, accessory: .amount(X, currency: Y, prefix: ""))
 │   │                 → InfoRowConfig(... amount: X, currency: Y, prefix: "")
 │   │   (renders FormattedAmountText internally, with `value:` fallback for VoiceOver)
 │   │
@@ -2808,7 +2684,7 @@ Rules that make this safe:
 |---------|----------------------|----------|
 | Standalone view display | **`FormattedAmountText`** | Smart (hides `.00`, dims `.XX`); abbreviates only when it doesn't fit |
 | Abbreviated amount (fallback only) | `Formatting.formatCurrencyCompact(_:currency:)` | Localized compact ("1,2 млн ₸") |
-| InfoRow / InfoRowConfig | **`init(... amount: currency:)`** | Smart (delegates to `FormattedAmountText`) |
+| `UniversalRow(accessory: .amount)` / InfoRowConfig | **`.amount(_:currency:prefix:)`** | Smart (delegates to `FormattedAmountText`) |
 | Composed display string | **`Formatting.formatCurrencySmart(_:currency:)`** | Smart (0 or 2) |
 | Accessibility / VoiceOver / CSV | `Formatting.formatCurrency(_:currency:)` | Always 2 (legacy compat — DO NOT use for display) |
 | Storage / parse | `AmountFormatter.format(_:)` / `.parse(_:)` | Always 2 |
@@ -2822,7 +2698,7 @@ Rules that make this safe:
 
 For signed deltas ("+1 200 ₸" / "−500 ₸"):
 - **Negative is automatic** — `NumberFormatter` and `FormattedAmountText` already render `"-1 200 ₸"` for negative `Double`.
-- **Positive needs explicit `prefix: "+"`** — pass `prefix: diff > 0 ? "+" : ""` to `FormattedAmountText` or `InfoRow(... amount:currency:prefix:)`.
+- **Positive needs explicit `prefix: "+"`** — pass `prefix: diff > 0 ? "+" : ""` to `FormattedAmountText` or `UniversalRow(accessory: .amount(_:currency:prefix:))`.
 - DO NOT compose with `String(format: "%@%@", "+", Formatting.formatCurrency(...))`.
 
 For income/expense `+`/`−` styling in transaction lists, pass the sign as `prefix:` and the colour as `color:` to `FormattedAmountText` (Tenra resolves both from the transaction type with its `TransactionDisplayHelper`).
@@ -2867,7 +2743,7 @@ Every form in both apps is `EditSheetContainer(wrapInForm: false)` over a `Scrol
 `FormSection` cards, with or without an `EditableHero` on top (§4): Tenra's entity edits, loan
 payments and rate changes, Dalada's trip, catch, check-in and place forms. Neither app has a
 system `Form` sheet left. A new form is built the same way: the rows that fill a card
-(`FormTextField(style: .row)` and `UniversalRow` with its accessories, 6.2.0) pad themselves for
+(`FormTextField(style: .row)` and `UniversalRow` with its accessories, 7.0.0) pad themselves for
 it (§10).
 `wrapInForm: true`, still the parameter's default, wraps the content in a system `Form` for a
 host that wants the grouped-list look.
@@ -2951,7 +2827,7 @@ with the iOS 27 SDK — Xcode 27; built with Xcode 26 the gate honours Reduce Mo
 | **Compact surface** | Its own, smaller | — | `MessageBanner` (`md`), `ChartSelectionBanner` (`lg` × `sm`) |
 | **Row**: no surface, lives in a container | Vertical only, from its `RowConfiguration` preset | The container's: a card's `.cardContentPadding()`, `List` / `Form` insets, or `.screenPadding()` | `InfoRow`, `AmountRow` (info style), `NetAmountRow`, `ScheduleRow` (`.info`, 8) |
 | **List row**: lives only in a `List` | None: the `List`'s row insets give both | `List` | `AmountRow(style: .list)` |
-| **Row in a `FormSection`** | Vertical and horizontal (`.standard`: 12 × 16), since `FormSection`'s surface has none | — | `UniversalRow` (`config: .standard`, its default since 6.2.0), `FormTextField(style: .row)` |
+| **Row in a `FormSection`** | Vertical and horizontal (`.standard`: 12 × 16), since `FormSection`'s surface has none | — | `UniversalRow` (`config: .standard`, its default since 7.0.0), `FormTextField(style: .row)` |
 | **Primitive** | None: the parent places it | — | `Badge`, `TrendBadge`, `FormattedAmountText`, `LinearProgressBar`, charts |
 
 Outer spacing is never a component's: the screen insets with `.screenPadding()` and spaces cards with its stack's `spacing`.
@@ -2976,10 +2852,10 @@ VStack, HStack, custom cards must add `.padding(AppSpacing.lg)` (or the equivale
 
 ### Why H:0 for `.info` and `.settings`
 
-- **`.info` H:0** — InfoRow always lives inside a container with `.padding(.lg)` — adding own H padding would double it to 32pt
+- **`.info` H:0** — a detail row (`accessory: .info`) always lives inside a container with `.padding(.lg)` — adding own H padding would double it to 32pt
 - **`.settings` H:0** — `List` / `Form` apply `listRowInsets` (16pt leading/trailing) automatically — rows inside must NOT add H padding
 - **So a `.settings` row in a `FormSection` card touches the card's edges.** `UniversalRow`
-  defaults to `.standard` (6.2.0); in a `List` pass `.settings`, and a navigation row leaves its
+  defaults to `.standard` (7.0.0); in a `List` pass `.settings`, and a navigation row leaves its
   chevron to the list. The deprecated rows that took `config:` defaulted to `.settings`.
 
 ### Dividers inside cards

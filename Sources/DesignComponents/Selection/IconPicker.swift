@@ -81,7 +81,7 @@ public struct IconPicker: View {
                         HapticManager.light()
                         dismiss()
                     } label: {
-                        // A system bar's item: iOS draws its symbol (6.2.0, outside the Icon rule).
+                        // A system bar's item: iOS draws its symbol (7.0.0, outside the Icon rule).
                         Image(systemName: "checkmark")
                     }
                     .dsButton()

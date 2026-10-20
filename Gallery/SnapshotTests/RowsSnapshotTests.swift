@@ -196,7 +196,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// UniversalRow's accessories (6.2.0) in a card: every row's icon 24 pt, so the titles
+        /// UniversalRow's accessories (7.0.0) in a card: every row's icon 24 pt, so the titles
         /// line up; a value, a switch, a menu, a stepper, a date, a destructive action.
         @Test func universalRowAccessories() async {
             await assertComponentSnapshot(

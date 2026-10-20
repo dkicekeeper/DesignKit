@@ -48,7 +48,7 @@ public enum IconTint: Equatable, Hashable {
     case hierarchical(Color)    // Иерархическая раскраска (iOS 15+, для SF Symbols)
     case palette([Color])       // Палитра цветов (multicolor SF Symbols)
     case original               // Оригинальные цвета (для растровых изображений)
-    /// The foreground style around the icon (6.2.0): a symbol in a button, a badge or a line of
+    /// The foreground style around the icon (7.0.0): a symbol in a button, a badge or a line of
     /// text takes the colour its container gives, as a symbol in a `Label` does.
     case inherit
 
@@ -96,7 +96,7 @@ public enum IconTint: Equatable, Hashable {
     }
 }
 
-/// What an icon is, by its size alone (6.2.0, the owner's rule).
+/// What an icon is, by its size alone (7.0.0, the owner's rule).
 public enum IconKind: Hashable, Sendable {
     /// Under 44 pt (`AppIconSize.xs` … `xxl`): the symbol at its size, edge to edge, with no
     /// plate. It grows with the text size, as a symbol in a line of text does.
@@ -114,7 +114,7 @@ public enum IconKind: Hashable, Sendable {
 
 /// Полная конфигурация стиля иконки с интеграцией Design System
 ///
-/// 6.2.0: the size decides what the icon is (`IconKind`): under 44 pt a glyph with no plate,
+/// 7.0.0: the size decides what the icon is (`IconKind`): under 44 pt a glyph with no plate,
 /// so `backgroundColor` and glass apply to tiles (and logos) only.
 public struct IconStyle: Equatable, Hashable {
     public var size: CGFloat
@@ -124,7 +124,7 @@ public struct IconStyle: Equatable, Hashable {
     public var backgroundColor: Color?
     public var padding: CGFloat?  // Внутренний padding (опционально)
     public var hasGlassEffect: Bool  // Применять ли glass effect
-    /// Whether a glyph grows with the text size (6.2.0, on by default). Off for a glyph in a
+    /// Whether a glyph grows with the text size (7.0.0, on by default). Off for a glyph in a
     /// control of a fixed size (a round button, a key), which would not hold a larger one.
     public var scalesWithText: Bool = true
 
@@ -302,7 +302,7 @@ public struct IconStyle: Equatable, Hashable {
         )
     }
 
-    /// A glyph of `size` points in `tint` (6.2.0): the style of a symbol in a component, a row,
+    /// A glyph of `size` points in `tint` (7.0.0): the style of a symbol in a component, a row,
     /// a banner, a badge, a button. `.inherit` takes the colour around it.
     public static func glyph(_ size: CGFloat, tint: IconTint = .inherit) -> IconStyle {
         .circle(size: size, tint: tint)

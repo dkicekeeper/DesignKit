@@ -2,12 +2,12 @@
 //  RowAccessory.swift
 //  DesignKit
 //
-//  6.2.0 (the owner's review of the rows): one row for every form card and settings list.
+//  7.0.0 (the owner's review of the rows): one row for every form card and settings list.
 //  `UniversalRow(_:icon:value:hint:role:config:accessory:)` takes what the row carries (a
 //  switch, a menu, a list to pick from, a date, a stepper, a slider, a check, a screen to open,
 //  an action, a value) and lays it out, pads it and draws its icon, so every row of a card
 //  lines up. The twelve rows that each did one of these (`ToggleSettingsRow`, `MenuPickerRow`,
-//  `InfoRow`, …) are this row now and deprecated.
+//  `InfoRow`, …) are this row now; they are removed in 7.0.0 (docs/migration-7.0.md).
 //
 
 import SwiftUI
@@ -15,13 +15,13 @@ import DesignTokens
 import DesignSupport
 
 /// How a row reads: in the text's colours, or in red for an action that deletes or ends
-/// something (6.2.0).
+/// something (7.0.0).
 public enum RowRole: Hashable, Sendable {
     case standard
     case destructive
 }
 
-/// What a `UniversalRow` carries besides its title, and what a tap on it does (6.2.0).
+/// What a `UniversalRow` carries besides its title, and what a tap on it does (7.0.0).
 ///
 /// ```swift
 /// UniversalRow("Quiet hours", icon: "moon.fill", accessory: .toggle($quietHours))
@@ -51,7 +51,7 @@ public struct RowAccessory {
     /// Nothing: the title, and `value` on the trailing edge if the row has one.
     public static var none: RowAccessory { RowAccessory(kind: .none) }
 
-    /// A detail's value (`InfoRow` before 6.2.0): the title as the grey label, `value` in the
+    /// A detail's value (`InfoRow` before 7.0.0): the title as the grey label, `value` in the
     /// emphasised type on the trailing edge; long values stack under the label at large text
     /// sizes. In a padded container pass `config: .info`.
     public static func info(_ value: String) -> RowAccessory {

@@ -38,7 +38,7 @@ public struct HeroSymbol: View {
 
     public var body: some View {
         let color = tint ?? AppColors.accent
-        // A tile (6.2.0): its disc is the plate, the symbol 3/7 of it.
+        // A tile (7.0.0): its disc is the plate, the symbol 3/7 of it.
         Icon(
             source: .sfSymbol(systemImage),
             style: .circle(size: size, tint: .monochrome(color), backgroundColor: AppColors.pale(color), padding: size * 2 / 7)

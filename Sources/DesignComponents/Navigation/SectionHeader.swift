@@ -218,7 +218,7 @@ public struct SectionHeader: View {
     ) -> some View {
         if let systemImage {
             HStack(spacing: spacing) {
-                // 6.2.0: the symbols are Icons at the title's size (the leading one a step larger).
+                // 7.0.0: the symbols are Icons at the title's size (the leading one a step larger).
                 Icon(systemImage, size: leadingSize)
                     .foregroundStyle(tint ?? leadingColor)
                 withTrailingSymbol(text, size: trailingSize)

@@ -93,7 +93,7 @@ public struct EditSheetContainer<Content: View>: View {
     private var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .cancellationAction) {
             Button(action: onCancel) {
-                // A system bar's item: iOS draws its symbol (6.2.0, outside the Icon rule).
+                // A system bar's item: iOS draws its symbol (7.0.0, outside the Icon rule).
                 Image(systemName: "xmark")
             }
             .accessibilityLabel(String(localized: "button.cancel"))
@@ -111,7 +111,7 @@ public struct EditSheetContainer<Content: View>: View {
                     HapticManager.light()
                     onSave()
                 } label: {
-                    // A system bar's item: iOS draws its symbol (6.2.0, outside the Icon rule).
+                    // A system bar's item: iOS draws its symbol (7.0.0, outside the Icon rule).
                     Image(systemName: "checkmark")
                 }
                 .disabled(isSaveDisabled)

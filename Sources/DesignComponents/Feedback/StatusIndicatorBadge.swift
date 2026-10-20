@@ -64,7 +64,7 @@ public enum EntityStatus {
 public struct StatusIndicatorBadge: View {
     let status: EntityStatus
 
-    /// The symbol's size (6.2.0: an `Icon`).
+    /// The symbol's size (7.0.0: an `Icon`).
     let size: CGFloat
 
     /// - Parameter size: The symbol's size, `AppIconSize.md` by default.

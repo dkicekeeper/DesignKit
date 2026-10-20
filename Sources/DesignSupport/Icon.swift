@@ -12,7 +12,7 @@ import DesignTokens
 /// Универсальный компонент для отображения иконок и логотипов
 /// Полностью интегрирован с Design System (AppTheme.swift)
 ///
-/// 6.2.0 (the owner's rule): every icon in DesignKit is an `Icon`, and its size says what it
+/// 7.0.0 (the owner's rule): every icon in DesignKit is an `Icon`, and its size says what it
 /// is (`IconKind`). Under 44 pt a **glyph**: the symbol at its size, no plate, growing with the
 /// text size. From 44 pt a **tile**: the symbol on a plate with room around it (20 % of the
 /// side to 63 pt, 25 % from 64 pt), at its size. A logo fills its shape at any size.
@@ -46,7 +46,7 @@ public struct Icon: View {
 
     let source: IconSource?
     let style: IconStyle
-    /// A glyph's side as the text size scales it (6.2.0); a tile keeps `style.size`.
+    /// A glyph's side as the text size scales it (7.0.0); a tile keeps `style.size`.
     @ScaledMetric private var scaledSide: CGFloat
 
     // MARK: - Initializers
@@ -76,7 +76,7 @@ public struct Icon: View {
         self._scaledSide = ScaledMetric(wrappedValue: size, relativeTo: .body)
     }
 
-    /// A glyph of an SF Symbol (6.2.0): `size` points, in `tint` (by default the colour around
+    /// A glyph of an SF Symbol (7.0.0): `size` points, in `tint` (by default the colour around
     /// it), no plate.
     ///
     /// ```swift
@@ -332,7 +332,7 @@ public struct Icon: View {
     }
 }
 
-/// The tile's room around its symbol (6.2.0).
+/// The tile's room around its symbol (7.0.0).
 enum IconMetrics {
     /// From this side a tile is large and gets more room.
     static let largeTile: CGFloat = 64

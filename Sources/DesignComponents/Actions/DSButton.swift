@@ -133,7 +133,7 @@ public struct DSButton: View {
             : Text(verbatim: ""))
     }
 
-    /// The symbol at the size of the label's text (6.2.0: an `Icon`).
+    /// The symbol at the size of the label's text (7.0.0: an `Icon`).
     private var iconSize: CGFloat { size == .small ? AppIconSize.sm : AppIconSize.md }
 
     @ViewBuilder

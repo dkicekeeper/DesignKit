@@ -56,7 +56,7 @@ private struct InRowHost<Content: View>: View {
 }
 
 private struct UniversalRowPage: View {
-    /// What the row carries (6.2.0): one page for every kind of row.
+    /// What the row carries (7.0.0): one page for every kind of row.
     enum Kind: String, CaseIterable {
         case none = "None", info = "Info", amount = "Amount", toggle = "Toggle", navigation = "Navigation"
         case action = "Action", checkmark = "Checkmark", menu = "Menu", picker = "Picker", date = "Date"
@@ -89,12 +89,12 @@ private struct UniversalRowPage: View {
     var body: some View {
         ComponentPage(
             name: "UniversalRow",
-            summary: "The one row of a form card or a settings list (6.2.0): an icon, the title, what the row carries (accessory: a switch, a menu, a list, a date, a stepper, a slider, a check, a screen, an action, a value) and a hint.",
+            summary: "The one row of a form card or a settings list (7.0.0): an icon, the title, what the row carries (accessory: a switch, a menu, a list, a date, a stepper, a slider, a check, a screen, an action, a value) and a hint.",
             apps: [.tenra, .dalada],
             canvas: .fill,
             notes: [
                 "UniversalRow(_:icon:value:hint:role:config:accessory:). config: .standard in a FormSection card (the default), .settings in a List, .info inside a padded container.",
-                "The icon is a glyph in the accent, 24 pt in every row (6.2.0), so the titles of a card line up. role: .destructive turns the title and the icon red.",
+                "The icon is a glyph in the accent, 24 pt in every row (7.0.0), so the titles of a card line up. role: .destructive turns the title and the icon red.",
                 "It replaced ToggleSettingsRow, ActionSettingsRow, ActionRowLabel, NavigationSettingsRow, CheckmarkRow, MenuPickerRow, NavigationPickerRow, DatePickerRow, StepperRow, SliderRow, ColorPickerRow and InfoRow, removed in 7.0.0 (docs/migration-7.0.md).",
                 "The generic UniversalRow(config:leadingIcon:hint:content:trailing:) stays for a row none of these is.",
             ]
@@ -166,7 +166,7 @@ private struct UniversalRowPage: View {
 
     private var value: String? {
         switch kind {
-        case .none: "6.2.0"
+        case .none: "7.0.0"
         case .navigation: "English"
         case .checkmark: "1 250 000 ₸"
         default: nil
