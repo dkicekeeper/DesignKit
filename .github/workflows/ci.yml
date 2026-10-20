@@ -164,7 +164,8 @@ jobs:
   snapshots:
     name: Snapshot tests
     runs-on: macos-26
-    timeout-minutes: 45
+    # A recording run of every test took 48 minutes in October 2026 (7.0.0).
+    timeout-minutes: 75
     permissions:
       contents: write
     env:

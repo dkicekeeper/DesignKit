@@ -199,28 +199,34 @@ extension ComponentSnapshots {
         /// UniversalRow's accessories (7.0.0) in a card: every row's icon 24 pt, so the titles
         /// line up; a value, a switch, a menu, a stepper, a date, a destructive action.
         @Test func universalRowAccessories() async {
-            await assertComponentSnapshot(
-                NavigationStack {
-                    FormSection {
-                        UniversalRow("Next payment", icon: "calendar", accessory: .info("12 October"))
-                        Divider().padding(.leading, AppSpacing.lg)
-                        UniversalRow("Quiet hours", icon: "moon.fill", hint: "No notifications at night",
-                                     accessory: .toggle(.constant(true)))
-                        Divider().padding(.leading, AppSpacing.lg)
-                        UniversalRow("Language", icon: "globe", value: "English", accessory: .navigation { EmptyView() })
-                        Divider().padding(.leading, AppSpacing.lg)
-                        UniversalRow("Repeat", icon: "repeat", accessory: .menu(.constant("month"), options: [
-                            (label: "Weekly", value: "week"), (label: "Monthly", value: "month"),
-                        ]))
-                        Divider().padding(.leading, AppSpacing.lg)
-                        UniversalRow("Fish caught", icon: "number", accessory: .stepper(.constant(3), in: 0...99) { "\($0) pcs" })
-                        Divider().padding(.leading, AppSpacing.lg)
-                        UniversalRow("Delete all data", icon: "trash", role: .destructive, accessory: .action {})
-                    }
-                    .toolbar(.hidden, for: .navigationBar)
-                },
-                appearances: [.light, .dark, .largeText]
-            )
+            // A NavigationStack has no size of its own: a fixed height, taller at large text,
+            // where the menu, the stepper and the navigation value move under the title.
+            await assertComponentSnapshot(accessoryRows(height: 360), appearances: [.light, .dark])
+            await assertComponentSnapshot(accessoryRows(height: 900), named: "accessibility", appearances: [.largeText])
+        }
+
+        private func accessoryRows(height: CGFloat) -> some View {
+            NavigationStack {
+                FormSection {
+                    UniversalRow("Next payment", icon: "calendar", accessory: .info("12 October"))
+                    Divider().padding(.leading, AppSpacing.lg)
+                    UniversalRow("Quiet hours", icon: "moon.fill", hint: "No notifications at night",
+                                 accessory: .toggle(.constant(true)))
+                    Divider().padding(.leading, AppSpacing.lg)
+                    UniversalRow("Language", icon: "globe", value: "English", accessory: .navigation { EmptyView() })
+                    Divider().padding(.leading, AppSpacing.lg)
+                    UniversalRow("Repeat", icon: "repeat", accessory: .menu(.constant("month"), options: [
+                        (label: "Weekly", value: "week"), (label: "Monthly", value: "month"),
+                    ]))
+                    Divider().padding(.leading, AppSpacing.lg)
+                    UniversalRow("Fish caught", icon: "number", accessory: .stepper(.constant(3), in: 0...99) { "\($0) pcs" })
+                    Divider().padding(.leading, AppSpacing.lg)
+                    UniversalRow("Delete all data", icon: "trash", role: .destructive, accessory: .action {})
+                }
+                .frame(maxHeight: .infinity, alignment: .top)
+                .toolbar(.hidden, for: .navigationBar)
+            }
+            .frame(height: height)
         }
 
         /// The same rows in a List (`config: .settings`): the list pads them and draws the
@@ -236,9 +242,10 @@ extension ComponentSnapshots {
                                      accessory: .checkmark(isSelected: true) {})
                     }
                     .scrollDisabled(true)
-                    .frame(height: 260)
                     .toolbar(.hidden, for: .navigationBar)
-                },
+                }
+                // A NavigationStack has no size of its own.
+                .frame(height: 260),
                 appearances: [.light, .dark]
             )
         }
