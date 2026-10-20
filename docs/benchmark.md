@@ -266,7 +266,7 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
   аксессуаре панели вкладок, `DownloadRow` для офлайн-загрузок, `ArticleBody`,
   `ChipPicker(allTitle:)`, `PersonRow(style: .card)`.
 - **2.9.0** — аудит, раунд 4, из Tenra: `TransactionRow` (строка операции и перевода),
-  `SnapCardPicker` (выбор карточкой в ряду с доводкой), `OptionCard` / `OptionCardPicker`,
+  `SnapCardPicker` (выбор карточкой в ряду с доводкой), `OptionCardPicker`,
   `StreamingText` (текст по словам с подсветкой), `DateRangePickerSheet`, `.cascadeIn`,
   `PagerArrows`, `.progressOverlay`, `FlowLayout(alignment:)`. Редизайн `PackedCircleIcons`:
   глянцевые шарики (прежний вид — `.flat`). Шкала `HeroHalfGauge` в стеклянной карточке

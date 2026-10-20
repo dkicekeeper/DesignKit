@@ -55,7 +55,7 @@ public extension View {
     }
 
     /// The accent outline of a chosen option (5.0.0): one look for the cards and tiles a person
-    /// picks from (`OptionCard`, `PickerCarousel`, `IconPicker`), 2 pt on the shape's edge, clear
+    /// picks from (`OptionCardPicker`, `PickerCarousel`, `IconPicker`), 2 pt on the shape's edge, clear
     /// when not chosen.
     func selectionOutline(_ isSelected: Bool, cornerRadius: CGFloat) -> some View {
         overlay(
@@ -214,6 +214,6 @@ public extension View {
 
 /// The chosen option's outline (`selectionOutline`, 5.0.0).
 public enum AppSelection {
-    /// 2 pt: `OptionCard` drew 3 pt before 5.0.0, `PickerCarousel` and `IconPicker` 2 pt.
+    /// 2 pt: `OptionCard` (removed in 6.0.0) drew 3 pt before 5.0.0, `PickerCarousel` and `IconPicker` 2 pt.
     public static let outline: CGFloat = 2
 }

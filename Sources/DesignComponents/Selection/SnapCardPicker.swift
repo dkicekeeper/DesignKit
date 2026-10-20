@@ -160,40 +160,51 @@ public struct SnapCardPicker<Item, ID: Hashable, Card: View>: View {
     /// cards have their width before the row is measured, so the write the full-width cards lose
     /// does not happen here; the margins centre a card once the row's width is known.
     private func centeredRow(width: CGFloat) -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            LazyHStack(spacing: SnapCardPickerMetrics.cardSpacing) {
-                ForEach(items, id: id) { item in
-                    let itemID = item[keyPath: id]
-                    card(item, selection == itemID) {
-                        guard selection != itemID else { return }
-                        withAnimation(AppAnimation.contentSpring) { selection = itemID }
-                        onSelectionChange?(itemID)
-                    }
-                    .frame(width: width)
-                    .id(itemID)
-                    .scrollTransition(.interactive, axis: .horizontal) { content, phase in
-                        content
-                            .scaleEffect(phase.isIdentity ? 1 : SnapCardPickerMetrics.sideScale)
-                            .opacity(phase.isIdentity ? 1 : SnapCardPickerMetrics.sideOpacity)
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHStack(spacing: SnapCardPickerMetrics.cardSpacing) {
+                    ForEach(items, id: id) { item in
+                        let itemID = item[keyPath: id]
+                        card(item, selection == itemID) {
+                            guard selection != itemID else { return }
+                            withAnimation(AppAnimation.contentSpring) { selection = itemID }
+                            onSelectionChange?(itemID)
+                        }
+                        .frame(width: width)
+                        .id(itemID)
+                        .scrollTransition(.interactive, axis: .horizontal) { content, phase in
+                            content
+                                .scaleEffect(phase.isIdentity ? 1 : SnapCardPickerMetrics.sideScale)
+                                .opacity(phase.isIdentity ? 1 : SnapCardPickerMetrics.sideOpacity)
+                        }
                     }
                 }
+                .scrollTargetLayout()
             }
-            .scrollTargetLayout()
-        }
-        .contentMargins(.horizontal, max(0, (containerWidth - width) / 2), for: .scrollContent)
-        // The cards' outline and shadow reach past the row (5.2.0: they were cut at the top and
-        // bottom), as in `.fill`.
-        .scrollClipDisabled()
-        .scrollTargetBehavior(.viewAligned)
-        .scrollPosition(id: $selection, anchor: .center)
-        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { containerWidth = $0 }
-        // A drag moves the selection with the centre: tell the app as it lands on each card.
-        .onScrollPhaseChange { _, newPhase in
-            isScrolledByHand = newPhase == .tracking || newPhase == .interacting || newPhase == .decelerating
-        }
-        .onChange(of: selection) { _, newValue in
-            guard isScrolledByHand, let newValue else { return }
-            onSelectionChange?(newValue)
+            .contentMargins(.horizontal, max(0, (containerWidth - width) / 2), for: .scrollContent)
+            // The cards' outline and shadow reach past the row (5.2.0: they were cut at the top and
+            // bottom), as in `.fill`.
+            .scrollClipDisabled()
+            .scrollTargetBehavior(.viewAligned)
+            .scrollPosition(id: $selection, anchor: .center)
+            .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { measured in
+                let isFirstMeasure = containerWidth == 0 && measured > 0
+                containerWidth = measured
+                // 6.0.0: the margins centre a card only once the row is measured, and a first
+                // position taken before that can be lost when the cards overflow the row (an
+                // OptionCardPicker opened on its first option). Put the selection back in the
+                // middle then, a tick later, once the margins are in.
+                guard isFirstMeasure, let selection else { return }
+                DispatchQueue.main.async { proxy.scrollTo(selection, anchor: .center) }
+            }
+            // A drag moves the selection with the centre: tell the app as it lands on each card.
+            .onScrollPhaseChange { _, newPhase in
+                isScrolledByHand = newPhase == .tracking || newPhase == .interacting || newPhase == .decelerating
+            }
+            .onChange(of: selection) { _, newValue in
+                guard isScrolledByHand, let newValue else { return }
+                onSelectionChange?(newValue)
+            }
         }
     }
 
