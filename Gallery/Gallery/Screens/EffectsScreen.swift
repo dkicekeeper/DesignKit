@@ -172,7 +172,7 @@ private struct AuroraBackgroundPage: View {
             canvas: .bleed,
             notes: [
                 "MeshGradient in one GPU pass, no blur, 30 fps only while AmbientMotionGate allows; otherwise one still frame.",
-                "Weighted spots (2.5.0): AuroraBackground([.init(color:weight:)]): each colour a soft pool sized and brightened by its weight, sampled into a 5×5 mesh. Replaced GradientOrbsBackground (removed in 3.0.0): no blur, no screen blend, no offscreen pass.",
+                "Weighted spots (2.5.0): AuroraBackground([.init(color:weight:)]): each colour a soft pool sized and brightened by its weight, sampled into a 9×9 mesh (5×5 before 6.1.0); where pools meet, their hues turn into each other in OKLab and keep their chroma (6.1.0). Replaced GradientOrbsBackground (removed in 3.0.0): no blur, no screen blend, no offscreen pass.",
                 "Still by default with spots: under Liquid Glass a moving background makes every glass surface redraw each frame. A change of data flows into the new shape in 0.6 s.",
                 "A fine still grain (2.5.0) keeps the gradient from banding on a dark screen; grain: 0 turns it off.",
             ]

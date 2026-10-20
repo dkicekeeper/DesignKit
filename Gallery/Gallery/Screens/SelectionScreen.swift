@@ -303,7 +303,7 @@ private struct OptionCardPickerPage: View {
             canvas: .bleed,
             notes: [
                 "6.0.0: the only look. A swipe or a tap on a neighbour changes the choice, with the selection haptic; only the centred preview moves.",
-                "settings: what the app sets for the chosen option, in DesignKit's form rows: a FormSection of ActionRowLabel (a PhotosPicker's label), ToggleSettingsRow, SliderRow and ActionSettingsRow, inset dividers between them.",
+                "settings: what the app sets for the chosen option, in DesignKit's form rows: a FormSection of ActionRowLabel (a PhotosPicker's label), ToggleSettingsRow, SliderRow and ActionSettingsRow with config: .standard, inset dividers between them.",
                 "artwork fills the frame it is given: a phone's shape, 180 × 270.",
             ]
         ) {
@@ -346,7 +346,7 @@ private struct OptionCardPickerPage: View {
                 ToggleSettingsRow(icon: "wind", title: "Moves slowly", config: .standard, isOn: $moves)
                 Divider().padding(.leading, AppSpacing.lg)
                 SliderRow("Intensity", systemImage: "circle.lefthalf.filled", value: $intensity, in: 0.1...1,
-                          valueText: "\(Int((intensity * 100).rounded()))%")
+                          valueText: "\(Int((intensity * 100).rounded()))%", config: .standard)
             }
             .screenPadding()
         case .photo:

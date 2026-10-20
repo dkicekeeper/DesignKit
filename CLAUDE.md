@@ -257,6 +257,10 @@ rather than importing an app type.
   is a carousel of large previews only; `style:` (`.list`, `.carousel`), `OptionCard` and the row
   of small cards under one preview went, and its settings are DesignKit's form rows
   ([docs/migration-6.0.md](docs/migration-6.0.md)).
+- DesignKit 6.1.0 (2026-10, the owner's review of Tenra's background settings on a device):
+  `SliderRow(config:)` pads it in a `FormSection` card, and `AuroraBackground(_ spots:)` shows
+  its colours bright (denser pools, hues meeting in OKLab with their chroma, a 9×9 mesh, colours
+  read as linear light); the Gallery shows settings rows in a card or a `List` with their config.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.

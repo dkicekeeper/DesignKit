@@ -43,4 +43,5 @@ OptionCardPicker(HomeBackgroundMode.allCases, selection: $mode, title: { $0.loca
 - The settings stay under the carousel. Put them in DesignKit's form rows: a `FormSection` of
   `ActionRowLabel` (as a `PhotosPicker`'s label), `ToggleSettingsRow`, `SliderRow` and
   `ActionSettingsRow` with the `.standard` config, `Divider().padding(.leading, AppSpacing.lg)`
-  between them.
+  between them. `SliderRow` takes `config:` since 6.1.0; before that it had no side padding in a
+  card.
