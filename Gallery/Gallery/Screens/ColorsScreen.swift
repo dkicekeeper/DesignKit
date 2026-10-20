@@ -282,7 +282,7 @@ struct ColorsScreen: View {
         }
     }
 
-    /// The 30 colours a user picks from (`CategoryColors.pickerPalette`, `ColorPickerRow`'s
+    /// The 30 colours a user picks from (`CategoryColors.pickerPalette`, `UniversalRow(accessory: .colors)`'s
     /// default). The first 14, marked "#", are the hash palette too: the colour of a name that
     /// has none stored (`CategoryColors.color(for:)`: an insight's item, a letter avatar,
     /// a category before the user picks one). Under them, a few names and the colour they hash to.

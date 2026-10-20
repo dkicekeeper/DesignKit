@@ -26,14 +26,12 @@ extension ComponentSnapshots {
                         // ("6/17/26") in the runs of 5-9 October and the medium one ("Jun 17, 2026")
                         // on 12 October, on the same runner image, simulator and Xcode. A time has
                         // one style, and the row (icon, title, pill) is the same.
-                        DatePickerRow(icon: "clock", title: "Reminder", selection: .constant(FormsSample.startDate),
-                                      displayedComponents: .hourAndMinute)
-                        MenuPickerRow(
-                            icon: "arrow.triangle.2.circlepath",
-                            title: "Frequency",
-                            selection: .constant("monthly"),
-                            options: [(label: "Weekly", value: "weekly"), (label: "Monthly", value: "monthly")]
-                        )
+                        UniversalRow("Reminder", icon: "clock",
+                                     accessory: .date(.constant(FormsSample.startDate), components: .hourAndMinute))
+                        UniversalRow("Frequency", icon: "arrow.triangle.2.circlepath",
+                                     accessory: .menu(.constant("monthly"), options: [
+                                         (label: "Weekly", value: "weekly"), (label: "Monthly", value: "monthly"),
+                                     ]))
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
@@ -45,10 +43,10 @@ extension ComponentSnapshots {
         @Test func formRows3() async {
             await assertComponentSnapshot(
                 FormSection(header: "Catch") {
-                    StepperRow(icon: "fish", title: "Fish caught", value: .constant(3), in: 0...99)
-                    StepperRow(title: "Spare hooks", value: .constant(12), in: 0...50) { "\($0) pcs" }
-                    ToggleSettingsRow(title: "Released", config: .standard, isOn: .constant(true))
-                    ActionSettingsRow(title: "Delete catch", isDestructive: true, config: .standard) {}
+                    UniversalRow("Fish caught", icon: "fish", accessory: .stepper(.constant(3), in: 0...99))
+                    UniversalRow("Spare hooks", accessory: .stepper(.constant(12), in: 0...50) { "\($0) pcs" })
+                    UniversalRow("Released", accessory: .toggle(.constant(true)))
+                    UniversalRow("Delete catch", role: .destructive, accessory: .action {})
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light, .dark, .largeText]
@@ -59,9 +57,9 @@ extension ComponentSnapshots {
         @Test func actionRowLabels() async {
             await assertComponentSnapshot(
                 FormSection(header: "Photos") {
-                    ActionRowLabel("Add photos", systemImage: "photo.on.rectangle.angled")
+                    UniversalRow("Add photos", icon: "photo.on.rectangle.angled", titleColor: AppColors.accent)
                     Divider().padding(.leading, AppSpacing.lg)
-                    ActionRowLabel("Add a photo", systemImage: "camera", titleColor: AppColors.Text.primary)
+                    UniversalRow("Add a photo", icon: "camera")
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light, .dark, .largeText]
@@ -100,11 +98,13 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 NavigationStack {
                     FormSection(header: "Catch") {
-                        NavigationPickerRow(icon: "fish", title: "Species", selection: .constant("pike"),
-                                            options: [(label: "Pike", value: "pike"), (label: "Perch", value: "perch")])
+                        UniversalRow("Species", icon: "fish", accessory: .picker(.constant("pike"), options: [
+                            (label: "Pike", value: "pike"), (label: "Perch", value: "perch"),
+                        ]))
                         Divider().padding(.leading, AppSpacing.lg)
-                        NavigationPickerRow(title: "Packing list", selection: .constant("winter"),
-                                            options: [(label: "Winter fishing", value: "winter")])
+                        UniversalRow("Packing list", accessory: .picker(.constant("winter"), options: [
+                            (label: "Winter fishing", value: "winter"),
+                        ]))
                     }
                     .frame(maxHeight: .infinity, alignment: .top)
                     .toolbar(.hidden, for: .navigationBar)
@@ -150,14 +150,15 @@ extension ComponentSnapshots {
             )
         }
 
-        /// NavigationPickerRow(style: .list) (4.14.0): the row of a List, as in Settings.
+        /// A picker row in a List (`config: .settings`; 4.14.0's NavigationPickerRow(style: .list)), as in Settings.
         @Test func navigationPickerRowList() async {
             await assertComponentSnapshot(
                 NavigationStack {
                     List {
-                        NavigationPickerRow(icon: "waveform", title: "Voice language", selection: .constant(""),
-                                            options: [(label: "App language", value: ""), (label: "English", value: "en-US")],
-                                            style: .list)
+                        UniversalRow("Voice language", icon: "waveform", config: .settings,
+                                     accessory: .picker(.constant(""), options: [
+                                         (label: "App language", value: ""), (label: "English", value: "en-US"),
+                                     ]))
                     }
                     .toolbar(.hidden, for: .navigationBar)
                 }

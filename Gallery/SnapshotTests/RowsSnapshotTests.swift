@@ -44,18 +44,14 @@ extension ComponentSnapshots {
         @Test func settingsRows() async {
             await assertComponentSnapshot(
                 VStack(spacing: 0) {
-                    ActionSettingsRow(icon: "square.and.arrow.up", title: "Export data") {}
+                    UniversalRow("Export data", icon: "square.and.arrow.up", config: .settings, accessory: .action {})
                     Divider()
-                    ToggleSettingsRow(icon: "faceid", title: "Face ID", isOn: .constant(true))
+                    UniversalRow("Face ID", icon: "faceid", config: .settings, accessory: .toggle(.constant(true)))
                     Divider()
-                    ToggleSettingsRow(
-                        icon: "location",
-                        title: "Share location",
-                        hint: "Friends see your trip on the map",
-                        isOn: .constant(false)
-                    )
+                    UniversalRow("Share location", icon: "location", hint: "Friends see your trip on the map",
+                                 config: .settings, accessory: .toggle(.constant(false)))
                     Divider()
-                    ActionSettingsRow(icon: "trash", title: "Delete all data", isDestructive: true) {}
+                    UniversalRow("Delete all data", icon: "trash", role: .destructive, config: .settings, accessory: .action {})
                 }
                 .cardStyle(),
                 appearances: [.light, .dark, .largeText]
@@ -65,12 +61,13 @@ extension ComponentSnapshots {
         @Test func checkmarkRows() async {
             await assertComponentSnapshot(
                 VStack(spacing: 0) {
-                    CheckmarkRow("All accounts", isSelected: false) {}
-                    CheckmarkRow("Kaspi Gold",
-                                 icon: .custom(source: .sfSymbol("creditcard.fill"),
-                                               style: .roundedSquare(size: AppIconSize.xl, tint: .accentMonochrome)),
+                    UniversalRow("All accounts", config: .settings, accessory: .checkmark(isSelected: false) {})
+                    UniversalRow("Kaspi Gold",
+                                 leadingIcon: .custom(source: .sfSymbol("creditcard.fill"),
+                                                      style: .roundedSquare(size: AppIconSize.xl, tint: .accentMonochrome)),
                                  value: "120 000 ₸",
-                                 isSelected: true) {}
+                                 config: .settings,
+                                 accessory: .checkmark(isSelected: true) {})
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light, .dark, .largeText]
@@ -80,9 +77,9 @@ extension ComponentSnapshots {
         @Test func infoRows() async {
             await assertComponentSnapshot(
                 VStack(spacing: 0) {
-                    InfoRow(icon: "calendar", label: "Next payment", value: "12 October")
-                    InfoRow(icon: "banknote", label: "Amount", amount: 4_990, currency: "KZT")
-                    InfoRow(label: "A long label that truncates before the value", value: "1 234 567 ₸")
+                    UniversalRow("Next payment", icon: "calendar", config: .info, accessory: .info("12 October"))
+                    UniversalRow("Amount", icon: "banknote", config: .info, accessory: .amount(4_990, currency: "KZT"))
+                    UniversalRow("A long label that truncates before the value", config: .info, accessory: .info("1 234 567 ₸"))
                 }
                 .cardContentPadding()
                 .cardStyle(),
@@ -109,7 +106,7 @@ extension ComponentSnapshots {
 
         @Test func colorPickerRow() async {
             await assertComponentSnapshot(
-                ColorPickerRow(selectedColorHex: .constant(CategoryColors.pickerPalette[2]), title: "Color")
+                UniversalRow("Color", config: .settings, accessory: .colors(.constant(CategoryColors.pickerPalette[2])))
                     .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light, .dark, .largeText]
             )
@@ -188,15 +185,13 @@ extension ComponentSnapshots {
 
         @Test func sliderRow() async {
             await assertComponentSnapshot(
-                VStack(spacing: 0) {
-                    SliderRow("Colour intensity", systemImage: "circle.lefthalf.filled",
-                              value: .constant(0.6), in: 0.05...1, valueText: "60%")
-                    Divider()
-                    SliderRow("Radius", value: .constant(500), in: 100...2_000, step: 100, valueText: "500 m",
-                              hint: "Trips hide their track inside this circle")
-                }
-                .padding(.horizontal, AppSpacing.lg)
-                .formCardStyle(),
+                FormSection {
+                    UniversalRow("Colour intensity", icon: "circle.lefthalf.filled",
+                                 accessory: .slider(.constant(0.6), in: 0.05...1, valueText: "60%"))
+                    Divider().padding(.leading, AppSpacing.lg)
+                    UniversalRow("Radius", hint: "Trips hide their track inside this circle",
+                                 accessory: .slider(.constant(500), in: 100...2_000, step: 100, valueText: "500 m"))
+                },
                 appearances: [.light, .dark, .largeText]
             )
         }
@@ -253,14 +248,14 @@ extension ComponentSnapshots {
         @Test func settingsCard() async {
             await assertComponentSnapshot(
                 FormSection {
-                    ActionRowLabel("Change photo", systemImage: "photo.on.rectangle")
+                    UniversalRow("Change photo", icon: "photo.on.rectangle", titleColor: AppColors.accent)
                     Divider().padding(.leading, AppSpacing.lg)
-                    ToggleSettingsRow(icon: "camera.filters", title: "Blur", config: .standard, isOn: .constant(true))
+                    UniversalRow("Blur", icon: "camera.filters", accessory: .toggle(.constant(true)))
                     Divider().padding(.leading, AppSpacing.lg)
-                    SliderRow("Intensity", systemImage: "circle.lefthalf.filled", value: .constant(0.35),
-                              in: 0.05...1, valueText: "35%", config: .standard)
+                    UniversalRow("Intensity", icon: "circle.lefthalf.filled",
+                                 accessory: .slider(.constant(0.35), in: 0.05...1, valueText: "35%"))
                     Divider().padding(.leading, AppSpacing.lg)
-                    ActionSettingsRow(icon: "trash", title: "Remove photo", isDestructive: true, config: .standard) {}
+                    UniversalRow("Remove photo", icon: "trash", role: .destructive, accessory: .action {})
                 },
                 appearances: [.light, .dark, .largeText]
             )
