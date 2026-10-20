@@ -147,6 +147,7 @@ public struct FormattedAmountText: View {
             guard let unitString else { return nil }
             unit = Text(" " + unitString)
         case .systemImage(let name):
+            // A symbol inside the text, set in its font (6.2.0, outside the Icon rule).
             unit = Text(" \(Image(systemName: name))")
         case .numberOnly:
             return nil

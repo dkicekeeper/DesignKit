@@ -223,8 +223,8 @@ public struct MessageComposer<Leading: View>: View {
             ZStack {
                 Circle()
                     .fill(isEnabled ? AppColors.accent : AppColors.Background.neutral2)
-                Image(systemName: "mic.fill")
-                    .font(.system(size: AppIconSize.sm, weight: .bold))
+                Icon("mic.fill", size: AppIconSize.sm, scalesWithText: false)
+                    .fontWeight(.bold)
                     .foregroundStyle(isEnabled ? AppColors.staticWhite : AppColors.Text.tertiary)
             }
             .frame(width: MessageComposerMetrics.buttonSize, height: MessageComposerMetrics.buttonSize)
@@ -246,8 +246,8 @@ public struct MessageComposer<Leading: View>: View {
                         .controlSize(.small)
                         .tint(AppColors.staticWhite)
                 } else {
-                    Image(systemName: "arrow.up")
-                        .font(.system(size: AppIconSize.sm, weight: .bold))
+                    Icon("arrow.up", size: AppIconSize.sm, scalesWithText: false)
+                        .fontWeight(.bold)
                         .foregroundStyle(isSendEnabled ? AppColors.staticWhite : AppColors.Text.tertiary)
                 }
             }
@@ -282,8 +282,7 @@ public struct MessageComposer<Leading: View>: View {
                     HapticManager.light()
                     onCancelQuote()
                 } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: AppIconSize.md))
+                    Icon("xmark.circle.fill", size: AppIconSize.md, scalesWithText: false)
                         .foregroundStyle(AppColors.Text.tertiary)
                 }
                 .buttonStyle(.plain)
@@ -301,8 +300,7 @@ public struct MessageComposer<Leading: View>: View {
                 .font(AppTypography.caption)
                 .foregroundStyle(AppColors.destructive)
         } icon: {
-            Image(systemName: "exclamationmark.circle.fill")
-                .font(AppTypography.caption)
+            Icon("exclamationmark.circle.fill", size: AppIconSize.sm)
                 .foregroundStyle(AppColors.destructive)
         }
     }
@@ -359,8 +357,8 @@ public struct MessageComposerAccessory: View {
     }
 
     public var body: some View {
-        Image(systemName: systemImage)
-            .font(.system(size: AppIconSize.md, weight: .medium))
+        Icon(systemImage, size: AppIconSize.md, scalesWithText: false)
+            .fontWeight(.medium)
             .foregroundStyle(isEnabled ? AppColors.Text.secondary : AppColors.Text.tertiary)
             .frame(width: MessageComposerMetrics.buttonSize, height: MessageComposerMetrics.buttonSize)
             .contentShape(Circle())

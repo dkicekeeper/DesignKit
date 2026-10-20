@@ -134,8 +134,7 @@ public struct EditableHero: View {
                         Text(verbatim: Formatting.currencySymbol(for: currency))
                         Text(verbatim: currency)
                             .font(AppTypography.bodySmall)
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: AppIconSize.sm))
+                        Icon("chevron.right", size: AppIconSize.sm, scalesWithText: false)
                     }
                     .filterChipStyle(isSelected: false)
                 }

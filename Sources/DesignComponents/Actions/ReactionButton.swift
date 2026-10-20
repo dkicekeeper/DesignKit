@@ -73,7 +73,7 @@ public struct ReactionButton: View {
                             Text(verbatim: "\(count)")
                         }
                     } icon: {
-                        Image(systemName: isSelected ? selectedSystemImage : systemImage)
+                        Icon(isSelected ? selectedSystemImage : systemImage, size: AppIconSize.sm)
                             // 2.2.0: the fill grows in, the symbol bounces and sparkles
                             // burst around it when the reaction is added.
                             .symbolMagicReplace()
@@ -91,7 +91,7 @@ public struct ReactionButton: View {
                 Label {
                     Text(verbatim: "\(count)")
                 } icon: {
-                    Image(systemName: systemImage)
+                    Icon(systemImage, size: AppIconSize.sm)
                 }
                 .foregroundStyle(AppColors.Text.secondary)
                 .accessibilityLabel(Text(verbatim: accessibilityLabel))

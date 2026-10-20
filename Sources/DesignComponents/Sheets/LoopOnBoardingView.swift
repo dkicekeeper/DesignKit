@@ -99,8 +99,7 @@ public struct LoopOnboardingHero: View {
 
     public var body: some View {
         ZStack {
-            Image(systemName: symbol)
-                .font(.system(size: config.iconSize - 20))
+            Icon(symbol, size: config.iconSize - 20, scalesWithText: false)
                 .foregroundStyle(config.tint.gradient)
                 .contentTransition(.symbolEffect(.replace.downUp))
                 .frame(width: config.iconSize, height: config.iconSize)

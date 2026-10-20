@@ -77,9 +77,7 @@ public struct PendingItemCard<Content: View>: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             HStack(spacing: AppSpacing.sm) {
                 if let systemImage {
-                    Image(systemName: systemImage)
-                        .foregroundStyle(AppColors.accent)
-                        .accessibilityHidden(true)
+                    Icon(systemImage, size: AppIconSize.md, tint: .monochrome(AppColors.accent))
                 }
                 Text(verbatim: title)
                     .font(AppTypography.bodyEmphasis)

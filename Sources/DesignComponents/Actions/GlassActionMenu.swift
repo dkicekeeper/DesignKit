@@ -100,8 +100,8 @@ public struct GlassActionMenu: View {
                     item.action()
                     setOpen(false)
                 } label: {
-                    Image(systemName: item.systemImage)
-                        .font(.system(size: AppIconSize.md, weight: .semibold))
+                    Icon(item.systemImage, size: AppIconSize.md, scalesWithText: false)
+                        .fontWeight(.semibold)
                         .frame(width: GlassActionMenuMetrics.action, height: GlassActionMenuMetrics.action)
                 }
                 .buttonStyle(.plain)
@@ -118,8 +118,8 @@ public struct GlassActionMenu: View {
             HapticManager.selection()
             setOpen(!isOpen)
         } label: {
-            Image(systemName: isOpen ? "xmark" : systemImage)
-                .font(.system(size: AppIconSize.lg, weight: .semibold))
+            Icon(isOpen ? "xmark" : systemImage, size: AppIconSize.lg, scalesWithText: false)
+                .fontWeight(.semibold)
                 .foregroundStyle(isOpen ? AppColors.Text.primary : AppColors.Text.onAccent)
                 .contentTransition(.symbolEffect(.replace))
                 .frame(width: GlassActionMenuMetrics.button, height: GlassActionMenuMetrics.button)

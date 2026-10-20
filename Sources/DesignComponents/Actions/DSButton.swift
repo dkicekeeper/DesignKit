@@ -133,12 +133,19 @@ public struct DSButton: View {
             : Text(verbatim: ""))
     }
 
+    /// The symbol at the size of the label's text (6.2.0: an `Icon`).
+    private var iconSize: CGFloat { size == .small ? AppIconSize.sm : AppIconSize.md }
+
     @ViewBuilder
     private var content: some View {
         switch iconPlacement {
         case .leading, .top:
             if let systemImage {
-                Label(title, systemImage: systemImage)
+                Label {
+                    Text(verbatim: title)
+                } icon: {
+                    Icon(systemImage, size: iconSize)
+                }
             } else {
                 Text(verbatim: title)
             }
@@ -146,11 +153,11 @@ public struct DSButton: View {
             HStack(spacing: AppSpacing.xs) {
                 Text(verbatim: title)
                 if let systemImage {
-                    Image(systemName: systemImage)
+                    Icon(systemImage, size: iconSize)
                 }
             }
         case .only:
-            Image(systemName: systemImage ?? "circle")
+            Icon(systemImage ?? "circle", size: iconSize)
         }
     }
 
@@ -166,8 +173,8 @@ public struct DSButton: View {
                         .controlSize(.small)
                         .frame(width: AppIconSize.lg, height: AppIconSize.lg)
                 } else if let systemImage {
-                    Image(systemName: systemImage)
-                        .font(.system(size: AppIconSize.lg, weight: .semibold))
+                    Icon(systemImage, size: AppIconSize.lg, scalesWithText: false)
+                        .fontWeight(.semibold)
                         .symbolCue(.bounce, trigger: presses)
                         .frame(width: AppIconSize.lg, height: AppIconSize.lg)
                 }

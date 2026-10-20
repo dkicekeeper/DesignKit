@@ -39,8 +39,8 @@ public struct ChartZoomControls: View {
                     let next = max(range.lowerBound, zoomScale / step)
                     zoomScale = next
                 } label: {
-                    Image(systemName: "minus.magnifyingglass")
-                        .font(AppTypography.h4.weight(.medium))
+                    Icon("minus.magnifyingglass", size: AppIconSize.md)
+                        .fontWeight(.medium)
                         .frame(width: 44, height: 44)
                         .contentShape(Circle())
                 }
@@ -55,8 +55,8 @@ public struct ChartZoomControls: View {
                     let next = min(range.upperBound, zoomScale * step)
                     zoomScale = next
                 } label: {
-                    Image(systemName: "plus.magnifyingglass")
-                        .font(AppTypography.h4.weight(.medium))
+                    Icon("plus.magnifyingglass", size: AppIconSize.md)
+                        .fontWeight(.medium)
                         .frame(width: 44, height: 44)
                         .contentShape(Circle())
                 }

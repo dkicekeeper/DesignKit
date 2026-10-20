@@ -59,9 +59,9 @@ public struct ChecklistRow: View {
                     .foregroundStyle(isChecked ? AppColors.Text.secondary : AppColors.Text.primary)
                 Spacer(minLength: 0)
                 if let accessorySystemImage {
-                    Image(systemName: accessorySystemImage)
-                        .font(AppTypography.caption)
+                    Icon(accessorySystemImage, size: AppIconSize.sm)
                         .foregroundStyle(AppColors.Text.tertiary)
+                        .accessibilityElement(children: .ignore)
                         .accessibilityLabel(Text(verbatim: accessoryLabel ?? ""))
                         .accessibilityHidden(accessoryLabel == nil)
                 }
@@ -127,10 +127,10 @@ public struct ChecklistSummaryRow: View {
                     .foregroundStyle(AppColors.Text.primary)
                 Spacer(minLength: 0)
                 if isComplete {
-                    Image(systemName: "checkmark.seal.fill")
-                        .foregroundStyle(AppColors.success)
+                    Icon("checkmark.seal.fill", size: AppIconSize.md, tint: .monochrome(AppColors.success))
                         // 2.2.0: the seal draws itself on when the list is complete.
                         .drawOnAppear()
+                        .accessibilityElement(children: .ignore)
                         .accessibilityLabel(Text(verbatim: completeLabel
                             ?? String(localized: "checklist.complete", defaultValue: "Complete")))
                 }

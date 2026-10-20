@@ -25,8 +25,7 @@ public struct RecommendationBox: View {
 
     public var body: some View {
         HStack(alignment: .top, spacing: AppSpacing.sm) {
-            Image(systemName: icon)
-                .font(.system(size: AppIconSize.sm))
+            Icon(icon, size: AppIconSize.sm, scalesWithText: false)
                 .foregroundStyle(color)
 
             Text(text)
@@ -55,8 +54,7 @@ public struct RecommendationBoxSkeleton: View {
     public var body: some View {
         // The box's own layout, invisible, gives the height (it grows with Dynamic Type).
         HStack(alignment: .top, spacing: AppSpacing.sm) {
-            Image(systemName: "lightbulb.fill")
-                .font(.system(size: AppIconSize.sm))
+            Icon("lightbulb.fill", size: AppIconSize.sm, scalesWithText: false)
             Text(verbatim: Array(repeating: "Ag", count: lines).joined(separator: "\n"))
                 .font(AppTypography.bodySmall)
         }

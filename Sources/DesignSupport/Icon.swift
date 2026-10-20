@@ -82,8 +82,16 @@ public struct Icon: View {
     /// ```swift
     /// Icon("checkmark.circle.fill", size: AppIconSize.sm, tint: .monochrome(AppColors.success))
     /// ```
-    public init(_ systemName: String, size: CGFloat = AppIconSize.md, tint: IconTint = .inherit) {
-        self.init(source: .sfSymbol(systemName), style: .glyph(size, tint: tint))
+    ///
+    /// - Parameter scalesWithText: Whether it grows with the text size (the default); off for a
+    ///   symbol in a control of a fixed size (a round button, a key).
+    public init(
+        _ systemName: String,
+        size: CGFloat = AppIconSize.md,
+        tint: IconTint = .inherit,
+        scalesWithText: Bool = true
+    ) {
+        self.init(source: .sfSymbol(systemName), style: IconStyle.glyph(size, tint: tint).scaling(scalesWithText))
     }
 
     // MARK: - Body

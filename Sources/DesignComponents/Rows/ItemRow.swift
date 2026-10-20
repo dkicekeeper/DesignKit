@@ -142,12 +142,13 @@ public struct MetaLine: View {
         case .text(let text):
             text.foregroundStyle(item.tint ?? tint)
         case .label(let text, let systemImage):
-            Label { text } icon: { Image(systemName: systemImage) }
+            Label { text } icon: { Icon(systemImage, size: AppIconSize.xs) }
                 .labelStyle(.titleAndIcon)
                 .foregroundStyle(item.tint ?? tint)
         case .symbol(let systemImage, let accessibilityLabel):
-            Image(systemName: systemImage)
+            Icon(systemImage, size: AppIconSize.xs)
                 .foregroundStyle(item.tint ?? tint)
+                .accessibilityElement(children: .ignore)
                 .accessibilityLabel(accessibilityLabel)
         }
     }
@@ -281,15 +282,13 @@ public struct ItemRow<Accessory: View>: View {
     private var leadingView: some View {
         switch leading {
         case .symbol(let name, let tint):
-            Image(systemName: name)
-                .font(.system(size: AppIconSize.md))
+            Icon(name, size: AppIconSize.md, scalesWithText: false)
                 .foregroundStyle(tint)
                 .frame(width: AppIconSize.xxl, height: AppIconSize.xxl)
                 .background(AppColors.pale(tint), in: Circle())
                 .accessibilityHidden(true)
         case .glyph(let name, let tint):
-            Image(systemName: name)
-                .font(.system(size: glyphSize))
+            Icon(name, size: glyphSize, scalesWithText: false)
                 .foregroundStyle(tint)
                 .frame(width: glyphSlot)
                 .accessibilityHidden(true)

@@ -64,22 +64,25 @@ public enum EntityStatus {
 public struct StatusIndicatorBadge: View {
     let status: EntityStatus
 
-    /// Font size applied to the SF Symbol via `.font()`.
-    /// Provide either `font` (semantic) or `iconSize` (explicit points), not both.
-    var font: Font = AppTypography.h4
+    /// The symbol's size (6.2.0: an `Icon`).
+    let size: CGFloat
 
-    public init(
-        status: EntityStatus,
-        font: Font = AppTypography.h4
-    ) {
+    /// - Parameter size: The symbol's size, `AppIconSize.md` by default.
+    public init(status: EntityStatus, size: CGFloat = AppIconSize.md) {
         self.status = status
-        self.font = font
+        self.size = size
+    }
+
+    /// The symbol at the size of a text style (before 6.2.0).
+    @available(*, deprecated, message: "Use init(status:size:) with an AppIconSize (6.2.0).")
+    public init(status: EntityStatus, font: Font) {
+        self.init(status: status, size: AppIconSize.matching(font))
     }
 
     public var body: some View {
-        Image(systemName: status.iconName)
-            .font(font)
-            .foregroundStyle(status.tintColor)
+        Icon(status.iconName, size: size, tint: .monochrome(status.tintColor))
+            // A symbol that says something: its own element, with the status as its label.
+            .accessibilityElement(children: .ignore)
             .accessibilityLabel(status.accessibilityLabel)
     }
 }
@@ -90,19 +93,36 @@ public struct StatusIndicatorBadge: View {
 
 /// Placeholder of a `StatusIndicatorBadge`: a circle the size of its symbol.
 public struct StatusIndicatorBadgeSkeleton: View {
-    let font: Font
+    let size: CGFloat
 
-    public init(font: Font = AppTypography.body) {
-        self.font = font
+    public init(size: CGFloat = AppIconSize.md) {
+        self.size = size
+    }
+
+    /// A circle the size of a text style's symbol (before 6.2.0).
+    @available(*, deprecated, message: "Use init(size:) with an AppIconSize (6.2.0).")
+    public init(font: Font) {
+        self.init(size: AppIconSize.matching(font))
     }
 
     public var body: some View {
-        // The symbol's own size, invisible, under a grey circle.
-        Image(systemName: "circle.fill")
-            .font(font)
-            .hidden()
-            .background(Skeleton.fill, in: Circle())
+        Circle()
+            .fill(Skeleton.fill)
+            .frame(width: size, height: size)
             .shimmer()
             .skeletonLoadingLabel()
+    }
+}
+
+extension AppIconSize {
+    /// The glyph size of a symbol set in `font` before 6.2.0, for the inits that took a font:
+    /// the nearest size of the scale to the text style's, `md` for any other font.
+    static func matching(_ font: Font) -> CGFloat {
+        let sizes: [(Font, CGFloat)] = [
+            (AppTypography.h1, xl), (AppTypography.h2, xl), (AppTypography.h3, lg), (AppTypography.h4, md),
+            (AppTypography.bodyEmphasis, md), (AppTypography.body, md), (AppTypography.bodySmall, sm),
+            (AppTypography.caption, xs), (AppTypography.caption2, xs),
+        ]
+        return sizes.first { $0.0 == font }?.1 ?? md
     }
 }

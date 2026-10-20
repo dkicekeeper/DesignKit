@@ -142,8 +142,8 @@ public struct SectionHeader: View {
             around: Text(title)
                 .font(AppTypography.bodyEmphasis)
                 .foregroundStyle(AppColors.Text.primary),
-            font: AppTypography.bodyEmphasis,
-            leadingFont: AppTypography.bodyEmphasis,
+            leadingSize: AppIconSize.md,
+            trailingSize: AppIconSize.sm,
             leadingColor: AppColors.accent,
             spacing: AppSpacing.sm
         )
@@ -155,8 +155,8 @@ public struct SectionHeader: View {
                 .font(AppTypography.bodySmall)
                 .foregroundStyle(AppColors.Text.secondary)
                 .textCase(.uppercase),
-            font: AppTypography.bodySmall,
-            leadingFont: AppTypography.bodySmall,
+            leadingSize: AppIconSize.sm,
+            trailingSize: AppIconSize.xs,
             leadingColor: AppColors.Text.secondary,
             spacing: AppSpacing.sm
         )
@@ -197,8 +197,8 @@ public struct SectionHeader: View {
             around: Text(title)
                 .font(AppTypography.h3)
                 .foregroundStyle(AppColors.Text.primary),
-            font: AppTypography.h3,
-            leadingFont: nil,
+            leadingSize: AppIconSize.md,
+            trailingSize: AppIconSize.md,
             leadingColor: AppColors.accent,
             spacing: AppSpacing.md
         )
@@ -211,44 +211,30 @@ public struct SectionHeader: View {
     @ViewBuilder
     private func symbols(
         around text: some View,
-        font: Font,
-        leadingFont: Font?,
+        leadingSize: CGFloat,
+        trailingSize: CGFloat,
         leadingColor: Color,
         spacing: CGFloat
     ) -> some View {
         if let systemImage {
             HStack(spacing: spacing) {
-                leadingSymbol(systemImage, font: leadingFont, color: leadingColor)
-                withTrailingSymbol(text, font: font)
+                // 6.2.0: the symbols are Icons at the title's size (the leading one a step larger).
+                Icon(systemImage, size: leadingSize)
+                    .foregroundStyle(tint ?? leadingColor)
+                withTrailingSymbol(text, size: trailingSize)
             }
         } else {
-            withTrailingSymbol(text, font: font)
-        }
-    }
-
-    /// `font: nil` leaves the symbol in the font around it (the large style's).
-    @ViewBuilder
-    private func leadingSymbol(_ name: String, font: Font?, color: Color) -> some View {
-        let symbol = Image(systemName: name)
-            .foregroundStyle(tint ?? color)
-            .accessibilityHidden(true)
-        if let font {
-            symbol.font(font)
-        } else {
-            symbol
+            withTrailingSymbol(text, size: trailingSize)
         }
     }
 
     @ViewBuilder
-    private func withTrailingSymbol(_ text: some View, font: Font) -> some View {
+    private func withTrailingSymbol(_ text: some View, size: CGFloat) -> some View {
         if let trailingSystemImage {
             HStack(spacing: AppSpacing.xs) {
                 text
-                Image(systemName: trailingSystemImage)
-                    .font(font)
-                    .imageScale(.small)
+                Icon(trailingSystemImage, size: size)
                     .foregroundStyle(tint ?? AppColors.Text.tertiary)
-                    .accessibilityHidden(true)
             }
         } else {
             text
@@ -277,18 +263,18 @@ public struct SectionHeaderSkeleton: View {
             switch style {
             case .default:
                 line(SkeletonText(AppTypography.bodyEmphasis, width: 120),
-                     iconFont: AppTypography.bodyEmphasis, spacing: AppSpacing.sm)
+                     iconSize: AppIconSize.md, spacing: AppSpacing.sm)
             case .compact:
                 line(SkeletonText(AppTypography.bodySmall, width: 100),
-                     iconFont: AppTypography.bodySmall, spacing: AppSpacing.sm)
+                     iconSize: AppIconSize.sm, spacing: AppSpacing.sm)
             case .large:
-                line(SkeletonText(AppTypography.h3, width: 160), iconFont: .body, spacing: AppSpacing.md)
+                line(SkeletonText(AppTypography.h3, width: 160), iconSize: AppIconSize.md, spacing: AppSpacing.md)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .screenPadding()
             case .card:
                 HStack {
                     withIcon(SkeletonText(AppTypography.bodyEmphasis, width: 100),
-                             font: AppTypography.bodyEmphasis, spacing: AppSpacing.sm)
+                             size: AppIconSize.md, spacing: AppSpacing.sm)
                     Spacer()
                     if showsTrailing {
                         SkeletonText(AppTypography.bodySmall, width: 80)
@@ -303,27 +289,26 @@ public struct SectionHeaderSkeleton: View {
     }
 
     @ViewBuilder
-    private func line(_ title: SkeletonText, iconFont: Font, spacing: CGFloat) -> some View {
+    private func line(_ title: SkeletonText, iconSize: CGFloat, spacing: CGFloat) -> some View {
         if showsTrailing {
             HStack {
-                withIcon(title, font: iconFont, spacing: spacing)
+                withIcon(title, size: iconSize, spacing: spacing)
                 Spacer(minLength: 0)
                 SkeletonText(AppTypography.bodySmall, width: 40)
             }
         } else {
-            withIcon(title, font: iconFont, spacing: spacing)
+            withIcon(title, size: iconSize, spacing: spacing)
         }
     }
 
     @ViewBuilder
-    private func withIcon(_ title: SkeletonText, font: Font, spacing: CGFloat) -> some View {
+    private func withIcon(_ title: SkeletonText, size: CGFloat, spacing: CGFloat) -> some View {
         if showsIcon {
             HStack(spacing: spacing) {
-                // A symbol's box in the style's font, drawn as a grey circle.
-                Image(systemName: "circle.fill")
-                    .font(font)
-                    .hidden()
-                    .overlay { Circle().fill(Skeleton.fill) }
+                // The symbol's box, drawn as a grey circle.
+                Circle()
+                    .fill(Skeleton.fill)
+                    .frame(width: size, height: size)
                     .shimmer()
                     .accessibilityHidden(true)
                 title

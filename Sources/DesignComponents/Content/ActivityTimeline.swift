@@ -98,8 +98,8 @@ public struct ActivityTimeline<Item: Identifiable, Content: View>: View {
             if let symbol = marker.systemImage {
                 Circle()
                     .fill(AppColors.pale(color))
-                Image(systemName: symbol)
-                    .font(.system(size: AppIconSize.sm * 0.8, weight: .semibold))
+                Icon(symbol, size: AppIconSize.xs, scalesWithText: false)
+                    .fontWeight(.semibold)
                     .foregroundStyle(color)
             } else {
                 Circle()

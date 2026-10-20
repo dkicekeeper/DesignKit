@@ -81,6 +81,7 @@ public struct IconPicker: View {
                         HapticManager.light()
                         dismiss()
                     } label: {
+                        // A system bar's item: iOS draws its symbol (6.2.0, outside the Icon rule).
                         Image(systemName: "checkmark")
                     }
                     .dsButton()
@@ -282,8 +283,7 @@ private struct IconPickerLogosTab: View {
                 Spacer()
 
                 if isSelected {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(AppColors.accent)
+                    Icon("checkmark.circle.fill", size: AppIconSize.md, tint: .monochrome(AppColors.accent))
                 }
             }
             .padding(.vertical, AppSpacing.xs)

@@ -284,7 +284,7 @@ extension ComponentSnapshots {
                         BadgeSkeleton()
                         TrendBadgeSkeleton()
                         TrendBadgeSkeleton(style: .inline)
-                        StatusIndicatorBadgeSkeleton(font: AppTypography.h4)
+                        StatusIndicatorBadgeSkeleton(size: AppIconSize.md)
                     }
                     StatusBannerSkeleton()
                     StatusBannerSkeleton(style: .compact)

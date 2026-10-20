@@ -56,8 +56,7 @@ public struct VoiceOrbButton: View {
             VoiceWave(level: level, style: .orb)
                 .frame(width: Self.size, height: Self.size)
                 .overlay {
-                    Image(systemName: systemImage)
-                        .font(.system(size: AppIconSize.lg))
+                    Icon(systemImage, size: AppIconSize.lg, scalesWithText: false)
                         .foregroundStyle(AppColors.staticWhite)
                         .shadow(color: .black.opacity(0.25), radius: 4)
                 }

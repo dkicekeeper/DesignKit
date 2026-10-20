@@ -120,8 +120,7 @@ public struct PayoffProgressCard<Accessory: View>: View {
                 switch phase {
                 case .done(let caption):
                     HStack(spacing: AppSpacing.xs) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(AppTypography.bodySmall)
+                        Icon("checkmark.circle.fill", size: AppIconSize.sm)
                             .foregroundStyle(AppColors.income)
                         Text(caption)
                             .font(AppTypography.bodySmall)
@@ -131,8 +130,7 @@ public struct PayoffProgressCard<Accessory: View>: View {
                 case .inProgress(let nextDate, let remainingCaption):
                     if let nextDate {
                         HStack(spacing: AppSpacing.xs) {
-                            Image(systemName: "calendar")
-                                .font(AppTypography.bodySmall)
+                            Icon("calendar", size: AppIconSize.sm)
                                 .foregroundStyle(AppColors.Text.secondary)
                             Text(nextDate)
                                 .font(AppTypography.bodySmall)

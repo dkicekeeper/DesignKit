@@ -38,15 +38,14 @@ public struct HeroSymbol: View {
 
     public var body: some View {
         let color = tint ?? AppColors.accent
-        Image(systemName: systemImage)
-            .font(.system(size: size * 3 / 7))
-            .foregroundStyle(color)
-            // 2.3.0: SF Symbols 7 gradient: the tint lightens across the symbol, for depth.
-            .symbolColorRenderingMode(.gradient)
-            .drawOnAppear(delay: HeroSymbolMetrics.drawDelay, isEnabled: drawsOnAppear)
-            .frame(width: size, height: size)
-            .background(AppColors.pale(color), in: Circle())
-            .accessibilityHidden(true)
+        // A tile (6.2.0): its disc is the plate, the symbol 3/7 of it.
+        Icon(
+            source: .sfSymbol(systemImage),
+            style: .circle(size: size, tint: .monochrome(color), backgroundColor: AppColors.pale(color), padding: size * 2 / 7)
+        )
+        // 2.3.0: SF Symbols 7 gradient: the tint lightens across the symbol, for depth.
+        .symbolColorRenderingMode(.gradient)
+        .drawOnAppear(delay: HeroSymbolMetrics.drawDelay, isEnabled: drawsOnAppear)
     }
 }
 

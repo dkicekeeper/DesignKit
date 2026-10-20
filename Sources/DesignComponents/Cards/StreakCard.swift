@@ -50,8 +50,7 @@ public struct StreakCard: View {
 
     public var body: some View {
         HStack(spacing: AppSpacing.md) {
-            Image(systemName: systemImage)
-                .font(.system(size: AppIconSize.lg))
+            Icon(systemImage, size: AppIconSize.lg, scalesWithText: false)
                 .foregroundStyle(isActive ? AppColors.accent : AppColors.Text.tertiary)
                 .frame(width: AppIconSize.xxl)
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {

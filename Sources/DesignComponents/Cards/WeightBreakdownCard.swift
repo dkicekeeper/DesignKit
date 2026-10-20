@@ -131,8 +131,7 @@ public struct WeightBreakdownCard: View {
 
     private func legendRow(_ segment: Segment) -> some View {
         HStack(spacing: AppSpacing.md) {
-            Image(systemName: segment.systemImage)
-                .font(.system(size: AppIconSize.sm))
+            Icon(segment.systemImage, size: AppIconSize.sm, scalesWithText: false)
                 .foregroundStyle(segment.color)
                 .frame(width: 24)
 

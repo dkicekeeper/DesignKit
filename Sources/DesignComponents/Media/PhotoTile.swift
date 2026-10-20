@@ -91,8 +91,7 @@ public struct PhotoPlaceholderSymbol: View {
     public init() {}
 
     public var body: some View {
-        Image(systemName: "photo")
-            .foregroundStyle(AppColors.Text.tertiary)
+        Icon("photo", size: AppIconSize.lg, tint: .monochrome(AppColors.Text.tertiary))
     }
 }
 

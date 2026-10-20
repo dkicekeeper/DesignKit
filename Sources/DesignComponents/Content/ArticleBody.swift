@@ -97,8 +97,7 @@ struct ArticleBlockView: View {
             .foregroundStyle(AppColors.Text.primary)
         case .note(let text):
             HStack(alignment: .top, spacing: AppSpacing.sm) {
-                Image(systemName: "info.circle")
-                    .foregroundStyle(AppColors.accent)
+                Icon("info.circle", size: AppIconSize.sm, tint: .monochrome(AppColors.accent))
                 inline(text)
                     .font(AppTypography.bodySmall)
                     .foregroundStyle(AppColors.Text.primary)

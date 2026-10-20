@@ -76,8 +76,7 @@ public struct ProgressRingTile: View {
                         )
                     }
 
-                    Image(systemName: systemImage)
-                        .font(AppTypography.h2)
+                    Icon(systemImage, size: AppIconSize.xl)
                         .foregroundStyle(color)
                         .frame(width: AppIconSize.Tile.xl, height: AppIconSize.Tile.xl)
                         .glassEffect(

@@ -85,8 +85,8 @@ public struct InsightsStatCard<Trend: View>: View {
                 let isUp = delta > 0
                 let color: Color = (isUp == upIsGood) ? AppColors.success : AppColors.destructive
                 HStack(spacing: 2) {
-                    Image(systemName: isUp ? "arrow.up" : "arrow.down")
-                        .font(.system(size: AppIconSize.sm, weight: .bold))
+                    Icon(isUp ? "arrow.up" : "arrow.down", size: AppIconSize.sm, scalesWithText: false)
+                        .fontWeight(.bold)
                     Text(String(format: "%.0f%%", abs(delta)))
                         .font(AppTypography.bodyEmphasis)
                 }

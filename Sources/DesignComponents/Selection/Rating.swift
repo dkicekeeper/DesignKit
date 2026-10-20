@@ -39,8 +39,7 @@ public struct Rating: View {
     public var body: some View {
         HStack(spacing: 2) {
             ForEach(1...maximum, id: \.self) { star in
-                Image(systemName: Self.symbol(for: star, rating: rating))
-                    .font(.system(size: size))
+                Icon(Self.symbol(for: star, rating: rating), size: size, scalesWithText: false)
                     .foregroundStyle(color)
             }
         }
@@ -94,8 +93,7 @@ public struct RatingPicker: View {
                     rating = star
                     HapticManager.selection()
                 } label: {
-                    Image(systemName: star <= rating ? "star.fill" : "star")
-                        .font(.system(size: size))
+                    Icon(star <= rating ? "star.fill" : "star", size: size, scalesWithText: false)
                         .foregroundStyle(color)
                         .symbolEffect(.bounce, value: star == rating)
                 }

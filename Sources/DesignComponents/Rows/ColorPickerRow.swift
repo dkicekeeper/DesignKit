@@ -69,8 +69,8 @@ struct ColorSwatch: View {
                         .stroke(.white, lineWidth: 3)
                         .frame(width: AppIconSize.Tile.sm, height: AppIconSize.Tile.sm)
 
-                    Image(systemName: "checkmark")
-                        .font(.system(size: AppIconSize.md, weight: .bold))
+                    Icon("checkmark", size: AppIconSize.md, scalesWithText: false)
+                        .fontWeight(.bold)
                         .foregroundStyle(AppColors.staticWhite)
                 }
             }

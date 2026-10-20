@@ -52,8 +52,7 @@ public struct ScheduleRow: View {
 
     public var body: some View {
         HStack(alignment: .top, spacing: AppSpacing.md) {
-            Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
-                .font(.system(size: AppIconSize.lg))
+            Icon(isDone ? "checkmark.circle.fill" : "circle", size: AppIconSize.lg, scalesWithText: false)
                 .foregroundStyle(isDone ? AppColors.income : AppColors.Text.secondary)
 
             VStack(alignment: .leading, spacing: AppSpacing.xs) {

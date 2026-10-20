@@ -64,8 +64,7 @@ public struct PagerArrows<Content: View>: View {
     private func arrow(step delta: Int, systemImage: String, label: String) -> some View {
         let enabled = Self.stepped(index, by: delta, count: count) != nil
         return Button { step(delta) } label: {
-            Image(systemName: systemImage)
-                .font(AppTypography.bodyEmphasis)
+            Icon(systemImage, size: AppIconSize.md)
         }
         .buttonStyle(.plain)
         .foregroundStyle(enabled ? AppColors.accent : AppColors.Text.tertiary)

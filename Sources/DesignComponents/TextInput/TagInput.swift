@@ -104,8 +104,7 @@ public struct TagInput: View {
                 HapticManager.light()
                 tags.removeAll { $0 == tag }
             } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(AppTypography.bodySmall)
+                Icon("xmark.circle.fill", size: AppIconSize.sm)
                     .foregroundStyle(AppColors.Text.secondary)
             }
             .buttonStyle(.plain)

@@ -89,7 +89,7 @@ public struct LoadMoreFooter<Placeholder: View>: View {
                 Label {
                     Text(verbatim: message ?? String(localized: "loadMore.failed", defaultValue: "Couldn’t load more"))
                 } icon: {
-                    Image(systemName: "exclamationmark.triangle")
+                    Icon("exclamationmark.triangle", size: AppIconSize.xs)
                 }
                 .font(AppTypography.caption)
                 .foregroundStyle(AppColors.Text.secondary)
