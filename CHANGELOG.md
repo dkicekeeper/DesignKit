@@ -18,8 +18,9 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 
 ## 6.1.0 - 2026-10-20
 
-`SliderRow` pads itself in a `FormSection` card, as the other form rows do (the owner's review of
-Tenra's background settings on a device: the intensity slider touched the card's edges).
+The owner's review of Tenra's background settings on a device: `SliderRow` pads itself in a
+`FormSection` card, as the other form rows do (the intensity slider touched the card's edges),
+and the weighted `AuroraBackground` shows its colours bright and clean instead of pale and grey.
 [#85](https://github.com/dkicekeeper/DesignKit/pull/85)
 
 ### Added
@@ -28,6 +29,20 @@ Tenra's background settings on a device: the intensity slider touched the card's
   `ToggleSettingsRow` and `ActionSettingsRow` have it. `.settings`, the default, keeps the row as
   it was (4 pt above and below, nothing at the sides, for a `List`); `.standard` in a
   `FormSection` card pads it 12 × 16, like the rows around it.
+
+### Changed
+
+- `AuroraBackground(_ spots:)` (Tenra's home background and its preview): each pool is denser,
+  55 to 90 % of its colour at its centre (30 to 55 % before), and where pools meet their hues
+  turn into each other in OKLab with their own chroma, so orange and blue meet through pink and
+  violet, not a grey mauve. A pool keeps its own hue near its centre. The mesh is 9 × 9 points
+  (5 × 5 before, whose cells showed once each pool kept its hue). The same intensity shows
+  clearly more colour: Tenra's 35 % now looks about like its 100 % before, without the grey.
+
+### Fixed
+
+- `AuroraBackground(_ spots:)` read its colours in sRGB and drew them as linear light, which
+  paled every colour (an orange came out peach).
 
 ### Migration
 
@@ -53,7 +68,7 @@ SliderRow("Radius", value: $radius, in: 100...2_000, step: 100, valueText: text,
   `NavigationSettingsRow`, a `List` row, is shown in a `List`. They showed `.settings` rows in a
   card, with no side padding. `OptionCardPicker`'s gradient settings pad the slider.
 - Snapshot `settingsCard`: a card of form rows with `.standard` (a photo picker's label, a
-  switch, a slider, a destructive action).
+  switch, a slider, a destructive action). `auroraSpots` re-recorded for the new colours.
 
 ## 6.0.0 - 2026-10-20
 

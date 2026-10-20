@@ -8,9 +8,15 @@
 //
 //  Weighted spots (2.5.0): colours with weights, each a soft pool of light sized and
 //  brightened by its weight, the way GradientOrbsBackground drew its orbs, but sampled into a
-//  5×5 mesh instead of blurred. Still by default: behind Liquid Glass a moving background
+//  mesh instead of blurred. Still by default: behind Liquid Glass a moving background
 //  makes every glass surface recompute its blur each frame, so a screen's background should
 //  hold still. When the spots change, the mesh flows to its new shape in 0.6 s.
+//
+//  6.1.0 (the owner's review of Tenra's background on a device: dull colours): the pools are
+//  denser (55-90 % of their colour at the centre, 30-55 % before), their hues meet in OKLab
+//  with their own chroma (an average in RGB turned orange and blue into a grey mauve), on a
+//  9×9 mesh (5×5 showed its cells once each pool kept its hue), and the colours are read as
+//  linear light (they were read in sRGB and drawn as linear, which paled every one).
 //
 //  Light: the GPU draws a mesh gradient in one pass, with no blur, plus a still grain (2.5.0)
 //  that keeps it from banding on a dark screen. A drifting aurora redraws at 30 fps only while
@@ -207,10 +213,14 @@ enum AuroraMetrics {
 // MARK: - Weighted spots
 
 /// The weighted aurora: a field of soft pools of light, one per spot, sampled at the points of
-/// a 5×5 mesh. The mesh interpolates between the samples, so the pools blend with no blur.
+/// a 9×9 mesh. The mesh interpolates between the samples, so the pools blend with no blur.
 enum AuroraSpots {
-    /// Points per side of the mesh.
-    static let side = 5
+    /// Points per side of the mesh: dense enough that a change of hue between two points does
+    /// not show the mesh's cells (6.1.0; 5 before).
+    static let side = 9
+    /// How far an inner point drifts, in unit coordinates: under half a cell, so the mesh never
+    /// folds.
+    static let drift = 0.24 / Double(side - 1)
 
     /// Where each spot sits, heaviest first, in unit coordinates: the dominant one left of
     /// centre, then top right, bottom, right, top left (GradientOrbsBackground's layout).
@@ -228,8 +238,8 @@ enum AuroraSpots {
                 let inner = row > 0 && row < side - 1 && column > 0 && column < side - 1
                 if inner && time != 0 {
                     let seed = Double(row * side + column)
-                    x += sin(time * 2 * .pi / (11 + seed.truncatingRemainder(dividingBy: 7)) + seed) * 0.06
-                    y += cos(time * 2 * .pi / (13 + seed.truncatingRemainder(dividingBy: 5)) + seed * 1.3) * 0.06
+                    x += sin(time * 2 * .pi / (11 + seed.truncatingRemainder(dividingBy: 7)) + seed) * drift
+                    y += cos(time * 2 * .pi / (13 + seed.truncatingRemainder(dividingBy: 5)) + seed * 1.3) * drift
                 }
                 points.append(SIMD2(Float(x), Float(y)))
             }
@@ -238,36 +248,45 @@ enum AuroraSpots {
     }
 
     /// The colour at each mesh point: the spots' pools of light combined like light, so two
-    /// overlapping pools brighten each other; transparent where no pool reaches.
+    /// overlapping pools cover more of the page; transparent where no pool reaches. Where pools
+    /// meet, each one's hue counts by its strength squared, so near its centre a pool keeps its
+    /// own colour and the hues turn into each other in a band between them.
     static func colors(for spots: [Spot], aspect: Double, in environment: EnvironmentValues) -> [Color] {
-        let resolved = spots.map { $0.color.resolve(in: environment) }
+        let labs = spots.map { OKLab($0.color.resolve(in: environment)) }
         var colors = [Color]()
+        colors.reserveCapacity(side * side)
         for row in 0..<side {
             for column in 0..<side {
                 // Distances in units of the height, so pools stay round on a tall screen.
                 let point = SIMD2(Double(column) / Double(side - 1) * aspect, Double(row) / Double(side - 1))
-                var red = 0.0, green = 0.0, blue = 0.0, weightSum = 0.0, clear = 1.0
+                var lightness = 0.0, a = 0.0, b = 0.0, chroma = 0.0, hueWeights = 0.0, clear = 1.0
                 for (index, spot) in spots.enumerated() {
                     let anchor = SIMD2(anchors[index].x * aspect, anchors[index].y)
                     let radius = 0.17 + 0.26 * spot.weight
                     let delta = point - anchor
                     let falloff = exp(-(delta.x * delta.x + delta.y * delta.y) / (2 * radius * radius))
-                    let strength = (0.3 + 0.25 * spot.weight) * falloff
-                    red += Double(resolved[index].red) * strength
-                    green += Double(resolved[index].green) * strength
-                    blue += Double(resolved[index].blue) * strength
-                    weightSum += strength
+                    let strength = (0.55 + 0.35 * spot.weight) * falloff
                     clear *= 1 - strength
+                    let hueWeight = strength * strength
+                    lightness += labs[index].lightness * hueWeight
+                    a += labs[index].a * hueWeight
+                    b += labs[index].b * hueWeight
+                    chroma += labs[index].chroma * hueWeight
+                    hueWeights += hueWeight
                 }
-                guard weightSum > 0 else {
+                guard hueWeights > 0 else {
                     colors.append(.clear)
                     continue
                 }
+                // The averaged hue with the pools' own chroma: two hues averaged lose it.
+                let mixed = OKLab(lightness: lightness / hueWeights, a: a / hueWeights, b: b / hueWeights)
+                    .withChroma(chroma / hueWeights)
+                let rgb = mixed.linearSRGB
                 colors.append(Color(Color.Resolved(
                     colorSpace: .sRGBLinear,
-                    red: Float(red / weightSum),
-                    green: Float(green / weightSum),
-                    blue: Float(blue / weightSum),
+                    red: Float(rgb.red),
+                    green: Float(rgb.green),
+                    blue: Float(rgb.blue),
                     opacity: Float(1 - clear)
                 )))
             }
@@ -276,4 +295,54 @@ enum AuroraSpots {
     }
 
     typealias Spot = AuroraBackground.Spot
+}
+
+/// A colour in OKLab (Björn Ottosson, 2020): its lightness and two opponent axes, green to red
+/// (`a`) and blue to yellow (`b`). An average of two colours here is the hue between them at an
+/// even lightness, where an average in RGB drifts to grey.
+struct OKLab: Equatable {
+    var lightness: Double
+    var a: Double
+    var b: Double
+
+    init(lightness: Double, a: Double, b: Double) {
+        self.lightness = lightness
+        self.a = a
+        self.b = b
+    }
+
+    /// From a resolved colour's linear light.
+    init(_ color: Color.Resolved) {
+        let red = Double(color.linearRed), green = Double(color.linearGreen), blue = Double(color.linearBlue)
+        let l = cbrt(0.4122214708 * red + 0.5363325363 * green + 0.0514459929 * blue)
+        let m = cbrt(0.2119034982 * red + 0.6806995451 * green + 0.1073969566 * blue)
+        let s = cbrt(0.0883024619 * red + 0.2817188376 * green + 0.6299787005 * blue)
+        lightness = 0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s
+        a = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s
+        b = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s
+    }
+
+    /// How colourful it is: the distance from grey.
+    var chroma: Double { (a * a + b * b).squareRoot() }
+
+    /// The same lightness and hue with `chroma`; a grey stays grey.
+    func withChroma(_ chroma: Double) -> OKLab {
+        let current = self.chroma
+        guard current > 1e-6 else { return self }
+        return OKLab(lightness: lightness, a: a / current * chroma, b: b / current * chroma)
+    }
+
+    /// Linear sRGB, clamped to what sRGB can show.
+    var linearSRGB: (red: Double, green: Double, blue: Double) {
+        let l = lightness + 0.3963377774 * a + 0.2158037573 * b
+        let m = lightness - 0.1055613458 * a - 0.0638541728 * b
+        let s = lightness - 0.0894841775 * a - 1.2914855480 * b
+        let l3 = l * l * l, m3 = m * m * m, s3 = s * s * s
+        func clamped(_ value: Double) -> Double { min(max(value, 0), 1) }
+        return (
+            clamped(4.0767416621 * l3 - 3.3077115913 * m3 + 0.2309699292 * s3),
+            clamped(-1.2684380046 * l3 + 2.6097574011 * m3 - 0.3413193965 * s3),
+            clamped(-0.0041960863 * l3 - 0.7034186147 * m3 + 1.7076147010 * s3)
+        )
+    }
 }
