@@ -133,7 +133,11 @@ rather than importing an app type.
    Name it for what it is, without `View` or `App` (`SectionHeader`, `Avatar`, `DSButton`;
    2.0.0, docs/migration-2.0.md); tokens keep their `App` prefix (`AppColors`, `AppSpacing`).
    A variant of an existing component is a parameter or a style of it, not a new view
-   (`DSButton(iconPlacement: .top)`, `SectionHeader(style: .card)`).
+   (`DSButton(iconPlacement: .top)`, `SectionHeader(style: .card)`); a row of a form or a
+   settings list is `UniversalRow(_:icon:accessory:)` (6.2.0). Every symbol is an `Icon`: under
+   44 pt a glyph with no plate, from 44 pt a tile on its plate (6.2.0, the owner's rule); iOS's
+   own bars, menus, swipe actions, tabs and segments, and a symbol inside a line of text, are the
+   exceptions (docs/design-system.md, "Icon Sizes").
 2. `public` on the type, `body`, nested types used in the API, and protocol requirements
    (`id`, `body(content:)`, `==`). Write an explicit `public init` — memberwise inits are internal.
    Padding follows docs/design-system.md §10: a card pads itself, a row pads only vertically
@@ -261,6 +265,12 @@ rather than importing an app type.
   `SliderRow(config:)` pads it in a `FormSection` card, and `AuroraBackground(_ spots:)` shows
   its colours bright (denser pools, hues meeting in OKLab with their chroma, a 9×9 mesh, colours
   read as linear light); the Gallery shows settings rows in a card or a `List` with their config.
+- DesignKit 6.2.0 (2026-10, the owner's review of the rows and icons): one row,
+  `UniversalRow(_:icon:value:hint:role:config:accessory:)`, for every form card and settings
+  list (a switch, a menu, a list, a date, a stepper, a slider, a check, a screen, an action, a
+  value); the twelve rows that each did one of these are deprecated wrappers over it, to be
+  removed in 7.0 once no app uses them. And the icon rule: every symbol is an `Icon`, a glyph
+  under 44 pt, a tile on its plate from 44 pt; row icons are 24 pt in forms and lists alike.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.

@@ -16,6 +16,104 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 6.2.0 - 2026-10-20
+
+The owner's review of the rows and the icons: one row for every form card and settings list,
+`UniversalRow(_:icon:accessory:)`, and one rule for every icon, a glyph under 44 pt and a tile on
+its plate from 44 pt. The twelve rows that each did one thing are deprecated wrappers over the
+new row, so an app builds as it is and moves when it touches them.
+[#86](https://github.com/dkicekeeper/DesignKit/pull/86)
+
+### Added
+
+- `UniversalRow(_:icon:iconColor:value:hint:role:titleColor:config:accessory:)`: the title, an SF
+  Symbol in the accent (24 pt), what is set (`value`), a hint, and what the row carries
+  (`accessory`); it pads itself for its `config` (`.standard` in a card, the default; `.settings`
+  in a `List`; `.info` in a padded container). `UniversalRow(_:leadingIcon:…)` takes any icon (a
+  logo, a coloured tile). Both inits are `nonisolated`, for a `PhotosPicker`'s label.
+- `RowAccessory`: `.none`, `.info(_:)`, `.amount(_:currency:prefix:)`, `.toggle(_:)`,
+  `.navigation { … }`, `.action(_:)`, `.checkmark(isSelected:action:)`, `.menu(_:options:)`,
+  `.picker(_:options:)`, `.date(_:components:from:through:)`, `.stepper(_:in:step:format:)`,
+  `.slider(_:in:step:valueText:)`, `.colors(_:palette:)`. `RowRole`: `.standard`, `.destructive`.
+- A disabled `UniversalRow` (`.disabled(true)`) greys its title and icon.
+- `Icon(_:size:tint:scalesWithText:)`: a glyph of an SF Symbol, in the colour around it by default.
+- `IconKind` (`.glyph`, `.tile`) and `IconStyle.kind`; `IconStyle.scalesWithText` and
+  `scaling(_:)`; `IconStyle.glyph(_:tint:)`; `IconTint.inherit` (the colour around the icon; the
+  string `iconStyle.tint.inherit`).
+- `StatusIndicatorBadge(status:size:)` and `StatusIndicatorBadgeSkeleton(size:)`.
+
+### Changed
+
+- The icon rule. Under 44 pt an `Icon` is a glyph: the symbol at its size, no plate, no padding,
+  growing with the text size. A 24 pt symbol drew 19.2 pt before, so the icons of form rows and of
+  24 pt glyphs elsewhere are a quarter larger; a style's background under 44 pt (the grey plate of
+  `Icon(source:size:)` and of a placeholder) is gone. From 44 pt an `Icon` is a tile: always a plate
+  (the style's colour, else `Background.neutral1`) with 20 % padding to 63 pt and 25 % from 64 pt.
+- `EmptyState`'s 80 pt symbol sits on a round neutral plate. `HeroSymbol` is drawn as a tile (the
+  same disc and symbol).
+- Every symbol of the components is an `Icon` on the size scale: a few move a little (`TotalsCard`'s
+  arrow 12 pt, 9 pt before; `ThumbnailCard`'s placeholder 32 pt, 30 before; `ActivityTimeline`'s 12
+  pt, 12.8 before). Symbols set in a text style (badges, banners, chips, labels) still grow with the
+  text; symbols in controls of a fixed size (round buttons, keys, rings) still do not.
+- The icons of settings rows are 24 pt, as in form rows (20 before): `ToggleSettingsRow`,
+  `ActionSettingsRow`, `NavigationSettingsRow`, `NavigationPickerRow(style: .list)`. The titles of
+  a card's rows line up.
+- `DatePickerRow`'s title is in DesignKit's type, the picker on the trailing edge (the system
+  picker's own label before). `ColorPickerRow`'s title is the row's (body), not a section header.
+- `SectionHeader`'s symbols are Icons at the title's size (the trailing one a step smaller, as
+  `.imageScale(.small)` drew it).
+
+### Deprecated
+
+- `ToggleSettingsRow` → `UniversalRow(_:icon:hint:accessory: .toggle(_:))`.
+- `ActionSettingsRow` → `UniversalRow(_:icon:role:accessory: .action(_:))`.
+- `ActionRowLabel` → `UniversalRow(_:icon:titleColor: AppColors.accent)` as the label.
+- `NavigationSettingsRow` → `UniversalRow(_:icon:value:config: .settings, accessory: .navigation { … })`.
+- `CheckmarkRow` → `UniversalRow(_:leadingIcon:value:config:accessory: .checkmark(isSelected:action:))`.
+- `MenuPickerRow` → `UniversalRow(_:icon:accessory: .menu(_:options:))`.
+- `NavigationPickerRow` → `UniversalRow(_:icon:config:accessory: .picker(_:options:))`.
+- `DatePickerRow` → `UniversalRow(_:icon:accessory: .date(_:components:from:through:))`.
+- `StepperRow` → `UniversalRow(_:icon:accessory: .stepper(_:in:step:format:))`.
+- `SliderRow` → `UniversalRow(_:icon:hint:config:accessory: .slider(_:in:step:valueText:))`.
+- `ColorPickerRow` → `UniversalRow(_:accessory: .colors(_:palette:))`.
+- `InfoRow` → `UniversalRow(_:icon:config: .info, accessory: .info(_:))` or `.amount(_:currency:prefix:)`.
+- `StatusIndicatorBadge(status:font:)` → `StatusIndicatorBadge(status:size:)`;
+  `StatusIndicatorBadgeSkeleton(font:)` → `StatusIndicatorBadgeSkeleton(size:)`.
+
+### Migration
+
+- Nothing breaks: the deprecated rows draw the new row. Move a screen to `UniversalRow` when you
+  touch it; the compiler's warnings list what is left. The new row's `config` defaults to
+  `.standard` (a card); a row in a `List` passes `.settings`, as the old settings rows did by
+  default.
+
+```swift
+// 6.1
+ToggleSettingsRow(icon: "moon.fill", title: "Quiet hours", config: .standard, isOn: $quiet)
+MenuPickerRow(icon: "repeat", title: "Repeat", selection: $period, options: periods)
+ActionSettingsRow(icon: "trash", title: "Delete", isDestructive: true, config: .standard) { delete() }
+NavigationSettingsRow(icon: "globe", title: "Language", value: "English") { LanguageScreen() }
+InfoRow(icon: "calendar", label: "Next payment", value: "12 October")
+// 6.2
+UniversalRow("Quiet hours", icon: "moon.fill", accessory: .toggle($quiet))
+UniversalRow("Repeat", icon: "repeat", accessory: .menu($period, options: periods))
+UniversalRow("Delete", icon: "trash", role: .destructive, accessory: .action { delete() })
+UniversalRow("Language", icon: "globe", value: "English", config: .settings, accessory: .navigation { LanguageScreen() })
+UniversalRow("Next payment", icon: "calendar", config: .info, accessory: .info("12 October"))
+```
+
+- An app's own symbols go through `Icon` too: `Image(systemName: "checkmark").font(.system(size:
+  16))` → `Icon("checkmark", size: AppIconSize.sm, scalesWithText: false)`, a symbol in a text
+  style → `Icon(name, size:)` at the style's size. A system bar's, menu's, swipe action's, tab's or
+  segment's symbol stays an `Image`.
+
+### Gallery and tooling
+
+- `UniversalRow`'s page: an "Accessory" control for every kind, the row in a card or a `List`, the
+  value, hint, destructive role and the Disabled state. The pages of the deprecated rows say so.
+- Snapshots `universalRowAccessories` (a card of rows) and `universalRowList`; most references
+  re-recorded for the icon rule.
+
 ## 6.1.0 - 2026-10-20
 
 The owner's review of Tenra's background settings on a device: `SliderRow` pads itself in a

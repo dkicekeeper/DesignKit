@@ -81,7 +81,7 @@ public struct TagInput: View {
                                 add(suggestion)
                                 text = ""
                             } label: {
-                                Label(suggestion, systemImage: "plus")
+                                Label { Text(verbatim: suggestion) } icon: { Icon("plus", size: AppIconSize.sm) }
                                     .font(AppTypography.bodySmall)
                             }
                             .buttonStyle(.plain)

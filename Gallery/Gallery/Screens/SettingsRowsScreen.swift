@@ -76,60 +76,151 @@ private struct InRowHost<Content: View>: View {
 }
 
 private struct UniversalRowPage: View {
-    @State private var config = 0
+    /// What the row carries (6.2.0): one page for every kind of row.
+    enum Kind: String, CaseIterable {
+        case none = "None", info = "Info", amount = "Amount", toggle = "Toggle", navigation = "Navigation"
+        case action = "Action", checkmark = "Checkmark", menu = "Menu", picker = "Picker", date = "Date"
+        case stepper = "Stepper", slider = "Slider", colors = "Colors"
+    }
+
+    @State private var kind: Kind = .toggle
+    @State private var host: RowHost = .card
     @State private var showsIcon = true
     @State private var showsHint = false
-    @State private var trailing = 1
+    @State private var showsValue = true
+    @State private var destructive = false
     @State private var state: SpecimenState = .content
 
-    private var rowConfig: RowConfiguration {
-        [RowConfiguration.standard, .settings, .info, .selectable, .sheetList][config]
-    }
+    @State private var isOn = true
+    @State private var period = "month"
+    @State private var species = "pike"
+    @State private var date = Date()
+    @State private var count = 3
+    @State private var level = 0.35
+    @State private var colorHex = CategoryColors.pickerPalette[3]
+    @State private var picked = false
 
-    private var skeletonTrailing: UniversalRowSkeleton.Trailing {
-        [.empty, .value, .chevron][trailing]
-    }
+    private let periods: [(label: String, value: String)] = [
+        (label: "Weekly", value: "week"), (label: "Monthly", value: "month"), (label: "Yearly", value: "year"),
+    ]
+    private let fish: [(label: String, value: String)] = ["Pike", "Perch", "Carp", "Asp", "Bream", "Catfish", "Chub",
+        "Grayling", "Ide", "Roach", "Rudd", "Tench", "Trout", "Zander"].map { (label: $0, value: $0.lowercased()) }
 
     var body: some View {
         ComponentPage(
             name: "UniversalRow",
-            summary: "The row every list row is built on: a leading icon, content, a trailing slot, a hint; padding from its RowConfiguration preset.",
+            summary: "The one row of a form card or a settings list (6.2.0): an icon, the title, what the row carries (accessory: a switch, a menu, a list, a date, a stepper, a slider, a check, a screen, an action, a value) and a hint.",
             apps: [.tenra, .dalada],
             canvas: .fill,
             notes: [
-                "Presets: .standard, .settings, .info, .selectable, .sheetList (design-system §10 for their padding).",
-                "The rows on it, for what a row does: ToggleSettingsRow, ActionSettingsRow, NavigationSettingsRow, MenuPickerRow, NavigationPickerRow, DatePickerRow, StepperRow, CheckmarkRow, InfoRow. They fix the icon, the value's type and what VoiceOver hears; UniversalRow itself is for a row none of them is.",
+                "UniversalRow(_:icon:value:hint:role:config:accessory:). config: .standard in a FormSection card (the default), .settings in a List, .info inside a padded container.",
+                "The icon is a glyph in the accent, 24 pt in every row (6.2.0), so the titles of a card line up. role: .destructive turns the title and the icon red.",
+                "It replaces ToggleSettingsRow, ActionSettingsRow, ActionRowLabel, NavigationSettingsRow, CheckmarkRow, MenuPickerRow, NavigationPickerRow, DatePickerRow, StepperRow, SliderRow, ColorPickerRow and InfoRow, deprecated in 6.2.0.",
+                "The generic UniversalRow(config:leadingIcon:hint:content:trailing:) stays for a row none of these is.",
             ]
         ) {
-            InFormCard {
+            InRowHost(host: host) {
                 if state == .loading {
-                    UniversalRowSkeleton(config: rowConfig,
-                                         iconStyle: showsIcon ? .circle(size: AppIconSize.md) : nil,
+                    UniversalRowSkeleton(config: host.config,
+                                         iconStyle: showsIcon ? .circle(size: AppIconSize.lg) : nil,
                                          trailing: skeletonTrailing)
                 } else {
-                    UniversalRow(
-                        config: rowConfig,
-                        leadingIcon: showsIcon ? .sfSymbol("bell.fill", color: AppColors.accent) : nil,
-                        hint: showsHint ? "Reminders the evening before" : nil
-                    ) {
-                        Text("Notifications").font(AppTypography.body)
-                    } trailing: {
-                        switch trailing {
-                        case 1: Text("On").font(AppTypography.body).foregroundStyle(AppColors.textSecondary)
-                        case 2: DisclosureChevron()
-                        default: EmptyView()
-                        }
-                    }
+                    row.disabled(state == .disabled)
                 }
             }
         } controls: {
-            StateControl(state: $state)
-            ChoiceControl("Preset", selection: $config, options: [
-                (".standard", 0), (".settings", 1), (".info", 2), (".selectable", 3), (".sheetList", 4),
-            ])
-            ToggleControl("Leading icon", isOn: $showsIcon)
+            StateControl(state: $state, states: [.content, .loading, .disabled])
+            ChoiceControl("Accessory", selection: $kind, options: Kind.allCases.map { ($0.rawValue, $0) })
+            ChoiceControl("In", selection: $host, options: RowHost.options)
+            ToggleControl("Icon", isOn: $showsIcon)
+            ToggleControl("Value", isOn: $showsValue)
             ToggleControl("Hint", isOn: $showsHint)
-            ChoiceControl("Trailing", selection: $trailing, options: [("None", 0), ("Value", 1), ("Chevron", 2)])
+            ToggleControl("Destructive", isOn: $destructive)
+        }
+    }
+
+    private var row: some View {
+        UniversalRow(
+            title,
+            icon: showsIcon ? symbol : nil,
+            value: showsValue ? value : nil,
+            hint: showsHint ? "Shown under the title" : nil,
+            role: destructive ? .destructive : .standard,
+            config: host.config,
+            accessory: accessory
+        )
+    }
+
+    private var title: String {
+        switch kind {
+        case .none: "Version"
+        case .info: "Next payment"
+        case .amount: "Monthly payment"
+        case .toggle: "Quiet hours"
+        case .navigation: "Language"
+        case .action: destructive ? "Delete all data" : "Export"
+        case .checkmark: "Kaspi Gold"
+        case .menu: "Repeat"
+        case .picker: "Species"
+        case .date: "Start date"
+        case .stepper: "Fish caught"
+        case .slider: "Colour intensity"
+        case .colors: "Colour"
+        }
+    }
+
+    private var symbol: String {
+        switch kind {
+        case .none: "info.circle"
+        case .info, .date: "calendar"
+        case .amount: "banknote"
+        case .toggle: "moon.fill"
+        case .navigation: "globe"
+        case .action: destructive ? "trash" : "square.and.arrow.up"
+        case .checkmark: "creditcard.fill"
+        case .menu: "repeat"
+        case .picker: "fish"
+        case .stepper: "number"
+        case .slider: "circle.lefthalf.filled"
+        case .colors: "paintpalette"
+        }
+    }
+
+    private var value: String? {
+        switch kind {
+        case .none: "6.2.0"
+        case .navigation: "English"
+        case .checkmark: "1 250 000 ₸"
+        default: nil
+        }
+    }
+
+    private var accessory: RowAccessory {
+        switch kind {
+        case .none: .none
+        case .info: .info("12 October")
+        case .amount: .amount(85_000, currency: "KZT")
+        case .toggle: .toggle($isOn)
+        case .navigation: .navigation { Text("Language settings").navigationTitle("Language") }
+        case .action: .action {}
+        case .checkmark: .checkmark(isSelected: picked) { picked.toggle() }
+        case .menu: .menu($period, options: periods)
+        case .picker: .picker($species, options: fish)
+        case .date: .date($date)
+        case .stepper: .stepper($count, in: 0...99) { "\($0) pcs" }
+        case .slider: .slider($level, in: 0.05...1, valueText: "\(Int((level * 100).rounded()))%")
+        case .colors: .colors($colorHex)
+        }
+    }
+
+    private var skeletonTrailing: UniversalRowSkeleton.Trailing {
+        switch kind {
+        case .toggle: .toggle
+        case .navigation, .picker: .chevron
+        case .checkmark: .selection
+        case .menu, .date: .capsule
+        case .none, .info, .amount, .stepper: .value
+        case .action, .slider, .colors: .empty
         }
     }
 }
@@ -142,7 +233,7 @@ private struct InfoRowPage: View {
     var body: some View {
         ComponentPage(
             name: "InfoRow",
-            summary: "A label and its value (text or an amount) on a detail screen; stacks at large text sizes.",
+            summary: "Deprecated in 6.2.0: UniversalRow(config: .info, accessory: .info / .amount). A label and its value (text or an amount) on a detail screen; stacks at large text sizes.",
             apps: [.tenra],
             canvas: .fill,
             notes: ["Any value view: InfoRowLayout(label:) { … } is the layout InfoRow is built on."]
@@ -172,7 +263,7 @@ private struct NavigationSettingsRowPage: View {
     var body: some View {
         ComponentPage(
             name: "NavigationSettingsRow",
-            summary: "A settings row that opens a screen: a small icon, the title, what is set, a chevron.",
+            summary: "Deprecated in 6.2.0: UniversalRow(config: .settings, accessory: .navigation). A settings row that opens a screen: a small icon, the title, what is set, a chevron.",
             apps: [.tenra],
             canvas: .fill,
             notes: [
@@ -207,7 +298,7 @@ private struct ToggleSettingsRowPage: View {
     var body: some View {
         ComponentPage(
             name: "ToggleSettingsRow",
-            summary: "A settings row with a switch and an optional hint under the title.",
+            summary: "Deprecated in 6.2.0: UniversalRow(accessory: .toggle). A settings row with a switch and an optional hint under the title.",
             since: "0.6.0",
             apps: [.tenra, .dalada],
             canvas: .fill,
@@ -242,7 +333,7 @@ private struct ActionSettingsRowPage: View {
     var body: some View {
         ComponentPage(
             name: "ActionSettingsRow",
-            summary: "A settings row that runs an action: export, sign out, delete the account.",
+            summary: "Deprecated in 6.2.0: UniversalRow(accessory: .action). A settings row that runs an action: export, sign out, delete the account.",
             apps: [.tenra, .dalada],
             canvas: .fill,
             notes: [
@@ -273,7 +364,7 @@ private struct MenuPickerRowPage: View {
     var body: some View {
         ComponentPage(
             name: "MenuPickerRow",
-            summary: "A form row whose value opens a menu of a few options.",
+            summary: "Deprecated in 6.2.0: UniversalRow(accessory: .menu). A form row whose value opens a menu of a few options.",
             apps: [.tenra, .dalada],
             canvas: .fill
         ) {
@@ -310,7 +401,7 @@ private struct NavigationPickerRowPage: View {
     var body: some View {
         ComponentPage(
             name: "NavigationPickerRow",
-            summary: "A choice from a long list: the row shows the chosen value; a tap pushes the list, with a search field past 12 options.",
+            summary: "Deprecated in 6.2.0: UniversalRow(accessory: .picker). A choice from a long list: the row shows the chosen value; a tap pushes the list, with a search field past 12 options.",
             since: "3.0.0",
             apps: [.dalada, .tenra],
             canvas: .fill,
@@ -364,7 +455,7 @@ private struct StepperRowPage: View {
     var body: some View {
         ComponentPage(
             name: "StepperRow",
-            summary: "A whole number in a form: the title, the value and − / + to change it, within a range.",
+            summary: "Deprecated in 6.2.0: UniversalRow(accessory: .stepper). A whole number in a form: the title, the value and − / + to change it, within a range.",
             since: "3.0.0",
             apps: [.dalada],
             canvas: .fill
@@ -398,7 +489,7 @@ private struct SliderRowPage: View {
     var body: some View {
         ComponentPage(
             name: "SliderRow",
-            summary: "A setting set with a slider: the title, the current value on the right, the slider, an optional hint.",
+            summary: "Deprecated in 6.2.0: UniversalRow(accessory: .slider). A setting set with a slider: the title, the current value on the right, the slider, an optional hint.",
             since: "1.15.0",
             apps: [.tenra, .dalada],
             canvas: .fill,
@@ -442,7 +533,7 @@ private struct DatePickerRowPage: View {
     var body: some View {
         ComponentPage(
             name: "DatePickerRow",
-            summary: "A form row with a date (and time) in a compact picker.",
+            summary: "Deprecated in 6.2.0: UniversalRow(accessory: .date). A form row with a date (and time) in a compact picker.",
             apps: [.tenra, .dalada],
             canvas: .fill
         ) {
@@ -468,7 +559,7 @@ private struct ColorPickerRowPage: View {
     var body: some View {
         ComponentPage(
             name: "ColorPickerRow",
-            summary: "A row of colour swatches to pick a category's or an account's colour.",
+            summary: "Deprecated in 6.2.0: UniversalRow(accessory: .colors). A row of colour swatches to pick a category's or an account's colour.",
             apps: [.tenra],
             canvas: .fill,
             notes: ["The default palette is CategoryColors.pickerPalette (1.11.0): the 14 colours a name hashes to, then 16 deeper and neutral shades."]
@@ -503,7 +594,7 @@ private struct CheckmarkRowPage: View {
     var body: some View {
         ComponentPage(
             name: "CheckmarkRow",
-            summary: "A row of a choice list (a filter or picker sheet): a SelectionIndicator on every row, the accent filled check on the picked one.",
+            summary: "Deprecated in 6.2.0: UniversalRow(accessory: .checkmark). A row of a choice list (a filter or picker sheet): a SelectionIndicator on every row, the accent filled check on the picked one.",
             since: "1.10.0",
             apps: [.tenra, .dalada],
             canvas: .fill
@@ -538,7 +629,7 @@ private struct ActionRowLabelPage: View {
     var body: some View {
         ComponentPage(
             name: "ActionRowLabel",
-            summary: "The look of an action row for a control that is not a Button: the label of a PhotosPicker, a ShareLink, a Link.",
+            summary: "Deprecated in 6.2.0: UniversalRow(_:icon:iconColor:titleColor:) as the label. The look of an action row for a control that is not a Button: the label of a PhotosPicker, a ShareLink, a Link.",
             since: "3.1.0",
             apps: [.dalada],
             canvas: .fill,

@@ -575,22 +575,22 @@ public struct UniversalRowSkeleton: View {
 
     /// `NavigationSettingsRow`: a small icon, the title and a chevron.
     public static var navigationSettings: UniversalRowSkeleton {
-        UniversalRowSkeleton(config: .settings, iconStyle: .circle(size: AppIconSize.md), trailing: .chevron)
+        UniversalRowSkeleton(config: .settings, iconStyle: .circle(size: AppIconSize.lg), trailing: .chevron)
     }
 
     /// `ToggleSettingsRow`: a small icon, the title and a switch.
     public static var toggleSettings: UniversalRowSkeleton {
-        UniversalRowSkeleton(config: .settings, iconStyle: .circle(size: AppIconSize.md), trailing: .toggle)
+        UniversalRowSkeleton(config: .settings, iconStyle: .circle(size: AppIconSize.lg), trailing: .toggle)
     }
 
     /// `ActionSettingsRow`: a small icon and the title.
     public static var actionSettings: UniversalRowSkeleton {
-        UniversalRowSkeleton(config: .settings, iconStyle: .circle(size: AppIconSize.md))
+        UniversalRowSkeleton(config: .settings, iconStyle: .circle(size: AppIconSize.lg))
     }
 
     /// `MenuPickerRow`: a small icon, the title and the chosen value.
     public static var menuPicker: UniversalRowSkeleton {
-        UniversalRowSkeleton(iconStyle: .circle(size: AppIconSize.md), trailing: .value)
+        UniversalRowSkeleton(iconStyle: .circle(size: AppIconSize.lg), trailing: .value)
     }
 
     /// `CheckmarkRow`: the row of a choice list, its title in `h4` and its empty circle (5.2.0);
@@ -601,7 +601,7 @@ public struct UniversalRowSkeleton: View {
 
     /// `DatePickerRow`: a small icon, the title and the date in its capsule.
     public static var datePicker: UniversalRowSkeleton {
-        UniversalRowSkeleton(iconStyle: .circle(size: AppIconSize.md), trailing: .capsule)
+        UniversalRowSkeleton(iconStyle: .circle(size: AppIconSize.lg), trailing: .capsule)
     }
 
     public var body: some View {

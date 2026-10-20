@@ -303,7 +303,7 @@ private struct OptionCardPickerPage: View {
             canvas: .bleed,
             notes: [
                 "6.0.0: the only look. A swipe or a tap on a neighbour changes the choice, with the selection haptic; only the centred preview moves.",
-                "settings: what the app sets for the chosen option, in DesignKit's form rows: a FormSection of ActionRowLabel (a PhotosPicker's label), ToggleSettingsRow, SliderRow and ActionSettingsRow with config: .standard, inset dividers between them.",
+                "settings: what the app sets for the chosen option, in DesignKit's rows: a FormSection of UniversalRows (a PhotosPicker's label, .toggle, .slider, a destructive .action), inset dividers between them.",
                 "artwork fills the frame it is given: a phone's shape, 180 × 270.",
             ]
         ) {
@@ -343,25 +343,27 @@ private struct OptionCardPickerPage: View {
             EmptyView()
         case .gradient:
             FormSection(header: "Colours") {
-                ToggleSettingsRow(icon: "wind", title: "Moves slowly", config: .standard, isOn: $moves)
+                UniversalRow("Moves slowly", icon: "wind", accessory: .toggle($moves))
                 Divider().padding(.leading, AppSpacing.lg)
-                SliderRow("Intensity", systemImage: "circle.lefthalf.filled", value: $intensity, in: 0.1...1,
-                          valueText: "\(Int((intensity * 100).rounded()))%", config: .standard)
+                UniversalRow("Intensity", icon: "circle.lefthalf.filled",
+                             accessory: .slider($intensity, in: 0.1...1, valueText: "\(Int((intensity * 100).rounded()))%"))
             }
             .screenPadding()
         case .photo:
             FormSection {
                 PhotosPicker(selection: $photoItem, matching: .images) {
-                    ActionRowLabel(hasPhoto ? "Change photo" : "Choose a photo", systemImage: "photo.on.rectangle")
+                    UniversalRow(hasPhoto ? "Change photo" : "Choose a photo", icon: "photo.on.rectangle",
+                                 titleColor: AppColors.accent)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 if hasPhoto {
                     Divider().padding(.leading, AppSpacing.lg)
-                    ToggleSettingsRow(icon: "camera.filters", title: "Blur", config: .standard, isOn: $blursPhoto)
+                    UniversalRow("Blur", icon: "camera.filters", accessory: .toggle($blursPhoto))
                     Divider().padding(.leading, AppSpacing.lg)
-                    ActionSettingsRow(icon: "trash", title: "Remove photo", isDestructive: true, config: .standard) {
+                    UniversalRow("Remove photo", icon: "trash", role: .destructive, accessory: .action {
                         hasPhoto = false
-                    }
+                    })
                 }
             }
             .screenPadding()

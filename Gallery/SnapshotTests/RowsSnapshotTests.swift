@@ -201,6 +201,53 @@ extension ComponentSnapshots {
             )
         }
 
+        /// UniversalRow's accessories (6.2.0) in a card: every row's icon 24 pt, so the titles
+        /// line up; a value, a switch, a menu, a stepper, a date, a destructive action.
+        @Test func universalRowAccessories() async {
+            await assertComponentSnapshot(
+                NavigationStack {
+                    FormSection {
+                        UniversalRow("Next payment", icon: "calendar", accessory: .info("12 October"))
+                        Divider().padding(.leading, AppSpacing.lg)
+                        UniversalRow("Quiet hours", icon: "moon.fill", hint: "No notifications at night",
+                                     accessory: .toggle(.constant(true)))
+                        Divider().padding(.leading, AppSpacing.lg)
+                        UniversalRow("Language", icon: "globe", value: "English", accessory: .navigation { EmptyView() })
+                        Divider().padding(.leading, AppSpacing.lg)
+                        UniversalRow("Repeat", icon: "repeat", accessory: .menu(.constant("month"), options: [
+                            (label: "Weekly", value: "week"), (label: "Monthly", value: "month"),
+                        ]))
+                        Divider().padding(.leading, AppSpacing.lg)
+                        UniversalRow("Fish caught", icon: "number", accessory: .stepper(.constant(3), in: 0...99) { "\($0) pcs" })
+                        Divider().padding(.leading, AppSpacing.lg)
+                        UniversalRow("Delete all data", icon: "trash", role: .destructive, accessory: .action {})
+                    }
+                    .toolbar(.hidden, for: .navigationBar)
+                },
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// The same rows in a List (`config: .settings`): the list pads them and draws the
+        /// navigation chevron.
+        @Test func universalRowList() async {
+            await assertComponentSnapshot(
+                NavigationStack {
+                    List {
+                        UniversalRow("Quiet hours", icon: "moon.fill", config: .settings, accessory: .toggle(.constant(false)))
+                        UniversalRow("Language", icon: "globe", value: "English", config: .settings,
+                                     accessory: .navigation { EmptyView() })
+                        UniversalRow("Kaspi Gold", icon: "creditcard.fill", value: "1 250 000 ₸", config: .settings,
+                                     accessory: .checkmark(isSelected: true) {})
+                    }
+                    .scrollDisabled(true)
+                    .frame(height: 260)
+                    .toolbar(.hidden, for: .navigationBar)
+                },
+                appearances: [.light, .dark]
+            )
+        }
+
         /// A settings card of form rows (6.1.0): each with `.standard`, so all pad alike, the
         /// slider included; inset dividers between them. A home background's photo settings.
         @Test func settingsCard() async {

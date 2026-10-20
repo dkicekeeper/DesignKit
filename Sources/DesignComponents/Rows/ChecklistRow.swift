@@ -136,7 +136,7 @@ public struct ChecklistSummaryRow: View {
                 }
             }
             if let subtitle {
-                Label(subtitle, systemImage: subtitleSystemImage)
+                Label { Text(verbatim: subtitle) } icon: { Icon(subtitleSystemImage, size: AppIconSize.xs) }
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.Text.secondary)
             }

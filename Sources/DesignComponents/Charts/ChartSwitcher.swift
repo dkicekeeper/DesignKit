@@ -120,6 +120,7 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
     private var picker: some View {
         Picker("", selection: $style) {
             ForEach(ChartStyle.allCases) { s in
+                // A system segmented picker's item: iOS draws its symbol (6.2.0, outside the Icon rule).
                 Label(s.label, systemImage: s.systemImage)
                     .labelStyle(.iconOnly)
                     .tag(s)
