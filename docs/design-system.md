@@ -2048,7 +2048,7 @@ photo option sits in a `PhotosPicker`). Tenra: `HomeBackgroundPicker`.
 *(5.2.0)* `style: .carousel` (`OptionCardPickerStyle`), as Ten's wardrobe: the chosen option's
 artwork large on top in a phone's shape (160 × 240, `AppRadius.xl`, fading from one to the next),
 the options in a row of cards under it (`SnapCardPicker(style: .centered(width: 112))`: a 64 × 96
-artwork over the name, the outline, the check and the accent name on the chosen one; the centred
+artwork over the name, the outline and the accent name on the chosen one, no check since 5.5.1; the centred
 card is the choice, a swipe or a tap changes it, with the selection haptic), and under the row
 what the app sets for the chosen option: `OptionCardPicker(options, selection:, style:, title:,
 artwork:, settings:)` ("Choose a photo" for a photo; under the cards in `.list`). The artwork
