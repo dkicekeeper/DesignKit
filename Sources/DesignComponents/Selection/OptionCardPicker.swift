@@ -14,6 +14,8 @@
 //  large on top, in a phone's shape, the options in a row of cards under it (the centred one is
 //  the choice, `SnapCardPicker(style: .centered(width:))`), and under the row what the app sets
 //  for the chosen option (`settings:`: "Choose a photo" for a photo).
+//  5.5.1: the carousel's chosen card has no check: the outline, the accent name and the large
+//  preview above already say which one it is.
 //
 
 import SwiftUI
@@ -240,7 +242,7 @@ public struct OptionCardPicker<Option: Hashable, Artwork: View>: View {
 }
 
 /// An option in `OptionCardPicker`'s carousel: its artwork over its name, the chosen one outlined
-/// in the accent with a check on the artwork and its name in the accent.
+/// in the accent with its name in the accent (no check since 5.5.1: the preview above shows it).
 private struct OptionCarouselCard<Artwork: View>: View {
     let title: String
     let isSelected: Bool
@@ -255,12 +257,6 @@ private struct OptionCarouselCard<Artwork: View>: View {
                 // A hairline, as the preview's: an artwork the colour of the card (a plain
                 // background) still shows its shape.
                 .overlay(RoundedRectangle(cornerRadius: AppRadius.md).strokeBorder(AppColors.Border.normal, lineWidth: 0.5))
-                .overlay(alignment: .topTrailing) {
-                    if isSelected {
-                        OptionCardCheck()
-                            .transition(.scale.combined(with: .opacity))
-                    }
-                }
             Text(verbatim: title)
                 .font(AppTypography.bodyEmphasis)
                 .foregroundStyle(isSelected ? AppColors.accent : AppColors.Text.primary)

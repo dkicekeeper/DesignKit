@@ -16,6 +16,21 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 5.5.1 - 2026-10-20
+
+Tenra's background screen after a look on a device: the carousel's chosen card loses its check.
+[#83](https://github.com/dkicekeeper/DesignKit/pull/83)
+
+### Changed
+
+- `OptionCardPicker(style: .carousel)`: the chosen card in the row has no check on its artwork.
+  The accent outline, the accent name and the large preview above say which option is chosen.
+  `OptionCard` and `.list` keep their check.
+
+### Gallery and tooling
+
+- The Gallery's Selection page describes the carousel without the check.
+
 ## 5.5.0 - 2026-10-17
 
 What Dalada asked for once it took its part of docs/adoption.md: a tooltip that can point at a

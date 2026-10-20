@@ -293,7 +293,7 @@ private struct OptionCardPickerPage: View {
     var body: some View {
         ComponentPage(
             name: "OptionCardPicker · OptionCard",
-            summary: "Options as pictures, the chosen one outlined in the accent with a check. carousel (5.2.0): the chosen option large on top, the options in a row under it, its settings under the row; list: cards one under another.",
+            summary: "Options as pictures, the chosen one outlined in the accent (with a check in list). carousel (5.2.0): the chosen option large on top, the options in a row under it, its settings under the row; list: cards one under another.",
             since: "2.9.0",
             apps: [.tenra],
             canvas: style == .carousel ? .bleed : .fill,
