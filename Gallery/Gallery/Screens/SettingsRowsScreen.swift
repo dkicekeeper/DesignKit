@@ -45,6 +45,36 @@ private struct InFormCard<Content: View>: View {
     }
 }
 
+/// Where a settings row sits (6.1.0): in a `FormSection` card with `.standard`, which pads the
+/// row like the rows around it, or in a `List` with `.settings`, which leaves the padding to the
+/// list. A `.settings` row in a card has no side padding.
+private enum RowHost: Hashable {
+    case card, list
+
+    var config: RowConfiguration { self == .card ? .standard : .settings }
+
+    static let options: [(String, RowHost)] = [("Card: .standard", .card), ("List: .settings", .list)]
+}
+
+private struct InRowHost<Content: View>: View {
+    let host: RowHost
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        switch host {
+        case .card:
+            FormSection { content }
+        case .list:
+            NavigationStack {
+                List { content }
+                    .scrollDisabled(true)
+                    .toolbar(.hidden, for: .navigationBar)
+            }
+            .frame(height: 200)
+        }
+    }
+}
+
 private struct UniversalRowPage: View {
     @State private var config = 0
     @State private var showsIcon = true
@@ -147,9 +177,10 @@ private struct NavigationSettingsRowPage: View {
             canvas: .fill,
             notes: [
                 "value: what is set, before the chevron, as iOS Settings shows it (5.0.0). NavigationPickerRow(style: .list) is this row with the chosen option.",
+                "A List row: the list pads it and draws the chevron. In a FormSection card use NavigationPickerRow.",
             ]
         ) {
-            InFormCard {
+            InRowHost(host: .list) {
                 if state == .loading {
                     UniversalRowSkeleton.navigationSettings
                 } else {
@@ -170,6 +201,7 @@ private struct ToggleSettingsRowPage: View {
     @State private var isOn = true
     @State private var showsHint = true
     @State private var showsIcon = true
+    @State private var host: RowHost = .card
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -178,19 +210,23 @@ private struct ToggleSettingsRowPage: View {
             summary: "A settings row with a switch and an optional hint under the title.",
             since: "0.6.0",
             apps: [.tenra, .dalada],
-            canvas: .fill
+            canvas: .fill,
+            notes: [
+                "config: .standard in a FormSection card, .settings (the default) in a List (3.0.0).",
+            ]
         ) {
-            InFormCard {
+            InRowHost(host: host) {
                 if state == .loading {
-                    UniversalRowSkeleton.toggleSettings
+                    UniversalRowSkeleton(config: host.config, iconStyle: .circle(size: AppIconSize.md), trailing: .toggle)
                 } else {
                     ToggleSettingsRow(icon: showsIcon ? "moon.fill" : nil, title: "Quiet hours",
                                       hint: showsHint ? "No notifications from 22:00 to 8:00" : nil,
-                                      isOn: $isOn)
+                                      config: host.config, isOn: $isOn)
                 }
             }
         } controls: {
             StateControl(state: $state)
+            ChoiceControl("In", selection: $host, options: RowHost.options)
             ToggleControl("On", isOn: $isOn)
             ToggleControl("Hint", isOn: $showsHint)
             ToggleControl("Icon (optional since 3.0.0)", isOn: $showsIcon)
@@ -200,6 +236,7 @@ private struct ToggleSettingsRowPage: View {
 
 private struct ActionSettingsRowPage: View {
     @State private var destructive = false
+    @State private var host: RowHost = .card
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -207,19 +244,23 @@ private struct ActionSettingsRowPage: View {
             name: "ActionSettingsRow",
             summary: "A settings row that runs an action: export, sign out, delete the account.",
             apps: [.tenra, .dalada],
-            canvas: .fill
+            canvas: .fill,
+            notes: [
+                "config: .standard in a FormSection card, .settings (the default) in a List. A PhotosPicker or a ShareLink takes ActionRowLabel as its label.",
+            ]
         ) {
-            InFormCard {
+            InRowHost(host: host) {
                 if state == .loading {
-                    UniversalRowSkeleton.actionSettings
+                    UniversalRowSkeleton(config: host.config, iconStyle: .circle(size: AppIconSize.md))
                 } else {
                     ActionSettingsRow(icon: destructive ? "trash" : "square.and.arrow.up",
                                       title: destructive ? "Delete all data" : "Export",
-                                      isDestructive: destructive) {}
+                                      isDestructive: destructive, config: host.config) {}
                 }
             }
         } controls: {
             StateControl(state: $state)
+            ChoiceControl("In", selection: $host, options: RowHost.options)
             ToggleControl("Destructive", isOn: $destructive)
         }
     }
@@ -351,6 +392,7 @@ private struct SliderRowPage: View {
     @State private var showsIcon = true
     @State private var showsHint = false
     @State private var stepped = false
+    @State private var host: RowHost = .card
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -363,11 +405,12 @@ private struct SliderRowPage: View {
             notes: [
                 "The app formats the value (per cent, metres, minutes) and passes it as valueText.",
                 "Haptics (2.3.0): a tick on every step of a stepped slider; a smooth one ticks at either end.",
+                "config (6.1.0): .standard in a FormSection card, .settings (the default) in a List.",
             ]
         ) {
-            InFormCard {
+            InRowHost(host: host) {
                 if state == .loading {
-                    SliderRowSkeleton(showsHint: showsHint)
+                    SliderRowSkeleton(showsHint: showsHint, config: host.config)
                 } else {
                     SliderRow(
                         "Colour intensity",
@@ -376,12 +419,14 @@ private struct SliderRowPage: View {
                         in: 0.05...1,
                         step: stepped ? 0.05 : nil,
                         valueText: "\(Int((value * 100).rounded()))%",
-                        hint: showsHint ? "How strongly the home background shows through the cards." : nil
+                        hint: showsHint ? "How strongly the home background shows through the cards." : nil,
+                        config: host.config
                     )
                 }
             }
         } controls: {
             StateControl(state: $state)
+            ChoiceControl("In", selection: $host, options: RowHost.options)
             ToggleControl("Icon", isOn: $showsIcon)
             ToggleControl("Hint", isOn: $showsHint)
             ToggleControl("Steps of 5%", isOn: $stepped)
@@ -450,7 +495,7 @@ private struct CheckmarkRowPage: View {
     @State private var selection = "kaspi"
     @State private var showsIcons = true
     @State private var showsValues = true
-    @State private var inCard = false
+    @State private var host: RowHost = .card
     @State private var state: SpecimenState = .content
 
     private let accounts = [("kaspi", "Kaspi Gold", "1 250 000 ₸"), ("halyk", "Halyk", "320 000 ₸"), ("cash", "Cash", "45 000 ₸")]
@@ -463,16 +508,17 @@ private struct CheckmarkRowPage: View {
             apps: [.tenra, .dalada],
             canvas: .fill
         ) {
-            InFormCard {
+            InRowHost(host: host) {
                 ForEach(accounts, id: \.0) { account in
                     if state == .loading {
-                        UniversalRowSkeleton.checkmark(iconStyle: showsIcons ? .circle(size: AppIconSize.lg) : nil)
+                        UniversalRowSkeleton(config: host.config, iconStyle: showsIcons ? .circle(size: AppIconSize.lg) : nil,
+                                             titleFont: AppTypography.h4, trailing: .selection)
                     } else {
                         CheckmarkRow(account.1,
                                      icon: showsIcons ? .sfSymbol("creditcard.fill", color: AppColors.accent) : nil,
                                      value: showsValues ? account.2 : nil,
                                      isSelected: selection == account.0,
-                                     config: inCard ? .standard : .settings) { selection = account.0 }
+                                     config: host.config) { selection = account.0 }
                     }
                 }
             }
@@ -480,7 +526,7 @@ private struct CheckmarkRowPage: View {
             StateControl(state: $state)
             ToggleControl("Icons", isOn: $showsIcons)
             ToggleControl("Values", isOn: $showsValues)
-            ToggleControl("Card padding (.standard, 3.0.0)", isOn: $inCard)
+            ChoiceControl("In (.standard since 3.0.0)", selection: $host, options: RowHost.options)
         }
     }
 }

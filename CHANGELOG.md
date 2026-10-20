@@ -16,6 +16,45 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 6.1.0 - 2026-10-20
+
+`SliderRow` pads itself in a `FormSection` card, as the other form rows do (the owner's review of
+Tenra's background settings on a device: the intensity slider touched the card's edges).
+[#85](https://github.com/dkicekeeper/DesignKit/pull/85)
+
+### Added
+
+- `SliderRow(config:)` and `SliderRowSkeleton(config:)`: the row's padding preset, as
+  `ToggleSettingsRow` and `ActionSettingsRow` have it. `.settings`, the default, keeps the row as
+  it was (4 pt above and below, nothing at the sides, for a `List`); `.standard` in a
+  `FormSection` card pads it 12 × 16, like the rows around it.
+
+### Migration
+
+- A `SliderRow` in a `FormSection` card takes `config: .standard` in place of the app's own
+  padding (the same 12 × 16): Dalada's privacy zone radius, Tenra's background intensity.
+
+```swift
+// 6.0
+SliderRow("Radius", value: $radius, in: 100...2_000, step: 100, valueText: text)
+    .padding(.horizontal, AppSpacing.lg)
+    .padding(.vertical, AppSpacing.sm)
+// 6.1
+SliderRow("Radius", value: $radius, in: 100...2_000, step: 100, valueText: text, config: .standard)
+```
+
+- A `ToggleSettingsRow`, `ActionSettingsRow` or `CheckmarkRow` in a `FormSection` card takes
+  `config: .standard` too; their default `.settings` is a `List` row's, with no side padding.
+
+### Gallery and tooling
+
+- The pages of `ToggleSettingsRow`, `ActionSettingsRow`, `SliderRow` and `CheckmarkRow` show the
+  row in a card with `.standard` or in a `List` with `.settings` (the "In" control);
+  `NavigationSettingsRow`, a `List` row, is shown in a `List`. They showed `.settings` rows in a
+  card, with no side padding. `OptionCardPicker`'s gradient settings pad the slider.
+- Snapshot `settingsCard`: a card of form rows with `.standard` (a photo picker's label, a
+  switch, a slider, a destructive action).
+
 ## 6.0.0 - 2026-10-20
 
 `OptionCardPicker` is a carousel of large previews and nothing else (the owner's review of

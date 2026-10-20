@@ -7,6 +7,10 @@
 //  Slider with a label and value.) Ported from Tenra's background-intensity row (1.15.0);
 //  what the value means and how it is formatted stay in the app.
 //
+//  6.1.0: `config:`, the padding preset, as the other form rows have it: in a `FormSection` card
+//  `.standard` pads the row like the rows around it; until then it padded only vertically, and
+//  an app padded it by hand.
+//
 
 import SwiftUI
 import DesignTokens
@@ -21,7 +25,8 @@ import DesignSupport
 ///           valueText: "\(Int(radius)) m", hint: "Trips hide their track inside this circle")
 /// ```
 ///
-/// A row pads only vertically (docs/design-system.md §10); put it in a form card or a list.
+/// `config` is `.settings` (a `List` row, no side padding); in a `FormSection` card pass
+/// `.standard`, which pads it like the rows around it (6.1.0, docs/design-system.md §10).
 public struct SliderRow: View {
     let title: String
     let systemImage: String?
@@ -30,6 +35,7 @@ public struct SliderRow: View {
     let step: Double?
     let valueText: String
     let hint: String?
+    let config: RowConfiguration
 
     public init(
         _ title: String,
@@ -38,7 +44,8 @@ public struct SliderRow: View {
         in range: ClosedRange<Double>,
         step: Double? = nil,
         valueText: String,
-        hint: String? = nil
+        hint: String? = nil,
+        config: RowConfiguration = .settings
     ) {
         self.title = title
         self.systemImage = systemImage
@@ -47,6 +54,7 @@ public struct SliderRow: View {
         self.step = step
         self.valueText = valueText
         self.hint = hint
+        self.config = config
     }
 
     public var body: some View {
@@ -78,7 +86,8 @@ public struct SliderRow: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding(.vertical, AppSpacing.xs)
+        .padding(.vertical, config.verticalPadding)
+        .padding(.horizontal, config.horizontalPadding)
     }
 
     private var isAtEnd: Bool { value <= range.lowerBound || value >= range.upperBound }
@@ -105,12 +114,14 @@ public struct SliderRow: View {
 // MARK: - Skeleton
 
 /// Placeholder of a `SliderRow`: the title and value lines, the slider's track at its height,
-/// and the hint line when the row has one.
+/// and the hint line when the row has one; `config` as the row's (6.1.0).
 public struct SliderRowSkeleton: View {
     let showsHint: Bool
+    let config: RowConfiguration
 
-    public init(showsHint: Bool = false) {
+    public init(showsHint: Bool = false, config: RowConfiguration = .settings) {
         self.showsHint = showsHint
+        self.config = config
     }
 
     public var body: some View {
@@ -127,7 +138,8 @@ public struct SliderRowSkeleton: View {
             }
         }
         .shimmer()
-        .padding(.vertical, AppSpacing.xs)
+        .padding(.vertical, config.verticalPadding)
+        .padding(.horizontal, config.horizontalPadding)
         .skeletonLoadingLabel()
     }
 }

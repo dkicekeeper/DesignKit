@@ -201,6 +201,24 @@ extension ComponentSnapshots {
             )
         }
 
+        /// A settings card of form rows (6.1.0): each with `.standard`, so all pad alike, the
+        /// slider included; inset dividers between them. A home background's photo settings.
+        @Test func settingsCard() async {
+            await assertComponentSnapshot(
+                FormSection {
+                    ActionRowLabel("Change photo", systemImage: "photo.on.rectangle")
+                    Divider().padding(.leading, AppSpacing.lg)
+                    ToggleSettingsRow(icon: "camera.filters", title: "Blur", config: .standard, isOn: .constant(true))
+                    Divider().padding(.leading, AppSpacing.lg)
+                    SliderRow("Intensity", systemImage: "circle.lefthalf.filled", value: .constant(0.35),
+                              in: 0.05...1, valueText: "35%", config: .standard)
+                    Divider().padding(.leading, AppSpacing.lg)
+                    ActionSettingsRow(icon: "trash", title: "Remove photo", isDestructive: true, config: .standard) {}
+                },
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
         /// ItemRow (3.6.0) in both styles, with a pale-circle symbol, a top glyph next to a
         /// description, a badge, two meta lines and the accessories; one card per style.
         @Test func itemRows() async {

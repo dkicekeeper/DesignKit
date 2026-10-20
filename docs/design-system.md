@@ -1094,15 +1094,21 @@ row with its own button. No skeleton: it shows no data. Dalada: "Add photos" in 
 #### `SliderRow` *(1.15.0)*
 A setting set with a slider: the title (body, with an optional symbol), the value on the trailing
 edge (bodySmall, secondary, tabular digits), the slider in the accent, an optional hint (caption).
-The app formats the value. Pads only vertically, like a row; put it in a form card.
+The app formats the value. `config:` *(6.1.0)* is its padding, as for `ToggleSettingsRow`:
+`.settings` (the default, a `List` row) pads it only vertically, `.standard` in a `FormSection`
+card pads it like the rows around it (§10). Before 6.1.0 it had only the vertical padding, so in
+a card it touched the card's edges unless the app padded it.
 
 ```swift
-SliderRow("Colour intensity", systemImage: "circle.lefthalf.filled",
-          value: $opacity, in: 0.05...1, valueText: "\(Int((opacity * 100).rounded()))%")
+FormSection(header: "Background") {
+    SliderRow("Colour intensity", systemImage: "circle.lefthalf.filled",
+              value: $opacity, in: 0.05...1, valueText: "\(Int((opacity * 100).rounded()))%",
+              config: .standard)
+}
 ```
 
 VoiceOver reads the slider with the title as its label and `valueText` as its value. Skeleton:
-`SliderRowSkeleton(showsHint:)`. Tenra's background-intensity row is its adapter.
+`SliderRowSkeleton(showsHint:config:)`. Tenra's background-intensity row is its adapter.
 
 #### `SelectionIndicator(isSelected:tint:)`
 Check circle for multi-select and checklist rows, and since 5.2.0 the trailing mark of every
@@ -2069,8 +2075,8 @@ OptionCardPicker(HomeBackground.allCases, selection: $background, title: { $0.na
 
 `settings:` *(5.2.0)* is what the app sets for the chosen option, under the carousel, fading from
 one option's to the next: DesignKit's form rows in a `FormSection` (`ActionRowLabel` as a
-`PhotosPicker`'s label, `ToggleSettingsRow`, `SliderRow`, `ActionSettingsRow`, `.standard`
-config, inset dividers), empty for an option with nothing to set. Skeleton:
+`PhotosPicker`'s label, `ToggleSettingsRow`, `SliderRow`, `ActionSettingsRow`, each with the
+`.standard` config, inset dividers), empty for an option with nothing to set. Skeleton:
 `OptionCardPickerSkeleton()`. Tenra: `HomeBackgroundPicker` (Settings → Background). Before
 6.0.0 it also had `style: .list` (`OptionCard`s one under another) and, in `.carousel`, a row of
 small cards under one preview ([migration-6.0.md](migration-6.0.md)).
@@ -2810,7 +2816,8 @@ Every form in both apps is `EditSheetContainer(wrapInForm: false)` over a `Scrol
 payments and rate changes, Dalada's trip, catch, check-in and place forms. Neither app has a
 system `Form` sheet left. A new form is built the same way: the rows that fill a card
 (`FormTextField(style: .row)`, `MenuPickerRow`, `NavigationPickerRow`, `DatePickerRow`,
-`StepperRow`, `SliderRow`, `ToggleSettingsRow(config: .standard)`) pad themselves for it (§10).
+`StepperRow`, `SliderRow(config: .standard)`, `ToggleSettingsRow(config: .standard)`,
+`ActionSettingsRow(config: .standard)`, `ActionRowLabel`) pad themselves for it (§10).
 `wrapInForm: true`, still the parameter's default, wraps the content in a system `Form` for a
 host that wants the grouped-list look.
 
@@ -2893,7 +2900,7 @@ with the iOS 27 SDK — Xcode 27; built with Xcode 26 the gate honours Reduce Mo
 | **Compact surface** | Its own, smaller | — | `MessageBanner` (`md`), `ChartSelectionBanner` (`lg` × `sm`) |
 | **Row**: no surface, lives in a container | Vertical only, from its `RowConfiguration` preset | The container's: a card's `.cardContentPadding()`, `List` / `Form` insets, or `.screenPadding()` | `InfoRow`, `AmountRow` (info style), `NetAmountRow`, `ScheduleRow` (`.info`, 8) |
 | **List row**: lives only in a `List` | None: the `List`'s row insets give both | `List` | `AmountRow(style: .list)` |
-| **Row in a `FormSection`** | Vertical and horizontal (`.standard`: 12 × 16), since `FormSection`'s surface has none | — | `MenuPickerRow`, `DatePickerRow` |
+| **Row in a `FormSection`** | Vertical and horizontal (`.standard`: 12 × 16), since `FormSection`'s surface has none | — | `MenuPickerRow`, `DatePickerRow`, `StepperRow`, `ActionRowLabel`; with `config: .standard`: `ToggleSettingsRow`, `ActionSettingsRow`, `CheckmarkRow`, `SliderRow` (6.1.0) |
 | **Primitive** | None: the parent places it | — | `Badge`, `TrendBadge`, `FormattedAmountText`, `LinearProgressBar`, charts |
 
 Outer spacing is never a component's: the screen insets with `.screenPadding()` and spaces cards with its stack's `spacing`.
@@ -2920,6 +2927,10 @@ VStack, HStack, custom cards must add `.padding(AppSpacing.lg)` (or the equivale
 
 - **`.info` H:0** — InfoRow always lives inside a container with `.padding(.lg)` — adding own H padding would double it to 32pt
 - **`.settings` H:0** — `List` / `Form` apply `listRowInsets` (16pt leading/trailing) automatically — rows inside must NOT add H padding
+- **So a `.settings` row in a `FormSection` card touches the card's edges.** The rows that take
+  `config:` default to `.settings` (they began as `List` rows); in a card pass `.standard`.
+  `NavigationSettingsRow` has no `config:`: it is a `List` row (the list draws its chevron); in a
+  card, `NavigationPickerRow` is the row that opens a screen.
 
 ### Dividers inside cards
 
