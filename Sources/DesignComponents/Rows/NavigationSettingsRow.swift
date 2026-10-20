@@ -17,6 +17,7 @@ import DesignSupport
 ///
 /// 5.0.0: `value:`, what is set, before the list's chevron ("Language  English ›"), and the icon
 /// may be left out; `NavigationPickerRow(style: .list)` is this row.
+@available(*, deprecated, message: "Use UniversalRow(_:icon:value:config: .settings, accessory: .navigation { … }) (6.2.0).")
 public struct NavigationSettingsRow<Destination: View>: View {
     // MARK: - Props
 
@@ -48,22 +49,8 @@ public struct NavigationSettingsRow<Destination: View>: View {
     // MARK: - Body
 
     public var body: some View {
-        UniversalRow(
-            config: .settings,
-            leadingIcon: icon.map { .sfSymbol($0, color: iconColor, size: AppIconSize.md) },
-            title: title
-        ) {
-            // The NavigationLink adds the chevron after it.
-            if let value {
-                Text(value)
-                    .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.Text.secondary)
-                    .lineLimit(1)
-            }
-        }
-        .navigationRow {
-            destination
-        }
+        UniversalRow(title, icon: icon, iconColor: iconColor, value: value, config: .settings,
+                     accessory: .navigation { destination })
     }
 }
 

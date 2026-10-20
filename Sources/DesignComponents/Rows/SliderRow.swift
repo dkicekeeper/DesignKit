@@ -28,6 +28,7 @@ import DesignSupport
 ///
 /// `config` is `.settings` (a `List` row, no side padding); in a `FormSection` card pass
 /// `.standard`, which pads it like the rows around it (6.1.0, docs/design-system.md §10).
+@available(*, deprecated, message: "Use UniversalRow(_:icon:hint:config:accessory: .slider(_:in:step:valueText:)) (6.2.0).")
 public struct SliderRow: View {
     let title: String
     let systemImage: String?
@@ -59,51 +60,8 @@ public struct SliderRow: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            HStack(spacing: config.spacing) {
-                if let systemImage {
-                    let icon = IconConfig.sfSymbol(systemImage, color: AppColors.accent, size: AppIconSize.lg)
-                    Icon(source: icon.source, style: icon.style)
-                }
-                Text(title)
-                    .font(AppTypography.body)
-                    .foregroundStyle(AppColors.Text.primary)
-
-                Spacer()
-
-                Text(valueText)
-                    .font(AppTypography.bodySmall.monospacedDigit())
-                    .foregroundStyle(AppColors.Text.secondary)
-            }
-
-            slider
-                .tint(AppColors.accent)
-                // 2.3.0: a tick on every step of a stepped slider, and at either end of a smooth one.
-                .hapticCue(.tick, trigger: value) { _, _ in step != nil }
-                .hapticCue(.tick, trigger: isAtEnd) { _, atEnd in step == nil && atEnd }
-                .accessibilityLabel(Text(title))
-                .accessibilityValue(Text(valueText))
-
-            if let hint {
-                Text(hint)
-                    .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.Text.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-        .padding(.vertical, config.verticalPadding)
-        .padding(.horizontal, config.horizontalPadding)
-    }
-
-    private var isAtEnd: Bool { value <= range.lowerBound || value >= range.upperBound }
-
-    @ViewBuilder
-    private var slider: some View {
-        if let step {
-            Slider(value: $value, in: range, step: step)
-        } else {
-            Slider(value: $value, in: range)
-        }
+        UniversalRow(title, icon: systemImage, hint: hint, config: config,
+                     accessory: .slider($value, in: range, step: step, valueText: valueText))
     }
 }
 

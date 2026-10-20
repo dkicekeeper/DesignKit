@@ -12,6 +12,7 @@ import DesignSupport
 
 /// Date picker row with inline style
 /// For button-based selection (Yesterday/Today/Calendar), use DateButtons directly
+@available(*, deprecated, message: "Use UniversalRow(_:icon:accessory: .date(_:components:from:through:)) (6.2.0).")
 public struct DatePickerRow: View {
     let icon: String?
     let title: String
@@ -40,42 +41,8 @@ public struct DatePickerRow: View {
     }
 
     public var body: some View {
-        UniversalRow(
-            config: .standard,
-            leadingIcon: icon.map { .sfSymbol($0, color: AppColors.accent, size: AppIconSize.lg) }
-        ) {
-            if let minDate, let maxDate {
-                DatePicker(
-                    title,
-                    selection: $selection,
-                    in: minDate...max(minDate, maxDate),
-                    displayedComponents: displayedComponents
-                )
-            } else if let minDate {
-                // 3.0.0: a lower bound (a trip day from today on).
-                DatePicker(
-                    title,
-                    selection: $selection,
-                    in: minDate...,
-                    displayedComponents: displayedComponents
-                )
-            } else if let maxDate {
-                DatePicker(
-                    title,
-                    selection: $selection,
-                    in: ...maxDate,
-                    displayedComponents: displayedComponents
-                )
-            } else {
-                DatePicker(
-                    title,
-                    selection: $selection,
-                    displayedComponents: displayedComponents
-                )
-            }
-        } trailing: {
-            EmptyView()
-        }
+        UniversalRow(title, icon: icon,
+                     accessory: .date($selection, components: displayedComponents, from: minDate, through: maxDate))
     }
 }
 

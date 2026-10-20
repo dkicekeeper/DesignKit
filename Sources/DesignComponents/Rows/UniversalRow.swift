@@ -73,9 +73,12 @@ public struct UniversalRow<Content: View, Trailing: View>: View {
 
     @ViewBuilder let content: () -> Content
     @ViewBuilder let trailing: () -> Trailing
+    /// A row made of a title and an accessory (6.2.0), laid out by `RowControlView`.
+    var control: RowControl? = nil
 
+    /// The hint starts under the title: past the icon and the gap after it.
     private var hintLeadingPad: CGFloat {
-        leadingIcon != nil ? AppIconSize.md + config.spacing : 0
+        leadingIcon.map { $0.style.size + config.spacing } ?? 0
     }
 
     // MARK: - Initializer
@@ -96,7 +99,16 @@ public struct UniversalRow<Content: View, Trailing: View>: View {
 
     // MARK: - Body
 
+    @ViewBuilder
     public var body: some View {
+        if let control {
+            RowControlView(row: control)
+        } else {
+            layout
+        }
+    }
+
+    private var layout: some View {
         let stack = VStack(alignment: .leading, spacing: hint != nil ? AppSpacing.xs : 0) {
             HStack(spacing: config.spacing) {
                 // Leading icon via Icon
@@ -420,8 +432,88 @@ public extension UniversalRow where Content == Text {
     }
 }
 
-// Note: Removed overly-specific convenience initializer for navigation rows
-// Use the standard UniversalRow initializer with explicit trailing view instead
+// MARK: - One row for every form and settings list (6.2.0)
+
+public extension UniversalRow where Content == Text, Trailing == EmptyView {
+    /// A row of a form card or a settings list: an SF Symbol in the accent (24 pt, a glyph),
+    /// the title, what the row carries (`accessory`) and a hint under the title.
+    ///
+    /// ```swift
+    /// FormSection {
+    ///     UniversalRow("Quiet hours", icon: "moon.fill", hint: "No notifications at night",
+    ///                  accessory: .toggle($quietHours))
+    ///     UniversalRow("Repeat", icon: "repeat", accessory: .menu($period, options: periods))
+    ///     UniversalRow("Delete all data", icon: "trash", role: .destructive, accessory: .action { delete() })
+    /// }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - icon: An SF Symbol before the title, in the accent (red with `role: .destructive`);
+    ///     none leaves the room out.
+    ///   - iconColor: Another colour for the symbol.
+    ///   - value: What is set, in grey on the trailing edge (before a navigation chevron, after
+    ///     a checkmark row's title).
+    ///   - hint: A line under the title.
+    ///   - role: `.destructive` turns the title and the symbol red.
+    ///   - titleColor: Another colour for the title (the accent for a link-like action).
+    ///   - config: `.standard` (default) pads the row for a `FormSection` card; `.settings` for
+    ///     a `List`, which pads it; `.info` for a detail inside a padded container.
+    ///   - accessory: What the row carries and what a tap does (`RowAccessory`).
+    ///
+    /// The initialiser is `nonisolated`: a `PhotosPicker` builds its label off the main actor.
+    nonisolated init(
+        _ title: String,
+        icon: String? = nil,
+        iconColor: Color? = nil,
+        value: String? = nil,
+        hint: String? = nil,
+        role: RowRole = .standard,
+        titleColor: Color? = nil,
+        config: RowConfiguration = .standard,
+        accessory: RowAccessory = .none
+    ) {
+        let tint = iconColor ?? (role == .destructive ? AppColors.destructive : AppColors.accent)
+        self.init(
+            title,
+            leadingIcon: icon.map { .sfSymbol($0, color: tint, size: AppIconSize.lg) },
+            value: value,
+            hint: hint,
+            role: role,
+            titleColor: titleColor,
+            config: config,
+            accessory: accessory
+        )
+    }
+
+    /// A row with any leading icon: a logo, a coloured tile, an icon of another size.
+    nonisolated init(
+        _ title: String,
+        leadingIcon: IconConfig?,
+        value: String? = nil,
+        hint: String? = nil,
+        role: RowRole = .standard,
+        titleColor: Color? = nil,
+        config: RowConfiguration = .standard,
+        accessory: RowAccessory = .none
+    ) {
+        self.config = config
+        self.leadingIcon = leadingIcon
+        self.hint = hint
+        self.content = { Text(title) }
+        self.trailing = { EmptyView() }
+        self.control = RowControl(
+            title: title,
+            icon: leadingIcon,
+            value: value,
+            hint: hint,
+            role: role,
+            titleColor: titleColor,
+            config: config,
+            accessory: accessory
+        )
+    }
+}
+
 
 // MARK: - Previews
 

@@ -24,6 +24,7 @@ import DesignSupport
 ///
 /// VoiceOver focuses the switch itself (labelled with the title, hinted with `hint`), so a
 /// double tap toggles it; the visible title is not read twice.
+@available(*, deprecated, message: "Use UniversalRow(_:icon:hint:config:accessory: .toggle(_:)) (6.2.0).")
 public struct ToggleSettingsRow: View {
     let icon: String?
     let title: String
@@ -49,23 +50,6 @@ public struct ToggleSettingsRow: View {
     }
 
     public var body: some View {
-        UniversalRow(
-            config: config,
-            leadingIcon: icon.map { .sfSymbol($0, color: iconColor, size: AppIconSize.md) },
-            hint: hint
-        ) {
-            Text(title)
-                .font(AppTypography.body)
-                .foregroundStyle(AppColors.Text.primary)
-                .accessibilityHidden(true)
-        } trailing: {
-            Toggle(isOn: $isOn) {
-                Text(title)
-            }
-            .labelsHidden()
-            .tint(AppColors.accent)
-            .accessibilityHint(hint.map { Text($0) } ?? Text(verbatim: ""))
-            .onChange(of: isOn) { _, _ in HapticManager.selection() }
-        }
+        UniversalRow(title, icon: icon, iconColor: iconColor, hint: hint, config: config, accessory: .toggle($isOn))
     }
 }

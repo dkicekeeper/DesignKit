@@ -14,6 +14,7 @@ import DesignSupport
 /// Props-based action row for Settings
 /// Single Responsibility: Display action button with icon, title, and optional destructive styling
 /// Now built on top of UniversalRow for consistency
+@available(*, deprecated, message: "Use UniversalRow(_:icon:role:config:accessory: .action(_:)) (6.2.0).")
 public struct ActionSettingsRow: View {
     // MARK: - Props
 
@@ -45,30 +46,18 @@ public struct ActionSettingsRow: View {
         self.action = action
     }
 
-    // MARK: - Computed Properties
-
-    private var resolvedIconColor: Color {
-        iconColor ?? (isDestructive ? AppColors.destructive : AppColors.accent)
-    }
-
-    private var resolvedTitleColor: Color {
-        titleColor ?? (isDestructive ? AppColors.destructive : AppColors.Text.primary)
-    }
-
     // MARK: - Body
 
     public var body: some View {
         UniversalRow(
+            title,
+            icon: icon,
+            iconColor: iconColor,
+            role: isDestructive ? .destructive : .standard,
+            titleColor: titleColor,
             config: config,
-            leadingIcon: icon.map { .sfSymbol($0, color: resolvedIconColor, size: AppIconSize.md) }
-        ) {
-            Text(title)
-                .font(AppTypography.body)
-                .foregroundStyle(resolvedTitleColor)
-        } trailing: {
-            EmptyView()
-        }
-        .actionRow(role: isDestructive ? .destructive : nil, action: action)
+            accessory: .action(action)
+        )
     }
 }
 

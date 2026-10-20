@@ -44,6 +44,7 @@ public struct InfoRowLayout<Value: View>: View {
 
 /// Info row component for displaying label + value pairs
 /// Now built on top of UniversalRow for consistency
+@available(*, deprecated, message: "Use UniversalRow(_:icon:config: .info, accessory: .info(_:)) or .amount(_:currency:prefix:) (6.2.0).")
 public struct InfoRow: View {
     let icon: String?
     let label: String
@@ -73,29 +74,14 @@ public struct InfoRow: View {
     }
 
     public var body: some View {
-        UniversalRow(
-            config: .info,
-            leadingIcon: icon.map { .sfSymbol($0, color: AppColors.accent, size: AppIconSize.lg) }
-        ) {
-            InfoRowLayout(label: label) {
-                if let display = amountDisplay {
-                    FormattedAmountText(
-                        amount: display.amount,
-                        currency: display.currency,
-                        prefix: display.prefix,
-                        fontSize: AppTypography.bodyEmphasis,
-                        fontWeight: .semibold,
-                        color: AppColors.Text.primary
-                    )
-                } else {
-                    Text(value)
-                        .font(AppTypography.bodyEmphasis)
-                        .multilineTextAlignment(.trailing)
-                }
-            }
-        } trailing: {
-            EmptyView()
+        UniversalRow(label, icon: icon, config: .info, accessory: accessory)
+    }
+
+    private var accessory: RowAccessory {
+        if let display = amountDisplay {
+            return .amount(display.amount, currency: display.currency, prefix: display.prefix)
         }
+        return .info(value)
     }
 }
 

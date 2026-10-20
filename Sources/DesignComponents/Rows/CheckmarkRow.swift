@@ -25,6 +25,7 @@ import DesignSupport
 ///
 /// A tap plays the selection haptic, then runs `action`. VoiceOver hears the row as a button
 /// and "Selected" on the picked one.
+@available(*, deprecated, message: "Use UniversalRow(_:leadingIcon:value:config:accessory: .checkmark(isSelected:action:)) (6.2.0).")
 public struct CheckmarkRow: View {
     let title: String
     let icon: IconConfig?
@@ -55,27 +56,7 @@ public struct CheckmarkRow: View {
     }
 
     public var body: some View {
-        UniversalRow(config: config, leadingIcon: icon) {
-            HStack(spacing: 0) {
-                Text(title)
-                    .font(AppTypography.h4)
-                    .fontWeight(.medium)
-
-                if let value {
-                    Spacer()
-
-                    Text(value)
-                        .font(AppTypography.h4)
-                        .foregroundStyle(AppColors.Text.secondary)
-                }
-            }
-        } trailing: {
-            // Every row shows its circle, so the list reads as a choice before anything is picked.
-            SelectionIndicator(isSelected: isSelected)
-        }
-        .selectableRow(isSelected: isSelected) {
-            HapticManager.selection()
-            action()
-        }
+        UniversalRow(title, leadingIcon: icon, value: value, config: config,
+                     accessory: .checkmark(isSelected: isSelected, action: action))
     }
 }

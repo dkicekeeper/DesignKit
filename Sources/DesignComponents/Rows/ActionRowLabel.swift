@@ -25,6 +25,7 @@ import DesignSupport
 ///
 /// `ActionSettingsRow` is the same row with its own button; use this one when the control is
 /// someone else's. No skeleton: it shows no data.
+@available(*, deprecated, message: "Use UniversalRow(_:icon:iconColor:titleColor:) as the label (6.2.0).")
 public struct ActionRowLabel: View {
     let title: String
     let systemImage: String?
@@ -53,12 +54,7 @@ public struct ActionRowLabel: View {
     }
 
     public var body: some View {
-        UniversalRow(
-            config: config,
-            leadingIcon: systemImage.map { .sfSymbol($0, color: tint, size: AppIconSize.lg) },
-            title: title,
-            titleColor: titleColor ?? tint
-        )
-        .contentShape(Rectangle())
+        UniversalRow(title, icon: systemImage, iconColor: tint, titleColor: titleColor ?? tint, config: config)
+            .contentShape(Rectangle())
     }
 }

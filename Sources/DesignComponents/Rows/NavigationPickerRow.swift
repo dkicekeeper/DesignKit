@@ -22,6 +22,7 @@ import DesignSupport
 /// ```
 ///
 /// Its skeleton is `UniversalRowSkeleton.menuPicker`: the same shape, a title and a value.
+@available(*, deprecated, message: "Use UniversalRow(_:icon:config:accessory: .picker(_:options:)) (6.2.0).")
 public struct NavigationPickerRow<T: Hashable>: View {
     /// Where the row lives.
     public enum Style: Sendable {
@@ -38,8 +39,6 @@ public struct NavigationPickerRow<T: Hashable>: View {
     @Binding var selection: T
     let options: [(label: String, value: T)]
     let style: Style
-
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     /// - Parameters:
     ///   - icon: An SF Symbol before the title, in the accent; none by default.
@@ -60,77 +59,10 @@ public struct NavigationPickerRow<T: Hashable>: View {
         self.style = style
     }
 
-    private var selectedLabel: String? {
-        options.first { $0.value == selection }?.label
-    }
-
-    private var leadingIcon: IconConfig? {
-        icon.map { .sfSymbol($0, color: AppColors.accent, size: style == .list ? AppIconSize.md : AppIconSize.lg) }
-    }
 
     public var body: some View {
-        switch style {
-        case .form: formRow
-        case .list: listRow
-        }
-    }
-
-    /// A row of a `List`: `NavigationSettingsRow` with the chosen value (5.0.0), so the list adds
-    /// its chevron.
-    private var listRow: some View {
-        NavigationSettingsRow(icon: icon, title: title, value: selectedLabel) {
-            NavigationPickerList(title: title, selection: $selection, options: options)
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(title))
-        .accessibilityValue(Text(selectedLabel ?? ""))
-        .accessibilityAddTraits(.isButton)
-    }
-
-    private var formRow: some View {
-        NavigationLink {
-            NavigationPickerList(title: title, selection: $selection, options: options)
-        } label: {
-            Group {
-                if dynamicTypeSize.isAccessibilitySize {
-                    // Accessibility sizes: the chosen value under the title, as in iOS Settings.
-                    UniversalRow(config: .standard, leadingIcon: leadingIcon) {
-                        VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                            Text(title)
-                                .font(AppTypography.body)
-                                .foregroundStyle(AppColors.Text.primary)
-                            if let selectedLabel {
-                                valueText(selectedLabel)
-                            }
-                        }
-                    } trailing: {
-                        DisclosureChevron()
-                    }
-                } else {
-                    UniversalRow(config: .standard, leadingIcon: leadingIcon, title: title) {
-                        HStack(spacing: AppSpacing.sm) {
-                            if let selectedLabel {
-                                valueText(selectedLabel)
-                            }
-                            DisclosureChevron()
-                        }
-                    }
-                }
-            }
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(title))
-        .accessibilityValue(Text(selectedLabel ?? ""))
-        .accessibilityAddTraits(.isButton)
-    }
-
-    private func valueText(_ label: String) -> some View {
-        Text(label)
-            .font(AppTypography.body)
-            .foregroundStyle(AppColors.Text.secondary)
-            .lineLimit(1)
+        UniversalRow(title, icon: icon, config: style == .list ? .settings : .standard,
+                     accessory: .picker($selection, options: options))
     }
 }
 
@@ -158,11 +90,12 @@ struct NavigationPickerList<T: Hashable>: View {
     var body: some View {
         List {
             ForEach(shown, id: \.value) { option in
-                CheckmarkRow(option.label, isSelected: option.value == selection) {
-                    selection = option.value
-                    HapticManager.selection()
-                    dismiss()
-                }
+                // The row ticks as it chooses.
+                UniversalRow(option.label, config: .settings,
+                             accessory: .checkmark(isSelected: option.value == selection) {
+                                 selection = option.value
+                                 dismiss()
+                             })
             }
         }
         .navigationTitle(title)

@@ -12,6 +12,7 @@ import DesignSupport
 
 /// Color picker row with preset palette and custom color option
 /// Shows horizontal scrollable color swatches
+@available(*, deprecated, message: "Use UniversalRow(_:accessory: .colors(_:palette:)) (6.2.0).")
 public struct ColorPickerRow: View {
     @Binding var selectedColorHex: String
     let title: String
@@ -27,47 +28,27 @@ public struct ColorPickerRow: View {
         self.palette = palette
     }
 
-    /// Palette to render. If the current color isn't one of the presets (custom color,
-    /// or a stored color in a different case), it's prepended so the user can see and
-    /// keep their current selection instead of nothing appearing selected.
-    private var displayPalette: [String] {
-        let selected = selectedColorHex.lowercased()
-        if palette.contains(where: { $0.lowercased() == selected }) {
-            return palette
-        }
-        return [selectedColorHex] + palette
-    }
-
     public var body: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            // Title
-            if !title.isEmpty {
-                SectionHeader(
-                    String(title),
-                    style: .default
-                )
-            }
-
-            // Color swatches using UniversalCarousel
-            UniversalCarousel(config: .compact) {
-                ForEach(displayPalette, id: \.self) { colorHex in
-                    ColorSwatch(
-                        colorHex: colorHex,
-                        isSelected: selectedColorHex.lowercased() == colorHex.lowercased(),
-                        onTap: {
-                            HapticManager.selection()
-                            selectedColorHex = colorHex
-                        }
-                    )
-                }
-            }
-        }
+        // No padding of its own, as before 6.2.0: the container placed it.
+        UniversalRow(title, config: ColorPickerRowMetrics.unpadded, accessory: .colors($selectedColorHex, palette: palette))
     }
+}
+
+enum ColorPickerRowMetrics {
+    /// The deprecated row's padding: none, its container placed it.
+    static let unpadded = RowConfiguration(
+        spacing: AppSpacing.md,
+        verticalPadding: 0,
+        horizontalPadding: 0,
+        backgroundColor: .clear,
+        cornerRadius: 0
+    )
 }
 
 // MARK: - Color Swatch
 
-private struct ColorSwatch: View {
+/// One colour of a palette: a filled circle, outlined with a check when chosen (`RowAccessory.colors`).
+struct ColorSwatch: View {
     let colorHex: String
     let isSelected: Bool
     let onTap: () -> Void

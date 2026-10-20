@@ -19,6 +19,7 @@ import DesignSupport
 /// ```
 ///
 /// Its skeleton is `UniversalRowSkeleton.menuPicker`: the same shape, a title and a value.
+@available(*, deprecated, message: "Use UniversalRow(_:icon:accessory: .stepper(_:in:step:format:)) (6.2.0).")
 public struct StepperRow: View {
     let icon: String?
     let title: String
@@ -27,7 +28,6 @@ public struct StepperRow: View {
     let step: Int
     let format: (Int) -> String
 
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     /// - Parameters:
     ///   - icon: An SF Symbol before the title, in the accent; none by default.
@@ -50,57 +50,6 @@ public struct StepperRow: View {
     }
 
     public var body: some View {
-        UniversalRow(
-            config: .standard,
-            leadingIcon: icon.map { .sfSymbol($0, color: AppColors.accent, size: AppIconSize.lg) }
-        ) {
-            if dynamicTypeSize.isAccessibilitySize {
-                VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                    titleText
-                    HStack(spacing: AppSpacing.md) {
-                        valueText
-                        Spacer(minLength: 0)
-                        stepper
-                    }
-                }
-            } else {
-                titleText
-            }
-        } trailing: {
-            if !dynamicTypeSize.isAccessibilitySize {
-                HStack(spacing: AppSpacing.md) {
-                    // The value keeps its width: "12 pcs" stays on one line, the title gives way.
-                    valueText
-                        .fixedSize()
-                    stepper
-                }
-            }
-        }
-    }
-
-    private var titleText: some View {
-        Text(title)
-            .font(AppTypography.body)
-            .foregroundStyle(AppColors.Text.primary)
-            .accessibilityHidden(true)
-    }
-
-    private var valueText: some View {
-        Text(verbatim: format(value))
-            .font(AppTypography.body)
-            .monospacedDigit()
-            .foregroundStyle(AppColors.Text.secondary)
-            .contentTransition(.numericText(value: Double(value)))
-            .animation(AppAnimation.contentSpring, value: value)
-            .accessibilityHidden(true)
-    }
-
-    private var stepper: some View {
-        Stepper(value: $value, in: range, step: step) {
-            Text(title)
-        }
-        .labelsHidden()
-        .accessibilityValue(Text(verbatim: format(value)))
-        .onChange(of: value) { _, _ in HapticManager.selection() }
+        UniversalRow(title, icon: icon, accessory: .stepper($value, in: range, step: step, format: format))
     }
 }

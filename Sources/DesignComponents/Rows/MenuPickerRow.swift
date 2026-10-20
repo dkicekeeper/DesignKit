@@ -21,13 +21,12 @@ import DesignSupport
 /// single-select dropdown bound to a `Hashable` value. iOS renders the
 /// options as native menu items with a built-in checkmark on the selected
 /// row, so we don't draw the checkmark ourselves.
+@available(*, deprecated, message: "Use UniversalRow(_:icon:accessory: .menu(_:options:)) (6.2.0).")
 public struct MenuPickerRow<T: Hashable>: View {
     let icon: String?
     let title: String
     @Binding var selection: T
     let options: [(label: String, value: T)]
-
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     public init(
         icon: String? = nil,
@@ -42,56 +41,7 @@ public struct MenuPickerRow<T: Hashable>: View {
     }
 
     public var body: some View {
-        if dynamicTypeSize.isAccessibilitySize {
-            // Accessibility text sizes: the selected value moves under the title, as in iOS
-            // Settings, so neither is truncated.
-            UniversalRow(
-                config: .standard,
-                leadingIcon: icon.map { .sfSymbol($0, color: AppColors.accent, size: AppIconSize.lg) }
-            ) {
-                VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                    Text(title)
-                        .font(AppTypography.body)
-                        .foregroundStyle(AppColors.Text.primary)
-                    menu
-                }
-            } trailing: {
-                EmptyView()
-            }
-        } else {
-            UniversalRow(
-                config: .standard,
-                leadingIcon: icon.map { .sfSymbol($0, color: AppColors.accent, size: AppIconSize.lg) }
-            ) {
-                Text(title)
-                    .font(AppTypography.body)
-                    .foregroundStyle(AppColors.Text.primary)
-            } trailing: {
-                menu
-            }
-        }
-    }
-
-    private var menu: some View {
-        Menu {
-            Picker(title, selection: $selection) {
-                ForEach(options, id: \.value) { option in
-                    Text(option.label).tag(option.value)
-                }
-            }
-        } label: {
-            if let selectedOption = options.first(where: { $0.value == selection }) {
-                HStack(spacing: AppSpacing.xs) {
-                    Text(selectedOption.label)
-                        .font(AppTypography.body)
-                        .foregroundStyle(AppColors.Text.primary)
-                        .lineLimit(1)
-                    Image(systemName: "chevron.up.chevron.down")
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(AppColors.Text.primary)
-                }
-            }
-        }
+        UniversalRow(title, icon: icon, accessory: .menu($selection, options: options))
     }
 }
 
