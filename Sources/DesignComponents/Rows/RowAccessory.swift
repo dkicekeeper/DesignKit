@@ -52,8 +52,8 @@ public struct RowAccessory {
     public static var none: RowAccessory { RowAccessory(kind: .none) }
 
     /// A detail's value (`InfoRow` before 7.0.0): the title as the grey label, `value` in the
-    /// emphasised type on the trailing edge; long values stack under the label at large text
-    /// sizes. In a padded container pass `config: .info`.
+    /// emphasised type on the trailing edge, whole; the label truncates when both do not fit
+    /// (at large text sizes too). In a padded container pass `config: .info`.
     public static func info(_ value: String) -> RowAccessory {
         RowAccessory(kind: .info(value))
     }
