@@ -32,6 +32,9 @@ and the weighted `AuroraBackground` shows its colours bright and clean instead o
 
 ### Changed
 
+- `SliderRow`'s symbol is DesignKit's row icon, in the accent at 24 pt as `StepperRow` and
+  `MenuPickerRow` draw theirs, with the row's spacing before the title; it was the system
+  `Label`'s glyph in the text's black. A row without a symbol (Dalada's radius) is unchanged.
 - `AuroraBackground(_ spots:)` (Tenra's home background and its preview): each pool is denser,
   55 to 90 % of its colour at its centre (30 to 55 % before), and where pools meet their hues
   turn into each other in OKLab with their own chroma, so orange and blue meet through pink and

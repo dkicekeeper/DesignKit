@@ -1094,7 +1094,8 @@ row with its own button. No skeleton: it shows no data. Dalada: "Add photos" in 
 #### `SliderRow` *(1.15.0)*
 A setting set with a slider: the title (body, with an optional symbol), the value on the trailing
 edge (bodySmall, secondary, tabular digits), the slider in the accent, an optional hint (caption).
-The app formats the value. `config:` *(6.1.0)* is its padding, as for `ToggleSettingsRow`:
+The app formats the value. The symbol is a row icon in the accent at 24 pt, like the other form
+rows' (6.1.0; the system `Label`'s black glyph before). `config:` *(6.1.0)* is its padding, as for `ToggleSettingsRow`:
 `.settings` (the default, a `List` row) pads it only vertically, `.standard` in a `FormSection`
 card pads it like the rows around it (§10). Before 6.1.0 it had only the vertical padding, so in
 a card it touched the card's edges unless the app padded it.

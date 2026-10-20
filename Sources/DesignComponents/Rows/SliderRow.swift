@@ -9,7 +9,8 @@
 //
 //  6.1.0: `config:`, the padding preset, as the other form rows have it: in a `FormSection` card
 //  `.standard` pads the row like the rows around it; until then it padded only vertically, and
-//  an app padded it by hand.
+//  an app padded it by hand. Its symbol is DesignKit's row icon (the accent, 24 pt, as
+//  `StepperRow` and `MenuPickerRow` draw theirs), not the system `Label`'s black glyph.
 //
 
 import SwiftUI
@@ -59,8 +60,12 @@ public struct SliderRow: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            HStack {
-                titleLabel
+            HStack(spacing: config.spacing) {
+                if let systemImage {
+                    let icon = IconConfig.sfSymbol(systemImage, color: AppColors.accent, size: AppIconSize.lg)
+                    Icon(source: icon.source, style: icon.style)
+                }
+                Text(title)
                     .font(AppTypography.body)
                     .foregroundStyle(AppColors.Text.primary)
 
@@ -91,15 +96,6 @@ public struct SliderRow: View {
     }
 
     private var isAtEnd: Bool { value <= range.lowerBound || value >= range.upperBound }
-
-    @ViewBuilder
-    private var titleLabel: some View {
-        if let systemImage {
-            Label(title, systemImage: systemImage)
-        } else {
-            Text(title)
-        }
-    }
 
     @ViewBuilder
     private var slider: some View {
