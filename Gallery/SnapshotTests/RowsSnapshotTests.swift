@@ -200,9 +200,10 @@ extension ComponentSnapshots {
         /// line up; a value, a switch, a menu, a stepper, a date, a destructive action.
         @Test func universalRowAccessories() async {
             // A NavigationStack has no size of its own: a fixed height, taller at large text,
-            // where the menu, the stepper and the navigation value move under the title.
+            // where the menu, the stepper and the navigation value move under the title (within
+            // the 956 pt screen with the margins: SnapshotSupport checks it).
             await assertComponentSnapshot(accessoryRows(height: 360), appearances: [.light, .dark])
-            await assertComponentSnapshot(accessoryRows(height: 900), named: "accessibility", appearances: [.largeText])
+            await assertComponentSnapshot(accessoryRows(height: 680), named: "accessibility", appearances: [.largeText])
         }
 
         private func accessoryRows(height: CGFloat) -> some View {
