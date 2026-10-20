@@ -936,6 +936,17 @@
         }
       }
     },
+    "iconStyle.tint.inherit" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Colour"
+          }
+        }
+      }
+    },
     "iconStyle.tint.monochrome" : {
       "extractionState" : "manual",
       "localizations" : {

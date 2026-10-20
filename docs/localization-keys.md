@@ -102,6 +102,7 @@ text, not keys. A new key goes there as well.
 | `iconStyle.shape.roundedSquare` | IconStyle | — |
 | `iconStyle.shape.square` | IconStyle | — |
 | `iconStyle.tint.hierarchical` | IconStyle | — |
+| `iconStyle.tint.inherit` | IconStyle (6.2.0) | — |
 | `iconStyle.tint.monochrome` | IconStyle | — |
 | `iconStyle.tint.original` | IconStyle | — |
 | `iconStyle.tint.palette` | IconStyle | — |
