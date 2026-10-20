@@ -61,22 +61,12 @@ extension ComponentSnapshots {
             )
         }
 
-        @Test func optionCards() async {
+        /// OptionCardPicker (6.0.0): the options as large previews in a carousel, the chosen one
+        /// centred and outlined, the neighbours peeking smaller and paler; under it the chosen
+        /// option's settings in DesignKit's form rows.
+        @Test func optionCardPicker() async {
             await assertComponentSnapshot(
-                VStack(spacing: AppSpacing.md) {
-                    OptionCard(title: "None", isSelected: false) { Rectangle().fill(AppColors.bgBase) }
-                    OptionCard(title: "Gradient", isSelected: true) {
-                        LinearGradient(colors: [.orange, .pink], startPoint: .top, endPoint: .bottom)
-                    }
-                }
-            )
-        }
-
-        /// OptionCardPicker(style: .carousel) (5.2.0): the chosen option large on top, the row
-        /// under it with the chosen card in the middle, the chosen option's settings under it.
-        @Test func optionCardCarousel() async {
-            await assertComponentSnapshot(
-                OptionCardPicker(["None", "Gradient", "Photo"], selection: .constant("Gradient"), style: .carousel,
+                OptionCardPicker(["None", "Gradient", "Photo"], selection: .constant("Gradient"),
                                  title: { $0 }) { option in
                     switch option {
                     case "Gradient": LinearGradient(colors: [.orange, .pink], startPoint: .top, endPoint: .bottom)
@@ -84,7 +74,9 @@ extension ComponentSnapshots {
                     default: Rectangle().fill(AppColors.bgBase)
                     }
                 } settings: { _ in
-                    DSButton("Animate", systemImage: "sparkles", appearance: .secondary) {}
+                    FormSection {
+                        ToggleSettingsRow(icon: "wind", title: "Moves slowly", config: .standard, isOn: .constant(true))
+                    }
                 },
                 appearances: [.light, .dark]
             )

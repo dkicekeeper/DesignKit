@@ -16,6 +16,52 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 6.0.0 - 2026-10-20
+
+`OptionCardPicker` is a carousel of large previews and nothing else (the owner's review of
+Tenra's background screen). [docs/migration-6.0.md](docs/migration-6.0.md).
+[#84](https://github.com/dkicekeeper/DesignKit/pull/84)
+
+### Added
+
+- `OptionCardPickerSkeleton()`: three previews in a phone's shape with a name under each, the
+  side ones smaller and paler.
+
+### Changed
+
+- `OptionCardPicker`: each option is a 180 × 270 preview in a phone's shape with its name under
+  it, in a carousel; the centred one is the choice (the accent outline and the accent name), the
+  neighbours peek at the sides, smaller, paler and still. The row of small cards under one large
+  preview is gone. The settings stay under the carousel.
+
+### Removed
+
+- `OptionCardPicker`'s `style:` parameter, `OptionCardPicker.Style` and `OptionCardPickerStyle`
+  (`.list`, `.carousel`): the carousel is the only look.
+- `OptionCard` and `OptionCardSkeleton`, the list's card; no app used them.
+- `OptionCardCarouselSkeleton`, renamed `OptionCardPickerSkeleton`.
+
+### Migration
+
+- Drop `style: .carousel` from `OptionCardPicker`; a picker in `.list` becomes the carousel.
+- `OptionCardCarouselSkeleton()` becomes `OptionCardPickerSkeleton()`.
+
+```swift
+// 5.5
+OptionCardPicker(modes, selection: $mode, style: .carousel, title: { $0.name }) { preview($0) } settings: { settings($0) }
+// 6.0
+OptionCardPicker(modes, selection: $mode, title: { $0.name }) { preview($0) } settings: { settings($0) }
+```
+
+### Gallery and tooling
+
+- Gallery: OptionCardPicker's page has no style control; its settings are DesignKit's form rows
+  (a photo picker's `ActionRowLabel`, `ToggleSettingsRow`, `SliderRow`, a destructive
+  `ActionSettingsRow`).
+- Snapshots: `optionCardPicker` replaces `optionCards` and `optionCardCarousel`; the skeletons'
+  `financeRowSkeletons` without the option card, and `optionCardPicker` for the new skeleton.
+- docs/migration-6.0.md.
+
 ## 5.5.1 - 2026-10-20
 
 Tenra's background screen after a look on a device: the carousel's chosen card loses its check.

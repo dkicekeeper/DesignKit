@@ -147,13 +147,13 @@ extension ComponentSnapshots {
             )
         }
 
-        /// The skeletons of 2.9.0: the transaction row, the option card, streaming text, the card picker.
+        /// The skeletons of 2.9.0: the transaction row, streaming text, the card picker, and
+        /// OptionCardPicker's (6.0.0).
         @Test func financeRowSkeletons() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {
                     TransactionRowSkeleton()
                     StreamingTextSkeleton(font: AppTypography.h3)
-                    OptionCardSkeleton()
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light, .dark]
@@ -163,10 +163,10 @@ extension ComponentSnapshots {
                 named: "snapCardPicker",
                 appearances: [.light]
             )
-            // OptionCardPicker(style: .carousel)'s skeleton (5.2.0).
+            // OptionCardPicker's skeleton (6.0.0): the carousel of previews.
             await assertComponentSnapshot(
-                OptionCardCarouselSkeleton(),
-                named: "optionCardCarousel",
+                OptionCardPickerSkeleton(),
+                named: "optionCardPicker",
                 appearances: [.light]
             )
         }

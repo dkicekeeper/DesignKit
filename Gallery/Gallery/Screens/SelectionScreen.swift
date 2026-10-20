@@ -9,6 +9,7 @@ import SwiftUI
 import DesignTokens
 import DesignSupport
 import DesignComponents
+import PhotosUI
 
 struct SelectionScreen: View {
     static let title = "Selection"
@@ -249,7 +250,7 @@ private struct SnapCardPickerPage: View {
             notes: [
                 "The card is the app's (SelectableBalanceCard, a category card); the picker passes it isSelected and the action that selects it.",
                 "It aligns only once its container is measured, so a selection that arrives after it appears still scrolls into place.",
-                "centered(width:): the neighbours a little smaller and paler, the selection following the centre as the row scrolls. PickerCarousel and OptionCardPicker(style: .carousel) are built on it.",
+                "centered(width:): the neighbours a little smaller and paler, the selection following the centre as the row scrolls. PickerCarousel and OptionCardPicker are built on it.",
                 "5.2.0: fill's selection follows the centre during a drag too (it waited for the row to stop), and centered no longer clips its cards' outline at the top and bottom.",
             ],
             styles: ["fill", "centered"]
@@ -285,41 +286,42 @@ private struct OptionCardPickerPage: View {
     }
 
     @State private var selection: Background = .gradient
-    @State private var style: OptionCardPickerStyle = .carousel
     @State private var hasSettings = true
     @State private var moves = true
+    @State private var intensity = 0.6
+    @State private var hasPhoto = true
+    @State private var blursPhoto = false
+    @State private var photoItem: PhotosPickerItem?
     @State private var state: SpecimenState = .content
 
     var body: some View {
         ComponentPage(
-            name: "OptionCardPicker · OptionCard",
-            summary: "Options as pictures, the chosen one outlined in the accent (with a check in list). carousel (5.2.0): the chosen option large on top, the options in a row under it, its settings under the row; list: cards one under another.",
+            name: "OptionCardPicker",
+            summary: "Options as large previews in a carousel: the centred one is the choice, outlined in the accent, the neighbours peek at the sides; under it, the chosen option's settings.",
             since: "2.9.0",
             apps: [.tenra],
-            canvas: style == .carousel ? .bleed : .fill,
+            canvas: .bleed,
             notes: [
-                "carousel: as Ten's wardrobe. The centred card is the choice, a swipe or a tap changes it; the preview on top is the option's artwork in a phone's shape.",
-                "settings: what the app sets for the chosen option (Choose a photo for a photo); under the row, or under the cards in list.",
-                "OptionCard alone for a list that mixes plain options with one that opens a picker (wrap that card in a PhotosPicker).",
-            ],
-            styles: ["list", "carousel"]
+                "6.0.0: the only look. A swipe or a tap on a neighbour changes the choice, with the selection haptic; only the centred preview moves.",
+                "settings: what the app sets for the chosen option, in DesignKit's form rows: a FormSection of ActionRowLabel (a PhotosPicker's label), ToggleSettingsRow, SliderRow and ActionSettingsRow, inset dividers between them.",
+                "artwork fills the frame it is given: a phone's shape, 180 × 270.",
+            ]
         ) {
             if state == .loading {
-                if style == .carousel { OptionCardCarouselSkeleton() } else { OptionCardSkeleton() }
+                OptionCardPickerSkeleton()
             } else if hasSettings {
-                OptionCardPicker(Background.allCases, selection: $selection, style: style, title: { $0.rawValue }) { background in
+                OptionCardPicker(Background.allCases, selection: $selection, title: { $0.rawValue }) { background in
                     artwork(background)
                 } settings: { background in
                     settings(background)
                 }
             } else {
-                OptionCardPicker(Background.allCases, selection: $selection, style: style, title: { $0.rawValue }) { background in
+                OptionCardPicker(Background.allCases, selection: $selection, title: { $0.rawValue }) { background in
                     artwork(background)
                 }
             }
         } controls: {
             StateControl(state: $state)
-            ChoiceControl("Style", selection: $style, options: [("List", .list), ("Carousel", .carousel)])
             ToggleControl("Settings", isOn: $hasSettings)
         }
     }
@@ -328,26 +330,44 @@ private struct OptionCardPickerPage: View {
     private func artwork(_ background: Background) -> some View {
         switch background {
         case .none: Rectangle().fill(AppColors.bgBase)
-        case .gradient: AuroraBackground(motion: moves ? .drift : .still)
-        case .photo: GalleryPhotoView(photo: GalleryPhoto.samples[0])
+        case .gradient: AuroraBackground(motion: moves ? .drift : .still).opacity(intensity)
+        case .photo: GalleryPhotoView(photo: GalleryPhoto.samples[0]).blur(radius: blursPhoto ? 8 : 0, opaque: true)
         }
     }
 
-    /// What each background sets, as an app would put it.
+    /// What each background sets, as an app would put it: DesignKit's form rows in a card.
     @ViewBuilder
     private func settings(_ background: Background) -> some View {
         switch background {
         case .none:
-            Text("The plain background of the screen.")
-                .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.Text.secondary)
+            EmptyView()
         case .gradient:
-            FormSection {
-                ToggleSettingsRow(title: "Moves slowly", config: .standard, isOn: $moves)
+            FormSection(header: "Colours") {
+                ToggleSettingsRow(icon: "wind", title: "Moves slowly", config: .standard, isOn: $moves)
+                Divider().padding(.leading, AppSpacing.lg)
+                SliderRow("Intensity", systemImage: "circle.lefthalf.filled", value: $intensity, in: 0.1...1,
+                          valueText: "\(Int((intensity * 100).rounded()))%")
             }
             .screenPadding()
         case .photo:
-            DSButton("Choose a photo", systemImage: "photo.on.rectangle", appearance: .secondary) {}
+            FormSection {
+                PhotosPicker(selection: $photoItem, matching: .images) {
+                    ActionRowLabel(hasPhoto ? "Change photo" : "Choose a photo", systemImage: "photo.on.rectangle")
+                }
+                .buttonStyle(.plain)
+                if hasPhoto {
+                    Divider().padding(.leading, AppSpacing.lg)
+                    ToggleSettingsRow(icon: "camera.filters", title: "Blur", config: .standard, isOn: $blursPhoto)
+                    Divider().padding(.leading, AppSpacing.lg)
+                    ActionSettingsRow(icon: "trash", title: "Remove photo", isDestructive: true, config: .standard) {
+                        hasPhoto = false
+                    }
+                }
+            }
+            .screenPadding()
+            .onChange(of: photoItem) { _, item in
+                if item != nil { hasPhoto = true; photoItem = nil }
+            }
         }
     }
 }

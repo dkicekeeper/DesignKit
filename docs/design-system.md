@@ -48,7 +48,9 @@
 typealiases until 3.0.0, which removed them ([migration-2.0.md](migration-2.0.md),
 [migration-3.0.md](migration-3.0.md)); 4.0.0 removed the last deprecated name,
 `SectionHeader.Style.list` ([migration-4.0.md](migration-4.0.md)); 5.0.0 removed `ListCard`,
-folded into `FormSection(style: .glass)` ([migration-5.0.md](migration-5.0.md)).
+folded into `FormSection(style: .glass)` ([migration-5.0.md](migration-5.0.md)); 6.0.0 removed
+`OptionCard` and `OptionCardPicker`'s `style:`, the carousel its only look
+([migration-6.0.md](migration-6.0.md)).
 The tokens keep their prefix (`AppColors`, `AppSpacing`, `AppIconSize`, …): a token namespace
 is not a view, and `Color` / `Font` would clash with SwiftUI. The button is `DSButton` because
 `Button` is SwiftUI's.
@@ -1289,7 +1291,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `PersonRow`, `CommentRow`, `ThreadCard`, `ReviewCard`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ChecklistRow`, `ChecklistSummaryRow`, `StatsStrip`, `StreakCard`, `ThumbnailCard`, `ThumbnailRow` (1.12.0) | `…Skeleton` (`StatsStripSkeleton(count:)`, `AchievementTileSkeleton(medalSize:)`, `ThumbnailCardSkeleton(width:)`, `PersonRowSkeleton(showsSubtitle:style:)`) |
 | `RemotePhoto` (3.1.0) | `RemotePhotoSkeleton()`: fills the frame; the container gives the corner |
 | `PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `ShareCardFrame` (and `ShareCardSheet` while it loads), `LiveSessionBar`, `DownloadRow`, `ArticleBody` (2.8.0) | `…Skeleton` (`PhotoTileSkeleton(size:cornerRadius:)`, `PhotoStripSkeleton(count:size:)`, `PhotoGridSkeleton(count:columns:style:)`, `ShareCardSkeleton(format:)`, `ArticleBodySkeleton(paragraphs:)`) |
-| `TransactionRow`, `OptionCard`, `StreamingText`, `SnapCardPicker` (2.9.0) | `…Skeleton` (`TransactionRowSkeleton(showsDetails:)`, `StreamingTextSkeleton(font:)`, `SnapCardPickerSkeleton { the card's skeleton }`); `OptionCardPicker(style: .carousel)`: `OptionCardCarouselSkeleton()` (5.2.0) |
+| `TransactionRow`, `OptionCardPicker`, `StreamingText`, `SnapCardPicker` (2.9.0) | `…Skeleton` (`TransactionRowSkeleton(showsDetails:)`, `StreamingTextSkeleton(font:)`, `SnapCardPickerSkeleton { the card's skeleton }`, `OptionCardPickerSkeleton()`, 6.0.0) |
 
 **No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`, `CurrencyRow`, 3.6.0); `MetaLine` (3.6.0, a line inside a row that has the skeleton); `LoadMoreFooter` (4.1.0, the loading state itself); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); `AmountEntrySheet` and `VoiceOrbButton` (4.14.0: an input and a control); `ActionRowLabel` (3.1.0, a label); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`, `ChartSelectionBanner`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `CreatureTabLabel`, `CreatureGlyph`, `MessageComposerAccessory`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
 
@@ -2039,21 +2041,39 @@ follows the centre as the row scrolls: the cards have their width before the row
 the write `.fill` waits for is not lost here. `PickerCarousel`'s row of 4.14.0, moved here as it
 was; the default `.fill` is unchanged. Its cards' outline and shadow are not clipped at the row's top and bottom (5.2.0).
 
-#### `OptionCard`, `OptionCardPicker`
-An option as a picture: an 80 × 120 artwork (`AppRadius.lg`) with a check on it when chosen, the
-title beside it (accent when chosen), on the grouped-list card colour (`AppRadius.xl`), the
-accent outline when chosen (`.selectionOutline`, 2 pt since 5.0.0, 3 pt before). `OptionCardPicker(options, selection:title:artwork:)` lays plain
-options out; `OptionCard` alone for a list that mixes them with one that opens a picker (Tenra's
-photo option sits in a `PhotosPicker`). Tenra: `HomeBackgroundPicker`.
-*(5.2.0)* `style: .carousel` (`OptionCardPickerStyle`), as Ten's wardrobe: the chosen option's
-artwork large on top in a phone's shape (160 × 240, `AppRadius.xl`, fading from one to the next),
-the options in a row of cards under it (`SnapCardPicker(style: .centered(width: 112))`: a 64 × 96
-artwork over the name, the outline and the accent name on the chosen one, no check since 5.5.1; the centred
-card is the choice, a swipe or a tap changes it, with the selection haptic), and under the row
-what the app sets for the chosen option: `OptionCardPicker(options, selection:, style:, title:,
-artwork:, settings:)` ("Choose a photo" for a photo; under the cards in `.list`). The artwork
-must fill the frame it is given. Skeleton: `OptionCardCarouselSkeleton()`. `.list` is the default
-and draws as before.
+#### `OptionCardPicker`
+Options as pictures *(6.0.0: the carousel is its only look)*: each option's artwork large in a
+phone's shape (180 × 270, `AppRadius.xl`, a hairline edge), its name under it, in a carousel
+(`SnapCardPicker(style: .centered(width: 180))`). The centred card is the choice: the accent
+outline (`.selectionOutline`, 2 pt) and its name in the accent; the neighbours peek at the
+sides, a little smaller and paler, and stand still (`.designKitMotion(false)`), while the chosen
+one may move. A swipe or a tap on a neighbour changes the choice, with the selection haptic.
+
+```swift
+OptionCardPicker(HomeBackground.allCases, selection: $background, title: { $0.name }) { background in
+    BackgroundPreview(background)                       // fills the frame it is given
+} settings: { background in
+    if background == .photo {
+        FormSection {
+            PhotosPicker(selection: $item, matching: .images) {
+                ActionRowLabel("Choose a photo", systemImage: "photo.on.rectangle")
+            }
+            .buttonStyle(.plain)
+            Divider().padding(.leading, AppSpacing.lg)
+            ActionSettingsRow(icon: "trash", title: "Remove photo", isDestructive: true, config: .standard) { … }
+        }
+        .screenPadding()
+    }
+}
+```
+
+`settings:` *(5.2.0)* is what the app sets for the chosen option, under the carousel, fading from
+one option's to the next: DesignKit's form rows in a `FormSection` (`ActionRowLabel` as a
+`PhotosPicker`'s label, `ToggleSettingsRow`, `SliderRow`, `ActionSettingsRow`, `.standard`
+config, inset dividers), empty for an option with nothing to set. Skeleton:
+`OptionCardPickerSkeleton()`. Tenra: `HomeBackgroundPicker` (Settings → Background). Before
+6.0.0 it also had `style: .list` (`OptionCard`s one under another) and, in `.carousel`, a row of
+small cards under one preview ([migration-6.0.md](migration-6.0.md)).
 
 #### `StreamingText`
 Text that arrives word by word: words in a `FlowLayout` (`sm` apart, 6 pt between lines), each
