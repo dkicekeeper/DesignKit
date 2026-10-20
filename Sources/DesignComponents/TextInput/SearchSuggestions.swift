@@ -378,8 +378,7 @@ public struct SearchSuggestionRow: View {
             Spacer(minLength: AppSpacing.sm)
             if let onFill {
                 Button(action: onFill) {
-                    Image(systemName: "arrow.up.left")
-                        .font(AppTypography.body)
+                    Icon("arrow.up.left", size: AppIconSize.md)
                         .foregroundStyle(AppColors.Text.tertiary)
                         .frame(minWidth: AppIconSize.lg, minHeight: AppIconSize.lg)
                         .contentShape(Rectangle())

@@ -116,8 +116,7 @@ public struct MessageBanner: View {
 
     private var bannerContent: some View {
         HStack(spacing: AppSpacing.md) {
-            Image(systemName: type.icon)
-                .font(.system(size: AppIconSize.md))
+            Icon(type.icon, size: AppIconSize.md, scalesWithText: false)
                 .foregroundStyle(type.tintColor)
                 .scaleEffect(iconScale)
                 .animation(reduceMotion ? nil : BannerAnimation.icon, value: iconScale)

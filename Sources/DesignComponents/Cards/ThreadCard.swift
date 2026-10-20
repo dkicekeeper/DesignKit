@@ -53,7 +53,7 @@ public struct ThreadCard: View {
                 Label {
                     Text(verbatim: "\(repliesCount)")
                 } icon: {
-                    Image(systemName: "bubble.left")
+                    Icon("bubble.left", size: AppIconSize.xs)
                 }
                 Text(verbatim: author)
                     .lineLimit(1)

@@ -231,13 +231,13 @@ public struct OrbChart: View {
                        value: entered)
     }
 
-    /// White category icon on the sphere. `.circle` with a nil background = glyph only.
+    /// White category icon on the sphere: a tile whose plate is the orb, so a clear one.
     @ViewBuilder
     private var centerIconView: some View {
         if showsCenterIcon, let centerIcon {
             Icon(
                 source: centerIcon,
-                style: .circle(size: AppIconSize.Tile.xxxl, tint: .monochrome(.white), backgroundColor: nil)
+                style: .circle(size: AppIconSize.Tile.xxxl, tint: .monochrome(.white), backgroundColor: .clear)
             )
         }
     }

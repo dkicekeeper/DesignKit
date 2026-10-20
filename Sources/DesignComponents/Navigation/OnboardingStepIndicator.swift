@@ -70,8 +70,8 @@ public struct OnboardingStepIndicator: View {
         let isActive = stepNumber == currentStep
         let isCompleted = stepNumber < currentStep
 
-        Image(systemName: symbols[index])
-            .font(.system(size: 16, weight: isActive ? .semibold : .regular))
+        Icon(symbols[index], size: AppIconSize.sm, scalesWithText: false)
+            .fontWeight(isActive ? .semibold : .regular)
             .foregroundStyle(
                 isActive
                     ? AnyShapeStyle(AppColors.accent.gradient)

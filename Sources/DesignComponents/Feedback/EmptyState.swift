@@ -208,7 +208,7 @@ public struct EmptyState: View {
             if let actionTitle = actionTitle, let action = action {
                 Button(action: action) {
                     HStack(spacing: AppSpacing.xs) {
-                        Image(systemName: "arrow.clockwise")
+                        Icon("arrow.clockwise", size: AppIconSize.md)
                         Text(actionTitle)
                     }
                     .frame(maxWidth: .infinity)

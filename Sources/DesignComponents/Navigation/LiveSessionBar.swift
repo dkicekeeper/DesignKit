@@ -58,7 +58,7 @@ public struct LiveSessionBar: View {
                 // The pulse is a loop: Reduce Motion, the system's request to save resources
                 // and `.designKitMotion(false)` stop it, as they stop the other loops.
                 AmbientMotionGate { allowsAmbientMotion in
-                    Image(systemName: isPaused ? "pause.circle.fill" : "record.circle")
+                    Icon(isPaused ? "pause.circle.fill" : "record.circle", size: AppIconSize.md)
                         .foregroundStyle(isPaused ? AppColors.warning : AppColors.destructive)
                         .symbolEffect(.pulse, isActive: !isPaused && allowsAmbientMotion && designKitMotion)
                 }
@@ -71,8 +71,7 @@ public struct LiveSessionBar: View {
                         .foregroundStyle(AppColors.Text.secondary)
                 }
                 Spacer(minLength: 0)
-                Image(systemName: "chevron.up")
-                    .foregroundStyle(AppColors.Text.tertiary)
+                Icon("chevron.up", size: AppIconSize.md, tint: .monochrome(AppColors.Text.tertiary))
             }
             .font(AppTypography.bodyEmphasis)
             .padding(.horizontal, AppSpacing.lg)

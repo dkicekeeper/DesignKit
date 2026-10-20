@@ -198,7 +198,7 @@ extension ComponentSnapshots {
                     UniversalRowSkeleton.toggleSettings
                     UniversalRowSkeleton.datePicker
                     UniversalRowSkeleton.checkmark(iconStyle: .roundedSquare(size: AppIconSize.xl))
-                    ColorPickerRowSkeleton(swatches: 5)
+                    UniversalRowSkeleton.colors(swatches: 5)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light, .dark, .largeText]
@@ -214,7 +214,7 @@ extension ComponentSnapshots {
                     AmountRowSkeleton(style: .info)
                     NetAmountRowSkeleton()
                     ScheduleRowSkeleton()
-                    InfoRowSkeleton(showsIcon: true)
+                    UniversalRowSkeleton.info(showsIcon: true)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light, .dark, .largeText]
@@ -284,7 +284,7 @@ extension ComponentSnapshots {
                         BadgeSkeleton()
                         TrendBadgeSkeleton()
                         TrendBadgeSkeleton(style: .inline)
-                        StatusIndicatorBadgeSkeleton(font: AppTypography.h4)
+                        StatusIndicatorBadgeSkeleton(size: AppIconSize.md)
                     }
                     StatusBannerSkeleton()
                     StatusBannerSkeleton(style: .compact)
@@ -413,7 +413,7 @@ extension ComponentSnapshots {
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {
                     SectionHeaderSkeleton(showsTrailing: true)
                     SectionHeaderSkeleton(style: .large, showsTrailing: true)
-                    SliderRowSkeleton(showsHint: true)
+                    UniversalRowSkeleton.slider(showsHint: true, config: .settings)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light, .dark]

@@ -58,28 +58,25 @@ public enum EntityStatus {
 /// Use inside a row, card, or chip where you need a compact visual status signal.
 ///
 /// ```swift
-/// StatusIndicatorBadge(status: .active, font: AppTypography.h4)
-/// StatusIndicatorBadge(status: .paused, iconSize: AppIconSize.md)
+/// StatusIndicatorBadge(status: .active)
+/// StatusIndicatorBadge(status: .paused, size: AppIconSize.lg)
 /// ```
 public struct StatusIndicatorBadge: View {
     let status: EntityStatus
 
-    /// Font size applied to the SF Symbol via `.font()`.
-    /// Provide either `font` (semantic) or `iconSize` (explicit points), not both.
-    var font: Font = AppTypography.h4
+    /// The symbol's size (7.0.0: an `Icon`).
+    let size: CGFloat
 
-    public init(
-        status: EntityStatus,
-        font: Font = AppTypography.h4
-    ) {
+    /// - Parameter size: The symbol's size, `AppIconSize.md` by default.
+    public init(status: EntityStatus, size: CGFloat = AppIconSize.md) {
         self.status = status
-        self.font = font
+        self.size = size
     }
 
     public var body: some View {
-        Image(systemName: status.iconName)
-            .font(font)
-            .foregroundStyle(status.tintColor)
+        Icon(status.iconName, size: size, tint: .monochrome(status.tintColor))
+            // A symbol that says something: its own element, with the status as its label.
+            .accessibilityElement(children: .ignore)
             .accessibilityLabel(status.accessibilityLabel)
     }
 }
@@ -90,18 +87,16 @@ public struct StatusIndicatorBadge: View {
 
 /// Placeholder of a `StatusIndicatorBadge`: a circle the size of its symbol.
 public struct StatusIndicatorBadgeSkeleton: View {
-    let font: Font
+    let size: CGFloat
 
-    public init(font: Font = AppTypography.body) {
-        self.font = font
+    public init(size: CGFloat = AppIconSize.md) {
+        self.size = size
     }
 
     public var body: some View {
-        // The symbol's own size, invisible, under a grey circle.
-        Image(systemName: "circle.fill")
-            .font(font)
-            .hidden()
-            .background(Skeleton.fill, in: Circle())
+        Circle()
+            .fill(Skeleton.fill)
+            .frame(width: size, height: size)
             .shimmer()
             .skeletonLoadingLabel()
     }

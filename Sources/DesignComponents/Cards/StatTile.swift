@@ -62,7 +62,7 @@ public struct StatTile: View {
             Label {
                 Text(verbatim: title)
             } icon: {
-                Image(systemName: systemImage)
+                Icon(systemImage, size: AppIconSize.xs)
             }
         } else {
             Text(verbatim: title)

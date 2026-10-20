@@ -129,8 +129,7 @@ public struct TargetProgressCard: View {
 
     private var headerRow: some View {
         HStack(spacing: AppSpacing.md) {
-            Image(systemName: systemImage)
-                .font(.system(size: AppIconSize.md))
+            Icon(systemImage, size: AppIconSize.md, scalesWithText: false)
                 .foregroundStyle(color)
                 .frame(width: 28)
 

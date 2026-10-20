@@ -73,9 +73,12 @@ public struct UniversalRow<Content: View, Trailing: View>: View {
 
     @ViewBuilder let content: () -> Content
     @ViewBuilder let trailing: () -> Trailing
+    /// A row made of a title and an accessory (7.0.0), laid out by `RowControlView`.
+    var control: RowControl? = nil
 
+    /// The hint starts under the title: past the icon and the gap after it.
     private var hintLeadingPad: CGFloat {
-        leadingIcon != nil ? AppIconSize.md + config.spacing : 0
+        leadingIcon.map { $0.style.size + config.spacing } ?? 0
     }
 
     // MARK: - Initializer
@@ -96,7 +99,16 @@ public struct UniversalRow<Content: View, Trailing: View>: View {
 
     // MARK: - Body
 
+    @ViewBuilder
     public var body: some View {
+        if let control {
+            RowControlView(row: control)
+        } else {
+            layout
+        }
+    }
+
+    private var layout: some View {
         let stack = VStack(alignment: .leading, spacing: hint != nil ? AppSpacing.xs : 0) {
             HStack(spacing: config.spacing) {
                 // Leading icon via Icon
@@ -246,7 +258,7 @@ public struct RowConfiguration: Sendable {
 
     /// Standard form row (default)
     /// V: 12pt / H: 16pt — rows own their padding; cardStyle() adds no padding.
-    /// Used for: MenuPickerRow, DatePickerRow, InfoRow, BudgetSettingsSection rows.
+    /// Used for: the rows of a `FormSection` card (`UniversalRow`'s default).
     public static let standard = RowConfiguration(
         spacing: AppSpacing.md,
         verticalPadding: AppSpacing.md,
@@ -256,7 +268,7 @@ public struct RowConfiguration: Sendable {
     )
 
     /// Settings row style
-    /// Used for ActionSettingsRow, NavigationSettingsRow
+    /// Used for the rows of a `List`
     /// No horizontal padding (managed by List)
     public static let settings = RowConfiguration(
         spacing: AppSpacing.md,
@@ -291,7 +303,7 @@ public struct RowConfiguration: Sendable {
 
     /// Info row style — display-only component, always inside a padded container.
     /// V: 8pt / H: 0 — container (detail card VStack with .padding(.lg)) owns horizontal spacing.
-    /// Used for InfoRow (read-only label + value) inside LoanDetailView, DepositDetailView, etc.
+    /// Used for a detail row (`accessory: .info`) inside a padded container (a detail card).
     public static let info = RowConfiguration(
         spacing: AppSpacing.md,
         verticalPadding: AppSpacing.sm,
@@ -420,8 +432,88 @@ public extension UniversalRow where Content == Text {
     }
 }
 
-// Note: Removed overly-specific convenience initializer for navigation rows
-// Use the standard UniversalRow initializer with explicit trailing view instead
+// MARK: - One row for every form and settings list (7.0.0)
+
+public extension UniversalRow where Content == Text, Trailing == EmptyView {
+    /// A row of a form card or a settings list: an SF Symbol in the accent (24 pt, a glyph),
+    /// the title, what the row carries (`accessory`) and a hint under the title.
+    ///
+    /// ```swift
+    /// FormSection {
+    ///     UniversalRow("Quiet hours", icon: "moon.fill", hint: "No notifications at night",
+    ///                  accessory: .toggle($quietHours))
+    ///     UniversalRow("Repeat", icon: "repeat", accessory: .menu($period, options: periods))
+    ///     UniversalRow("Delete all data", icon: "trash", role: .destructive, accessory: .action { delete() })
+    /// }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - icon: An SF Symbol before the title, in the accent (red with `role: .destructive`);
+    ///     none leaves the room out.
+    ///   - iconColor: Another colour for the symbol.
+    ///   - value: What is set, in grey on the trailing edge (before a navigation chevron, after
+    ///     a checkmark row's title).
+    ///   - hint: A line under the title.
+    ///   - role: `.destructive` turns the title and the symbol red.
+    ///   - titleColor: Another colour for the title (the accent for a link-like action).
+    ///   - config: `.standard` (default) pads the row for a `FormSection` card; `.settings` for
+    ///     a `List`, which pads it; `.info` for a detail inside a padded container.
+    ///   - accessory: What the row carries and what a tap does (`RowAccessory`).
+    ///
+    /// The initialiser is `nonisolated`: a `PhotosPicker` builds its label off the main actor.
+    nonisolated init(
+        _ title: String,
+        icon: String? = nil,
+        iconColor: Color? = nil,
+        value: String? = nil,
+        hint: String? = nil,
+        role: RowRole = .standard,
+        titleColor: Color? = nil,
+        config: RowConfiguration = .standard,
+        accessory: RowAccessory = .none
+    ) {
+        let tint = iconColor ?? (role == .destructive ? AppColors.destructive : AppColors.accent)
+        self.init(
+            title,
+            leadingIcon: icon.map { .sfSymbol($0, color: tint, size: AppIconSize.lg) },
+            value: value,
+            hint: hint,
+            role: role,
+            titleColor: titleColor,
+            config: config,
+            accessory: accessory
+        )
+    }
+
+    /// A row with any leading icon: a logo, a coloured tile, an icon of another size.
+    nonisolated init(
+        _ title: String,
+        leadingIcon: IconConfig?,
+        value: String? = nil,
+        hint: String? = nil,
+        role: RowRole = .standard,
+        titleColor: Color? = nil,
+        config: RowConfiguration = .standard,
+        accessory: RowAccessory = .none
+    ) {
+        self.config = config
+        self.leadingIcon = leadingIcon
+        self.hint = hint
+        self.content = { Text(title) }
+        self.trailing = { EmptyView() }
+        self.control = RowControl(
+            title: title,
+            icon: leadingIcon,
+            value: value,
+            hint: hint,
+            role: role,
+            titleColor: titleColor,
+            config: config,
+            accessory: accessory
+        )
+    }
+}
+
 
 // MARK: - Previews
 
@@ -439,7 +531,7 @@ public extension UniversalRow where Content == Text {
 ///
 /// ```swift
 /// UniversalRowSkeleton(trailing: .value)
-/// UniversalRowSkeleton.toggleSettings          // ToggleSettingsRow
+/// UniversalRowSkeleton.toggleSettings          // UniversalRow(accessory: .toggle)
 /// ```
 public struct UniversalRowSkeleton: View {
     /// What sits on the trailing edge.
@@ -481,35 +573,52 @@ public struct UniversalRowSkeleton: View {
         self.trailing = trailing
     }
 
-    /// `NavigationSettingsRow`: a small icon, the title and a chevron.
+    /// A slider row (`accessory: .slider`, 7.0.0; `SliderRowSkeleton` before): the title and
+    /// value lines, the track, the hint line when the row has one.
+    public static func slider(showsHint: Bool = false, config: RowConfiguration = .standard) -> some View {
+        RowSliderSkeleton(showsHint: showsHint, config: config)
+    }
+
+    /// A detail row (`accessory: .info`, 7.0.0; `InfoRowSkeleton` before): the label and the value.
+    public static func info(showsIcon: Bool = false) -> some View {
+        RowInfoSkeleton(showsIcon: showsIcon)
+    }
+
+    /// A colour row (`accessory: .colors`, 7.0.0; `ColorPickerRowSkeleton` before): the title and
+    /// `swatches` circles.
+    public static func colors(swatches: Int = 6) -> some View {
+        RowColorsSkeleton(swatches: max(1, swatches))
+    }
+
+    /// A navigation row (`accessory: .navigation`): the icon, the title and a chevron.
     public static var navigationSettings: UniversalRowSkeleton {
-        UniversalRowSkeleton(config: .settings, iconStyle: .circle(size: AppIconSize.md), trailing: .chevron)
+        UniversalRowSkeleton(config: .settings, iconStyle: .circle(size: AppIconSize.lg), trailing: .chevron)
     }
 
-    /// `ToggleSettingsRow`: a small icon, the title and a switch.
+    /// A switch row (`accessory: .toggle`): the icon, the title and a switch.
     public static var toggleSettings: UniversalRowSkeleton {
-        UniversalRowSkeleton(config: .settings, iconStyle: .circle(size: AppIconSize.md), trailing: .toggle)
+        UniversalRowSkeleton(config: .settings, iconStyle: .circle(size: AppIconSize.lg), trailing: .toggle)
     }
 
-    /// `ActionSettingsRow`: a small icon and the title.
+    /// An action row (`accessory: .action`): the icon and the title.
     public static var actionSettings: UniversalRowSkeleton {
-        UniversalRowSkeleton(config: .settings, iconStyle: .circle(size: AppIconSize.md))
+        UniversalRowSkeleton(config: .settings, iconStyle: .circle(size: AppIconSize.lg))
     }
 
-    /// `MenuPickerRow`: a small icon, the title and the chosen value.
+    /// A menu row (`accessory: .menu`): the icon, the title and the chosen value.
     public static var menuPicker: UniversalRowSkeleton {
-        UniversalRowSkeleton(iconStyle: .circle(size: AppIconSize.md), trailing: .value)
+        UniversalRowSkeleton(iconStyle: .circle(size: AppIconSize.lg), trailing: .value)
     }
 
-    /// `CheckmarkRow`: the row of a choice list, its title in `h4` and its empty circle (5.2.0);
+    /// A choice row (`accessory: .checkmark`): the row of a choice list, its title in `h4` and its empty circle (5.2.0);
     /// pass the icon's style when the rows have one.
     public static func checkmark(iconStyle: IconStyle? = nil) -> UniversalRowSkeleton {
         UniversalRowSkeleton(config: .settings, iconStyle: iconStyle, titleFont: AppTypography.h4, trailing: .selection)
     }
 
-    /// `DatePickerRow`: a small icon, the title and the date in its capsule.
+    /// A date row (`accessory: .date`): the icon, the title and the date in its capsule.
     public static var datePicker: UniversalRowSkeleton {
-        UniversalRowSkeleton(iconStyle: .circle(size: AppIconSize.md), trailing: .capsule)
+        UniversalRowSkeleton(iconStyle: .circle(size: AppIconSize.lg), trailing: .capsule)
     }
 
     public var body: some View {

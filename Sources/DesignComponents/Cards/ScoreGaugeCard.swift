@@ -430,7 +430,7 @@ public struct ScoreGaugeCard: View {
     /// "↗ +17.0% than last month" in a capsule: translucent white on colour, neutral on the page.
     private func trendCapsule(_ trend: Trend, onColor: Bool) -> some View {
         HStack(spacing: AppSpacing.xs) {
-            Image(systemName: trend.direction.systemImage)
+            Icon(trend.direction.systemImage, size: AppIconSize.sm)
                 .foregroundStyle(onColor ? AppColors.Text.primaryOnDark : trend.direction.color)
             Text(verbatim: [trend.changeText, trend.caption]
                 .compactMap { $0 }

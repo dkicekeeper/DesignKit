@@ -83,7 +83,7 @@ public struct CalculatorKeypad: View {
 
     private func backspaceKey() -> some View {
         keyShape(background: AppColors.Background.neutral1) {
-            Image(systemName: "delete.left").foregroundStyle(AppColors.Text.secondary)
+            Icon("delete.left", size: AppIconSize.lg, tint: .monochrome(AppColors.Text.secondary), scalesWithText: false)
         }
         .scaleEffect(backspacePressed ? 0.96 : 1.0)
         .brightness(backspacePressed ? -0.05 : 0.0)

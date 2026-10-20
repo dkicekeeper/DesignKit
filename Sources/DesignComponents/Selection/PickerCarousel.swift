@@ -96,7 +96,7 @@ public struct PickerCarousel<Item: Identifiable, Picture: View>: View {
             ZStack(alignment: .top) {
                 PickerCarouselMetrics.reservedLines(PickerCarouselMetrics.lines, font: AppTypography.bodyEmphasis)
                 if let focusedItem, let opensWith = condition(focusedItem) {
-                    Label(opensWith, systemImage: "lock.fill")
+                    Label { Text(verbatim: opensWith) } icon: { Icon("lock.fill", size: AppIconSize.md) }
                         .font(AppTypography.bodyEmphasis)
                         .foregroundStyle(AppColors.accent)
                         .multilineTextAlignment(.center)
@@ -141,8 +141,7 @@ public struct PickerCarousel<Item: Identifiable, Picture: View>: View {
             .selectionOutline(isChosen, cornerRadius: AppRadius.lg)
             .overlay(alignment: .topTrailing) {
                 if !isOpen {
-                    Image(systemName: "lock.fill")
-                        .font(AppTypography.caption)
+                    Icon("lock.fill", size: AppIconSize.sm)
                         .foregroundStyle(AppColors.Text.secondary)
                         .padding(AppSpacing.sm)
                 }

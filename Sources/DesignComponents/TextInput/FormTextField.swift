@@ -287,8 +287,7 @@ public struct FormTextField: View {
                 .font(AppTypography.caption)
                 .foregroundStyle(AppColors.destructive)
         } icon: {
-            Image(systemName: "exclamationmark.circle.fill")
-                .font(AppTypography.caption)
+            Icon("exclamationmark.circle.fill", size: AppIconSize.sm)
                 .foregroundStyle(AppColors.destructive)
         }
     }

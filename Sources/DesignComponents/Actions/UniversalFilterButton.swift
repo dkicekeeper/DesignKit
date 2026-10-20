@@ -73,8 +73,7 @@ public struct UniversalFilterButton<IconContent: View, MenuContent: View>: View 
 
             // Optional chevron
             if showChevron {
-                Image(systemName: "chevron.down")
-                    .font(.system(size: 12))
+                Icon("chevron.down", size: AppIconSize.xs, scalesWithText: false)
             }
         }
         .filterChipStyle(isSelected: isSelected)

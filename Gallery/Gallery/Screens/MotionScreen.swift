@@ -704,14 +704,16 @@ private struct HapticCuesPage: View {
             since: "2.3.0",
             notes: [
                 ".hapticCue(.select, trigger: selection) in a view; HapticManager.play(.confirm) in an action.",
-                "Built in: SegmentedPicker (select), SliderRow (a tick per step, or at either end), .celebration (celebrate), .completionMoment (confirm).",
+                "Built in: SegmentedPicker (select), UniversalRow's slider (a tick per step, or at either end), .celebration (celebrate), .completionMoment (confirm).",
                 "Haptics are not motion: Reduce Motion leaves them on; the system's haptics switch turns them off.",
             ]
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.lg) {
                 SegmentedPicker(title: "Period", selection: $segment, options: [("Week", 0), ("Month", 1), ("Year", 2)])
-                SliderRow("Stepped", value: $steps, in: 0...10, step: 1, valueText: "\(Int(steps))")
-                SliderRow("Smooth (ticks at the ends)", value: $level, in: 0...1, valueText: "\(Int((level * 100).rounded()))%")
+                UniversalRow("Stepped", config: .settings,
+                             accessory: .slider($steps, in: 0...10, step: 1, valueText: "\(Int(steps))"))
+                UniversalRow("Smooth (ticks at the ends)", config: .settings,
+                             accessory: .slider($level, in: 0...1, valueText: "\(Int((level * 100).rounded()))%"))
             }
         } controls: {
             ForEach(cues, id: \.1) { cue, name, detail in

@@ -19,8 +19,7 @@ public struct DisclosureChevron: View {
     public init() {}
 
     public var body: some View {
-        Image(systemName: "chevron.forward")
-            .font(AppTypography.bodySmall)
+        Icon("chevron.forward", size: AppIconSize.sm)
             .foregroundStyle(AppColors.Text.tertiary)
             .accessibilityHidden(true)
     }

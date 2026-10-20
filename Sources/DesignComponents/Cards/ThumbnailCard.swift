@@ -67,12 +67,12 @@ public struct ThumbnailCard<Picture: View, Details: View>: View {
                     .frame(width: width, height: ThumbnailMetrics.cardImageHeight)
                     .clipShape(RoundedRectangle(cornerRadius: AppRadius.md))
                 if isSaved {
-                    Image(systemName: "bookmark.fill")
-                        .font(AppTypography.caption)
+                    Icon("bookmark.fill", size: AppIconSize.xs)
                         .foregroundStyle(AppColors.staticWhite)
                         .padding(AppSpacing.xs)
                         .background(AppColors.accent, in: Circle())
                         .padding(AppSpacing.xs)
+                        .accessibilityElement(children: .ignore)
                         .accessibilityLabel(Text(verbatim: savedLabel ?? ThumbnailText.saved))
                 }
             }
@@ -148,9 +148,9 @@ public struct ThumbnailRow<Picture: View, Details: View>: View {
                         VerifiedSeal(label: verifiedLabel)
                     }
                     if isSaved {
-                        Image(systemName: "bookmark.fill")
-                            .font(AppTypography.caption)
+                        Icon("bookmark.fill", size: AppIconSize.xs)
                             .foregroundStyle(AppColors.accent)
+                            .accessibilityElement(children: .ignore)
                             .accessibilityLabel(Text(verbatim: savedLabel ?? ThumbnailText.saved))
                     }
                 }
@@ -181,8 +181,7 @@ public struct ThumbnailPlaceholder: View {
     public var body: some View {
         ZStack {
             AppColors.pale(tint)
-            Image(systemName: systemImage)
-                .font(.system(size: AppIconSize.md * 1.5))
+            Icon(systemImage, size: AppIconSize.xl, scalesWithText: false)
                 .foregroundStyle(tint)
         }
         .accessibilityHidden(true)
@@ -194,9 +193,9 @@ private struct VerifiedSeal: View {
     let label: String?
 
     var body: some View {
-        Image(systemName: "checkmark.seal.fill")
-            .font(AppTypography.caption)
+        Icon("checkmark.seal.fill", size: AppIconSize.xs)
             .foregroundStyle(AppColors.accent)
+            .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text(verbatim: label ?? ThumbnailText.verified))
     }
 }

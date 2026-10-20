@@ -136,7 +136,7 @@ public struct ChipPicker<Option: Hashable>: View {
     private func chipLabel(_ option: Option) -> some View {
         if let symbol = systemImage?(option) {
             HStack(spacing: AppSpacing.xxs) {
-                Image(systemName: symbol)
+                Icon(symbol, size: AppIconSize.sm)
                 Text(verbatim: label(option))
             }
         } else {

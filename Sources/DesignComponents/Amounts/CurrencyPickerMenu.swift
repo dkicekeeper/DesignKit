@@ -51,6 +51,7 @@ public struct CurrencyPickerMenu: View {
                         Text(verbatim: "\(currency.code) \(currency.symbol)")
                         Spacer()
                         if selection == currency.code {
+                            // A system menu's item: iOS draws its symbol (7.0.0, outside the Icon rule).
                             Image(systemName: "checkmark")
                         }
                     }
@@ -70,8 +71,7 @@ public struct CurrencyPickerMenu: View {
         } label: {
             HStack(spacing: AppSpacing.sm) {
                 Text(verbatim: Formatting.currencySymbol(for: selection))
-                Image(systemName: "chevron.down")
-                    .font(.system(size: AppIconSize.sm))
+                Icon("chevron.down", size: AppIconSize.sm, scalesWithText: false)
             }
             .filterChipStyle(isSelected: false)
         }

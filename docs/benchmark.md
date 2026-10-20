@@ -43,14 +43,14 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
 | Счётчик символов у поля | — | ✓ | ✓ | ✓ | ✓ | ✓ | **+** `FormTextField(limit:)`, `MessageComposer(limit:)` (4.1.0) |
 | Поиск | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ○ `.searchable`; **+** недавние запросы и подсказки `.dsSearchSuggestions` (3.5.0) |
 | Чекбокс / радио | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `SelectionIndicator` (+ `tint`) |
-| Строка с переключателем | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **+** `ToggleSettingsRow` |
+| Строка с переключателем | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **+** `UniversalRow(accessory: .toggle)` (`ToggleSettingsRow` до 7.0.0) |
 | Чипсы: выбор одного | — | ✓ | ✓ | ✓ | ✓ | ✓ | **+** `ChipPicker` |
 | Чипсы: фильтр из нескольких | — | ✓ | ✓ | ✓ | ✓ | ✓ | **+** `ChipPicker(selection: Set)` |
-| Дата / время | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `DatePickerRow`, `DateButtons` |
-| Слайдер, степпер | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ○ `Slider`, `Stepper` |
+| Дата / время | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `UniversalRow(accessory: .date)`, `DateButtons` |
+| Слайдер, степпер | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `UniversalRow(accessory: .slider / .stepper)` |
 | Рейтинг | ✓ | — | — | — | — | — | **+** `Rating`, `RatingPicker` |
 | Сводка оценок (средняя и полоски по звёздам) | ✓ | — | — | — | — | — | **+** `RatingSummary` (4.1.0) |
-| Цвет | ✓ | — | — | — | — | — | ✓ `ColorPickerRow` |
+| Цвет | ✓ | — | — | — | — | — | ✓ `UniversalRow(accessory: .colors)` |
 | Файл | ✓ | — | — | ✓ | ✓ | — | ✓ `DocumentPicker` |
 | Ввод суммы, калькулятор | — | — | — | — | — | — | ✓ `CalculatorKeypad`, `AmountInput` (специфика финансов) |
 | Ввод тегов (token field) | ✓ | ✓ | — | ✓ | ✓ | ✓ | **+** `TagInput` (0.7.0), `FlowLayout` для переноса чипсов |
@@ -64,7 +64,7 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
 | Бейдж / тег / лозенж | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **+** `Badge`, `TrendBadge`; ✓ `StatusIndicatorBadge` |
 | Карточка | — | ✓ | ✓ | ✓ | ✓ | — | ✓ `cardStyle()`, `FinanceCard`, `InsightsStatCard` |
 | Показатель (KPI) | — | — | — | — | — | — | **+** `StatTile` (паттерн дашбордов; нужен Dalada) |
-| Строка списка | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `UniversalRow`, `InfoRow`, строки настроек |
+| Строка списка | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `UniversalRow` — одна строка с аксессуаром для форм, настроек и деталей (7.0.0) |
 | Заголовок секции | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ `SectionHeader` (пять стилей, с действием в конце строки) |
 | «Показать ещё» для текста | — | — | — | — | — | — | **+** `ExpandableText` (паттерн App Store; отзывы и статьи Dalada) |
 | Раскрывающийся блок | ✓ | ✓ | — | ✓ | ✓ | ✓ | ○ `DisclosureGroup` |

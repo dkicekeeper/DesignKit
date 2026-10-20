@@ -12,7 +12,7 @@
 //  along an arc) and `.orbit` (marbles on a turning orbit, PackedCircleIconsOrbit.swift; a
 //  carousel of coins since 4.7.0).
 //  4.4.0: `.shelf` (app icons in a row in a pocket, PackedCircleIconsShelf.swift) replaces the
-//  fan, whose cards behind the top one barely showed; `.fan` is deprecated and draws the shelf.
+//  fan, whose cards behind the top one barely showed; `.fan`, deprecated since, is gone in 7.0.0.
 //  4.5.1: the shelf's tiles are 36 pt whatever the count; the largest that fit the width show,
 //  the rest go into "+N", and the shelf is as wide as its row.
 //  4.15.0: the shelf's tiles are whole (no pocket) and 48 pt, and every style is 160 pt wide
@@ -57,9 +57,6 @@ public enum PackedCircleIconsStyle: Sendable {
     /// logo fills its tile. They come up one after another, and every few seconds a light runs
     /// across them (not under Reduce Motion).
     case shelf
-    /// 3.3.0's playing cards fanned along an arc. Since 4.4.0 it draws the shelf.
-    @available(*, deprecated, message: "The fan became the shelf in 4.4.0: app icons in a row in a pocket, every one readable. Use .shelf.")
-    case fan
     /// A carousel of coins (4.7.0; 3.3.0 drew the largest amount as a marble in the middle with
     /// the rest on a tilted orbit round it): coins of one size, the largest amount first, on a
     /// ring seen from slightly above that turns slowly, the front ones large and sharp, the far
@@ -168,9 +165,8 @@ public struct PackedCircleIcons: View {
             packed
         case .orbit:
             PackedOrbit(items: visible, overflowCount: overflowCount, size: boxSize)
-        default:
-            // `.shelf`, and the deprecated `.fan` (not named, so the package builds clean). It
-            // shows the largest that fit its width (4.5.1).
+        case .shelf:
+            // It shows the largest that fit its width (4.5.1).
             PackedShelf(items: items, maxVisible: maxVisible, size: boxSize)
         }
     }
@@ -547,7 +543,7 @@ private struct MarbleSway: ViewModifier {
 // MARK: - Skeleton
 
 /// Placeholder of a `PackedCircleIcons` in its style: a few circles of falling sizes packed in
-/// the same box; for `.shelf` (4.4.0; and the deprecated `.fan`) four grey tiles in a row, whole
+/// the same box; for `.shelf` (4.4.0) four grey tiles in a row, whole
 /// since 4.15.0, for `.orbit` grey coins on the carousel's ring (4.7.0; 3.3.0: a grey middle
 /// circle with three on its orbit).
 public struct PackedCircleIconsSkeleton: View {

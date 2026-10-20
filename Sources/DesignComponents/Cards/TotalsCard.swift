@@ -164,8 +164,8 @@ public struct TotalsCard: View {
                 let isUp = delta > 0
                 let color: Color = (isUp == increaseIsGood) ? AppColors.success : AppColors.destructive
                 HStack(spacing: 2) {
-                    Image(systemName: isUp ? "arrow.up" : "arrow.down")
-                        .font(.system(size: 9, weight: .bold))
+                    Icon(isUp ? "arrow.up" : "arrow.down", size: AppIconSize.xs, scalesWithText: false)
+                        .fontWeight(.bold)
                     Text(String(format: "%.0f%%", abs(delta)))
                         .font(AppTypography.caption)
                         .fontWeight(.semibold)

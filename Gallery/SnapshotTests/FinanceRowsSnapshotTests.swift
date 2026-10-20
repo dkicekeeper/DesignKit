@@ -75,7 +75,7 @@ extension ComponentSnapshots {
                     }
                 } settings: { _ in
                     FormSection {
-                        ToggleSettingsRow(icon: "wind", title: "Moves slowly", config: .standard, isOn: .constant(true))
+                        UniversalRow("Moves slowly", icon: "wind", accessory: .toggle(.constant(true)))
                     }
                 },
                 appearances: [.light, .dark]

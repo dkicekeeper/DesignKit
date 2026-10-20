@@ -507,9 +507,8 @@ public struct AmountRow: View {
         case .chevron:
             DisclosureChevron()
         case .systemImage(let name):
-            Image(systemName: name)
+            Icon(name, size: AppIconSize.sm, scalesWithText: false)
                 .foregroundStyle(.secondary)
-                .font(.system(size: AppIconSize.sm))
         }
     }
 

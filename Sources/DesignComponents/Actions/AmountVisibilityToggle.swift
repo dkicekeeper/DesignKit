@@ -44,8 +44,7 @@ public struct AmountVisibilityToggle: View {
                 isHidden.toggle()
             }
         } label: {
-            Image(systemName: isHidden ? "eye.slash" : "eye")
-                .font(.system(size: size))
+            Icon(isHidden ? "eye.slash" : "eye", size: size, scalesWithText: false)
                 .foregroundStyle(color)
                 // 2.2.0: Magic Replace draws the slash on and off.
                 .symbolMagicReplace()

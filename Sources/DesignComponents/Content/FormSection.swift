@@ -14,8 +14,8 @@ import DesignSupport
 
 /// Form section container with optional header and footer.
 ///
-/// With `.card` (the default) the card adds no padding: its rows pad themselves (`UniversalRow(config: .standard)`,
-/// `MenuPickerRow`, `DatePickerRow`, …; docs/design-system.md §10), and the caller puts a
+/// With `.card` (the default) the card adds no padding: its rows pad themselves (`UniversalRow`,
+/// `.standard` by default; docs/design-system.md §10), and the caller puts a
 /// `Divider()` between them. A bare field goes in a row's trailing slot:
 ///
 /// ```swift
@@ -24,7 +24,7 @@ import DesignSupport
 ///         FormTextField(text: $title, placeholder: "Title", style: .inline)
 ///     }
 ///     Divider().padding(.leading, AppSpacing.lg)
-///     DatePickerRow(icon: "calendar", title: "Date", selection: $date)
+///     UniversalRow("Date", icon: "calendar", accessory: .date($date))
 /// }
 /// ```
 ///

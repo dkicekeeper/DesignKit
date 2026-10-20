@@ -91,8 +91,7 @@ public struct PhotoStrip<Item: Identifiable, Photo: View>: View {
             Button {
                 onRemove(item)
             } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: PhotoStripMetrics.removeGlyph))
+                Icon("xmark.circle.fill", size: PhotoStripMetrics.removeGlyph, scalesWithText: false)
                     .symbolRenderingMode(.palette)
                     .foregroundStyle(AppColors.staticWhite, Color.black.opacity(0.55))
             }

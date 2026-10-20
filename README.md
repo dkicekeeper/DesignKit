@@ -44,7 +44,7 @@ Sources/
 ```
 
 Highlights of `DesignComponents`: `FinanceCard`, `InsightsStatCard`, `HeroSection`,
-`EditSheetContainer`, `FormSection`, `FormTextField`, `UniversalRow`, `InfoRow`, `MenuPickerRow`,
+`EditSheetContainer`, `FormSection`, `FormTextField`, `UniversalRow` (every form and settings row),
 `UniversalCarousel`, `UniversalFilterButton`, `MessageBanner`, `EmptyState`,
 `FormattedAmountText` (adaptive abbreviation), calculator keypad, `OrbChart`, `ProgressRing`,
 `LinearProgressBar`, Mini*/Hero* gauges and bar pairs, `AccentGlow`, `BlurSlideTransition`,

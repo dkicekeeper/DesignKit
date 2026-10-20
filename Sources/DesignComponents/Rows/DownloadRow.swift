@@ -98,8 +98,7 @@ public struct DownloadRow: View {
             Label {
                 Text(verbatim: caption)
             } icon: {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(AppColors.accent)
+                Icon("checkmark.circle.fill", size: AppIconSize.xs, tint: .monochrome(AppColors.accent))
             }
             .font(AppTypography.caption)
             .foregroundStyle(AppColors.Text.secondary)
@@ -115,15 +114,13 @@ public struct DownloadRow: View {
         switch status {
         case .available, .failed, .paused:
             Button(action: onDownload) {
-                Image(systemName: "arrow.down.circle")
-                    .font(.title2)
+                Icon("arrow.down.circle", size: AppIconSize.lg)
             }
             .buttonStyle(.borderless)
             .accessibilityLabel(Text(verbatim: downloadLabel))
         case .downloading:
             Button(action: onPause) {
-                Image(systemName: "pause.circle")
-                    .font(.title2)
+                Icon("pause.circle", size: AppIconSize.lg)
             }
             .buttonStyle(.borderless)
             .accessibilityLabel(Text(verbatim: pauseLabel))

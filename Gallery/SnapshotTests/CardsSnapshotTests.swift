@@ -114,8 +114,8 @@ extension ComponentSnapshots {
                         ItemRow("Magnum", meta: [MetaLine([.text("Groceries · 12:15")])], leading: .symbol("cart.fill"))
                     }
                     FormSection(style: .glass) {
-                        InfoRow(label: "Amount", value: "12 000 ₸")
-                        InfoRow(label: "Date", value: "15 October")
+                        UniversalRow("Amount", config: .info, accessory: .info("12 000 ₸"))
+                        UniversalRow("Date", config: .info, accessory: .info("15 October"))
                     }
                 },
                 appearances: [.light, .dark, .largeText]

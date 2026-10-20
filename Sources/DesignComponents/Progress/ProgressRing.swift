@@ -200,8 +200,8 @@ public struct ProgressRing: View {
         let ring = arc
             .overlay {
                 if isCelebratedComplete {
-                    Image(systemName: "checkmark")
-                        .font(.system(size: size * 0.38, weight: .bold))
+                    Icon("checkmark", size: size * 0.38, scalesWithText: false)
+                        .fontWeight(.bold)
                         .foregroundStyle(completionTint)
                         .drawOnAppear()
                 }

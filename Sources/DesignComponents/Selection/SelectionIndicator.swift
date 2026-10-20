@@ -32,8 +32,7 @@ public struct SelectionIndicator: View {
     }
 
     public var body: some View {
-        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-            .font(.title3)
+        Icon(isSelected ? "checkmark.circle.fill" : "circle", size: AppIconSize.lg)
             .foregroundStyle(isSelected ? tint : AppColors.Text.secondary)
             // 2.2.0: Magic Replace grows the checkmark out of the circle.
             .symbolMagicReplace()

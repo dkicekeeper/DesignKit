@@ -110,8 +110,8 @@ public struct MonthCalendar<Item: Identifiable, Marker: View, Accessory: View>: 
                     .animation(.easeInOut(duration: AppAnimation.standard), value: isExpanded)
             }
 
-            Image(systemName: "chevron.down")
-                .font(AppTypography.bodySmall.weight(.semibold))
+            Icon("chevron.down", size: AppIconSize.sm)
+                .fontWeight(.semibold)
                 .foregroundStyle(AppColors.Text.secondary)
                 .rotationEffect(.degrees(isExpanded ? 180 : 0))
                 .animation(AppAnimation.contentSpring, value: isExpanded)

@@ -61,7 +61,7 @@ public struct Badge: View {
             Label {
                 Text(verbatim: text)
             } icon: {
-                Image(systemName: systemImage)
+                Icon(systemImage, size: AppIconSize.xs)
             }
         } else {
             Text(verbatim: text)

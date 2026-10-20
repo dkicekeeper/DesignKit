@@ -198,8 +198,7 @@ public struct TransactionRow: View {
                 style: .circle(size: AppIconSize.Tile.sm, tint: iconTint, backgroundColor: iconBackground)
             )
             if let badgeSystemImage {
-                Image(systemName: badgeSystemImage)
-                    .font(.system(size: AppIconSize.sm))
+                Icon(badgeSystemImage, size: AppIconSize.sm, scalesWithText: false)
                     .foregroundStyle(.primary)
                     .padding(AppSpacing.xs)
                     .background(AppColors.bgBase)
@@ -267,8 +266,7 @@ public struct TransactionRow: View {
             }
 
             HStack(spacing: AppSpacing.xs) {
-                Image(systemName: "arrow.turn.down.right")
-                    .font(.system(size: AppIconSize.sm))
+                Icon("arrow.turn.down.right", size: AppIconSize.sm, scalesWithText: false)
                     .foregroundStyle(AppColors.Text.secondary)
 
                 if let to {

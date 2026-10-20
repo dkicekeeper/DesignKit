@@ -12,6 +12,11 @@ import DesignTokens
 /// Универсальный компонент для отображения иконок и логотипов
 /// Полностью интегрирован с Design System (AppTheme.swift)
 ///
+/// 7.0.0 (the owner's rule): every icon in DesignKit is an `Icon`, and its size says what it
+/// is (`IconKind`). Under 44 pt a **glyph**: the symbol at its size, no plate, growing with the
+/// text size. From 44 pt a **tile**: the symbol on a plate with room around it (20 % of the
+/// side to 63 pt, 25 % from 64 pt), at its size. A logo fills its shape at any size.
+///
 /// # Примеры использования:
 ///
 /// ## SF Symbol с пресетом
@@ -41,12 +46,15 @@ public struct Icon: View {
 
     let source: IconSource?
     let style: IconStyle
+    /// A glyph's side as the text size scales it (7.0.0); a tile keeps `style.size`.
+    @ScaledMetric private var scaledSide: CGFloat
 
     // MARK: - Initializers
 
     public init(source: IconSource?, style: IconStyle) {
         self.source = source
         self.style = style
+        self._scaledSide = ScaledMetric(wrappedValue: style.size, relativeTo: .body)
     }
 
     /// Convenience initializer с автоматическим выбором стиля по типу источника
@@ -65,6 +73,25 @@ public struct Icon: View {
         case .none:
             self.style = .placeholder(size: size)
         }
+        self._scaledSide = ScaledMetric(wrappedValue: size, relativeTo: .body)
+    }
+
+    /// A glyph of an SF Symbol (7.0.0): `size` points, in `tint` (by default the colour around
+    /// it), no plate.
+    ///
+    /// ```swift
+    /// Icon("checkmark.circle.fill", size: AppIconSize.sm, tint: .monochrome(AppColors.success))
+    /// ```
+    ///
+    /// - Parameter scalesWithText: Whether it grows with the text size (the default); off for a
+    ///   symbol in a control of a fixed size (a round button, a key).
+    public init(
+        _ systemName: String,
+        size: CGFloat = AppIconSize.md,
+        tint: IconTint = .inherit,
+        scalesWithText: Bool = true
+    ) {
+        self.init(source: .sfSymbol(systemName), style: IconStyle.glyph(size, tint: tint).scaling(scalesWithText))
     }
 
     // MARK: - Body
@@ -79,50 +106,45 @@ public struct Icon: View {
 
     // MARK: - Computed Properties
 
-    /// Адаптивный padding с нелинейным масштабированием по размеру
-    /// - SF Symbols: 5% (малые <24pt) / 10% (средние 24–44pt) / 15% (большие 44–64pt) / 18% (героические 64pt+)
-    /// - Логотипы (bank/brand): без padding (заполняют контейнер полностью)
-    /// - Placeholder: нелинейная кривая аналогичная SF Symbols
-    /// - Явно заданный padding имеет приоритет
-    private var effectivePadding: CGFloat? {
+    private var isTile: Bool { style.kind == .tile }
+
+    private var isLogo: Bool {
+        if case .brandService = source { return true }
+        return false
+    }
+
+    /// The icon's side: a glyph's grows with the text size unless its style holds it.
+    private var side: CGFloat {
+        isTile || !style.scalesWithText ? style.size : scaledSide
+    }
+
+    /// Room between the plate's edge and the symbol: none for a glyph (the symbol is the
+    /// icon), 20 % of the side for a tile to 63 pt and 25 % from 64 pt; an explicit `padding`
+    /// sets a tile's. A logo fills its shape unless its style pads it.
+    private var effectivePadding: CGFloat {
+        if isLogo { return style.padding ?? 0 }
+        guard isTile else { return 0 }
         if let explicitPadding = style.padding { return explicitPadding }
-
-        switch source {
-        case .sfSymbol:
-            return adaptiveSFSymbolPadding
-        case .brandService:
-            return nil
-        case .none:
-            return adaptivePlaceholderPadding
-        }
+        return side * (side < IconMetrics.largeTile ? IconMetrics.tilePadding : IconMetrics.largeTilePadding)
     }
 
-    /// Нелинейный padding для SF Symbols:
-    /// маленькие иконки получают меньше отступа (символ крупнее),
-    /// большие иконки получают больше (визуальное дыхание в окружности)
-    private var adaptiveSFSymbolPadding: CGFloat {
-        switch style.size {
-        case ..<24:   return style.size * 0   // малые: минимальный отступ, символ заметнее
-        case 24..<44: return style.size * 0.10   // средние: сбалансированно
-        case 44..<64: return style.size * 0.20   // крупные: пространство для дыхания
-        default:      return style.size * 0.25   // героические (64pt+): щедрый отступ
-        }
+    /// What the icon sits on: a tile's plate (its style's colour, else the neutral fill; with
+    /// glass, the glass and the colour if any), nothing for a glyph. A logo keeps its style's.
+    private var plateColor: Color? {
+        if isLogo { return style.backgroundColor }
+        guard isTile else { return nil }
+        if style.hasGlassEffect { return style.backgroundColor }
+        return style.backgroundColor ?? AppColors.Background.neutral1
     }
 
-    private var adaptivePlaceholderPadding: CGFloat {
-        switch style.size {
-        case ..<24:   return style.size * 0
-        case 24..<44: return style.size * 0.12
-        default:      return style.size * 0.18
-        }
+    /// Glass on a tile or a logo; a glyph has no plate to be glass.
+    private var hasGlass: Bool {
+        style.hasGlassEffect && (isTile || isLogo)
     }
 
     /// Размер контента с учетом padding
     private var contentSize: CGFloat {
-        if let padding = effectivePadding {
-            return style.size - (padding * 2)
-        }
-        return style.size
+        side - effectivePadding * 2
     }
 
     // MARK: - Content View
@@ -132,10 +154,8 @@ public struct Icon: View {
         switch source {
         case .sfSymbol(let name):
             sfSymbolView(name)
-
         case .brandService(let name):
             brandServiceView(name)
-
         case .none:
             placeholderView
         }
@@ -166,6 +186,8 @@ public struct Icon: View {
         case .original:
             image
                 .foregroundStyle(AppColors.accent)
+        case .inherit:
+            image
         }
     }
 
@@ -211,14 +233,14 @@ public struct Icon: View {
     @ViewBuilder
     private func containerView<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         let baseView = content()
-            .frame(width: style.size, height: style.size)
+            .frame(width: side, height: side)
 
         // Определяем, нужно ли обрезать контент (только для изображений, не для SF Symbols)
         let shouldClipContent = shouldClipContentForSource()
 
         // Применяем фон если задан
         let viewWithBackground = Group {
-            if let bgColor = style.backgroundColor {
+            if let bgColor = plateColor {
                 // Для SF Symbols обрезаем только фон, не контент
                 if shouldClipContent {
                     baseView.background(bgColor)
@@ -277,7 +299,7 @@ public struct Icon: View {
         }
 
         // Применяем glass effect если требуется
-        if style.hasGlassEffect {
+        if hasGlass {
             switch style.shape {
             case .circle:
                 viewWithShape
@@ -308,4 +330,14 @@ public struct Icon: View {
             return false // Placeholder не обрезается
         }
     }
+}
+
+/// The tile's room around its symbol (7.0.0).
+enum IconMetrics {
+    /// From this side a tile is large and gets more room.
+    static let largeTile: CGFloat = 64
+    /// A tile's padding, of its side, to 63 pt.
+    static let tilePadding: CGFloat = 0.2
+    /// A large tile's padding, of its side.
+    static let largeTilePadding: CGFloat = 0.25
 }

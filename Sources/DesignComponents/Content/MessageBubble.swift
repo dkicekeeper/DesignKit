@@ -101,8 +101,7 @@ public struct MessageBubble: View {
             }
             if let failure {
                 HStack(spacing: AppSpacing.xs) {
-                    Image(systemName: "exclamationmark.circle.fill")
-                        .foregroundStyle(AppColors.Status.negative)
+                    Icon("exclamationmark.circle.fill", size: AppIconSize.xs, tint: .monochrome(AppColors.Status.negative))
                     Text(failure)
                         .font(AppTypography.caption)
                         .foregroundStyle(AppColors.Status.negative)

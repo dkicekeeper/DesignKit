@@ -74,8 +74,7 @@ public struct SuggestionChips: View {
             } label: {
                 HStack(spacing: AppSpacing.xs) {
                     if let systemImage {
-                        Image(systemName: systemImage)
-                            .foregroundStyle(AppColors.accent)
+                        Icon(systemImage, size: AppIconSize.sm, tint: .monochrome(AppColors.accent))
                     }
                     Text(suggestion)
                 }

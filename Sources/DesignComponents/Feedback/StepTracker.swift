@@ -76,8 +76,8 @@ public struct StepTracker: View {
         ZStack {
             if index < current {
                 Circle().fill(AppColors.accent)
-                Image(systemName: "checkmark")
-                    .font(.system(size: circleSize * 0.45, weight: .bold))
+                Icon("checkmark", size: circleSize * 0.45, scalesWithText: false)
+                    .fontWeight(.bold)
                     .foregroundStyle(AppColors.staticWhite)
                     // 2.2.0: a step done draws its checkmark on.
                     .drawOnAppear()

@@ -318,6 +318,7 @@ struct CreatureSpeechWords: View {
     }
 
     private func words(elapsed: Double?, schedule: [Double]) -> some View {
+        // A symbol as a word of the speech, set in its font (7.0.0, outside the Icon rule).
         let content = speech.symbol.map { Text(Image(systemName: $0)) } ?? Text(speech.text)
         let line = content
             .font(speech.symbol == nil ? CreatureSpeechMetrics.font(emotion) : CreatureSpeechMetrics.pictureFont)

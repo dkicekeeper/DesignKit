@@ -94,8 +94,7 @@ public struct StatusBanner: View {
 
     private func content(showsChevron: Bool) -> some View {
         HStack(alignment: .top, spacing: AppSpacing.sm) {
-            Image(systemName: systemImage ?? status.systemImage)
-                .font(style == .standard ? .system(size: AppIconSize.sm) : AppTypography.caption)
+            Icon(systemImage ?? status.systemImage, size: style == .standard ? AppIconSize.sm : AppIconSize.xs)
                 .foregroundStyle(status.solid)
                 .accessibilityHidden(true)
 
@@ -133,8 +132,7 @@ public struct StatusBannerSkeleton: View {
     public var body: some View {
         // The banner's own layout, invisible, gives the height (it grows with Dynamic Type).
         HStack(alignment: .top, spacing: AppSpacing.sm) {
-            Image(systemName: "info.circle.fill")
-                .font(style == .standard ? .system(size: AppIconSize.sm) : AppTypography.caption)
+            Icon("info.circle.fill", size: style == .standard ? AppIconSize.sm : AppIconSize.xs)
             Text(verbatim: Array(repeating: "Ag", count: lines).joined(separator: "\n"))
                 .font(style == .standard ? AppTypography.bodySmall : AppTypography.caption)
         }

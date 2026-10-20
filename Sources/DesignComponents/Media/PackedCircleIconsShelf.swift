@@ -316,8 +316,8 @@ private struct PackedShelfTile: View {
                     endPoint: .bottomTrailing
                 )
             )
-            Image(systemName: symbolName)
-                .font(.system(size: side * 0.4, weight: .semibold))
+            Icon(symbolName, size: side * 0.4, scalesWithText: false)
+                .fontWeight(.semibold)
                 .foregroundStyle(.white)
                 .shadow(color: .black.opacity(0.2), radius: 0.5, y: 0.5)
         }
