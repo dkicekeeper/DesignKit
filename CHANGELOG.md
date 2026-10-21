@@ -18,7 +18,7 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 
 ## 8.0.0 - 2026-10-21
 
-A major release from the owner's review of the app's screens: one look everywhere, as in Tenra's Finances and Insights. Every section is a Liquid Glass card on the page, with one divider and one row height, and the things a person keeps are a `CardList` with one set of actions. This first build is the probe on a device: menus in a one-row glass section, dragging cards to reorder, a list of 200.
+A major release from the owner's review of the app's screens: one look everywhere, as in Tenra's Finances and Insights. Every section is a Liquid Glass card on the page, with one divider and one row height, and the things a person keeps are a `CardList` with one set of actions. The probe on a device (build 96: menus in a one-row glass section, dragging cards to reorder, a list of 200) passed; a section's rows now move more than once.
 
 ### Added
 

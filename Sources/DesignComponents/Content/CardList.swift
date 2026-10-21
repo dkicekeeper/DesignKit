@@ -94,10 +94,16 @@ public struct CardList<Data: RandomAccessCollection, Card: View>: View where Dat
                 }
             }
         case .section:
-            DividedRows {
-                ForEach(data) { item in
-                    entry(item)
-                        .modifier(reorderable(item))
+            // Each row draws the divider under itself. Splitting the whole list into rows
+            // (`DividedRows`) rebuilt every row on a move, and a drag stopped after the first
+            // step (the owner's device check of 8.0.0's probe); here a row keeps its identity
+            // while it moves, as a card does.
+            VStack(spacing: 0) {
+                ForEach(Array(data.enumerated()), id: \.element.id) { index, item in
+                    SectionRow(showsDivider: index < data.count - 1) {
+                        entry(item)
+                    }
+                    .modifier(reorderable(item))
                 }
             }
             .padding(.horizontal, AppSpacing.lg)
@@ -153,6 +159,24 @@ public struct CardList<Data: RandomAccessCollection, Card: View>: View where Dat
     }
 }
 
+/// A row of a `.section` list with the divider under it, under the row's text.
+private struct SectionRow<Content: View>: View {
+    let showsDivider: Bool
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        Group(subviews: content) { parts in
+            let inset = parts.first?.containerValues.rowDividerInset ?? 0
+            VStack(spacing: 0) {
+                ForEach(parts) { $0 }
+                if showsDivider {
+                    RowDivider(inset: inset)
+                }
+            }
+        }
+    }
+}
+
 /// An item with what a mode puts around it: the card's own divider inset is kept and moved by
 /// what comes before it.
 private struct CardListEntry<Leading: View, Content: View, Trailing: View>: View {
@@ -202,6 +226,9 @@ private struct CardReorderModifier<ID: Hashable>: ViewModifier {
     func body(content: Content) -> some View {
         if isEnabled, let index = ids.firstIndex(of: id) {
             content
+                // The whole item takes the drop: a row of a section has no background, and its
+                // content takes no taps while reordering, so only the handle did.
+                .contentShape(Rectangle())
                 .contentShape(.dragPreview, .rect(cornerRadius: AppRadius.xl))
                 .onDrag {
                     dragging = id
