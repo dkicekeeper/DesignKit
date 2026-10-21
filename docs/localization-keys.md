@@ -20,7 +20,15 @@ text, not keys. A new key goes there as well.
 | `amount.hidden` | FormattedAmountText under `.amountsHidden()` (VoiceOver) | `Hidden amount` |
 | `amount.hide` | AmountVisibilityToggle (VoiceOver, amounts shown) | `Hide amounts` |
 | `amount.show` | AmountVisibilityToggle (VoiceOver, amounts hidden) | `Show amounts` |
-| `bulk.deleteCount` | the apps' bulk-delete `DSButton` title (BulkDeleteButton's until 3.0.0 removed it) | — |
+| `bulk.add` | `cardListToolbar` (the add button's VoiceOver name when no `addLabel` is given, 8.0.0) | `Add` |
+| `bulk.deleteCount` | `cardListToolbar`'s "Delete N" under a list (8.0.0; the apps' bulk-delete `DSButton` title before, BulkDeleteButton's until 3.0.0) | — |
+| `bulk.deselectAll` | `cardListToolbar` (selecting, everything picked, 8.0.0) | `Deselect All` |
+| `bulk.done` | `cardListToolbar` (leaving selecting or reordering, 8.0.0) | `Done` |
+| `bulk.moveDown` | `CardList` (VoiceOver action while reordering, 8.0.0) | `Move down` |
+| `bulk.moveUp` | `CardList` (VoiceOver action while reordering, 8.0.0) | `Move up` |
+| `bulk.reorder` | `cardListToolbar` (the change-order button's VoiceOver name, 8.0.0) | `Change order` |
+| `bulk.select` | `cardListToolbar` (the select button's VoiceOver name, 8.0.0) | `Select` |
+| `bulk.selectAll` | `cardListToolbar` (selecting, 8.0.0) | `Select All` |
 | `button.apply` | DateRangePickerSheet (Apply) | `Apply` |
 | `button.cancel` | EditSheetContainer (AmountEntrySheet's ✕ since 5.0.0), ImportProgressSheet | — |
 | `button.copy` | AnimatedInputComponents | — |

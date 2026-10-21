@@ -99,13 +99,21 @@ public struct UniversalRow<Content: View, Trailing: View>: View {
 
     // MARK: - Body
 
-    @ViewBuilder
     public var body: some View {
-        if let control {
-            RowControlView(row: control)
-        } else {
-            layout
+        Group {
+            if let control {
+                RowControlView(row: control)
+            } else {
+                layout
+            }
         }
+        // 8.0.0: a FormSection's divider under this row starts where its text does.
+        .rowDividerInset(dividerInset)
+    }
+
+    /// The row's side padding and its icon with the space after it.
+    private var dividerInset: CGFloat {
+        config.horizontalPadding + (leadingIcon.map { $0.style.size + config.spacing } ?? 0)
     }
 
     private var layout: some View {
@@ -257,12 +265,14 @@ public struct RowConfiguration: Sendable {
     // MARK: - Presets
 
     /// Standard form row (default)
-    /// V: 12pt / H: 16pt — rows own their padding; cardStyle() adds no padding.
+    /// V: 16pt / H: 0 (8.0.0; 12 / 16 before): the row pads only vertically, its card pads it
+    /// at the sides (`FormSection`, `CardList`, a `cardStyle()` card with padding), as
+    /// docs/design-system.md §10 says. A row is 56 pt with a 24 pt icon.
     /// Used for: the rows of a `FormSection` card (`UniversalRow`'s default).
     public static let standard = RowConfiguration(
         spacing: AppSpacing.md,
-        verticalPadding: AppSpacing.md,
-        horizontalPadding: AppSpacing.lg,
+        verticalPadding: AppSpacing.lg,
+        horizontalPadding: 0,
         backgroundColor: .clear,
         cornerRadius: 0
     )

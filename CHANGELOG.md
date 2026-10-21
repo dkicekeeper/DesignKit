@@ -16,6 +16,34 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.0.0 - 2026-10-21
+
+A major release from the owner's review of the app's screens: one look everywhere, as in Tenra's Finances and Insights. Every section is a Liquid Glass card on the page, with one divider and one row height, and the things a person keeps are a `CardList` with one set of actions. This first build is the probe on a device: menus in a one-row glass section, dragging cards to reorder, a list of 200.
+
+### Added
+
+- `CardList(_:layout:mode:selection:onMove:card:)`: a list of items on Liquid Glass, a card per item (`.cards`) or every item a row in one card (`.section`). `CardListMode` `.browsing`, `.selecting` (a circle on every item) and `.reordering` (a handle; a long press lifts an item, moving it over another puts it there; VoiceOver moves it up or down). `CardListSkeleton(layout:count:)`.
+- `.cardListToolbar(mode:selection:allIDs:canReorder:addLabel:onAdd:onDeleteSelected:)`: the same toolbar on every list: select, change the order, add; Done and Select All; "Delete N" under the list.
+- `RowDivider(inset:)`: the one divider between two rows in a card, under the row's text. `.rowDividerInset(_:)`: where it starts under a custom row.
+
+### Changed
+
+- `FormSection` is a Liquid Glass card (Material before), pads its rows 16 pt at the sides and draws a `RowDivider` between them under each row's text, 16 pt short of the card's edge.
+- `RowConfiguration.standard` pads a row 16 pt above and below and not at the sides (12 and 16 before): a row is 56 pt, and its card pads it at the sides.
+- `NoticeCard` is its own padded glass card.
+
+### Deprecated
+
+- `FormSection(header:footer:style:content:)`: one look since 8.0.0, drop `style:`.
+
+### Migration
+
+- Remove the `Divider()` between the rows of a `FormSection`: the section draws its own.
+
+### Gallery and tooling
+
+- `FormSection`'s page shows one to four rows (one: the menu probe); a `CardList` page with its layouts, modes and up to 200 items.
+
 ## 7.1.0 - 2026-10-21
 
 The owner's review of 7.0.0 in Tenra: `PackedCircleIcons` draws its symbols as before the icon

@@ -6,63 +6,62 @@
 //  Reduces boilerplate in edit views
 //  5.0.0: `style: .glass`, a Liquid Glass card that pads and spaces its rows: content that is
 //  not a form (an assistant's reply, a short list). It was `ListCard` in 4.14.0.
+//  8.0.0 (the owner's review of the app's screens): one look. Every section is a Liquid Glass
+//  card, as in Tenra's Finances and Insights; it pads its rows at the sides and draws the
+//  divider between them itself, under each row's text (RowDivider).
 //
 
 import SwiftUI
 import DesignTokens
 import DesignSupport
 
-/// Form section container with optional header and footer.
+/// A titled group of rows on a Liquid Glass card (8.0.0: one look for forms, settings and
+/// short lists).
 ///
-/// With `.card` (the default) the card adds no padding: its rows pad themselves (`UniversalRow`,
-/// `.standard` by default; docs/design-system.md §10), and the caller puts a
-/// `Divider()` between them. A bare field goes in a row's trailing slot:
+/// The card pads its rows at the sides (`AppSpacing.lg`); the rows pad themselves only
+/// vertically (`UniversalRow`'s `.standard`, docs/design-system.md §10). Between two rows the
+/// section draws a `RowDivider` under the upper row's text, short of the card's trailing edge
+/// by its padding; a custom row with something before its text says where with
+/// `.rowDividerInset(_:)`.
 ///
 /// ```swift
 /// FormSection(header: "Transaction") {
 ///     UniversalRow(config: .standard) { Text("Title") } trailing: {
 ///         FormTextField(text: $title, placeholder: "Title", style: .inline)
 ///     }
-///     Divider().padding(.leading, AppSpacing.lg)
 ///     UniversalRow("Date", icon: "calendar", accessory: .date($date))
-/// }
-/// ```
-///
-/// `.glass` (5.0.0) pads its rows on every side and spaces them by `AppSpacing.sm`, no dividers:
-///
-/// ```swift
-/// FormSection(header: "Payments", style: .glass) {
-///     ForEach(payments) { payment in
-///         TransactionRow(…)
-///     }
 /// }
 /// ```
 public struct FormSection<Content: View>: View {
     let header: String?
     let footer: String?
-    let style: Style
     @ViewBuilder let content: Content
 
+    /// Before 8.0.0 a section was a Material card (`.card`) or a glass one that spaced its rows
+    /// (`.glass`); both are the glass card with dividers now.
     public enum Style: Sendable {
-        /// A form's card: Material behind rows that pad themselves, the caller's `Divider()`
-        /// between them. Material, not Liquid Glass: glass becomes the morph source of a menu
-        /// inside and swallows a one-row section at the tap.
         case card
-        /// A Liquid Glass card (`cardStyle()`) that pads its rows by `AppSpacing.lg` and spaces
-        /// them by `AppSpacing.sm` (5.0.0; `ListCard` in 4.14.0): content that is not a form.
         case glass
     }
 
     public init(
         header: String? = nil,
         footer: String? = nil,
-        style: Style = .card,
         @ViewBuilder content: () -> Content
     ) {
         self.header = header
         self.footer = footer
-        self.style = style
         self.content = content()
+    }
+
+    @available(*, deprecated, message: "One look since 8.0.0, the glass card with dividers: drop style:.")
+    public init(
+        header: String? = nil,
+        footer: String? = nil,
+        style: Style,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.init(header: header, footer: footer, content: content)
     }
 
     public var body: some View {
@@ -75,26 +74,15 @@ public struct FormSection<Content: View>: View {
                 }
             }
 
-            // Content
-            switch style {
-            case .card:
-                VStack(spacing: 0) {
-                    content
-                }
-                // `formCardStyle()` (Material on every iOS) instead of `cardStyle()`
-                // (`glassEffect` on iOS 26). Liquid Glass becomes the morph-source for
-                // any `Picker(.menu)` / `Menu` rendered inside the card — in a single-
-                // row section the glass-rect ≈ row, so iOS collapses the whole row
-                // into the menu popover at tap. Material has no such interaction.
-                .formCardStyle()
-            case .glass:
-                VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                    content
-                }
-                .padding(AppSpacing.lg)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .cardStyle()
+            DividedRows {
+                content
             }
+            .padding(.horizontal, AppSpacing.lg)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            // 8.0.0: Liquid Glass, drawn behind the rows (`cardStyle()`), as every card of the
+            // app. Up to 7.x the form card was Material: iOS 26 took a glass card for the morph
+            // source of a menu inside it and collapsed a one-row section into the popover.
+            .cardStyle()
 
             // Footer
             if let footer = footer {
@@ -107,9 +95,3 @@ public struct FormSection<Content: View>: View {
         }
     }
 }
-
-// MARK: - Previews
-
-
-
-
