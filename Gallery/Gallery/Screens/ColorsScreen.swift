@@ -32,6 +32,7 @@ struct ColorsScreen: View {
     private let background: [Token] = [
         .init(name: "Background.base", color: AppColors.Background.base, use: "The screen"),
         .init(name: "Background.baseAlt", color: AppColors.Background.baseAlt, use: "Grouped-list screen"),
+        .init(name: "Background.baseAltCard", color: AppColors.Background.baseAltCard, use: "Cards, list sections on baseAlt"),
         .init(name: "Background.elevation1", color: AppColors.Background.elevation1, use: "Sheets, cards on base"),
         .init(name: "Background.elevation2", color: AppColors.Background.elevation2, use: "Cards on elevation 1"),
         .init(name: "Background.elevation3", color: AppColors.Background.elevation3, use: "Above everything"),

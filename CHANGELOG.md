@@ -16,6 +16,39 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 7.1.0 - 2026-10-21
+
+The owner's review of 7.0.0 in Tenra: `PackedCircleIcons` draws its symbols as before the icon
+rule, and `CurrencyList` looks like every grouped list, white cards on the grey background.
+[#87](https://github.com/dkicekeeper/DesignKit/pull/87)
+
+### Added
+
+- `AppColors.Background.baseAltCard`: a card or a list's section on `baseAlt`
+  (`.secondarySystemGroupedBackground`), as a grouped `List`'s rows: white in light, a step
+  lighter than `baseAlt` in dark, and in a sheet, where iOS raises both.
+
+### Changed
+
+- `CurrencyList` paints the grouped background (`baseAlt`) under its cards, and the cards are
+  `baseAltCard`: white cards on grey, as every `List` of an app. They were grey
+  (`Background.neutral1`) on the screen's white before. It stays a `ScrollView`, so it can still
+  sit in a scroll view of its own.
+
+### Fixed
+
+- `PackedCircleIcons`' symbols keep their disc and their room at every diameter, as before
+  7.0.0: under the icon rule a `.flat` circle under 44 pt lost its pale disc and its symbol
+  filled the circle, a marble or a coin under 44 pt had its symbol from edge to edge, and one
+  from 44 pt a grey plate over its colour. They are drawn outside the rule now (`PackedSymbol`),
+  the owner's call; logos stay `Icon`s. The shelf's symbol is set in type again (an `Icon` drew
+  it a quarter larger in 7.0.0).
+
+### Gallery and tooling
+
+- The Colors screen and the `surfaces` snapshot show `baseAltCard`; the `PackedCircleIcons`
+  references are recorded again.
+
 ## 7.0.0 - 2026-10-20
 
 A major release for the owner's review of the rows and the icons: one row for every form card and

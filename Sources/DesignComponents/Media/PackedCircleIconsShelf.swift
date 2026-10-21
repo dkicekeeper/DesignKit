@@ -17,7 +17,7 @@
 //  one barely showed.
 //
 //  A logo fills its tile, as an app icon does; a symbol is white on a tile of its colour; the
-//  "+N" tile is grey.
+//  "+N" tile is grey. 7.1.0: the symbol is set in type again, outside the icon rule.
 //
 
 import SwiftUI
@@ -316,8 +316,10 @@ private struct PackedShelfTile: View {
                     endPoint: .bottomTrailing
                 )
             )
-            Icon(symbolName, size: side * 0.4, scalesWithText: false)
-                .fontWeight(.semibold)
+            // Set at the tile's type size, outside the icon rule, as every symbol of
+            // PackedCircleIcons (7.1.0; an Icon in 7.0.0 drew it a quarter larger).
+            Image(systemName: symbolName)
+                .font(.system(size: side * 0.4, weight: .semibold))
                 .foregroundStyle(.white)
                 .shadow(color: .black.opacity(0.2), radius: 0.5, y: 0.5)
         }
