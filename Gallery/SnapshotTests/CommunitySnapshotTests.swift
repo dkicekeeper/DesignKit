@@ -117,16 +117,25 @@ extension ComponentSnapshots {
             )
         }
 
+        /// Checklist items in a glass section, where they pad themselves and the divider starts
+        /// after the circle (8.1.0), and checklists in a card; one glass card per snapshot.
         @Test func checklistRows() async {
             await assertComponentSnapshot(
-                VStack(spacing: AppSpacing.md) {
+                FormSection {
                     ChecklistRow("Tent", isChecked: true, accessorySystemImage: "backpack", accessoryLabel: "From gear") {}
                     ChecklistRow("Headlamp", isChecked: false) {}
+                },
+                named: "items",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.md) {
                     ChecklistSummaryRow(title: "Weekend at the lake", subtitle: "Sat, 12 Oct", checked: 12, total: 20)
                     ChecklistSummaryRow(title: "Fishing kit", checked: 8, total: 8)
                 }
                 .cardContentPadding()
                 .cardStyle(),
+                named: "summaries",
                 appearances: [.light, .dark, .largeText]
             )
         }

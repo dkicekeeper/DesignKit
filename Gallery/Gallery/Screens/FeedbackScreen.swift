@@ -72,7 +72,7 @@ private struct LoadMoreFooterPage: View {
             VStack(alignment: .leading, spacing: AppSpacing.md) {
                 ForEach(0..<2, id: \.self) { index in
                     ItemRow("Review \(index + 1)", meta: [MetaLine([.text("Aida"), .text("3 days ago")])],
-                            leading: .symbol("star.bubble"))
+                            leading: .symbol("star.bubble"), verticalPadding: 0)
                 }
                 LoadMoreFooter(state: loadState, rows: rows, onLoad: { loads += 1 }) {
                     if cardPlaceholder {

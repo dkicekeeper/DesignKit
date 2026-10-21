@@ -256,10 +256,11 @@ extension ComponentSnapshots {
         }
 
         /// ItemRow (3.6.0) in both styles, with a pale-circle symbol, a top glyph next to a
-        /// description, a badge, two meta lines and the accessories; one card per style.
+        /// description, a badge, two meta lines and the accessories; one glass section per
+        /// style, where the rows pad themselves and the dividers start at their text (8.1.0).
         @Test func itemRows() async {
             await assertComponentSnapshot(
-                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                FormSection {
                     ItemRow(
                         "Morning on Kapchagay",
                         meta: [
@@ -293,14 +294,12 @@ extension ComponentSnapshots {
                         Image(systemName: "wrench.and.screwdriver")
                             .foregroundStyle(AppColors.warning)
                     }
-                }
-                .cardContentPadding()
-                .cardStyle(),
+                },
                 named: "standard",
                 appearances: [.light, .dark, .largeText]
             )
             await assertComponentSnapshot(
-                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                FormSection {
                     ItemRow("12 Oct 2026, 09:40", badge: "Auto",
                             meta: [MetaLine([.text("1 204 transactions"), .text("3.1 MB")])], style: .large) {
                         Image(systemName: "arrow.counterclockwise")
@@ -309,9 +308,7 @@ extension ComponentSnapshots {
                     }
                     ItemRow("Coffee", meta: [MetaLine([.text("Used 14 times"), .text("Oct 9, 2026")])],
                             style: .large, titleFont: AppTypography.h4)
-                }
-                .cardContentPadding()
-                .cardStyle(),
+                },
                 named: "large",
                 appearances: [.light, .dark, .largeText]
             )

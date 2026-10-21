@@ -162,6 +162,14 @@ public enum ItemRowStyle: Hashable {
     case standard
     /// Title in body, facts in bodySmall, a little more air.
     case large
+
+    /// The space between the leading symbol or glyph and the text.
+    var leadingSpacing: CGFloat { self == .large ? AppSpacing.sm : AppSpacing.md }
+
+    /// Where the text of a row with a `.symbol` starts: the pale circle and the space after it
+    /// (8.1.0). An `ItemRow` sets it on itself; a `Button` or `NavigationLink` around the row
+    /// keeps it to its label, so put it on the link: `.rowDividerInset(ItemRowStyle.standard.symbolDividerInset)`.
+    public var symbolDividerInset: CGFloat { AppIconSize.xxl + leadingSpacing }
 }
 
 /// What stands before an `ItemRow`'s title.
@@ -174,7 +182,12 @@ public enum ItemRowLeading {
 
 /// A row for an item of the app's own (a trip, a place, an article, a backup): a symbol, the
 /// title with an optional badge, a description, lines of facts (`MetaLine`) and an accessory.
-/// No padding of its own: it lives in a `List` or a card's stack, which spaces it.
+///
+/// A row of a glass section (8.1.0): it pads itself `AppSpacing.md` above and below, as a
+/// `FormSection` or a `CardList(layout: .section)` puts its rows back to back, and the divider
+/// under it starts at its text. In a stack that spaces its rows, or a `List`, pass
+/// `verticalPadding: 0` (before 8.1.0 it had no padding of its own, and every app padded it in
+/// a section by hand).
 ///
 /// ```swift
 /// NavigationLink(value: trip.id) {
@@ -199,6 +212,7 @@ public struct ItemRow<Accessory: View>: View {
     let style: Style
     let titleFont: Font?
     let titleLineLimit: Int?
+    let verticalPadding: CGFloat
     let accessory: Accessory
 
     /// The glyph grows with the text, as a `.title3` symbol would.
@@ -211,6 +225,8 @@ public struct ItemRow<Accessory: View>: View {
     ///   - meta: Lines of facts under it; the first in the secondary grey, pass a tint for a
     ///     fainter one.
     ///   - titleFont: Overrides the style's title font, for a row that had another one.
+    ///   - verticalPadding: Above and below the row: `AppSpacing.md` in a glass section, 0 in a
+    ///     stack that spaces its rows or a `List`.
     ///   - accessory: The trailing edge: `DisclosureChevron()`, a status symbol, a button.
     public init(
         _ title: String,
@@ -221,6 +237,7 @@ public struct ItemRow<Accessory: View>: View {
         style: Style = .standard,
         titleFont: Font? = nil,
         titleLineLimit: Int? = nil,
+        verticalPadding: CGFloat = AppSpacing.md,
         @ViewBuilder accessory: () -> Accessory
     ) {
         self.title = title
@@ -231,6 +248,7 @@ public struct ItemRow<Accessory: View>: View {
         self.style = style
         self.titleFont = titleFont
         self.titleLineLimit = titleLineLimit
+        self.verticalPadding = verticalPadding
         self.accessory = accessory()
     }
 
@@ -240,7 +258,7 @@ public struct ItemRow<Accessory: View>: View {
     }
 
     public var body: some View {
-        HStack(alignment: isTopAligned ? .top : .center, spacing: style == .large ? AppSpacing.sm : AppSpacing.md) {
+        HStack(alignment: isTopAligned ? .top : .center, spacing: style.leadingSpacing) {
             leadingView
             VStack(alignment: .leading, spacing: style == .large ? AppSpacing.xs : AppSpacing.xxs) {
                 titleLine
@@ -258,8 +276,20 @@ public struct ItemRow<Accessory: View>: View {
             Spacer(minLength: 0)
             accessory
         }
+        .padding(.vertical, verticalPadding)
         .environment(\.itemRowStyle, style)
         .contentShape(Rectangle())
+        // 8.1.0: a section's divider under this row starts where its text does.
+        .rowDividerInset(dividerInset)
+    }
+
+    /// The leading symbol or glyph and the space after it.
+    private var dividerInset: CGFloat {
+        switch leading {
+        case .symbol: style.symbolDividerInset
+        case .glyph: glyphSlot + style.leadingSpacing
+        case nil: 0
+        }
     }
 
     @ViewBuilder
@@ -308,10 +338,12 @@ public extension ItemRow where Accessory == EmptyView {
         leading: Leading? = nil,
         style: Style = .standard,
         titleFont: Font? = nil,
-        titleLineLimit: Int? = nil
+        titleLineLimit: Int? = nil,
+        verticalPadding: CGFloat = AppSpacing.md
     ) {
         self.init(title, badge: badge, detail: detail, meta: meta, leading: leading, style: style,
-                  titleFont: titleFont, titleLineLimit: titleLineLimit) { EmptyView() }
+                  titleFont: titleFont, titleLineLimit: titleLineLimit,
+                  verticalPadding: verticalPadding) { EmptyView() }
     }
 }
 
@@ -332,27 +364,30 @@ extension EnvironmentValues {
 // MARK: - Skeleton
 
 /// Placeholder of an `ItemRow`: the pale circle (or none), a title line and `metaLines`
-/// shorter lines, in the style's fonts.
+/// shorter lines, in the style's fonts, padded as the row is (`verticalPadding`, 8.1.0).
 public struct ItemRowSkeleton: View {
     let style: ItemRowStyle
     let showsLeading: Bool
     let showsDetail: Bool
     let metaLines: Int
+    let verticalPadding: CGFloat
 
     public init(
         style: ItemRowStyle = .standard,
         showsLeading: Bool = true,
         showsDetail: Bool = false,
-        metaLines: Int = 1
+        metaLines: Int = 1,
+        verticalPadding: CGFloat = AppSpacing.md
     ) {
         self.style = style
         self.showsLeading = showsLeading
         self.showsDetail = showsDetail
         self.metaLines = metaLines
+        self.verticalPadding = verticalPadding
     }
 
     public var body: some View {
-        HStack(spacing: style == .large ? AppSpacing.sm : AppSpacing.md) {
+        HStack(spacing: style.leadingSpacing) {
             if showsLeading {
                 Skeleton.circle(AppIconSize.xxl)
             }
@@ -367,7 +402,9 @@ public struct ItemRowSkeleton: View {
             }
             Spacer(minLength: 0)
         }
+        .padding(.vertical, verticalPadding)
         .shimmer()
         .skeletonLoadingLabel()
+        .rowDividerInset(showsLeading ? style.symbolDividerInset : 0)
     }
 }
