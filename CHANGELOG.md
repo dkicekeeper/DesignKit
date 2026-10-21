@@ -36,6 +36,10 @@ A major release from the owner's review of the apps' screens: one look everywher
 - The headers of `IconPicker`'s sections and of `.dsSearchSuggestions`' Recent and Suggestions are `.default`, bold in sentence case (the small grey uppercase `.compact` before).
 - `NoticeCard` is its own padded glass card.
 
+### Deprecated
+
+- `ManagementMode` (`.normal`, `.selecting`, `.reordering` over a `List` in edit mode) → `CardListMode` with `CardList` and `.cardListToolbar`.
+
 ### Removed
 
 - `FormSection.Style` and `FormSection(header:footer:style:content:)`: one look, `FormSection(header:footer:content:)`.

@@ -2,11 +2,16 @@
 //  ManagementMode.swift
 //  Tenra
 //
+//  8.0.0: deprecated. `CardList` takes the same three modes (`CardListMode`) and draws them
+//  itself, with `cardListToolbar` for the buttons; a `List` in edit mode is no longer how a
+//  list of things is managed.
+//
 
 import SwiftUI
 import DesignTokens
 import DesignSupport
 
+@available(*, deprecated, message: "One set of actions on every list since 8.0.0: use CardList with CardListMode and .cardListToolbar.")
 public enum ManagementMode: Equatable {
     case normal
     case selecting
