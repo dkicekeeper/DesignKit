@@ -2,12 +2,14 @@
 //  SectionHeader.swift
 //  Tenra
 //
-//  The title over a section, in four styles, with symbols around the title and an optional
+//  The title over a section, in three styles, with symbols around the title and an optional
 //  action at the end of the line.
 //  2.0.0: named SectionHeaderView before; SettingsSectionHeaderView became the `.list` style
 //  and DateSectionHeaderView the `.card` style.
 //  3.2.0: `.list` is `.compact`, which no longer pads itself; both symbols show in every style.
 //  4.0.0: the deprecated `.list` name is removed.
+//  8.0.0 (the owner's review of the app's screens): one look for a section's title, bold and in
+//  sentence case; `.compact`, the small grey uppercase label, is removed.
 //
 
 import SwiftUI
@@ -15,18 +17,15 @@ import DesignTokens
 import DesignSupport
 
 /// The title over a section:
-/// - `.default`: bodyEmphasis, primary colour. Forms, cards.
-/// - `.compact`: small uppercase, secondary colour, no padding of its own (3.2.0): a `List` /
-///   `Form` section header, where the system insets it, or, with `.screenPadding()`, a header
-///   on a screen (filters, pickers). `.list` before 3.2.0.
+/// - `.default`: bodyEmphasis, primary colour, in sentence case even in a `List`'s header
+///   (8.0.0), no padding of its own. Forms, cards, a screen's sections with `.screenPadding()`.
 /// - `.large`: h3, with the screen padding. A screen's own sections.
 /// - `.card`: the default title on a glass card with its padding, the action (a day's total)
 ///   on the trailing edge. A date's header in a transaction list (DateSectionHeaderView
 ///   before 2.0).
 ///
 /// A symbol before the title (`systemImage`) and one right after it (`trailingSystemImage`,
-/// 3.2.0) show in every style, in the title's font: the leading one in the accent (the label's
-/// grey in `.compact`), the trailing one in the tertiary grey, `tint` for both. The trailing
+/// 3.2.0) show in every style, in the title's font: the leading one in the accent, the trailing one in the tertiary grey, `tint` for both. The trailing
 /// one says what the header does: `chevron.forward` for one that leads somewhere,
 /// `info.circle` for one that explains.
 ///
@@ -53,12 +52,9 @@ public struct SectionHeader: View {
     let trailing: AnyView?
 
     public enum Style {
-        /// Standard section header (bodyEmphasis, primary color)
+        /// Standard section header (bodyEmphasis, primary color); the one style of a section's
+        /// title since 8.0.0 (`.compact`, the small uppercase label, is removed)
         case `default`
-
-        /// Small uppercase label (bodySmall, secondary color) with no padding of its own (3.2.0):
-        /// a `List` / `Form` header as it is, a screen's with `.screenPadding()`
-        case compact
 
         /// Page-level section title with horizontal padding (h3, primary color)
         case large
@@ -71,8 +67,8 @@ public struct SectionHeader: View {
     ///   - systemImage: SF Symbol before the title.
     ///   - trailingSystemImage: SF Symbol right after the title (3.2.0): `chevron.forward`,
     ///     `info.circle`.
-    ///   - tint: Colour of both symbols; the accent before the title (the label's grey in
-    ///     `.compact`) and the tertiary grey after it by default.
+    ///   - tint: Colour of both symbols; the accent before the title and the tertiary grey
+    ///     after it by default.
     public init(
         _ title: String,
         systemImage: String? = nil,
@@ -110,8 +106,6 @@ public struct SectionHeader: View {
         switch style {
         case .default:
             line(defaultTitle)
-        case .compact:
-            line(compactTitle)
         case .large:
             largeStyle
         case .card:
@@ -141,23 +135,12 @@ public struct SectionHeader: View {
         symbols(
             around: Text(title)
                 .font(AppTypography.bodyEmphasis)
-                .foregroundStyle(AppColors.Text.primary),
+                .foregroundStyle(AppColors.Text.primary)
+                // A List's header capitalises its text; the title keeps its own case (8.0.0).
+                .textCase(nil),
             leadingSize: AppIconSize.md,
             trailingSize: AppIconSize.sm,
             leadingColor: AppColors.accent,
-            spacing: AppSpacing.sm
-        )
-    }
-
-    private var compactTitle: some View {
-        symbols(
-            around: Text(title)
-                .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.Text.secondary)
-                .textCase(.uppercase),
-            leadingSize: AppIconSize.sm,
-            trailingSize: AppIconSize.xs,
-            leadingColor: AppColors.Text.secondary,
             spacing: AppSpacing.sm
         )
     }
@@ -264,9 +247,6 @@ public struct SectionHeaderSkeleton: View {
             case .default:
                 line(SkeletonText(AppTypography.bodyEmphasis, width: 120),
                      iconSize: AppIconSize.md, spacing: AppSpacing.sm)
-            case .compact:
-                line(SkeletonText(AppTypography.bodySmall, width: 100),
-                     iconSize: AppIconSize.sm, spacing: AppSpacing.sm)
             case .large:
                 line(SkeletonText(AppTypography.h3, width: 160), iconSize: AppIconSize.md, spacing: AppSpacing.md)
                     .frame(maxWidth: .infinity, alignment: .leading)

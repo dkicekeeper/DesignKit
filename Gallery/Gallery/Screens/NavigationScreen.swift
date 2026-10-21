@@ -81,7 +81,7 @@ private struct SectionHeaderPage: View {
         } controls: {
             StateControl(state: $state)
             ChoiceControl("Style", selection: $style, options: [
-                ("Default", .default), ("Compact", .compact), ("Large", .large), ("Card", .card),
+                ("Default", .default), ("Large", .large), ("Card", .card),
             ])
             ChoiceControl("Action", selection: $trailing, options: [("None", 0), ("All", 1), ("Spinner", 2), ("Total", 3)])
             ToggleControl("Icon before the title", isOn: $showsIcon)
@@ -100,7 +100,6 @@ private struct SectionHeaderPage: View {
 
     private var title: String {
         switch style {
-        case .compact: "Notifications"
         case .card: "Yesterday"
         default: "Recent trips"
         }

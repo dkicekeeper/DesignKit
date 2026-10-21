@@ -116,7 +116,7 @@ private struct IconPickerSymbolsTab: View {
                     LazyVStack(alignment: .leading, spacing: AppSpacing.xxl) {
                         ForEach(sections, id: \.title) { section in
                             VStack(alignment: .leading, spacing: AppSpacing.lg) {
-                                SectionHeader(section.title, style: .compact)
+                                SectionHeader(section.title)
                                     .screenPadding()
                                 grid(section.symbols)
                             }
@@ -211,7 +211,7 @@ private struct IconPickerLogosTab: View {
 
     private func sectionView(_ section: DesignKitLogoCatalog.Section) -> some View {
         VStack(alignment: .leading, spacing: AppSpacing.lg) {
-            SectionHeader(section.title, style: .compact)
+            SectionHeader(section.title)
                 .screenPadding()
 
             LazyVGrid(

@@ -8,7 +8,7 @@
 //  not a form (an assistant's reply, a short list). It was `ListCard` in 4.14.0.
 //  8.0.0 (the owner's review of the app's screens): one look. Every section is a Liquid Glass
 //  card, as in Tenra's Finances and Insights; it pads its rows at the sides and draws the
-//  divider between them itself, under each row's text (RowDivider).
+//  divider between them itself, under each row's text (RowDivider). `style:` is removed.
 //
 
 import SwiftUI
@@ -37,13 +37,6 @@ public struct FormSection<Content: View>: View {
     let footer: String?
     @ViewBuilder let content: Content
 
-    /// Before 8.0.0 a section was a Material card (`.card`) or a glass one that spaced its rows
-    /// (`.glass`); both are the glass card with dividers now.
-    public enum Style: Sendable {
-        case card
-        case glass
-    }
-
     public init(
         header: String? = nil,
         footer: String? = nil,
@@ -52,16 +45,6 @@ public struct FormSection<Content: View>: View {
         self.header = header
         self.footer = footer
         self.content = content()
-    }
-
-    @available(*, deprecated, message: "One look since 8.0.0, the glass card with dividers: drop style:.")
-    public init(
-        header: String? = nil,
-        footer: String? = nil,
-        style: Style,
-        @ViewBuilder content: () -> Content
-    ) {
-        self.init(header: header, footer: footer, content: content)
     }
 
     public var body: some View {

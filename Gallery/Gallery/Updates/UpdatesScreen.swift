@@ -55,7 +55,7 @@ struct UpdatesScreen: View {
                         }
                     }
                 } header: {
-                    SectionHeader(line.title, style: .compact)
+                    SectionHeader(line.title)
                 }
             }
         }

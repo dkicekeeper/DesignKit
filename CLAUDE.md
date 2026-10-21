@@ -134,7 +134,8 @@ rather than importing an app type.
    2.0.0, docs/migration-2.0.md); tokens keep their `App` prefix (`AppColors`, `AppSpacing`).
    A variant of an existing component is a parameter or a style of it, not a new view
    (`DSButton(iconPlacement: .top)`, `SectionHeader(style: .card)`); a row of a form or a
-   settings list is `UniversalRow(_:icon:accessory:)` (7.0.0). Every symbol is an `Icon`: under
+   settings list is `UniversalRow(_:icon:accessory:)` (7.0.0), in a `FormSection` glass card that
+   draws its dividers (8.0.0), and a list of things a person keeps is a `CardList`. Every symbol is an `Icon`: under
    44 pt a glyph with no plate, from 44 pt a tile on its plate (7.0.0, the owner's rule); iOS's
    own bars, menus, swipe actions, tabs and segments, and a symbol inside a line of text, are the
    exceptions (docs/design-system.md, "Icon Sizes").
@@ -272,6 +273,14 @@ rather than importing an app type.
   step. And the icon rule: every symbol is an `Icon`, a glyph under 44 pt, a tile on its plate
   from 44 pt; row icons are 24 pt in forms and lists alike. `PackedCircleIconsStyle.fan` went
   too: no deprecated API is left ([docs/migration-7.0.md](docs/migration-7.0.md)).
+- DesignKit 8.0.0 (2026-10, the owner's review of the apps' screens): one look, Tenra's
+  Analytics and Finances everywhere. Every section is a Liquid Glass `FormSection` on the white
+  page (Material and `style:` gone), rows are 56 pt with one `RowDivider` under their text, a
+  section's title is bold in sentence case (`SectionHeader.Style.compact` removed), and the
+  things a person keeps are a `CardList` (a card per item, or rows in one card) with one set of
+  actions: a tap opens, a long press shows Edit and Delete, the toolbar selects, reorders and
+  adds; no swipe actions ([docs/migration-8.0.md](docs/migration-8.0.md)). Both apps move their
+  forms, lists and `List` screens in the same step.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.
@@ -294,6 +303,7 @@ rather than importing an app type.
 | Moving an app to 5.0 (`ListCard` removed, `FormSection(style: .glass)` in its place) | [docs/migration-5.0.md](docs/migration-5.0.md) |
 | Moving an app to 6.0 (`OptionCardPicker`'s `style:` and `OptionCard` removed) | [docs/migration-6.0.md](docs/migration-6.0.md) |
 | Moving an app to 7.0 (the twelve rows → `UniversalRow(accessory:)`, the icon rule) | [docs/migration-7.0.md](docs/migration-7.0.md) |
+| Moving an app to 8.0 (glass sections and their dividers, `CardList`, `.compact` and `style:` removed) | [docs/migration-8.0.md](docs/migration-8.0.md) |
 | What exists vs Apple HIG / Material / Fluent / Carbon / Polaris / Atlassian, next candidates | [docs/benchmark.md](docs/benchmark.md) |
 | Components no app uses yet and where they could go (for the app sessions) | [docs/adoption.md](docs/adoption.md) |
 | Where a component goes (Gallery sections, source folders), how its Gallery page is built | [docs/gallery-structure.md](docs/gallery-structure.md) |

@@ -18,7 +18,7 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 
 ## 8.0.0 - 2026-10-21
 
-A major release from the owner's review of the app's screens: one look everywhere, as in Tenra's Finances and Insights. Every section is a Liquid Glass card on the page, with one divider and one row height, and the things a person keeps are a `CardList` with one set of actions. The probe on a device (build 96: menus in a one-row glass section, dragging cards to reorder, a list of 200) passed; a section's rows now move more than once.
+A major release from the owner's review of the apps' screens: one look everywhere, as in Tenra's Finances and Insights. Every section is a Liquid Glass card on the page, with one divider, one row height and one title style, and the things a person keeps are a `CardList` with one set of actions. The probe on a device (builds 96 and 97: menus in a one-row glass section, dragging cards and rows to reorder, a list of 200) passed. `FormSection`'s `style:` and `SectionHeader`'s `.compact` are removed, both apps moving in the same step ([docs/migration-8.0.md](docs/migration-8.0.md)).
 
 ### Added
 
@@ -29,21 +29,48 @@ A major release from the owner's review of the app's screens: one look everywher
 
 ### Changed
 
-- `FormSection` is a Liquid Glass card (Material before), pads its rows 16 pt at the sides and draws a `RowDivider` between them under each row's text, 16 pt short of the card's edge.
+- `FormSection` is a Liquid Glass card (Material before), pads its rows 16 pt at the sides and draws a `RowDivider` between them under each row's text, 16 pt short of the card's edge. What was `style: .glass` has the dividers too and no gap between rows.
 - `RowConfiguration.standard` pads a row 16 pt above and below and not at the sides (12 and 16 before): a row is 56 pt, and its card pads it at the sides.
+- `SectionHeader(.default)` keeps its title's case inside a `List`'s header, which capitalised it.
+- The headers of `IconPicker`'s sections and of `.dsSearchSuggestions`' Recent and Suggestions are `.default`, bold in sentence case (the small grey uppercase `.compact` before).
 - `NoticeCard` is its own padded glass card.
 
-### Deprecated
+### Removed
 
-- `FormSection(header:footer:style:content:)`: one look since 8.0.0, drop `style:`.
+- `FormSection.Style` and `FormSection(header:footer:style:content:)`: one look, `FormSection(header:footer:content:)`.
+- `SectionHeader.Style.compact` (and `SectionHeaderSkeleton(style: .compact)`): `.default`, with `.screenPadding()` on a screen.
 
 ### Migration
 
-- Remove the `Divider()` between the rows of a `FormSection`: the section draws its own.
+- `FormSection(…, style: .card)` and `FormSection(…, style: .glass)` → `FormSection(…)`.
+- Remove the `Divider()` between the rows of a `FormSection`: the section draws its own. A custom row with something before its text sets `.rowDividerInset(_:)`; so does a `PhotosPicker` around a `UniversalRow`.
+- `SectionHeader(title, style: .compact)` → `SectionHeader(title)`.
+- A `.standard` `UniversalRow` on a bare `cardStyle()` stack: pad the stack at the sides (`.padding(.horizontal, AppSpacing.lg)`), or make it a `FormSection`.
+- A `List` of grouped settings rows → a `ScrollView` of `FormSection`s; a `List` of things with swipe actions and `.onMove` → `CardList` with `.cardListToolbar` (docs/migration-8.0.md).
+
+```swift
+// 7.x
+FormSection(header: "Bank", style: .glass) {
+    UniversalRow(config: .standard) { Text("Name") } trailing: {
+        FormTextField(text: $bank, placeholder: "Bank name", style: .inline)
+    }
+    Divider().padding(.leading, AppSpacing.lg)
+    UniversalRow("Rate", icon: "percent", accessory: .info("14%"))
+}
+Section(header: SectionHeader("Notifications", style: .compact)) { … }
+
+// 8.0
+FormSection(header: "Bank") {
+    UniversalRow("Name", accessory: .textField($bank, placeholder: "Bank name"))
+    UniversalRow("Rate", icon: "percent", accessory: .info("14%"))
+}
+FormSection(header: "Notifications") { … }
+```
 
 ### Gallery and tooling
 
-- `FormSection`'s page shows one to four rows (one: the menu probe); a `CardList` page with its layouts, modes and up to 200 items.
+- `FormSection`'s page shows one to four rows (one: the menu probe); a `CardList` page with its layouts, modes and up to 200 items; `SectionHeader`'s page has three styles.
+- Snapshot tests for `CardList` (both layouts in every mode) and its skeleton; the Gallery's and the tests' sections lose their hand-drawn dividers, and the cards with two glass sections are one per snapshot.
 
 ## 7.1.0 - 2026-10-21
 
