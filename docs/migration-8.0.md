@@ -25,6 +25,12 @@ starts, so the divider starts there too: `.rowDividerInset(AppIconSize.Tile.sm +
 A `UniversalRow` does it on its own; a `UniversalRow` inside a `PhotosPicker`'s or a `Button`'s
 label does not pass it out, so put the modifier on the picker.
 
+The card pads every row at the sides, so a row's own side padding inside a section goes
+(`.padding(.horizontal, AppSpacing.lg)` on a custom row, `.padding(AppSpacing.md)` around a
+`SegmentedPicker` → `.padding(.vertical, AppSpacing.md)`). Content that scrolls under the card's
+edges takes the card's whole width with `.fullWidthRow()`: `ChipPicker(inset:)` does it on its
+own, a `VStack` of them or a photo strip with `.contentMargins` says it.
+
 ```swift
 // 7.x
 FormSection(header: "Payment") {

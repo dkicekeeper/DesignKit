@@ -415,6 +415,11 @@ FormSection(header: "Payment", footer: "Charged on the 17th of every month") {
   as in a list of transactions. `UniversalRow` says where its text starts; a custom row with
   something before its text says it with `.rowDividerInset(_:)`; an explicit `RowDivider()` in
   the content takes the place of the automatic one.
+- A row that scrolls under the card's edges (chips, a strip of photos) takes the card's whole
+  width with `.fullWidthRow()` and keeps itself off the edge with its own inset
+  (`ChipPicker(inset: AppSpacing.lg)` does it on its own; a `VStack` of pickers or a strip with
+  `.contentMargins(.horizontal, AppSpacing.lg, for: .scrollContent)` says it). Its divider starts
+  at the card's padding, as under any row.
 - The header is `SectionHeader(.default)`, bold in sentence case; an empty `header` is left out
   *(5.0.0)*. The footer is a caption under the card.
 - A menu inside the glass card is safe: the owner's check on a device (8.0.0's probe) found no

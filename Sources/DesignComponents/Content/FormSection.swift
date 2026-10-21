@@ -22,7 +22,8 @@ import DesignSupport
 /// vertically (`UniversalRow`'s `.standard`, docs/design-system.md §10). Between two rows the
 /// section draws a `RowDivider` under the upper row's text, short of the card's trailing edge
 /// by its padding; a custom row with something before its text says where with
-/// `.rowDividerInset(_:)`.
+/// `.rowDividerInset(_:)`. A row that scrolls under the card's edges (chips with their inset)
+/// takes the card's whole width with `.fullWidthRow()`.
 ///
 /// ```swift
 /// FormSection(header: "Transaction") {
@@ -57,10 +58,9 @@ public struct FormSection<Content: View>: View {
                 }
             }
 
-            DividedRows {
+            DividedRows(padding: AppSpacing.lg) {
                 content
             }
-            .padding(.horizontal, AppSpacing.lg)
             .frame(maxWidth: .infinity, alignment: .leading)
             // 8.0.0: Liquid Glass, drawn behind the rows (`cardStyle()`), as every card of the
             // app. Up to 7.x the form card was Material: iOS 26 took a glass card for the morph

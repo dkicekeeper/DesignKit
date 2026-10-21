@@ -25,6 +25,7 @@ A major release from the owner's review of the apps' screens: one look everywher
 - `CardList(_:layout:mode:selection:onMove:card:)`: a list of items on Liquid Glass, a card per item (`.cards`) or every item a row in one card (`.section`). `CardListMode` `.browsing`, `.selecting` (a circle on every item) and `.reordering` (a handle; a long press lifts an item, moving it over another puts it there; VoiceOver moves it up or down). `CardListSkeleton(layout:count:)`.
 - `.cardListToolbar(mode:selection:allIDs:canReorder:addLabel:onAdd:onDeleteSelected:)`: the same toolbar on every list: select, change the order, add; Done and Select All; "Delete N" under the list.
 - `RowDivider(inset:)`: the one divider between two rows in a card, under the row's text. `.rowDividerInset(_:)`: where it starts under a custom row.
+- `.fullWidthRow()`: a row of a `FormSection` that takes the card's whole width, for content that scrolls under the card's edges (a strip of photos); `ChipPicker` with an `inset` is one on its own.
 - `RowAccessory.textField(_:placeholder:keyboard:)`: a short value typed in the row itself, right-aligned (a bank's name, a rate).
 
 ### Changed
@@ -44,6 +45,7 @@ A major release from the owner's review of the apps' screens: one look everywher
 
 - `FormSection(…, style: .card)` and `FormSection(…, style: .glass)` → `FormSection(…)`.
 - Remove the `Divider()` between the rows of a `FormSection`: the section draws its own. A custom row with something before its text sets `.rowDividerInset(_:)`; so does a `PhotosPicker` around a `UniversalRow`.
+- Drop a row's own side padding inside a `FormSection` (`.padding(.horizontal, AppSpacing.lg)`, `.padding(AppSpacing.md)` around a `SegmentedPicker` → `.padding(.vertical, AppSpacing.md)`): the card pads it. A group of `ChipPicker`s in a `VStack`, or a strip with `.contentMargins`, takes `.fullWidthRow()`.
 - `SectionHeader(title, style: .compact)` → `SectionHeader(title)`.
 - A `.standard` `UniversalRow` on a bare `cardStyle()` stack: pad the stack at the sides (`.padding(.horizontal, AppSpacing.lg)`), or make it a `FormSection`.
 - A `List` of grouped settings rows → a `ScrollView` of `FormSection`s; a `List` of things with swipe actions and `.onMove` → `CardList` with `.cardListToolbar` (docs/migration-8.0.md).

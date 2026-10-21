@@ -16,6 +16,8 @@ extension ContainerValues {
     @Entry var rowDividerInset: CGFloat = 0
     /// An explicit `RowDivider` among the rows: no divider is drawn next to it.
     @Entry var isRowDivider: Bool = false
+    /// A row that takes the card's whole width: the section does not pad it at the sides.
+    @Entry var isFullWidthRow: Bool = false
 }
 
 public extension View {
@@ -25,6 +27,14 @@ public extension View {
     /// itself; a custom row sets it when it has something before its text.
     func rowDividerInset(_ inset: CGFloat) -> some View {
         containerValue(\.rowDividerInset, inset)
+    }
+
+    /// A row of a `FormSection` that takes the card's whole width (8.0.0): the section leaves
+    /// its sides unpadded, for content that scrolls under the card's edges (chips, a strip of
+    /// photos), which keeps itself off the edge with its own inset. The divider under it starts
+    /// at the section's padding, as under any row. `ChipPicker` with an `inset` does it itself.
+    func fullWidthRow() -> some View {
+        containerValue(\.isFullWidthRow, true)
     }
 }
 
@@ -56,19 +66,24 @@ public struct RowDivider: View {
 }
 
 /// Rows one under another with a `RowDivider` between each two, under the upper row's text.
-/// The rows of a `FormSection` and of a `CardList(layout: .section)`.
+/// The rows of a `FormSection` and of a `CardList(layout: .section)`. `padding` pads each row
+/// at the sides (a `fullWidthRow()` not), and the dividers with it: the card's own padding.
 struct DividedRows<Content: View>: View {
+    var padding: CGFloat = 0
     @ViewBuilder let content: Content
 
     var body: some View {
         VStack(spacing: 0) {
             Group(subviews: content) { rows in
                 ForEach(Array(rows.enumerated()), id: \.element.id) { index, row in
+                    let fullWidth = row.containerValues.isFullWidthRow
                     row
+                        .padding(.horizontal, fullWidth ? 0 : padding)
                     if index < rows.count - 1,
                        !row.containerValues.isRowDivider,
                        !rows[index + 1].containerValues.isRowDivider {
-                        RowDivider(inset: row.containerValues.rowDividerInset)
+                        RowDivider(inset: padding + row.containerValues.rowDividerInset)
+                            .padding(.trailing, padding)
                     }
                 }
             }
