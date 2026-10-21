@@ -60,7 +60,7 @@ private struct UniversalRowPage: View {
     enum Kind: String, CaseIterable {
         case none = "None", info = "Info", amount = "Amount", toggle = "Toggle", navigation = "Navigation"
         case action = "Action", checkmark = "Checkmark", menu = "Menu", picker = "Picker", date = "Date"
-        case stepper = "Stepper", slider = "Slider", colors = "Colors"
+        case stepper = "Stepper", slider = "Slider", colors = "Colors", textField = "Text field"
     }
 
     @State private var kind: Kind = .toggle
@@ -79,6 +79,7 @@ private struct UniversalRowPage: View {
     @State private var level = 0.35
     @State private var colorHex = CategoryColors.pickerPalette[3]
     @State private var picked = false
+    @State private var bank = ""
 
     private let periods: [(label: String, value: String)] = [
         (label: "Weekly", value: "week"), (label: "Monthly", value: "month"), (label: "Yearly", value: "year"),
@@ -144,6 +145,7 @@ private struct UniversalRowPage: View {
         case .stepper: "Fish caught"
         case .slider: "Colour intensity"
         case .colors: "Colour"
+        case .textField: "Bank"
         }
     }
 
@@ -161,6 +163,7 @@ private struct UniversalRowPage: View {
         case .stepper: "number"
         case .slider: "circle.lefthalf.filled"
         case .colors: "paintpalette"
+        case .textField: "building.columns"
         }
     }
 
@@ -188,6 +191,7 @@ private struct UniversalRowPage: View {
         case .stepper: .stepper($count, in: 0...99) { "\($0) pcs" }
         case .slider: .slider($level, in: 0.05...1, valueText: "\(Int((level * 100).rounded()))%")
         case .colors: .colors($colorHex)
+        case .textField: .textField($bank, placeholder: "Bank name")
         }
     }
 
@@ -210,7 +214,7 @@ private struct UniversalRowPage: View {
         case .navigation, .picker: .chevron
         case .checkmark: .selection
         case .menu, .date: .capsule
-        case .none, .info, .amount, .stepper: .value
+        case .none, .info, .amount, .stepper, .textField: .value
         case .action, .slider, .colors: .empty
         }
     }

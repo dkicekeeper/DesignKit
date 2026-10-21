@@ -44,6 +44,7 @@ public struct RowAccessory {
         case stepper(Binding<Int>, range: ClosedRange<Int>, step: Int, format: (Int) -> String)
         case slider(Binding<Double>, range: ClosedRange<Double>, step: Double?, valueText: String)
         case colors(Binding<String>, palette: [String])
+        case textField(Binding<String>, placeholder: String, keyboard: UIKeyboardType)
     }
 
     let kind: Kind
@@ -139,6 +140,17 @@ public struct RowAccessory {
         valueText: String
     ) -> RowAccessory {
         RowAccessory(kind: .slider(value, range: range, step: step, valueText: valueText))
+    }
+
+    /// A field on the trailing edge (8.0.0): a short value typed in the row itself (a bank's
+    /// name, a rate), right-aligned, as `FormTextField(style: .inline)`. VoiceOver reads the
+    /// title as the field's label.
+    public static func textField(
+        _ text: Binding<String>,
+        placeholder: String,
+        keyboard: UIKeyboardType = .default
+    ) -> RowAccessory {
+        RowAccessory(kind: .textField(text, placeholder: placeholder, keyboard: keyboard))
     }
 
     /// A colour from `palette` (lowercase `#rrggbb`): the swatches in a row under the title; a
@@ -241,6 +253,11 @@ struct RowControlView: View {
             sliderRow(value, range: range, step: step, valueText: valueText)
         case .colors(let selection, let palette):
             colorsRow(selection, palette: palette)
+        case .textField(let text, let placeholder, let keyboard):
+            layout { titleText.accessibilityHidden(true) } trailing: {
+                FormTextField(text: text, placeholder: placeholder, style: .inline, keyboardType: keyboard)
+                    .accessibilityLabel(Text(row.title))
+            }
         }
     }
 

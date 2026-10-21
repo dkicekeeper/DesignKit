@@ -25,6 +25,7 @@ A major release from the owner's review of the app's screens: one look everywher
 - `CardList(_:layout:mode:selection:onMove:card:)`: a list of items on Liquid Glass, a card per item (`.cards`) or every item a row in one card (`.section`). `CardListMode` `.browsing`, `.selecting` (a circle on every item) and `.reordering` (a handle; a long press lifts an item, moving it over another puts it there; VoiceOver moves it up or down). `CardListSkeleton(layout:count:)`.
 - `.cardListToolbar(mode:selection:allIDs:canReorder:addLabel:onAdd:onDeleteSelected:)`: the same toolbar on every list: select, change the order, add; Done and Select All; "Delete N" under the list.
 - `RowDivider(inset:)`: the one divider between two rows in a card, under the row's text. `.rowDividerInset(_:)`: where it starts under a custom row.
+- `RowAccessory.textField(_:placeholder:keyboard:)`: a short value typed in the row itself, right-aligned (a bank's name, a rate).
 
 ### Changed
 
