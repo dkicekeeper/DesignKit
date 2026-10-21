@@ -19,6 +19,7 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 ## 8.0.0 - 2026-10-21
 
 A major release from the owner's review of the apps' screens: one look everywhere, as in Tenra's Finances and Insights. Every section is a Liquid Glass card on the page, with one divider, one row height and one title style, and the things a person keeps are a `CardList` with one set of actions. The probe on a device (builds 96 and 97: menus in a one-row glass section, dragging cards and rows to reorder, a list of 200) passed. `FormSection`'s `style:` and `SectionHeader`'s `.compact` are removed, both apps moving in the same step ([docs/migration-8.0.md](docs/migration-8.0.md)).
+[#88](https://github.com/dkicekeeper/DesignKit/pull/88)
 
 ### Added
 
