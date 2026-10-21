@@ -25,6 +25,7 @@ struct ContentScreen: View {
         MonthCalendarPage()
         FlowLayoutPage()
         FormSectionPage()
+        CardListPage()
         EditSheetContainerPage()
         EditableHeroPage()
         ArticleBodyPage()
@@ -170,67 +171,177 @@ private struct FlowLayoutPage: View {
 }
 
 private struct FormSectionPage: View {
-    @State private var style = FormSection<EmptyView>.Style.card
     @State private var showsHeader = true
     @State private var showsFooter = true
-    @State private var rows = 3
+    @State private var rows = 4
     @State private var title = "Groceries"
-    @State private var note = ""
+    @State private var period = "month"
+    @State private var quiet = true
     @State private var state: SpecimenState = .content
 
-    private let samples: [(String, String, String)] = [
-        ("Coffee House", "Cafés · 08:40", "cup.and.saucer.fill"),
-        ("Magnum", "Groceries · 12:15", "cart.fill"),
-        ("Yandex Go", "Taxi · 19:02", "car.fill"),
-        ("Kaspi", "Transfer · 21:30", "arrow.left.arrow.right"),
+    private let periods: [(label: String, value: String)] = [
+        (label: "Weekly", value: "week"), (label: "Monthly", value: "month"), (label: "Yearly", value: "year"),
     ]
 
     var body: some View {
         ComponentPage(
             name: "FormSection",
-            summary: "A titled group of rows on a card: a form's rows on Material (card), or a short list on Liquid Glass (glass, 5.0.0; ListCard in 4.14.0).",
+            summary: "A titled group of rows on a Liquid Glass card (8.0.0: one look for forms, settings and short lists). It pads its rows at the sides and draws the divider between them, under each row's text.",
             apps: [.tenra, .dalada],
             canvas: .fill,
             notes: [
-                "card: Material, not glass, since native menus in it morph from it otherwise. The section adds no padding: its rows pad themselves (docs/design-system.md §10). A field goes in a row's trailing slot, UniversalRow(config: .standard), with a Divider between rows.",
-                "glass: the card pads its rows on every side and spaces them by sm, no dividers: a reply's list, a draft to confirm, a notice (NoticeCard sits on one).",
-            ],
-            styles: ["card", "glass"]
+                "Rows pad themselves only vertically (UniversalRow .standard, 16 pt: a 56 pt row); the card pads them 16 pt at the sides (docs/design-system.md §10).",
+                "No Divider between rows: the section draws a RowDivider under the upper row's text, 16 pt short of the card's edge. A custom row with something before its text says where with .rowDividerInset(_:).",
+                "One row: a menu in a one-row section is the case iOS 26 once collapsed into its popover on glass. Tap it on a device (TestFlight) to check the menu opens from the row.",
+            ]
         ) {
-            switch style {
-            case .card:
-                FormSection(header: showsHeader ? "Transaction" : nil, footer: showsFooter ? "Shown on the transaction detail." : nil) {
-                    UniversalRow(config: .standard) {
-                        Text("Title").font(AppTypography.body)
-                    } trailing: {
-                        FormTextField(text: $title, placeholder: "Title", style: .inline)
-                    }
-                    Divider().padding(.leading, AppSpacing.lg)
-                    UniversalRow(config: .standard) {
-                        Text("Note").font(AppTypography.body)
-                    } trailing: {
-                        FormTextField(text: $note, placeholder: "Optional", style: .inline)
-                    }
-                }
-            case .glass:
-                FormSection(header: showsHeader ? "Payments" : nil, footer: showsFooter ? "This month." : nil, style: .glass) {
+            NavigationStack {
+                Group {
                     if state == .loading {
-                        ForEach(0..<rows, id: \.self) { _ in ItemRowSkeleton() }
+                        CardListSkeleton(layout: .section, count: rows)
                     } else {
-                        ForEach(Array(samples.prefix(rows).enumerated()), id: \.offset) { _, sample in
-                            ItemRow(sample.0, meta: [MetaLine([.text(sample.1)])], leading: .symbol(sample.2))
+                        FormSection(header: showsHeader ? "Payment" : nil, footer: showsFooter ? "Charged on the 17th of every month." : nil) {
+                            UniversalRow("Repeat", icon: "repeat", accessory: .menu($period, options: periods))
+                            if rows > 1 {
+                                UniversalRow("Reminder", icon: "bell", hint: "A day before the charge", accessory: .toggle($quiet))
+                            }
+                            if rows > 2 {
+                                UniversalRow(config: .standard) {
+                                    Text("Title").font(AppTypography.body)
+                                } trailing: {
+                                    FormTextField(text: $title, placeholder: "Title", style: .inline)
+                                }
+                            }
+                            if rows > 3 {
+                                UniversalRow("Language", icon: "globe", value: "English", accessory: .navigation { Text("Language").navigationTitle("Language") })
+                            }
                         }
                     }
                 }
+                .frame(maxHeight: .infinity, alignment: .top)
+                .toolbar(.hidden, for: .navigationBar)
             }
+            .frame(height: 420)
         } controls: {
-            ChoiceControl("Style", selection: $style, options: [("Card", .card), ("Glass", .glass)])
+            StateControl(state: $state)
             ToggleControl("Header", isOn: $showsHeader)
             ToggleControl("Footer", isOn: $showsFooter)
-            if style == .glass {
-                StateControl(state: $state)
-                StepperControl("Rows", value: $rows, in: 1...4)
+            StepperControl("Rows", value: $rows, in: 1...4)
+        }
+    }
+}
+
+/// CardList (8.0.0): the probe of the owner's step 0 on a device: drag a card to reorder, pick
+/// several, a list of 200.
+private struct CardListPage: View {
+    struct Item: Identifiable, Hashable {
+        let id: Int
+        let name: String
+        let symbol: String
+        let amount: String
+    }
+
+    @State private var layout: CardListLayout = .cards
+    @State private var mode: CardListMode = .browsing
+    @State private var count = 5
+    @State private var items: [Item] = CardListPage.make(5)
+    @State private var selection: Set<Int> = []
+    @State private var state: SpecimenState = .content
+
+    private static let names = ["Main card", "Cash", "Savings", "Travel", "Car loan", "Mortgage", "Groceries", "Gifts"]
+    private static let symbols = ["creditcard.fill", "banknote.fill", "lock.fill", "airplane", "car.fill", "house.fill", "cart.fill", "gift.fill"]
+
+    private static func make(_ count: Int) -> [Item] {
+        (0..<count).map { index in
+            Item(
+                id: index,
+                name: names[index % names.count] + (index >= names.count ? " \(index / names.count + 1)" : ""),
+                symbol: symbols[index % symbols.count],
+                amount: "\((index + 1) * 12_500) ₸"
+            )
+        }
+    }
+
+    var body: some View {
+        ComponentPage(
+            name: "CardList",
+            summary: "The things a person keeps (accounts, deposits, loans, categories, trips) with one set of actions: open, select several and delete, change the order by dragging. A card per item, or every item a row in one card.",
+            since: "8.0.0",
+            apps: [],
+            canvas: .fill,
+            notes: [
+                "cards: a glass card per item, padded 16 pt; section: every item a row in one glass card, a divider under each row's text; stack: items that are cards already (a PayoffProgressCard), the circle and the handle beside them.",
+                "cardListToolbar(mode:selection:allIDs:onAdd:onDeleteSelected:) is the same toolbar on every list: select, change the order, add; Done; Delete N under the list.",
+                "Reordering: a long press lifts a card, moving it over another puts it there (a tick on each step). VoiceOver: move up, move down.",
+            ]
+        ) {
+            NavigationStack {
+                ScrollView {
+                    if state == .loading {
+                        CardListSkeleton(layout: layout, count: min(count, 6))
+                            .screenPadding()
+                    } else {
+                        CardList(items, layout: layout, mode: mode, selection: $selection, onMove: { from, to in
+                            items.move(fromOffsets: from, toOffset: to)
+                        }) { item in
+                            itemView(item)
+                                .contextMenu {
+                                    Button(role: .destructive) {
+                                        items.removeAll { $0.id == item.id }
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                }
+                        }
+                        .screenPadding()
+                    }
+                }
+                .navigationTitle("Accounts")
+                .navigationBarTitleDisplayMode(.inline)
+                .cardListToolbar(
+                    mode: $mode,
+                    selection: $selection,
+                    allIDs: items.map(\.id),
+                    addLabel: "New account",
+                    onAdd: {
+                        let next = (items.map(\.id).max() ?? -1) + 1
+                        items.append(Item(id: next, name: "New account", symbol: "creditcard", amount: "0 ₸"))
+                    },
+                    onDeleteSelected: {
+                        items.removeAll { selection.contains($0.id) }
+                        selection.removeAll()
+                        mode = .browsing
+                    }
+                )
             }
+            .frame(height: 560)
+        } controls: {
+            StateControl(state: $state)
+            ChoiceControl("Layout", selection: $layout, options: [("Cards", .cards), ("Section", .section), ("Stack", .stack)])
+            ChoiceControl("Mode", selection: $mode, options: [("Browsing", .browsing), ("Selecting", .selecting), ("Reordering", .reordering)])
+            ChoiceControl("Items", selection: $count, options: [("5", 5), ("12", 12), ("200", 200)])
+        }
+        .onChange(of: count) { _, new in
+            items = CardListPage.make(new)
+            selection.removeAll()
+        }
+    }
+
+    /// An item's row; in `.stack` a card of its own, as an app's ready-made card would be.
+    @ViewBuilder
+    private func itemView(_ item: Item) -> some View {
+        let row = UniversalRow(
+            item.name,
+            leadingIcon: .sfSymbol(item.symbol, color: AppColors.accent, size: AppIconSize.Tile.sm),
+            value: item.amount,
+            config: .standard
+        )
+        if layout == .stack {
+            row
+                .padding(.horizontal, AppSpacing.lg)
+                .cardStyle()
+        } else {
+            row
         }
     }
 }

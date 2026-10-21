@@ -59,8 +59,8 @@ private struct FormCardStylePage: View {
     var body: some View {
         ComponentPage(
             name: ".formCardStyle()",
-            summary: "The material card for interactive rows (menus, pickers): no glass, so native menus open from their own row.",
-            apps: [.tenra],
+            summary: "A material card, for a host that wants one. Up to 7.x the form cards were material for fear of menus in glass; since 8.0.0 FormSection is glass (cardStyle), and menus open from their row there too.",
+            apps: [],
             canvas: .fill
         ) {
             VStack(spacing: 0) {

@@ -53,6 +53,9 @@ extension ComponentSnapshots {
                 ("calculation", AnyView(CalculationCardSkeleton())),
                 ("dateSectionHeader", AnyView(SectionHeaderSkeleton(style: .card, showsTrailing: true))),
                 ("monthCalendar", AnyView(MonthCalendarSkeleton())),
+                // 8.0.0: one card of rows, and one card of a `.cards` list.
+                ("cardListSection", AnyView(CardListSkeleton(layout: .section, count: 3))),
+                ("cardListCards", AnyView(CardListSkeleton(layout: .cards, count: 1))),
             ]
             for (name, card) in cards {
                 await assertComponentSnapshot(card, named: name, appearances: [.light])
@@ -338,8 +341,6 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {
                     SectionHeaderSkeleton(showsTrailing: true, showsIcon: true)
-                    SectionHeaderSkeleton(style: .compact, showsIcon: true)
-                        .screenPadding()
                     SectionHeaderSkeleton(style: .large, showsIcon: true)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
@@ -420,20 +421,19 @@ extension ComponentSnapshots {
             )
         }
 
-        /// A glass `FormSection` of row skeletons (5.0.0; `ListCardSkeleton` in 4.14.0),
-        /// NoticeCardSkeleton, PickerCarouselSkeleton (4.14.0).
+        /// A `FormSection` of row skeletons (5.0.0; `ListCardSkeleton` in 4.14.0),
+        /// NoticeCardSkeleton, PickerCarouselSkeleton (4.14.0). One glass card per snapshot.
         @Test func portedViewSkeletons() async {
             await assertComponentSnapshot(
-                VStack(spacing: AppSpacing.lg) {
-                    FormSection(style: .glass) {
-                        ItemRowSkeleton()
-                        ItemRowSkeleton()
-                    }
-                    NoticeCardSkeleton()
-                    PickerCarouselSkeleton()
+                FormSection {
+                    ItemRowSkeleton()
+                    ItemRowSkeleton()
                 },
+                named: "section",
                 appearances: [.light, .dark]
             )
+            await assertComponentSnapshot(NoticeCardSkeleton(), named: "notice", appearances: [.light, .dark])
+            await assertComponentSnapshot(PickerCarouselSkeleton(), named: "carousel", appearances: [.light, .dark])
         }
     }
 }

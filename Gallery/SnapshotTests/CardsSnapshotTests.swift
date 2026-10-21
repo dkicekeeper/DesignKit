@@ -104,20 +104,24 @@ extension ComponentSnapshots {
             )
         }
 
-        /// `FormSection(style: .glass)` (5.0.0): rows under a title, and without one. It was
-        /// `ListCard` in 4.14.0, whose references these are: the same pixels.
+        /// A FormSection of other rows (`FormSection(style: .glass)` in 5.0, `ListCard` in
+        /// 4.14.0): items under a title, details without one; the dividers its own (8.0.0).
+        /// One glass card per snapshot.
         @Test func listCards() async {
             await assertComponentSnapshot(
-                VStack(spacing: AppSpacing.lg) {
-                    FormSection(header: "Payments", style: .glass) {
-                        ItemRow("Coffee House", meta: [MetaLine([.text("Cafés · 08:40")])], leading: .symbol("cup.and.saucer.fill"))
-                        ItemRow("Magnum", meta: [MetaLine([.text("Groceries · 12:15")])], leading: .symbol("cart.fill"))
-                    }
-                    FormSection(style: .glass) {
-                        UniversalRow("Amount", config: .info, accessory: .info("12 000 ₸"))
-                        UniversalRow("Date", config: .info, accessory: .info("15 October"))
-                    }
+                FormSection(header: "Payments") {
+                    ItemRow("Coffee House", meta: [MetaLine([.text("Cafés · 08:40")])], leading: .symbol("cup.and.saucer.fill"))
+                    ItemRow("Magnum", meta: [MetaLine([.text("Groceries · 12:15")])], leading: .symbol("cart.fill"))
                 },
+                named: "items",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                FormSection {
+                    UniversalRow("Amount", config: .info, accessory: .info("12 000 ₸"))
+                    UniversalRow("Date", config: .info, accessory: .info("15 October"))
+                },
+                named: "details",
                 appearances: [.light, .dark, .largeText]
             )
         }

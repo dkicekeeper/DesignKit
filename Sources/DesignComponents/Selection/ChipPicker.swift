@@ -29,7 +29,8 @@ import DesignSupport
 /// ```
 ///
 /// `inset` (3.1.0) keeps the caption and the first chip off the edge while the chips still scroll
-/// to it: a picker inside a `FormSection` card passes the card's padding.
+/// to it: a picker inside a `FormSection` card passes the card's padding, and with an inset the
+/// picker takes the section's whole width (`fullWidthRow()`, 8.0.0).
 ///
 /// ```swift
 /// FormSection { ChipPicker("Bite", options: …, selection: $bite, inset: AppSpacing.lg) { … } }
@@ -130,6 +131,8 @@ public struct ChipPicker<Option: Hashable>: View {
             .modifier(ChipRowInset(inset: inset))
         }
         .padding(.vertical, AppSpacing.xs)
+        // 8.0.0: in a FormSection, the chips scroll under the card's edges.
+        .modifier(ChipPickerSectionRow(inset: inset))
     }
 
     @ViewBuilder
@@ -176,6 +179,21 @@ public struct ChipPicker<Option: Hashable>: View {
             } else {
                 binding.wrappedValue.insert(option)
             }
+        }
+    }
+}
+
+/// With an inset, a whole-width row of a `FormSection` (8.0.0); without one, an ordinary row.
+private struct ChipPickerSectionRow: ViewModifier {
+    let inset: CGFloat
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if inset > 0 {
+            content
+                .fullWidthRow()
+        } else {
+            content
         }
     }
 }

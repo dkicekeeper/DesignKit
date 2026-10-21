@@ -20,7 +20,7 @@ extension ComponentSnapshots {
         @Test func formSection() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.md) {
-                    SectionHeader("Subscription", style: .compact)
+                    SectionHeader("Subscription")
                     FormSection(header: "Payment", footer: "Charged on the 17th of every month") {
                         // A time, not a date: the system's compact date label took the short style
                         // ("6/17/26") in the runs of 5-9 October and the medium one ("Jun 17, 2026")
@@ -58,7 +58,6 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 FormSection(header: "Photos") {
                     UniversalRow("Add photos", icon: "photo.on.rectangle.angled", titleColor: AppColors.accent)
-                    Divider().padding(.leading, AppSpacing.lg)
                     UniversalRow("Add a photo", icon: "camera")
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
@@ -84,7 +83,6 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 FormSection(header: "Trip") {
                     FormTextField(text: .constant("Kapchagay weekend"), placeholder: "Name", style: .row)
-                    Divider().padding(.leading, AppSpacing.lg)
                     FormTextField(text: .constant(""), placeholder: "Note", style: .rowMultiline(min: 2, max: 4))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
@@ -101,7 +99,6 @@ extension ComponentSnapshots {
                         UniversalRow("Species", icon: "fish", accessory: .picker(.constant("pike"), options: [
                             (label: "Pike", value: "pike"), (label: "Perch", value: "perch"),
                         ]))
-                        Divider().padding(.leading, AppSpacing.lg)
                         UniversalRow("Packing list", accessory: .picker(.constant("winter"), options: [
                             (label: "Winter fishing", value: "winter"),
                         ]))

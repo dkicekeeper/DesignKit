@@ -5,8 +5,8 @@
 //  A message the app writes to the person (4.14.0): a picture on the leading edge (a mascot,
 //  an icon, `NoticeCardMetrics.leadingSize` since 5.2.0), a title and a line or two of text, a
 //  button that hides it, and an action under the text, in line with it ("Go through it"; 5.2.0,
-//  under the picture before). On a glass card (`FormSection(style: .glass)` since 5.0.0, `ListCard`
-//  before). Ported from Tenra's AssistantNoticeCard; what the message is, when it shows and what
+//  under the picture before). On a glass card that pads it (its own since 8.0.0;
+//  `FormSection(style: .glass)` from 5.0.0, `ListCard` before). Ported from Tenra's AssistantNoticeCard; what the message is, when it shows and what
 //  the action does stay in the app.
 //
 
@@ -66,7 +66,9 @@ public struct NoticeCard<Leading: View>: View {
     }
 
     public var body: some View {
-        FormSection(style: .glass) {
+        // One glass card that pads its content on every side (FormSection(style: .glass) until
+        // 8.0.0, when sections became rows with dividers).
+        Group {
             HStack(alignment: .top, spacing: AppSpacing.md) {
                 leading
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
@@ -96,6 +98,9 @@ public struct NoticeCard<Leading: View>: View {
                 }
             }
         }
+        .padding(AppSpacing.lg)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardStyle()
         .accessibilityElement(children: .contain)
     }
 }

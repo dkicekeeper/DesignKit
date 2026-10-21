@@ -33,7 +33,7 @@ extension ComponentSnapshots {
                         ],
                         accessibilityLabel: "Groceries"
                     )
-                    Divider()
+                    RowDivider(inset: AppIconSize.Tile.sm + AppSpacing.md)
                     TransactionRow(
                         .entry(title: "Salary", account: .deleted("Old card")),
                         icon: .sfSymbol("banknote.fill"), iconTint: .monochrome(AppColors.income),
@@ -43,7 +43,7 @@ extension ComponentSnapshots {
                         isPending: true,
                         accessibilityLabel: "Salary"
                     )
-                    Divider()
+                    RowDivider(inset: AppIconSize.Tile.sm + AppSpacing.md)
                     TransactionRow(
                         .transfer(from: kaspi, to: deposit),
                         icon: .sfSymbol("arrow.left.arrow.right"), iconTint: .monochrome(AppColors.transfer),

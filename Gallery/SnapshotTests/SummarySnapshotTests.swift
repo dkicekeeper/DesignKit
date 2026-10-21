@@ -85,9 +85,9 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 VStack(spacing: 0) {
                     NetAmountRow(label: "May 2026", inflow: 530_000, outflow: 320_000, net: 210_000, currency: "KZT")
-                    Divider()
+                    RowDivider()
                     NetAmountRow(label: "April 2026", inflow: 280_000, outflow: 340_000, net: -60_000, currency: "KZT")
-                    Divider()
+                    RowDivider()
                     NetAmountRow(label: "March 2026", inflow: 0, outflow: 0, net: 0, currency: "KZT",
                                  singleValue: 410_000, singleColor: AppColors.success)
                 }

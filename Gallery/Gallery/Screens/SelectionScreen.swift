@@ -344,7 +344,6 @@ private struct OptionCardPickerPage: View {
         case .gradient:
             FormSection(header: "Colours") {
                 UniversalRow("Moves slowly", icon: "wind", accessory: .toggle($moves))
-                Divider().padding(.leading, AppSpacing.lg)
                 UniversalRow("Intensity", icon: "circle.lefthalf.filled",
                              accessory: .slider($intensity, in: 0.1...1, valueText: "\(Int((intensity * 100).rounded()))%"))
             }
@@ -357,10 +356,10 @@ private struct OptionCardPickerPage: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                // The picker's label does not pass the row's divider inset out: its icon and space.
+                .rowDividerInset(AppIconSize.lg + AppSpacing.md)
                 if hasPhoto {
-                    Divider().padding(.leading, AppSpacing.lg)
                     UniversalRow("Blur", icon: "camera.filters", accessory: .toggle($blursPhoto))
-                    Divider().padding(.leading, AppSpacing.lg)
                     UniversalRow("Remove photo", icon: "trash", role: .destructive, accessory: .action {
                         hasPhoto = false
                     })

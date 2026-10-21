@@ -16,6 +16,70 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.0.0 - 2026-10-21
+
+A major release from the owner's review of the apps' screens: one look everywhere, as in Tenra's Finances and Insights. Every section is a Liquid Glass card on the page, with one divider, one row height and one title style, and the things a person keeps are a `CardList` with one set of actions. The probe on a device (builds 96 and 97: menus in a one-row glass section, dragging cards and rows to reorder, a list of 200) passed. `FormSection`'s `style:` and `SectionHeader`'s `.compact` are removed, both apps moving in the same step ([docs/migration-8.0.md](docs/migration-8.0.md)).
+[#88](https://github.com/dkicekeeper/DesignKit/pull/88)
+
+### Added
+
+- `CardList(_:layout:mode:selection:onMove:card:)`: a list of items on Liquid Glass, a card per item (`.cards`), every item a row in one card (`.section`), or items that are cards already (`.stack`: a `PayoffProgressCard`, a `RecurringPaymentCard`). `CardListMode` `.browsing`, `.selecting` (a circle on every item) and `.reordering` (a handle; a long press lifts an item, moving it over another puts it there; VoiceOver moves it up or down). `CardListSkeleton(layout:count:)`.
+- `.cardListToolbar(mode:selection:allIDs:canReorder:addLabel:onAdd:onDeleteSelected:)`: the same toolbar on every list: select, change the order, add; Done and Select All; "Delete N" under the list.
+- `RowDivider(inset:)`: the one divider between two rows in a card, under the row's text. `.rowDividerInset(_:)`: where it starts under a custom row.
+- `.fullWidthRow()`: a row of a `FormSection` that takes the card's whole width, for content that scrolls under the card's edges (a strip of photos); `ChipPicker` with an `inset` is one on its own.
+- `RowAccessory.textField(_:placeholder:keyboard:)`: a short value typed in the row itself, right-aligned (a bank's name, a rate).
+
+### Changed
+
+- `FormSection` is a Liquid Glass card (Material before), pads its rows 16 pt at the sides and draws a `RowDivider` between them under each row's text, 16 pt short of the card's edge. What was `style: .glass` has the dividers too and no gap between rows.
+- `RowConfiguration.standard` pads a row 16 pt above and below and not at the sides (12 and 16 before): a row is 56 pt, and its card pads it at the sides.
+- `SectionHeader(.default)` keeps its title's case inside a `List`'s header, which capitalised it.
+- The headers of `IconPicker`'s sections and of `.dsSearchSuggestions`' Recent and Suggestions are `.default`, bold in sentence case (the small grey uppercase `.compact` before).
+- `NoticeCard` is its own padded glass card.
+
+### Deprecated
+
+- `ManagementMode` (`.normal`, `.selecting`, `.reordering` over a `List` in edit mode) → `CardListMode` with `CardList` and `.cardListToolbar`.
+
+### Removed
+
+- `FormSection.Style` and `FormSection(header:footer:style:content:)`: one look, `FormSection(header:footer:content:)`.
+- `SectionHeader.Style.compact` (and `SectionHeaderSkeleton(style: .compact)`): `.default`, with `.screenPadding()` on a screen.
+
+### Migration
+
+- `FormSection(…, style: .card)` and `FormSection(…, style: .glass)` → `FormSection(…)`.
+- Remove the `Divider()` between the rows of a `FormSection`: the section draws its own. A custom row with something before its text sets `.rowDividerInset(_:)`; so does a `PhotosPicker` around a `UniversalRow`.
+- Drop a row's own side padding inside a `FormSection` (`.padding(.horizontal, AppSpacing.lg)`, `.padding(AppSpacing.md)` around a `SegmentedPicker` → `.padding(.vertical, AppSpacing.md)`): the card pads it. A group of `ChipPicker`s in a `VStack`, or a strip with `.contentMargins`, takes `.fullWidthRow()`.
+- `SectionHeader(title, style: .compact)` → `SectionHeader(title)`.
+- A `.standard` `UniversalRow` on a bare `cardStyle()` stack: pad the stack at the sides (`.padding(.horizontal, AppSpacing.lg)`), or make it a `FormSection`.
+- A `List` of grouped settings rows → a `ScrollView` of `FormSection`s; a `List` of things with swipe actions and `.onMove` → `CardList` with `.cardListToolbar` (docs/migration-8.0.md).
+
+```swift
+// 7.x
+FormSection(header: "Bank", style: .glass) {
+    UniversalRow(config: .standard) { Text("Name") } trailing: {
+        FormTextField(text: $bank, placeholder: "Bank name", style: .inline)
+    }
+    Divider().padding(.leading, AppSpacing.lg)
+    UniversalRow("Rate", icon: "percent", accessory: .info("14%"))
+}
+Section(header: SectionHeader("Notifications", style: .compact)) { … }
+
+// 8.0
+FormSection(header: "Bank") {
+    UniversalRow("Name", accessory: .textField($bank, placeholder: "Bank name"))
+    UniversalRow("Rate", icon: "percent", accessory: .info("14%"))
+}
+FormSection(header: "Notifications") { … }
+```
+
+### Gallery and tooling
+
+- `FormSection`'s page shows one to four rows (one: the menu probe); a `CardList` page with its layouts, modes and up to 200 items; `SectionHeader`'s page has three styles.
+- `.formCardStyle()`'s page names no app: none uses a material card now.
+- Snapshot tests for `CardList` (its layouts in every mode) and its skeleton; the Gallery's and the tests' sections lose their hand-drawn dividers, and the cards with two glass sections are one per snapshot.
+
 ## 7.1.0 - 2026-10-21
 
 The owner's review of 7.0.0 in Tenra: `PackedCircleIcons` draws its symbols as before the icon

@@ -50,7 +50,9 @@ typealiases until 3.0.0, which removed them ([migration-2.0.md](migration-2.0.md
 `SectionHeader.Style.list` ([migration-4.0.md](migration-4.0.md)); 5.0.0 removed `ListCard`,
 folded into `FormSection(style: .glass)` ([migration-5.0.md](migration-5.0.md)); 6.0.0 removed
 `OptionCard` and `OptionCardPicker`'s `style:`, the carousel its only look
-([migration-6.0.md](migration-6.0.md)).
+([migration-6.0.md](migration-6.0.md)); 7.0.0 the twelve rows `UniversalRow(accessory:)` replaced
+([migration-7.0.md](migration-7.0.md)); 8.0.0 `FormSection`'s `style:` and
+`SectionHeader.Style.compact`, one look for every section ([migration-8.0.md](migration-8.0.md)).
 The tokens keep their prefix (`AppColors`, `AppSpacing`, `AppIconSize`, …): a token namespace
 is not a view, and `Color` / `Font` would clash with SwiftUI. The button is `DSButton` because
 `Button` is SwiftUI's.
@@ -320,7 +322,7 @@ The 1.x tokens, still used by the components that have them:
 | Modifier | Effect | When to Use |
 |----------|--------|-------------|
 | `.cardStyle(radius:)` | Liquid Glass (iOS 26+) or `.ultraThinMaterial` card background. Default radius: `AppRadius.xl` (20pt). Since 3.0.0 the glass is drawn behind the content, so the content keeps its exact colours (applied to the content, the glass blended its layers into each other) | **Display cards only.** Account/Loan/Health hero cards, list cards, detail-view cards — anything without interactive `Picker(.menu)` / `Menu` inside |
-| `.formCardStyle(radius:)` | `.ultraThinMaterial` card background on every iOS. Same shape/padding contract as `cardStyle`. | **Form-section cards.** `FormSection`, `BudgetSettingsSection` — any card that wraps a menu row (`UniversalRow(accessory: .menu)`) / `Picker(.menu)` / `Menu`. iOS 26's `glassEffect` becomes the morph-source for menus, so single-row form sections would collapse the whole row into the popover at tap. `formCardStyle` uses Material to side-step that |
+| `.formCardStyle(radius:)` | `.ultraThinMaterial` card background on every iOS. Same shape/padding contract as `cardStyle`. | A Material card for a host that wants one. `FormSection` used it up to 7.x, for fear that iOS 26's `glassEffect` would become the morph source of a menu inside it and collapse a one-row section into the popover; 8.0.0's probe on a device showed menus in glass cards work, and `FormSection` is glass (`cardStyle`) |
 | `.filterChipStyle(isSelected:)` | Glass chip styling with accent tint when selected. Animated selection transition | Filter buttons, `UniversalFilterButton` |
 | `.screenPadding()` | `.padding(.horizontal, AppSpacing.lg)` (16pt) | Screen-level horizontal insets |
 | `.cardContentPadding()` | `.padding(AppSpacing.lg)` (16pt) | Internal card content padding — canonical, matches §10 |
@@ -394,28 +396,84 @@ EditSheetContainer(
 | System form | `true` (the default) | `Form` → `Section` groups | no screen in either app; for a host that wants the system look (§8) |
 
 #### `FormSection`
-**Purpose:** Groups form rows with optional header/footer.
+**Purpose:** A titled group of rows on a Liquid Glass card: every form, settings list and short
+list of both apps *(8.0.0: one look, as in Tenra's Finances and Insights)*.
 
 ```swift
-FormSection(header: "Settings", footer: nil, style: .card) {
-    UniversalRow(config: .standard) { ... }
-    Divider()
+FormSection(header: "Payment", footer: "Charged on the 17th of every month") {
     UniversalRow("Repeat", icon: "repeat", accessory: .menu($period, options: periods))
+    UniversalRow("Reminder", icon: "bell", hint: "A day before", accessory: .toggle($remind))
+    UniversalRow("Bank", icon: "building.columns", accessory: .textField($bank, placeholder: "Bank name"))
 }
 ```
 
-| Style | Background | Use For |
-|-------|-----------|---------|
-| `.card` (the default) | `.formCardStyle()` (Material; **not** Liquid Glass); the rows pad themselves, the caller's `Divider()` between them | Every form card. Material is intentional — iOS 26 `glassEffect` would become the morph-source for any `Picker(.menu)` / menu row inside, collapsing single-row sections into the popover at tap |
-| `.glass` *(5.0.0)* | `.cardStyle()` (Liquid Glass); the card pads its rows `lg` on every side and spaces them `sm`, no dividers | Content that is not a form: an assistant's reply (payments, a draft to confirm, an attachment), a short list on a screen, a `NoticeCard`. It was `ListCard` in 4.14.0 (removed in 5.0.0, docs/migration-5.0.md) |
+- The card is `cardStyle()` (Liquid Glass behind the rows) and pads its rows `lg` at the sides;
+  the rows pad themselves only vertically (`UniversalRow`'s `.standard`, 16 pt: a row is 56 pt
+  with its 24 pt icon, §10).
+- **No `Divider()` between rows** *(8.0.0)*: the section draws a `RowDivider` between each two
+  rows, under the upper row's text (after its icon) and 16 pt short of the card's trailing edge,
+  as in a list of transactions. `UniversalRow` says where its text starts; a custom row with
+  something before its text says it with `.rowDividerInset(_:)`; an explicit `RowDivider()` in
+  the content takes the place of the automatic one.
+- A row that scrolls under the card's edges (chips, a strip of photos) takes the card's whole
+  width with `.fullWidthRow()` and keeps itself off the edge with its own inset
+  (`ChipPicker(inset: AppSpacing.lg)` does it on its own; a `VStack` of pickers or a strip with
+  `.contentMargins(.horizontal, AppSpacing.lg, for: .scrollContent)` says it). Its divider starts
+  at the card's padding, as under any row.
+- The header is `SectionHeader(.default)`, bold in sentence case; an empty `header` is left out
+  *(5.0.0)*. The footer is a caption under the card.
+- A menu inside the glass card is safe: the owner's check on a device (8.0.0's probe) found no
+  popover collapsing into a one-row section, the reason the card was Material up to 7.x.
+- `style:` is removed *(8.0.0)*: `.card` (Material, the caller's dividers) and `.glass` (5.0.0,
+  rows spaced `sm` with no dividers; `ListCard` in 4.14.0) are both this card
+  ([migration-8.0.md](migration-8.0.md)).
 
-An empty `header` is left out *(5.0.0)*. Inside a `List`, group rows with `Section(header: SectionHeader(title, style: .compact))` instead.
+#### `CardList` *(8.0.0)*
+**Purpose:** the things a person keeps (accounts, deposits, loans, debts, goals, categories,
+subscriptions; trips, places, gear) with one set of actions on every list: a tap opens, a long
+press shows the item's menu (Edit, Delete with a confirmation), and the toolbar selects several to
+delete, changes the order by dragging and adds. No swipe actions.
 
 ```swift
-FormSection(header: "Payments", style: .glass) {
-    ForEach(payments) { TransactionRow(…) }
+@State private var mode: CardListMode = .browsing
+@State private var selection: Set<Account.ID> = []
+
+ScrollView {
+    CardList(accounts, layout: .cards, mode: mode, selection: $selection, onMove: moveAccounts) { account in
+        NavigationLink(value: account) { AccountCardContent(account) }
+            .contextMenu { editButton(account); deleteButton(account) }
+    }
+    .screenPadding()
 }
+.cardListToolbar(mode: $mode, selection: $selection, allIDs: accounts.map(\.id),
+                 addLabel: "New account", onAdd: addAccount, onDeleteSelected: confirmDelete)
 ```
+
+| Layout | Look | Use for |
+|---|---|---|
+| `.cards` (default) | a glass card per item, its content padded `lg` on every side, `md` between cards | accounts, deposits, debts, categories |
+| `.section` | every item a row in one glass card, a `RowDivider` under each row's text | subcategories, a short list of options |
+| `.stack` | items that are cards already (`PayoffProgressCard`, `TargetProgressCard`, `RecurringPaymentCard`), spaced `md`; the circle and the handle of the modes beside the card | loans, goals, subscriptions |
+
+| Mode | What the item shows | A tap |
+|---|---|---|
+| `.browsing` | the item as the app draws it | the app's (`NavigationLink`, context menu) |
+| `.selecting` | a `SelectionIndicator` before it (the divider moves past it) | picks the item or leaves it |
+| `.reordering` | a handle (`line.3.horizontal`) after it | none: a long press lifts it, moving it over another puts it there (a tick on each step); VoiceOver: "Move up", "Move down" |
+
+- `onMove` is `List`'s `(IndexSet, Int)`; `nil` for a list whose order is fixed (a sorted
+  list: `cardListToolbar(canReorder: false)`).
+- `cardListToolbar(mode:selection:allIDs:canReorder:addLabel:onAdd:onDeleteSelected:)`:
+  browsing shows select (`checkmark.circle`), reorder (`arrow.up.arrow.down`, two items or more)
+  and a fixed space before `+` (`.dsButton()`); selecting shows Select All / Deselect All and
+  Done, and "Delete N" (`DSButton(role: .destructive)`) under the list while something is picked;
+  reordering shows a checkmark. `onDeleteSelected` runs on "Delete N": the app confirms and
+  deletes. The strings are `bulk.*` (docs/localization-keys.md).
+- A `LazyVStack`, not a `List`: the cards stay Liquid Glass like the rest of the app, and a
+  200-item list scrolls on the probe's device check. What an item is, what opening it shows and
+  what deleting does stay in the app.
+- Skeleton: `CardListSkeleton(layout:count:)`, grey rows of an icon, a title and a value in the
+  layout's cards.
 
 #### `EditableHero` *(1.10.0)*
 The top of an edit sheet: a glass hero icon (entrance spring) that opens `IconPicker`, the name typed in place (`AnimatedTitleInput`), and with `.amountAndCurrency` an amount (`AmountInput`, 48 pt) and a currency chip that pushes `CurrencyList` (so put the hero in a `NavigationStack`). `iconTint` draws a symbol in that colour on glass (a category); `.symbolsOnly` hides the logos tab. Tenra: `EditableHeroSection` (its `HeroConfig` presets, the category hex colour) is an adapter.
@@ -463,9 +521,11 @@ FormSection {
 | `.stepper(_:in:step:format:)` | − / + and the formatted value | `StepperRow` |
 | `.slider(_:in:step:valueText:)` | the value on the title's line, the slider under it, the hint under the slider | `SliderRow` |
 | `.colors(_:palette:)` | the palette's swatches under the title | `ColorPickerRow` |
+| `.textField(_:placeholder:keyboard:)` *(8.0.0)* | a value typed on the trailing edge (a bank's name, a rate): an inline `FormTextField`, VoiceOver names it by the title | `UniversalRow { title } trailing: { FormTextField(style: .inline) }` |
 | no accessory, `titleColor: AppColors.accent` | the label of a `PhotosPicker`, a `ShareLink` (the init is `nonisolated`) | `ActionRowLabel` |
 
-`config:` is `.standard` (a `FormSection` card, the default), `.settings` (a `List`, which pads
+`config:` is `.standard` (a `FormSection` or `CardList` card, the default; 8.0.0: 16 pt above and
+below, none at the sides, a 56 pt row), `.settings` (a `List`, which pads
 the row and draws a navigation chevron) or `.info` (a detail inside a padded container). A
 disabled row (`.disabled(true)`) greys its title and icon. `UniversalRow(_:leadingIcon:…)` takes
 any icon (a logo, a coloured tile). The twelve rows it replaced are gone in 7.0.0
@@ -506,7 +566,7 @@ UniversalRow(
 
 | Preset | V-Padding | H-Padding | Context |
 |--------|-----------|-----------|---------|
-| `.standard` | 12 | 16 | Form rows in `FormSection` |
+| `.standard` | 16 | 0 | Form rows in `FormSection` and `CardList` (8.0.0: 56 pt with a 24 pt icon; 12 × 16 before) |
 | `.settings` | 4 | 0 | Settings list rows |
 | `.selectable` | 12 | 16 | Checkmark selection lists |
 | `.sheetList` | 12 | 16 | Modal selection sheets |
@@ -1430,13 +1490,14 @@ HStack {
 ```
 
 #### `SectionHeader`
-Section header text in four styles, symbols around the title, and an optional action at the end
+Section header text in three styles, symbols around the title, and an optional action at the end
 of the line (1.15.0). SectionHeaderView before 2.0; the card style was DateSectionHeaderView.
+8.0.0: one look for a section's title, bold in sentence case (`.default`, even in a `List`'s
+header); `.compact`, the small grey uppercase label, is removed (migration-8.0.md).
 
 ```swift
-SectionHeader("Transactions")                                      // .default: bodyEmphasis
-Section(header: SectionHeader("Notifications", style: .compact)) { … } // bodySmall, secondary, uppercase, no padding
-SectionHeader("Filters", style: .compact).screenPadding()          // the same label on a screen
+SectionHeader("Transactions")                                      // .default: bodyEmphasis, no padding
+SectionHeader("Filters").screenPadding()                           // the same title on a screen
 SectionHeader("Spending", systemImage: "chart.bar", style: .large) // h3 + accent icon, screen padding
 SectionHeader("Yesterday", style: .card) {                         // .default's title on a padded glass card
     FormattedAmountText(amount: 45_000, currency: "KZT", prefix: "-",
@@ -1454,8 +1515,7 @@ NavigationLink { TripsList() } label: {                            // a header t
 **Symbols (3.2.0).** `systemImage` (before the title) and `trailingSystemImage` (right after it)
 show in every style; before 3.2.0 the icon showed in `.large` only and the other styles dropped
 it. Both take the title's font (`.large`'s leading symbol keeps the body size it always had) and
-are hidden from VoiceOver. The leading one is the accent, the label's grey in `.compact`; the
-trailing one the tertiary grey, `imageScale(.small)`, `AppSpacing.xs` after the title. `tint`
+are hidden from VoiceOver. The leading one is the accent; the trailing one the tertiary grey, `imageScale(.small)`, `AppSpacing.xs` after the title. `tint`
 colours both. The trailing symbol says what the header does: `chevron.forward` for one that
 leads somewhere (wrap the header in a `NavigationLink`), `info.circle` for one that explains.
 The end of the line stays the action's.
@@ -2001,7 +2061,7 @@ OptionCardPicker(HomeBackground.allCases, selection: $background, title: { $0.na
                 UniversalRow("Choose a photo", icon: "photo.on.rectangle", titleColor: AppColors.accent)
             }
             .buttonStyle(.plain)
-            Divider().padding(.leading, AppSpacing.lg)
+            .rowDividerInset(AppIconSize.lg + AppSpacing.md)    // a picker's label keeps the row's inset to itself
             UniversalRow("Remove photo", icon: "trash", role: .destructive, accessory: .action { … })
         }
         .screenPadding()
@@ -2011,7 +2071,7 @@ OptionCardPicker(HomeBackground.allCases, selection: $background, title: { $0.na
 
 `settings:` *(5.2.0)* is what the app sets for the chosen option, under the carousel, fading from
 one option's to the next: `UniversalRow`s in a `FormSection` (a `PhotosPicker`'s label,
-`.toggle`, `.slider`, a destructive `.action`, inset dividers), empty for an option with nothing to set. Skeleton:
+`.toggle`, `.slider`, a destructive `.action`; the section's own dividers), empty for an option with nothing to set. Skeleton:
 `OptionCardPickerSkeleton()`. Tenra: `HomeBackgroundPicker` (Settings → Background). Before
 6.0.0 it also had `style: .list` (`OptionCard`s one under another) and, in `.carousel`, a row of
 small cards under one preview ([migration-6.0.md](migration-6.0.md)).
@@ -2373,9 +2433,8 @@ EditSheetContainer(title:, wrapInForm: false, isSaving:, onSave:, onCancel:)   �
 └── ScrollView
     └── VStack(spacing: AppSpacing.xl)
         ├── EditableHero(…)                  optional: icon, name, amount + currency
-        ├── FormSection(header:) {           a Material card of rows
-        │   FormTextField(style: .row)  or  UniversalRow { FormTextField(style: .inline) }
-        │   Divider().padding(.leading, AppSpacing.lg)
+        ├── FormSection(header:) {           a glass card of rows, its dividers its own (8.0.0)
+        │   FormTextField(style: .row)  or  UniversalRow(title, accessory: .textField(…))
         │   UniversalRow(title, icon:, accessory: .menu / .picker / .date / .stepper /
         │                .slider / .toggle / .action)   (7.0.0)
         │   }
@@ -2423,10 +2482,9 @@ Tenra builds every entity detail screen this way (its `EntityDetailScaffold`).
 
 | List | Built from |
 |---|---|
-| Entities to manage (reorder, delete) | `List` of `AmountRow(style: .list)`, `.onMove`, swipe actions; `AmountRowSkeleton(style: .list)` rows while loading |
-| Cards | `ScrollView` → `VStack(spacing: AppSpacing.lg)` of cards (`RecurringPaymentCard`, `PayoffProgressCard`, `ThumbnailCard`, …) in `NavigationLink`s; `EmptyState` when there are none |
+| Things a person keeps (accounts, deposits, loans, debts, goals, categories, subscriptions; trips, places, gear) *(8.0.0)* | `ScrollView` → `CardList(_:layout:mode:selection:onMove:)` with `.cardListToolbar(…)`: a tap opens, a long press shows Edit and Delete (with a confirmation), the toolbar selects and deletes, reorders and adds; no swipe actions. `.cards` for a card per item (`RecurringPaymentCard`, `PayoffProgressCard`, an account's balance), `.section` for rows in one card (subcategories); `CardListSkeleton` while loading, `EmptyState` when there are none |
 | Day-grouped history | `List` of `Section`s: header `SectionHeader(day, style: .card) { day total }`, rows `TransactionRow`. Slice the sections (`prefix(visibleSectionLimit)` and a trigger at the end): 500+ sections in a `List` freeze |
-| Settings | `List` of `Section(header: SectionHeader(title, style: .compact))` with `UniversalRow(config: .settings)` rows (`.navigationRow {}`, `.actionRow(role:) {}`), `ToggleSettingsRow`, `ActionSettingsRow` |
+| Settings *(8.0.0)* | `ScrollView` → `VStack(spacing: AppSpacing.xl)` of `FormSection(header:)` glass cards of `UniversalRow`s (`.navigation`, `.toggle`, `.action`, …), the screen padded with `.screenPadding()`; no `List` |
 
 ### Dashboard
 
@@ -2517,9 +2575,11 @@ Modal edit form?
     ├── An entity with an icon and a name → EditableHero on top
     └── Anything else (an action, a payment, a rate change, a report) → the cards alone
 
-Grouping form rows?
-├── In a sheet → FormSection
-└── Inside List → Section(header: SectionHeader(title, style: .compact))
+Grouping form or settings rows? → FormSection, in a sheet and on a screen alike (8.0.0: no
+List screens; a screen is a ScrollView of glass sections)
+
+A list of the things a person keeps (accounts, loans, goals, trips)? → CardList (8.0.0):
+.cards, a card per item, or .section, rows in one card; .cardListToolbar for select, reorder, +
 
 Horizontal scroll?
 └── UniversalCarousel with appropriate preset
@@ -2542,7 +2602,7 @@ under it, so it reads as part of the bar and stays while the list scrolls. A pic
 form's field stays in the form.
 
 Card-style container?
-├── Rows under an optional title → FormSection(header:, style: .glass) (5.0.0; ListCard in 4.14.0)
+├── Rows under an optional title → FormSection(header:) (8.0.0; style: .glass in 5.0, ListCard in 4.14.0)
 ├── A message to the person with a hide button and an action → NoticeCard (4.14.0)
 └── Anything else → VStack { ... }.padding(AppSpacing.lg).cardStyle()
 ```
@@ -2830,12 +2890,12 @@ with the iOS 27 SDK — Xcode 27; built with Xcode 26 the gate honours Reduce Mo
 | **Compact surface** | Its own, smaller | — | `MessageBanner` (`md`), `ChartSelectionBanner` (`lg` × `sm`) |
 | **Row**: no surface, lives in a container | Vertical only, from its `RowConfiguration` preset | The container's: a card's `.cardContentPadding()`, `List` / `Form` insets, or `.screenPadding()` | `InfoRow`, `AmountRow` (info style), `NetAmountRow`, `ScheduleRow` (`.info`, 8) |
 | **List row**: lives only in a `List` | None: the `List`'s row insets give both | `List` | `AmountRow(style: .list)` |
-| **Row in a `FormSection`** | Vertical and horizontal (`.standard`: 12 × 16), since `FormSection`'s surface has none | — | `UniversalRow` (`config: .standard`, its default since 7.0.0), `FormTextField(style: .row)` |
+| **Row in a `FormSection` or a `CardList`** | Vertical only (`.standard`: 16, 8.0.0; 12 × 16 before): the card pads its rows `lg` at the sides | The card's | `UniversalRow` (`config: .standard`, its default since 7.0.0), `FormTextField(style: .row)`, a `CardList(layout: .section)` row |
 | **Primitive** | None: the parent places it | — | `Badge`, `TrendBadge`, `FormattedAmountText`, `LinearProgressBar`, charts |
 
 Outer spacing is never a component's: the screen insets with `.screenPadding()` and spaces cards with its stack's `spacing`.
 
-A stack of rows in a card: `spacing: 0` with `Divider()`s between rows, or `AppSpacing.sm` without dividers (Tenra's detail list cards). The rows' own vertical padding does the rest.
+A stack of rows in a card: `FormSection` (8.0.0), which pads them and draws the dividers; by hand, `spacing: 0` with a `RowDivider(inset:)` between rows and `.padding(.horizontal, AppSpacing.lg)` before `.cardStyle()`, or `AppSpacing.sm` without dividers (Tenra's detail list cards). The rows' own vertical padding does the rest.
 
 ### Rows own their padding
 
@@ -2843,7 +2903,7 @@ A stack of rows in a card: `spacing: 0` with `Divider()`s between rows, or `AppS
 
 | Preset | V padding | H padding |
 |--------|-----------|-----------|
-| `.standard` | 12 | 16 |
+| `.standard` | 16 (8.0.0; 12 before) | 0 (8.0.0; 16 before): the card's |
 | `.info` | 8 | 0 |
 | `.selectable` | 12 | 16 |
 | `.sheetList` | 12 | 16 |
@@ -2857,13 +2917,17 @@ VStack, HStack, custom cards must add `.padding(AppSpacing.lg)` (or the equivale
 
 - **`.info` H:0** — a detail row (`accessory: .info`) always lives inside a container with `.padding(.lg)` — adding own H padding would double it to 32pt
 - **`.settings` H:0** — `List` / `Form` apply `listRowInsets` (16pt leading/trailing) automatically — rows inside must NOT add H padding
-- **So a `.settings` row in a `FormSection` card touches the card's edges.** `UniversalRow`
-  defaults to `.standard` (7.0.0); in a `List` pass `.settings`, and a navigation row leaves its
-  chevron to the list. The deprecated rows that took `config:` defaulted to `.settings`.
+- **`.standard` H:0 too (8.0.0)** — `FormSection` and `CardList` pad their rows at the sides;
+  a `.standard` row on a bare `cardStyle()` needs `.padding(.horizontal, AppSpacing.lg)` on the
+  stack. `.settings` stays for a row inside a `List` (vertical 4, the list's own row height).
 
-### Dividers inside cards
+### Dividers inside cards *(8.0.0)*
 
-`.padding(.leading, AppSpacing.lg)` (16pt) to align with row content start.
+One divider everywhere: `RowDivider`, under the row's text (after its icon and the space after
+it) and short of the card's trailing edge by the card's padding (16 pt), as in a list of
+transactions. `FormSection` and `CardList(layout: .section)` draw it themselves; a row says
+where its text starts (`UniversalRow` on its own, a custom row with `.rowDividerInset(_:)`). By
+hand: `RowDivider(inset: AppIconSize.Tile.sm + AppSpacing.md)` under a row with a 44 pt tile.
 
 ---
 

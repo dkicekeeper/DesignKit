@@ -230,7 +230,7 @@ public struct SearchSuggestionsContent: View {
                     }
                 }
             } header: {
-                SectionHeader(String(localized: "search.recent", defaultValue: "Recent"), style: .compact) {
+                SectionHeader(String(localized: "search.recent", defaultValue: "Recent")) {
                     Button(String(localized: "search.recent.clear", defaultValue: "Clear")) {
                         recent?.wrappedValue.removeAll()
                     }
@@ -265,7 +265,7 @@ public struct SearchSuggestionsContent: View {
                     }
                 }
             } header: {
-                SectionHeader(String(localized: "search.suggestions", defaultValue: "Suggestions"), style: .compact)
+                SectionHeader(String(localized: "search.suggestions", defaultValue: "Suggestions"))
             }
         }
     }
