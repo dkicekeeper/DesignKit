@@ -267,7 +267,7 @@ private struct CardListPage: View {
             name: "CardList",
             summary: "The things a person keeps (accounts, deposits, loans, categories, trips) with one set of actions: open, select several and delete, change the order by dragging. A card per item, or every item a row in one card.",
             since: "8.0.0",
-            apps: [.tenra],
+            apps: [.tenra, .dalada],
             canvas: .fill,
             notes: [
                 "cards: a glass card per item, padded 16 pt; section: every item a row in one glass card, a divider under each row's text; stack: items that are cards already (a PayoffProgressCard), the circle and the handle beside them.",

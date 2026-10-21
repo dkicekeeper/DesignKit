@@ -81,7 +81,7 @@ private struct IconPage: View {
         ComponentPage(
             name: "Icon",
             summary: "Every icon: an SF Symbol or a brand logo (loaded by the app's DesignKitLogoLoader), in a shape, a size, a tint, on glass or not.",
-            apps: [.tenra],
+            apps: [.tenra, .dalada],
             notes: [
                 "A brand logo is Icon(source: .brandService(\"netflix.com\")); BrandLogoView, its view of its own, was removed in 2.0.0.",
                 "Sizes: AppIconSize (glyphs, xs 12 to xxl 40) and AppIconSize.Tile (icons with a backing, sm 44 to xxxl 80).",
