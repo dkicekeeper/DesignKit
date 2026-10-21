@@ -156,7 +156,7 @@ extension ComponentSnapshots {
                         Button("All") {}
                     }
                     SectionHeader("Waiting to send", systemImage: "icloud.and.arrow.up",
-                                  trailingSystemImage: "info.circle", style: .compact)
+                                  trailingSystemImage: "info.circle")
                         .screenPadding()
                     SectionHeader("Insights", systemImage: "sparkles", trailingSystemImage: "chevron.forward",
                                   style: .large)

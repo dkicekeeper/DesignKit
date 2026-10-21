@@ -76,7 +76,8 @@ FormSection(header: "Notifications") { … }
 ### Gallery and tooling
 
 - `FormSection`'s page shows one to four rows (one: the menu probe); a `CardList` page with its layouts, modes and up to 200 items; `SectionHeader`'s page has three styles.
-- Snapshot tests for `CardList` (both layouts in every mode) and its skeleton; the Gallery's and the tests' sections lose their hand-drawn dividers, and the cards with two glass sections are one per snapshot.
+- `.formCardStyle()`'s page names no app: none uses a material card now.
+- Snapshot tests for `CardList` (its layouts in every mode) and its skeleton; the Gallery's and the tests' sections lose their hand-drawn dividers, and the cards with two glass sections are one per snapshot.
 
 ## 7.1.0 - 2026-10-21
 
