@@ -312,13 +312,13 @@ private struct PackedCoin: View {
 
     @ViewBuilder
     private var face: some View {
-        if let item, case .sfSymbol = item.iconSource {
+        if let item, case .sfSymbol(let name) = item.iconSource {
             let tint = item.tint ?? AppColors.accent
             ZStack {
                 Circle().fill(LinearGradient(colors: [tint.mix(with: .white, by: 0.12), tint.mix(with: .black, by: 0.18)],
                                              startPoint: .topLeading, endPoint: .bottomTrailing))
-                Icon(source: item.iconSource, style: .circle(size: diameter, tint: .monochrome(.white),
-                                                             padding: PackedCircleMetrics.symbolPadding(for: diameter)))
+                // Outside the icon rule, as every symbol of PackedCircleIcons (7.1.0).
+                PackedSymbol(name: name, diameter: diameter, color: .white)
                     .shadow(color: .black.opacity(0.2), radius: 0.5, y: 0.5)
             }
         } else if let item {

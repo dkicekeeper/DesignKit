@@ -38,6 +38,7 @@ extension ComponentSnapshots {
                 SwatchGrid(items: [
                     ("base", AppColors.Background.base),
                     ("baseAlt", AppColors.Background.baseAlt),
+                    ("baseAltCard", AppColors.Background.baseAltCard),
                     ("elevation1", AppColors.Background.elevation1),
                     ("elevation2", AppColors.Background.elevation2),
                     ("elevation3", AppColors.Background.elevation3),

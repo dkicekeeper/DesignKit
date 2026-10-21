@@ -124,6 +124,7 @@ Modifiers:
 |---|---|---|
 | `base` | `.systemBackground` | The screen |
 | `baseAlt` | `.systemGroupedBackground` | A grouped-list screen |
+| `baseAltCard` *(7.1.0)* | `.secondarySystemGroupedBackground` | A card or a list's section on `baseAlt`, as a grouped `List`'s rows: white in light, a step lighter in dark (and in a sheet, where iOS raises both) |
 | `elevation1` / `elevation2` / `elevation3` | white / `#1C1C1E`, `#2C2C2E`, `#3A3A3C` | Sheets and cards on base; cards on elevation 1; above everything. In light a shadow tells the levels apart, in dark the colour (iOS's own elevated backgrounds) |
 | `neutral1` | `.secondarySystemBackground` | Opaque, minimal contrast: fields, grouped blocks, inactive chips |
 | `neutral2` | `.systemGray5` | Opaque, more contrast: progress tracks, sunken controls, secondary buttons |
@@ -820,7 +821,9 @@ the colour around it (`tint: .inherit`); its size says glyph or tile (Icon Sizes
 **Where iOS draws the symbol (the exceptions):** a system bar's item (a toolbar button), a system
 menu's or context menu's item, a swipe action, a tab, a segmented picker's segment, and a symbol
 inside a line of text (`Text("… \(Image(systemName:))")`): there `Image` / `Label` stay, with a
-comment saying so.
+comment saying so. And `PackedCircleIcons` *(7.1.0, the owner's call)*: its circles come in every
+size, so its symbols keep their disc and their room at any diameter (`PackedSymbol`), and the
+shelf's symbol is set in type, as before 7.0.0; its logos stay `Icon`s.
 
 **Accessibility:** `Icon.body` has `accessibilityHidden(true)` — it is always decorative within its parent row/card. The parent element owns the accessibility label. An icon that says something on its own (a status, "Saved") gets `.accessibilityElement(children: .ignore).accessibilityLabel(…)`.
 
@@ -971,7 +974,7 @@ The "≈" line (1.14.0):
 The logic is `CurrencyEquivalent.swift` (internal), unit-tested in `CurrencyEquivalentTests`.
 
 #### `CurrencyList` *(1.10.0)*
-Every `CurrencyInfo` currency to pick from: "Popular", then all, in cards (a `ScrollView`, so the screen's background shows through), each row code, name and symbol, the chosen one checked, with a search in the navigation bar's drawer. `CurrencyList(selection: code) { code in … }`; the screen around it is the caller's. Tenra: `CurrencyListContent` (Settings, onboarding) is an adapter.
+Every `CurrencyInfo` currency to pick from: "Popular", then all, in cards (a `ScrollView`, so it can sit in a scroll view of its own), white on the grey grouped background as every grouped list *(7.1.0; grey cards on the screen's white before)*, each row code, name and symbol, the chosen one checked, with a search in the navigation bar's drawer. `CurrencyList(selection: code) { code in … }`; the screen around it is the caller's. Tenra: `CurrencyListContent` (Settings, onboarding) is an adapter.
 
 #### `CurrencyRow` *(3.6.0)*
 One currency: the code (bodyEmphasis) over its name (bodySmall), the symbol, and a `SelectionIndicator` (5.2.0): the filled check in the accent when chosen, an empty circle otherwise; `isLocked: true` (an account's own currency, not for this list to change) shows the check in the tertiary grey. The row `CurrencyList` draws; no padding of its own (a `List` insets it). Wrap it in a `Button` with `.buttonStyle(.plain)` to make it pick. Tenra: the quick-access currency list. No skeleton: local data.

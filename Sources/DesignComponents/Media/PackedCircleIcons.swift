@@ -17,6 +17,9 @@
 //  the rest go into "+N", and the shelf is as wide as its row.
 //  4.15.0: the shelf's tiles are whole (no pocket) and 48 pt, and every style is 160 pt wide
 //  unless given a width (120 pt before): four tiles, coins of 48 pt, more room for the marbles.
+//  7.1.0: the symbols are drawn outside the icon rule (`PackedSymbol`): under 7.0.0's rule a
+//  symbol under 44 pt lost its disc and its room, and one from 44 pt got a grey plate over its
+//  marble. Logos stay `Icon`s: a logo fills its circle at any size.
 //
 
 import SwiftUI
@@ -219,22 +222,16 @@ private struct PackedCircleIcon: View {
 
     private var symbolTint: Color { tintOverride ?? AppColors.accent }
 
-    private var flatStyle: IconStyle {
-        switch iconSource {
-        case .sfSymbol:
+    @ViewBuilder
+    private var flatIcon: some View {
+        if case .sfSymbol(let name) = iconSource {
             // The symbol on a pale disc of its own colour, like every icon backing (2.0.0;
-            // a grey disc before).
-            let tint: IconTint = tintOverride.map { .monochrome($0) } ?? .accentMonochrome
-            return .circle(
-                size: diameter,
-                tint: tint,
-                backgroundColor: AppColors.pale(symbolTint),
-                padding: PackedCircleMetrics.symbolPadding(for: diameter)
-            )
-        case .brandService, .none:
+            // a grey disc before), at every diameter (7.1.0).
+            PackedSymbol(name: name, diameter: diameter, color: symbolTint, plate: AppColors.pale(symbolTint))
+        } else {
             // Brand logos render edge-to-edge by Icon convention — they
             // already include their own internal padding/whitespace.
-            return .circle(size: diameter, tint: .original)
+            Icon(source: iconSource, style: .circle(size: diameter, tint: .original))
         }
     }
 
@@ -242,7 +239,7 @@ private struct PackedCircleIcon: View {
         PackedCircleEntrance(style: style, index: index, targetOffset: targetOffset) {
             switch style {
             case .flat:
-                Icon(source: iconSource, style: flatStyle)
+                flatIcon
                     .overlay(Circle().strokeBorder(.background, lineWidth: borderWidth))
             default:
                 PackedMarble(iconSource: iconSource, tint: tintOverride, diameter: diameter, index: index)
@@ -293,12 +290,11 @@ struct PackedMarble: View {
     @ViewBuilder
     private var marble: some View {
         switch iconSource {
-        case .sfSymbol:
+        case .sfSymbol(let name):
             GlossyMarble(diameter: diameter, shadowColor: symbolTint, index: index, sways: sways) {
                 MarbleBody(tint: symbolTint, diameter: diameter)
                     .overlay {
-                        Icon(source: iconSource, style: .circle(size: diameter, tint: .monochrome(.white),
-                                                                padding: PackedCircleMetrics.symbolPadding(for: diameter)))
+                        PackedSymbol(name: name, diameter: diameter, color: .white)
                             .shadow(color: .black.opacity(0.25), radius: 0.5, y: 0.5)
                     }
             }
@@ -333,6 +329,37 @@ struct PackedOverflowLabel: View {
     var body: some View {
         Text("+\(count)")
             .font(.system(size: size * 0.35, weight: .semibold, design: .rounded))
+    }
+}
+
+// MARK: - Symbol
+
+/// A symbol in its circle, drawn outside the icon rule (7.1.0, the owner's call): the circles
+/// come in every size, and the rule took a symbol's disc and room under 44 pt (it filled its
+/// circle) and put a grey plate over its marble from 44 pt. Here it keeps
+/// `PackedCircleMetrics.symbolPadding(for:)` around it and its disc, if any, at every diameter,
+/// as before 7.0.0. Used by the flat circles, the marbles and the orbit's coins.
+struct PackedSymbol: View {
+    let name: String
+    let diameter: CGFloat
+    let color: Color
+    /// The disc under the symbol (`.flat`); a marble or a coin is its own.
+    var plate: Color? = nil
+
+    var body: some View {
+        let side = diameter - 2 * PackedCircleMetrics.symbolPadding(for: diameter)
+        Image(systemName: name)
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .foregroundStyle(color)
+            .frame(width: side, height: side)
+            .frame(width: diameter, height: diameter)
+            .background {
+                if let plate {
+                    Circle().fill(plate)
+                }
+            }
+            .accessibilityHidden(true)
     }
 }
 

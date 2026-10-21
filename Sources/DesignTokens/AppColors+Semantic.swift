@@ -62,6 +62,10 @@ public extension AppColors {
         public nonisolated static let base = Color(.systemBackground)
         /// An alternative screen background (grouped lists): grey in light, black in dark.
         public nonisolated static let baseAlt = Color(.systemGroupedBackground)
+        /// A card or a list's section on `baseAlt` (7.1.0), as the rows of a grouped `List`:
+        /// white in light, a step lighter than `baseAlt` in dark, in a sheet too (iOS raises
+        /// both there; the fixed `elevation1` would be the sheet's own colour).
+        public nonisolated static let baseAltCard = Color(.secondarySystemGroupedBackground)
         /// Sheets, modal screens, cards on `base`.
         public nonisolated static let elevation1 = AppColors.dynamic(light: .white, dark: UIColor(white: 28 / 255, alpha: 1))
         /// Cards on `elevation1`.
