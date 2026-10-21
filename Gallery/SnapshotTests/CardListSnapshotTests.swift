@@ -58,6 +58,23 @@ extension ComponentSnapshots {
             }
         }
 
+        /// Items that are cards already (`.stack`): the circle and the handle beside the card.
+        @Test func stack() async {
+            for (name, mode) in [("selecting", CardListMode.selecting), ("reordering", .reordering)] {
+                await assertComponentSnapshot(
+                    CardList([CardListSample.accounts[0]], layout: .stack, mode: mode, selection: .constant([0]),
+                             onMove: { _, _ in }) { item in
+                        loanCard(item)
+                            .padding(AppSpacing.lg)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .cardStyle()
+                    },
+                    named: name,
+                    appearances: [.light, .dark]
+                )
+            }
+        }
+
         private func sectionList(_ mode: CardListMode) -> some View {
             CardList(CardListSample.accounts, layout: .section, mode: mode, selection: .constant([1]),
                      onMove: { _, _ in }) { item in

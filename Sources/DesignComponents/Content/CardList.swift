@@ -22,6 +22,9 @@ public enum CardListLayout: Hashable, Sendable {
     /// Every item a row in one glass card, a divider under each row's text (subcategories, a
     /// short list of options).
     case section
+    /// Every item a card of its own already (a `PayoffProgressCard`, a `RecurringPaymentCard`):
+    /// the list spaces them, and the circle and the handle of the modes sit beside the card.
+    case stack
 }
 
 /// What a `CardList` is doing (8.0.0).
@@ -34,8 +37,9 @@ public enum CardListMode: Hashable, Sendable {
     case reordering
 }
 
-/// A list of items on Liquid Glass (8.0.0): a card per item (`.cards`), or every item a row
-/// in one card with a divider under each row's text (`.section`). In `.selecting` a tap picks an
+/// A list of items on Liquid Glass (8.0.0): a card per item (`.cards`), every item a row
+/// in one card with a divider under each row's text (`.section`), or items that are cards
+/// already (`.stack`). In `.selecting` a tap picks an
 /// item; in `.reordering` an item is dragged to its place (VoiceOver: move up, move down), and
 /// `onMove` gets the move as `List`'s `onMove` does.
 ///
@@ -90,6 +94,13 @@ public struct CardList<Data: RandomAccessCollection, Card: View>: View where Dat
                         .padding(AppSpacing.lg)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .cardStyle()
+                        .modifier(reorderable(item))
+                }
+            }
+        case .stack:
+            LazyVStack(spacing: AppSpacing.md) {
+                ForEach(data) { item in
+                    entry(item)
                         .modifier(reorderable(item))
                 }
             }
@@ -433,7 +444,7 @@ public struct CardListSkeleton: View {
     public var body: some View {
         Group {
             switch layout {
-            case .cards:
+            case .cards, .stack:
                 VStack(spacing: AppSpacing.md) {
                     ForEach(0..<count, id: \.self) { _ in
                         row

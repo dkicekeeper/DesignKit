@@ -270,7 +270,7 @@ private struct CardListPage: View {
             apps: [],
             canvas: .fill,
             notes: [
-                "cards: a glass card per item, padded 16 pt; section: every item a row in one glass card, a divider under each row's text.",
+                "cards: a glass card per item, padded 16 pt; section: every item a row in one glass card, a divider under each row's text; stack: items that are cards already (a PayoffProgressCard), the circle and the handle beside them.",
                 "cardListToolbar(mode:selection:allIDs:onAdd:onDeleteSelected:) is the same toolbar on every list: select, change the order, add; Done; Delete N under the list.",
                 "Reordering: a long press lifts a card, moving it over another puts it there (a tick on each step). VoiceOver: move up, move down.",
             ]
@@ -284,19 +284,14 @@ private struct CardListPage: View {
                         CardList(items, layout: layout, mode: mode, selection: $selection, onMove: { from, to in
                             items.move(fromOffsets: from, toOffset: to)
                         }) { item in
-                            UniversalRow(
-                                item.name,
-                                leadingIcon: .sfSymbol(item.symbol, color: AppColors.accent, size: AppIconSize.Tile.sm),
-                                value: item.amount,
-                                config: .standard
-                            )
-                            .contextMenu {
-                                Button(role: .destructive) {
-                                    items.removeAll { $0.id == item.id }
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
+                            itemView(item)
+                                .contextMenu {
+                                    Button(role: .destructive) {
+                                        items.removeAll { $0.id == item.id }
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
                                 }
-                            }
                         }
                         .screenPadding()
                     }
@@ -322,13 +317,31 @@ private struct CardListPage: View {
             .frame(height: 560)
         } controls: {
             StateControl(state: $state)
-            ChoiceControl("Layout", selection: $layout, options: [("Cards", .cards), ("Section", .section)])
+            ChoiceControl("Layout", selection: $layout, options: [("Cards", .cards), ("Section", .section), ("Stack", .stack)])
             ChoiceControl("Mode", selection: $mode, options: [("Browsing", .browsing), ("Selecting", .selecting), ("Reordering", .reordering)])
             ChoiceControl("Items", selection: $count, options: [("5", 5), ("12", 12), ("200", 200)])
         }
         .onChange(of: count) { _, new in
             items = CardListPage.make(new)
             selection.removeAll()
+        }
+    }
+
+    /// An item's row; in `.stack` a card of its own, as an app's ready-made card would be.
+    @ViewBuilder
+    private func itemView(_ item: Item) -> some View {
+        let row = UniversalRow(
+            item.name,
+            leadingIcon: .sfSymbol(item.symbol, color: AppColors.accent, size: AppIconSize.Tile.sm),
+            value: item.amount,
+            config: .standard
+        )
+        if layout == .stack {
+            row
+                .padding(.horizontal, AppSpacing.lg)
+                .cardStyle()
+        } else {
+            row
         }
     }
 }

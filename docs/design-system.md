@@ -451,8 +451,9 @@ ScrollView {
 
 | Layout | Look | Use for |
 |---|---|---|
-| `.cards` (default) | a glass card per item, its content padded `lg` on every side, `md` between cards | accounts, deposits, loans, debts, goals, subscriptions, categories |
+| `.cards` (default) | a glass card per item, its content padded `lg` on every side, `md` between cards | accounts, deposits, debts, categories |
 | `.section` | every item a row in one glass card, a `RowDivider` under each row's text | subcategories, a short list of options |
+| `.stack` | items that are cards already (`PayoffProgressCard`, `TargetProgressCard`, `RecurringPaymentCard`), spaced `md`; the circle and the handle of the modes beside the card | loans, goals, subscriptions |
 
 | Mode | What the item shows | A tap |
 |---|---|---|
