@@ -244,6 +244,7 @@ private struct ItemRowPage: View {
     @State private var showsDetail = false
     @State private var showsNote = true
     @State private var accessory = 1
+    @State private var verticalPadding = AppSpacing.md
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -256,14 +257,16 @@ private struct ItemRowPage: View {
             notes: [
                 "standard: title in bodyEmphasis, facts in caption. large: title in body, facts in bodySmall, more air.",
                 "Leading .symbol is a pale circle centred on the row; .glyph a bare symbol at the top, next to a description.",
-                "No padding of its own: a List insets it, a card's stack spaces it.",
+                "A row of a glass section (8.1.0): it pads itself 12 pt above and below (verticalPadding), and the divider under it starts at its text. verticalPadding: 0 in a stack that spaces its rows or a List.",
+                "Inside a Button or NavigationLink the divider's inset stays in the label: put .rowDividerInset(ItemRowStyle.standard.symbolDividerInset) on the link.",
             ],
             styles: ["standard", "large"]
         ) {
-            InCard {
+            FormSection {
                 if state == .loading {
                     ItemRowSkeleton(style: style, showsLeading: leading != 0, showsDetail: showsDetail,
-                                    metaLines: showsNote ? 2 : 1)
+                                    metaLines: showsNote ? 2 : 1, verticalPadding: verticalPadding)
+                    ItemRowSkeleton(style: style, showsLeading: leading != 0, verticalPadding: verticalPadding)
                 } else {
                     ItemRow(
                         "Morning on Kapchagay",
@@ -272,7 +275,8 @@ private struct ItemRowPage: View {
                         meta: metaLines,
                         leading: leadingValue,
                         style: style,
-                        titleLineLimit: 1
+                        titleLineLimit: 1,
+                        verticalPadding: verticalPadding
                     ) {
                         switch accessory {
                         case 1: DisclosureChevron()
@@ -282,6 +286,10 @@ private struct ItemRowPage: View {
                         default: EmptyView()
                         }
                     }
+                    // A second row, for the divider between them.
+                    ItemRow("Evening at Bartogay", meta: [MetaLine([.text("13 Oct"), .text("6.8 km")])],
+                            leading: leadingValue, style: style, titleLineLimit: 1,
+                            verticalPadding: verticalPadding)
                 }
             }
         } controls: {
@@ -292,6 +300,8 @@ private struct ItemRowPage: View {
             ToggleControl("Description", isOn: $showsDetail)
             ToggleControl("Second line", isOn: $showsNote)
             ChoiceControl("Accessory", selection: $accessory, options: [("None", 0), ("Chevron", 1), ("Status", 2)])
+            ChoiceControl("Vertical padding", selection: $verticalPadding,
+                          options: [("Section (12)", AppSpacing.md), ("None (0)", 0)])
         }
     }
 
@@ -458,6 +468,7 @@ private struct CommentRowPage: View {
 private struct ChecklistRowPage: View {
     @State private var isChecked = false
     @State private var showsMark = true
+    @State private var verticalPadding = AppSpacing.sm
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -466,21 +477,30 @@ private struct ChecklistRowPage: View {
             summary: "An item to tick off; struck through once done, an optional mark on the right.",
             since: "1.12.0",
             apps: [.dalada],
-            canvas: .fill
+            canvas: .fill,
+            notes: [
+                "A row of a glass section (8.1.0): it pads itself 8 pt above and below (verticalPadding), and the divider under it starts at its title, after the circle. verticalPadding: 0 in a stack that spaces its rows or a List.",
+            ]
         ) {
-            InCard {
+            FormSection {
                 if state == .loading {
-                    ChecklistRowSkeleton()
+                    ChecklistRowSkeleton(verticalPadding: verticalPadding)
+                    ChecklistRowSkeleton(verticalPadding: verticalPadding)
                 } else {
                     ChecklistRow("Tent", isChecked: isChecked,
                                  accessorySystemImage: showsMark ? "backpack" : nil,
-                                 accessoryLabel: showsMark ? "From gear" : nil) { isChecked.toggle() }
+                                 accessoryLabel: showsMark ? "From gear" : nil,
+                                 verticalPadding: verticalPadding) { isChecked.toggle() }
+                    // A second row, for the divider between them.
+                    ChecklistRow("Headlamp", isChecked: false, verticalPadding: verticalPadding) {}
                 }
             }
         } controls: {
             StateControl(state: $state)
             ToggleControl("Checked", isOn: $isChecked)
             ToggleControl("Mark", isOn: $showsMark)
+            ChoiceControl("Vertical padding", selection: $verticalPadding,
+                          options: [("Section (8)", AppSpacing.sm), ("None (0)", 0)])
         }
     }
 }

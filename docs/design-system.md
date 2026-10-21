@@ -1276,7 +1276,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `LimitProgressCard`, `TargetProgressCard`, `PayoffProgressCard`, `ScoreCard`, `ScoreGaugeCard`, `MetricCard`, `WeightBreakdownCard`, `CalculationCard`, `ProgressRingTile`, `ProgressRingTileGrid` | `…Skeleton` (`ScoreGaugeCardSkeleton(style:)`, `MetricCardSkeleton(chartPlacement:)`, `WeightBreakdownCardSkeleton(segments:)`, `CalculationCardSkeleton(rows:showsHero:)`) |
 | `UniversalRow` | `UniversalRowSkeleton(config:iconStyle:titleFont:showsSubtitle:trailing:)` |
 | `UniversalRow`'s accessories (7.0.0) | `UniversalRowSkeleton.navigationSettings`, `.toggleSettings`, `.actionSettings`, `.menuPicker`, `.datePicker`, `.checkmark(iconStyle:)` (a stepper or picker row is `.menuPicker`, the same shape), `.slider(showsHint:config:)`, `.info(showsIcon:)`, `.colors(swatches:)` |
-| `ItemRow` (3.6.0) | `ItemRowSkeleton(style:showsLeading:showsDetail:metaLines:)` |
+| `ItemRow` (3.6.0) | `ItemRowSkeleton(style:showsLeading:showsDetail:metaLines:verticalPadding:)` |
 | `PendingItemCard` (3.6.0) | `PendingItemCardSkeleton(contentLines:)` |
 | `NoticeCard`, `PickerCarousel` (4.14.0); a glass `FormSection` (5.0.0) | `NoticeCardSkeleton(leadingSize:showsAction:)`, `PickerCarouselSkeleton(pictureSize:)`; `FormSection(style: .glass)` of its rows' skeletons (`ItemRowSkeleton`, …; `ListCardSkeleton` until 5.0.0) |
 | `RatingSummary` (4.1.0) | `RatingSummarySkeleton(maximum:)` |
@@ -1865,7 +1865,9 @@ A control: no skeleton.
 #### `ChecklistRow`, `ChecklistSummaryRow`
 - **Item:** `SelectionIndicator` (success tint), the title struck through and secondary once
   ticked, an optional tertiary mark on the right (`accessorySystemImage`, `accessoryLabel`);
-  a tap calls `onToggle`.
+  a tap calls `onToggle`. A row of a glass section (8.1.0): it pads itself `AppSpacing.sm`
+  above and below (`verticalPadding:`, 0 in a stack that spaces its rows or a `List`), and the
+  divider under it starts at the title, after the circle (`rowDividerInset`, on the button).
 - **Checklist in a list:** the title with a success seal once complete, a caption line with a
   calendar (the day it is for), a 6 pt bar (success when complete) and "12 of 20" under it; an
   empty list says "No items yet". Keys: `checklist.progress %lld %lld`, `checklist.empty`,
@@ -1975,7 +1977,9 @@ the tab bar's bottom accessory on iOS 26.1+ (`LiveSessionAccessory.isAvailable`)
 another way back. Dalada: `TripMiniPlayer` is an adapter.
 
 #### `ItemRow` / `MetaLine` *(3.6.0)*
-A row for an item of the app's own (a trip, a place, an article, gear, a backup): a symbol, the title with an optional `Badge`, a description (bodySmall, two lines), lines of short facts (`MetaLine`) and an accessory on the trailing edge (`DisclosureChevron()`, a status symbol, a button). No padding of its own: a `List` insets it, a card's stack spaces it.
+A row for an item of the app's own (a trip, a place, an article, gear, a backup): a symbol, the title with an optional `Badge`, a description (bodySmall, two lines), lines of short facts (`MetaLine`) and an accessory on the trailing edge (`DisclosureChevron()`, a status symbol, a button).
+
+A row of a glass section (8.1.0): it pads itself `AppSpacing.md` above and below, as a `FormSection` or a `CardList(layout: .section)` puts its rows back to back, and the divider under it starts at its text (after a `.symbol` or a `.glyph`). `verticalPadding: 0` in a stack that spaces its rows or a `List`. A `Button` or `NavigationLink` around it keeps the divider's inset to its label: put `.rowDividerInset(ItemRowStyle.standard.symbolDividerInset)` (`.large` for that style) on the link. Before 8.1.0 it had no padding of its own and every app padded it in a section by hand; Tenra's backups, Ten's memory and subcategories went without, their text on the dividers (Tenra#88).
 
 ```swift
 ItemRow(trip.title,
@@ -1989,7 +1993,7 @@ ItemRow(trip.title,
 - **Styles:** `.standard` (title bodyEmphasis, facts caption, Dalada's lists), `.large` (title body, facts bodySmall, more air; Tenra's settings lists). `titleFont:` keeps a row that had another title font (Dalada's gear in body, Tenra's subcategories in h4).
 - **Leading:** `.symbol(name, tint:)` is a symbol on a pale circle of its tint (40 pt), centred on the row; `.glyph(name, tint:)` a bare symbol at the top, next to a description (an article).
 - **`MetaLine(items, separator:, tint:)`:** `.text`, `.label(text, systemImage:)`, `.symbol(name, accessibilityLabel:)`, each with an optional tint; `.dot` joins facts of one kind with "·", `.space` sets labels side by side. It takes the font around it (`ItemRow` sets it; elsewhere `.font(AppTypography.caption)`); a long fact wraps, `.lineLimit(1)` on the line keeps each to one line. At accessibility sizes the facts go one under another without dots (a symbol alone stays after its fact).
-- Skeleton: `ItemRowSkeleton(style:showsLeading:showsDetail:metaLines:)`.
+- Skeleton: `ItemRowSkeleton(style:showsLeading:showsDetail:metaLines:verticalPadding:)`, padded as the row.
 
 Dalada: trips, places, articles, gear, the facts under a place in search results. Tenra: backups, subcategories.
 
@@ -2890,12 +2894,14 @@ with the iOS 27 SDK — Xcode 27; built with Xcode 26 the gate honours Reduce Mo
 | **Compact surface** | Its own, smaller | — | `MessageBanner` (`md`), `ChartSelectionBanner` (`lg` × `sm`) |
 | **Row**: no surface, lives in a container | Vertical only, from its `RowConfiguration` preset | The container's: a card's `.cardContentPadding()`, `List` / `Form` insets, or `.screenPadding()` | `InfoRow`, `AmountRow` (info style), `NetAmountRow`, `ScheduleRow` (`.info`, 8) |
 | **List row**: lives only in a `List` | None: the `List`'s row insets give both | `List` | `AmountRow(style: .list)` |
-| **Row in a `FormSection` or a `CardList`** | Vertical only (`.standard`: 16, 8.0.0; 12 × 16 before): the card pads its rows `lg` at the sides | The card's | `UniversalRow` (`config: .standard`, its default since 7.0.0), `FormTextField(style: .row)`, a `CardList(layout: .section)` row |
+| **Row in a `FormSection` or a `CardList`** | Vertical only (`.standard`: 16, 8.0.0; 12 × 16 before): the card pads its rows `lg` at the sides | The card's | `UniversalRow` (`config: .standard`, its default since 7.0.0), `FormTextField(style: .row)`, `ItemRow` (12, 8.1.0), `ChecklistRow` (8, 8.1.0), a `CardList(layout: .section)` row |
 | **Primitive** | None: the parent places it | — | `Badge`, `TrendBadge`, `FormattedAmountText`, `LinearProgressBar`, charts |
 
 Outer spacing is never a component's: the screen insets with `.screenPadding()` and spaces cards with its stack's `spacing`.
 
 A stack of rows in a card: `FormSection` (8.0.0), which pads them and draws the dividers; by hand, `spacing: 0` with a `RowDivider(inset:)` between rows and `.padding(.horizontal, AppSpacing.lg)` before `.cardStyle()`, or `AppSpacing.sm` without dividers (Tenra's detail list cards). The rows' own vertical padding does the rest.
+
+A section's rows stand back to back, so each needs its own vertical padding: a row that has none (a `List`-era row, a custom `HStack`) has its text on the dividers. Since 8.1.0 `ItemRow` and `ChecklistRow` pad themselves; a custom row pads itself (`.padding(.vertical, AppSpacing.md)`). The apps' `section_rows_lint.py` (CI) fails on a row of a section that does not, and on a link around an icon row without `.rowDividerInset`.
 
 ### Rows own their padding
 

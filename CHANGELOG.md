@@ -16,6 +16,52 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.1.0 - 2026-10-21
+
+The rows made for a `List`, `ItemRow` and `ChecklistRow`, are rows of a glass section now: they pad themselves and start the divider under their text, so a section of them no longer depends on each app padding them by hand. Found in Tenra, where backups, Ten's memory and subcategories had their text on the dividers (Tenra#88), and in Dalada, where the checklist items' dividers ran under the circles.
+[#90](https://github.com/dkicekeeper/DesignKit/pull/90)
+
+### Added
+
+- `ItemRow(verticalPadding:)` and `ItemRowSkeleton(verticalPadding:)`, `AppSpacing.md` by default.
+- `ChecklistRow(verticalPadding:)` and `ChecklistRowSkeleton(verticalPadding:)`, `AppSpacing.sm` by default.
+- `ItemRowStyle.symbolDividerInset`: where the text of a row with a `.symbol` starts, for a `Button` or `NavigationLink` around the row, which keeps the row's own inset to its label.
+
+### Changed
+
+- `ItemRow` pads itself 12 pt above and below and `ChecklistRow` 8 pt, as a `FormSection` or a `CardList(layout: .section)` puts its rows back to back; their skeletons pad the same. A row an app padded by hand has twice the padding until the app drops its own; one in a stack that spaces its rows, or in a `List`, takes `verticalPadding: 0`.
+- In a glass section the divider under an `ItemRow` starts at its text, after a `.symbol` or a `.glyph`, and under a `ChecklistRow` after the circle, instead of at the card's padding.
+
+### Migration
+
+Drop the padding an app put on these rows in a section; pass 0 where the rows sit in a spaced stack or a `List`:
+
+```swift
+// Before
+FormSection {
+    ForEach(items) { item in
+        ItemRow(item.name, meta: meta)
+            .padding(.vertical, AppSpacing.md)
+    }
+}
+VStack(spacing: AppSpacing.md) { ItemRow(chat.title, meta: meta) }
+
+// After
+FormSection {
+    ForEach(items) { item in
+        ItemRow(item.name, meta: meta)
+    }
+}
+VStack(spacing: AppSpacing.md) { ItemRow(chat.title, meta: meta, verticalPadding: 0) }
+```
+
+An app's own inset constant for a linked `ItemRow` with a `.symbol` (Dalada's `ItemRowMetrics.symbolInset`) becomes `ItemRowStyle.standard.symbolDividerInset`.
+
+### Gallery and tooling
+
+- The `ItemRow` and `ChecklistRow` pages show two rows in a glass section, the divider between them, with a "Vertical padding" control; the Updates screen's rows (a `List`) and `LoadMoreFooter`'s example take `verticalPadding: 0`.
+- Snapshots: `itemRows` in glass sections, `checklistRows` as items in a section and checklists in a card; `listCards.items` and the row skeletons show the padding.
+
 ## 8.0.1 - 2026-10-21
 
 Gallery and tooling after 8.0.0 and both apps' move to it, no change in an app.

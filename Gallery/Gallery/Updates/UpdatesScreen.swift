@@ -100,7 +100,9 @@ private struct ReleaseRow: View {
             badge: release.isMajor ? "Major" : nil,
             detail: release.summary.first.map(Self.plainText),
             meta: [MetaLine(facts)],
-            leading: .symbol(release.kindSymbol, tint: release.kindTint)
+            leading: .symbol(release.kindSymbol, tint: release.kindTint),
+            // A List row: the list insets it.
+            verticalPadding: 0
         )
     }
 

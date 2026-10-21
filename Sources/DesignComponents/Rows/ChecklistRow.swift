@@ -20,25 +20,34 @@ import DesignSupport
 ///              accessoryLabel: "From gear") { … }
 /// ```
 ///
-/// Padding: none, like a row that lives in a `List` (design-system §10).
+/// A row of a glass section (8.1.0): it pads itself `AppSpacing.sm` above and below, and the
+/// divider under it starts at its title, after the circle. In a stack that spaces its rows,
+/// or a `List`, pass `verticalPadding: 0` (before 8.1.0 it had no padding of its own).
 public struct ChecklistRow: View {
     let title: String
     let isChecked: Bool
     let tint: Color
     let accessorySystemImage: String?
     let accessoryLabel: String?
+    let verticalPadding: CGFloat
     let onToggle: () -> Void
+
+    /// Where the title starts: the circle and the space after it.
+    static let dividerInset = AppIconSize.lg + AppSpacing.md
 
     /// - Parameters:
     ///   - tint: The checked circle.
     ///   - accessorySystemImage: A small mark on the right (where the item came from).
     ///   - accessoryLabel: The mark's VoiceOver label.
+    ///   - verticalPadding: Above and below the row: `AppSpacing.sm` in a glass section, 0 in a
+    ///     stack that spaces its rows or a `List`.
     public init(
         _ title: String,
         isChecked: Bool,
         tint: Color = AppColors.success,
         accessorySystemImage: String? = nil,
         accessoryLabel: String? = nil,
+        verticalPadding: CGFloat = AppSpacing.sm,
         onToggle: @escaping () -> Void
     ) {
         self.title = title
@@ -46,6 +55,7 @@ public struct ChecklistRow: View {
         self.tint = tint
         self.accessorySystemImage = accessorySystemImage
         self.accessoryLabel = accessoryLabel
+        self.verticalPadding = verticalPadding
         self.onToggle = onToggle
     }
 
@@ -66,10 +76,13 @@ public struct ChecklistRow: View {
                         .accessibilityHidden(accessoryLabel == nil)
                 }
             }
+            .padding(.vertical, verticalPadding)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isChecked ? .isSelected : [])
+        // 8.1.0: on the button, not in its label, which keeps it to itself.
+        .rowDividerInset(Self.dividerInset)
     }
 }
 
@@ -176,9 +189,13 @@ enum ChecklistMetrics {
 
 // MARK: - Skeletons
 
-/// Placeholder of a `ChecklistRow`: the circle and a title line.
+/// Placeholder of a `ChecklistRow`: the circle and a title line, padded as the row is.
 public struct ChecklistRowSkeleton: View {
-    public init() {}
+    let verticalPadding: CGFloat
+
+    public init(verticalPadding: CGFloat = AppSpacing.sm) {
+        self.verticalPadding = verticalPadding
+    }
 
     public var body: some View {
         HStack(spacing: AppSpacing.md) {
@@ -189,8 +206,10 @@ public struct ChecklistRowSkeleton: View {
             SkeletonText(AppTypography.body, width: 180)
             Spacer(minLength: 0)
         }
+        .padding(.vertical, verticalPadding)
         .shimmer()
         .skeletonLoadingLabel()
+        .rowDividerInset(ChecklistRow.dividerInset)
     }
 }
 

@@ -281,6 +281,13 @@ rather than importing an app type.
   actions: a tap opens, a long press shows Edit and Delete, the toolbar selects, reorders and
   adds; no swipe actions ([docs/migration-8.0.md](docs/migration-8.0.md)). Both apps move their
   forms, lists and `List` screens in the same step.
+- DesignKit 8.1.0 (2026-10, the owner's look at Tenra after 8.0.0): the rows made for a `List`
+  are rows of a glass section. `ItemRow` pads itself 12 pt and `ChecklistRow` 8 pt above and
+  below (`verticalPadding: 0` in a spaced stack or a `List`), and both start the divider under
+  their text; a link around a row keeps its inset to its label, so it takes
+  `.rowDividerInset(ItemRowStyle.standard.symbolDividerInset)`. Both apps' `section_rows_lint.py`
+  (CI) fails on a section row without its own vertical padding and on a linked icon row without
+  `.rowDividerInset`.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.
