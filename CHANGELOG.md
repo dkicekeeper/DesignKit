@@ -16,6 +16,16 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.0.1 - 2026-10-21
+
+Gallery and tooling after 8.0.0 and both apps' move to it, no change in an app.
+[#89](https://github.com/dkicekeeper/DesignKit/pull/89)
+
+### Gallery and tooling
+
+- A new snapshot reference is the picture two renders agree on, drawn a third time when the first two differ: written from one render, `CardList`'s section at large text was the rare one without the glass shading along its bottom edge, and the next run failed on it.
+- The Gallery's badges follow the apps after their move to 8.0.0 (Tenra#84 to #87, Dalada#25 to #28): `CardList` and `Icon` are used by both apps, `SelectionIndicator` by Dalada only (Tenra's lists pick with `CardList`).
+
 ## 8.0.0 - 2026-10-21
 
 A major release from the owner's review of the apps' screens: one look everywhere, as in Tenra's Finances and Insights. Every section is a Liquid Glass card on the page, with one divider, one row height and one title style, and the things a person keeps are a `CardList` with one set of actions. The probe on a device (builds 96 and 97: menus in a one-row glass section, dragging cards and rows to reorder, a list of 200) passed. `FormSection`'s `style:` and `SectionHeader`'s `.compact` are removed, both apps moving in the same step ([docs/migration-8.0.md](docs/migration-8.0.md)).

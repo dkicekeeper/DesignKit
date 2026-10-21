@@ -72,12 +72,22 @@ func assertComponentSnapshot<V: View>(
         // So when comparing, a render that differs is drawn once more in a new window; the test
         // fails only if the second render differs too. The comparison itself is as strict.
         if isComparingSnapshots,
-           verifySnapshot(
+           let failure = verifySnapshot(
                of: image, as: strategy, named: name, record: .never,
                fileID: fileID, file: file, testName: testName, line: line, column: column
-           ) != nil {
+           ) {
             print("SNAPSHOT-RETRY \(label)")
-            image = await ComponentRenderer.render(view, width: width, appearance: appearance, label: label)
+            let second = await ComponentRenderer.render(view, width: width, appearance: appearance, label: label)
+            // A new reference is the picture two renders agree on: written from one render, it
+            // was now and then the one without the shading, and every later run failed on it
+            // (CardList's section at large text, 8.0.0).
+            if failure.contains("No reference was found"), strategy.diffing.diff(image, second) != nil {
+                print("SNAPSHOT-NEW-DIFFERS \(label)")
+                let third = await ComponentRenderer.render(view, width: width, appearance: appearance, label: label)
+                image = strategy.diffing.diff(image, third) == nil ? image : second
+            } else {
+                image = second
+            }
         }
         assertSnapshot(
             of: image,

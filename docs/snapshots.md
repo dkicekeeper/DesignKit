@@ -136,7 +136,9 @@ References are recorded on CI, not on a laptop, so they match what CI compares w
 1. Push the branch.
 2. Run the **CI** workflow manually on that branch (Actions → CI → Run workflow, or the API)
    with `record_snapshots`:
-   - `missing`: only tests that have no reference yet (a new test or appearance);
+   - `missing`: only tests that have no reference yet (a new test or appearance); a new
+     reference is the picture two renders agree on (8.0.1), drawn a third time when the
+     first two differ, so a render without the glass shading does not become the reference;
    - `failed`: only references that differ (after an intentional visual change); like a
      normal run it draws a differing snapshot a second time and writes it only if it still
      differs (2.4.0), so a render that lost the glass shading is not written over a good
