@@ -23,6 +23,7 @@ import DesignSupport
 ///     var chartAxisLabel: String { shortMonth }      // "JAN"
 ///     var chartTitle: String { fullMonth }           // "January 2025"
 ///     var chartDate: Date? { start }                 // first future bucket gets "Today"
+///     var chartIsPartial: Bool { end > .now }        // this month is not over yet
 /// }
 /// ```
 /// or use `ChartValuePoint` for plain data.
@@ -34,14 +35,20 @@ public protocol ChartPoint: Identifiable, Hashable {
     /// Title of the selection banner ("January 2025"). Defaults to `chartLabel`.
     var chartTitle: String { get }
     /// Start of the bucket. The first point that starts after now gets the "Today" marker.
-    /// Defaults to `nil` (no marker).
+    /// Defaults to `nil` (no marker). The charts open on the period that holds today: the
+    /// last point that does not start after now (the last point when there are no dates).
     var chartDate: Date? { get }
+    /// The period is not over yet (this month, this week), so its value is still growing
+    /// (8.2.0). A bar fades towards its top, the line's last stretch is dashed and the banner
+    /// says "so far" (key `chart.partial`). Defaults to `false`.
+    var chartIsPartial: Bool { get }
 }
 
 public extension ChartPoint {
     var chartAxisLabel: String { chartLabel }
     var chartTitle: String { chartLabel }
     var chartDate: Date? { nil }
+    var chartIsPartial: Bool { false }
 }
 
 /// Ready-made point: a label and values by series id.
@@ -59,13 +66,16 @@ public struct ChartValuePoint: ChartPoint {
     public let chartAxisLabel: String
     public let chartTitle: String
     public let chartDate: Date?
+    public let chartIsPartial: Bool
     public let values: [String: Double]
 
+    /// - Parameter isPartial: the period is not over yet (8.2.0, `ChartPoint.chartIsPartial`).
     public init(
         label: String,
         axisLabel: String? = nil,
         title: String? = nil,
         date: Date? = nil,
+        isPartial: Bool = false,
         values: [String: Double]
     ) {
         self.id = label
@@ -73,6 +83,7 @@ public struct ChartValuePoint: ChartPoint {
         self.chartAxisLabel = axisLabel ?? label
         self.chartTitle = title ?? label
         self.chartDate = date
+        self.chartIsPartial = isPartial
         self.values = values
     }
 
@@ -247,7 +258,7 @@ public extension ChartSeries where Point == ChartValuePoint {
 // MARK: - Value format
 
 /// How the selection banner (and VoiceOver) shows a value. The Y axis always uses
-/// `ChartValueFormat.compactString` ("1.5M", "75K").
+/// `ChartValueFormat.compactString` ("1.5M", "75K"; "1,5 млн" in Russian).
 public enum ChartValueFormat {
     /// "1.5M" / "75K" / "500".
     case compact
@@ -256,12 +267,12 @@ public enum ChartValueFormat {
     /// Your own text, units included ("12.4 km").
     case custom((Double) -> String)
 
-    /// Compact number: 1_500_000 → "1.5M", 75_000 → "75K", 500 → "500", -30_000 → "-30K".
+    /// Compact number in the person's language: 1_500_000 → "1.5M", 75_000 → "75K",
+    /// 1_500 → "1.5K", 500 → "500", -30_000 → "-30K"; in Russian "1,5 млн", "75 тыс.".
+    /// 8.2.0: before, the thousands were rounded to whole numbers (1 500 → "2K", so the axis
+    /// could show the wrong value) and every language read "K" and "M".
     public static func compactString(_ value: Double) -> String {
-        let magnitude = Swift.abs(value)
-        if magnitude >= 1_000_000 { return String(format: "%.1fM", value / 1_000_000) }
-        if magnitude >= 1_000 { return String(format: "%.0fK", value / 1_000) }
-        return String(format: "%.0f", value)
+        value.formatted(.number.notation(.compactName))
     }
 
     /// Plain text of a value, for VoiceOver.

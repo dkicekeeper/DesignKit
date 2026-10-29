@@ -66,6 +66,33 @@ enum GallerySamples {
             )
         }
     }()
+
+    /// `count` months ending this month, for the trend charts' pages (8.2.0): the last sixteen
+    /// are `months`, earlier years repeat them a little lower. `inProgress`: this month is not
+    /// over yet, and only ten days of it are in.
+    static func months(_ count: Int, inProgress: Bool) -> [ChartValuePoint] {
+        let calendar = Calendar.current
+        let thisMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: .now)) ?? .now
+        let axis = DateFormatter()
+        axis.dateFormat = "MMM"
+        let title = DateFormatter()
+        title.dateFormat = "LLLL yyyy"
+        let base = months
+        return (0..<count).map { index in
+            let monthsAgo = count - 1 - index
+            let sample = base[base.count - 1 - monthsAgo % base.count]
+            let scale = pow(0.92, Double(monthsAgo / base.count)) * (inProgress && monthsAgo == 0 ? 0.35 : 1)
+            let date = calendar.date(byAdding: .month, value: -monthsAgo, to: thisMonth) ?? thisMonth
+            return ChartValuePoint(
+                label: "y\(index)",
+                axisLabel: axis.string(from: date).uppercased(),
+                title: title.string(from: date),
+                date: date,
+                isPartial: inProgress && monthsAgo == 0,
+                values: sample.values.mapValues { $0 * scale }
+            )
+        }
+    }
 }
 
 // MARK: - Photos

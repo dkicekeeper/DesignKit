@@ -10,7 +10,12 @@
 //  - "you are here" dot on the last point
 //
 //  Not scrollable: the hero shows the whole series at a glance; ChartSwitcher is the
-//  tool for scrolling.
+//  tool for scrolling. Unlike LineChart it opens with nothing selected: the screen's header
+//  already shows the latest value.
+//
+//  8.2.0: values come from the shared cache (read once per dataset, refreshed when they
+//  change), the banner's slot grows with Dynamic Type, VoiceOver reads each period by its
+//  title with the value in the chart's format.
 //
 
 import SwiftUI
@@ -67,7 +72,8 @@ public struct HeroSparkline<Point: ChartPoint>: View {
     /// tapping it never selects anything.
     private static var projectionLabel: String { "→" }
 
-    private var values: [Double] { dataPoints.map(series.value) }
+    /// The series' values, read once per dataset (8.2.0: on every render before).
+    private var values: [Double] { cache.values.first ?? [] }
 
     /// Last-point dot and projection tail: the solid colour, or the latest value's sign.
     private var tintColor: Color { onColor ? ChartOnColor.mark : series.color(for: values.last ?? 0) }
@@ -82,16 +88,8 @@ public struct HeroSparkline<Point: ChartPoint>: View {
         return paddedMin...(raw.upperBound + headroom)
     }
 
-    private var selectedPoint: Point? {
-        guard let label = selectedValueLabel,
-              let idx = cache.labelToIndex[label] else { return nil }
-        return dataPoints[idx]
-    }
-
     private func rebuildCacheIfNeeded() {
-        rebuildChartCacheIfNeeded(cache, points: dataPoints) { p in
-            [series.value(p)]
-        }
+        rebuildChartCacheIfNeeded(cache, points: dataPoints, series: [series], format: valueFormat)
     }
 
     // MARK: - Body
@@ -114,22 +112,23 @@ public struct HeroSparkline<Point: ChartPoint>: View {
 
     private var bannerSlot: some View {
         ZStack {
-            if let p = selectedPoint {
+            if let label = selectedValueLabel, let index = cache.labelToIndex[label] {
                 ChartSelectionBanner(
-                    title: p.chartTitle,
-                    entries: chartBannerEntries(point: p, series: [series]),
+                    title: cache.titles[index],
+                    note: cache.isPartial[index] ? ChartText.partial : nil,
+                    entries: chartBannerEntries(index: index, cache: cache, series: [series]),
                     format: valueFormat
                 )
                 .transition(.opacity)
             }
         }
-        .chartBannerSlotStyle(animationKey: selectedPoint?.chartLabel)
+        .chartBannerSlotStyle(animationKey: selectedValueLabel)
         .chartSelectionAnnouncement(announcementText)
     }
 
     private var announcementText: String? {
-        guard let p = selectedPoint else { return nil }
-        return chartAnnouncementText(title: p.chartTitle, point: p, series: [series], format: valueFormat)
+        guard let label = selectedValueLabel, let index = cache.labelToIndex[label] else { return nil }
+        return chartAnnouncementText(title: cache.titles[index], index: index, cache: cache, series: [series])
     }
 
     // MARK: - Chart
@@ -141,37 +140,45 @@ public struct HeroSparkline<Point: ChartPoint>: View {
         let lineFill = onColor ? AnyShapeStyle(ChartOnColor.mark) : series.lineStyle(yDomain: styleEnvelope)
         let areaFill = onColor ? ChartOnColor.area : series.areaStyle(yDomain: styleEnvelope)
         let onColor = self.onColor
-        var categoryDomain = dataPoints.map(\.chartLabel)
+        var categoryDomain = cache.labels
         if projectedValue != nil { categoryDomain.append(Self.projectionLabel) }
         let tint = tintColor
         let vals = values
         let axisLabels = cache.axisLabels
 
+        let labels = cache.labels
+        let titles = cache.titles
+        let spoken = cache.spoken.first ?? []
+        let selectedIndex = selectedValueLabel.flatMap { cache.labelToIndex[$0] }
+
         return Chart {
-            ForEach(dataPoints) { point in
-                let v = series.value(point)
+            ForEach(labels.indices, id: \.self) { i in
                 AreaMark(
-                    x: .value("Period", point.chartLabel),
-                    y: .value("Value", v),
+                    x: .value("Period", labels[i]),
+                    y: .value("Value", vals[i]),
                     series: .value("Type", "fact"),
                     stacking: .unstacked
                 )
                 .foregroundStyle(areaFill)
                 .interpolationMethod(.monotone)
+                .accessibilityHidden(true)
                 LineMark(
-                    x: .value("Period", point.chartLabel),
-                    y: .value("Value", v),
+                    x: .value("Period", labels[i]),
+                    y: .value("Value", vals[i]),
                     series: .value("Type", "fact")
                 )
                 .foregroundStyle(lineFill)
                 .interpolationMethod(.monotone)
                 .lineStyle(StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                .accessibilityLabel(titles[i])
+                .accessibilityValue(spoken[i])
             }
 
             if series.showsZeroRule, domain.lowerBound < 0 {
                 RuleMark(y: .value("Zero", 0))
                     .foregroundStyle(onColor ? ChartOnColor.label : AppColors.Text.tertiary.opacity(0.5))
                     .lineStyle(StrokeStyle(lineWidth: 0.5, dash: [4, 4]))
+                    .accessibilityHidden(true)
             }
 
             // Dashed projection tail: last point → forecast endpoint, hollow dot.
@@ -213,12 +220,14 @@ public struct HeroSparkline<Point: ChartPoint>: View {
                 )
                 .symbolSize(90)
                 .foregroundStyle(onColor ? ChartOnColor.mark : AppColors.success)
+                .accessibilityHidden(true)
                 PointMark(
                     x: .value("Period", dataPoints[minIdx].chartLabel),
                     y: .value("Value", vals[minIdx])
                 )
                 .symbolSize(90)
                 .foregroundStyle(onColor ? ChartOnColor.label : AppColors.destructive)
+                .accessibilityHidden(true)
             }
 
             // "You are here" dot on the last point.
@@ -229,21 +238,25 @@ public struct HeroSparkline<Point: ChartPoint>: View {
                 )
                 .symbolSize(55)
                 .foregroundStyle(tint)
+                .accessibilityHidden(true)
             }
 
             // Selection emphasis — drawn LAST; the x-domain is locked by chartXScale.
-            if let p = selectedPoint {
-                let v = series.value(p)
+            if let i = selectedIndex {
+                let v = vals[i]
                 let pointColor = onColor ? ChartOnColor.mark : series.color(for: v)
-                RuleMark(x: .value("Selected", p.chartLabel))
+                RuleMark(x: .value("Selected", labels[i]))
                     .foregroundStyle(pointColor.opacity(0.5))
                     .lineStyle(StrokeStyle(lineWidth: 1.5))
-                PointMark(x: .value("SelectedHalo", p.chartLabel), y: .value("SelectedV", v))
+                    .accessibilityHidden(true)
+                PointMark(x: .value("SelectedHalo", labels[i]), y: .value("SelectedV", v))
                     .symbolSize(180)
                     .foregroundStyle(pointColor.opacity(0.20))
-                PointMark(x: .value("SelectedInner", p.chartLabel), y: .value("SelectedV", v))
+                    .accessibilityHidden(true)
+                PointMark(x: .value("SelectedInner", labels[i]), y: .value("SelectedV", v))
                     .symbolSize(70)
                     .foregroundStyle(pointColor)
+                    .accessibilityHidden(true)
             }
         }
         .chartXScale(domain: categoryDomain)

@@ -3,7 +3,8 @@
 //  DesignKit
 //
 //  LineChart and BarChart behind a bar/line segmented picker and −/+ zoom controls
-//  (Tenra's insight detail charts).
+//  (Tenra's insight detail charts). 8.2.0: the selected period outlives a switch (the other
+//  chart opens centred on it), and only the first chart plays its entrance.
 //
 //  ┌──────────┐               ┌────┐ ┌────┐
 //  │ Bar/Line │  …            │  − │ │  + │       ← controls row
@@ -17,7 +18,8 @@ import SwiftUI
 import DesignTokens
 import DesignSupport
 
-/// Bar/line chart with a style picker and zoom. Selection resets when the style changes.
+/// Bar/line chart with a style picker and zoom. The selected period stays when the style
+/// changes.
 ///
 /// ```swift
 /// ChartSwitcher(dataPoints: months, series: [income, spending], valueFormat: .currency("KZT"))
@@ -32,6 +34,10 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
 
     @State private var style: ChartStyle
     @State private var zoomScale: CGFloat = 1.0
+    /// The selected period's `chartLabel`; nil: the current period.
+    @State private var selection: String?
+    /// Once the style changed, the next chart is simply there: no second entrance.
+    @State private var hasSwitched = false
 
     /// Parameters as in `LineChart`; `initialStyle` picks the first chart shown.
     public init(
@@ -87,7 +93,8 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
                         todayText: todayText,
                         emptyTitle: emptyTitle,
                         emptyMessage: emptyMessage,
-                        zoomScale: $zoomScale
+                        zoomScale: $zoomScale,
+                        selection: $selection
                     )
                 case .bar:
                     BarChart(
@@ -97,14 +104,28 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
                         todayText: todayText,
                         emptyTitle: emptyTitle,
                         emptyMessage: emptyMessage,
-                        zoomScale: $zoomScale
+                        zoomScale: $zoomScale,
+                        selection: $selection
                     )
                 }
             }
-            .id(style)        // fresh state (selection) on style change
+            .id(style)
             .transition(.opacity)
+            .environment(\.chartPlaysEntrance, !hasSwitched)
         }
         .animation(AppAnimation.gentleSpring, value: style)
+    }
+
+    /// The picker's selection: a switch also turns the next chart's entrance off, in the same
+    /// update, so the new chart never starts one.
+    private var styleSelection: Binding<ChartStyle> {
+        Binding(
+            get: { style },
+            set: { newStyle in
+                hasSwitched = true
+                style = newStyle
+            }
+        )
     }
 
     // MARK: - Controls row
@@ -118,7 +139,7 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
     }
 
     private var picker: some View {
-        Picker("", selection: $style) {
+        Picker("", selection: styleSelection) {
             ForEach(ChartStyle.allCases) { s in
                 // A system segmented picker's item: iOS draws its symbol (7.0.0, outside the Icon rule).
                 Label(s.label, systemImage: s.systemImage)
@@ -129,7 +150,7 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
         .pickerStyle(.segmented)
         .controlSize(.large)
         .frame(maxWidth: 120)
-        .accessibilityLabel(Text(verbatim: "Chart style"))
+        .accessibilityLabel(Text(String(localized: "chart.style", defaultValue: "Chart style")))
         .onChange(of: style) { _, _ in
             HapticManager.selection()
         }
@@ -139,12 +160,14 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
 // MARK: - Skeleton
 
 /// Placeholder of a `ChartSwitcher`: the style picker and zoom buttons, then the chart's
-/// skeleton.
+/// skeleton. `series: 2` for a chart of two series, whose banner names each.
 public struct ChartSwitcherSkeleton: View {
     let style: ChartStyle
+    let series: Int
 
-    public init(style: ChartStyle = .line) {
+    public init(style: ChartStyle = .line, series: Int = 1) {
         self.style = style
+        self.series = series
     }
 
     public var body: some View {
@@ -162,8 +185,8 @@ public struct ChartSwitcherSkeleton: View {
             .screenPadding()
 
             switch style {
-            case .line: LineChartSkeleton()
-            case .bar: BarChartSkeleton()
+            case .line: LineChartSkeleton(series: series)
+            case .bar: BarChartSkeleton(series: series)
             }
         }
         .skeletonLoadingLabel()

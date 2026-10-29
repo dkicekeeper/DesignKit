@@ -45,7 +45,11 @@ text, not keys. A new key goes there as well.
 | `calendar.showWeek` | MonthCalendar (VoiceOver action on the header) | `Show week` |
 | `chart.empty.message` | LineChart, BarChart, ChartSwitcher (default `emptyMessage`) | — |
 | `chart.empty.title` | LineChart, BarChart, ChartSwitcher (default `emptyTitle`) | — |
+| `chart.partial` | LineChart, BarChart, HeroSparkline (after the banner's title for a period that is not over, 8.2.0) | `so far` |
+| `chart.style` | ChartSwitcher (the style picker's VoiceOver name, 8.2.0) | `Chart style` |
 | `chart.today` | LineChart, BarChart, ChartSwitcher (default `todayText`) | — |
+| `chart.zoomIn` | ChartZoomControls (VoiceOver, 8.2.0) | `Zoom in` |
+| `chart.zoomOut` | ChartZoomControls (VoiceOver, 8.2.0) | `Zoom out` |
 | `checklist.complete` | ChecklistSummaryRow (VoiceOver on the seal; `completeLabel` replaces it) | `Complete` |
 | `checklist.empty` | ChecklistSummaryRow (no items; `emptyText` replaces it) | `No items yet` |
 | `checklist.progress %lld %lld` | ChecklistSummaryRow (under the bar; `progressText` replaces it) | `%lld of %lld` |

@@ -33,6 +33,7 @@ struct ChartsScreen: View {
 
 private struct ChartSwitcherPage: View {
     @State private var initial: ChartStyle = .line
+    @State private var inProgress = true
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -41,28 +42,36 @@ private struct ChartSwitcherPage: View {
             summary: "A LineChart and a BarChart of the same data with a switch between them; zoom and tap a point.",
             since: "0.5.0",
             apps: [.tenra],
-            canvas: .bleed
+            canvas: .bleed,
+            notes: [
+                "Opens on the current period, selected and in the middle of the window (8.2.0).",
+                "The selected period stays when you switch; zoom re-centres on it.",
+            ]
         ) {
             switch state {
             case .loading:
-                ChartSwitcherSkeleton(style: initial)
+                ChartSwitcherSkeleton(style: initial, series: 2)
             case .empty:
                 ChartSwitcher(dataPoints: [], series: [GallerySamples.income, GallerySamples.expenses],
                               valueFormat: .currency("KZT"), todayText: "Today", initialStyle: initial)
             default:
-                ChartSwitcher(dataPoints: GallerySamples.months, series: [GallerySamples.income, GallerySamples.expenses],
+                ChartSwitcher(dataPoints: GallerySamples.months(24, inProgress: inProgress),
+                              series: [GallerySamples.income, GallerySamples.expenses],
                               valueFormat: .currency("KZT"), todayText: "Today", initialStyle: initial)
-                    .id(initial)
+                    .id("\(initial)\(inProgress)")
             }
         } controls: {
             StateControl(state: $state, states: [.content, .loading, .empty])
             ChoiceControl("Starts as", selection: $initial, options: [("Line", .line), ("Bar", .bar)])
+            ToggleControl("This month in progress", isOn: $inProgress)
         }
     }
 }
 
 private struct LineChartPage: View {
     @State private var signed = true
+    @State private var inProgress = true
+    @State private var count = 24.0
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -71,26 +80,36 @@ private struct LineChartPage: View {
             summary: "A trend over time; a signed series is green above zero and red below with a dashed zero rule.",
             since: "0.5.0",
             apps: [.tenra],
-            canvas: .bleed
+            canvas: .bleed,
+            notes: [
+                "Opens on the current period, selected and in the middle of the window; the banner always shows the selected period (8.2.0).",
+                "A period that is not over (ChartPoint.chartIsPartial) ends the line in dashes and reads “so far”.",
+                "Two series: no fill under the lines, and the banner names each.",
+            ]
         ) {
             if state == .loading {
-                LineChartSkeleton()
-            } else if signed {
-                LineChart(dataPoints: GallerySamples.months, series: GallerySamples.netFlow,
-                          valueFormat: .currency("KZT"), todayText: "Today")
+                LineChartSkeleton(series: signed ? 1 : 2)
+            } else if state == .empty {
+                LineChart(dataPoints: [], series: GallerySamples.netFlow, todayText: "Today")
             } else {
-                LineChart(dataPoints: GallerySamples.months, series: [GallerySamples.income, GallerySamples.expenses],
+                LineChart(dataPoints: GallerySamples.months(Int(count), inProgress: inProgress),
+                          series: signed ? [GallerySamples.netFlow] : [GallerySamples.income, GallerySamples.expenses],
                           valueFormat: .currency("KZT"), todayText: "Today")
+                    .id("\(signed)\(inProgress)")
             }
         } controls: {
-            StateControl(state: $state)
+            StateControl(state: $state, states: [.content, .loading, .empty])
             ToggleControl("Signed series (net)", isOn: $signed)
+            ToggleControl("This month in progress", isOn: $inProgress)
+            SliderControl("Months", value: $count, in: 4...120, step: 1)
         }
     }
 }
 
 private struct BarChartPage: View {
-    @State private var bars = 12.0
+    @State private var count = 24.0
+    @State private var twoSeries = false
+    @State private var inProgress = true
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -99,19 +118,33 @@ private struct BarChartPage: View {
             summary: "Bars per period, one or several series side by side.",
             since: "0.5.0",
             apps: [.tenra],
-            canvas: .bleed
+            canvas: .bleed,
+            notes: [
+                "Opens on the current period, selected and in the middle of the window; its bars are in full colour, the others step back (8.2.0).",
+                "The bars rise from zero as the chart appears; a period that is not over fades towards the top.",
+            ]
         ) {
             if state == .loading {
-                BarChartSkeleton(bars: Int(bars))
+                BarChartSkeleton(bars: min(Int(count), 12), series: twoSeries ? 2 : 1)
+            } else if state == .empty {
+                BarChart(dataPoints: [], series: GallerySamples.distance, todayText: "Today")
+            } else if twoSeries {
+                BarChart(dataPoints: GallerySamples.months(Int(count), inProgress: inProgress),
+                         series: [GallerySamples.income, GallerySamples.expenses],
+                         valueFormat: .currency("KZT"), todayText: "Today")
+                    .id("two\(inProgress)")
             } else {
-                BarChart(dataPoints: Array(GallerySamples.months.suffix(Int(bars))),
+                BarChart(dataPoints: GallerySamples.months(Int(count), inProgress: inProgress),
                          series: GallerySamples.distance,
                          valueFormat: .custom({ "\($0.formatted(.number.precision(.fractionLength(0)))) km" }),
                          todayText: "Today")
+                    .id("one\(inProgress)")
             }
         } controls: {
-            StateControl(state: $state)
-            SliderControl("Bars", value: $bars, in: 4...16, step: 1)
+            StateControl(state: $state, states: [.content, .loading, .empty])
+            ToggleControl("Two series", isOn: $twoSeries)
+            ToggleControl("This month in progress", isOn: $inProgress)
+            SliderControl("Months", value: $count, in: 4...120, step: 1)
         }
     }
 }
@@ -217,26 +250,33 @@ private struct OrbChartPage: View {
 
 private struct ChartSelectionBannerPage: View {
     @State private var twoValues = true
+    @State private var inProgress = false
+    @State private var state: SpecimenState = .content
 
     var body: some View {
         ComponentPage(
             name: "ChartSelectionBanner",
-            summary: "What a tapped point holds: its title and one or more values with colour dots.",
+            summary: "The selected period: its title and one or more values; with several series it names each.",
             since: "0.5.0",
-            canvas: .fill
+            canvas: .fill,
+            notes: ["A note after the title in the secondary colour, “so far” for a period that is not over (8.2.0)."]
         ) {
-            if twoValues {
-                ChartSelectionBanner(title: "January 2026", entries: [
-                    .init(value: 480_000, color: AppColors.success),
-                    .init(value: 275_000, color: AppColors.destructive),
+            if state == .loading {
+                ChartSelectionBannerSkeleton(values: twoValues ? 2 : 1)
+            } else if twoValues {
+                ChartSelectionBanner(title: "January 2026", note: inProgress ? "so far" : nil, entries: [
+                    .init(value: 480_000, color: AppColors.success, label: "Income"),
+                    .init(value: 275_000, color: AppColors.destructive, label: "Expenses"),
                 ], format: .currency("KZT"))
             } else {
-                ChartSelectionBanner(title: "Week 12", entries: [
+                ChartSelectionBanner(title: "Week 12", note: inProgress ? "so far" : nil, entries: [
                     .init(value: 42.5, color: AppColors.accent, showsDot: false),
                 ], format: .custom({ "\($0.formatted()) km" }))
             }
         } controls: {
+            StateControl(state: $state)
             ToggleControl("Two values", isOn: $twoValues)
+            ToggleControl("In progress", isOn: $inProgress)
         }
     }
 }

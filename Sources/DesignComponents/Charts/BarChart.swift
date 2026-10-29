@@ -6,8 +6,13 @@
 //  from Tenra's insights BarChart. Several series are grouped side by side via
 //  `position(by:)`. Paired with LineChart by ChartSwitcher.
 //
-//  Performance rules (charts.md): static Y domain, tap-only selection, cached
-//  label → index lookups, no animations on hot-path state.
+//  8.2.0 (TrendChartFrame): opens on the current period, selected and in the middle of the
+//  window; the selected period's bars are in full colour and the others step back (a ruler
+//  ran through the bar before); the bars rise from zero as the chart appears; the bar of a
+//  period that is not over fades towards its top.
+//
+//  Performance rules (charts.md): static Y domain, values read from the cache, tap-only
+//  selection, no animations on hot-path state.
 //
 
 import SwiftUI
@@ -15,7 +20,8 @@ import Charts
 import DesignTokens
 import DesignSupport
 
-/// Scrollable bar chart with tap selection, a selection banner and a "Today" marker.
+/// Scrollable bar chart that opens on the current period, with tap selection, a banner and a
+/// "Today" marker.
 ///
 /// ```swift
 /// BarChart(dataPoints: months, series: spending, valueFormat: .currency("KZT"))
@@ -28,12 +34,10 @@ public struct BarChart<Point: ChartPoint>: View {
     let todayText: String
     let emptyTitle: String
     let emptyMessage: String?
+    let selection: Binding<String?>?
 
     /// External zoom (ChartSwitcher's toolbar); 1.0 when standalone.
     @Binding var zoomScale: CGFloat
-
-    @State private var selectedValueLabel: String?
-    @State private var cache = ChartPointCache()
 
     /// Parameters as in `LineChart`.
     public init(
@@ -45,13 +49,16 @@ public struct BarChart<Point: ChartPoint>: View {
         emptyMessage: String? = String(localized: "chart.empty.message"),
         zoomScale: Binding<CGFloat> = .constant(1.0)
     ) {
-        self.dataPoints = dataPoints
-        self.seriesList = series
-        self.valueFormat = valueFormat
-        self.todayText = todayText
-        self.emptyTitle = emptyTitle
-        self.emptyMessage = emptyMessage
-        self._zoomScale = zoomScale
+        self.init(
+            dataPoints: dataPoints,
+            series: series,
+            valueFormat: valueFormat,
+            todayText: todayText,
+            emptyTitle: emptyTitle,
+            emptyMessage: emptyMessage,
+            zoomScale: zoomScale,
+            selection: nil
+        )
     }
 
     /// Single-series convenience.
@@ -71,100 +78,62 @@ public struct BarChart<Point: ChartPoint>: View {
             todayText: todayText,
             emptyTitle: emptyTitle,
             emptyMessage: emptyMessage,
-            zoomScale: zoomScale
+            zoomScale: zoomScale,
+            selection: nil
         )
     }
 
-    private var chartHeight: CGFloat { ChartMetrics.plotHeight }
-
-    /// Static Y domain over the whole dataset with ~6 % headroom (bars touching the plot
-    /// edge read as clipped).
-    private var fullYDomain: ClosedRange<Double> {
-        paddedChartDomain(
-            yMin: cache.yMin,
-            yMax: cache.yMax,
-            allowsNegative: seriesList.contains { $0.baseline == .signed }
-        )
-    }
-
-    private var selectedPoint: Point? {
-        guard let label = selectedValueLabel,
-              let idx = cache.labelToIndex[label] else { return nil }
-        return dataPoints[idx]
-    }
-
-    /// Width-independent visible window; see LineChart.
-    private var visibleCount: Int {
-        let base = 12.0
-        let raw = Int((base / max(zoomScale, 0.1)).rounded())
-        return max(1, min(dataPoints.count, raw))
-    }
-
-    private func rebuildCacheIfNeeded() {
-        rebuildChartCacheIfNeeded(cache, points: dataPoints) { p in
-            seriesList.map { $0.value(p) }
-        }
+    /// ChartSwitcher's: the selection outlives a switch to the line.
+    init(
+        dataPoints: [Point],
+        series: [ChartSeries<Point>],
+        valueFormat: ChartValueFormat,
+        todayText: String,
+        emptyTitle: String,
+        emptyMessage: String?,
+        zoomScale: Binding<CGFloat>,
+        selection: Binding<String?>?
+    ) {
+        self.dataPoints = dataPoints
+        self.seriesList = series
+        self.valueFormat = valueFormat
+        self.todayText = todayText
+        self.emptyTitle = emptyTitle
+        self.emptyMessage = emptyMessage
+        self._zoomScale = zoomScale
+        self.selection = selection
     }
 
     // MARK: Body
 
     public var body: some View {
-        // Prime the per-dataset cache before any cache-reading getter fires.
-        let _ = rebuildCacheIfNeeded()
         if dataPoints.isEmpty || seriesList.isEmpty {
-            emptyState.frame(height: chartHeight)
+            EmptyState(
+                icon: "chart.bar",
+                title: emptyTitle,
+                description: emptyMessage,
+                style: .compact
+            )
+            .frame(height: ChartMetrics.plotHeight)
         } else {
-            VStack(spacing: AppSpacing.lg) {
-                bannerSlot
-                fullChart
-                    .padding(.leading, AppSpacing.lg)
-                    .frame(height: chartHeight)
-                    // 2.3.0: the bars rise in one after another, left to right.
-                    .chartDrawIn()
-            }
-            .chartAppear()
-        }
-    }
-
-    private var bannerSlot: some View {
-        ZStack {
-            if let p = selectedPoint {
-                ChartSelectionBanner(
-                    title: p.chartTitle,
-                    entries: chartBannerEntries(point: p, series: seriesList),
-                    format: valueFormat
-                )
-                .transition(.opacity)
+            TrendChartFrame(
+                dataPoints: dataPoints,
+                series: seriesList,
+                valueFormat: valueFormat,
+                zoomScale: $zoomScale,
+                selection: selection,
+                entrance: .rise
+            ) { context in
+                plot(context)
             }
         }
-        .chartBannerSlotStyle(animationKey: selectedPoint?.chartLabel)
-        .chartSelectionAnnouncement(announcementText)
     }
 
-    private var announcementText: String? {
-        guard let p = selectedPoint else { return nil }
-        return chartAnnouncementText(title: p.chartTitle, point: p, series: seriesList, format: valueFormat)
-    }
+    // MARK: - Marks
 
-    private var emptyState: some View {
-        EmptyState(
-            icon: "chart.bar",
-            title: emptyTitle,
-            description: emptyMessage,
-            style: .compact
-        )
-    }
-
-    // MARK: - Interactive full chart
-
-    private var fullChart: some View {
-        let domain = fullYDomain
-        let categoryDomain = dataPoints.map(\.chartLabel)
-        let leftIdx = max(0, dataPoints.count - visibleCount)
-        let trailingAnchorLabel = dataPoints[leftIdx].chartLabel
-        let isGrouped = seriesList.count > 1
+    private func plot(_ context: TrendChartContext) -> some View {
+        let cache = context.cache
         let showZeroRule = seriesList.contains(where: \.showsZeroRule)
-        let axisLabels = cache.axisLabels
         return Chart {
             // Today marker — drawn first; today is one of the categories.
             if let today = cache.todayLabel {
@@ -176,68 +145,87 @@ public struct BarChart<Point: ChartPoint>: View {
                             .font(AppTypography.caption2)
                             .foregroundStyle(AppColors.accent)
                     }
+                    .accessibilityHidden(true)
             }
 
-            ForEach(seriesList.indices, id: \.self) { i in
-                let s = seriesList[i]
-                ForEach(dataPoints) { point in
-                    let v = s.value(point)
-                    // Per-value colour: signed series read green above zero, red below.
-                    if isGrouped {
-                        BarMark(
-                            x: .value("Period", point.chartLabel),
-                            y: .value("Value", v)
-                        )
-                        .cornerRadius(AppRadius.xs)
-                        .foregroundStyle(s.color(for: v).opacity(0.85))
-                        .position(by: .value("Type", s.id))
-                    } else {
-                        BarMark(
-                            x: .value("Period", point.chartLabel),
-                            y: .value("Value", v)
-                        )
-                        .cornerRadius(AppRadius.xs)
-                        .foregroundStyle(s.color(for: v).opacity(0.85))
-                    }
-                }
+            ForEach(seriesList.indices, id: \.self) { s in
+                seriesBars(s, context: context)
             }
 
             if showZeroRule {
                 RuleMark(y: .value("Zero", 0))
                     .foregroundStyle(AppColors.Text.tertiary.opacity(0.5))
                     .lineStyle(StrokeStyle(lineWidth: 0.5, dash: [4, 4]))
-            }
-
-            // Selection emphasis last: translucent column band + a ruler through its centre.
-            if let label = selectedValueLabel {
-                RectangleMark(x: .value("SelBand", label))
-                    .foregroundStyle(AppColors.accent.opacity(0.10))
-
-                RuleMark(x: .value("Selected", label))
-                    .foregroundStyle(AppColors.accent.opacity(0.5))
-                    .lineStyle(StrokeStyle(lineWidth: 1.5))
+                    .accessibilityHidden(true)
             }
         }
-        .chartXScale(domain: categoryDomain)
-        .chartYScale(domain: domain)
-        .chartXVisibleDomain(length: visibleCount)
-        .chartScrollableAxes(.horizontal)
-        .chartScrollPosition(initialX: trailingAnchorLabel)
-        .chartXLabelSelectionWithFeedback($selectedValueLabel)
-        .chartCategoryXAxis(labelMap: axisLabels)
-        .chartCompactYAxis()
-        .chartLegend(.hidden)
+    }
+
+    /// One series' bars. Per-value colour: signed series read green above zero, red below.
+    @ChartContentBuilder
+    private func seriesBars(_ s: Int, context: TrendChartContext) -> some ChartContent {
+        let cache = context.cache
+        let series = seriesList[s]
+        let values = cache.values[s]
+        let isGrouped = seriesList.count > 1
+        let namePrefix = isGrouped ? "\(series.name), " : ""
+
+        ForEach(cache.labels.indices, id: \.self) { i in
+            let v = values[i]
+            let style = Self.barStyle(
+                series.color(for: v),
+                isSelected: i == context.selectedIndex,
+                isPartial: cache.isPartial[i],
+                isNegative: v < 0
+            )
+            if isGrouped {
+                BarMark(
+                    x: .value("Period", cache.labels[i]),
+                    y: .value("Value", context.risen ? v : 0)
+                )
+                .cornerRadius(AppRadius.xs)
+                .foregroundStyle(style)
+                .position(by: .value("Type", series.id))
+                .accessibilityLabel(namePrefix + cache.titles[i])
+                .accessibilityValue(cache.spoken[s][i])
+            } else {
+                BarMark(
+                    x: .value("Period", cache.labels[i]),
+                    y: .value("Value", context.risen ? v : 0),
+                    width: .ratio(ChartMetrics.barWidthRatio)
+                )
+                .cornerRadius(AppRadius.xs)
+                .foregroundStyle(style)
+                .accessibilityLabel(cache.titles[i])
+                .accessibilityValue(cache.spoken[s][i])
+            }
+        }
+    }
+
+    /// The selected period in full colour, the others a step back; a period that is not over
+    /// fades towards the bar's end, as a forecast does.
+    static func barStyle(_ color: Color, isSelected: Bool, isPartial: Bool, isNegative: Bool) -> AnyShapeStyle {
+        let opacity = isSelected ? 1 : ChartMetrics.dimmedOpacity
+        guard isPartial else { return AnyShapeStyle(color.opacity(opacity)) }
+        return AnyShapeStyle(LinearGradient(
+            colors: [color.opacity(opacity), color.opacity(opacity * ChartMetrics.partialFade)],
+            startPoint: isNegative ? .top : .bottom,
+            endPoint: isNegative ? .bottom : .top
+        ))
     }
 }
 
 // MARK: - Skeleton
 
-/// Placeholder of a `BarChart`: the banner slot, then a row of bars with the chart's corner.
+/// Placeholder of a `BarChart`: the banner's card, then a row of bars with the chart's corner.
+/// `series: 2` for a chart of two series, whose banner names each.
 public struct BarChartSkeleton: View {
     let bars: Int
+    let series: Int
 
-    public init(bars: Int = 12) {
+    public init(bars: Int = 12, series: Int = 1) {
         self.bars = max(1, bars)
+        self.series = series
     }
 
     /// Heights of the bars, as shares of the plot: varied, so the row reads as a bar chart.
@@ -245,7 +233,8 @@ public struct BarChartSkeleton: View {
 
     public var body: some View {
         VStack(spacing: AppSpacing.lg) {
-            Color.clear.frame(height: ChartMetrics.bannerHeight)
+            ChartSelectionBannerSkeleton(values: series)
+                .screenPadding()
             HStack(alignment: .bottom, spacing: AppSpacing.sm) {
                 ForEach(0..<bars, id: \.self) { index in
                     Skeleton(

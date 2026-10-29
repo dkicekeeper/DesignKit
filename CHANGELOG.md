@@ -16,6 +16,52 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.2.0 - 2026-10-29
+
+The trend charts after the owner's audit of `LineChart` and `BarChart` (UX, speed, look, motion). A chart opens on the current period, selected and in the middle of the window instead of against the screen's right edge; the banner above it always shows the selected period and names the series; a period that is not over reads as such instead of as a drop. Under it, one frame for both charts that reads the data once, and fixes for a clipped peak, the Y axis labels and VoiceOver.
+
+### Added
+
+- `ChartPoint.chartIsPartial` (default `false`) and `ChartValuePoint(isPartial:)`: the period is not over yet. Its bar fades towards the top, the line's last stretch is dashed, and the banner says "so far" (key `chart.partial`).
+- `ChartSelectionBanner(title:note:entries:format:)`: a note after the title in the secondary colour, and `ChartSelectionBanner.Entry(label:)`: the series' name over its value.
+- `ChartSelectionBannerSkeleton(values:)`, and `series:` on `LineChartSkeleton`, `BarChartSkeleton` and `ChartSwitcherSkeleton` for a chart of two series.
+- Strings `chart.partial` ("so far"), `chart.style` ("Chart style"), `chart.zoomIn` ("Zoom in") and `chart.zoomOut` ("Zoom out"), each with an English default.
+
+### Changed
+
+- `LineChart`, `BarChart` and `ChartSwitcher` open on the current period: the last point that does not start after now (the last point when the points have no dates). It is selected, and when the series is longer than the window it sits in the middle, with empty periods after the last one. A series that fits the window is shown whole, as before.
+- The banner above these charts is always there and shows the selected period, the current one until a tap picks another; a touch that lifts no longer clears it. With several series it names each over its value, so it is the chart's legend.
+- `ChartSwitcher` keeps the selected period when the style changes and opens the other chart centred on it; only the first chart plays its entrance. A zoom centres the window on the selected period.
+- `LineChart` draws a clean line: no dot on every value, round ends, a halo and a dot in a ring of the background on the selected period. With several series there is no fill under the lines (two fills over each other turned brown).
+- `BarChart`: the selected period's bars are in full colour and the others at 40 % (a ruler through the bar before); a single series' bars take 60 % of their period's width; the bars rise from zero as the chart appears instead of being revealed from the left.
+- The Y axis of `LineChart`, `BarChart` and `HeroSparkline` shows about four values over a thin dashed grid. `ChartValueFormat.compactString` follows the person's language ("1,5 млн", "75 тыс." in Russian) and keeps a decimal (1 500 reads "1.5K", not "2K").
+- The charts fade in without the 0.94 scale; the line is traced in 0.7 s (0.9 s before). New values under the same periods move the marks to them; new periods or a zoom fade to the new chart. The banner's numbers roll from one period to the next in every format.
+- `HeroSparkline`'s banner slot is 64 pt at the default text size and grows with Dynamic Type (56 pt before, less than the banner, which overlapped the plot at large sizes).
+- VoiceOver reads each period of these charts by its title with the value in the chart's format (the raw label and number before), once per value; their Audio Graph does the same.
+
+### Fixed
+
+- A chart kept its Y domain when its values changed under the same periods (a new expense this month, another series on the same points): the new peak was clipped. The charts' cache now covers the values and the series.
+- `LineChart` with several series left a negative value without its halo when selected; only zero values are skipped now.
+- `.chartDrawIn()` no longer keeps its mask once the chart is drawn, so a scrolling chart does not render through it on every frame.
+
+### Migration
+
+Nothing has to change. To show this month as not over, set `chartIsPartial` where an app conforms its points:
+
+```swift
+extension PeriodDataPoint: ChartPoint {
+    nonisolated var chartIsPartial: Bool { periodEnd > .now }
+}
+```
+
+The keys `chart.partial`, `chart.style`, `chart.zoomIn` and `chart.zoomOut` go in the app's string tables for its other languages (docs/localization-keys.md); English is built in.
+
+### Gallery and tooling
+
+- The `LineChart`, `BarChart` and `ChartSwitcher` pages take up to 120 months and a "This month in progress" switch; `BarChart` a "Two series" switch; `ChartSelectionBanner` a note and its skeleton.
+- Snapshots: `lineAndBarCharts` as one chart per snapshot (each has its banner, a glass card), `unfinishedPeriod`, `centredWindow`, `chartSelectionBanner.legend`; the chart skeletons show the banner's card.
+
 ## 8.1.0 - 2026-10-21
 
 The rows made for a `List`, `ItemRow` and `ChecklistRow`, are rows of a glass section now: they pad themselves and start the divider under their text, so a section of them no longer depends on each app padding them by hand. Found in Tenra, where backups, Ten's memory and subcategories had their text on the dividers (Tenra#88), and in Dalada, where the checklist items' dividers ran under the circles.

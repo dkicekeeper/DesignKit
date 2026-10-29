@@ -309,6 +309,28 @@
         }
       }
     },
+    "chart.partial" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "so far"
+          }
+        }
+      }
+    },
+    "chart.style" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart style"
+          }
+        }
+      }
+    },
     "chart.today" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -316,6 +338,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Today"
+          }
+        }
+      }
+    },
+    "chart.zoomIn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom in"
+          }
+        }
+      }
+    },
+    "chart.zoomOut" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom out"
           }
         }
       }

@@ -68,15 +68,39 @@ extension ComponentSnapshots {
             )
         }
 
+        /// One chart per snapshot: each opens on its last period with the banner, a glass card.
         @Test func lineAndBarCharts() async {
-            let income = ChartSeries<ChartValuePoint>.keyed("income", name: "Income", coloring: .solid(AppColors.success))
-            let expenses = ChartSeries<ChartValuePoint>.keyed("expenses", name: "Expenses", coloring: .solid(AppColors.destructive))
-
             await assertComponentSnapshot(
-                VStack(spacing: AppSpacing.xl) {
-                    LineChart(dataPoints: ChartSample.months, series: [income, expenses], todayText: "Today")
-                    BarChart(dataPoints: ChartSample.months, series: [income, expenses], todayText: "Today")
-                }
+                LineChart(dataPoints: ChartSample.months, series: [ChartSample.income, ChartSample.expenses], todayText: "Today"),
+                named: "line",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                BarChart(dataPoints: ChartSample.months, series: [ChartSample.income, ChartSample.expenses], todayText: "Today"),
+                named: "bar"
+            )
+        }
+
+        /// 8.2.0: the last period is not over: a dashed end of the line, a bar fading upwards,
+        /// "so far" in the banner.
+        @Test func unfinishedPeriod() async {
+            await assertComponentSnapshot(
+                LineChart(dataPoints: ChartSample.monthsInProgress, series: ChartSample.income,
+                          valueFormat: .currency("KZT"), todayText: "Today"),
+                named: "line"
+            )
+            await assertComponentSnapshot(
+                BarChart(dataPoints: ChartSample.monthsInProgress, series: ChartSample.income,
+                         valueFormat: .currency("KZT"), todayText: "Today"),
+                named: "bar"
+            )
+        }
+
+        /// 8.2.0: more periods than the window holds: the last one in the middle, empty periods
+        /// after it.
+        @Test func centredWindow() async {
+            await assertComponentSnapshot(
+                BarChart(dataPoints: ChartSample.year, series: ChartSample.expenses, todayText: "Today")
             )
         }
 
@@ -189,6 +213,15 @@ extension ComponentSnapshots {
                 ], format: .custom({ String(format: "%.1f km", $0) })),
                 named: "oneValue"
             )
+            // 8.2.0: the series' names (the legend) and a note after the title.
+            await assertComponentSnapshot(
+                ChartSelectionBanner(title: "January 2026", note: "so far", entries: [
+                    .init(value: 480_000, color: AppColors.success, label: "Income"),
+                    .init(value: 275_000, color: AppColors.destructive, label: "Expenses"),
+                ], format: .currency("KZT")),
+                named: "legend",
+                appearances: [.light, .dark, .largeText]
+            )
         }
     }
 }
@@ -204,6 +237,24 @@ private enum ChartSample {
     static let months: [ChartValuePoint] = rows.map { row in
         ChartValuePoint(label: row.0, values: ["income": row.1 * 1_000, "expenses": row.2 * 1_000])
     }
+
+    /// The same six months, June not over yet (a third of it in).
+    static let monthsInProgress: [ChartValuePoint] = rows.map { row in
+        let inProgress = row.0 == "Jun"
+        let share = inProgress ? 0.35 : 1
+        return ChartValuePoint(label: row.0, isPartial: inProgress,
+                               values: ["income": row.1 * 1_000 * share, "expenses": row.2 * 1_000 * share])
+    }
+
+    /// Eighteen months, more than a chart's window of twelve.
+    static let year: [ChartValuePoint] = (0..<18).map { index in
+        let row = rows[index % rows.count]
+        return ChartValuePoint(label: "\(row.0) \(index / rows.count + 1)", axisLabel: row.0,
+                               values: ["income": row.1 * 1_000, "expenses": row.2 * 1_000])
+    }
+
+    static let income = ChartSeries<ChartValuePoint>.keyed("income", name: "Income", coloring: .solid(AppColors.success))
+    static let expenses = ChartSeries<ChartValuePoint>.keyed("expenses", name: "Expenses", coloring: .solid(AppColors.destructive))
 
     /// A spending breakdown for the orb, donut and proportion bars.
     static let slices: [DonutSlice] = [

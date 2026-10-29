@@ -7,8 +7,13 @@
 //  visible window follows `zoomScale` (ChartSwitcher's −/+). Pinch-to-zoom is not used:
 //  it fights the navigation back-swipe.
 //
-//  Performance rules (charts.md): static Y domain, tap-only selection, cached
-//  label → index lookups, no animations on hot-path state.
+//  8.2.0 (TrendChartFrame): opens on the current period, selected and in the middle of the
+//  window; the banner always shows the selected period and names the series. A clean line
+//  (no dot on every value), a fill only under a lone series, a dashed last stretch for a
+//  period that is not over.
+//
+//  Performance rules (charts.md): static Y domain, values read from the cache, tap-only
+//  selection, no animations on hot-path state.
 //
 
 import SwiftUI
@@ -16,11 +21,12 @@ import Charts
 import DesignTokens
 import DesignSupport
 
-/// Scrollable area/line chart with tap selection, a selection banner and a "Today" marker.
+/// Scrollable area/line chart that opens on the current period, with tap selection, a banner
+/// and a "Today" marker.
 ///
 /// ```swift
 /// LineChart(dataPoints: months, series: netFlow, valueFormat: .currency("KZT"))
-/// LineChart(dataPoints: months, series: [income, spending])   // overlaid, dual banner
+/// LineChart(dataPoints: months, series: [income, spending])   // overlaid, the banner names both
 /// ```
 ///
 /// For a card-sized trend use `Sparkline` (Canvas, no Charts render tree).
@@ -31,16 +37,14 @@ public struct LineChart<Point: ChartPoint>: View {
     let todayText: String
     let emptyTitle: String
     let emptyMessage: String?
+    let selection: Binding<String?>?
 
     /// External zoom (ChartSwitcher's toolbar); 1.0 when standalone.
     @Binding var zoomScale: CGFloat
 
-    @State private var selectedValueLabel: String?
-    @State private var cache = ChartPointCache()
-
     /// - Parameters:
     ///   - dataPoints: points in X order (oldest first).
-    ///   - series: one or more series; several are overlaid and the banner lists each.
+    ///   - series: one or more series; several are overlaid and the banner lists each by name.
     ///   - valueFormat: banner / VoiceOver value format. The Y axis is always compact.
     ///   - todayText: label of the "Today" marker (key `chart.today`).
     ///   - emptyTitle / emptyMessage: empty state (keys `chart.empty.title` / `chart.empty.message`).
@@ -54,13 +58,16 @@ public struct LineChart<Point: ChartPoint>: View {
         emptyMessage: String? = String(localized: "chart.empty.message"),
         zoomScale: Binding<CGFloat> = .constant(1.0)
     ) {
-        self.dataPoints = dataPoints
-        self.seriesList = series
-        self.valueFormat = valueFormat
-        self.todayText = todayText
-        self.emptyTitle = emptyTitle
-        self.emptyMessage = emptyMessage
-        self._zoomScale = zoomScale
+        self.init(
+            dataPoints: dataPoints,
+            series: series,
+            valueFormat: valueFormat,
+            todayText: todayText,
+            emptyTitle: emptyTitle,
+            emptyMessage: emptyMessage,
+            zoomScale: zoomScale,
+            selection: nil
+        )
     }
 
     /// Single-series convenience.
@@ -80,104 +87,67 @@ public struct LineChart<Point: ChartPoint>: View {
             todayText: todayText,
             emptyTitle: emptyTitle,
             emptyMessage: emptyMessage,
-            zoomScale: zoomScale
+            zoomScale: zoomScale,
+            selection: nil
         )
     }
 
-    private var chartHeight: CGFloat { ChartMetrics.plotHeight }
-
-    /// Static Y domain over the whole dataset (all series), from the cached envelope.
-    private var fullYDomain: ClosedRange<Double> {
-        paddedChartDomain(
-            yMin: cache.yMin,
-            yMax: cache.yMax,
-            allowsNegative: seriesList.contains { $0.baseline == .signed }
-        )
-    }
-
-    private var selectedPoint: Point? {
-        guard let label = selectedValueLabel,
-              let idx = cache.labelToIndex[label] else { return nil }
-        return dataPoints[idx]
-    }
-
-    /// Points in the visible window: 12 by default; zoom-in halves, zoom-out doubles.
-    /// Width-independent: `chartXVisibleDomain(length:)` on a category axis counts categories.
-    private var visibleCount: Int {
-        let base = 12.0
-        let raw = Int((base / max(zoomScale, 0.1)).rounded())
-        return max(1, min(dataPoints.count, raw))
-    }
-
-    private func rebuildCacheIfNeeded() {
-        rebuildChartCacheIfNeeded(cache, points: dataPoints) { p in
-            seriesList.map { $0.value(p) }
-        }
+    /// ChartSwitcher's: the selection outlives a switch to the bars.
+    init(
+        dataPoints: [Point],
+        series: [ChartSeries<Point>],
+        valueFormat: ChartValueFormat,
+        todayText: String,
+        emptyTitle: String,
+        emptyMessage: String?,
+        zoomScale: Binding<CGFloat>,
+        selection: Binding<String?>?
+    ) {
+        self.dataPoints = dataPoints
+        self.seriesList = series
+        self.valueFormat = valueFormat
+        self.todayText = todayText
+        self.emptyTitle = emptyTitle
+        self.emptyMessage = emptyMessage
+        self._zoomScale = zoomScale
+        self.selection = selection
     }
 
     // MARK: Body
 
     public var body: some View {
-        // Prime the per-dataset cache before any cache-reading getter fires.
-        let _ = rebuildCacheIfNeeded()
         if dataPoints.isEmpty || seriesList.isEmpty {
-            emptyState.frame(height: chartHeight)
+            EmptyState(
+                icon: "chart.line.uptrend.xyaxis",
+                title: emptyTitle,
+                description: emptyMessage,
+                style: .compact
+            )
+            .frame(height: ChartMetrics.plotHeight)
         } else {
-            VStack(spacing: AppSpacing.lg) {
-                bannerSlot
-                fullChart
-                    .padding(.leading, AppSpacing.lg)
-                    .frame(height: chartHeight)
-                    // 2.3.0: the line is traced in from the left.
-                    .chartDrawIn()
-            }
-            .chartAppear()
-        }
-    }
-
-    private var bannerSlot: some View {
-        ZStack {
-            if let p = selectedPoint {
-                ChartSelectionBanner(
-                    title: p.chartTitle,
-                    entries: chartBannerEntries(point: p, series: seriesList),
-                    format: valueFormat
-                )
-                .transition(.opacity)
+            TrendChartFrame(
+                dataPoints: dataPoints,
+                series: seriesList,
+                valueFormat: valueFormat,
+                zoomScale: $zoomScale,
+                selection: selection,
+                entrance: .drawIn
+            ) { context in
+                plot(context)
             }
         }
-        .chartBannerSlotStyle(animationKey: selectedPoint?.chartLabel)
-        .chartSelectionAnnouncement(announcementText)
     }
 
-    private var announcementText: String? {
-        guard let p = selectedPoint else { return nil }
-        return chartAnnouncementText(title: p.chartTitle, point: p, series: seriesList, format: valueFormat)
-    }
+    // MARK: - Marks
 
-    private var emptyState: some View {
-        EmptyState(
-            icon: "chart.line.uptrend.xyaxis",
-            title: emptyTitle,
-            description: emptyMessage,
-            style: .compact
-        )
-    }
-
-    // MARK: - Interactive full chart
-
-    private var fullChart: some View {
-        let domain = fullYDomain
+    private func plot(_ context: TrendChartContext) -> some View {
+        let cache = context.cache
         // Gradients resolve against the marks' own bounds: use the UNPADDED envelope, not
         // the padded axis domain, or the colour switch drifts above the zero line.
         let styleEnvelope = min(cache.yMin, 0)...max(cache.yMax, 1)
         let lineFills = seriesList.map { $0.lineStyle(yDomain: styleEnvelope) }
         let areaFills = seriesList.map { $0.areaStyle(yDomain: styleEnvelope) }
-        let categoryDomain = dataPoints.map(\.chartLabel)
-        let leftIdx = max(0, dataPoints.count - visibleCount)
-        let trailingAnchorLabel = dataPoints[leftIdx].chartLabel
         let showZeroRule = seriesList.contains(where: \.showsZeroRule)
-        let axisLabels = cache.axisLabels
         return Chart {
             // Today / future boundary — drawn first; today is one of the categories.
             if let today = cache.todayLabel {
@@ -189,101 +159,135 @@ public struct LineChart<Point: ChartPoint>: View {
                             .font(AppTypography.caption2)
                             .foregroundStyle(AppColors.accent)
                     }
+                    .accessibilityHidden(true)
             }
 
-            // `series:` + `stacking: .unstacked` keep several series as distinct overlaid
-            // lines/areas with a y = 0 baseline. Harmless for one series.
-            ForEach(seriesList.indices, id: \.self) { i in
-                let s = seriesList[i]
-                ForEach(dataPoints) { point in
-                    let v = s.value(point)
-                    AreaMark(
-                        x: .value("Period", point.chartLabel),
-                        y: .value("Value", v),
-                        series: .value("Type", s.id),
-                        stacking: .unstacked
-                    )
-                    .foregroundStyle(areaFills[i])
-                    .interpolationMethod(.monotone)
-                    LineMark(
-                        x: .value("Period", point.chartLabel),
-                        y: .value("Value", v),
-                        series: .value("Type", s.id)
-                    )
-                    .foregroundStyle(lineFills[i])
-                    .interpolationMethod(.monotone)
-                    .lineStyle(StrokeStyle(lineWidth: s.lineWidth))
-                    PointMark(x: .value("Period", point.chartLabel), y: .value("Value", v))
-                        .foregroundStyle(s.color(for: v))
-                        .symbolSize(30)
-                }
+            ForEach(seriesList.indices, id: \.self) { s in
+                seriesMarks(s, cache: cache, lineFill: lineFills[s], areaFill: areaFills[s])
             }
 
             if showZeroRule {
                 RuleMark(y: .value("Zero", 0))
                     .foregroundStyle(AppColors.Text.tertiary.opacity(0.5))
                     .lineStyle(StrokeStyle(lineWidth: 0.5, dash: [4, 4]))
+                    .accessibilityHidden(true)
             }
 
-            // Selection emphasis — drawn LAST so it is on top: ruler → halo → point.
-            // Several series: every series' point at the selected x; zero values are
-            // skipped (a halo on the baseline reads as noise).
-            if let label = selectedValueLabel,
-               let idx = cache.labelToIndex[label] {
-                let selected = dataPoints[idx]
-                let rulerColor = seriesList.count == 1
-                    ? seriesList[0].color(for: seriesList[0].value(selected))
-                    : AppColors.accent
+            // Selection emphasis — drawn LAST so it is on top: ruler → halo → dot.
+            selectionMarks(index: context.selectedIndex, cache: cache)
+        }
+    }
 
-                RuleMark(x: .value("Selected", label))
-                    .foregroundStyle(rulerColor.opacity(0.5))
-                    .lineStyle(StrokeStyle(lineWidth: 1.5))
+    /// One series: the fill (a lone series only: two fills over each other turn muddy), the
+    /// line, and a dashed stretch into the periods that are not over.
+    @ChartContentBuilder
+    private func seriesMarks(
+        _ s: Int,
+        cache: ChartPointCache,
+        lineFill: AnyShapeStyle,
+        areaFill: AnyShapeStyle
+    ) -> some ChartContent {
+        let series = seriesList[s]
+        let values = cache.values[s]
+        let hasFill = seriesList.count == 1
+        let hasPartial = cache.partialStart != nil
+        let partialStart = cache.partialStart ?? cache.labels.count
+        let solid = StrokeStyle(lineWidth: series.lineWidth, lineCap: .round, lineJoin: .round)
+        let dashed = StrokeStyle(lineWidth: series.lineWidth, lineCap: .round, lineJoin: .round, dash: ChartMetrics.partialDash)
+        let namePrefix = seriesList.count > 1 ? "\(series.name), " : ""
 
-                ForEach(seriesList.indices, id: \.self) { i in
-                    let s = seriesList[i]
-                    let v = s.value(selected)
-                    if seriesList.count == 1 || v > 0 {
-                        let pointColor = s.color(for: v)
-                        PointMark(
-                            x: .value("SelectedHalo", selected.chartLabel),
-                            y: .value("SelectedV", v)
-                        )
-                        .symbolSize(180)
-                        .foregroundStyle(pointColor.opacity(0.20))
-
-                        PointMark(
-                            x: .value("SelectedInner", selected.chartLabel),
-                            y: .value("SelectedV", v)
-                        )
-                        .symbolSize(70)
-                        .foregroundStyle(pointColor)
-                    }
-                }
+        ForEach(cache.labels.indices, id: \.self) { i in
+            if hasFill {
+                // `series:` + `stacking: .unstacked` keep the area on its own y = 0 baseline.
+                AreaMark(
+                    x: .value("Period", cache.labels[i]),
+                    y: .value("Value", values[i]),
+                    series: .value("Type", series.id),
+                    stacking: .unstacked
+                )
+                .foregroundStyle(areaFill)
+                .interpolationMethod(.monotone)
+                .accessibilityHidden(true)
+            }
+            if i < partialStart {
+                LineMark(
+                    x: .value("Period", cache.labels[i]),
+                    y: .value("Value", values[i]),
+                    series: .value("Type", series.id)
+                )
+                .foregroundStyle(lineFill)
+                .interpolationMethod(.monotone)
+                .lineStyle(solid)
+                .accessibilityLabel(namePrefix + cache.titles[i])
+                .accessibilityValue(cache.spoken[s][i])
+            }
+            if hasPartial && i >= max(partialStart - 1, 0) {
+                LineMark(
+                    x: .value("Period", cache.labels[i]),
+                    y: .value("Value", values[i]),
+                    series: .value("Type", series.id + ChartPartialSeries.suffix)
+                )
+                .foregroundStyle(lineFill)
+                .interpolationMethod(.monotone)
+                .lineStyle(dashed)
+                .accessibilityLabel(namePrefix + cache.titles[i])
+                .accessibilityValue(cache.spoken[s][i])
+                // The stretch starts on the last finished period, already read above.
+                .accessibilityHidden(i < partialStart)
             }
         }
-        // Lock the category order to the data: otherwise Charts derives the x-domain from
-        // the first occurrence across marks and the selection ruler reorders the axis.
-        .chartXScale(domain: categoryDomain)
-        .chartYScale(domain: domain)
-        .chartXVisibleDomain(length: visibleCount)
-        .chartScrollableAxes(.horizontal)
-        .chartScrollPosition(initialX: trailingAnchorLabel)
-        .chartXLabelSelectionWithFeedback($selectedValueLabel)
-        .chartCategoryXAxis(labelMap: axisLabels)
-        .chartCompactYAxis()
-        .chartLegend(.hidden)
     }
+
+    /// A ruler through the selected period, a halo and a ringed dot on each series' value
+    /// there. Several series: zero values are skipped (a halo on the baseline reads as noise).
+    @ChartContentBuilder
+    private func selectionMarks(index: Int, cache: ChartPointCache) -> some ChartContent {
+        let label = cache.labels[index]
+        let rulerColor = seriesList.count == 1
+            ? seriesList[0].color(for: cache.values[0][index])
+            : AppColors.accent
+
+        RuleMark(x: .value("Selected", label))
+            .foregroundStyle(rulerColor.opacity(0.5))
+            .lineStyle(StrokeStyle(lineWidth: 1.5))
+            .accessibilityHidden(true)
+
+        ForEach(seriesList.indices, id: \.self) { s in
+            let v = cache.values[s][index]
+            if seriesList.count == 1 || v != 0 {
+                let color = seriesList[s].color(for: v)
+                PointMark(x: .value("SelectedHalo", label), y: .value("SelectedV", v))
+                    .symbolSize(ChartMetrics.haloSize)
+                    .foregroundStyle(color.opacity(0.20))
+                    .accessibilityHidden(true)
+                PointMark(x: .value("SelectedDot", label), y: .value("SelectedV", v))
+                    .symbol { ChartSelectedDot(color: color) }
+                    .accessibilityHidden(true)
+            }
+        }
+    }
+}
+
+/// The dashed stretch of a line is a series of its own.
+enum ChartPartialSeries {
+    static let suffix = "\u{2063}partial"
 }
 
 // MARK: - Skeleton
 
-/// Placeholder of a `LineChart`: the banner slot, then the plot area with a soft corner.
+/// Placeholder of a `LineChart`: the banner's card, then the plot area with a soft corner.
+/// `series: 2` for a chart of two series, whose banner names each.
 public struct LineChartSkeleton: View {
-    public init() {}
+    let series: Int
+
+    public init(series: Int = 1) {
+        self.series = series
+    }
 
     public var body: some View {
         VStack(spacing: AppSpacing.lg) {
-            Color.clear.frame(height: ChartMetrics.bannerHeight)
+            ChartSelectionBannerSkeleton(values: series)
+                .screenPadding()
             Skeleton(height: ChartMetrics.plotHeight)
                 .padding(.leading, AppSpacing.lg)
         }

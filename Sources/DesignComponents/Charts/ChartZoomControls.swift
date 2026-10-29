@@ -1,9 +1,10 @@
 //
 //  ChartZoomControls.swift
-//  Tenra
+//  DesignKit
 //
-//  Reusable +/- zoom button pair for scrollable period charts.
-//  Extracted during the 2026-07 charts refactor.
+//  Reusable +/- zoom button pair for scrollable period charts, ported from Tenra (its
+//  2026-07 charts refactor). The charts re-centre on the selected period after a zoom
+//  (8.2.0); the period's length comes from the app (a month, a week), not from here.
 //
 
 import SwiftUI
@@ -48,7 +49,7 @@ public struct ChartZoomControls: View {
                 .buttonBorderShape(.circle)
                 .disabled(!canZoomOut)
                 .opacity(canZoomOut ? 1.0 : 0.4)
-                .accessibilityLabel(Text(verbatim: "Zoom out"))
+                .accessibilityLabel(Text(String(localized: "chart.zoomOut", defaultValue: "Zoom out")))
 
                 Button {
                     HapticManager.light()
@@ -64,7 +65,7 @@ public struct ChartZoomControls: View {
                 .buttonBorderShape(.circle)
                 .disabled(!canZoomIn)
                 .opacity(canZoomIn ? 1.0 : 0.4)
-                .accessibilityLabel(Text(verbatim: "Zoom in"))
+                .accessibilityLabel(Text(String(localized: "chart.zoomIn", defaultValue: "Zoom in")))
             }
         }
     }
