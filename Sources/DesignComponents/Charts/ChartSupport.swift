@@ -3,13 +3,13 @@
 //  DesignKit
 //
 //  Shared infrastructure of the ChartPoint charts (LineChart, BarChart, HeroSparkline),
-//  ported from Tenra's PeriodChartHelpers / ChartAxisHelpers and reworked in 8.2.0:
+//  ported from Tenra's PeriodChartHelpers / ChartAxisHelpers and reworked in 8.3.0:
 //
 //  - `ChartPointCache`: everything derived from a dataset (each series' values, label →
 //    index, axis labels, Y envelope, the current period, the unfinished periods, VoiceOver
 //    texts), keyed by a hash of the points and the series ids. Lives in `@State`, so it
 //    survives body re-evaluations; rebuilt only when the data changes, so a tap or a scroll
-//    never redoes O(N) work or calls a series' value closure. Before 8.2.0 the key was the
+//    never redoes O(N) work or calls a series' value closure. Before 8.3.0 the key was the
 //    count and the first and last labels: new values under the same labels kept a stale
 //    Y domain and clipped the new peak.
 //  - `ChartWindow`: the visible window of a scrolling chart, centred on the selected period,
@@ -256,7 +256,7 @@ func paddedChartDomain(yMin: Double, yMax: Double, allowsNegative: Bool) -> Clos
 
 // MARK: - Window
 
-/// The visible part of a scrolling chart (8.2.0): `visiblePoints` categories at zoom 1, the
+/// The visible part of a scrolling chart (8.3.0): `visiblePoints` categories at zoom 1, the
 /// selected period in the middle. When that period is near the end, empty categories follow
 /// the last point, so the latest period does not sit against the screen's edge.
 struct ChartWindow {
@@ -267,7 +267,7 @@ struct ChartWindow {
     /// The category at the window's leading edge when the chart appears.
     let leadingLabel: String
 
-    /// Empty categories before the first point (a window that follows the scroll, 8.2.0).
+    /// Empty categories before the first point (a window that follows the scroll, 8.3.0).
     let leadingPadding: Int
 
     /// Categories on screen at once: 12 at zoom 1, fewer zoomed in, at most the whole series
@@ -280,7 +280,7 @@ struct ChartWindow {
     }
 
     /// - Parameter followsScroll: the selection is whatever sits in the window's middle
-    ///   (8.2.0): empty categories pad both ends, so the first and the last point can reach
+    ///   (8.3.0): empty categories pad both ends, so the first and the last point can reach
     ///   the middle too, and the chart always scrolls.
     init(labels: [String], centerIndex: Int, zoomScale: CGFloat, followsScroll: Bool = false) {
         let count = labels.count
@@ -339,7 +339,7 @@ struct ChartWindow {
 // MARK: - Axis builders
 
 extension View {
-    /// Category X axis: the labels `labels` chose (8.2.0: Swift Charts' greedy collision
+    /// Category X axis: the labels `labels` chose (8.3.0: Swift Charts' greedy collision
     /// resolution before), display strings from `labelMap`. The selected period's label is
     /// semibold in the primary colour. On colour (`tone: .onColor`, 4.5.0) the labels are
     /// white, the others translucent.
@@ -364,7 +364,7 @@ extension View {
     }
 
     /// Leading Y axis: about four values in the person's language ("75K", "1,5 млн") over a
-    /// thin dashed grid (8.2.0; a solid grid at the system's tick count before). On colour
+    /// thin dashed grid (8.3.0; a solid grid at the system's tick count before). On colour
     /// (`tone: .onColor`, 4.5.0) the grid and the labels are translucent white.
     @ViewBuilder
     func chartCompactYAxis(tone: HeroTone = .onSurface) -> some View {
@@ -401,7 +401,7 @@ extension View {
 
 // MARK: - X axis labels
 
-/// Which category labels the X axis draws (8.2.0). Swift Charts' greedy collision resolution
+/// Which category labels the X axis draws (8.3.0). Swift Charts' greedy collision resolution
 /// dropped every label that did not fit, unevenly and at the edges, so a period could have no
 /// date under it. Now the labels go at a regular step that fits the widest one, counted from
 /// the current period (which always has its label); the selected period's label is always
@@ -509,7 +509,7 @@ extension View {
     }
 
     /// Slot for a banner that comes and goes (HeroSparkline), so the chart does not jump. Its
-    /// height follows Dynamic Type (8.2.0: a fixed 56 pt before, less than the banner itself).
+    /// height follows Dynamic Type (8.3.0: a fixed 56 pt before, less than the banner itself).
     func chartBannerSlotStyle(animationKey: AnyHashable?) -> some View {
         modifier(ChartBannerSlot(animationKey: animationKey))
     }
@@ -552,7 +552,7 @@ func chartAnnouncementText<Point>(
 }
 
 /// Banner entries for a point: one undotted value for a single series; for several a dot,
-/// the series' name and its value each, so the banner is the chart's legend (8.2.0).
+/// the series' name and its value each, so the banner is the chart's legend (8.3.0).
 @MainActor
 func chartBannerEntries<Point>(
     index: Int,
@@ -573,21 +573,21 @@ func chartBannerEntries<Point>(
 enum ChartText {
     /// After the banner's title for a period that is not over yet.
     static var partial: String { String(localized: "chart.partial", defaultValue: "so far") }
-    /// The banner's line for a forecast (8.2.0).
+    /// The banner's line for a forecast (8.3.0).
     static var forecast: String { String(localized: "chart.forecast", defaultValue: "Forecast") }
-    /// The banner's line for `ChartSeries.comparison` by default (8.2.0).
+    /// The banner's line for `ChartSeries.comparison` by default (8.3.0).
     static var yearAgo: String { String(localized: "chart.yearAgo", defaultValue: "A year ago") }
-    /// A picked stretch's average; the average reference line (8.2.0).
+    /// A picked stretch's average; the average reference line (8.3.0).
     static var average: String { String(localized: "chart.average", defaultValue: "Average") }
-    /// Where a level stood at the start of a picked stretch (8.2.0).
+    /// Where a level stood at the start of a picked stretch (8.3.0).
     static var from: String { String(localized: "chart.from", defaultValue: "From") }
-    /// The sum of stacked bars (8.2.0).
+    /// The sum of stacked bars (8.3.0).
     static var total: String { String(localized: "chart.total", defaultValue: "Total") }
 }
 
 // MARK: - Audio Graph
 
-/// What VoiceOver's Audio Graph reads (8.2.0): the periods by their titles, the values in the
+/// What VoiceOver's Audio Graph reads (8.3.0): the periods by their titles, the values in the
 /// chart's format.
 struct ChartAudioGraph: AXChartDescriptorRepresentable {
     let categories: [String]
@@ -644,12 +644,12 @@ func chartAudioGraph<Point: ChartPoint>(
 
 extension EnvironmentValues {
     /// Whether a chart plays its entrance when it appears. `ChartSwitcher` turns it off once
-    /// the person switches style, so the other chart is simply there (8.2.0).
+    /// the person switches style, so the other chart is simply there (8.3.0).
     @Entry var chartPlaysEntrance: Bool = true
 }
 
 extension View {
-    /// A chart fades in once as it first appears (8.2.0: without the scale of `.chartAppear()`;
+    /// A chart fades in once as it first appears (8.3.0: without the scale of `.chartAppear()`;
     /// the marks bring their own motion). Instant under Reduce Motion, with
     /// `.designKitMotion(false)` and after a `ChartSwitcher` switch.
     func chartFadeIn() -> some View {

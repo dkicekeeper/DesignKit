@@ -13,7 +13,7 @@
 //  tool for scrolling. Unlike LineChart it opens with nothing selected: the screen's header
 //  already shows the latest value.
 //
-//  8.2.0: values come from the shared cache (read once per dataset, refreshed when they
+//  8.3.0: values come from the shared cache (read once per dataset, refreshed when they
 //  change), the banner's slot grows with Dynamic Type, VoiceOver reads each period by its
 //  title with the value in the chart's format.
 //
@@ -76,7 +76,7 @@ public struct HeroSparkline<Point: ChartPoint>: View {
     /// tapping it never selects anything.
     private static var projectionLabel: String { "→" }
 
-    /// The series' values, read once per dataset (8.2.0: on every render before).
+    /// The series' values, read once per dataset (8.3.0: on every render before).
     private var values: [Double] { cache.values.first ?? [] }
 
     /// Last-point dot and projection tail: the solid colour, or the latest value's sign.

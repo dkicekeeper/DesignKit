@@ -3,7 +3,7 @@
 //  DesignKit
 //
 //  LineChart and BarChart behind a bar/line segmented picker and −/+ zoom controls
-//  (Tenra's insight detail charts). 8.2.0: the selected period outlives a switch (the other
+//  (Tenra's insight detail charts). 8.3.0: the selected period outlives a switch (the other
 //  chart opens centred on it), only the first chart plays its entrance, and under
 //  `.chartDisplayOptions(_:)` a menu by the zoom turns the chart's extras on and off.
 //
@@ -44,7 +44,7 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
     @Environment(\.chartDisplayOptions) private var displayOptions
 
     /// Parameters as in `LineChart`; `initialStyle` picks the first chart shown, `barLayout`
-    /// how the bars draw several series (8.2.0).
+    /// how the bars draw several series (8.3.0).
     public init(
         dataPoints: [Point],
         series: [ChartSeries<Point>],
@@ -201,7 +201,7 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
 
 // MARK: - Options menu
 
-/// The person's chart options in a menu (8.2.0): a glass button by the zoom. A forecast and a
+/// The person's chart options in a menu (8.3.0): a glass button by the zoom. A forecast and a
 /// comparison are offered only when a series has them. The menu stays open while the person
 /// turns several on or off; its items are iOS's (outside the Icon rule).
 struct ChartOptionsMenu: View {

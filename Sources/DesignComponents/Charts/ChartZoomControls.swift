@@ -4,7 +4,7 @@
 //
 //  Reusable +/- zoom button pair for scrollable period charts, ported from Tenra (its
 //  2026-07 charts refactor). The charts re-centre on the selected period after a zoom
-//  (8.2.0); the period's length comes from the app (a month, a week), not from here.
+//  (8.3.0); the period's length comes from the app (a month, a week), not from here.
 //
 
 import SwiftUI

@@ -2,7 +2,7 @@
 //  CalendarHeatmap.swift
 //  DesignKit
 //
-//  Days as a grid of small squares, a week per column, today at the trailing end (8.2.0, the
+//  Days as a grid of small squares, a week per column, today at the trailing end (8.3.0, the
 //  owner's list after the charts audit): each square tinted by the day's value in five steps,
 //  from an empty grey square to the full colour, so the busy days and the quiet weeks stand
 //  out at a glance (spending by day, kilometres by day). A tap picks a day; the banner above

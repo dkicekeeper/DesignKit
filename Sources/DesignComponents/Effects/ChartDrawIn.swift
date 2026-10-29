@@ -7,10 +7,10 @@
 //  on Swift Charts and Canvas charts alike.
 //
 //  LineChart and HeroSparkline use it on their entrance (BarChart's bars rise from zero
-//  instead since 8.2.0). Under Reduce Motion, `.designKitMotion(false)` or after a
+//  instead since 8.3.0). Under Reduce Motion, `.designKitMotion(false)` or after a
 //  `ChartSwitcher` switch the chart is simply there.
 //
-//  8.2.0: 0.7 s (0.9 s before), and the mask goes once the chart is drawn, so a scrolling
+//  8.3.0: 0.7 s (0.9 s before), and the mask goes once the chart is drawn, so a scrolling
 //  chart no longer renders through it on every frame. Taking it away rebuilds the view under
 //  it once: apply it outside any state that must survive (a chart's selection lives in the
 //  chart's view, outside the `Chart`).
@@ -32,7 +32,7 @@ public extension View {
 
 struct ChartDrawInModifier: ViewModifier {
     let delay: Double
-    /// When it changes, the chart is drawn in again (8.2.0: `LineChart` on new periods, a week
+    /// When it changes, the chart is drawn in again (8.3.0: `LineChart` on new periods, a week
     /// to a month). `nil`: once, on first appearance.
     var replayKey: Int? = nil
 

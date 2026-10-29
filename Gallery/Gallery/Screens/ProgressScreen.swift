@@ -340,7 +340,7 @@ private struct MiniBarsPage: View {
         ComponentPage(
             name: "MiniBars",
             summary: "A row of small bars, one in colour: the busiest weekday, today, a peak hour.",
-            since: "8.2.0",
+            since: "8.3.0",
             apps: [],
             notes: [
                 "For a card's 120×60 pt slot; the tallest bar takes the colour unless highlighted: names another.",

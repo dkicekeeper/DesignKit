@@ -16,7 +16,7 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
-## 8.2.0 - 2026-10-29
+## 8.3.0 - 2026-10-29
 
 The trend charts after the owner's audit of `LineChart` and `BarChart` (UX, speed, look, motion). A chart opens on the current period, selected and in the middle of the window instead of against the screen's right edge; the banner above it always shows the selected period, names the series and gives the change from the period before; a period that is not over reads as such instead of as a drop. Then everything on the owner's list of what charts could add: forecasts, a year ago, average and limit lines, records, a picked stretch of periods, a selection that follows the scroll, stacked bars, a glow in dark mode, an entrance on new periods, and `CalendarHeatmap`. The person can turn the extras on and off in a menu by the zoom, kept for every chart of the app (`.chartDisplayOptions`), and `MiniBars` gives a feed card a row of bars. Under it, one frame for both charts that reads the data once, and fixes for a clipped peak, the axis labels and VoiceOver.
 [#91](https://github.com/dkicekeeper/DesignKit/pull/91)

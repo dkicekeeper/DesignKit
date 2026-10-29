@@ -39,7 +39,7 @@ public protocol ChartPoint: Identifiable, Hashable {
     /// last point that does not start after now (the last point when there are no dates).
     var chartDate: Date? { get }
     /// The period is not over yet (this month, this week), so its value is still growing
-    /// (8.2.0). A bar fades towards its top, the line's last stretch is dashed and the banner
+    /// (8.3.0). A bar fades towards its top, the line's last stretch is dashed and the banner
     /// says "so far" (key `chart.partial`). Defaults to `false`.
     var chartIsPartial: Bool { get }
 }
@@ -69,7 +69,7 @@ public struct ChartValuePoint: ChartPoint {
     public let chartIsPartial: Bool
     public let values: [String: Double]
 
-    /// - Parameter isPartial: the period is not over yet (8.2.0, `ChartPoint.chartIsPartial`).
+    /// - Parameter isPartial: the period is not over yet (8.3.0, `ChartPoint.chartIsPartial`).
     public init(
         label: String,
         axisLabel: String? = nil,
@@ -109,7 +109,7 @@ public enum ChartColoring {
     }
 }
 
-/// Which way a series is better (8.2.0): the colour of its change in the banner and which
+/// Which way a series is better (8.3.0): the colour of its change in the banner and which
 /// period is its record.
 public enum ChartBetter: Hashable, Sendable {
     /// More is better: income, savings, distance.
@@ -118,7 +118,7 @@ public enum ChartBetter: Hashable, Sendable {
     case lower
 }
 
-/// What the banner shows for a stretch of periods picked with a long press and a drag (8.2.0).
+/// What the banner shows for a stretch of periods picked with a long press and a drag (8.3.0).
 public enum ChartRangeSummary: Hashable, Sendable {
     /// The sum of the periods, their average and the change from the first to the last:
     /// amounts that add up (spending, income, distance).
@@ -155,25 +155,25 @@ public struct ChartSeries<Point> {
     public let baseline: Baseline
     /// Line width in full-size charts.
     public let lineWidth: CGFloat
-    /// Which way the series is better (8.2.0): its change reads green or red, and its best
+    /// Which way the series is better (8.3.0): its change reads green or red, and its best
     /// finished period is a record. `nil`: neither, the change in the secondary colour.
     public let better: ChartBetter?
-    /// What the banner sums up for a picked stretch of periods (8.2.0).
+    /// What the banner sums up for a picked stretch of periods (8.3.0).
     public let rangeSummary: ChartRangeSummary
     public let value: (Point) -> Double
-    /// What a period that is not over is expected to reach (8.2.0): a forecast, drawn as a
+    /// What a period that is not over is expected to reach (8.3.0): a forecast, drawn as a
     /// pale bar or a dashed rise above the value so far. Read for unfinished points only.
     public let projected: ((Point) -> Double?)?
-    /// The same period one cycle before, a year ago (8.2.0): drawn as a pale shadow behind
+    /// The same period one cycle before, a year ago (8.3.0): drawn as a pale shadow behind
     /// the value, and in the banner.
     public let comparison: ((Point) -> Double?)?
 
     /// - Parameters:
-    ///   - better: which way is better: the change's colour and the record (8.2.0).
-    ///   - rangeSummary: what a picked stretch of periods sums up to (8.2.0).
+    ///   - better: which way is better: the change's colour and the record (8.3.0).
+    ///   - rangeSummary: what a picked stretch of periods sums up to (8.3.0).
     ///   - value: the value at a point.
-    ///   - projected: the forecast of an unfinished point (8.2.0).
-    ///   - comparison: the same period one cycle before (8.2.0).
+    ///   - projected: the forecast of an unfinished point (8.3.0).
+    ///   - comparison: the same period one cycle before (8.3.0).
     public init(
         id: String,
         name: String,
@@ -287,7 +287,7 @@ public struct ChartSeries<Point> {
 
 public extension ChartSeries where Point == ChartValuePoint {
     /// Series reading `point[id]` from `ChartValuePoint`s; the forecast and the comparison,
-    /// when given, from `point[projectedKey]` and `point[comparisonKey]` (8.2.0).
+    /// when given, from `point[projectedKey]` and `point[comparisonKey]` (8.3.0).
     static func keyed(
         _ id: String,
         name: String,
@@ -334,7 +334,7 @@ public enum ChartValueFormat {
 
     /// Compact number in the person's language: 1_500_000 → "1.5M", 75_000 → "75K",
     /// 1_500 → "1.5K", 500 → "500", -30_000 → "-30K"; in Russian "1,5 млн", "75 тыс.".
-    /// 8.2.0: before, the thousands were rounded to whole numbers (1 500 → "2K", so the axis
+    /// 8.3.0: before, the thousands were rounded to whole numbers (1 500 → "2K", so the axis
     /// could show the wrong value) and every language read "K" and "M".
     public static func compactString(_ value: Double) -> String {
         value.formatted(.number.notation(.compactName))
@@ -356,7 +356,7 @@ public enum ChartValueFormat {
 
 // MARK: - Reference lines
 
-/// A horizontal line across a `LineChart` or `BarChart` (8.2.0): the average of a series, or a
+/// A horizontal line across a `LineChart` or `BarChart` (8.3.0): the average of a series, or a
 /// fixed value such as a limit or a goal. Its label sits in a pill at the plot's leading edge,
 /// over the line, and stays there while the chart scrolls.
 ///
@@ -409,7 +409,7 @@ public struct ChartReferenceLine: Identifiable {
 
 // MARK: - Display options
 
-/// What the trend charts draw besides their values, as the person chose it (8.2.0). Hand it
+/// What the trend charts draw besides their values, as the person chose it (8.3.0). Hand it
 /// to the charts with `.chartDisplayOptions(_:)`: each `LineChart`, `BarChart` and
 /// `ChartSwitcher` below follows it, and a `ChartSwitcher` shows it as a menu next to its zoom.
 /// An `OptionSet` over `Int`, so `@AppStorage` keeps it and every chart of the app opens the
@@ -450,7 +450,7 @@ extension EnvironmentValues {
 
 extension View {
     /// The trend charts below draw what `options` holds, and each `ChartSwitcher` shows it in a
-    /// menu that changes it (8.2.0). It stands in for the charts' `.average()` reference lines
+    /// menu that changes it (8.3.0). It stands in for the charts' `.average()` reference lines
     /// (an average line per series when on), `marksExtremes:` and `followsScroll:`; other
     /// reference lines, a limit or a goal, stay.
     public func chartDisplayOptions(_ options: Binding<ChartDisplayOptions>) -> some View {

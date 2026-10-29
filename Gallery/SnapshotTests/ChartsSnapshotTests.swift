@@ -81,7 +81,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 8.2.0: the last period is not over: a dashed end of the line, a bar fading upwards,
+        /// 8.3.0: the last period is not over: a dashed end of the line, a bar fading upwards,
         /// "so far" in the banner.
         @Test func unfinishedPeriod() async {
             await assertComponentSnapshot(
@@ -96,7 +96,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 8.2.0: a forecast for the unfinished month (a pale bar, a dotted rise to a ring) and a
+        /// 8.3.0: a forecast for the unfinished month (a pale bar, a dotted rise to a ring) and a
         /// year ago (a pale wider bar, a pale dashed line); the banner's change, forecast and year
         /// ago lines.
         @Test func forecastAndYearAgo() async {
@@ -113,7 +113,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 8.2.0: an average and a limit across the plot (bars past it orange), records.
+        /// 8.3.0: an average and a limit across the plot (bars past it orange), records.
         @Test func referenceLinesAndRecords() async {
             await assertComponentSnapshot(
                 BarChart(dataPoints: ChartSample.months, series: ChartSample.expenses, todayText: "Today",
@@ -128,7 +128,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 8.2.0: spending by category in stacks; the banner leads with the total.
+        /// 8.3.0: spending by category in stacks; the banner leads with the total.
         @Test func stackedBars() async {
             await assertComponentSnapshot(
                 BarChart(dataPoints: ChartSample.categoryMonths, series: ChartSample.categories,
@@ -137,7 +137,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 8.2.0: sixteen weeks of days up to a fixed day, Monday first.
+        /// 8.3.0: sixteen weeks of days up to a fixed day, Monday first.
         @Test func calendarHeatmap() async {
             await assertComponentSnapshot(
                 CalendarHeatmap(values: ChartSample.days, weeks: 16, color: AppColors.destructive,
@@ -146,7 +146,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 8.2.0: more periods than the window holds: the last one in the middle, empty periods
+        /// 8.3.0: more periods than the window holds: the last one in the middle, empty periods
         /// after it.
         @Test func centredWindow() async {
             await assertComponentSnapshot(
@@ -247,7 +247,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 8.2.0: spending by weekday in a card's slot, Saturday in colour, with the initials.
+        /// 8.3.0: spending by weekday in a card's slot, Saturday in colour, with the initials.
         @Test func miniBars() async {
             await assertComponentSnapshot(
                 HStack(alignment: .bottom, spacing: AppSpacing.xl) {
@@ -262,7 +262,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 8.2.0: the person's options (`.chartDisplayOptions`) over a chart's parameters: an
+        /// 8.3.0: the person's options (`.chartDisplayOptions`) over a chart's parameters: an
         /// average line per series in its colour, records, the forecast and a year ago.
         @Test func displayOptions() async {
             await assertComponentSnapshot(
@@ -280,7 +280,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 8.2.0: a window that follows the scroll: an odd window, the ruler on the middle bar,
+        /// 8.3.0: a window that follows the scroll: an odd window, the ruler on the middle bar,
         /// every bar in full colour, the banner on the period under the ruler. The chart scrolls,
         /// so the ruler and the average's pill stand on the visible plot (`plotContainerFrame`).
         @Test func followsScroll() async {
@@ -306,7 +306,7 @@ extension ComponentSnapshots {
                 ], format: .custom({ String(format: "%.1f km", $0) })),
                 named: "oneValue"
             )
-            // 8.2.0: the series' names (the legend) and a note after the title.
+            // 8.3.0: the series' names (the legend) and a note after the title.
             await assertComponentSnapshot(
                 ChartSelectionBanner(title: "January 2026", note: "so far", entries: [
                     .init(value: 480_000, color: AppColors.success, label: "Income"),
@@ -315,7 +315,7 @@ extension ComponentSnapshots {
                 named: "legend",
                 appearances: [.light, .dark, .largeText]
             )
-            // 8.2.0: the change from the period before, lines under the value, a record.
+            // 8.3.0: the change from the period before, lines under the value, a record.
             await assertComponentSnapshot(
                 ChartSelectionBanner(title: "March 2026", entries: [
                     .init(value: 560_000, color: AppColors.success, label: "Income", changePercent: 12.4, better: .higher,

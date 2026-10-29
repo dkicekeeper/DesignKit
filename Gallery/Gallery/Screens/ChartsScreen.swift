@@ -32,7 +32,7 @@ struct ChartsScreen: View {
     }
 }
 
-/// The extras a trend chart page can switch on (8.2.0).
+/// The extras a trend chart page can switch on (8.3.0).
 private struct TrendExtras {
     var forecast = true
     var lastYear = false
@@ -98,10 +98,10 @@ private struct ChartSwitcherPage: View {
             apps: [.tenra],
             canvas: .bleed,
             notes: [
-                "Opens on the current period, selected and in the middle of the window (8.2.0).",
+                "Opens on the current period, selected and in the middle of the window (8.3.0).",
                 "The selected period stays when you switch; zoom re-centres on it.",
                 "Press and drag across periods: the banner sums them up.",
-                "Under .chartDisplayOptions($options) a menu by the zoom turns the average, records, forecast, a year ago and the ruler on and off for every chart of the app (8.2.0).",
+                "Under .chartDisplayOptions($options) a menu by the zoom turns the average, records, forecast, a year ago and the ruler on and off for every chart of the app (8.3.0).",
             ]
         ) {
             Group {
@@ -173,7 +173,7 @@ private struct LineChartPage: View {
             apps: [.tenra],
             canvas: .bleed,
             notes: [
-                "Opens on the current period, selected and in the middle of the window; the banner always shows the selected period and its change from the one before (8.2.0).",
+                "Opens on the current period, selected and in the middle of the window; the banner always shows the selected period and its change from the one before (8.3.0).",
                 "A period that is not over (ChartPoint.chartIsPartial) ends the line in dashes and reads “so far”; with a forecast (ChartSeries.projected) a dotted rise goes to it.",
                 "Press and drag across periods: the banner sums them up. In dark mode the line glows.",
             ]
@@ -217,7 +217,7 @@ private struct BarChartPage: View {
             apps: [.tenra],
             canvas: .bleed,
             notes: [
-                "Opens on the current period, selected and in the middle of the window; its bars are in full colour, the others step back (8.2.0).",
+                "Opens on the current period, selected and in the middle of the window; its bars are in full colour, the others step back (8.3.0).",
                 "The bars rise from zero as the chart appears; a period that is not over fades towards the top, under a pale bar up to its forecast; a pale wider bar shows a year ago.",
                 "layout: .stacked puts the series on top of each other; the banner leads with the total.",
             ],
@@ -277,7 +277,7 @@ private struct CalendarHeatmapPage: View {
         ComponentPage(
             name: "CalendarHeatmap",
             summary: "Days as small squares, a week per column, tinted by their value; tap a day for its amount.",
-            since: "8.2.0",
+            since: "8.3.0",
             canvas: .fill,
             notes: [
                 "Five steps from an empty grey square to the full colour, by the quartiles of the days with a value.",
@@ -415,7 +415,7 @@ private struct ChartSelectionBannerPage: View {
             summary: "The selected period: its title and one or more values; with several series it names each.",
             since: "0.5.0",
             canvas: .fill,
-            notes: ["A note after the title in the secondary colour, “so far” for a period that is not over (8.2.0)."]
+            notes: ["A note after the title in the secondary colour, “so far” for a period that is not over (8.3.0)."]
         ) {
             if state == .loading {
                 ChartSelectionBannerSkeleton(values: twoValues ? 2 : 1)

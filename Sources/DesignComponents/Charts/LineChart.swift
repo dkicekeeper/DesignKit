@@ -7,7 +7,7 @@
 //  visible window follows `zoomScale` (ChartSwitcher's −/+). Pinch-to-zoom is not used:
 //  it fights the navigation back-swipe.
 //
-//  8.2.0 (TrendChartFrame): opens on the current period, selected and in the middle of the
+//  8.3.0 (TrendChartFrame): opens on the current period, selected and in the middle of the
 //  window; the banner always shows the selected period, names the series and gives the
 //  change from the period before. A clean line (no dot on every value), a fill only under a
 //  lone series, a dashed last stretch for a period that is not over and a dotted rise to its
@@ -55,14 +55,14 @@ public struct LineChart<Point: ChartPoint>: View {
     ///   - todayText: label of the "Today" marker (key `chart.today`).
     ///   - emptyTitle / emptyMessage: empty state (keys `chart.empty.title` / `chart.empty.message`).
     ///   - zoomScale: visible-window scale; 1.0 shows 12 points.
-    ///   - referenceLines: an average, a limit, a goal across the plot (8.2.0).
-    ///   - marksExtremes: dots on each series' highest and lowest finished period (8.2.0).
+    ///   - referenceLines: an average, a limit, a goal across the plot (8.3.0).
+    ///   - marksExtremes: dots on each series' highest and lowest finished period (8.3.0).
     ///   - followsScroll: a ruler in the window's middle; the chart scrolls under it and the
-    ///     period at the ruler is the selection, with a tick (8.2.0).
+    ///     period at the ruler is the selection, with a tick (8.3.0).
     ///   - comparisonLabel: the banner's line for `ChartSeries.comparison` (key `chart.yearAgo`).
     ///   - selection: the selected period's `chartLabel`, to open on another period than the
     ///     current one or to read what the person picked; `nil` (the binding or its value): the
-    ///     current period (8.2.0).
+    ///     current period (8.3.0).
     public init(
         dataPoints: [Point],
         series: [ChartSeries<Point>],
@@ -422,7 +422,7 @@ enum ChartComparisonSeries {
     static let suffix = "\u{2063}comparison"
 }
 
-/// A forecast's end: a hollow ring (8.2.0).
+/// A forecast's end: a hollow ring (8.3.0).
 struct ChartForecastRing: View {
     let color: Color
 
@@ -434,7 +434,7 @@ struct ChartForecastRing: View {
     }
 }
 
-/// The picked stretch: a pale band over its periods (8.2.0).
+/// The picked stretch: a pale band over its periods (8.3.0).
 struct ChartRangeBands: ChartContent {
     let range: ClosedRange<Int>?
     let labels: [String]
@@ -451,7 +451,7 @@ struct ChartRangeBands: ChartContent {
 }
 
 /// The reference lines: dashed rules across the plot; their labels are the frame's overlay
-/// (8.2.0).
+/// (8.3.0).
 struct ChartReferenceRules: ChartContent {
     let references: [ChartResolvedReference]
 

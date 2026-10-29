@@ -336,7 +336,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 8.2.0: the heatmap's banner card and grid of grey squares.
+        /// 8.3.0: the heatmap's banner card and grid of grey squares.
         @Test func calendarHeatmapSkeleton() async {
             await assertComponentSnapshot(
                 CalendarHeatmapSkeleton(weeks: 16)
@@ -345,7 +345,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// 8.2.0: seven bars in a card's 120 pt slot.
+        /// 8.3.0: seven bars in a card's 120 pt slot.
         @Test func miniBarsSkeleton() async {
             await assertComponentSnapshot(
                 MiniBarsSkeleton()

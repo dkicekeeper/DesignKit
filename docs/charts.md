@@ -53,7 +53,7 @@ Several series: `LineChart` overlays them (no fill under the lines), `BarChart` 
 (`position(by:)`), the banner lists each value under the series' name with a dot (the chart's
 legend), VoiceOver reads `name: value` per series.
 
-### How the trend charts behave *(8.2.0, the owner's audit)*
+### How the trend charts behave *(8.3.0, the owner's audit)*
 
 `LineChart` and `BarChart` share one frame, `TrendChartFrame` (internal): the cache, the
 selection, the window, the banner, the axes, the Audio Graph and the motion. Each chart draws
@@ -86,9 +86,9 @@ only its marks from a `TrendChartContext`.
 - **Data read once.** `ChartPointCache` is keyed by a hash of the points (their `Hashable`,
   values included when synthesized) and the series ids, and holds every series' values, the
   titles, the VoiceOver texts, the current and unfinished periods. A tap or a scroll never calls
-  a series' value closure. Before 8.2.0 the key was the count and the first and last labels: new
+  a series' value closure. Before 8.3.0 the key was the count and the first and last labels: new
   values under the same labels kept the old Y domain, and the new peak was clipped.
-- **What the charts add** *(8.2.0, the owner's list)*:
+- **What the charts add** *(8.3.0, the owner's list)*:
   - `ChartSeries(better:)`: the banner's change ("↗ +12.4%", from the period before, from the
     forecast while a period is not over, none from a period at or below zero) reads green the
     better way and red the other; the series' best finished period is a record (a sparkling
@@ -138,10 +138,10 @@ only its marks from a `TrendChartContext`.
     selected dot.
   - New periods play the entrance again: the bars' `risenKey` is the labels' hash, and
     `ChartDrawInModifier(replayKey:)` draws the line in again when it changes.
-- **`MiniBars`** *(8.2.0)*: a feed card's row of bars in a `Canvas` (MiniBarPair's grammar: muted
+- **`MiniBars`** *(8.3.0)*: a feed card's row of bars in a `Canvas` (MiniBarPair's grammar: muted
   grey bars, one in colour, rounded tops on a hairline baseline), optional labels under them
   resolved once per draw with `context.resolve`. Decorative for VoiceOver.
-- **`CalendarHeatmap`** *(8.2.0)*: days in a `Canvas` (a week per column, Monday or Sunday first by
+- **`CalendarHeatmap`** *(8.3.0)*: days in a `Canvas` (a week per column, Monday or Sunday first by
   the calendar), five steps by the quartiles of the days with a value, a horizontal scroll view
   that opens on today (`defaultScrollAnchor(.trailing)`), a tap picks the day under it. Not Swift
   Charts: a few hundred cells as marks would be a heavy chart for a grid.
@@ -175,11 +175,11 @@ Feature-bound names replaced with reusable ones (old → new; grep for the new n
 `LineChart` and `BarChart` take `series: [ChartSeries<Point>]` (single-series convenience inits exist; Tenra maps its `PeriodChartSeries` onto them in its adapters). The income/expense overlay is NOT a separate chart: it is `[income, spending]`, two series.
 
 - Marks always pass `series: .value("Type", series.id)` + `stacking: .unstacked` (line) / `position(by:)` when grouped (bar).
-- The banner is generic: one `ChartSelectionBanner.Entry` per series (with its name since 8.2.0), so any combination of series works.
-- Selection halos: multi-series skips zero-valued points (halo at the baseline reads as noise; before 8.2.0 it skipped negative ones too); single-series always highlights.
+- The banner is generic: one `ChartSelectionBanner.Entry` per series (with its name since 8.3.0), so any combination of series works.
+- Selection halos: multi-series skips zero-valued points (halo at the baseline reads as noise; before 8.3.0 it skipped negative ones too); single-series always highlights.
 - A series is one value: `ChartSeries(id:name:coloring:baseline:lineWidth:better:rangeSummary:value:projected:comparison:)` carries everything a chart reads; nothing else switches on it.
 
-`ChartSwitcher` (segmented bar/line picker + `ChartZoomControls`; zoom and, since 8.2.0, the selected period live here, passed down as bindings) wraps the pair everywhere: InsightsSummaryDetailView (`[.income, .spending]`, default `.bar`), InsightDetailView periodTrend details (single series, default `.line`). Charts no longer own a zoom toolbar — standalone use gets `.constant(1.0)`. The length of a period (week, month) is the app's global granularity, not the chart's: zoom only changes how many periods fit on screen.
+`ChartSwitcher` (segmented bar/line picker + `ChartZoomControls`; zoom and, since 8.3.0, the selected period live here, passed down as bindings) wraps the pair everywhere: InsightsSummaryDetailView (`[.income, .spending]`, default `.bar`), InsightDetailView periodTrend details (single series, default `.line`). Charts no longer own a zoom toolbar — standalone use gets `.constant(1.0)`. The length of a period (week, month) is the app's global granularity, not the chart's: zoom only changes how many periods fit on screen.
 
 ### Y-domain headroom (peak clipping)
 
@@ -263,7 +263,7 @@ Without `series:`, two areas merge into one zigzag-series between x-points.
 
 ## Axis Labels
 
-### Which labels show *(8.2.0)*
+### Which labels show *(8.3.0)*
 
 ```swift
 let labels = ChartAxisLabels(cache: cache, anchorIndex: cache.currentIndex, selectedIndex: selected,
@@ -272,7 +272,7 @@ let labels = ChartAxisLabels(cache: cache, anchorIndex: cache.currentIndex, sele
 Chart { … }.chartCategoryXAxis(labelMap: cache.axisLabels, labels: labels)
 ```
 
-Until 8.2.0 the X axis used `AxisValueLabel(collisionResolution: .greedy(minimumSpacing: 6))`:
+Until 8.3.0 the X axis used `AxisValueLabel(collisionResolution: .greedy(minimumSpacing: 6))`:
 Swift Charts dropped every label that collided with another or overflowed the chart's edge, so
 the gaps were uneven and a period (often the last one) had no date under it at all; the owner
 found it on a device. Now `ChartAxisLabels` measures the widest label (Inter `caption2` at the
@@ -284,7 +284,7 @@ labels to `AxisMarks(values:)` with `collisionResolution: .disabled`, so none is
 chart whose last point sits at its trailing edge, a last label wider than its category is
 anchored `.topTrailing` (it ends at its tick) instead of being cut by the chart's frame.
 
-### Initial position: the selected period in the middle *(8.2.0)*
+### Initial position: the selected period in the middle *(8.3.0)*
 
 ```swift
 let window = ChartWindow(labels: cache.labels, centerIndex: selected, zoomScale: zoomScale)
@@ -294,7 +294,7 @@ Chart { … }
     .chartScrollPosition(initialX: window.leadingLabel)
 ```
 
-Until 8.2.0 the window opened on the last `visibleCount` points, so the latest period sat
+Until 8.3.0 the window opened on the last `visibleCount` points, so the latest period sat
 against the screen's right edge. `chartXVisibleDomain(length: N)` for category axis shows N
 categories regardless of frame width — no `GeometryReader` needed; derive `visibleCount` from
 `zoomScale` only.
@@ -317,7 +317,7 @@ Lock via `chartXScale(domain: dataPoints.map { $0.label })` AND put conditional/
 
 ## Selection Banner Anti-Jump
 
-`LineChart` and `BarChart` always show their banner (8.2.0), so nothing comes and goes and the
+`LineChart` and `BarChart` always show their banner (8.3.0), so nothing comes and goes and the
 plot never moves. `HeroSparkline`'s banner still comes and goes: it sits in a fixed slot
 (`chartBannerSlotStyle`) with an opacity transition, 64 pt at the default text size and scaled
 with Dynamic Type (`@ScaledMetric`; a fixed 56 pt before, less than the banner itself).
@@ -326,7 +326,7 @@ with Dynamic Type (`@ScaledMetric`; a fixed 56 pt before, less than the banner i
 
 ### ChartZoomControls
 
-`ChartZoomControls(zoomScale: $zoomScale, range:)` — `+/-` buttons with step ×1.5, own file `Charts/ChartZoomControls.swift` (also hosts `ChartStyle`). Used in `ChartSwitcher` (picker left, zoom right in HStack). The owner keeps the magnifiers (8.2.0 audit): the dates follow the app's global granularity.
+`ChartZoomControls(zoomScale: $zoomScale, range:)` — `+/-` buttons with step ×1.5, own file `Charts/ChartZoomControls.swift` (also hosts `ChartStyle`). Used in `ChartSwitcher` (picker left, zoom right in HStack). The owner keeps the magnifiers (8.3.0 audit): the dates follow the app's global granularity.
 
 ### Chart support (internal)
 
@@ -353,7 +353,7 @@ A new chart in DesignKit plugs into these — don't reimplement inline.
 ### ChartSelectionBanner
 
 `ChartSelectionBanner(title:note:entries:format:)`: one `Entry(value:color:showsDot:label:)` per
-value (dotted and named when a chart has several series, 8.2.0). Capitalises the title's first character; `note` follows it in the secondary
+value (dotted and named when a chart has several series, 8.3.0). Capitalises the title's first character; `note` follows it in the secondary
 colour ("so far"); `format` as in the charts. Values roll from one period to the next
 (`numericText`). `ChartSelectionBannerSkeleton(values:)` is its placeholder.
 
@@ -401,4 +401,4 @@ For compact sparklines/donuts inside cards, use `Canvas`-based components:
 Anything per point (a value closure, `chartTitle` with a `DateFormatter`, a `Dictionary` build,
 an amount's text) goes into `ChartPointCache`, built once per data change; otherwise a tap or a
 zoom redoes it for every point. Tenra's average-daily series computes calendar days in its value
-closure: before 8.2.0 every tap ran it three times per point (area, line, point marks).
+closure: before 8.3.0 every tap ran it three times per point (area, line, point marks).

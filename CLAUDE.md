@@ -288,7 +288,7 @@ rather than importing an app type.
   `.rowDividerInset(ItemRowStyle.standard.symbolDividerInset)`. Both apps' `section_rows_lint.py`
   (CI) fails on a section row without its own vertical padding and on a linked icon row without
   `.rowDividerInset`.
-- DesignKit 8.2.0 (2026-10, the owner's audit of the trend charts): `LineChart`, `BarChart` and
+- DesignKit 8.3.0 (2026-10, the owner's audit of the trend charts): `LineChart`, `BarChart` and
   `ChartSwitcher` open on the current period, selected and centred in the window (empty periods
   after the last one), the banner always above them naming the series; `ChartPoint.chartIsPartial`
   marks a period that is not over; one `TrendChartFrame` under both charts reads the data once.

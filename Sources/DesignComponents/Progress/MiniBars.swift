@@ -2,7 +2,7 @@
 //  MiniBars.swift
 //  DesignKit
 //
-//  Canvas row of small bars for insight feed cards (8.2.0): a value per weekday, per hour or
+//  Canvas row of small bars for insight feed cards (8.3.0): a value per weekday, per hour or
 //  per month, one bar in colour (the busiest day, today) and the others muted. Tenra's
 //  "By day" card: the weekday that spends the most. The grammar of MiniBarPair: muted grey =
 //  context, the tinted bar = the signal, rounded tops on a hairline baseline.

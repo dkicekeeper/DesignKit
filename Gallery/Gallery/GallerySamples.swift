@@ -67,7 +67,7 @@ enum GallerySamples {
         }
     }()
 
-    /// `count` months ending this month, for the trend charts' pages (8.2.0): the last sixteen
+    /// `count` months ending this month, for the trend charts' pages (8.3.0): the last sixteen
     /// are `months`, earlier years repeat them a little lower. `inProgress`: this month is not
     /// over yet, and only ten days of it are in; `<key>Forecast` is where it is heading. Each
     /// month also has `<key>LastYear` (a year before, a little lower) and spending by category

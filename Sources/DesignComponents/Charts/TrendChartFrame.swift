@@ -2,7 +2,7 @@
 //  TrendChartFrame.swift
 //  DesignKit
 //
-//  What LineChart and BarChart share (8.2.0): the dataset cache, the selection, the window
+//  What LineChart and BarChart share (8.3.0): the dataset cache, the selection, the window
 //  centred on it, the banner above the plot, the axes, the reference lines, the Audio Graph
 //  and the motion. Each chart draws only its marks.
 //
@@ -546,7 +546,7 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
     }
 }
 
-/// A window that follows the scroll (8.2.0): the point under the ruler, observed by the banner
+/// A window that follows the scroll (8.3.0): the point under the ruler, observed by the banner
 /// alone, and the scroll position, which Swift Charts writes as the chart scrolls and which
 /// must not redraw anything.
 @Observable
@@ -596,7 +596,7 @@ struct TrendChartIdentity: Hashable {
 }
 
 /// Following the scroll, the chart comes to rest with a period in the middle of the window,
-/// under the ruler: the scroll stops on whole periods (8.2.0). The window shows `visibleCount`
+/// under the ruler: the scroll stops on whole periods (8.3.0). The window shows `visibleCount`
 /// periods across the plot, so a period is the plot's width over that.
 struct ChartPeriodSnap: ChartScrollTargetBehavior {
     let visibleCount: Int
@@ -678,7 +678,7 @@ struct ChartPlotOverlay: View {
     }
 }
 
-/// "Average 480K" in a pill of the line's colour (8.2.0).
+/// "Average 480K" in a pill of the line's colour (8.3.0).
 struct ChartReferencePill: View {
     let reference: ChartResolvedReference
 
@@ -708,7 +708,7 @@ private struct ChartLeadingAligned: ViewModifier {
 }
 
 /// The selected point of a line: a soft halo under a dot in a ring of the background, so it
-/// stands out from the line it sits on (8.2.0). In dark mode it glows.
+/// stands out from the line it sits on (8.3.0). In dark mode it glows.
 struct ChartSelectedDot: View {
     let color: Color
     var glows = false

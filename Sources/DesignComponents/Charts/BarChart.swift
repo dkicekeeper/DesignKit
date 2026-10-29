@@ -6,7 +6,7 @@
 //  from Tenra's insights BarChart. Several series are grouped side by side via
 //  `position(by:)`. Paired with LineChart by ChartSwitcher.
 //
-//  8.2.0 (TrendChartFrame): opens on the current period, selected and in the middle of the
+//  8.3.0 (TrendChartFrame): opens on the current period, selected and in the middle of the
 //  window; the selected period's bars are in full colour and the others step back (a ruler
 //  ran through the bar before); the bars rise from zero as the chart appears, and again on
 //  new periods; the bar of a period that is not over fades towards its top, under a pale bar
@@ -22,7 +22,7 @@ import Charts
 import DesignTokens
 import DesignSupport
 
-/// How a `BarChart` draws several series (8.2.0).
+/// How a `BarChart` draws several series (8.3.0).
 public enum BarChartLayout: Hashable, Sendable {
     /// Side by side in each period: income next to spending.
     case grouped
@@ -56,7 +56,7 @@ public struct BarChart<Point: ChartPoint>: View {
     /// External zoom (ChartSwitcher's toolbar); 1.0 when standalone.
     @Binding var zoomScale: CGFloat
 
-    /// Parameters as in `LineChart`; `layout` stacks several series (8.2.0).
+    /// Parameters as in `LineChart`; `layout` stacks several series (8.3.0).
     public init(
         dataPoints: [Point],
         series: [ChartSeries<Point>],

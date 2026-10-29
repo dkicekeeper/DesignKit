@@ -7,7 +7,7 @@
 //  two or one `Entry`). The title's first letter is capitalised: Russian `MMMM`
 //  formatters return lowercase month names.
 //
-//  8.2.0: an entry can carry its series' name (with several series the banner is the
+//  8.3.0: an entry can carry its series' name (with several series the banner is the
 //  chart's legend), its change from the previous period, lines under it (a forecast, a year
 //  ago, an average) and a record; the title a note ("so far"); the values roll from one to
 //  the next, and many entries wrap.
@@ -28,7 +28,7 @@ import DesignSupport
 /// ], format: .currency("KZT"))
 /// ```
 public struct ChartSelectionBanner: View {
-    /// A line under an entry's value in the secondary colour: "Forecast 520 000 ₸" (8.2.0).
+    /// A line under an entry's value in the secondary colour: "Forecast 520 000 ₸" (8.3.0).
     public struct Detail {
         public let label: String
         public let value: Double
@@ -44,16 +44,16 @@ public struct ChartSelectionBanner: View {
         public let color: Color
         /// A colour dot before the value (or its label); on by default, off for a lone value.
         public let showsDot: Bool
-        /// The series' name over its value (8.2.0). With several series it is the legend.
+        /// The series' name over its value (8.3.0). With several series it is the legend.
         public let label: String?
-        /// The change from the previous period, in percent, with its arrow (8.2.0).
+        /// The change from the previous period, in percent, with its arrow (8.3.0).
         public let changePercent: Double?
         /// Which way is better: the change reads green when it goes that way, red when not;
-        /// `nil` keeps it in the secondary colour (8.2.0).
+        /// `nil` keeps it in the secondary colour (8.3.0).
         public let better: ChartBetter?
-        /// Lines under the value: a forecast, a year ago, an average (8.2.0).
+        /// Lines under the value: a forecast, a year ago, an average (8.3.0).
         public let details: [Detail]
-        /// The best period of its series: a "Record" pill with sparkles (8.2.0).
+        /// The best period of its series: a "Record" pill with sparkles (8.3.0).
         public let isRecord: Bool
 
         public init(
@@ -87,7 +87,7 @@ public struct ChartSelectionBanner: View {
 
     /// - Parameters:
     ///   - title: the period ("January 2026"); its first letter is capitalised.
-    ///   - note: a word after the title in the secondary colour ("so far", 8.2.0).
+    ///   - note: a word after the title in the secondary colour ("so far", 8.3.0).
     ///   - entries: one value per series.
     ///   - format: how the values read.
     public init(title: String, note: String? = nil, entries: [Entry], format: ChartValueFormat = .compact) {
@@ -207,7 +207,7 @@ public struct ChartSelectionBanner: View {
 // MARK: - Change and record
 
 /// "↗ +12.4%" in the caption size: green when the change goes the better way, red when not,
-/// secondary when neither is better (8.2.0).
+/// secondary when neither is better (8.3.0).
 struct ChartChangeText: View {
     let percent: Double
     let better: ChartBetter?
@@ -239,7 +239,7 @@ struct ChartChangeText: View {
     }
 }
 
-/// "Record" in a pill of the series' colour that sparkles as it appears (8.2.0, key
+/// "Record" in a pill of the series' colour that sparkles as it appears (8.3.0, key
 /// `chart.record`).
 struct ChartRecordPill: View {
     let color: Color
@@ -265,7 +265,7 @@ struct ChartRecordPill: View {
 
 // MARK: - Skeleton
 
-/// Placeholder of a `ChartSelectionBanner` (8.2.0): its glass card with a grey title and a grey
+/// Placeholder of a `ChartSelectionBanner` (8.3.0): its glass card with a grey title and a grey
 /// value. `values: 2` for a chart of two series, whose banner names each.
 public struct ChartSelectionBannerSkeleton: View {
     let values: Int
