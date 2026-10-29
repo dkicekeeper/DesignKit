@@ -46,6 +46,9 @@ public struct ChartSelectionBanner: View {
     let entries: [Entry]
     let format: ChartValueFormat
 
+    /// The colour dot grows with the text beside it.
+    @ScaledMetric(relativeTo: .caption) private var dotSize: CGFloat = 8
+
     /// - Parameters:
     ///   - title: the period ("January 2026"); its first letter is capitalised.
     ///   - note: a word after the title in the secondary colour ("so far", 8.2.0).
@@ -109,7 +112,7 @@ public struct ChartSelectionBanner: View {
     private func dot(_ color: Color) -> some View {
         Circle()
             .fill(color)
-            .frame(width: 8, height: 8)
+            .frame(width: dotSize, height: dotSize)
     }
 
     @ViewBuilder

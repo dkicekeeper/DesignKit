@@ -22,7 +22,7 @@ The trend charts after the owner's audit of `LineChart` and `BarChart` (UX, spee
 
 ### Added
 
-- `ChartPoint.chartIsPartial` (default `false`) and `ChartValuePoint(isPartial:)`: the period is not over yet. Its bar fades towards the top, the line's last stretch is dashed, and the banner says "so far" (key `chart.partial`).
+- `ChartPoint.chartIsPartial` (default `false`) and `ChartValuePoint(isPartial:)`: the period is not over yet. Its bar fades towards the top, the line's last stretch is dashed with no fill under it (as under a forecast), and the banner says "so far" (key `chart.partial`).
 - `ChartSelectionBanner(title:note:entries:format:)`: a note after the title in the secondary colour, and `ChartSelectionBanner.Entry(label:)`: the series' name over its value.
 - `ChartSelectionBannerSkeleton(values:)`, and `series:` on `LineChartSkeleton`, `BarChartSkeleton` and `ChartSwitcherSkeleton` for a chart of two series.
 - Strings `chart.partial` ("so far"), `chart.style` ("Chart style"), `chart.zoomIn` ("Zoom in") and `chart.zoomOut` ("Zoom out"), each with an English default.

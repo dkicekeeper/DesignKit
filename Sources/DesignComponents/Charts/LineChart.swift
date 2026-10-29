@@ -179,7 +179,9 @@ public struct LineChart<Point: ChartPoint>: View {
     }
 
     /// One series: the fill (a lone series only: two fills over each other turn muddy), the
-    /// line, and a dashed stretch into the periods that are not over.
+    /// line, and a dashed stretch into the periods that are not over. The fill stops where the
+    /// stretch starts, as under a forecast: it is a curve and the stretch a straight dash, so a
+    /// fill under the stretch would bulge past it.
     @ChartContentBuilder
     private func seriesMarks(
         _ s: Int,
@@ -197,7 +199,7 @@ public struct LineChart<Point: ChartPoint>: View {
         let namePrefix = seriesList.count > 1 ? "\(series.name), " : ""
 
         ForEach(cache.labels.indices, id: \.self) { i in
-            if hasFill {
+            if hasFill && i < partialStart {
                 // `series:` + `stacking: .unstacked` keep the area on its own y = 0 baseline.
                 AreaMark(
                     x: .value("Period", cache.labels[i]),

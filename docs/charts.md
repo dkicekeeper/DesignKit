@@ -73,8 +73,9 @@ only its marks from a `TrendChartContext`.
   so taps move the selection, not the window; a new chart (new periods, another zoom: the
   chart's `.id`) is centred on the selected period again.
 - **A period that is not over** (`ChartPoint.chartIsPartial`): its bar fades towards its end,
-  the line's stretch into it is dashed (a series of its own, `ChartPartialSeries`), the banner
-  adds "so far" (`chart.partial`). Only the unfinished periods at the end of the series turn the
+  the line's stretch into it is dashed (a series of its own, `ChartPartialSeries`) with no fill
+  under it (the fill is a monotone curve, the stretch a straight dash: a fill under it bulged
+  past the dash), the banner adds "so far" (`chart.partial`). Only the unfinished periods at the end of the series turn the
   line dashed.
 - **Motion.** The chart fades in (no scale); the line is traced in (`.chartDrawIn`, 0.7 s, its
   mask taken away once drawn), the bars rise from zero (a data change inside one
