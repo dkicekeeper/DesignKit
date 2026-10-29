@@ -325,10 +325,12 @@ private enum ChartSample {
     /// Six months of spending by category, no dates.
     static let categoryMonths: [ChartValuePoint] = rows.enumerated().map { index, row in
         let spending = row.2 * 1_000
+        let food = (spending * (0.36 + 0.02 * Double(index % 3))).rounded()
+        let home = (spending * 0.32).rounded()
         return ChartValuePoint(label: row.0, values: [
-            "food": spending * (0.36 + 0.02 * Double(index % 3)),
-            "home": spending * 0.32,
-            "transport": spending * (0.32 - 0.02 * Double(index % 3)),
+            "food": food,
+            "home": home,
+            "transport": spending - food - home,
         ])
     }
 

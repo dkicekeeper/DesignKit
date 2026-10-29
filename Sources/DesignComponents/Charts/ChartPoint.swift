@@ -357,7 +357,7 @@ public enum ChartValueFormat {
 // MARK: - Reference lines
 
 /// A horizontal line across a `LineChart` or `BarChart` (8.2.0): the average of a series, or a
-/// fixed value such as a limit or a goal. Its label sits in a pill at the plot's trailing edge,
+/// fixed value such as a limit or a goal. Its label sits in a pill at the plot's leading edge,
 /// over the line, and stays there while the chart scrolls.
 ///
 /// ```swift

@@ -97,7 +97,7 @@ enum GallerySamples {
             for (offset, share) in shares.enumerated() {
                 // A little different each month, the four adding up to the month's spending.
                 let wobble = 1 + 0.12 * sin(Double(index * 3 + offset))
-                values[share.0] = spending * share.1 * wobble
+                values[share.0] = (spending * share.1 * wobble).rounded()
             }
             return ChartValuePoint(
                 label: "y\(index)",

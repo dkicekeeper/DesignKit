@@ -230,7 +230,9 @@ private struct HeatmapGrid: View {
                    let last = model.day(column: column, row: 6),
                    column == 0 || model.calendar.component(.month, from: first) != model.calendar.component(.month, from: last)
                    || model.calendar.component(.day, from: first) == 1,
-                   column - lastMonthColumn >= 3 {
+                   column - lastMonthColumn >= 3,
+                   // A name needs about two columns: none where it would run off the end.
+                   column <= model.weeks - 2 || model.weeks < 2 {
                     let monthDay = column == 0 ? first : last
                     let name = monthDay.formatted(Date.FormatStyle(calendar: model.calendar, timeZone: model.calendar.timeZone).month(.abbreviated))
                     context.draw(

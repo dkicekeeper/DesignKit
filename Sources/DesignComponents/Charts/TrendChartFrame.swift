@@ -505,12 +505,22 @@ struct TrendChartCenter: Equatable {
     let identity: TrendChartIdentity
 }
 
-/// Over the plot, fixed while it scrolls: the reference lines' labels in pills at its trailing
-/// edge, and the ruler in its middle when the selection follows the scroll.
+/// Over the plot, fixed while it scrolls: the reference lines' labels in pills at its leading
+/// edge (over the older periods, not the current one), and the ruler in its middle when the
+/// selection follows the scroll. Pills of lines close together stack instead of overlapping.
 struct ChartPlotOverlay: View {
     let proxy: ChartProxy
     let references: [ChartResolvedReference]
     let showsCenterRuler: Bool
+
+    /// A pill's height and the gap to the next, at the person's text size.
+    @ScaledMetric(relativeTo: .caption2) private var pillStep: CGFloat = 22
+
+    init(proxy: ChartProxy, references: [ChartResolvedReference], showsCenterRuler: Bool) {
+        self.proxy = proxy
+        self.references = references
+        self.showsCenterRuler = showsCenterRuler
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -523,18 +533,36 @@ struct ChartPlotOverlay: View {
                             .frame(width: 2, height: plot.height)
                             .position(x: plot.midX, y: plot.midY)
                     }
-                    ForEach(references, id: \.id) { reference in
-                        if let y = proxy.position(forY: reference.value) {
-                            ChartReferencePill(reference: reference)
-                                .position(x: plot.maxX - ChartMetrics.referencePillInset, y: plot.minY + y)
-                                .offset(y: -ChartMetrics.referencePillLift)
-                        }
+                    ForEach(placedPills(), id: \.reference.id) { pill in
+                        ChartReferencePill(reference: pill.reference)
+                            .position(x: plot.minX + ChartMetrics.referencePillInset, y: plot.minY + pill.y)
                     }
                 }
             }
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)
+    }
+
+    private struct PlacedPill {
+        let reference: ChartResolvedReference
+        let y: CGFloat
+    }
+
+    /// Each pill just above its line; going down the plot, a pill closer than a step to the one
+    /// above moves down below it.
+    private func placedPills() -> [PlacedPill] {
+        let placed = references
+            .compactMap { reference in
+                proxy.position(forY: reference.value).map { PlacedPill(reference: reference, y: $0 - ChartMetrics.referencePillLift) }
+            }
+            .sorted { $0.y < $1.y }
+        var result: [PlacedPill] = []
+        for pill in placed {
+            let y = result.last.map { max(pill.y, $0.y + pillStep) } ?? pill.y
+            result.append(PlacedPill(reference: pill.reference, y: y))
+        }
+        return result
     }
 }
 
@@ -551,19 +579,19 @@ struct ChartReferencePill: View {
             .padding(.vertical, 2)
             .background(.regularMaterial, in: Capsule())
             .fixedSize()
-            // `position` centres the pill: shift it left by half its width so it ends at the edge.
-            .modifier(ChartTrailingAligned())
+            // `position` centres the pill: shift it right by half its width so it starts there.
+            .modifier(ChartLeadingAligned())
     }
 }
 
-/// Shifts a view left by half its width: placed with `position(x:)` at an edge, it ends there.
-private struct ChartTrailingAligned: ViewModifier {
+/// Shifts a view right by half its width: placed with `position(x:)` at an edge, it starts there.
+private struct ChartLeadingAligned: ViewModifier {
     @State private var width: CGFloat = 0
 
     func body(content: Content) -> some View {
         content
             .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
-            .offset(x: -width / 2)
+            .offset(x: width / 2)
     }
 }
 
