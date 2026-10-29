@@ -96,6 +96,56 @@ extension ComponentSnapshots {
             )
         }
 
+        /// 8.2.0: a forecast for the unfinished month (a pale bar, a dotted rise to a ring) and a
+        /// year ago (a pale wider bar, a pale dashed line); the banner's change, forecast and year
+        /// ago lines.
+        @Test func forecastAndYearAgo() async {
+            await assertComponentSnapshot(
+                BarChart(dataPoints: ChartSample.monthsInProgress, series: ChartSample.incomeWithExtras,
+                         valueFormat: .currency("KZT"), todayText: "Today"),
+                named: "bar",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                LineChart(dataPoints: ChartSample.monthsInProgress, series: ChartSample.incomeWithExtras,
+                          valueFormat: .currency("KZT"), todayText: "Today"),
+                named: "line"
+            )
+        }
+
+        /// 8.2.0: an average and a limit across the plot (bars past it orange), records.
+        @Test func referenceLinesAndRecords() async {
+            await assertComponentSnapshot(
+                BarChart(dataPoints: ChartSample.months, series: ChartSample.expenses, todayText: "Today",
+                         referenceLines: [.average(), .value(470_000, label: "Limit", aboveColor: AppColors.warning)],
+                         marksExtremes: true),
+                named: "bar"
+            )
+            await assertComponentSnapshot(
+                LineChart(dataPoints: ChartSample.months, series: ChartSample.income, todayText: "Today",
+                          referenceLines: [.average()], marksExtremes: true),
+                named: "line"
+            )
+        }
+
+        /// 8.2.0: spending by category in stacks; the banner leads with the total.
+        @Test func stackedBars() async {
+            await assertComponentSnapshot(
+                BarChart(dataPoints: ChartSample.categoryMonths, series: ChartSample.categories,
+                         valueFormat: .currency("KZT"), todayText: "Today", layout: .stacked),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// 8.2.0: sixteen weeks of days up to a fixed day, Monday first.
+        @Test func calendarHeatmap() async {
+            await assertComponentSnapshot(
+                CalendarHeatmap(values: ChartSample.days, weeks: 16, color: AppColors.destructive,
+                                valueFormat: .currency("KZT"), today: ChartSample.today, calendar: ChartSample.calendar),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
         /// 8.2.0: more periods than the window holds: the last one in the middle, empty periods
         /// after it.
         @Test func centredWindow() async {
@@ -222,6 +272,17 @@ extension ComponentSnapshots {
                 named: "legend",
                 appearances: [.light, .dark, .largeText]
             )
+            // 8.2.0: the change from the period before, lines under the value, a record.
+            await assertComponentSnapshot(
+                ChartSelectionBanner(title: "March 2026", entries: [
+                    .init(value: 560_000, color: AppColors.success, label: "Income", changePercent: 12.4, better: .higher,
+                          details: [.init("A year ago", value: 498_000)], isRecord: true),
+                    .init(value: 470_000, color: AppColors.destructive, label: "Expenses", changePercent: 6.1, better: .lower,
+                          details: [.init("Forecast", value: 520_000)]),
+                ], format: .currency("KZT")),
+                named: "details",
+                appearances: [.light, .dark, .largeText]
+            )
         }
     }
 }
@@ -238,12 +299,15 @@ private enum ChartSample {
         ChartValuePoint(label: row.0, values: ["income": row.1 * 1_000, "expenses": row.2 * 1_000])
     }
 
-    /// The same six months, June not over yet (a third of it in).
+    /// The same six months, June not over yet (a third of it in, heading for 590K); each month
+    /// with income a year before.
     static let monthsInProgress: [ChartValuePoint] = rows.map { row in
         let inProgress = row.0 == "Jun"
         let share = inProgress ? 0.35 : 1
-        return ChartValuePoint(label: row.0, isPartial: inProgress,
-                               values: ["income": row.1 * 1_000 * share, "expenses": row.2 * 1_000 * share])
+        var values = ["income": row.1 * 1_000 * share, "expenses": row.2 * 1_000 * share,
+                      "incomeLastYear": row.1 * 1_000 * 0.88]
+        if inProgress { values["incomeForecast"] = 590_000 }
+        return ChartValuePoint(label: row.0, isPartial: inProgress, values: values)
     }
 
     /// Eighteen months, more than a chart's window of twelve.
@@ -252,6 +316,51 @@ private enum ChartSample {
         return ChartValuePoint(label: "\(row.0) \(index / rows.count + 1)", axisLabel: row.0,
                                values: ["income": row.1 * 1_000, "expenses": row.2 * 1_000])
     }
+
+    /// Income with its forecast for June and a year ago for every month.
+    static let incomeWithExtras = ChartSeries<ChartValuePoint>.keyed(
+        "income", name: "Income", coloring: .solid(AppColors.success), better: .higher,
+        projectedKey: "incomeForecast", comparisonKey: "incomeLastYear")
+
+    /// Six months of spending by category, no dates.
+    static let categoryMonths: [ChartValuePoint] = rows.enumerated().map { index, row in
+        let spending = row.2 * 1_000
+        return ChartValuePoint(label: row.0, values: [
+            "food": spending * (0.36 + 0.02 * Double(index % 3)),
+            "home": spending * 0.32,
+            "transport": spending * (0.32 - 0.02 * Double(index % 3)),
+        ])
+    }
+
+    static let categories: [ChartSeries<ChartValuePoint>] = [
+        .keyed("food", name: "Food", coloring: .solid(AppColors.Palette.orange.color)),
+        .keyed("home", name: "Home", coloring: .solid(AppColors.Palette.blue.color)),
+        .keyed("transport", name: "Transport", coloring: .solid(AppColors.Palette.teal.color)),
+    ]
+
+    /// A fixed calendar and day for the heatmap: Monday first, UTC, Wednesday 28 October 2026.
+    static let calendar: Calendar = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.firstWeekday = 2
+        calendar.timeZone = TimeZone(identifier: "UTC") ?? .gmt
+        calendar.locale = Locale(identifier: "en_US")
+        return calendar
+    }()
+    static let today = calendar.date(from: DateComponents(year: 2026, month: 10, day: 28)) ?? .distantPast
+
+    /// 112 days of spending up to `today`, from a fixed formula: busier at weekends, nothing on
+    /// every seventh day.
+    static let days: [Date: Double] = {
+        var result = [Date: Double]()
+        for back in 0..<112 {
+            guard let day = calendar.date(byAdding: .day, value: -back, to: today) else { continue }
+            guard back % 7 != 3 else { continue }
+            let weekday = calendar.component(.weekday, from: day)
+            let weekend = weekday == 1 || weekday == 7 ? 1.9 : 1
+            result[day] = (5_000 + 1_500 * Double((back * 37) % 11)) * weekend
+        }
+        return result
+    }()
 
     static let income = ChartSeries<ChartValuePoint>.keyed("income", name: "Income", coloring: .solid(AppColors.success))
     static let expenses = ChartSeries<ChartValuePoint>.keyed("expenses", name: "Expenses", coloring: .solid(AppColors.destructive))

@@ -88,6 +88,42 @@ only its marks from a `TrendChartContext`.
   titles, the VoiceOver texts, the current and unfinished periods. A tap or a scroll never calls
   a series' value closure. Before 8.2.0 the key was the count and the first and last labels: new
   values under the same labels kept the old Y domain, and the new peak was clipped.
+- **What the charts add** *(8.2.0, the owner's list)*:
+  - `ChartSeries(better:)`: the banner's change ("↗ +12.4%", from the period before, from the
+    forecast while a period is not over, none from a period at or below zero) reads green the
+    better way and red the other; the series' best finished period is a record (a sparkling
+    "Record" pill, `cache.recordIndex`, at least three finished periods).
+  - `ChartSeries(projected:)`: the forecast of an unfinished period. A pale bar up to it behind
+    the bar so far; a dotted `RuleMark` from the value to a hollow ring on the line; "Forecast"
+    in the banner. Read for unfinished points only (`cache.projected`).
+  - `ChartSeries(comparison:)`: the same period a cycle before. A pale wider bar behind each bar
+    (`BarMark(stacking: .unstacked)` on both, so they overlay instead of stacking), a thin pale
+    dashed line (a series of its own, `ChartComparisonSeries`); "A year ago" in the banner.
+  - `ChartReferenceLine`: a dashed `RuleMark(y:)`; its pill is drawn by `chartOverlay` at
+    `proxy.position(forY:)` against the plot's trailing edge (`proxy.plotFrame`), so it stays
+    put while the plot scrolls under it. `.average()` is the series' average over finished
+    periods (`cache.finishedAverage`). Bars past a line with `aboveColor` take that colour.
+  - `marksExtremes`: dots on the highest and lowest finished period (`cache.maxIndex`,
+    `minIndex`), above a bar's end (`PointMark.offset(y:)`).
+  - A picked stretch: `chartXSelection(range:)` next to `chartXSelection(value:)` (both, or one
+    overrides the other). Long press and drag; the bounds map to indices through
+    `labelToIndex` (a `String` range is ordered by the alphabet, not by the axis). The banner
+    sums it up by `ChartSeries.rangeSummary` until the next tap; bars outside it step back.
+  - `followsScroll`: both ends padded with empty categories so every point can reach the
+    middle; `chartScrollPosition(x:)` with a binding whose getter returns what Swift Charts last
+    set (a class in `@State`, so a scroll frame does not redraw) and whose setter turns the
+    middle period into the selection, with a tick; the ruler is drawn by `chartOverlay` at the
+    plot's middle.
+  - `BarChartLayout.stacked`: `BarMark` without `position(by:)` stacks the series; the Y axis
+    spans `cache.stackedMax` / `stackedMin`; the banner leads with the total.
+  - Dark mode: `shadow(color:radius:)` on the line marks and the selected bars, a shadow on the
+    selected dot.
+  - New periods play the entrance again: the bars' `risenKey` is the labels' hash, and
+    `ChartDrawInModifier(replayKey:)` draws the line in again when it changes.
+- **`CalendarHeatmap`** *(8.2.0)*: days in a `Canvas` (a week per column, Monday or Sunday first by
+  the calendar), five steps by the quartiles of the days with a value, a horizontal scroll view
+  that opens on today (`defaultScrollAnchor(.trailing)`), a tap picks the day under it. Not Swift
+  Charts: a few hundred cells as marks would be a heavy chart for a grid.
 - **VoiceOver.** One element per value: the period's title (with the series' name when there are
   several) and the value in the chart's format; fills, rules and halos are hidden. The Audio
   Graph (`ChartAudioGraph`) reads the same titles and values.

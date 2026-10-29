@@ -336,6 +336,15 @@ extension ComponentSnapshots {
             )
         }
 
+        /// 8.2.0: the heatmap's banner card and grid of grey squares.
+        @Test func calendarHeatmapSkeleton() async {
+            await assertComponentSnapshot(
+                CalendarHeatmapSkeleton(weeks: 16)
+                    .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light]
+            )
+        }
+
         /// The symbol before the title as a grey circle in the style's font (3.2.0).
         @Test func headerIconSkeletons() async {
             await assertComponentSnapshot(

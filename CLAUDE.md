@@ -293,6 +293,9 @@ rather than importing an app type.
   after the last one), the banner always above them naming the series; `ChartPoint.chartIsPartial`
   marks a period that is not over; one `TrendChartFrame` under both charts reads the data once.
   The zoom magnifiers stay: the period's length is the app's global granularity (docs/charts.md).
+  Then the owner's whole list of additions: forecasts, a year ago, average and limit lines,
+  records, a picked stretch, a selection that follows the scroll, stacked bars, a glow in dark
+  mode, the entrance on new periods, and `CalendarHeatmap`.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.

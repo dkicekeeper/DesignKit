@@ -18,7 +18,7 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 
 ## 8.2.0 - 2026-10-29
 
-The trend charts after the owner's audit of `LineChart` and `BarChart` (UX, speed, look, motion). A chart opens on the current period, selected and in the middle of the window instead of against the screen's right edge; the banner above it always shows the selected period and names the series; a period that is not over reads as such instead of as a drop. Under it, one frame for both charts that reads the data once, and fixes for a clipped peak, the Y axis labels and VoiceOver.
+The trend charts after the owner's audit of `LineChart` and `BarChart` (UX, speed, look, motion). A chart opens on the current period, selected and in the middle of the window instead of against the screen's right edge; the banner above it always shows the selected period, names the series and gives the change from the period before; a period that is not over reads as such instead of as a drop. Then everything on the owner's list of what charts could add: forecasts, a year ago, average and limit lines, records, a picked stretch of periods, a selection that follows the scroll, stacked bars, a glow in dark mode, an entrance on new periods, and `CalendarHeatmap`. Under it, one frame for both charts that reads the data once, and fixes for a clipped peak, the axis labels and VoiceOver.
 [#91](https://github.com/dkicekeeper/DesignKit/pull/91)
 
 ### Added
@@ -26,7 +26,18 @@ The trend charts after the owner's audit of `LineChart` and `BarChart` (UX, spee
 - `ChartPoint.chartIsPartial` (default `false`) and `ChartValuePoint(isPartial:)`: the period is not over yet. Its bar fades towards the top, the line's last stretch is dashed with no fill under it (as under a forecast), and the banner says "so far" (key `chart.partial`).
 - `ChartSelectionBanner(title:note:entries:format:)`: a note after the title in the secondary colour, and `ChartSelectionBanner.Entry(label:)`: the series' name over its value.
 - `ChartSelectionBannerSkeleton(values:)`, and `series:` on `LineChartSkeleton`, `BarChartSkeleton` and `ChartSwitcherSkeleton` for a chart of two series.
-- Strings `chart.partial` ("so far"), `chart.style` ("Chart style"), `chart.zoomIn` ("Zoom in") and `chart.zoomOut` ("Zoom out"), each with an English default.
+- `ChartSeries(better:)` and `ChartBetter` (`.higher`, `.lower`): which way a series is better. Its change in the banner reads green that way and red the other, and its best finished period is a record: a "Record" pill that sparkles as it appears.
+- `ChartSeries(projected:)`: what an unfinished period is heading for. `BarChart` draws a pale bar up to it behind the bar so far, `LineChart` a dotted rise to a hollow ring, and the banner adds "Forecast" with the amount; the change from the period before is counted from the forecast.
+- `ChartSeries(comparison:)`: the same period one cycle before, a year ago. `BarChart` draws it as a pale wider bar behind each bar, `LineChart` as a pale dashed line, and the banner adds "A year ago" (`comparisonLabel:` names it otherwise).
+- `ChartSeries(rangeSummary:)` and `ChartRangeSummary` (`.total`, `.change`): what a stretch of periods sums up to. A long press and a drag on `LineChart` or `BarChart` pick the stretch; the banner shows its total and average (or, for a level such as a balance, its last value and where it started) and the change from the first period to the last, until the next tap.
+- `ChartSeries.keyed(_:name:coloring:baseline:lineWidth:better:rangeSummary:projectedKey:comparisonKey:)` for `ChartValuePoint`.
+- `ChartReferenceLine.average(of:label:color:)` and `.value(_:label:color:aboveColor:)`, and `referenceLines:` on `LineChart`, `BarChart` and `ChartSwitcher`: a dashed rule across the plot with its label in a pill at the plot's trailing edge, fixed while the chart scrolls. Bars past a line with `aboveColor` take that colour (a limit).
+- `marksExtremes:` on `LineChart`, `BarChart` and `ChartSwitcher`: dots on each series' highest and lowest finished period (success and destructive, the other way round for a series better lower).
+- `followsScroll:` on `LineChart`, `BarChart` and `ChartSwitcher`: a ruler in the window's middle; the chart scrolls under it and the period at the ruler is the selection, with a tick; a tap brings a period to the ruler.
+- `BarChart(layout:)` and `BarChartLayout` (`.grouped`, `.stacked`), and `ChartSwitcher(barLayout:)`: stacked bars, the parts of each period's total (spending by category). The banner leads with the total; forecasts and comparisons are not drawn on stacks.
+- `CalendarHeatmap(values:weeks:color:valueFormat:today:calendar:emptyTitle:emptyMessage:)` and `CalendarHeatmapSkeleton(weeks:)`: days as small squares, a week per column up to today, tinted in five steps by the quartiles of their values (spending by day). A tap picks a day; the banner above shows it, today until then.
+- `ChartSelectionBanner.Entry(changePercent:better:details:isRecord:)` and `ChartSelectionBanner.Detail`: the change from the period before with its arrow, lines under the value ("Forecast", "A year ago", "Average", "From") and the record pill. The banner wraps its entries when they do not fit one line.
+- Strings `chart.partial` ("so far"), `chart.style` ("Chart style"), `chart.zoomIn` ("Zoom in"), `chart.zoomOut` ("Zoom out"), `chart.forecast` ("Forecast"), `chart.yearAgo` ("A year ago"), `chart.average` ("Average"), `chart.from` ("From"), `chart.total` ("Total"), `chart.record` ("Record"), `chart.less` ("Less") and `chart.more` ("More"), each with an English default.
 
 ### Changed
 
@@ -37,6 +48,9 @@ The trend charts after the owner's audit of `LineChart` and `BarChart` (UX, spee
 - `BarChart`: the selected period's bars are in full colour and the others at 40 % (a ruler through the bar before); a single series' bars take 60 % of their period's width; the bars rise from zero as the chart appears instead of being revealed from the left.
 - The X axis of `LineChart`, `BarChart` and `HeroSparkline` labels its periods at a regular step that fits the widest label, counted from the current period, and always labels the selected period in semibold. Swift Charts used to drop every label that collided or reached the chart's edge, so some periods had no date under them at all, often the last one.
 - `LineChart`'s selected point is larger: a 16 pt dot in a 3 pt ring of the background over a wider halo (12 pt and 2 pt before).
+- The banner of `LineChart` and `BarChart` shows each value's change from the period before ("↗ +12.4%", in the secondary colour unless the series says which way is better). A change from a period at or below zero is not shown.
+- In dark mode the lines of `LineChart`, the selected bars of `BarChart` and the selected point glow softly.
+- New periods (a week to a month) play the chart's entrance again: the bars rise, the line is traced in; a zoom still fades to the new window.
 - The Y axis of `LineChart`, `BarChart` and `HeroSparkline` shows about four values over a thin dashed grid. `ChartValueFormat.compactString` follows the person's language ("1,5 млн", "75 тыс." in Russian) and keeps a decimal (1 500 reads "1.5K", not "2K").
 - The charts fade in without the 0.94 scale; the line is traced in 0.7 s (0.9 s before). New values under the same periods move the marks to them; new periods or a zoom fade to the new chart. The banner's numbers roll from one period to the next in every format.
 - `HeroSparkline`'s banner slot is 64 pt at the default text size and grows with Dynamic Type (56 pt before, less than the banner, which overlapped the plot at large sizes).
@@ -58,12 +72,21 @@ extension PeriodDataPoint: ChartPoint {
 }
 ```
 
-The keys `chart.partial`, `chart.style`, `chart.zoomIn` and `chart.zoomOut` go in the app's string tables for its other languages (docs/localization-keys.md); English is built in.
+The new features are each a parameter; Tenra's insight series could take, for example:
+
+```swift
+ChartSeries(id: "spending", name: …, coloring: .solid(AppColors.destructive), better: .lower,
+            value: { $0.expenses }, projected: { $0.forecastExpenses }, comparison: { $0.expensesYearAgo })
+ChartSeries(id: "wealth", …, rangeSummary: .change, value: { $0.cumulativeBalance ?? $0.netFlow })
+ChartSwitcher(dataPoints: points, series: [.income, .spending], referenceLines: [.average()])
+```
+
+The keys `chart.partial`, `chart.style`, `chart.zoomIn`, `chart.zoomOut`, `chart.forecast`, `chart.yearAgo`, `chart.average`, `chart.from`, `chart.total`, `chart.record`, `chart.less` and `chart.more` go in the app's string tables for its other languages (docs/localization-keys.md); English is built in.
 
 ### Gallery and tooling
 
-- The `LineChart`, `BarChart` and `ChartSwitcher` pages take up to 120 months and a "This month in progress" switch; `BarChart` a "Two series" switch; `ChartSelectionBanner` a note and its skeleton.
-- Snapshots: `lineAndBarCharts` as one chart per snapshot (each has its banner, a glass card), `unfinishedPeriod`, `centredWindow`, `chartSelectionBanner.legend`; the chart skeletons show the banner's card.
+- The `LineChart`, `BarChart` and `ChartSwitcher` pages take up to 120 months and switches for this month in progress, its forecast, a year ago, an average line, a limit, records and a selection that follows the scroll; `BarChart` shows distance, income and spending, or spending by category in stacks; `ChartSelectionBanner` a note and its skeleton. A new `CalendarHeatmap` page.
+- Snapshots: `lineAndBarCharts` as one chart per snapshot (each has its banner, a glass card), `unfinishedPeriod`, `centredWindow`, `forecastAndYearAgo`, `referenceLinesAndRecords`, `stackedBars`, `calendarHeatmap`, `chartSelectionBanner.legend` and `.details`, `calendarHeatmapSkeleton`; the chart skeletons show the banner's card.
 - The Gallery's badges follow the apps: Tenra no longer shows a `Tooltip` and now uses `OnboardingStepIndicator`.
 
 ## 8.1.0 - 2026-10-21
