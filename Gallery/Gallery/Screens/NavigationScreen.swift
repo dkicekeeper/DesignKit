@@ -188,7 +188,7 @@ private struct OnboardingStepIndicatorPage: View {
         ComponentPage(
             name: "OnboardingStepIndicator",
             summary: "Where onboarding is: a symbol per step, the current one in the accent.",
-            apps: [.dalada]
+            apps: [.tenra, .dalada]
         ) {
             OnboardingStepIndicator(currentStep: step, symbols: ["map", "tent.fill", "person.2.fill", "checkmark.seal.fill"])
         } controls: {

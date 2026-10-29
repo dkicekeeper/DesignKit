@@ -31,6 +31,7 @@ A card for something a person holds and what it is worth, made for Tenra's asset
 
 - Cards: Money has a `HoldingCard` page (a home that grew, a car that fell, an inheritance without a change; a status badge, live, hidden amounts, loading).
 - Snapshot tests: `holdingCards` (grown in light, dark and at a large text size; fallen with a badge; without a change) and the skeleton in `cardSkeletons`.
+- Gallery badges follow the apps' code again: `Tooltip` is used by neither app now, `OnboardingStepIndicator` by Tenra too.
 
 ## 8.1.0 - 2026-10-21
 
