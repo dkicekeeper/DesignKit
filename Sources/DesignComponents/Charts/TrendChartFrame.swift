@@ -634,7 +634,9 @@ struct ChartPlotOverlay: View {
 
     var body: some View {
         GeometryReader { geometry in
-            if let anchor = proxy.plotFrame {
+            // The visible part of the plot: in a chart that scrolls, `plotFrame` is the whole
+            // scrolled plot, whose middle and leading edge are off screen.
+            if let anchor = proxy.plotContainerFrame ?? proxy.plotFrame {
                 let plot = geometry[anchor]
                 ZStack(alignment: .topLeading) {
                     if showsCenterRuler {

@@ -101,6 +101,9 @@ public struct MiniBars: View {
             }
         }
         .frame(height: height)
+        // Seven initials share 120 pt: past Large they run into each other. Decorative (the
+        // card's text says it), so they stop growing there.
+        .dynamicTypeSize(...DynamicTypeSize.large)
         .accessibilityHidden(true)
     }
 }
