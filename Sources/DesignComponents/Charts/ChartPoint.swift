@@ -109,6 +109,24 @@ public enum ChartColoring {
     }
 }
 
+/// Which way a series is better (8.2.0): the colour of its change in the banner and which
+/// period is its record.
+public enum ChartBetter: Hashable, Sendable {
+    /// More is better: income, savings, distance.
+    case higher
+    /// Less is better: spending, debt.
+    case lower
+}
+
+/// What the banner shows for a stretch of periods picked with a long press and a drag (8.2.0).
+public enum ChartRangeSummary: Hashable, Sendable {
+    /// The sum of the periods, their average and the change from the first to the last:
+    /// amounts that add up (spending, income, distance).
+    case total
+    /// The last value and the change from the first: a level, not a flow (a balance, a weight).
+    case change
+}
+
 /// Where a series' Y axis starts.
 public enum ChartBaseline: Hashable, Sendable {
     /// Y axis from 0 (counts, amounts, distances).
@@ -137,22 +155,47 @@ public struct ChartSeries<Point> {
     public let baseline: Baseline
     /// Line width in full-size charts.
     public let lineWidth: CGFloat
+    /// Which way the series is better (8.2.0): its change reads green or red, and its best
+    /// finished period is a record. `nil`: neither, the change in the secondary colour.
+    public let better: ChartBetter?
+    /// What the banner sums up for a picked stretch of periods (8.2.0).
+    public let rangeSummary: ChartRangeSummary
     public let value: (Point) -> Double
+    /// What a period that is not over is expected to reach (8.2.0): a forecast, drawn as a
+    /// pale bar or a dashed rise above the value so far. Read for unfinished points only.
+    public let projected: ((Point) -> Double?)?
+    /// The same period one cycle before, a year ago (8.2.0): drawn as a pale shadow behind
+    /// the value, and in the banner.
+    public let comparison: ((Point) -> Double?)?
 
+    /// - Parameters:
+    ///   - better: which way is better: the change's colour and the record (8.2.0).
+    ///   - rangeSummary: what a picked stretch of periods sums up to (8.2.0).
+    ///   - value: the value at a point.
+    ///   - projected: the forecast of an unfinished point (8.2.0).
+    ///   - comparison: the same period one cycle before (8.2.0).
     public init(
         id: String,
         name: String,
         coloring: Coloring,
         baseline: Baseline = .zero,
         lineWidth: CGFloat = 2,
-        value: @escaping (Point) -> Double
+        better: ChartBetter? = nil,
+        rangeSummary: ChartRangeSummary = .total,
+        value: @escaping (Point) -> Double,
+        projected: ((Point) -> Double?)? = nil,
+        comparison: ((Point) -> Double?)? = nil
     ) {
         self.id = id
         self.name = name
         self.coloring = coloring
         self.baseline = baseline
         self.lineWidth = lineWidth
+        self.better = better
+        self.rangeSummary = rangeSummary
         self.value = value
+        self.projected = projected
+        self.comparison = comparison
     }
 
     /// Colour of one value: points, bars, the banner amount.
@@ -243,15 +286,37 @@ public struct ChartSeries<Point> {
 }
 
 public extension ChartSeries where Point == ChartValuePoint {
-    /// Series reading `point[id]` from `ChartValuePoint`s.
+    /// Series reading `point[id]` from `ChartValuePoint`s; the forecast and the comparison,
+    /// when given, from `point[projectedKey]` and `point[comparisonKey]` (8.2.0).
     static func keyed(
         _ id: String,
         name: String,
         coloring: Coloring,
         baseline: Baseline = .zero,
-        lineWidth: CGFloat = 2
+        lineWidth: CGFloat = 2,
+        better: ChartBetter? = nil,
+        rangeSummary: ChartRangeSummary = .total,
+        projectedKey: String? = nil,
+        comparisonKey: String? = nil
     ) -> ChartSeries {
-        ChartSeries(id: id, name: name, coloring: coloring, baseline: baseline, lineWidth: lineWidth) { $0[id] }
+        let projected: ((ChartValuePoint) -> Double?)? = projectedKey.map { key in
+            { (point: ChartValuePoint) -> Double? in point.values[key] }
+        }
+        let comparison: ((ChartValuePoint) -> Double?)? = comparisonKey.map { key in
+            { (point: ChartValuePoint) -> Double? in point.values[key] }
+        }
+        return ChartSeries(
+            id: id,
+            name: name,
+            coloring: coloring,
+            baseline: baseline,
+            lineWidth: lineWidth,
+            better: better,
+            rangeSummary: rangeSummary,
+            value: { $0[id] },
+            projected: projected,
+            comparison: comparison
+        )
     }
 }
 
@@ -286,5 +351,52 @@ public enum ChartValueFormat {
         case .custom(let format):
             return format(value)
         }
+    }
+}
+
+// MARK: - Reference lines
+
+/// A horizontal line across a `LineChart` or `BarChart` (8.2.0): the average of a series, or a
+/// fixed value such as a limit or a goal. Its label sits in a pill at the plot's trailing edge,
+/// over the line, and stays there while the chart scrolls.
+///
+/// ```swift
+/// BarChart(dataPoints: months, series: spending,
+///          referenceLines: [.average(), .value(500_000, label: "Limit", aboveColor: AppColors.warning)])
+/// ```
+public struct ChartReferenceLine: Identifiable {
+    enum Value {
+        /// The average of a series' finished periods (the first series when `nil`).
+        case average(seriesID: String?)
+        case fixed(Double)
+    }
+
+    public let id: String
+    let value: Value
+    let label: String
+    let color: Color
+    /// Bars above the line take this colour (a limit); `nil` keeps their own.
+    let aboveColor: Color?
+
+    /// The average of a series' finished periods: the first series unless `seriesID` names
+    /// another. Its label is "Average" (key `chart.average`) and its value.
+    public static func average(
+        of seriesID: String? = nil,
+        label: String = String(localized: "chart.average", defaultValue: "Average"),
+        color: Color = AppColors.Text.secondary
+    ) -> ChartReferenceLine {
+        ChartReferenceLine(id: "average-\(seriesID ?? "")", value: .average(seriesID: seriesID), label: label,
+                           color: color, aboveColor: nil)
+    }
+
+    /// A fixed value: a limit, a goal, a budget. `aboveColor` paints the bars that pass it.
+    public static func value(
+        _ value: Double,
+        label: String,
+        color: Color = AppColors.warning,
+        aboveColor: Color? = nil
+    ) -> ChartReferenceLine {
+        ChartReferenceLine(id: "value-\(label)-\(value)", value: .fixed(value), label: label,
+                           color: color, aboveColor: aboveColor)
     }
 }

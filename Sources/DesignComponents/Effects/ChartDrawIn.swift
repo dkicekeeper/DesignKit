@@ -32,6 +32,9 @@ public extension View {
 
 struct ChartDrawInModifier: ViewModifier {
     let delay: Double
+    /// When it changes, the chart is drawn in again (8.2.0: `LineChart` on new periods, a week
+    /// to a month). `nil`: once, on first appearance.
+    var replayKey: Int? = nil
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.designKitMotion) private var designKitMotion
@@ -39,36 +42,57 @@ struct ChartDrawInModifier: ViewModifier {
     /// 0 = hidden, `overshoot` = fully drawn.
     @State private var progress: CGFloat = 0
     @State private var isDrawn = false
+    @State private var hasAppeared = false
 
-    private var allowsMotion: Bool { !reduceMotion && designKitMotion && playsEntrance }
+    init(delay: Double, replayKey: Int? = nil) {
+        self.delay = delay
+        self.replayKey = replayKey
+    }
 
-    @ViewBuilder
+    private var allowsMotion: Bool { !reduceMotion && designKitMotion }
+
     func body(content: Content) -> some View {
-        // Without motion the chart is fully shown from the first frame (snapshots, Reduce Motion).
-        if isDrawn || !allowsMotion {
-            content
-        } else {
-            content
-                .mask(alignment: .leading) {
-                    GeometryReader { proxy in
-                        // The reveal's front edge is soft, like ink still spreading.
-                        HStack(spacing: 0) {
-                            Rectangle()
-                                .frame(width: max(0, proxy.size.width * progress))
-                            LinearGradient(colors: [.black, .clear], startPoint: .leading, endPoint: .trailing)
-                                .frame(width: ChartDrawInMetrics.edge)
+        Group {
+            // Without motion the chart is fully shown from the first frame (snapshots, Reduce
+            // Motion), and so is it when its first entrance is off (after a ChartSwitcher switch).
+            if isDrawn || !allowsMotion || (!hasAppeared && !playsEntrance) {
+                content
+            } else {
+                content
+                    .mask(alignment: .leading) {
+                        GeometryReader { proxy in
+                            // The reveal's front edge is soft, like ink still spreading.
+                            HStack(spacing: 0) {
+                                Rectangle()
+                                    .frame(width: max(0, proxy.size.width * progress))
+                                LinearGradient(colors: [.black, .clear], startPoint: .leading, endPoint: .trailing)
+                                    .frame(width: ChartDrawInMetrics.edge)
+                            }
                         }
                     }
-                }
-                .onAppear {
-                    withAnimation(
-                        .easeInOut(duration: ChartDrawInMetrics.duration).delay(AppAnimation.chartAppearDelay + delay)
-                    ) {
-                        progress = ChartDrawInMetrics.overshoot
-                    } completion: {
-                        isDrawn = true
-                    }
-                }
+                    .onAppear(perform: draw)
+            }
+        }
+        .onAppear {
+            guard !hasAppeared else { return }
+            hasAppeared = true
+            if !playsEntrance { isDrawn = true }
+        }
+        .onChange(of: replayKey) { _, _ in
+            guard allowsMotion else { return }
+            // Back to hidden: the masked view comes back and draws itself in.
+            progress = 0
+            isDrawn = false
+        }
+    }
+
+    private func draw() {
+        withAnimation(
+            .easeInOut(duration: ChartDrawInMetrics.duration).delay(AppAnimation.chartAppearDelay + delay)
+        ) {
+            progress = ChartDrawInMetrics.overshoot
+        } completion: {
+            isDrawn = true
         }
     }
 }

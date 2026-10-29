@@ -54,7 +54,21 @@ final class ChartPointCache {
     var isPartial: [Bool] = []
     /// Start of the unfinished periods at the end of the series: where a line turns dashed.
     var partialStart: Int?
-    /// Smallest / largest value across all series.
+    /// Each series' forecast of its unfinished points, `nil` elsewhere: `projected[series][point]`.
+    var projected: [[Double?]] = []
+    /// Each series' value one cycle before: `comparison[series][point]`.
+    var comparison: [[Double?]] = []
+    /// Each series' average over the finished periods.
+    var finishedAverage: [Double?] = []
+    /// Each series' highest and lowest finished period (`nil` with fewer than two or all equal).
+    var maxIndex: [Int?] = []
+    var minIndex: [Int?] = []
+    /// Each series' best finished period by its `better` (`nil` without one): its record.
+    var recordIndex: [Int?] = []
+    /// The tallest stack of positive values and the deepest of negative ones (stacked bars).
+    var stackedMax: Double = 0
+    var stackedMin: Double = 0
+    /// Smallest / largest value across all series, forecasts and comparisons included.
     var yMin: Double = 0
     var yMax: Double = 1
     /// The widest axis label and the text size it was measured at (0: not measured yet).
@@ -130,16 +144,54 @@ func rebuildChartCacheIfNeeded<Point: ChartPoint>(
 
     var values = [[Double]]()
     var spoken = [[String]]()
+    var projected = [[Double?]]()
+    var comparison = [[Double?]]()
+    var finishedAverage = [Double?]()
+    var maxIndex = [Int?]()
+    var minIndex = [Int?]()
+    var recordIndex = [Int?]()
     var minY = Double.infinity
     var maxY = -Double.infinity
+    func include(_ v: Double) {
+        if v < minY { minY = v }
+        if v > maxY { maxY = v }
+    }
     for s in series {
         let column = points.map(s.value)
-        for v in column {
-            if v < minY { minY = v }
-            if v > maxY { maxY = v }
-        }
+        column.forEach(include)
         values.append(column)
         spoken.append(column.map(format.spokenText))
+
+        let forecast: [Double?] = points.enumerated().map { i, p in
+            isPartial[i] ? s.projected?(p) : nil
+        }
+        forecast.compactMap { $0 }.forEach(include)
+        projected.append(forecast)
+
+        let before: [Double?] = s.comparison.map { read in points.map(read) } ?? Array(repeating: nil, count: points.count)
+        before.compactMap { $0 }.forEach(include)
+        comparison.append(before)
+
+        let finished = column.indices.filter { !isPartial[$0] }
+        finishedAverage.append(finished.isEmpty ? nil : finished.map { column[$0] }.reduce(0, +) / Double(finished.count))
+        let high = finished.max { column[$0] < column[$1] }
+        let low = finished.min { column[$0] < column[$1] }
+        let distinct = high.flatMap { h in low.map { l in column[h] != column[l] } } ?? false
+        maxIndex.append(distinct ? high : nil)
+        minIndex.append(distinct ? low : nil)
+        switch s.better {
+        case .higher: recordIndex.append(distinct && finished.count >= 3 ? high : nil)
+        case .lower: recordIndex.append(distinct && finished.count >= 3 ? low : nil)
+        case nil: recordIndex.append(nil)
+        }
+    }
+
+    var stackedMax = 0.0
+    var stackedMin = 0.0
+    for i in points.indices {
+        let column = values.map { $0[i] }
+        stackedMax = max(stackedMax, column.filter { $0 > 0 }.reduce(0, +))
+        stackedMin = min(stackedMin, column.filter { $0 < 0 }.reduce(0, +))
     }
 
     var partialStart: Int?
@@ -157,6 +209,14 @@ func rebuildChartCacheIfNeeded<Point: ChartPoint>(
     cache.labelsKey = labelsHasher.finalize()
     cache.values = values
     cache.spoken = spoken
+    cache.projected = projected
+    cache.comparison = comparison
+    cache.finishedAverage = finishedAverage
+    cache.maxIndex = maxIndex
+    cache.minIndex = minIndex
+    cache.recordIndex = recordIndex
+    cache.stackedMax = stackedMax
+    cache.stackedMin = stackedMin
     cache.labelToIndex = indexMap
     cache.axisLabels = axisLabels
     cache.todayLabel = todayLabel
@@ -192,14 +252,34 @@ struct ChartWindow {
     /// The category at the window's leading edge when the chart appears.
     let leadingLabel: String
 
-    /// Categories on screen at once: 12 at zoom 1, fewer zoomed in, at most the whole series.
-    static func visibleCount(count: Int, zoomScale: CGFloat) -> Int {
-        max(1, min(count, Int((ChartMetrics.visiblePoints / max(zoomScale, 0.1)).rounded())))
+    /// Empty categories before the first point (a window that follows the scroll, 8.2.0).
+    let leadingPadding: Int
+
+    /// Categories on screen at once: 12 at zoom 1, fewer zoomed in, at most the whole series
+    /// (any number when `followsScroll`, which pads both ends).
+    static func visibleCount(count: Int, zoomScale: CGFloat, followsScroll: Bool = false) -> Int {
+        let window = max(1, Int((ChartMetrics.visiblePoints / max(zoomScale, 0.1)).rounded()))
+        return followsScroll ? window : max(1, min(count, window))
     }
 
-    init(labels: [String], centerIndex: Int, zoomScale: CGFloat) {
+    /// - Parameter followsScroll: the selection is whatever sits in the window's middle
+    ///   (8.2.0): empty categories pad both ends, so the first and the last point can reach
+    ///   the middle too, and the chart always scrolls.
+    init(labels: [String], centerIndex: Int, zoomScale: CGFloat, followsScroll: Bool = false) {
         let count = labels.count
-        let window = Self.visibleCount(count: count, zoomScale: zoomScale)
+        let window = Self.visibleCount(count: count, zoomScale: zoomScale, followsScroll: followsScroll)
+        if followsScroll {
+            let lead = window / 2
+            let trail = window - 1 - lead
+            categories = (0..<lead).map(Self.leadingPaddingLabel) + labels + (0..<trail).map(Self.paddingLabel)
+            visibleCount = window
+            leadingPadding = lead
+            // With `lead` categories before the first point, the window that has point `c` in
+            // its middle starts at category `c`.
+            leadingLabel = categories[min(max(centerIndex, 0), max(count - 1, 0))]
+            return
+        }
+        leadingPadding = 0
         // The whole series fits: nothing scrolls, nothing to centre.
         guard count > window else {
             categories = labels
@@ -219,6 +299,19 @@ struct ChartWindow {
     /// real label.
     static func paddingLabel(_ index: Int) -> String {
         "\u{2063}chart-padding-\(index)"
+    }
+
+    /// An empty category before the first point.
+    static func leadingPaddingLabel(_ index: Int) -> String {
+        "\u{2063}chart-padding-lead-\(index)"
+    }
+
+    /// The point in the middle of a window that starts at `leadingLabel` (a window that
+    /// follows the scroll); `nil` for a label it does not hold.
+    func centerIndex(leadingLabel: String, labelToIndex: [String: Int]) -> Int? {
+        guard let start = categories.firstIndex(of: leadingLabel) else { return nil }
+        let index = start + visibleCount / 2 - leadingPadding
+        return labelToIndex.count > index && index >= 0 ? index : nil
     }
 
     static func isPadding(_ label: String) -> Bool {
@@ -463,6 +556,16 @@ func chartBannerEntries<Point>(
 enum ChartText {
     /// After the banner's title for a period that is not over yet.
     static var partial: String { String(localized: "chart.partial", defaultValue: "so far") }
+    /// The banner's line for a forecast (8.2.0).
+    static var forecast: String { String(localized: "chart.forecast", defaultValue: "Forecast") }
+    /// The banner's line for `ChartSeries.comparison` by default (8.2.0).
+    static var yearAgo: String { String(localized: "chart.yearAgo", defaultValue: "A year ago") }
+    /// A picked stretch's average; the average reference line (8.2.0).
+    static var average: String { String(localized: "chart.average", defaultValue: "Average") }
+    /// Where a level stood at the start of a picked stretch (8.2.0).
+    static var from: String { String(localized: "chart.from", defaultValue: "From") }
+    /// The sum of stacked bars (8.2.0).
+    static var total: String { String(localized: "chart.total", defaultValue: "Total") }
 }
 
 // MARK: - Audio Graph
@@ -590,6 +693,17 @@ enum ChartMetrics {
     static let haloSize: CGFloat = 320
     static let selectedDot: CGFloat = 16
     static let selectedRing: CGFloat = 3
+    /// A reference line's pill: its distance from the plot's trailing edge, and how far it sits
+    /// above its line.
+    static let referencePillInset: CGFloat = 6
+    static let referencePillLift: CGFloat = 10
+    /// The pale bar of a comparison (a year ago) as a share of its category, one series.
+    static let comparisonWidthRatio: Double = 0.85
+    /// The pale bar of a forecast, and the comparison, as shares of their colour's opacity.
+    static let forecastOpacity: Double = 0.22
+    static let comparisonOpacity: Double = 0.16
+    /// How far a record's dot sits above (below, under zero) its bar's end.
+    static let extremeDotOffset: CGFloat = 9
     /// Space between two X axis labels, and between the Y axis labels and the plot.
     static let axisLabelGap: CGFloat = 8
     /// The chart's width until its layout is known.

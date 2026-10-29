@@ -31,6 +31,7 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
     let todayText: String
     let emptyTitle: String
     let emptyMessage: String?
+    let options: TrendChartOptions
 
     @State private var style: ChartStyle
     @State private var zoomScale: CGFloat = 1.0
@@ -39,7 +40,8 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
     /// Once the style changed, the next chart is simply there: no second entrance.
     @State private var hasSwitched = false
 
-    /// Parameters as in `LineChart`; `initialStyle` picks the first chart shown.
+    /// Parameters as in `LineChart`; `initialStyle` picks the first chart shown, `barLayout`
+    /// how the bars draw several series (8.2.0).
     public init(
         dataPoints: [Point],
         series: [ChartSeries<Point>],
@@ -47,7 +49,12 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
         todayText: String = String(localized: "chart.today"),
         emptyTitle: String = String(localized: "chart.empty.title"),
         emptyMessage: String? = String(localized: "chart.empty.message"),
-        initialStyle: ChartStyle = .line
+        initialStyle: ChartStyle = .line,
+        barLayout: BarChartLayout = .grouped,
+        referenceLines: [ChartReferenceLine] = [],
+        marksExtremes: Bool = false,
+        followsScroll: Bool = false,
+        comparisonLabel: String = String(localized: "chart.yearAgo", defaultValue: "A year ago")
     ) {
         self.dataPoints = dataPoints
         self.seriesList = series
@@ -55,6 +62,13 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
         self.todayText = todayText
         self.emptyTitle = emptyTitle
         self.emptyMessage = emptyMessage
+        self.options = TrendChartOptions(
+            referenceLines: referenceLines,
+            marksExtremes: marksExtremes,
+            followsScroll: followsScroll,
+            stacked: barLayout == .stacked,
+            comparisonLabel: comparisonLabel
+        )
         self._style = State(initialValue: initialStyle)
     }
 
@@ -66,7 +80,11 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
         todayText: String = String(localized: "chart.today"),
         emptyTitle: String = String(localized: "chart.empty.title"),
         emptyMessage: String? = String(localized: "chart.empty.message"),
-        initialStyle: ChartStyle = .line
+        initialStyle: ChartStyle = .line,
+        referenceLines: [ChartReferenceLine] = [],
+        marksExtremes: Bool = false,
+        followsScroll: Bool = false,
+        comparisonLabel: String = String(localized: "chart.yearAgo", defaultValue: "A year ago")
     ) {
         self.init(
             dataPoints: dataPoints,
@@ -75,7 +93,11 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
             todayText: todayText,
             emptyTitle: emptyTitle,
             emptyMessage: emptyMessage,
-            initialStyle: initialStyle
+            initialStyle: initialStyle,
+            referenceLines: referenceLines,
+            marksExtremes: marksExtremes,
+            followsScroll: followsScroll,
+            comparisonLabel: comparisonLabel
         )
     }
 
@@ -94,6 +116,7 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
                         emptyTitle: emptyTitle,
                         emptyMessage: emptyMessage,
                         zoomScale: $zoomScale,
+                        options: lineOptions,
                         selection: $selection
                     )
                 case .bar:
@@ -105,6 +128,7 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
                         emptyTitle: emptyTitle,
                         emptyMessage: emptyMessage,
                         zoomScale: $zoomScale,
+                        options: options,
                         selection: $selection
                     )
                 }
@@ -114,6 +138,13 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
             .environment(\.chartPlaysEntrance, !hasSwitched)
         }
         .animation(AppAnimation.gentleSpring, value: style)
+    }
+
+    /// The line has no stacks: its options without them.
+    private var lineOptions: TrendChartOptions {
+        var line = options
+        line.stacked = false
+        return line
     }
 
     /// The picker's selection: a switch also turns the next chart's entrance off, in the same
