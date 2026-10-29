@@ -69,7 +69,8 @@ public struct BarChart<Point: ChartPoint>: View {
         referenceLines: [ChartReferenceLine] = [],
         marksExtremes: Bool = false,
         followsScroll: Bool = false,
-        comparisonLabel: String = String(localized: "chart.yearAgo", defaultValue: "A year ago")
+        comparisonLabel: String = String(localized: "chart.yearAgo", defaultValue: "A year ago"),
+        selection: Binding<String?>? = nil
     ) {
         self.init(
             dataPoints: dataPoints,
@@ -86,7 +87,7 @@ public struct BarChart<Point: ChartPoint>: View {
                 stacked: layout == .stacked,
                 comparisonLabel: comparisonLabel
             ),
-            selection: nil
+            selection: selection
         )
     }
 
@@ -102,7 +103,8 @@ public struct BarChart<Point: ChartPoint>: View {
         referenceLines: [ChartReferenceLine] = [],
         marksExtremes: Bool = false,
         followsScroll: Bool = false,
-        comparisonLabel: String = String(localized: "chart.yearAgo", defaultValue: "A year ago")
+        comparisonLabel: String = String(localized: "chart.yearAgo", defaultValue: "A year ago"),
+        selection: Binding<String?>? = nil
     ) {
         self.init(
             dataPoints: dataPoints,
@@ -115,7 +117,8 @@ public struct BarChart<Point: ChartPoint>: View {
             referenceLines: referenceLines,
             marksExtremes: marksExtremes,
             followsScroll: followsScroll,
-            comparisonLabel: comparisonLabel
+            comparisonLabel: comparisonLabel,
+            selection: selection
         )
     }
 

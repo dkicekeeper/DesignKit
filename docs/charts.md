@@ -171,12 +171,12 @@ Feature-bound names replaced with reusable ones (old → new; grep for the new n
 
 ### Multi-series period charts (the 4→2 merge)
 
-`LineChart` and `BarChart` take `series: [PeriodChartSeries]` (single-value convenience inits exist). The income/expense overlay is NOT a separate chart — it's `[.income, .spending]`: both cases already carried the needed styles in the enum, so the former `IncomeExpenseLineChart`/`IncomeExpenseBarChart`/`IncomeExpenseChartSwitcher` were deleted.
+`LineChart` and `BarChart` take `series: [ChartSeries<Point>]` (single-series convenience inits exist; Tenra maps its `PeriodChartSeries` onto them in its adapters). The income/expense overlay is NOT a separate chart: it is `[income, spending]`, two series.
 
-- Marks always pass `series: .value("Type", s.seriesKey)` + `stacking: .unstacked` (line) / `position(by:)` when grouped (bar).
+- Marks always pass `series: .value("Type", series.id)` + `stacking: .unstacked` (line) / `position(by:)` when grouped (bar).
 - The banner is generic: one `ChartSelectionBanner.Entry` per series (with its name since 8.2.0), so any combination of series works.
 - Selection halos: multi-series skips zero-valued points (halo at the baseline reads as noise; before 8.2.0 it skipped negative ones too); single-series always highlights.
-- Adding a `PeriodChartSeries` case: also set `seriesKey` (mark grouping) — plus the ~9 style switches listed below.
+- A series is one value: `ChartSeries(id:name:coloring:baseline:lineWidth:better:rangeSummary:value:projected:comparison:)` carries everything a chart reads; nothing else switches on it.
 
 `ChartSwitcher` (segmented bar/line picker + `ChartZoomControls`; zoom and, since 8.2.0, the selected period live here, passed down as bindings) wraps the pair everywhere: InsightsSummaryDetailView (`[.income, .spending]`, default `.bar`), InsightDetailView periodTrend details (single series, default `.line`). Charts no longer own a zoom toolbar — standalone use gets `.constant(1.0)`. The length of a period (week, month) is the app's global granularity, not the chart's: zoom only changes how many periods fit on screen.
 
@@ -351,9 +351,8 @@ A new chart in DesignKit plugs into these — don't reimplement inline.
 
 ### ChartSelectionBanner
 
-`ChartSelectionBanner(title:note:entries:format:)` — one `Entry(value:color:showsDot:label:)` per
-value (Tenra's former `.dual` = two dotted entries, `.single` = one undotted; `label:` names the
-series, 8.2.0). Capitalises the title's first character; `note` follows it in the secondary
+`ChartSelectionBanner(title:note:entries:format:)`: one `Entry(value:color:showsDot:label:)` per
+value (dotted and named when a chart has several series, 8.2.0). Capitalises the title's first character; `note` follows it in the secondary
 colour ("so far"); `format` as in the charts. Values roll from one period to the next
 (`numericText`). `ChartSelectionBannerSkeleton(values:)` is its placeholder.
 

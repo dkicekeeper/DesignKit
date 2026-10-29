@@ -60,6 +60,9 @@ public struct LineChart<Point: ChartPoint>: View {
     ///   - followsScroll: a ruler in the window's middle; the chart scrolls under it and the
     ///     period at the ruler is the selection, with a tick (8.2.0).
     ///   - comparisonLabel: the banner's line for `ChartSeries.comparison` (key `chart.yearAgo`).
+    ///   - selection: the selected period's `chartLabel`, to open on another period than the
+    ///     current one or to read what the person picked; `nil` (the binding or its value): the
+    ///     current period (8.2.0).
     public init(
         dataPoints: [Point],
         series: [ChartSeries<Point>],
@@ -71,7 +74,8 @@ public struct LineChart<Point: ChartPoint>: View {
         referenceLines: [ChartReferenceLine] = [],
         marksExtremes: Bool = false,
         followsScroll: Bool = false,
-        comparisonLabel: String = String(localized: "chart.yearAgo", defaultValue: "A year ago")
+        comparisonLabel: String = String(localized: "chart.yearAgo", defaultValue: "A year ago"),
+        selection: Binding<String?>? = nil
     ) {
         self.init(
             dataPoints: dataPoints,
@@ -87,7 +91,7 @@ public struct LineChart<Point: ChartPoint>: View {
                 followsScroll: followsScroll,
                 comparisonLabel: comparisonLabel
             ),
-            selection: nil
+            selection: selection
         )
     }
 
@@ -103,7 +107,8 @@ public struct LineChart<Point: ChartPoint>: View {
         referenceLines: [ChartReferenceLine] = [],
         marksExtremes: Bool = false,
         followsScroll: Bool = false,
-        comparisonLabel: String = String(localized: "chart.yearAgo", defaultValue: "A year ago")
+        comparisonLabel: String = String(localized: "chart.yearAgo", defaultValue: "A year ago"),
+        selection: Binding<String?>? = nil
     ) {
         self.init(
             dataPoints: dataPoints,
@@ -116,7 +121,8 @@ public struct LineChart<Point: ChartPoint>: View {
             referenceLines: referenceLines,
             marksExtremes: marksExtremes,
             followsScroll: followsScroll,
-            comparisonLabel: comparisonLabel
+            comparisonLabel: comparisonLabel,
+            selection: selection
         )
     }
 
