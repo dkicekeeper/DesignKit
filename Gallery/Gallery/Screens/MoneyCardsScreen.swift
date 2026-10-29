@@ -22,6 +22,7 @@ struct MoneyCardsScreen: View {
     @ViewBuilder static var pages: some View {
         BalanceCardPage()
         SelectableBalanceCardPage()
+        HoldingCardPage()
         FinanceCardPage()
         CashFlowCardPage()
         TotalsCardPage()
@@ -94,6 +95,81 @@ private struct SelectableBalanceCardPage: View {
             }
         } controls: {
             StateControl(state: $state)
+        }
+    }
+}
+
+private struct HoldingCardPage: View {
+    enum Kind: Hashable { case home, car, inherited }
+
+    @State private var kind: Kind = .home
+    @State private var showsBadge = false
+    @State private var isLive = false
+    @State private var hidden = false
+    @State private var state: SpecimenState = .content
+
+    var body: some View {
+        ComponentPage(
+            name: "HoldingCard",
+            summary: "Something a person holds and what it is worth: the value, its change since it was bought, the values over time.",
+            since: "8.2.0",
+            apps: [],
+            canvas: .fill,
+            notes: [
+                "change: a TrendBadge pill and a caption; nil without a price to compare with (an inheritance).",
+                "history: the values over time, oldest first; fewer than two draw no sparkline.",
+                "The sparkline takes the change's colour: green up, red down, the accent without one.",
+                "isLive: the value rolls up when the card appears and flashes the direction of a change.",
+            ]
+        ) {
+            if state == .loading {
+                HoldingCardSkeleton(showsSparkline: kind != .inherited)
+            } else {
+                card
+                    .amountsHidden(hidden)
+                    // A new card when the toggle flips, so turning it on rolls the value up.
+                    .id(isLive)
+            }
+        } controls: {
+            StateControl(state: $state)
+            ChoiceControl("Holding", selection: $kind, options: [
+                ("Home, grown", .home), ("Car, fallen", .car), ("Inherited", .inherited),
+            ])
+            ToggleControl("Status badge", isOn: $showsBadge)
+            ToggleControl("Live", isOn: $isLive)
+            ToggleControl("Amounts hidden", isOn: $hidden)
+        }
+    }
+
+    @ViewBuilder
+    private var card: some View {
+        switch kind {
+        case .home:
+            HoldingCard(
+                iconSource: .sfSymbol("house.fill"), title: "Apartment", subtitle: "Valued 16 Oct",
+                amount: 70_000_000, currency: "KZT",
+                change: .init(direction: .up, percent: 191.7, caption: "+46M ₸ since purchase"),
+                history: [24_000_000, 31_000_000, 45_000_000, 58_000_000, 70_000_000], isLive: isLive
+            ) { badge }
+        case .car:
+            HoldingCard(
+                iconSource: .sfSymbol("car.fill"), title: "Car", subtitle: "Valued 2 Sep",
+                amount: 8_400_000, currency: "KZT",
+                change: .init(direction: .down, percent: -16.0, caption: "−1.6M ₸ since purchase"),
+                history: [10_000_000, 9_300_000, 8_400_000], isLive: isLive
+            ) { badge }
+        case .inherited:
+            HoldingCard(
+                iconSource: .sfSymbol("leaf.fill"), title: "Country house", subtitle: "Valued 3 Mar",
+                amount: 18_000_000, currency: "KZT", isLive: isLive
+            ) { badge }
+        }
+    }
+
+    @ViewBuilder
+    private var badge: some View {
+        if showsBadge {
+            Badge("Sold")
         }
     }
 }

@@ -99,7 +99,23 @@ The keys `chart.partial`, `chart.style`, `chart.zoomIn`, `chart.zoomOut`, `chart
 
 - The `LineChart`, `BarChart` and `ChartSwitcher` pages take up to 120 months and switches for this month in progress, its forecast, a year ago, an average line, a limit, records and a selection that follows the scroll; `BarChart` shows distance, income and spending, or spending by category in stacks; `ChartSelectionBanner` a note and its skeleton. `ChartSwitcher` shows its options menu (`.chartDisplayOptions`) or the switches. New `CalendarHeatmap` and `MiniBars` pages.
 - Snapshots: `lineAndBarCharts` as one chart per snapshot (each has its banner, a glass card), `unfinishedPeriod`, `centredWindow`, `forecastAndYearAgo`, `referenceLinesAndRecords`, `stackedBars`, `calendarHeatmap`, `chartSelectionBanner.legend` and `.details`, `miniBars`, `displayOptions` (an average per series, records, the forecast and a year ago from the options; a chart with all of them off), `followsScroll`, `calendarHeatmapSkeleton`, `miniBarsSkeleton`; the chart skeletons show the banner's card.
-- The Gallery's badges follow the apps: Tenra no longer shows a `Tooltip` and now uses `OnboardingStepIndicator`.
+
+## 8.2.0 - 2026-10-29
+
+A card for something a person holds and what it is worth, made for Tenra's assets (a home, a car): the value, its change since it was bought and the values over time.
+[#92](https://github.com/dkicekeeper/DesignKit/pull/92)
+
+### Added
+
+- `HoldingCard`: an icon, the name and a subtitle with an accessory on the right; the value large (`isLive:` rolls it up); its change as a `TrendBadge` pill with a caption; the values over time as a sparkline on the trailing edge, in the change's colour.
+- `HoldingChange` (`HoldingCard.Change`): the change's direction, percent and caption.
+- `HoldingCardSkeleton(showsSparkline:)`.
+
+### Gallery and tooling
+
+- Cards: Money has a `HoldingCard` page (a home that grew, a car that fell, an inheritance without a change; a status badge, live, hidden amounts, loading).
+- Snapshot tests: `holdingCards` (grown in light, dark and at a large text size; fallen with a badge; without a change) and the skeleton in `cardSkeletons`.
+- Gallery badges follow the apps' code again: `Tooltip` is used by neither app now, `OnboardingStepIndicator` by Tenra too.
 
 ## 8.1.0 - 2026-10-21
 

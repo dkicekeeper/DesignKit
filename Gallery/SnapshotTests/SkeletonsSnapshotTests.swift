@@ -39,6 +39,7 @@ extension ComponentSnapshots {
                 ("finance", AnyView(FinanceCardSkeleton())),
                 ("balance", AnyView(BalanceCardSkeleton())),
                 ("selectableBalance", AnyView(SelectableBalanceCardSkeleton())),
+                ("holding", AnyView(HoldingCardSkeleton())),
                 ("cashFlow", AnyView(CashFlowCardSkeleton())),
                 ("insightsStat", AnyView(InsightsStatCardSkeleton())),
                 ("recurringPayment", AnyView(RecurringPaymentCardSkeleton())),

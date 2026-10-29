@@ -855,6 +855,18 @@ Something being paid off: icon, name (h4) and subtitle with an `accessory` view 
 #### `BalanceCard` *(1.5.0)*
 A named balance sized for a carousel: `Icon` (44 pt), the name (h4) and the amount (bodySmall semibold), `AppSpacing.sm` apart, padded `lg` on `cardStyle`. `isLive: true` *(2.7.0)* shows the amount as a `LiveAmountText`: it rolls up from zero when the card first appears and flashes green or red when the balance changes. Navigation, `glassEffectID` and `matchedTransitionSource` go on it at the call site. Tenra: `AccountCard` (accounts carousel) is an adapter.
 
+#### `HoldingCard` *(8.2.0)*
+Something a person holds and what it is worth (a home, a car, a share position): `Icon` (44 pt), the name (h4) and a subtitle (when it was valued) with an `accessory` on the right (a status `Badge`), as `PayoffProgressCard`'s header; the value (h2 bold, `FormattedAmountText`, or `LiveAmountText` with `isLive: true`), its change under it (`HoldingCard.Change`: a `TrendBadge(.pill)` and a caption, which drops under the pill when both do not fit; `nil` leaves the line out, as for an inheritance with no price to compare with), and on the trailing edge the values over time (`history`, oldest first) as a 96 × 44 pt `Sparkline` in the change's colour (green up, red down, the accent without one). Fewer than two values draw no sparkline and the text takes the width; at accessibility text sizes the sparkline goes under the value, full width. One VoiceOver element. `HoldingChange` is top-level, so an app builds it without naming the accessory. Tenra: `AssetCard` (assets) is an adapter.
+
+```swift
+HoldingCard(iconSource: .sfSymbol("house.fill"), title: "Apartment", subtitle: "Valued 16 Oct",
+            amount: 70_000_000, currency: "KZT",
+            change: .init(direction: .up, percent: 191.7, caption: "+46M ₸ since purchase"),
+            history: [24_000_000, 45_000_000, 70_000_000])
+```
+
+Skeleton: `HoldingCardSkeleton(showsSparkline:)`.
+
 #### `MetricCard` *(1.5.0)*
 One metric in a feed: a one-line title (secondary), a statement of up to three lines (bodyEmphasis), the value (`.amount` through `FormattedAmountText` or pre-formatted `.text`, h2 bold) with an optional unit and a `TrendBadge(.pill)` that drops under the value when both do not fit (`ViewThatFits`). An optional chart: `.trailing` overlays it at 120 × 120 pt on the trailing edge and the text keeps 128 pt clear; `.bottom` puts it full width under the text. Without a chart the text takes the full width. `Value`, `Trend` and `ChartPlacement` are typealiases of the top-level `MetricCardValue`, `MetricCardTrend` and `MetricCardChartPlacement`, so one value can feed cards with different charts. `ScoreCard` shares the mini-chart footprint. Tenra: `InsightsCardView` (the insight model and which mini chart each insight gets) is an adapter.
 
@@ -1272,7 +1284,7 @@ SkeletonReveal(isLoading: balance == nil) {
 
 | Component | Skeleton |
 |---|---|
-| `BalanceCard`, `SelectableBalanceCard`, `FinanceCard`, `CashFlowCard` (also its own loading state), `TotalsCard`, `ComparisonCard`, `InsightsStatCard`, `StatTile`, `RecurringPaymentCard`, `RecommendationBox` | `…Skeleton` (`TotalsCardSkeleton(count:showsTitle:amountFont:)`, `FinanceCardSkeleton(showsTrailing:)`, `RecommendationBoxSkeleton(lines:)`) |
+| `BalanceCard`, `SelectableBalanceCard`, `HoldingCard` (8.2.0), `FinanceCard`, `CashFlowCard` (also its own loading state), `TotalsCard`, `ComparisonCard`, `InsightsStatCard`, `StatTile`, `RecurringPaymentCard`, `RecommendationBox` | `…Skeleton` (`TotalsCardSkeleton(count:showsTitle:amountFont:)`, `FinanceCardSkeleton(showsTrailing:)`, `HoldingCardSkeleton(showsSparkline:)`, `RecommendationBoxSkeleton(lines:)`) |
 | `LimitProgressCard`, `TargetProgressCard`, `PayoffProgressCard`, `ScoreCard`, `ScoreGaugeCard`, `MetricCard`, `WeightBreakdownCard`, `CalculationCard`, `ProgressRingTile`, `ProgressRingTileGrid` | `…Skeleton` (`ScoreGaugeCardSkeleton(style:)`, `MetricCardSkeleton(chartPlacement:)`, `WeightBreakdownCardSkeleton(segments:)`, `CalculationCardSkeleton(rows:showsHero:)`) |
 | `UniversalRow` | `UniversalRowSkeleton(config:iconStyle:titleFont:showsSubtitle:trailing:)` |
 | `UniversalRow`'s accessories (7.0.0) | `UniversalRowSkeleton.navigationSettings`, `.toggleSettings`, `.actionSettings`, `.menuPicker`, `.datePicker`, `.checkmark(iconStyle:)` (a stepper or picker row is `.menuPicker`, the same shape), `.slider(showsHint:config:)`, `.info(showsIcon:)`, `.colors(swatches:)` |

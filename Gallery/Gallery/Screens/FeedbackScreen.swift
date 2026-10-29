@@ -334,6 +334,7 @@ private struct TooltipPage: View {
             name: "Tooltip",
             summary: "A short value or hint in an opaque bubble with a tail pointing at its target: the amount over a tapped bar.",
             since: "2.0.0",
+            apps: [],
             notes: [
                 "Put it in an overlay of its target with .tooltipAnchor(.top) (or .bottom with arrowEdge: .top), so it never moves the layout.",
                 "A target by the edge of the screen takes arrowAlignment: .leading or .trailing (5.5.0): the tail sits by that corner, still over the target's middle, and the bubble runs on to the side with room.",
