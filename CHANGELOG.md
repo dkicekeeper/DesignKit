@@ -16,6 +16,21 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.2.0 - 2026-10-29
+
+A card for something a person holds and what it is worth, made for Tenra's assets (a home, a car): the value, its change since it was bought and the values over time.
+
+### Added
+
+- `HoldingCard`: an icon, the name and a subtitle with an accessory on the right; the value large (`isLive:` rolls it up); its change as a `TrendBadge` pill with a caption; the values over time as a sparkline on the trailing edge, in the change's colour.
+- `HoldingChange` (`HoldingCard.Change`): the change's direction, percent and caption.
+- `HoldingCardSkeleton(showsSparkline:)`.
+
+### Gallery and tooling
+
+- Cards: Money has a `HoldingCard` page (a home that grew, a car that fell, an inheritance without a change; a status badge, live, hidden amounts, loading).
+- Snapshot tests: `holdingCards` (grown in light, dark and at a large text size; fallen with a badge; without a change) and the skeleton in `cardSkeletons`.
+
 ## 8.1.0 - 2026-10-21
 
 The rows made for a `List`, `ItemRow` and `ChecklistRow`, are rows of a glass section now: they pad themselves and start the divider under their text, so a section of them no longer depends on each app padding them by hand. Found in Tenra, where backups, Ten's memory and subcategories had their text on the dividers (Tenra#88), and in Dalada, where the checklist items' dividers ran under the circles.
