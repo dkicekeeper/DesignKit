@@ -19,6 +19,7 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 ## 8.2.0 - 2026-10-29
 
 A card for something a person holds and what it is worth, made for Tenra's assets (a home, a car): the value, its change since it was bought and the values over time.
+[#92](https://github.com/dkicekeeper/DesignKit/pull/92)
 
 ### Added
 
