@@ -25,14 +25,69 @@ struct ChartsScreen: View {
         BarChartPage()
         HeroSparklinePage()
         SparklinePage()
+        CalendarHeatmapPage()
         OrbChartPage()
         ChartSelectionBannerPage()
         ChartZoomControlsPage()
     }
 }
 
+/// The extras a trend chart page can switch on (8.3.0).
+private struct TrendExtras {
+    var forecast = true
+    var lastYear = false
+    var average = false
+    var limit = false
+    var records = false
+    var followsScroll = false
+
+    var expenses: ChartSeries<ChartValuePoint> {
+        .keyed("expenses", name: "Expenses", coloring: .solid(AppColors.destructive), better: .lower,
+               projectedKey: forecast ? "expensesForecast" : nil, comparisonKey: lastYear ? "expensesLastYear" : nil)
+    }
+
+    var income: ChartSeries<ChartValuePoint> {
+        .keyed("income", name: "Income", coloring: .solid(AppColors.success), better: .higher,
+               projectedKey: forecast ? "incomeForecast" : nil, comparisonKey: lastYear ? "incomeLastYear" : nil)
+    }
+
+    var distance: ChartSeries<ChartValuePoint> {
+        .keyed("km", name: "Distance", coloring: .solid(AppColors.accent), better: .higher,
+               projectedKey: forecast ? "kmForecast" : nil, comparisonKey: lastYear ? "kmLastYear" : nil)
+    }
+
+    func referenceLines(limit value: Double) -> [ChartReferenceLine] {
+        var lines: [ChartReferenceLine] = []
+        if average { lines.append(.average(label: "Average")) }
+        if limit { lines.append(.value(value, label: "Limit", aboveColor: AppColors.warning)) }
+        return lines
+    }
+
+    var key: String { "\(forecast)\(lastYear)\(average)\(limit)\(records)\(followsScroll)" }
+}
+
+/// The switches for `TrendExtras`.
+private struct TrendExtrasControls: View {
+    @Binding var extras: TrendExtras
+    var limitLabel = "Limit line (bars past it orange)"
+
+    var body: some View {
+        ToggleControl("Forecast for this month", isOn: $extras.forecast)
+        ToggleControl("A year ago", isOn: $extras.lastYear)
+        ToggleControl("Average line", isOn: $extras.average)
+        ToggleControl(limitLabel, isOn: $extras.limit)
+        ToggleControl("Records (highest, lowest)", isOn: $extras.records)
+        ToggleControl("Selection follows the scroll", isOn: $extras.followsScroll)
+    }
+}
+
 private struct ChartSwitcherPage: View {
     @State private var initial: ChartStyle = .line
+    @State private var inProgress = true
+    @State private var extras = TrendExtras()
+    /// The options menu: the person's choice, kept in `@AppStorage` by an app.
+    @State private var usesMenu = true
+    @State private var shown = ChartDisplayOptions.standard
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -41,28 +96,73 @@ private struct ChartSwitcherPage: View {
             summary: "A LineChart and a BarChart of the same data with a switch between them; zoom and tap a point.",
             since: "0.5.0",
             apps: [.tenra],
-            canvas: .bleed
+            canvas: .bleed,
+            notes: [
+                "Opens on the current period, selected and in the middle of the window (8.3.0).",
+                "The selected period stays when you switch; zoom re-centres on it.",
+                "Press and drag across periods: the banner sums them up.",
+                "Under .chartDisplayOptions($options) a menu by the zoom turns the average, records, forecast, a year ago and the ruler on and off for every chart of the app (8.3.0).",
+            ]
         ) {
-            switch state {
-            case .loading:
-                ChartSwitcherSkeleton(style: initial)
-            case .empty:
-                ChartSwitcher(dataPoints: [], series: [GallerySamples.income, GallerySamples.expenses],
-                              valueFormat: .currency("KZT"), todayText: "Today", initialStyle: initial)
-            default:
-                ChartSwitcher(dataPoints: GallerySamples.months, series: [GallerySamples.income, GallerySamples.expenses],
-                              valueFormat: .currency("KZT"), todayText: "Today", initialStyle: initial)
-                    .id(initial)
+            Group {
+                switch state {
+                case .loading:
+                    ChartSwitcherSkeleton(style: initial, series: 2)
+                case .empty:
+                    ChartSwitcher(dataPoints: [], series: [GallerySamples.income, GallerySamples.expenses],
+                                  valueFormat: .currency("KZT"), todayText: "Today", initialStyle: initial)
+                default:
+                    if usesMenu {
+                        // The menu decides: the series offer their forecast and a year ago.
+                        let offered = TrendExtras(forecast: true, lastYear: true, limit: extras.limit)
+                        ChartSwitcher(dataPoints: GallerySamples.monthSeries(24, inProgress: inProgress),
+                                      series: [offered.income, offered.expenses],
+                                      valueFormat: .currency("KZT"), todayText: "Today", initialStyle: initial,
+                                      referenceLines: offered.referenceLines(limit: 560_000))
+                            .id("\(initial)\(inProgress)\(extras.limit)")
+                    } else {
+                        ChartSwitcher(dataPoints: GallerySamples.monthSeries(24, inProgress: inProgress),
+                                      series: [extras.income, extras.expenses],
+                                      valueFormat: .currency("KZT"), todayText: "Today", initialStyle: initial,
+                                      referenceLines: extras.referenceLines(limit: 560_000),
+                                      marksExtremes: extras.records, followsScroll: extras.followsScroll)
+                            .id("\(initial)\(inProgress)\(extras.key)")
+                    }
+                }
             }
+            .modifier(GalleryChartOptions(options: usesMenu ? $shown : nil))
         } controls: {
             StateControl(state: $state, states: [.content, .loading, .empty])
             ChoiceControl("Starts as", selection: $initial, options: [("Line", .line), ("Bar", .bar)])
+            ToggleControl("This month in progress", isOn: $inProgress)
+            ToggleControl("Options menu (.chartDisplayOptions)", isOn: $usesMenu)
+            if usesMenu {
+                ToggleControl("Limit line (bars past it orange)", isOn: $extras.limit)
+            } else {
+                TrendExtrasControls(extras: $extras)
+            }
+        }
+    }
+}
+
+/// `.chartDisplayOptions(_:)` when the page shows the menu.
+private struct GalleryChartOptions: ViewModifier {
+    let options: Binding<ChartDisplayOptions>?
+
+    func body(content: Content) -> some View {
+        if let options {
+            content.chartDisplayOptions(options)
+        } else {
+            content
         }
     }
 }
 
 private struct LineChartPage: View {
-    @State private var signed = true
+    @State private var signed = false
+    @State private var inProgress = true
+    @State private var count = 24.0
+    @State private var extras = TrendExtras(average: true, records: true)
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -71,47 +171,136 @@ private struct LineChartPage: View {
             summary: "A trend over time; a signed series is green above zero and red below with a dashed zero rule.",
             since: "0.5.0",
             apps: [.tenra],
-            canvas: .bleed
+            canvas: .bleed,
+            notes: [
+                "Opens on the current period, selected and in the middle of the window; the banner always shows the selected period and its change from the one before (8.3.0).",
+                "A period that is not over (ChartPoint.chartIsPartial) ends the line in dashes and reads “so far”; with a forecast (ChartSeries.projected) a dotted rise goes to it.",
+                "Press and drag across periods: the banner sums them up. In dark mode the line glows.",
+            ]
         ) {
             if state == .loading {
-                LineChartSkeleton()
-            } else if signed {
-                LineChart(dataPoints: GallerySamples.months, series: GallerySamples.netFlow,
-                          valueFormat: .currency("KZT"), todayText: "Today")
+                LineChartSkeleton(series: signed ? 1 : 2)
+            } else if state == .empty {
+                LineChart(dataPoints: [], series: GallerySamples.netFlow, todayText: "Today")
             } else {
-                LineChart(dataPoints: GallerySamples.months, series: [GallerySamples.income, GallerySamples.expenses],
-                          valueFormat: .currency("KZT"), todayText: "Today")
+                LineChart(dataPoints: GallerySamples.monthSeries(Int(count), inProgress: inProgress),
+                          series: signed ? [GallerySamples.netFlow] : [extras.income, extras.expenses],
+                          valueFormat: .currency("KZT"), todayText: "Today",
+                          referenceLines: extras.referenceLines(limit: 600_000),
+                          marksExtremes: extras.records, followsScroll: extras.followsScroll)
+                    .id("\(signed)\(inProgress)\(extras.key)")
             }
         } controls: {
-            StateControl(state: $state)
+            StateControl(state: $state, states: [.content, .loading, .empty])
             ToggleControl("Signed series (net)", isOn: $signed)
+            ToggleControl("This month in progress", isOn: $inProgress)
+            SliderControl("Months", value: $count, in: 4...120, step: 1)
+            TrendExtrasControls(extras: $extras, limitLabel: "Limit line")
         }
     }
 }
 
 private struct BarChartPage: View {
-    @State private var bars = 12.0
+    private enum Data: Hashable { case distance, incomeAndSpending, categories }
+
+    @State private var count = 24.0
+    @State private var data: Data = .distance
+    @State private var inProgress = true
+    @State private var extras = TrendExtras(lastYear: true, limit: true)
     @State private var state: SpecimenState = .content
 
     var body: some View {
         ComponentPage(
             name: "BarChart",
-            summary: "Bars per period, one or several series side by side.",
+            summary: "Bars per period, one or several series side by side or stacked.",
             since: "0.5.0",
             apps: [.tenra],
-            canvas: .bleed
+            canvas: .bleed,
+            notes: [
+                "Opens on the current period, selected and in the middle of the window; its bars are in full colour, the others step back (8.3.0).",
+                "The bars rise from zero as the chart appears; a period that is not over fades towards the top, under a pale bar up to its forecast; a pale wider bar shows a year ago.",
+                "layout: .stacked puts the series on top of each other; the banner leads with the total.",
+            ],
+            styles: ["grouped", "stacked"]
         ) {
             if state == .loading {
-                BarChartSkeleton(bars: Int(bars))
+                BarChartSkeleton(bars: min(Int(count), 12), series: data == .distance ? 1 : 2)
+            } else if state == .empty {
+                BarChart(dataPoints: [], series: GallerySamples.distance, todayText: "Today")
             } else {
-                BarChart(dataPoints: Array(GallerySamples.months.suffix(Int(bars))),
-                         series: GallerySamples.distance,
-                         valueFormat: .custom({ "\($0.formatted(.number.precision(.fractionLength(0)))) km" }),
-                         todayText: "Today")
+                switch data {
+                case .distance:
+                    BarChart(dataPoints: GallerySamples.monthSeries(Int(count), inProgress: inProgress),
+                             series: extras.distance,
+                             valueFormat: .custom({ "\($0.formatted(.number.precision(.fractionLength(0)))) km" }),
+                             todayText: "Today",
+                             referenceLines: extras.referenceLines(limit: 55),
+                             marksExtremes: extras.records, followsScroll: extras.followsScroll)
+                        .id("one\(inProgress)\(extras.key)")
+                case .incomeAndSpending:
+                    BarChart(dataPoints: GallerySamples.monthSeries(Int(count), inProgress: inProgress),
+                             series: [extras.income, extras.expenses],
+                             valueFormat: .currency("KZT"), todayText: "Today",
+                             referenceLines: extras.referenceLines(limit: 560_000),
+                             marksExtremes: extras.records, followsScroll: extras.followsScroll)
+                        .id("two\(inProgress)\(extras.key)")
+                case .categories:
+                    BarChart(dataPoints: GallerySamples.monthSeries(Int(count), inProgress: inProgress),
+                             series: GallerySamples.categories,
+                             valueFormat: .currency("KZT"), todayText: "Today",
+                             layout: .stacked,
+                             referenceLines: extras.referenceLines(limit: 560_000),
+                             followsScroll: extras.followsScroll)
+                        .id("stacked\(inProgress)\(extras.key)")
+                }
             }
         } controls: {
-            StateControl(state: $state)
-            SliderControl("Bars", value: $bars, in: 4...16, step: 1)
+            StateControl(state: $state, states: [.content, .loading, .empty])
+            ChoiceControl("Data", selection: $data, options: [
+                ("Distance", .distance), ("Income and spending", .incomeAndSpending), ("Spending by category (stacked)", .categories),
+            ])
+            ToggleControl("This month in progress", isOn: $inProgress)
+            SliderControl("Months", value: $count, in: 4...120, step: 1)
+            TrendExtrasControls(extras: $extras)
+        }
+    }
+}
+
+private struct CalendarHeatmapPage: View {
+    private enum Tint: Hashable { case spending, distance }
+
+    @State private var weeks = 26.0
+    @State private var tint: Tint = .spending
+    @State private var state: SpecimenState = .content
+
+    var body: some View {
+        ComponentPage(
+            name: "CalendarHeatmap",
+            summary: "Days as small squares, a week per column, tinted by their value; tap a day for its amount.",
+            since: "8.3.0",
+            canvas: .fill,
+            notes: [
+                "Five steps from an empty grey square to the full colour, by the quartiles of the days with a value.",
+                "Opens on today at the trailing end; days after today are not drawn.",
+            ]
+        ) {
+            switch state {
+            case .loading:
+                CalendarHeatmapSkeleton(weeks: Int(weeks))
+            case .empty:
+                CalendarHeatmap(values: [:])
+            default:
+                CalendarHeatmap(
+                    values: GallerySamples.spendingByDay(),
+                    weeks: Int(weeks),
+                    color: tint == .spending ? AppColors.destructive : AppColors.accent,
+                    valueFormat: .currency("KZT")
+                )
+            }
+        } controls: {
+            StateControl(state: $state, states: [.content, .loading, .empty])
+            SliderControl("Weeks", value: $weeks, in: 4...53, step: 1)
+            ChoiceControl("Colour", selection: $tint, options: [("Spending", .spending), ("Accent", .distance)])
         }
     }
 }
@@ -217,26 +406,33 @@ private struct OrbChartPage: View {
 
 private struct ChartSelectionBannerPage: View {
     @State private var twoValues = true
+    @State private var inProgress = false
+    @State private var state: SpecimenState = .content
 
     var body: some View {
         ComponentPage(
             name: "ChartSelectionBanner",
-            summary: "What a tapped point holds: its title and one or more values with colour dots.",
+            summary: "The selected period: its title and one or more values; with several series it names each.",
             since: "0.5.0",
-            canvas: .fill
+            canvas: .fill,
+            notes: ["A note after the title in the secondary colour, “so far” for a period that is not over (8.3.0)."]
         ) {
-            if twoValues {
-                ChartSelectionBanner(title: "January 2026", entries: [
-                    .init(value: 480_000, color: AppColors.success),
-                    .init(value: 275_000, color: AppColors.destructive),
+            if state == .loading {
+                ChartSelectionBannerSkeleton(values: twoValues ? 2 : 1)
+            } else if twoValues {
+                ChartSelectionBanner(title: "January 2026", note: inProgress ? "so far" : nil, entries: [
+                    .init(value: 480_000, color: AppColors.success, label: "Income"),
+                    .init(value: 275_000, color: AppColors.destructive, label: "Expenses"),
                 ], format: .currency("KZT"))
             } else {
-                ChartSelectionBanner(title: "Week 12", entries: [
+                ChartSelectionBanner(title: "Week 12", note: inProgress ? "so far" : nil, entries: [
                     .init(value: 42.5, color: AppColors.accent, showsDot: false),
                 ], format: .custom({ "\($0.formatted()) km" }))
             }
         } controls: {
+            StateControl(state: $state)
             ToggleControl("Two values", isOn: $twoValues)
+            ToggleControl("In progress", isOn: $inProgress)
         }
     }
 }

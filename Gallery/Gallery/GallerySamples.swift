@@ -66,6 +66,78 @@ enum GallerySamples {
             )
         }
     }()
+
+    /// `count` months ending this month, for the trend charts' pages (8.3.0): the last sixteen
+    /// are `months`, earlier years repeat them a little lower. `inProgress`: this month is not
+    /// over yet, and only ten days of it are in; `<key>Forecast` is where it is heading. Each
+    /// month also has `<key>LastYear` (a year before, a little lower) and spending by category
+    /// (`food`, `home`, `transport`, `fun`) for stacked bars.
+    static func monthSeries(_ count: Int, inProgress: Bool) -> [ChartValuePoint] {
+        let calendar = Calendar.current
+        let thisMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: .now)) ?? .now
+        let axis = DateFormatter()
+        axis.dateFormat = "MMM"
+        let title = DateFormatter()
+        title.dateFormat = "LLLL yyyy"
+        let base = months
+        return (0..<count).map { index in
+            let monthsAgo = count - 1 - index
+            let sample = base[base.count - 1 - monthsAgo % base.count]
+            let isCurrent = inProgress && monthsAgo == 0
+            let yearScale = pow(0.92, Double(monthsAgo / base.count))
+            let scale = yearScale * (isCurrent ? 0.35 : 1)
+            let date = calendar.date(byAdding: .month, value: -monthsAgo, to: thisMonth) ?? thisMonth
+            var values = sample.values.mapValues { $0 * scale }
+            for (key, value) in sample.values {
+                values["\(key)LastYear"] = value * yearScale * 0.9
+                if isCurrent { values["\(key)Forecast"] = value * yearScale * 1.04 }
+            }
+            let spending = values["expenses"] ?? 0
+            let shares: [(String, Double)] = [("food", 0.38), ("home", 0.30), ("transport", 0.18), ("fun", 0.14)]
+            for (offset, share) in shares.enumerated() {
+                // A little different each month, the four adding up to the month's spending.
+                let wobble = 1 + 0.12 * sin(Double(index * 3 + offset))
+                values[share.0] = (spending * share.1 * wobble).rounded()
+            }
+            return ChartValuePoint(
+                label: "y\(index)",
+                axisLabel: axis.string(from: date).uppercased(),
+                title: title.string(from: date),
+                date: date,
+                isPartial: isCurrent,
+                values: values
+            )
+        }
+    }
+}
+
+extension GallerySamples {
+    /// Spending by category, for stacked bars.
+    static let categories: [ChartSeries<ChartValuePoint>] = [
+        .keyed("food", name: "Food", coloring: .solid(AppColors.Palette.orange.color)),
+        .keyed("home", name: "Home", coloring: .solid(AppColors.Palette.blue.color)),
+        .keyed("transport", name: "Transport", coloring: .solid(AppColors.Palette.teal.color)),
+        .keyed("fun", name: "Fun", coloring: .solid(AppColors.Palette.purple.color)),
+    ]
+
+    /// Spending a day for `days` days up to today: busier at the weekend and at the start of a
+    /// month, nothing on some days; the same on every run.
+    static func spendingByDay(days: Int = 371, today: Date = .now, calendar: Calendar = .current) -> [Date: Double] {
+        let last = calendar.startOfDay(for: today)
+        var result = [Date: Double]()
+        var seed: UInt64 = 42
+        for back in 0..<days {
+            guard let day = calendar.date(byAdding: .day, value: -back, to: last) else { continue }
+            seed = seed &* 6364136223846793005 &+ 1442695040888963407
+            let noise = Double(seed >> 33) / Double(UInt32.max)
+            let weekday = calendar.component(.weekday, from: day)
+            let weekend = weekday == 1 || weekday == 7 ? 1.8 : 1
+            let monthStart = calendar.component(.day, from: day) <= 3 ? 2.2 : 1
+            guard noise > 0.18 else { continue }
+            result[day] = (4_000 + 14_000 * noise) * weekend * monthStart
+        }
+        return result
+    }
 }
 
 // MARK: - Photos

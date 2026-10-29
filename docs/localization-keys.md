@@ -45,7 +45,23 @@ text, not keys. A new key goes there as well.
 | `calendar.showWeek` | MonthCalendar (VoiceOver action on the header) | `Show week` |
 | `chart.empty.message` | LineChart, BarChart, ChartSwitcher (default `emptyMessage`) | — |
 | `chart.empty.title` | LineChart, BarChart, ChartSwitcher (default `emptyTitle`) | — |
+| `chart.average` | LineChart, BarChart (`ChartReferenceLine.average()`'s label; a picked stretch's average in the banner, 8.3.0) | `Average` |
+| `chart.forecast` | LineChart, BarChart (the banner's line for a forecast, 8.3.0) | `Forecast` |
+| `chart.from` | LineChart, BarChart (where a level stood at the start of a picked stretch, 8.3.0) | `From` |
+| `chart.less` | CalendarHeatmap (the legend's start, 8.3.0) | `Less` |
+| `chart.more` | CalendarHeatmap (the legend's end, 8.3.0) | `More` |
+| `chart.option.average` | ChartSwitcher (the options menu's average line, 8.3.0) | `Average line` |
+| `chart.option.followsScroll` | ChartSwitcher (the options menu's ruler in the middle, 8.3.0) | `Scroll under a ruler` |
+| `chart.option.records` | ChartSwitcher (the options menu's highs and lows, 8.3.0) | `Highs and lows` |
+| `chart.options` | ChartSwitcher (the options menu's VoiceOver name, 8.3.0) | `Chart options` |
+| `chart.partial` | LineChart, BarChart, HeroSparkline (after the banner's title for a period that is not over, 8.3.0) | `so far` |
+| `chart.record` | ChartSelectionBanner (the record pill, 8.3.0) | `Record` |
+| `chart.style` | ChartSwitcher (the style picker's VoiceOver name, 8.3.0) | `Chart style` |
 | `chart.today` | LineChart, BarChart, ChartSwitcher (default `todayText`) | — |
+| `chart.total` | BarChart (`layout: .stacked`, the banner's total, 8.3.0) | `Total` |
+| `chart.yearAgo` | LineChart, BarChart, ChartSwitcher (default `comparisonLabel`, 8.3.0) | `A year ago` |
+| `chart.zoomIn` | ChartZoomControls (VoiceOver, 8.3.0) | `Zoom in` |
+| `chart.zoomOut` | ChartZoomControls (VoiceOver, 8.3.0) | `Zoom out` |
 | `checklist.complete` | ChecklistSummaryRow (VoiceOver on the seal; `completeLabel` replaces it) | `Complete` |
 | `checklist.empty` | ChecklistSummaryRow (no items; `emptyText` replaces it) | `No items yet` |
 | `checklist.progress %lld %lld` | ChecklistSummaryRow (under the bar; `progressText` replaces it) | `%lld of %lld` |
