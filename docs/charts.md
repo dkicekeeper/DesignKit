@@ -100,7 +100,8 @@ only its marks from a `TrendChartContext`.
     (`BarMark(stacking: .unstacked)` on both, so they overlay instead of stacking), a thin pale
     dashed line (a series of its own, `ChartComparisonSeries`); "A year ago" in the banner.
   - `ChartReferenceLine`: a dashed `RuleMark(y:)`; its pill is drawn by `chartOverlay` at
-    `proxy.position(forY:)` at the plot's leading edge (`proxy.plotFrame`), over the older
+    `proxy.position(forY:)` at the plot's leading edge (`proxy.plotContainerFrame`, the visible
+    plot: in a chart that scrolls, `plotFrame` is the whole scrolled plot), over the older
     periods rather than the current one, so it stays put while the plot scrolls under it; pills
     of lines closer than a pill's height stack. `.average()` is the series' average over finished
     periods (`cache.finishedAverage`). Bars past a line with `aboveColor` take that colour.
@@ -121,7 +122,7 @@ only its marks from a `TrendChartContext`.
     Now `ChartFollowState` (`@Observable`) holds the middle period, and only the banner
     (`ChartFollowedBanner`) reads it; the leading label and the window are
     `@ObservationIgnored`. The marks draw no selection, every bar is in full colour, and the
-    ruler is `chartOverlay`'s, at the plot's middle. A tap brings its period to the ruler
+    ruler is `chartOverlay`'s, at the middle of `plotContainerFrame`. A tap brings its period to the ruler
     (a bump of `scrollRequest`, so the getter is read again); a zoom opens on the followed
     period (`followedLabel`).
   - `ChartDisplayOptions` + `.chartDisplayOptions(_:)`: the person's extras in the environment

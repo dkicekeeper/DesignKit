@@ -281,10 +281,12 @@ extension ComponentSnapshots {
         }
 
         /// 8.2.0: a window that follows the scroll: an odd window, the ruler on the middle bar,
-        /// every bar in full colour, the banner on the period under the ruler.
+        /// every bar in full colour, the banner on the period under the ruler. The chart scrolls,
+        /// so the ruler and the average's pill stand on the visible plot (`plotContainerFrame`).
         @Test func followsScroll() async {
             await assertComponentSnapshot(
-                BarChart(dataPoints: ChartSample.year, series: ChartSample.expenses, todayText: "Today", followsScroll: true)
+                BarChart(dataPoints: ChartSample.year, series: ChartSample.expenses, todayText: "Today",
+                         referenceLines: [.average()], followsScroll: true)
             )
         }
 
