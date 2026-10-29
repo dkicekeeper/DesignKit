@@ -4,11 +4,12 @@
 //
 //  LineChart and BarChart behind a bar/line segmented picker and −/+ zoom controls
 //  (Tenra's insight detail charts). 8.2.0: the selected period outlives a switch (the other
-//  chart opens centred on it), and only the first chart plays its entrance.
+//  chart opens centred on it), only the first chart plays its entrance, and under
+//  `.chartDisplayOptions(_:)` a menu by the zoom turns the chart's extras on and off.
 //
-//  ┌──────────┐               ┌────┐ ┌────┐
-//  │ Bar/Line │  …            │  − │ │  + │       ← controls row
-//  └──────────┘               └────┘ └────┘
+//  ┌──────────┐        ┌────┐ ┌────┐ ┌────┐
+//  │ Bar/Line │  …     │ ≡  │ │  − │ │  + │       ← controls row (≡: the options menu)
+//  └──────────┘        └────┘ └────┘ └────┘
 //  ┌──────────────────────────────────────────┐
 //  │              chart content               │
 //  └──────────────────────────────────────────┘
@@ -39,6 +40,8 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
     @State private var selection: String?
     /// Once the style changed, the next chart is simply there: no second entrance.
     @State private var hasSwitched = false
+    /// The person's chart options; the menu shows only under `.chartDisplayOptions(_:)`.
+    @Environment(\.chartDisplayOptions) private var displayOptions
 
     /// Parameters as in `LineChart`; `initialStyle` picks the first chart shown, `barLayout`
     /// how the bars draw several series (8.2.0).
@@ -165,6 +168,14 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
         HStack(spacing: AppSpacing.md) {
             picker
             Spacer()
+            if let displayOptions {
+                ChartOptionsMenu(
+                    options: displayOptions,
+                    offersForecast: seriesList.contains { $0.projected != nil },
+                    offersComparison: seriesList.contains { $0.comparison != nil },
+                    comparisonLabel: options.comparisonLabel
+                )
+            }
             ChartZoomControls(zoomScale: $zoomScale, range: 0.4...4.0)
         }
     }
@@ -188,6 +199,64 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
     }
 }
 
+// MARK: - Options menu
+
+/// The person's chart options in a menu (8.2.0): a glass button by the zoom. A forecast and a
+/// comparison are offered only when a series has them. The menu stays open while the person
+/// turns several on or off; its items are iOS's (outside the Icon rule).
+struct ChartOptionsMenu: View {
+    @Binding var options: ChartDisplayOptions
+    let offersForecast: Bool
+    let offersComparison: Bool
+    let comparisonLabel: String
+
+    init(options: Binding<ChartDisplayOptions>, offersForecast: Bool, offersComparison: Bool, comparisonLabel: String) {
+        self._options = options
+        self.offersForecast = offersForecast
+        self.offersComparison = offersComparison
+        self.comparisonLabel = comparisonLabel
+    }
+
+    var body: some View {
+        Menu {
+            toggle(.average, String(localized: "chart.option.average", defaultValue: "Average line"),
+                   systemImage: "chart.line.flattrend.xyaxis")
+            toggle(.records, String(localized: "chart.option.records", defaultValue: "Highs and lows"),
+                   systemImage: "arrow.up.arrow.down")
+            if offersForecast {
+                toggle(.forecast, ChartText.forecast, systemImage: "chart.line.uptrend.xyaxis")
+            }
+            if offersComparison {
+                toggle(.comparison, comparisonLabel, systemImage: "clock.arrow.circlepath")
+            }
+            Divider()
+            toggle(.followsScroll, String(localized: "chart.option.followsScroll", defaultValue: "Scroll under a ruler"),
+                   systemImage: "arrow.left.and.right")
+        } label: {
+            Icon("slider.horizontal.3", size: AppIconSize.md)
+                .fontWeight(.medium)
+                .frame(width: 44, height: 44)
+                .contentShape(Circle())
+        }
+        .menuActionDismissBehavior(.disabled)
+        .buttonStyle(.glass)
+        .buttonBorderShape(.circle)
+        .accessibilityLabel(Text(String(localized: "chart.options", defaultValue: "Chart options")))
+    }
+
+    private func toggle(_ option: ChartDisplayOptions, _ title: String, systemImage: String) -> some View {
+        Toggle(isOn: Binding(
+            get: { options.contains(option) },
+            set: { isOn in
+                HapticManager.selection()
+                if isOn { options.insert(option) } else { options.remove(option) }
+            }
+        )) {
+            Label(title, systemImage: systemImage)
+        }
+    }
+}
+
 // MARK: - Skeleton
 
 /// Placeholder of a `ChartSwitcher`: the style picker and zoom buttons, then the chart's
@@ -195,6 +264,8 @@ public struct ChartSwitcher<Point: ChartPoint>: View {
 public struct ChartSwitcherSkeleton: View {
     let style: ChartStyle
     let series: Int
+
+    @Environment(\.chartDisplayOptions) private var displayOptions
 
     public init(style: ChartStyle = .line, series: Int = 1) {
         self.style = style
@@ -204,9 +275,13 @@ public struct ChartSwitcherSkeleton: View {
     public var body: some View {
         VStack(spacing: AppSpacing.sm) {
             HStack(spacing: AppSpacing.md) {
-                // The segmented picker (a capsule) and the two round zoom buttons.
+                // The segmented picker (a capsule), the options menu's button under
+                // `.chartDisplayOptions(_:)`, and the two round zoom buttons.
                 Skeleton.capsule(height: 32, width: 120)
                 Spacer()
+                if displayOptions != nil {
+                    Skeleton.circle(44)
+                }
                 HStack(spacing: 0) {
                     Skeleton.circle(44)
                     Skeleton.circle(44)

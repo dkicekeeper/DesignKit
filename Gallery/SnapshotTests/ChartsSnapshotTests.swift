@@ -247,6 +247,47 @@ extension ComponentSnapshots {
             )
         }
 
+        /// 8.2.0: spending by weekday in a card's slot, Saturday in colour, with the initials.
+        @Test func miniBars() async {
+            await assertComponentSnapshot(
+                HStack(alignment: .bottom, spacing: AppSpacing.xl) {
+                    MiniBars(values: ChartSample.weekdays, color: AppColors.accent,
+                             labels: ["M", "T", "W", "T", "F", "S", "S"])
+                        .frame(width: 120)
+                    MiniBars(values: ChartSample.weekdays, highlighted: 2, color: AppColors.destructive)
+                        .frame(width: 120)
+                }
+                .frame(maxWidth: .infinity),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
+        /// 8.2.0: the person's options (`.chartDisplayOptions`) over a chart's parameters: an
+        /// average line per series in its colour, records, the forecast and a year ago.
+        @Test func displayOptions() async {
+            await assertComponentSnapshot(
+                LineChart(dataPoints: ChartSample.monthsInProgress, series: [ChartSample.incomeWithExtras, ChartSample.expenses],
+                          valueFormat: .currency("KZT"), todayText: "Today")
+                    .chartDisplayOptions(.constant([.average, .records, .forecast, .comparison])),
+                named: "line"
+            )
+            await assertComponentSnapshot(
+                BarChart(dataPoints: ChartSample.monthsInProgress, series: ChartSample.incomeWithExtras,
+                         valueFormat: .currency("KZT"), todayText: "Today",
+                         referenceLines: [.average()], marksExtremes: true)
+                    .chartDisplayOptions(.constant([])),
+                named: "barNothing"
+            )
+        }
+
+        /// 8.2.0: a window that follows the scroll: an odd window, the ruler on the middle bar,
+        /// every bar in full colour, the banner on the period under the ruler.
+        @Test func followsScroll() async {
+            await assertComponentSnapshot(
+                BarChart(dataPoints: ChartSample.year, series: ChartSample.expenses, todayText: "Today", followsScroll: true)
+            )
+        }
+
         /// One banner per snapshot: each is a glass card.
         @Test func chartSelectionBanner() async {
             await assertComponentSnapshot(
@@ -363,6 +404,9 @@ private enum ChartSample {
         }
         return result
     }()
+
+    /// Spending by weekday, Monday first: Saturday the most.
+    static let weekdays: [Double] = [18_000, 12_500, 15_000, 14_000, 22_000, 31_000, 9_500]
 
     static let income = ChartSeries<ChartValuePoint>.keyed("income", name: "Income", coloring: .solid(AppColors.success))
     static let expenses = ChartSeries<ChartValuePoint>.keyed("expenses", name: "Expenses", coloring: .solid(AppColors.destructive))

@@ -196,16 +196,20 @@ public struct LineChart<Point: ChartPoint>: View {
                     .accessibilityHidden(true)
             }
 
-            ForEach(seriesList.indices, id: \.self) { s in
-                comparisonMarks(s, cache: cache)
+            if context.showsComparison {
+                ForEach(seriesList.indices, id: \.self) { s in
+                    comparisonMarks(s, cache: cache)
+                }
             }
 
             ForEach(seriesList.indices, id: \.self) { s in
                 seriesMarks(s, context: context, lineFill: lineFills[s], areaFill: areaFills[s])
             }
 
-            ForEach(seriesList.indices, id: \.self) { s in
-                forecastMarks(s, cache: cache)
+            if context.showsForecast {
+                ForEach(seriesList.indices, id: \.self) { s in
+                    forecastMarks(s, cache: cache)
+                }
             }
 
             if showZeroRule {
@@ -223,11 +227,13 @@ public struct LineChart<Point: ChartPoint>: View {
                 }
             }
 
-            // Selection emphasis — drawn LAST so it is on top: ruler → halo → dot.
+            // Selection emphasis — drawn LAST so it is on top: ruler → halo → dot. Following the
+            // scroll, the frame's ruler in the middle is the selection: the marks stay as they
+            // are while the chart scrolls under it.
             if let range = context.range {
                 selectionMarks(index: range.lowerBound, context: context)
                 selectionMarks(index: range.upperBound, context: context)
-            } else {
+            } else if !context.followsScroll {
                 selectionMarks(index: context.selectedIndex, context: context)
             }
         }
@@ -366,9 +372,9 @@ public struct LineChart<Point: ChartPoint>: View {
         }
     }
 
-    /// A ruler through a period (none when the frame draws the scroll's ruler), a halo and a
-    /// ringed dot on each series' value there. Several series: zero values are skipped (a halo
-    /// on the baseline reads as noise).
+    /// A ruler through a period (none at the ends of a stretch picked while following the
+    /// scroll: the frame draws its ruler), a halo and a ringed dot on each series' value there.
+    /// Several series: zero values are skipped (a halo on the baseline reads as noise).
     @ChartContentBuilder
     private func selectionMarks(index: Int, context: TrendChartContext) -> some ChartContent {
         let cache = context.cache

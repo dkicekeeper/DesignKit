@@ -226,14 +226,14 @@ public struct BarChart<Point: ChartPoint>: View {
         let isGrouped = seriesList.count > 1
 
         ForEach(cache.labels.indices, id: \.self) { i in
-            if let before = cache.comparison[s][i] {
+            if context.showsComparison, let before = cache.comparison[s][i] {
                 ghostBar(
                     label: cache.labels[i], value: context.risen ? before : 0, seriesID: series.id,
                     isGrouped: isGrouped, width: ChartMetrics.comparisonWidthRatio,
                     style: AppColors.Text.primary.opacity(ChartMetrics.comparisonOpacity)
                 )
             }
-            if let forecast = cache.projected[s][i] {
+            if context.showsForecast, let forecast = cache.projected[s][i] {
                 ghostBar(
                     label: cache.labels[i], value: context.risen ? forecast : 0, seriesID: series.id,
                     isGrouped: isGrouped, width: ChartMetrics.barWidthRatio,

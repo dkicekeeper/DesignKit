@@ -295,7 +295,11 @@ rather than importing an app type.
   The zoom magnifiers stay: the period's length is the app's global granularity (docs/charts.md).
   Then the owner's whole list of additions: forecasts, a year ago, average and limit lines,
   records, a picked stretch, a selection that follows the scroll, stacked bars, a glow in dark
-  mode, the entrance on new periods, and `CalendarHeatmap`.
+  mode, the entrance on new periods, and `CalendarHeatmap`. After the owner tried them: the
+  scroll that follows a ruler no longer redraws the chart under the finger (it shook), the
+  person turns the extras on and off in a `ChartSwitcher` menu kept for every chart
+  (`.chartDisplayOptions`), Tenra keeps its `OrbChart` over stacked bars, and `MiniBars` draws
+  the weekdays on Tenra's new "By day" insight card.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.

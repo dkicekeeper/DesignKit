@@ -50,6 +50,10 @@ text, not keys. A new key goes there as well.
 | `chart.from` | LineChart, BarChart (where a level stood at the start of a picked stretch, 8.2.0) | `From` |
 | `chart.less` | CalendarHeatmap (the legend's start, 8.2.0) | `Less` |
 | `chart.more` | CalendarHeatmap (the legend's end, 8.2.0) | `More` |
+| `chart.option.average` | ChartSwitcher (the options menu's average line, 8.2.0) | `Average line` |
+| `chart.option.followsScroll` | ChartSwitcher (the options menu's ruler in the middle, 8.2.0) | `Scroll under a ruler` |
+| `chart.option.records` | ChartSwitcher (the options menu's highs and lows, 8.2.0) | `Highs and lows` |
+| `chart.options` | ChartSwitcher (the options menu's VoiceOver name, 8.2.0) | `Chart options` |
 | `chart.partial` | LineChart, BarChart, HeroSparkline (after the banner's title for a period that is not over, 8.2.0) | `so far` |
 | `chart.record` | ChartSelectionBanner (the record pill, 8.2.0) | `Record` |
 | `chart.style` | ChartSwitcher (the style picker's VoiceOver name, 8.2.0) | `Chart style` |

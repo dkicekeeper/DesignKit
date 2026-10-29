@@ -389,6 +389,12 @@ public struct ChartReferenceLine: Identifiable {
                            color: color, aboveColor: nil)
     }
 
+    /// A series' average, which the person's `.average` option stands in for.
+    var isAverage: Bool {
+        if case .average = value { return true }
+        return false
+    }
+
     /// A fixed value: a limit, a goal, a budget. `aboveColor` paints the bars that pass it.
     public static func value(
         _ value: Double,
@@ -398,5 +404,56 @@ public struct ChartReferenceLine: Identifiable {
     ) -> ChartReferenceLine {
         ChartReferenceLine(id: "value-\(label)-\(value)", value: .fixed(value), label: label,
                            color: color, aboveColor: aboveColor)
+    }
+}
+
+// MARK: - Display options
+
+/// What the trend charts draw besides their values, as the person chose it (8.2.0). Hand it
+/// to the charts with `.chartDisplayOptions(_:)`: each `LineChart`, `BarChart` and
+/// `ChartSwitcher` below follows it, and a `ChartSwitcher` shows it as a menu next to its zoom.
+/// An `OptionSet` over `Int`, so `@AppStorage` keeps it and every chart of the app opens the
+/// way the person left the last one.
+///
+/// ```swift
+/// @AppStorage("chartOptions") private var chartOptions = ChartDisplayOptions.standard
+///
+/// InsightsScreen()
+///     .chartDisplayOptions($chartOptions)
+/// ```
+public struct ChartDisplayOptions: OptionSet, Hashable, Sendable {
+    public let rawValue: Int
+
+    public init(rawValue: Int) {
+        self.rawValue = rawValue
+    }
+
+    /// A dashed line at each series' average over its finished periods.
+    public static let average = ChartDisplayOptions(rawValue: 1 << 0)
+    /// Dots on each series' highest and lowest finished period (`marksExtremes:`).
+    public static let records = ChartDisplayOptions(rawValue: 1 << 1)
+    /// The forecast of a period that is not over (`ChartSeries.projected`).
+    public static let forecast = ChartDisplayOptions(rawValue: 1 << 2)
+    /// The same period a cycle back, a year ago (`ChartSeries.comparison`).
+    public static let comparison = ChartDisplayOptions(rawValue: 1 << 3)
+    /// A ruler in the middle of the window; the chart scrolls under it (`followsScroll:`).
+    public static let followsScroll = ChartDisplayOptions(rawValue: 1 << 4)
+
+    /// Forecasts and comparisons: what the charts draw when nobody chose.
+    public static let standard: ChartDisplayOptions = [.forecast, .comparison]
+}
+
+extension EnvironmentValues {
+    /// The person's chart options (`.chartDisplayOptions(_:)`); `nil`: each chart's parameters.
+    @Entry var chartDisplayOptions: Binding<ChartDisplayOptions>? = nil
+}
+
+extension View {
+    /// The trend charts below draw what `options` holds, and each `ChartSwitcher` shows it in a
+    /// menu that changes it (8.2.0). It stands in for the charts' `.average()` reference lines
+    /// (an average line per series when on), `marksExtremes:` and `followsScroll:`; other
+    /// reference lines, a limit or a goal, stay.
+    public func chartDisplayOptions(_ options: Binding<ChartDisplayOptions>) -> some View {
+        environment(\.chartDisplayOptions, options)
     }
 }

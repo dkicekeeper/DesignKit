@@ -18,7 +18,7 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 
 ## 8.2.0 - 2026-10-29
 
-The trend charts after the owner's audit of `LineChart` and `BarChart` (UX, speed, look, motion). A chart opens on the current period, selected and in the middle of the window instead of against the screen's right edge; the banner above it always shows the selected period, names the series and gives the change from the period before; a period that is not over reads as such instead of as a drop. Then everything on the owner's list of what charts could add: forecasts, a year ago, average and limit lines, records, a picked stretch of periods, a selection that follows the scroll, stacked bars, a glow in dark mode, an entrance on new periods, and `CalendarHeatmap`. Under it, one frame for both charts that reads the data once, and fixes for a clipped peak, the axis labels and VoiceOver.
+The trend charts after the owner's audit of `LineChart` and `BarChart` (UX, speed, look, motion). A chart opens on the current period, selected and in the middle of the window instead of against the screen's right edge; the banner above it always shows the selected period, names the series and gives the change from the period before; a period that is not over reads as such instead of as a drop. Then everything on the owner's list of what charts could add: forecasts, a year ago, average and limit lines, records, a picked stretch of periods, a selection that follows the scroll, stacked bars, a glow in dark mode, an entrance on new periods, and `CalendarHeatmap`. The person can turn the extras on and off in a menu by the zoom, kept for every chart of the app (`.chartDisplayOptions`), and `MiniBars` gives a feed card a row of bars. Under it, one frame for both charts that reads the data once, and fixes for a clipped peak, the axis labels and VoiceOver.
 [#91](https://github.com/dkicekeeper/DesignKit/pull/91)
 
 ### Added
@@ -33,11 +33,13 @@ The trend charts after the owner's audit of `LineChart` and `BarChart` (UX, spee
 - `ChartSeries.keyed(_:name:coloring:baseline:lineWidth:better:rangeSummary:projectedKey:comparisonKey:)` for `ChartValuePoint`.
 - `ChartReferenceLine.average(of:label:color:)` and `.value(_:label:color:aboveColor:)`, and `referenceLines:` on `LineChart`, `BarChart` and `ChartSwitcher`: a dashed rule across the plot with its label in a pill at the plot's leading edge, over the older periods, fixed while the chart scrolls; pills of lines close together stack. Bars past a line with `aboveColor` take that colour (a limit).
 - `marksExtremes:` on `LineChart`, `BarChart` and `ChartSwitcher`: dots on each series' highest and lowest finished period (success and destructive, the other way round for a series better lower).
-- `followsScroll:` on `LineChart`, `BarChart` and `ChartSwitcher`: a ruler in the window's middle; the chart scrolls under it and the period at the ruler is the selection, with a tick; a tap brings a period to the ruler.
+- `followsScroll:` on `LineChart`, `BarChart` and `ChartSwitcher`: a ruler in the window's middle; the chart scrolls under it and the banner shows the period at the ruler, with a tick; a tap brings a period to the ruler. The window holds an odd number of periods and the scroll comes to rest on whole periods, so the ruler stands on a period's middle; only the banner is redrawn while the chart scrolls (no selection marks follow the finger), and a zoom keeps the period under the ruler.
+- `ChartDisplayOptions` (`.average`, `.records`, `.forecast`, `.comparison`, `.followsScroll`; `.standard` is the forecast and the comparison) and `.chartDisplayOptions(_:)`: the person's choice of extras for every trend chart below the modifier, a binding an app keeps in `@AppStorage`. Each `ChartSwitcher` under it shows a menu by its zoom (a glass button with `slider.horizontal.3`) that turns them on and off, offering a forecast and a comparison only when a series has them. The options stand in for the charts' `.average()` lines (an average per series when on, in the series' colour when there are several), `marksExtremes:` and `followsScroll:`; a limit or a goal line stays. Hidden forecasts and comparisons leave the Y axis too.
+- `MiniBars(values:highlighted:color:labels:height:)` and `MiniBarsSkeleton(count:height:)`: a Canvas row of small bars for a card's 120×60 pt slot, one in colour (the tallest unless `highlighted:` names another) and the others muted, with optional labels under them (a weekday's initial): spending by weekday on an insight card.
 - `BarChart(layout:)` and `BarChartLayout` (`.grouped`, `.stacked`), and `ChartSwitcher(barLayout:)`: stacked bars, the parts of each period's total (spending by category). The banner leads with the total; forecasts and comparisons are not drawn on stacks.
 - `CalendarHeatmap(values:weeks:color:valueFormat:today:calendar:emptyTitle:emptyMessage:)` and `CalendarHeatmapSkeleton(weeks:)`: days as small squares, a week per column up to today, tinted in five steps by the quartiles of their values (spending by day). A tap picks a day; the banner above shows it, today until then.
 - `ChartSelectionBanner.Entry(changePercent:better:details:isRecord:)` and `ChartSelectionBanner.Detail`: the change from the period before with its arrow, lines under the value ("Forecast", "A year ago", "Average", "From") and the record pill. The banner wraps its entries when they do not fit one line.
-- Strings `chart.partial` ("so far"), `chart.style` ("Chart style"), `chart.zoomIn` ("Zoom in"), `chart.zoomOut` ("Zoom out"), `chart.forecast` ("Forecast"), `chart.yearAgo` ("A year ago"), `chart.average` ("Average"), `chart.from` ("From"), `chart.total` ("Total"), `chart.record` ("Record"), `chart.less` ("Less") and `chart.more` ("More"), each with an English default.
+- Strings `chart.partial` ("so far"), `chart.style` ("Chart style"), `chart.zoomIn` ("Zoom in"), `chart.zoomOut` ("Zoom out"), `chart.forecast` ("Forecast"), `chart.yearAgo` ("A year ago"), `chart.average` ("Average"), `chart.from` ("From"), `chart.total` ("Total"), `chart.record` ("Record"), `chart.less` ("Less"), `chart.more` ("More"), `chart.options` ("Chart options"), `chart.option.average` ("Average line"), `chart.option.records` ("Highs and lows") and `chart.option.followsScroll` ("Scroll under a ruler"), each with an English default.
 
 ### Changed
 
@@ -81,12 +83,21 @@ ChartSeries(id: "wealth", …, rangeSummary: .change, value: { $0.cumulativeBala
 ChartSwitcher(dataPoints: points, series: [.income, .spending], referenceLines: [.average()])
 ```
 
-The keys `chart.partial`, `chart.style`, `chart.zoomIn`, `chart.zoomOut`, `chart.forecast`, `chart.yearAgo`, `chart.average`, `chart.from`, `chart.total`, `chart.record`, `chart.less` and `chart.more` go in the app's string tables for its other languages (docs/localization-keys.md); English is built in.
+To let the person choose the extras once for every chart, keep the options in `@AppStorage` and hand them down; each `ChartSwitcher` then shows the menu:
+
+```swift
+@AppStorage("chartDisplayOptions") private var chartOptions = ChartDisplayOptions.standard
+
+InsightsView()
+    .chartDisplayOptions($chartOptions)
+```
+
+The keys `chart.partial`, `chart.style`, `chart.zoomIn`, `chart.zoomOut`, `chart.forecast`, `chart.yearAgo`, `chart.average`, `chart.from`, `chart.total`, `chart.record`, `chart.less`, `chart.more`, `chart.options`, `chart.option.average`, `chart.option.records` and `chart.option.followsScroll` go in the app's string tables for its other languages (docs/localization-keys.md); English is built in.
 
 ### Gallery and tooling
 
-- The `LineChart`, `BarChart` and `ChartSwitcher` pages take up to 120 months and switches for this month in progress, its forecast, a year ago, an average line, a limit, records and a selection that follows the scroll; `BarChart` shows distance, income and spending, or spending by category in stacks; `ChartSelectionBanner` a note and its skeleton. A new `CalendarHeatmap` page.
-- Snapshots: `lineAndBarCharts` as one chart per snapshot (each has its banner, a glass card), `unfinishedPeriod`, `centredWindow`, `forecastAndYearAgo`, `referenceLinesAndRecords`, `stackedBars`, `calendarHeatmap`, `chartSelectionBanner.legend` and `.details`, `calendarHeatmapSkeleton`; the chart skeletons show the banner's card.
+- The `LineChart`, `BarChart` and `ChartSwitcher` pages take up to 120 months and switches for this month in progress, its forecast, a year ago, an average line, a limit, records and a selection that follows the scroll; `BarChart` shows distance, income and spending, or spending by category in stacks; `ChartSelectionBanner` a note and its skeleton. `ChartSwitcher` shows its options menu (`.chartDisplayOptions`) or the switches. New `CalendarHeatmap` and `MiniBars` pages.
+- Snapshots: `lineAndBarCharts` as one chart per snapshot (each has its banner, a glass card), `unfinishedPeriod`, `centredWindow`, `forecastAndYearAgo`, `referenceLinesAndRecords`, `stackedBars`, `calendarHeatmap`, `chartSelectionBanner.legend` and `.details`, `miniBars`, `displayOptions` (an average per series, records, the forecast and a year ago from the options; a chart with all of them off), `followsScroll`, `calendarHeatmapSkeleton`, `miniBarsSkeleton`; the chart skeletons show the banner's card.
 - The Gallery's badges follow the apps: Tenra no longer shows a `Tooltip` and now uses `OnboardingStepIndicator`.
 
 ## 8.1.0 - 2026-10-21

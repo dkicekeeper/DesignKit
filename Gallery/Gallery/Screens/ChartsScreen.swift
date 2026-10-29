@@ -85,6 +85,9 @@ private struct ChartSwitcherPage: View {
     @State private var initial: ChartStyle = .line
     @State private var inProgress = true
     @State private var extras = TrendExtras()
+    /// The options menu: the person's choice, kept in `@AppStorage` by an app.
+    @State private var usesMenu = true
+    @State private var shown = ChartDisplayOptions.standard
     @State private var state: SpecimenState = .content
 
     var body: some View {
@@ -98,27 +101,59 @@ private struct ChartSwitcherPage: View {
                 "Opens on the current period, selected and in the middle of the window (8.2.0).",
                 "The selected period stays when you switch; zoom re-centres on it.",
                 "Press and drag across periods: the banner sums them up.",
+                "Under .chartDisplayOptions($options) a menu by the zoom turns the average, records, forecast, a year ago and the ruler on and off for every chart of the app (8.2.0).",
             ]
         ) {
-            switch state {
-            case .loading:
-                ChartSwitcherSkeleton(style: initial, series: 2)
-            case .empty:
-                ChartSwitcher(dataPoints: [], series: [GallerySamples.income, GallerySamples.expenses],
-                              valueFormat: .currency("KZT"), todayText: "Today", initialStyle: initial)
-            default:
-                ChartSwitcher(dataPoints: GallerySamples.monthSeries(24, inProgress: inProgress),
-                              series: [extras.income, extras.expenses],
-                              valueFormat: .currency("KZT"), todayText: "Today", initialStyle: initial,
-                              referenceLines: extras.referenceLines(limit: 560_000),
-                              marksExtremes: extras.records, followsScroll: extras.followsScroll)
-                    .id("\(initial)\(inProgress)\(extras.key)")
+            Group {
+                switch state {
+                case .loading:
+                    ChartSwitcherSkeleton(style: initial, series: 2)
+                case .empty:
+                    ChartSwitcher(dataPoints: [], series: [GallerySamples.income, GallerySamples.expenses],
+                                  valueFormat: .currency("KZT"), todayText: "Today", initialStyle: initial)
+                default:
+                    if usesMenu {
+                        // The menu decides: the series offer their forecast and a year ago.
+                        let offered = TrendExtras(forecast: true, lastYear: true, limit: extras.limit)
+                        ChartSwitcher(dataPoints: GallerySamples.monthSeries(24, inProgress: inProgress),
+                                      series: [offered.income, offered.expenses],
+                                      valueFormat: .currency("KZT"), todayText: "Today", initialStyle: initial,
+                                      referenceLines: offered.referenceLines(limit: 560_000))
+                            .id("\(initial)\(inProgress)\(extras.limit)")
+                    } else {
+                        ChartSwitcher(dataPoints: GallerySamples.monthSeries(24, inProgress: inProgress),
+                                      series: [extras.income, extras.expenses],
+                                      valueFormat: .currency("KZT"), todayText: "Today", initialStyle: initial,
+                                      referenceLines: extras.referenceLines(limit: 560_000),
+                                      marksExtremes: extras.records, followsScroll: extras.followsScroll)
+                            .id("\(initial)\(inProgress)\(extras.key)")
+                    }
+                }
             }
+            .modifier(GalleryChartOptions(options: usesMenu ? $shown : nil))
         } controls: {
             StateControl(state: $state, states: [.content, .loading, .empty])
             ChoiceControl("Starts as", selection: $initial, options: [("Line", .line), ("Bar", .bar)])
             ToggleControl("This month in progress", isOn: $inProgress)
-            TrendExtrasControls(extras: $extras)
+            ToggleControl("Options menu (.chartDisplayOptions)", isOn: $usesMenu)
+            if usesMenu {
+                ToggleControl("Limit line (bars past it orange)", isOn: $extras.limit)
+            } else {
+                TrendExtrasControls(extras: $extras)
+            }
+        }
+    }
+}
+
+/// `.chartDisplayOptions(_:)` when the page shows the menu.
+private struct GalleryChartOptions: ViewModifier {
+    let options: Binding<ChartDisplayOptions>?
+
+    func body(content: Content) -> some View {
+        if let options {
+            content.chartDisplayOptions(options)
+        } else {
+            content
         }
     }
 }

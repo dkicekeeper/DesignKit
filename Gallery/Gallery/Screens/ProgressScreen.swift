@@ -29,6 +29,7 @@ struct ProgressScreen: View {
         HalfGaugePage()
         MilestoneGaugePage()
         BarPairPage()
+        MiniBarsPage()
     }
 }
 
@@ -323,6 +324,45 @@ private struct BarPairPage: View {
             }
             SliderControl("Current (previous 320 000)", value: $current, in: 0...500_000, step: 1_000)
             ToggleControl("Projection", isOn: $projection)
+        }
+    }
+}
+
+private struct MiniBarsPage: View {
+    @State private var labels = true
+    @State private var pickTallest = true
+    @State private var state: SpecimenState = .content
+
+    /// Spending by weekday, Monday first: Saturday is the busiest.
+    private let values: [Double] = [18_000, 12_500, 15_000, 14_000, 22_000, 31_000, 9_500]
+
+    var body: some View {
+        ComponentPage(
+            name: "MiniBars",
+            summary: "A row of small bars, one in colour: the busiest weekday, today, a peak hour.",
+            since: "8.2.0",
+            apps: [],
+            notes: [
+                "For a card's 120×60 pt slot; the tallest bar takes the colour unless highlighted: names another.",
+                "Labels under the bars (a weekday's initial): the coloured bar's in its colour.",
+            ]
+        ) {
+            if state == .loading {
+                MiniBarsSkeleton()
+                    .frame(width: 120)
+            } else {
+                MiniBars(
+                    values: values,
+                    highlighted: pickTallest ? nil : 2,
+                    color: AppColors.accent,
+                    labels: labels ? ["M", "T", "W", "T", "F", "S", "S"] : nil
+                )
+                .frame(width: 120)
+            }
+        } controls: {
+            StateControl(state: $state)
+            ToggleControl("Labels", isOn: $labels)
+            ChoiceControl("In colour", selection: $pickTallest, options: [("The tallest", true), ("Wednesday", false)])
         }
     }
 }

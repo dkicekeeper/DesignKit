@@ -111,16 +111,35 @@ only its marks from a `TrendChartContext`.
     `labelToIndex` (a `String` range is ordered by the alphabet, not by the axis). The banner
     sums it up by `ChartSeries.rangeSummary` until the next tap; bars outside it step back.
   - `followsScroll`: both ends padded with empty categories so every point can reach the
-    middle; `chartScrollPosition(x:)` with a binding whose getter returns what Swift Charts last
-    set (a class in `@State`, so a scroll frame does not redraw) and whose setter turns the
-    middle period into the selection, with a tick; the ruler is drawn by `chartOverlay` at the
-    plot's middle.
+    middle, and an odd window (12 → 11) so its middle is a period's centre, not the gap between
+    two; `chartScrollTargetBehavior(ChartPeriodSnap)` brings the scroll to rest on whole
+    periods (the plot's width over the window). `chartScrollPosition(x:)` takes a binding whose
+    getter returns what Swift Charts last set and whose setter works out the middle period.
+    ⚠️ Nothing the chart reads may change while it scrolls: the first version made the middle
+    period the selection, every new period redrew the chart, the redraw set the scroll
+    position again and the chart shook under the finger, while the selected dot stayed behind.
+    Now `ChartFollowState` (`@Observable`) holds the middle period, and only the banner
+    (`ChartFollowedBanner`) reads it; the leading label and the window are
+    `@ObservationIgnored`. The marks draw no selection, every bar is in full colour, and the
+    ruler is `chartOverlay`'s, at the plot's middle. A tap brings its period to the ruler
+    (a bump of `scrollRequest`, so the getter is read again); a zoom opens on the followed
+    period (`followedLabel`).
+  - `ChartDisplayOptions` + `.chartDisplayOptions(_:)`: the person's extras in the environment
+    as a binding (an app keeps it in `@AppStorage`). `TrendChartOptions.applying` puts it over
+    the chart's parameters: the `.average()` lines go and one per series comes back when
+    `.average` is on; `marksExtremes`, `followsScroll`, `showsForecast` and `showsComparison`
+    follow it. `ChartSwitcher` shows `ChartOptionsMenu` by its zoom (`Toggle`s in a `Menu` that
+    stays open). Hidden forecasts and comparisons leave the Y domain too
+    (`cache.forecastRange`, `cache.comparisonRange` apart from `yMin`/`yMax`).
   - `BarChartLayout.stacked`: `BarMark` without `position(by:)` stacks the series; the Y axis
     spans `cache.stackedMax` / `stackedMin`; the banner leads with the total.
   - Dark mode: `shadow(color:radius:)` on the line marks and the selected bars, a shadow on the
     selected dot.
   - New periods play the entrance again: the bars' `risenKey` is the labels' hash, and
     `ChartDrawInModifier(replayKey:)` draws the line in again when it changes.
+- **`MiniBars`** *(8.2.0)*: a feed card's row of bars in a `Canvas` (MiniBarPair's grammar: muted
+  grey bars, one in colour, rounded tops on a hairline baseline), optional labels under them
+  resolved once per draw with `context.resolve`. Decorative for VoiceOver.
 - **`CalendarHeatmap`** *(8.2.0)*: days in a `Canvas` (a week per column, Monday or Sunday first by
   the calendar), five steps by the quartiles of the days with a value, a horizontal scroll view
   that opens on today (`defaultScrollAnchor(.trailing)`), a tap picks the day under it. Not Swift

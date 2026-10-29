@@ -45,13 +45,18 @@ struct TrendChartContext {
     let marksExtremes: Bool
     /// Dark mode: lines and the selected bar glow softly.
     let glows: Bool
-    /// The window's middle is the selection; the frame draws the ruler.
+    /// The window's middle is the selection; the frame draws the ruler, the marks draw no
+    /// selection (they do not change while the chart scrolls).
     let followsScroll: Bool
+    /// Forecasts and comparisons drawn (`ChartDisplayOptions`).
+    let showsForecast: Bool
+    let showsComparison: Bool
 
-    /// The selected period, or a period in the picked stretch: drawn in full colour.
+    /// The selected period, or a period in the picked stretch: drawn in full colour. Following
+    /// the scroll, every bar is.
     func isEmphasized(_ index: Int) -> Bool {
         if let range { return range.contains(index) }
-        return index == selectedIndex
+        return followsScroll || index == selectedIndex
     }
 
     /// The colour of a bar that passes a limit with `aboveColor`, or `nil`.
@@ -70,8 +75,31 @@ struct TrendChartOptions {
     var followsScroll = false
     /// Stacked bars: the Y axis spans the stacks, the banner leads with their total.
     var stacked = false
+    /// Forecasts (`ChartSeries.projected`) and comparisons (`ChartSeries.comparison`) drawn and
+    /// in the banner; a `ChartSwitcher` menu turns them off.
+    var showsForecast = true
+    var showsComparison = true
     /// The banner's line for `ChartSeries.comparison`.
     var comparisonLabel: String = ChartText.yearAgo
+
+    /// With the person's choice (`.chartDisplayOptions`) over the chart's parameters: its
+    /// average lines give way to one per series when `.average` is on.
+    func applying<Point>(_ shown: ChartDisplayOptions?, series: [ChartSeries<Point>]) -> TrendChartOptions {
+        guard let shown else { return self }
+        var result = self
+        result.referenceLines.removeAll(where: \.isAverage)
+        if shown.contains(.average) {
+            result.referenceLines += series.map { s in
+                // Several series: each line in its series' colour.
+                series.count == 1 ? .average(of: s.id) : .average(of: s.id, color: s.color(for: 0))
+            }
+        }
+        result.marksExtremes = shown.contains(.records)
+        result.showsForecast = shown.contains(.forecast)
+        result.showsComparison = shown.contains(.comparison)
+        result.followsScroll = shown.contains(.followsScroll)
+        return result
+    }
 }
 
 /// How a chart enters.
@@ -90,7 +118,8 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
     /// ChartSwitcher's selection, kept across a style switch; nil: the frame keeps its own.
     let selection: Binding<String?>?
     let entrance: TrendChartEntrance
-    let options: TrendChartOptions
+    /// The chart's parameters; `options` puts the person's choice over them.
+    let baseOptions: TrendChartOptions
     let plot: (TrendChartContext) -> Plot
 
     @State private var cache = ChartPointCache()
@@ -106,8 +135,10 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
     /// The periods (`labelsKey`) the bars have risen for: new periods rise again.
     @State private var risenKey: Int?
     @State private var hasAppeared = false
-    /// Where the scroll is (a window that follows it); read by Swift Charts, so not state.
-    @State private var scroll = ChartScrollBox()
+    /// Where the scroll is and which point is under the ruler (a window that follows it).
+    @State private var follow = ChartFollowState()
+    /// Bumped to scroll a tapped period to the ruler: the scroll position is read again.
+    @State private var scrollRequest = 0
     /// The chart's width, for how many X axis labels fit.
     @State private var chartWidth: CGFloat = 0
     /// `AppTypography.caption2` at the person's text size.
@@ -116,6 +147,7 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.designKitMotion) private var designKitMotion
     @Environment(\.chartPlaysEntrance) private var playsEntrance
+    @Environment(\.chartDisplayOptions) private var displayOptions
     @Environment(\.colorScheme) private var colorScheme
 
     init(
@@ -134,8 +166,12 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
         self._zoomScale = zoomScale
         self.selection = selection
         self.entrance = entrance
-        self.options = options
+        self.baseOptions = options
         self.plot = plot
+    }
+
+    private var options: TrendChartOptions {
+        baseOptions.applying(displayOptions?.wrappedValue, series: seriesList)
     }
 
     private var allowsMotion: Bool { !reduceMotion && designKitMotion }
@@ -148,10 +184,13 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
     }
 
     /// The window's centre: where it was when this chart appeared; a new chart (new periods,
-    /// a zoom) centres on the selected period.
+    /// a zoom) centres on the selected period, or on the one under the ruler.
     private func centerIndex(for identity: TrendChartIdentity) -> Int {
         if let center = windowCenter, center.identity == identity,
            let label = center.label, let index = cache.labelToIndex[label] {
+            return index
+        }
+        if identity.followsScroll, let label = follow.followedLabel, let index = cache.labelToIndex[label] {
             return index
         }
         return selectedIndex
@@ -165,11 +204,13 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
     var body: some View {
         // Prime the per-dataset cache before anything reads it.
         let _ = rebuildChartCacheIfNeeded(cache, points: dataPoints, series: seriesList, format: valueFormat)
+        let options = self.options
         let selected = selectedIndex
         let follows = options.followsScroll
         let identity = TrendChartIdentity(
             labels: cache.labelsKey,
-            visibleCount: ChartWindow.visibleCount(count: cache.labels.count, zoomScale: zoomScale, followsScroll: follows)
+            visibleCount: ChartWindow.visibleCount(count: cache.labels.count, zoomScale: zoomScale, followsScroll: follows),
+            followsScroll: follows
         )
         let window = ChartWindow(
             labels: cache.labels,
@@ -177,8 +218,9 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
             zoomScale: zoomScale,
             followsScroll: follows
         )
-        let references = resolvedReferences()
-        let domain = yDomain(references: references)
+        let references = resolvedReferences(options)
+        let domain = yDomain(references: references, options: options)
+        let openingCenter = centerIndex(for: identity)
         let context = TrendChartContext(
             cache: cache,
             selectedIndex: selected,
@@ -187,12 +229,15 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
             references: references,
             marksExtremes: options.marksExtremes,
             glows: colorScheme == .dark,
-            followsScroll: follows
+            followsScroll: follows,
+            showsForecast: options.showsForecast,
+            showsComparison: options.showsComparison
         )
+        let _ = scrollRequest
         let axisLabels = ChartAxisLabels(
             cache: cache,
             anchorIndex: cache.currentIndex,
-            selectedIndex: range?.lowerBound ?? selected,
+            selectedIndex: follows && range == nil ? nil : (range?.lowerBound ?? selected),
             visibleCount: window.visibleCount,
             alignsTrailingEdge: window.categories.count == cache.labels.count,
             chartWidth: chartWidth,
@@ -201,14 +246,23 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
         )
 
         VStack(spacing: AppSpacing.lg) {
-            banner(selected: selected)
+            if follows && range == nil {
+                // Only the banner follows the point under the ruler: the chart is not redrawn
+                // while it scrolls (a redraw set the scroll position again and the chart shook).
+                ChartFollowedBanner(state: follow, fallback: openingCenter) { index in
+                    banner(selected: index)
+                }
+            } else {
+                banner(selected: selected)
+            }
             entered(
                 scrolled(
                     plot(context)
                         .chartXScale(domain: window.categories)
                         .chartYScale(domain: domain)
                         .chartXVisibleDomain(length: window.visibleCount),
-                    window: window
+                    window: window,
+                    follows: follows
                 )
                 .chartXSelection(value: $rawSelection)
                 .chartXSelection(range: $rawRange)
@@ -241,14 +295,17 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
             guard let new, let index = cache.labelToIndex[new] else { return }
             let hadRange = range != nil
             range = nil
-            guard index != selectedIndex || hadRange else { return }
             if follows {
                 // A tap brings its period to the ruler.
-                scroll.leadingLabel = window.categories[index]
-                withAnimation(motion(AppAnimation.smooth)) { select(new) }
-            } else {
-                select(new)
+                guard index != (follow.centerIndex ?? openingCenter) || hadRange else { return }
+                follow.leadingLabel = window.categories[index]
+                follow.follow(index, label: new)
+                withAnimation(motion(AppAnimation.smooth)) { scrollRequest &+= 1 }
+                HapticManager.selection()
+                return
             }
+            guard index != selectedIndex || hadRange else { return }
+            select(new)
             HapticManager.selection()
         }
         .onChange(of: rawRange) { _, new in
@@ -262,9 +319,12 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
             HapticManager.selection()
         }
         .onChange(of: identity, initial: true) { _, newIdentity in
-            windowCenter = TrendChartCenter(label: label(at: selectedIndex), identity: newIdentity)
-            scroll.leadingLabel = nil
-            scroll.window = window
+            // Before `windowCenter` names the new chart, so it reads the centre it opened on.
+            let center = centerIndex(for: newIdentity)
+            windowCenter = TrendChartCenter(label: label(at: center), identity: newIdentity)
+            follow.leadingLabel = nil
+            follow.centerIndex = nil
+            follow.window = window
         }
         .onChange(of: cache.labelsKey) { _, newKey in
             range = nil
@@ -280,7 +340,8 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
     // MARK: - Banner
 
     private func banner(selected: Int) -> some View {
-        let content = range.map(rangeBanner) ?? periodBanner(selected)
+        let options = self.options
+        let content = range.map { rangeBanner($0, options: options) } ?? periodBanner(selected, options: options)
         return ChartSelectionBanner(
             title: content.title,
             note: content.note,
@@ -300,13 +361,13 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
 
     /// One period: each series' value, its change from the period before (from its forecast
     /// while the period is not over), its forecast, a year ago, a record.
-    private func periodBanner(_ i: Int) -> BannerContent {
+    private func periodBanner(_ i: Int, options: TrendChartOptions) -> BannerContent {
         let several = seriesList.count > 1
         var entries = seriesList.indices.map { s -> ChartSelectionBanner.Entry in
             let series = seriesList[s]
             let v = cache.values[s][i]
-            let forecast = cache.projected[s][i]
-            let before = cache.comparison[s][i]
+            let forecast = options.showsForecast ? cache.projected[s][i] : nil
+            let before = options.showsComparison ? cache.comparison[s][i] : nil
             var details: [ChartSelectionBanner.Detail] = []
             if let forecast { details.append(.init(ChartText.forecast, value: forecast)) }
             if let before { details.append(.init(options.comparisonLabel, value: before)) }
@@ -332,7 +393,7 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
 
     /// A picked stretch: per series its total and average (or, for a level, its last value and
     /// where it started), and the change from the first period to the last.
-    private func rangeBanner(_ r: ClosedRange<Int>) -> BannerContent {
+    private func rangeBanner(_ r: ClosedRange<Int>, options: TrendChartOptions) -> BannerContent {
         let several = seriesList.count > 1
         var entries = seriesList.indices.map { s -> ChartSelectionBanner.Entry in
             let series = seriesList[s]
@@ -375,15 +436,17 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
     // MARK: - Pieces
 
     /// The scroll position: where the window starts when the chart appears, or (following the
-    /// scroll) a binding that turns each new middle period into the selection.
+    /// scroll) a binding that turns each new middle period into the banner's, with the scroll
+    /// coming to rest on whole periods.
     @ViewBuilder
-    private func scrolled<Content: View>(_ content: Content, window: ChartWindow) -> some View {
-        if options.followsScroll {
+    private func scrolled<Content: View>(_ content: Content, window: ChartWindow, follows: Bool) -> some View {
+        if follows {
             content
                 .chartScrollableAxes(.horizontal)
+                .chartScrollTargetBehavior(ChartPeriodSnap(visibleCount: window.visibleCount))
                 .chartScrollPosition(x: Binding(
-                    get: { scroll.leadingLabel ?? window.leadingLabel },
-                    set: { leading in follow(leading) }
+                    get: { follow.leadingLabel ?? window.leadingLabel },
+                    set: { leading in followScroll(to: leading) }
                 ))
         } else {
             content
@@ -392,15 +455,16 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
         }
     }
 
-    /// The window moved: the period in its middle becomes the selection, with a tick.
-    private func follow(_ leading: String) {
-        guard leading != scroll.leadingLabel else { return }
-        scroll.leadingLabel = leading
+    /// The window moved: the period in its middle goes to the banner, with a tick. Nothing
+    /// the chart reads changes, so the chart is not redrawn under the finger.
+    private func followScroll(to leading: String) {
+        guard leading != follow.leadingLabel else { return }
+        follow.leadingLabel = leading
         guard range == nil, rawRange == nil,
-              let window = scroll.window,
+              let window = follow.window,
               let index = window.centerIndex(leadingLabel: leading, labelToIndex: cache.labelToIndex),
-              index != selectedIndex else { return }
-        select(cache.labels[index])
+              index != follow.centerIndex else { return }
+        follow.follow(index, label: cache.labels[index])
         HapticManager.selection()
     }
 
@@ -433,7 +497,7 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
         }
     }
 
-    private func resolvedReferences() -> [ChartResolvedReference] {
+    private func resolvedReferences(_ options: TrendChartOptions) -> [ChartResolvedReference] {
         options.referenceLines.compactMap { line in
             let value: Double?
             switch line.value {
@@ -448,13 +512,19 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
         }
     }
 
-    /// The padded Y domain over the values, forecasts, comparisons, stacks and reference lines.
-    private func yDomain(references: [ChartResolvedReference]) -> ClosedRange<Double> {
+    /// The padded Y domain over the values, the forecasts and comparisons drawn, the stacks and
+    /// the reference lines.
+    private func yDomain(references: [ChartResolvedReference], options: TrendChartOptions) -> ClosedRange<Double> {
         var low = cache.yMin
         var high = cache.yMax
         if options.stacked {
             low = min(low, cache.stackedMin)
             high = max(high, cache.stackedMax)
+        }
+        for span in [options.showsForecast ? cache.forecastRange : nil, options.showsComparison ? cache.comparisonRange : nil] {
+            guard let span else { continue }
+            low = min(low, span.lowerBound)
+            high = max(high, span.upperBound)
         }
         for reference in references {
             low = min(low, reference.value)
@@ -476,14 +546,38 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
     }
 }
 
-/// The scroll position of a window that follows the scroll. A class in `@State`: Swift Charts
-/// writes it as the chart scrolls, and a write must not redraw the chart.
+/// A window that follows the scroll (8.2.0): the point under the ruler, observed by the banner
+/// alone, and the scroll position, which Swift Charts writes as the chart scrolls and which
+/// must not redraw anything.
+@Observable
 @MainActor
-final class ChartScrollBox {
+final class ChartFollowState {
+    /// The point under the ruler; `nil`: the one the window opened on.
+    var centerIndex: Int?
+    /// Its label, kept across a zoom (the new window opens on it); the frame reads it without
+    /// being redrawn as it changes.
+    @ObservationIgnored var followedLabel: String?
     /// The category at the window's leading edge; `nil`: where the window opened.
-    var leadingLabel: String?
+    @ObservationIgnored var leadingLabel: String?
     /// The window the position belongs to.
-    var window: ChartWindow?
+    @ObservationIgnored var window: ChartWindow?
+
+    func follow(_ index: Int, label: String) {
+        centerIndex = index
+        followedLabel = label
+    }
+}
+
+/// The banner of a chart that follows the scroll: it alone reads the point under the ruler,
+/// so only it is redrawn as the chart scrolls.
+struct ChartFollowedBanner<Content: View>: View {
+    let state: ChartFollowState
+    let fallback: Int
+    let content: (Int) -> Content
+
+    var body: some View {
+        content(state.centerIndex ?? fallback)
+    }
 }
 
 /// Change in percent from `a` to `b`; `nil` when `a` is not above zero (a change from nothing
@@ -493,10 +587,26 @@ func chartChangePercent(from a: Double, to b: Double) -> Double? {
     return (b - a) / a * 100
 }
 
-/// What makes a new chart: other periods or another window size.
+/// What makes a new chart: other periods, another window size, a window that follows the
+/// scroll or not.
 struct TrendChartIdentity: Hashable {
     let labels: Int
     let visibleCount: Int
+    let followsScroll: Bool
+}
+
+/// Following the scroll, the chart comes to rest with a period in the middle of the window,
+/// under the ruler: the scroll stops on whole periods (8.2.0). The window shows `visibleCount`
+/// periods across the plot, so a period is the plot's width over that.
+struct ChartPeriodSnap: ChartScrollTargetBehavior {
+    let visibleCount: Int
+
+    func updateTarget(_ target: inout ScrollTarget, context: TargetContext) {
+        let period = context.containerSize.width / CGFloat(max(visibleCount, 1))
+        guard period > 0 else { return }
+        let end = max(context.contentSize.width - context.containerSize.width, 0)
+        target.rect.origin.x = min(max((target.rect.minX / period).rounded() * period, 0), end)
+    }
 }
 
 /// Where a chart's window was centred.

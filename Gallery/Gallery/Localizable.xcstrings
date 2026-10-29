@@ -364,6 +364,50 @@
         }
       }
     },
+    "chart.option.average" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Average line"
+          }
+        }
+      }
+    },
+    "chart.option.followsScroll" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scroll under a ruler"
+          }
+        }
+      }
+    },
+    "chart.option.records" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Highs and lows"
+          }
+        }
+      }
+    },
+    "chart.options" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart options"
+          }
+        }
+      }
+    },
     "chart.partial" : {
       "extractionState" : "manual",
       "localizations" : {

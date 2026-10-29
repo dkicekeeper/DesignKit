@@ -68,9 +68,13 @@ final class ChartPointCache {
     /// The tallest stack of positive values and the deepest of negative ones (stacked bars).
     var stackedMax: Double = 0
     var stackedMin: Double = 0
-    /// Smallest / largest value across all series, forecasts and comparisons included.
+    /// Smallest / largest value across all series.
     var yMin: Double = 0
     var yMax: Double = 1
+    /// The span of the forecasts and of the comparisons (`nil`: none), which the Y axis takes
+    /// in while they are drawn.
+    var forecastRange: ClosedRange<Double>?
+    var comparisonRange: ClosedRange<Double>?
     /// The widest axis label and the text size it was measured at (0: not measured yet).
     var axisLabelWidth: CGFloat = 0
     var axisLabelFontSize: CGFloat = 0
@@ -152,6 +156,8 @@ func rebuildChartCacheIfNeeded<Point: ChartPoint>(
     var recordIndex = [Int?]()
     var minY = Double.infinity
     var maxY = -Double.infinity
+    var forecastRange: ClosedRange<Double>?
+    var comparisonRange: ClosedRange<Double>?
     func include(_ v: Double) {
         if v < minY { minY = v }
         if v > maxY { maxY = v }
@@ -165,11 +171,11 @@ func rebuildChartCacheIfNeeded<Point: ChartPoint>(
         let forecast: [Double?] = points.enumerated().map { i, p in
             isPartial[i] ? s.projected?(p) : nil
         }
-        forecast.compactMap { $0 }.forEach(include)
+        forecastRange = chartSpan(forecastRange, forecast.compactMap { $0 })
         projected.append(forecast)
 
         let before: [Double?] = s.comparison.map { read in points.map(read) } ?? Array(repeating: nil, count: points.count)
-        before.compactMap { $0 }.forEach(include)
+        comparisonRange = chartSpan(comparisonRange, before.compactMap { $0 })
         comparison.append(before)
 
         let finished = column.indices.filter { !isPartial[$0] }
@@ -225,8 +231,17 @@ func rebuildChartCacheIfNeeded<Point: ChartPoint>(
     cache.partialStart = partialStart
     cache.yMin = minY.isFinite ? minY : 0
     cache.yMax = maxY.isFinite ? maxY : 1
+    cache.forecastRange = forecastRange
+    cache.comparisonRange = comparisonRange
     cache.axisLabelFontSize = 0
     cache.key = key
+}
+
+/// `span` widened to take in `values`.
+private func chartSpan(_ span: ClosedRange<Double>?, _ values: [Double]) -> ClosedRange<Double>? {
+    guard let low = values.min(), let high = values.max() else { return span }
+    guard let span else { return low...high }
+    return min(span.lowerBound, low)...max(span.upperBound, high)
 }
 
 /// Padded axis domain over a dataset: ~6 % headroom so the peak point (and its selection
@@ -259,7 +274,9 @@ struct ChartWindow {
     /// (any number when `followsScroll`, which pads both ends).
     static func visibleCount(count: Int, zoomScale: CGFloat, followsScroll: Bool = false) -> Int {
         let window = max(1, Int((ChartMetrics.visiblePoints / max(zoomScale, 0.1)).rounded()))
-        return followsScroll ? window : max(1, min(count, window))
+        // Following the scroll, the window is odd: its middle is a category's centre, under the
+        // ruler, not the gap between two.
+        return followsScroll ? (window.isMultiple(of: 2) ? max(1, window - 1) : window) : max(1, min(count, window))
     }
 
     /// - Parameter followsScroll: the selection is whatever sits in the window's middle

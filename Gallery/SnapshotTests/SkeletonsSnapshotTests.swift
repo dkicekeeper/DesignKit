@@ -345,6 +345,15 @@ extension ComponentSnapshots {
             )
         }
 
+        /// 8.2.0: seven bars in a card's 120 pt slot.
+        @Test func miniBarsSkeleton() async {
+            await assertComponentSnapshot(
+                MiniBarsSkeleton()
+                    .frame(width: 120),
+                appearances: [.light]
+            )
+        }
+
         /// The symbol before the title as a grey circle in the style's font (3.2.0).
         @Test func headerIconSkeletons() async {
             await assertComponentSnapshot(
