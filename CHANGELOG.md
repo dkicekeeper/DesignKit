@@ -19,6 +19,7 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 ## 8.2.0 - 2026-10-29
 
 The trend charts after the owner's audit of `LineChart` and `BarChart` (UX, speed, look, motion). A chart opens on the current period, selected and in the middle of the window instead of against the screen's right edge; the banner above it always shows the selected period and names the series; a period that is not over reads as such instead of as a drop. Under it, one frame for both charts that reads the data once, and fixes for a clipped peak, the Y axis labels and VoiceOver.
+[#91](https://github.com/dkicekeeper/DesignKit/pull/91)
 
 ### Added
 
