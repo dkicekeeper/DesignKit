@@ -55,7 +55,7 @@ private struct ChartSwitcherPage: View {
                 ChartSwitcher(dataPoints: [], series: [GallerySamples.income, GallerySamples.expenses],
                               valueFormat: .currency("KZT"), todayText: "Today", initialStyle: initial)
             default:
-                ChartSwitcher(dataPoints: GallerySamples.months(24, inProgress: inProgress),
+                ChartSwitcher(dataPoints: GallerySamples.monthSeries(24, inProgress: inProgress),
                               series: [GallerySamples.income, GallerySamples.expenses],
                               valueFormat: .currency("KZT"), todayText: "Today", initialStyle: initial)
                     .id("\(initial)\(inProgress)")
@@ -92,7 +92,7 @@ private struct LineChartPage: View {
             } else if state == .empty {
                 LineChart(dataPoints: [], series: GallerySamples.netFlow, todayText: "Today")
             } else {
-                LineChart(dataPoints: GallerySamples.months(Int(count), inProgress: inProgress),
+                LineChart(dataPoints: GallerySamples.monthSeries(Int(count), inProgress: inProgress),
                           series: signed ? [GallerySamples.netFlow] : [GallerySamples.income, GallerySamples.expenses],
                           valueFormat: .currency("KZT"), todayText: "Today")
                     .id("\(signed)\(inProgress)")
@@ -129,12 +129,12 @@ private struct BarChartPage: View {
             } else if state == .empty {
                 BarChart(dataPoints: [], series: GallerySamples.distance, todayText: "Today")
             } else if twoSeries {
-                BarChart(dataPoints: GallerySamples.months(Int(count), inProgress: inProgress),
+                BarChart(dataPoints: GallerySamples.monthSeries(Int(count), inProgress: inProgress),
                          series: [GallerySamples.income, GallerySamples.expenses],
                          valueFormat: .currency("KZT"), todayText: "Today")
                     .id("two\(inProgress)")
             } else {
-                BarChart(dataPoints: GallerySamples.months(Int(count), inProgress: inProgress),
+                BarChart(dataPoints: GallerySamples.monthSeries(Int(count), inProgress: inProgress),
                          series: GallerySamples.distance,
                          valueFormat: .custom({ "\($0.formatted(.number.precision(.fractionLength(0)))) km" }),
                          todayText: "Today")

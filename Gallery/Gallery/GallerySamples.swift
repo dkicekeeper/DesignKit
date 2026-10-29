@@ -70,7 +70,7 @@ enum GallerySamples {
     /// `count` months ending this month, for the trend charts' pages (8.2.0): the last sixteen
     /// are `months`, earlier years repeat them a little lower. `inProgress`: this month is not
     /// over yet, and only ten days of it are in.
-    static func months(_ count: Int, inProgress: Bool) -> [ChartValuePoint] {
+    static func monthSeries(_ count: Int, inProgress: Bool) -> [ChartValuePoint] {
         let calendar = Calendar.current
         let thisMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: .now)) ?? .now
         let axis = DateFormatter()
