@@ -329,6 +329,7 @@ private struct ChartBannerSlot: ViewModifier {
 
 /// "January 2025. 205 000 KZT." for one series; "January 2025. Income: 480 000 KZT.
 /// Expenses: 275 000 KZT." for several.
+@MainActor
 func chartAnnouncementText<Point>(
     title: String,
     index: Int,
@@ -344,6 +345,7 @@ func chartAnnouncementText<Point>(
 
 /// Banner entries for a point: one undotted value for a single series; for several a dot,
 /// the series' name and its value each, so the banner is the chart's legend (8.2.0).
+@MainActor
 func chartBannerEntries<Point>(
     index: Int,
     cache: ChartPointCache,

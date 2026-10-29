@@ -61,6 +61,7 @@ The keys `chart.partial`, `chart.style`, `chart.zoomIn` and `chart.zoomOut` go i
 
 - The `LineChart`, `BarChart` and `ChartSwitcher` pages take up to 120 months and a "This month in progress" switch; `BarChart` a "Two series" switch; `ChartSelectionBanner` a note and its skeleton.
 - Snapshots: `lineAndBarCharts` as one chart per snapshot (each has its banner, a glass card), `unfinishedPeriod`, `centredWindow`, `chartSelectionBanner.legend`; the chart skeletons show the banner's card.
+- The Gallery's badges follow the apps: Tenra no longer shows a `Tooltip` and now uses `OnboardingStepIndicator`.
 
 ## 8.1.0 - 2026-10-21
 
