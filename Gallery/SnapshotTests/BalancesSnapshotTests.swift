@@ -148,6 +148,33 @@ extension ComponentSnapshots {
             )
         }
 
+        /// `HoldingCard` (8.2.0): grown with a sparkline, fallen with a status badge, and one
+        /// without a purchase price (no change, no history).
+        @Test func holdingCards() async {
+            await assertComponentSnapshot(
+                HoldingCard(iconSource: .sfSymbol("house.fill"), title: "Apartment", subtitle: "Valued 16 Oct",
+                            amount: 70_000_000, currency: "KZT",
+                            change: .init(direction: .up, percent: 191.7, caption: "+46M ₸ since purchase"),
+                            history: [24_000_000, 31_000_000, 45_000_000, 58_000_000, 70_000_000]),
+                named: "grown",
+                appearances: [.light, .dark, .largeText]
+            )
+            await assertComponentSnapshot(
+                HoldingCard(iconSource: .sfSymbol("car.fill"), title: "Car", subtitle: "Sold 2 Sep",
+                            amount: 8_400_000, currency: "KZT",
+                            change: .init(direction: .down, percent: -16.0, caption: "−1.6M ₸ since purchase"),
+                            history: [10_000_000, 9_300_000, 8_400_000]) {
+                    Badge("Sold", color: AppColors.Text.secondary)
+                },
+                named: "fallenWithBadge"
+            )
+            await assertComponentSnapshot(
+                HoldingCard(iconSource: .sfSymbol("leaf.fill"), title: "Country house", subtitle: "Valued 3 Mar",
+                            amount: 18_000_000, currency: "KZT"),
+                named: "noChange"
+            )
+        }
+
         @Test func promptSheet() async {
             await assertComponentSnapshot(
                 PromptSheet(
