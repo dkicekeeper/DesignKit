@@ -39,6 +39,10 @@ public struct HeroSparkline<Point: ChartPoint>: View {
 
     @State private var selectedValueLabel: String?
     @State private var cache = ChartPointCache()
+    /// The chart's width, for how many X axis labels fit.
+    @State private var chartWidth: CGFloat = 0
+    /// `AppTypography.caption2` at the person's text size.
+    @ScaledMetric(relativeTo: .caption2) private var axisFontSize: CGFloat = 12
     /// Inside `.heroBackground(_:)` (4.5.0): a white line over a white fade, white points,
     /// translucent white axes.
     @Environment(\.heroTone) private var heroTone
@@ -100,6 +104,7 @@ public struct HeroSparkline<Point: ChartPoint>: View {
             VStack(spacing: AppSpacing.lg) {
                 bannerSlot
                 chart
+                    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { chartWidth = $0 }
                     .padding(.leading, AppSpacing.lg)
                     .padding(.trailing, AppSpacing.lg)
                     .frame(height: chartHeight)
@@ -150,6 +155,17 @@ public struct HeroSparkline<Point: ChartPoint>: View {
         let titles = cache.titles
         let spoken = cache.spoken.first ?? []
         let selectedIndex = selectedValueLabel.flatMap { cache.labelToIndex[$0] }
+        let fitted = ChartAxisLabels(
+            cache: cache,
+            anchorIndex: labels.count - 1,
+            selectedIndex: selectedIndex,
+            visibleCount: categoryDomain.count,
+            alignsTrailingEdge: projectedValue == nil,
+            chartWidth: chartWidth,
+            yDomain: domain,
+            fontSize: axisFontSize
+        )
+        let axisLabelPlan = projectedValue != nil ? fitted.appending(Self.projectionLabel) : fitted
 
         return Chart {
             ForEach(labels.indices, id: \.self) { i in
@@ -262,7 +278,7 @@ public struct HeroSparkline<Point: ChartPoint>: View {
         .chartXScale(domain: categoryDomain)
         .chartYScale(domain: domain)
         .chartXLabelSelectionWithFeedback($selectedValueLabel)
-        .chartCategoryXAxis(labelMap: axisLabels, tone: heroTone)
+        .chartCategoryXAxis(labelMap: axisLabels, labels: axisLabelPlan, tone: heroTone)
         .chartCompactYAxis(tone: heroTone)
         .chartLegend(.hidden)
     }

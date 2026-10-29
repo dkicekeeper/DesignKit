@@ -54,6 +54,10 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
     /// appeared: taps move the selection, not the window.
     @State private var windowCenter: TrendChartCenter?
     @State private var hasRisen = false
+    /// The chart's width, for how many X axis labels fit.
+    @State private var chartWidth: CGFloat = 0
+    /// `AppTypography.caption2` at the person's text size.
+    @ScaledMetric(relativeTo: .caption2) private var axisFontSize: CGFloat = 12
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.designKitMotion) private var designKitMotion
@@ -115,6 +119,16 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
             allowsNegative: seriesList.contains { $0.baseline == .signed }
         )
         let context = TrendChartContext(cache: cache, selectedIndex: selected, risen: risen)
+        let axisLabels = ChartAxisLabels(
+            cache: cache,
+            anchorIndex: cache.currentIndex,
+            selectedIndex: selected,
+            visibleCount: window.visibleCount,
+            alignsTrailingEdge: window.categories.count == cache.labels.count,
+            chartWidth: chartWidth,
+            yDomain: domain,
+            fontSize: axisFontSize
+        )
 
         VStack(spacing: AppSpacing.lg) {
             banner(index: selected)
@@ -126,7 +140,7 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
                     .chartScrollableAxes(.horizontal)
                     .chartScrollPosition(initialX: window.leadingLabel)
                     .chartXSelection(value: $rawSelection)
-                    .chartCategoryXAxis(labelMap: cache.axisLabels)
+                    .chartCategoryXAxis(labelMap: cache.axisLabels, labels: axisLabels)
                     .chartCompactYAxis()
                     .chartLegend(.hidden)
                     .accessibilityChartDescriptor(chartAudioGraph(
@@ -141,6 +155,7 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
                     // New periods or a zoom: a new chart, centred again, fades in.
                     .id(identity)
                     .transition(.opacity)
+                    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { chartWidth = $0 }
                     .padding(.leading, AppSpacing.lg)
                     .frame(height: ChartMetrics.plotHeight)
             )

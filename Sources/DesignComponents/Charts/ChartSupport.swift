@@ -19,6 +19,7 @@
 //
 
 import SwiftUI
+import UIKit
 import Charts
 import Accessibility
 import DesignTokens
@@ -56,6 +57,26 @@ final class ChartPointCache {
     /// Smallest / largest value across all series.
     var yMin: Double = 0
     var yMax: Double = 1
+    /// The widest axis label and the text size it was measured at (0: not measured yet).
+    var axisLabelWidth: CGFloat = 0
+    var axisLabelFontSize: CGFloat = 0
+
+    /// Width of the widest axis label at `fontSize`, measured once per dataset and text size.
+    func widestAxisLabel(fontSize: CGFloat) -> CGFloat {
+        if fontSize != axisLabelFontSize {
+            axisLabelWidth = axisLabels.values.map { chartTextWidth($0, fontSize: fontSize) }.max() ?? 0
+            axisLabelFontSize = fontSize
+        }
+        return axisLabelWidth
+    }
+}
+
+/// Width of a line of `AppTypography.caption2` text at `fontSize` (Inter regular).
+@MainActor
+func chartTextWidth(_ text: String, fontSize: CGFloat) -> CGFloat {
+    let descriptor = UIFontDescriptor(fontAttributes: [.family: AppInterFont.family])
+    let font = UIFont(descriptor: descriptor, size: fontSize)
+    return ceil((text as NSString).size(withAttributes: [.font: font]).width)
 }
 
 /// Hash of a dataset: its points (their `Hashable`, values included when synthesized) and
@@ -144,6 +165,7 @@ func rebuildChartCacheIfNeeded<Point: ChartPoint>(
     cache.partialStart = partialStart
     cache.yMin = minY.isFinite ? minY : 0
     cache.yMax = maxY.isFinite ? maxY : 1
+    cache.axisLabelFontSize = 0
     cache.key = key
 }
 
@@ -207,34 +229,25 @@ struct ChartWindow {
 // MARK: - Axis builders
 
 extension View {
-    /// Category X axis: greedy collision resolution, display strings from `labelMap`; the
-    /// empty categories of a centred window have no label. On colour (`tone: .onColor`, 4.5.0)
-    /// the labels are translucent white.
-    @ViewBuilder
-    func chartCategoryXAxis(labelMap: [String: String], tone: HeroTone = .onSurface) -> some View {
-        if tone == .onColor {
-            chartXAxis {
-                AxisMarks { value in
-                    AxisValueLabel(collisionResolution: .greedy(minimumSpacing: 6)) {
-                        if let label = value.as(String.self), !ChartWindow.isPadding(label) {
-                            Text(labelMap[label] ?? label)
-                                .font(AppTypography.caption2)
-                                .foregroundStyle(ChartOnColor.label)
-                                .lineLimit(1)
-                        }
-                    }
-                }
-            }
-        } else {
-            chartXAxis {
-                AxisMarks { value in
-                    AxisValueLabel(collisionResolution: .greedy(minimumSpacing: 6)) {
-                        if let label = value.as(String.self), !ChartWindow.isPadding(label) {
-                            Text(labelMap[label] ?? label)
-                                .font(AppTypography.caption2)
-                                .lineLimit(1)
-                        }
-                    }
+    /// Category X axis: the labels `labels` chose (8.2.0: Swift Charts' greedy collision
+    /// resolution before), display strings from `labelMap`. The selected period's label is
+    /// semibold in the primary colour. On colour (`tone: .onColor`, 4.5.0) the labels are
+    /// white, the others translucent.
+    func chartCategoryXAxis(labelMap: [String: String], labels: ChartAxisLabels, tone: HeroTone = .onSurface) -> some View {
+        chartXAxis {
+            AxisMarks(values: labels.values) { value in
+                let label = value.as(String.self) ?? ""
+                let isSelected = label == labels.emphasized
+                AxisValueLabel(
+                    anchor: label == labels.trailingEdge ? .topTrailing : nil,
+                    collisionResolution: .disabled
+                ) {
+                    Text(labelMap[label] ?? label)
+                        .font(AppTypography.caption2)
+                        .fontWeight(isSelected ? .semibold : .regular)
+                        .foregroundStyle(ChartAxisLabels.color(isSelected: isSelected, tone: tone))
+                        .lineLimit(1)
+                        .fixedSize()
                 }
             }
         }
@@ -272,6 +285,91 @@ extension View {
                     }
                 }
             }
+        }
+    }
+}
+
+// MARK: - X axis labels
+
+/// Which category labels the X axis draws (8.2.0). Swift Charts' greedy collision resolution
+/// dropped every label that did not fit, unevenly and at the edges, so a period could have no
+/// date under it. Now the labels go at a regular step that fits the widest one, counted from
+/// the current period (which always has its label); the selected period's label is always
+/// drawn, in bold, and a neighbour too close to it gives way. On a chart that does not scroll,
+/// the last label ends at its tick instead of being cut by the chart's edge.
+struct ChartAxisLabels {
+    /// The labels to draw, in order.
+    let values: [String]
+    /// The selected period's label.
+    let emphasized: String?
+    /// The label aligned by its trailing edge.
+    let trailingEdge: String?
+
+    /// - Parameters:
+    ///   - anchorIndex: the period the step counts from (the current one).
+    ///   - selectedIndex: the period whose label is always drawn, in bold.
+    ///   - visibleCount: categories on screen at once.
+    ///   - alignsTrailingEdge: the last point sits at the chart's trailing edge (a chart that
+    ///     does not scroll and has nothing after its last point).
+    ///   - chartWidth: the chart's width, Y axis included (0 before it is known).
+    ///   - yDomain: the Y axis' domain, for the width of its labels.
+    ///   - fontSize: `caption2` at the person's text size.
+    @MainActor
+    init(
+        cache: ChartPointCache,
+        anchorIndex: Int,
+        selectedIndex: Int?,
+        visibleCount: Int,
+        alignsTrailingEdge: Bool,
+        chartWidth: CGFloat,
+        yDomain: ClosedRange<Double>,
+        fontSize: CGFloat
+    ) {
+        let labels = cache.labels
+        guard !labels.isEmpty else {
+            values = []
+            emphasized = nil
+            trailingEdge = nil
+            return
+        }
+        let yAxisWidth = max(
+            chartTextWidth(ChartValueFormat.compactString(yDomain.upperBound), fontSize: fontSize),
+            chartTextWidth(ChartValueFormat.compactString(yDomain.lowerBound), fontSize: fontSize)
+        ) + ChartMetrics.axisLabelGap
+        let plotWidth = max((chartWidth > 0 ? chartWidth : ChartMetrics.fallbackWidth) - yAxisWidth, 1)
+        let band = plotWidth / CGFloat(max(visibleCount, 1))
+        let labelWidth = cache.widestAxisLabel(fontSize: fontSize)
+        let step = max(1, Int(((labelWidth + ChartMetrics.axisLabelGap) / band).rounded(.up)))
+
+        let anchor = min(max(anchorIndex, 0), labels.count - 1)
+        var shown = Set(labels.indices.filter { (($0 - anchor) % step + step) % step == 0 })
+        if let selected = selectedIndex, labels.indices.contains(selected), !shown.contains(selected) {
+            shown = shown.filter { abs($0 - selected) >= step }
+            shown.insert(selected)
+        }
+        values = shown.sorted().map { labels[$0] }
+        emphasized = selectedIndex.flatMap { labels.indices.contains($0) ? labels[$0] : nil }
+        let last = labels.count - 1
+        trailingEdge = alignsTrailingEdge && labelWidth > band && shown.contains(last) ? labels[last] : nil
+    }
+
+    init(values: [String], emphasized: String?, trailingEdge: String?) {
+        self.values = values
+        self.emphasized = emphasized
+        self.trailingEdge = trailingEdge
+    }
+
+    /// The same labels and one more at the end (HeroSparkline's projection arrow).
+    func appending(_ label: String) -> ChartAxisLabels {
+        ChartAxisLabels(values: values + [label], emphasized: emphasized, trailingEdge: trailingEdge)
+    }
+
+    static func color(isSelected: Bool, tone: HeroTone) -> Color {
+        switch (tone, isSelected) {
+        case (.onColor, true): return ChartOnColor.mark
+        case (.onColor, false): return ChartOnColor.label
+        case (_, true): return AppColors.Text.primary
+        case (_, false): return AppColors.Text.secondary
         }
     }
 }
@@ -489,7 +587,11 @@ enum ChartMetrics {
     /// The dash of a line's unfinished stretch.
     static let partialDash: [CGFloat] = [4, 4]
     /// The selected point: a soft halo, then the dot in a ring of the background.
-    static let haloSize: CGFloat = 180
-    static let selectedDot: CGFloat = 12
-    static let selectedRing: CGFloat = 2
+    static let haloSize: CGFloat = 320
+    static let selectedDot: CGFloat = 16
+    static let selectedRing: CGFloat = 3
+    /// Space between two X axis labels, and between the Y axis labels and the plot.
+    static let axisLabelGap: CGFloat = 8
+    /// The chart's width until its layout is known.
+    static let fallbackWidth: CGFloat = 360
 }

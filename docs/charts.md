@@ -206,13 +206,26 @@ Without `series:`, two areas merge into one zigzag-series between x-points.
 
 ## Axis Labels
 
-### Collision resolution
+### Which labels show *(8.2.0)*
 
 ```swift
-AxisValueLabel(collisionResolution: .greedy(minimumSpacing: 6))
+let labels = ChartAxisLabels(cache: cache, anchorIndex: cache.currentIndex, selectedIndex: selected,
+                             visibleCount: window.visibleCount, alignsTrailingEdge: …,
+                             chartWidth: chartWidth, yDomain: domain, fontSize: axisFontSize)
+Chart { … }.chartCategoryXAxis(labelMap: cache.axisLabels, labels: labels)
 ```
 
-Standard label thinning when dates collide. Apply everywhere `AxisMarks { }` uses String x-axis.
+Until 8.2.0 the X axis used `AxisValueLabel(collisionResolution: .greedy(minimumSpacing: 6))`:
+Swift Charts dropped every label that collided with another or overflowed the chart's edge, so
+the gaps were uneven and a period (often the last one) had no date under it at all; the owner
+found it on a device. Now `ChartAxisLabels` measures the widest label (Inter `caption2` at the
+person's text size, once per dataset) against the width of a category (the chart's width, from
+`onGeometryChange`, less the Y axis' labels, divided by the categories on screen), draws every
+`step`-th label counted from the current period (so it always has its label), always draws the
+selected period's label in semibold (a neighbour closer than a step gives way), and passes the
+labels to `AxisMarks(values:)` with `collisionResolution: .disabled`, so none is dropped. On a
+chart whose last point sits at its trailing edge, a last label wider than its category is
+anchored `.topTrailing` (it ends at its tick) instead of being cut by the chart's frame.
 
 ### Initial position: the selected period in the middle *(8.2.0)*
 
