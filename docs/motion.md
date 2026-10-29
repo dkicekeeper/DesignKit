@@ -152,7 +152,7 @@ breathe on their own.
 | Effect | What | Cost | Use |
 |---|---|---|---|
 | `LiveAmountText` | the digits roll up from zero on first appearance; a change flashes green (up) or red (down) for 0.7 s | `numericText` of `FormattedAmountText`; one short sleep ends the flash | a hero balance, a total that just updated (`BalanceCard(isLive:)`, 2.7.0) |
-| `.chartDrawIn(delay:)` | the chart is revealed from its leading edge once, with a soft front edge | one mask, 0.9 s | built into `LineChart`, `BarChart`, `HeroSparkline`; any Swift Chart |
+| `.chartDrawIn(delay:)` | the chart is revealed from its leading edge once, with a soft front edge | one mask, 0.7 s, taken away once the chart is drawn (8.2.0; 0.9 s and a mask for good before) | built into `LineChart`, `HeroSparkline`; any Swift Chart. `BarChart`'s bars rise from zero instead (8.2.0), and after a `ChartSwitcher` switch the other chart is simply there |
 | `.completionMoment(isComplete:tint:in:)` | when `isComplete` turns true: a glow of the shape flares and fades, the success haptic plays | one blurred shape for 0.8 s | `ProgressRing(celebratesCompletion:)`, `ChecklistSummaryRow`'s and `TargetProgressCard`'s bars; any goal |
 | `GlassActionMenu` | a floating glass button flows open into its actions (Liquid Glass morph, `glassEffectID`) | the system's | the add button of a screen |
 | `.scrollHero(parallax:fades:)` | stretches when pulled down; drifts slower and fades as it scrolls away | one `visualEffect`, no re-render | the image or header at the top of a detail screen |
