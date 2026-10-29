@@ -601,7 +601,7 @@ struct TrendChartIdentity: Hashable {
 struct ChartPeriodSnap: ChartScrollTargetBehavior {
     let visibleCount: Int
 
-    func updateTarget(_ target: inout ScrollTarget, context: TargetContext) {
+    func updateTarget(_ target: inout ScrollTarget, context: ChartScrollTargetBehaviorContext) {
         let period = context.containerSize.width / CGFloat(max(visibleCount, 1))
         guard period > 0 else { return }
         let end = max(context.contentSize.width - context.containerSize.width, 0)
