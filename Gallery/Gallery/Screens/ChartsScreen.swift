@@ -278,6 +278,7 @@ private struct CalendarHeatmapPage: View {
             name: "CalendarHeatmap",
             summary: "Days as small squares, a week per column, tinted by their value; tap a day for its amount.",
             since: "8.3.0",
+            apps: [.tenra],
             canvas: .fill,
             notes: [
                 "Five steps from an empty grey square to the full colour, by the quartiles of the days with a value.",

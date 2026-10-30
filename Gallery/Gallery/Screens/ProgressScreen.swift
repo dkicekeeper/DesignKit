@@ -341,7 +341,7 @@ private struct MiniBarsPage: View {
             name: "MiniBars",
             summary: "A row of small bars, one in colour: the busiest weekday, today, a peak hour.",
             since: "8.3.0",
-            apps: [],
+            apps: [.tenra],
             notes: [
                 "For a card's 120×60 pt slot; the tallest bar takes the colour unless highlighted: names another.",
                 "Labels under the bars (a weekday's initial): the coloured bar's in its colour.",
