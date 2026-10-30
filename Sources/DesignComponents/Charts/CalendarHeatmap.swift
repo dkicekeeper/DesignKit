@@ -211,7 +211,10 @@ private extension Int {
 
 // MARK: - Grid
 
-/// The squares and the month names, in one Canvas; a tap picks a day.
+/// The squares and the month names, in one Canvas; a tap picks a day. The grid sits `ringRoom`
+/// inside the Canvas on every side: the selected day's ring is drawn just outside its square,
+/// and a Canvas clips what it draws to its bounds (8.4.0: the ring of the first and the last
+/// column, and of the bottom row, was cut).
 private struct HeatmapGrid: View {
     let model: HeatmapModel
     let color: Color
@@ -237,7 +240,7 @@ private struct HeatmapGrid: View {
                     let name = monthDay.formatted(Date.FormatStyle(calendar: model.calendar, timeZone: model.calendar.timeZone).month(.abbreviated))
                     context.draw(
                         Text(name).font(AppTypography.caption2).foregroundStyle(AppColors.Text.secondary),
-                        at: CGPoint(x: CGFloat(column) * step, y: HeatmapMetrics.monthRow / 2),
+                        at: CGPoint(x: inset + CGFloat(column) * step, y: inset + HeatmapMetrics.monthRow / 2),
                         anchor: .leading
                     )
                     lastMonthColumn = column
@@ -252,35 +255,40 @@ private struct HeatmapGrid: View {
                     )
                     if day == selected {
                         context.stroke(
-                            Path(roundedRect: rect.insetBy(dx: -1.5, dy: -1.5), cornerRadius: HeatmapMetrics.corner + 1.5),
+                            Path(roundedRect: rect.insetBy(dx: -HeatmapMetrics.ringOffset, dy: -HeatmapMetrics.ringOffset),
+                                 cornerRadius: HeatmapMetrics.corner + HeatmapMetrics.ringOffset),
                             with: .color(AppColors.Text.primary),
-                            lineWidth: 2
+                            lineWidth: HeatmapMetrics.ringWidth
                         )
                     }
                 }
             }
         }
         .frame(
-            width: CGFloat(model.weeks) * step - HeatmapMetrics.gap,
-            height: HeatmapMetrics.monthRow + 7 * step - HeatmapMetrics.gap
+            width: CGFloat(model.weeks) * step - HeatmapMetrics.gap + 2 * inset,
+            height: HeatmapMetrics.monthRow + 7 * step - HeatmapMetrics.gap + 2 * inset
         )
         .contentShape(Rectangle())
         .onTapGesture(coordinateSpace: .local) { location in
-            let column = Int(location.x / step)
-            let row = Int((location.y - HeatmapMetrics.monthRow) / step)
+            let x = location.x - inset
+            let y = location.y - inset - HeatmapMetrics.monthRow
+            guard x >= 0, y >= 0 else { return }
+            let column = Int(x / step)
+            let row = Int(y / step)
             guard (0..<model.weeks).contains(column), (0..<7).contains(row),
                   let day = model.day(column: column, row: row), day <= model.today else { return }
             onSelect(day)
         }
-        // Room for the selected day's ring, which is drawn just outside its square.
-        .padding(HeatmapMetrics.ringRoom)
         .accessibilityHidden(true)
     }
 
+    /// Room around the grid for the selected day's ring.
+    private var inset: CGFloat { HeatmapMetrics.ringRoom }
+
     private func cellRect(column: Int, row: Int) -> CGRect {
         CGRect(
-            x: CGFloat(column) * step,
-            y: HeatmapMetrics.monthRow + CGFloat(row) * step,
+            x: inset + CGFloat(column) * step,
+            y: inset + HeatmapMetrics.monthRow + CGFloat(row) * step,
             width: HeatmapMetrics.cell,
             height: HeatmapMetrics.cell
         )
@@ -325,8 +333,11 @@ enum HeatmapMetrics {
     static let corner: CGFloat = 4
     static let monthRow: CGFloat = 18
     static let legendCell: CGFloat = 12
-    /// Room around the grid for the selected day's ring.
-    static let ringRoom: CGFloat = 2
+    /// The selected day's ring: its distance outside the square and its width.
+    static let ringOffset: CGFloat = 1.5
+    static let ringWidth: CGFloat = 2
+    /// Room around the grid for the selected day's ring: all of it, its outer half included.
+    static let ringRoom: CGFloat = ringOffset + ringWidth / 2 + 0.5
     /// The empty grey and four steps of the colour.
     static let levels = 5
 }

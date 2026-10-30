@@ -16,6 +16,27 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.4.0 - 2026-10-30
+
+The trend charts after the owner's check of Tenra 1.8 on a device: the X axis no longer runs its labels into each other or writes anything under the empty periods after the current one, a chart that scrolls under a ruler shows the period under it selected as a finger does, and three fixes on the calendar, the orb and a hero on colour.
+
+### Changed
+
+- With `followsScroll` (the ruler option of `.chartDisplayOptions`), the period under the ruler looks selected, as under a finger: the ruler takes the series' colour (the accent for several series), a line gets the ring in its halo on each series' value, and the bar of one series of bars is in full colour among the others stepped back (and glows in dark mode). It is drawn over the plot, so the chart is still not redrawn while it scrolls; stacks and grouped bars keep every bar whole, and a picked stretch keeps the plain ruler.
+- `OrbChart(labelStyle: .name)` writes a slice's name on up to two lines, centred, instead of cutting it on one.
+- `HeroSparkline` inside `.heroBackground(_:)` writes the selected value in the text's colour, in dark mode and on the pale tint of light mode: the series' colour on a hero of the same colour could not be read.
+
+### Fixed
+
+- The X axis of `LineChart`, `BarChart` and `HeroSparkline` writes text only under the periods it chose, and never under an empty category: on a device a scrolling chart showed a label under every period, running into each other, and the empty months after the current one read "chart-padding-…".
+- On a chart that does not scroll, the last label (aligned to end at its tick) no longer runs into the one before it: its neighbour now needs half a label more room.
+- `HeroSparkline`'s projection arrow on the X axis is drawn only when it clears the last label.
+- `CalendarHeatmap`: the ring of the selected day is no longer cut on the first and last columns and on the bottom row; the grid sits inside its Canvas with room for it.
+
+### Migration
+
+Nothing to change.
+
 ## 8.3.1 - 2026-10-30
 
 The Gallery after Tenra took 8.3.0, no change in an app.
