@@ -37,6 +37,11 @@ The trend charts after the owner's check of Tenra 1.8 on a device: the X axis no
 
 Nothing to change.
 
+### Gallery and tooling
+
+- The snapshots of `CalendarHeatmap` (the ring whole at the edge) and of a bar chart that follows the scroll (the bar under the ruler selected) are recorded again.
+- The Gallery's `ChipPicker` badge names Tenra too: a merchant's points and an asset's subcategories are chips there.
+
 ## 8.3.1 - 2026-10-30
 
 The Gallery after Tenra took 8.3.0, no change in an app.
