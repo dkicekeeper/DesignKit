@@ -343,8 +343,14 @@ extension View {
     /// resolution before), display strings from `labelMap`. The selected period's label is
     /// semibold in the primary colour. On colour (`tone: .onColor`, 4.5.0) the labels are
     /// white, the others translucent.
+    ///
+    /// 8.4.0: a mark Swift Charts draws for any other category (a scrolling chart marked every
+    /// category of its domain on device) has no text, and an empty category after the last
+    /// period never shows its key: months after the current one read "chart-padding-…" and the
+    /// labels of every month ran into each other.
     func chartCategoryXAxis(labelMap: [String: String], labels: ChartAxisLabels, tone: HeroTone = .onSurface) -> some View {
-        chartXAxis {
+        let shown = Set(labels.values)
+        return chartXAxis {
             AxisMarks(values: labels.values) { value in
                 let label = value.as(String.self) ?? ""
                 let isSelected = label == labels.emphasized
@@ -352,7 +358,7 @@ extension View {
                     anchor: label == labels.trailingEdge ? .topTrailing : nil,
                     collisionResolution: .disabled
                 ) {
-                    Text(labelMap[label] ?? label)
+                    Text(verbatim: shown.contains(label) ? ChartAxisLabels.text(for: label, in: labelMap) : "")
                         .font(AppTypography.caption2)
                         .fontWeight(isSelected ? .semibold : .regular)
                         .foregroundStyle(ChartAxisLabels.color(isSelected: isSelected, tone: tone))
@@ -414,6 +420,9 @@ struct ChartAxisLabels {
     let emphasized: String?
     /// The label aligned by its trailing edge.
     let trailingEdge: String?
+    /// The width of a category and of the widest label (0 when not measured).
+    var band: CGFloat = 0
+    var labelWidth: CGFloat = 0
 
     /// - Parameters:
     ///   - anchorIndex: the period the step counts from (the current one).
@@ -457,10 +466,20 @@ struct ChartAxisLabels {
             shown = shown.filter { abs($0 - selected) >= step }
             shown.insert(selected)
         }
+        let last = labels.count - 1
+        let alignsLast = alignsTrailingEdge && labelWidth > band && shown.contains(last)
+        if alignsLast {
+            // The last label ends at its tick instead of being centred on it: it reaches a whole
+            // label's width back, so its neighbour needs half a label more room (8.4.0: the two
+            // ran into each other, the current month over the one before).
+            let room = labelWidth * 1.5 + ChartMetrics.axisLabelGap
+            shown = shown.filter { $0 == last || CGFloat(last - $0) * band >= room }
+        }
         values = shown.sorted().map { labels[$0] }
         emphasized = selectedIndex.flatMap { labels.indices.contains($0) ? labels[$0] : nil }
-        let last = labels.count - 1
-        trailingEdge = alignsTrailingEdge && labelWidth > band && shown.contains(last) ? labels[last] : nil
+        trailingEdge = alignsLast ? labels[last] : nil
+        self.band = band
+        self.labelWidth = labelWidth
     }
 
     init(values: [String], emphasized: String?, trailingEdge: String?) {
@@ -469,9 +488,22 @@ struct ChartAxisLabels {
         self.trailingEdge = trailingEdge
     }
 
-    /// The same labels and one more at the end (HeroSparkline's projection arrow).
-    func appending(_ label: String) -> ChartAxisLabels {
-        ChartAxisLabels(values: values + [label], emphasized: emphasized, trailingEdge: trailingEdge)
+    /// The same labels and one more at the end (HeroSparkline's projection arrow), when it
+    /// clears the last one (8.4.0: on a long series the arrow sat on the latest period's label).
+    func appending(_ label: String, width: CGFloat) -> ChartAxisLabels {
+        let room = (labelWidth + width) / 2 + ChartMetrics.axisLabelGap
+        guard band == 0 || band >= room else { return self }
+        var result = ChartAxisLabels(values: values + [label], emphasized: emphasized, trailingEdge: trailingEdge)
+        result.band = band
+        result.labelWidth = labelWidth
+        return result
+    }
+
+    /// What the axis writes under a category: its label, nothing for an empty category (one
+    /// after the last period, or before the first).
+    static func text(for label: String, in labelMap: [String: String]) -> String {
+        if let text = labelMap[label] { return text }
+        return ChartWindow.isPadding(label) ? "" : label
     }
 
     static func color(isSelected: Bool, tone: HeroTone) -> Color {
@@ -710,6 +742,10 @@ enum ChartMetrics {
     static let haloSize: CGFloat = 320
     static let selectedDot: CGFloat = 16
     static let selectedRing: CGFloat = 3
+    /// The halo drawn as a view (the period under a ruler, 8.4.0): the circle of `haloSize`'s area.
+    static let haloDiameter: CGFloat = (haloSize * 4 / .pi).squareRoot()
+    /// The ruler of a chart that follows the scroll, as a finger's (8.4.0).
+    static let followedRulerWidth: CGFloat = 1.5
     /// A reference line's pill: its distance from the plot's trailing edge, and how far it sits
     /// above its line.
     static let referencePillInset: CGFloat = 6

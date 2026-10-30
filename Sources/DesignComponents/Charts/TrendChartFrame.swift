@@ -13,7 +13,9 @@
 //    tap.
 //  - The window opens centred on the selected period; zoom re-centres it. Taps move the
 //    selection, not the window; with `followsScroll` the selection is what sits under a
-//    ruler in the middle, and the chart scrolls under it.
+//    ruler in the middle, and the chart scrolls under it. The period under the ruler looks
+//    selected as under a finger (8.4.0): the ring and its halo on the line, the bar in full
+//    colour among faded ones, the ruler in the series' colour.
 //  - New values under the same periods morph the marks; a zoom cross-fades to a new chart;
 //    new periods (month → week) play the entrance again.
 //
@@ -45,18 +47,23 @@ struct TrendChartContext {
     let marksExtremes: Bool
     /// Dark mode: lines and the selected bar glow softly.
     let glows: Bool
-    /// The window's middle is the selection; the frame draws the ruler, the marks draw no
-    /// selection (they do not change while the chart scrolls).
+    /// The window's middle is the selection; the frame draws the ruler and the selection over
+    /// the plot (`ChartFollowedMarks`), the marks draw none (they do not change while the
+    /// chart scrolls).
     let followsScroll: Bool
+    /// Following the scroll, every bar steps back: the bar under the ruler is drawn in full
+    /// colour over the plot (one series of bars side by side; stacks and groups stay whole).
+    var dimsUnderRuler = false
     /// Forecasts and comparisons drawn (`ChartDisplayOptions`).
     let showsForecast: Bool
     let showsComparison: Bool
 
     /// The selected period, or a period in the picked stretch: drawn in full colour. Following
-    /// the scroll, every bar is.
+    /// the scroll, every bar is, or none when the one under the ruler is drawn over them.
     func isEmphasized(_ index: Int) -> Bool {
         if let range { return range.contains(index) }
-        return followsScroll || index == selectedIndex
+        if followsScroll { return !dimsUnderRuler }
+        return index == selectedIndex
     }
 
     /// The colour of a bar that passes a limit with `aboveColor`, or `nil`.
@@ -221,6 +228,7 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
         let references = resolvedReferences(options)
         let domain = yDomain(references: references, options: options)
         let openingCenter = centerIndex(for: identity)
+        let followedMarks = follows && range == nil
         let context = TrendChartContext(
             cache: cache,
             selectedIndex: selected,
@@ -230,6 +238,7 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
             marksExtremes: options.marksExtremes,
             glows: colorScheme == .dark,
             followsScroll: follows,
+            dimsUnderRuler: followedMarks && highlightsBarUnderRuler(options),
             showsForecast: options.showsForecast,
             showsComparison: options.showsComparison
         )
@@ -270,7 +279,22 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
                 .chartCompactYAxis()
                 .chartLegend(.hidden)
                 .chartOverlay { proxy in
-                    ChartPlotOverlay(proxy: proxy, references: references, showsCenterRuler: follows)
+                    ZStack {
+                        // A picked stretch keeps the plain ruler; otherwise the period under it
+                        // is drawn selected, its ruler in the series' colour.
+                        ChartPlotOverlay(proxy: proxy, references: references, showsCenterRuler: follows && !followedMarks)
+                        if followedMarks {
+                            ChartFollowedMarks(
+                                state: follow,
+                                fallback: openingCenter,
+                                proxy: proxy,
+                                visibleCount: window.visibleCount,
+                                glows: context.glows
+                            ) { index in
+                                followedSelection(at: index, context: context)
+                            }
+                        }
+                    }
                 }
                 .accessibilityChartDescriptor(chartAudioGraph(
                     cache: cache,
@@ -468,6 +492,34 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
         HapticManager.selection()
     }
 
+    /// One series of bars side by side: the bar under the ruler can be drawn over the plot.
+    private func highlightsBarUnderRuler(_ options: TrendChartOptions) -> Bool {
+        entrance == .rise && seriesList.count == 1 && !options.stacked
+    }
+
+    /// What the period under the ruler looks like selected: the ruler's colour, then a dot on
+    /// each series' value (a line), or the bar in full colour (bars of one series).
+    private func followedSelection(at index: Int, context: TrendChartContext) -> ChartFollowedSelection {
+        guard cache.labels.indices.contains(index) else { return ChartFollowedSelection(ruler: AppColors.accent, marks: []) }
+        let ruler = seriesList.count == 1 ? seriesList[0].color(for: cache.values[0][index]) : AppColors.accent
+        if entrance == .rise {
+            guard context.dimsUnderRuler else { return ChartFollowedSelection(ruler: ruler, marks: []) }
+            let v = cache.values[0][index]
+            let color = context.aboveColor(for: v) ?? seriesList[0].color(for: v)
+            let style = BarChart<Point>.barStyle(color, isSelected: true, isPartial: cache.isPartial[index], isNegative: v < 0)
+            return ChartFollowedSelection(ruler: ruler, marks: [
+                .bar(value: context.risen ? v : 0, color: color, style: style)
+            ])
+        }
+        let marks: [ChartFollowedSelection.Mark] = seriesList.indices.compactMap { s in
+            let v = cache.values[s][index]
+            // Several series: a zero value gets no dot, as under a finger.
+            guard seriesList.count == 1 || v != 0 else { return nil }
+            return .dot(value: v, color: seriesList[s].color(for: v))
+        }
+        return ChartFollowedSelection(ruler: ruler, marks: marks)
+    }
+
     private func select(_ label: String) {
         if let selection {
             selection.wrappedValue = label
@@ -565,6 +617,99 @@ final class ChartFollowState {
     func follow(_ index: Int, label: String) {
         centerIndex = index
         followedLabel = label
+    }
+}
+
+/// The period under the ruler drawn selected (8.4.0).
+struct ChartFollowedSelection {
+    enum Mark {
+        /// A line's value: the ring in its halo.
+        case dot(value: Double, color: Color)
+        /// A bar in full colour from zero to its value.
+        case bar(value: Double, color: Color, style: AnyShapeStyle)
+    }
+
+    /// The ruler's colour: the series' at that value, the accent for several series.
+    let ruler: Color
+    let marks: [Mark]
+}
+
+/// Over the plot of a chart that follows the scroll, fixed while it scrolls: the ruler in the
+/// window's middle and the period under it as a finger selects one (the ring and its halo on a
+/// line, the bar in full colour among faded ones). It alone reads the point under the ruler, so
+/// only it is redrawn as the chart scrolls: redrawing the chart set its scroll position again
+/// and it shook (8.3.0). The scroll comes to rest with a period's middle under the ruler, where
+/// these marks then sit exactly on it.
+struct ChartFollowedMarks: View {
+    let state: ChartFollowState
+    let fallback: Int
+    let proxy: ChartProxy
+    let visibleCount: Int
+    let glows: Bool
+    let selection: (Int) -> ChartFollowedSelection
+
+    init(
+        state: ChartFollowState,
+        fallback: Int,
+        proxy: ChartProxy,
+        visibleCount: Int,
+        glows: Bool,
+        selection: @escaping (Int) -> ChartFollowedSelection
+    ) {
+        self.state = state
+        self.fallback = fallback
+        self.proxy = proxy
+        self.visibleCount = visibleCount
+        self.glows = glows
+        self.selection = selection
+    }
+
+    var body: some View {
+        GeometryReader { geometry in
+            // The visible part of the plot for the middle; the plot itself for the values (its
+            // height does not scroll).
+            if let anchor = proxy.plotContainerFrame ?? proxy.plotFrame {
+                let visible = geometry[anchor]
+                let plot = proxy.plotFrame.map { geometry[$0] } ?? visible
+                let selected = selection(state.centerIndex ?? fallback)
+                ZStack(alignment: .topLeading) {
+                    Rectangle()
+                        .fill(selected.ruler.opacity(0.5))
+                        .frame(width: ChartMetrics.followedRulerWidth, height: plot.height)
+                        .position(x: visible.midX, y: plot.midY)
+                    ForEach(selected.marks.indices, id: \.self) { i in
+                        mark(selected.marks[i], x: visible.midX, plot: plot, band: visible.width / CGFloat(max(visibleCount, 1)))
+                    }
+                }
+            }
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+
+    @ViewBuilder
+    private func mark(_ mark: ChartFollowedSelection.Mark, x: CGFloat, plot: CGRect, band: CGFloat) -> some View {
+        switch mark {
+        case .dot(let value, let color):
+            if let y = proxy.position(forY: value) {
+                ZStack {
+                    Circle()
+                        .fill(color.opacity(0.20))
+                        .frame(width: ChartMetrics.haloDiameter, height: ChartMetrics.haloDiameter)
+                    ChartSelectedDot(color: color, glows: glows)
+                }
+                .position(x: x, y: plot.minY + y)
+            }
+        case .bar(let value, let color, let style):
+            if let top = proxy.position(forY: value), let zero = proxy.position(forY: 0) {
+                let height = abs(zero - top)
+                RoundedRectangle(cornerRadius: AppRadius.xs)
+                    .fill(style)
+                    .frame(width: band * ChartMetrics.barWidthRatio, height: height)
+                    .shadow(color: glows ? color.opacity(0.6) : .clear, radius: glows ? 8 : 0)
+                    .position(x: x, y: plot.minY + min(top, zero) + height / 2)
+            }
+        }
     }
 }
 

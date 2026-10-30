@@ -75,6 +75,14 @@ public struct ChartSelectionBanner: View {
             self.details = details
             self.isRecord = isRecord
         }
+
+        /// The same entry with its value in another colour.
+        func recoloured(_ color: Color) -> Entry {
+            Entry(
+                value: value, color: color, showsDot: showsDot, label: label, changePercent: changePercent,
+                better: better, details: details, isRecord: isRecord
+            )
+        }
     }
 
     let title: String

@@ -73,7 +73,7 @@ private struct ChipPickerPage: View {
             name: "ChipPicker",
             summary: "Chips to pick one option, or several (a filter); with icons, a title and an \"All\" chip.",
             since: "0.4.0",
-            apps: [.dalada],
+            apps: [.tenra, .dalada],
             canvas: .fill,
             notes: [
                 "allTitle (2.8.0): an \"All\" chip in front, selected while nothing is picked; a tap clears the selection.",

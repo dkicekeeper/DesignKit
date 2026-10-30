@@ -46,6 +46,9 @@ public struct HeroSparkline<Point: ChartPoint>: View {
     /// Inside `.heroBackground(_:)` (4.5.0): a white line over a white fade, white points,
     /// translucent white axes.
     @Environment(\.heroTone) private var heroTone
+    /// Inside `.heroBackground(_:)` in light mode: drawn as on the page, over a pale tint of
+    /// the colour.
+    @Environment(\.heroOnPale) private var heroOnPale
 
     private var onColor: Bool { heroTone == .onColor }
 
@@ -121,7 +124,7 @@ public struct HeroSparkline<Point: ChartPoint>: View {
                 ChartSelectionBanner(
                     title: cache.titles[index],
                     note: cache.isPartial[index] ? ChartText.partial : nil,
-                    entries: chartBannerEntries(index: index, cache: cache, series: [series]),
+                    entries: bannerEntries(index),
                     format: valueFormat
                 )
                 .transition(.opacity)
@@ -129,6 +132,15 @@ public struct HeroSparkline<Point: ChartPoint>: View {
         }
         .chartBannerSlotStyle(animationKey: selectedValueLabel)
         .chartSelectionAnnouncement(announcementText)
+    }
+
+    /// The selected value in the series' colour; inside `.heroBackground` (its colour in dark
+    /// mode, a pale tint of it in light mode) in the text's (8.4.0): the banner's glass lets the
+    /// hero's colour through, and a green value on a green hero could not be read.
+    private func bannerEntries(_ index: Int) -> [ChartSelectionBanner.Entry] {
+        let entries = chartBannerEntries(index: index, cache: cache, series: [series])
+        guard onColor || heroOnPale else { return entries }
+        return entries.map { $0.recoloured(AppColors.Text.primary) }
     }
 
     private var announcementText: String? {
@@ -165,7 +177,9 @@ public struct HeroSparkline<Point: ChartPoint>: View {
             yDomain: domain,
             fontSize: axisFontSize
         )
-        let axisLabelPlan = projectedValue != nil ? fitted.appending(Self.projectionLabel) : fitted
+        let axisLabelPlan = projectedValue != nil
+            ? fitted.appending(Self.projectionLabel, width: chartTextWidth(Self.projectionLabel, fontSize: axisFontSize))
+            : fitted
 
         return Chart {
             ForEach(labels.indices, id: \.self) { i in

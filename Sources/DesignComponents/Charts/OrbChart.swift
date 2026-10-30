@@ -359,9 +359,12 @@ private extension OrbChart {
             Text(String(format: "%.0f%%", value))
                 .contentTransition(.numericText())
         case .name:
+            // Up to two lines (8.4.0: one cut a longer name, "Деньги на сч…").
             Text(slices[index].label)
-                .lineLimit(1)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
                 .frame(maxWidth: 96)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }
