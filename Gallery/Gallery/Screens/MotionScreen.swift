@@ -258,6 +258,7 @@ private struct ScrollRevealPage: View {
             name: ".scrollReveal",
             summary: "Rows and cards settle in as they scroll into view and recede a little at the edges. Scroll inside the canvas.",
             since: "2.2.0",
+            apps: [.tenra],
             canvas: .tall(minHeight: 320),
             notes: [
                 "A scrollTransition: no state, no timers. Under Reduce Motion it keeps a light fade only.",

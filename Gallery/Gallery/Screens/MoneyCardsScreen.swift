@@ -113,7 +113,7 @@ private struct HoldingCardPage: View {
             name: "HoldingCard",
             summary: "Something a person holds and what it is worth: the value, its change since it was bought, the values over time.",
             since: "8.2.0",
-            apps: [],
+            apps: [.tenra],
             canvas: .fill,
             notes: [
                 "change: a TrendBadge pill and a caption; nil without a price to compare with (an inheritance).",
