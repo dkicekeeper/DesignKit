@@ -285,9 +285,8 @@ public struct BarChart<Point: ChartPoint>: View {
             let color = context.aboveColor(for: v) ?? series.color(for: v)
             let emphasized = context.isEmphasized(i)
             let style = Self.barStyle(color, isSelected: emphasized, isPartial: cache.isPartial[i], isNegative: v < 0)
-            // The selected bars glow; following the scroll nothing is selected in the marks, so
-            // nothing glows (every bar is in full colour there).
-            let glows = context.glows && emphasized && !context.followsScroll
+            // The selected bars glow (following the scroll, the period resting under the ruler).
+            let glows = context.glows && emphasized
             let glow = glows ? color.opacity(0.6) : Color.clear
             let glowRadius: CGFloat = glows ? 8 : 0
             if stacked {

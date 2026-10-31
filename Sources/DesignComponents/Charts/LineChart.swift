@@ -234,12 +234,13 @@ public struct LineChart<Point: ChartPoint>: View {
             }
 
             // Selection emphasis — drawn LAST so it is on top: ruler → halo → dot. Following the
-            // scroll, the frame's ruler in the middle is the selection: the marks stay as they
-            // are while the chart scrolls under it.
+            // scroll, the frame draws the ruler, and the halo and the dot sit on the period that
+            // rests under it, scrolling with the chart until the next one rests there (8.4.1).
             if let range = context.range {
                 selectionMarks(index: range.lowerBound, context: context)
                 selectionMarks(index: range.upperBound, context: context)
-            } else if !context.followsScroll {
+            } else {
+                // Following the scroll, the period that rests under the ruler.
                 selectionMarks(index: context.selectedIndex, context: context)
             }
         }
