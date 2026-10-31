@@ -742,10 +742,11 @@ enum ChartMetrics {
     static let haloSize: CGFloat = 320
     static let selectedDot: CGFloat = 16
     static let selectedRing: CGFloat = 3
-    /// The halo drawn as a view (the period under a ruler, 8.4.0): the circle of `haloSize`'s area.
-    static let haloDiameter: CGFloat = (haloSize * 4 / .pi).squareRoot()
     /// The ruler of a chart that follows the scroll, as a finger's (8.4.0).
     static let followedRulerWidth: CGFloat = 1.5
+    /// How long the scroll is still before the period under the ruler is selected on the chart
+    /// (8.4.1): past the snap to a whole period, so the redraw finds the scroll at rest.
+    static let followRestDelay: Duration = .milliseconds(450)
     /// A reference line's pill: its distance from the plot's trailing edge, and how far it sits
     /// above its line.
     static let referencePillInset: CGFloat = 6

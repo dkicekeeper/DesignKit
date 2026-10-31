@@ -16,6 +16,23 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.4.1 - 2026-10-31
+
+The scroll that follows a ruler after the owner's second check on a device: the selection is on the chart again.
+
+### Changed
+
+- With `followsScroll`, the period under the ruler is selected on the chart itself: the ring in its halo sits on the line's value, the bar is in full colour among the others stepped back, its axis label is semibold. The selection moves to the period under the ruler once the scroll has rested (450 ms, past the snap to a whole period), and scrolls with the chart meanwhile. In 8.4.0 the marks were drawn over the plot at the ruler, so they rode along with the ruler, off the line and off the bar while the chart moved. The ruler keeps the series' colour.
+
+### Migration
+
+Nothing to change.
+
+### Gallery and tooling
+
+- The snapshots of a bar chart that follows the scroll are recorded again (the bar under the ruler is the chart's own).
+- The Gallery's `SelectionIndicator` badge names Tenra too: the merchants picked to combine (Tenra's #115).
+
 ## 8.4.0 - 2026-10-30
 
 The trend charts after the owner's check of Tenra 1.8 on a device: the X axis no longer runs its labels into each other or writes anything under the empty periods after the current one, a chart that scrolls under a ruler shows the period under it selected as a finger does, and three fixes on the calendar, the orb and a hero on colour.

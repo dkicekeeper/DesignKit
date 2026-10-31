@@ -121,17 +121,17 @@ only its marks from a `TrendChartContext`.
     position again and the chart shook under the finger, while the selected dot stayed behind.
     Now `ChartFollowState` (`@Observable`) holds the middle period, and only the banner
     (`ChartFollowedBanner`) reads it; the leading label and the window are
-    `@ObservationIgnored`. The marks draw no selection. The period under the ruler is drawn
-    selected over the plot instead, as a finger selects one *(8.4.0, the owner's call)*:
-    `ChartFollowedMarks` in `chartOverlay` reads the followed period too, so it is redrawn with
-    the banner and the chart is not, and draws the ruler in the series' colour (a finger's,
-    `followedRulerWidth`), then the ring in its halo on each series' value (a line;
-    `haloDiameter` is the circle of `haloSize`'s area) or the bar in full colour (one series of
-    bars side by side: `TrendChartContext.dimsUnderRuler` steps every bar of the plot back,
-    `BarChart.barStyle`, glowing in dark mode). They sit at the middle of `plotContainerFrame`
-    and at `proxy.position(forY:)`, so while the finger moves they stay under the ruler and
-    jump from value to value; the scroll comes to rest with a period's middle there, on its
-    mark. Stacks and grouped bars keep every bar whole; a picked stretch keeps the plain accent
+    `@ObservationIgnored`. The period under the ruler is selected on the chart, as a finger
+    selects one *(8.4.0, the owner's call)*: the ring in its halo on each series' value, the bar
+    in full colour among bars stepped back (glowing in dark mode), the axis label in semibold,
+    the ruler in the series' colour (`followedRulerWidth`). The selection is
+    `ChartFollowState.restingIndex`, which follows the middle period only once the scroll has
+    been still for `followRestDelay` (`restAfterScroll()`, 450 ms, past the snap): the redraw
+    then finds the scroll at rest on a whole period, where the binding's leading label is
+    exactly the scroll position, so nothing moves. Meanwhile the marks scroll with the chart.
+    8.4.0 drew them over the plot at the ruler (`ChartFollowedMarks`) instead: they rode with
+    the ruler, off the line and off the bar while the chart moved (the owner's second check,
+    8.4.1). A picked stretch keeps the accent
     ruler. A tap brings its period to the ruler
     (a bump of `scrollRequest`, so the getter is read again); a zoom opens on the followed
     period (`followedLabel`).
