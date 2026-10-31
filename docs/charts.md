@@ -131,7 +131,15 @@ only its marks from a `TrendChartContext`.
     exactly the scroll position, so nothing moves. Meanwhile the marks scroll with the chart.
     8.4.0 drew them over the plot at the ruler (`ChartFollowedMarks`) instead: they rode with
     the ruler, off the line and off the bar while the chart moved (the owner's second check,
-    8.4.1). A picked stretch keeps the accent
+    8.4.1). ⚠️ At rest the snap leaves the window's leading edge exactly between two
+    categories, and Swift Charts reports the one before it: the leading label put the period
+    before the ruler's in the banner and on the marks (the owner's third check, 8.4.2). The
+    snap's target is the truth instead: `ChartPeriodSnap` passes it to
+    `ChartFollowState.settle(atLeading:)` (a tap passes its period to `settle(at:)`), a
+    reported period one before it resolves to it (`report(_:)`), and the rest applies it; the
+    settle ends once a report shows the scroll arrived, or when none came. A programmatic
+    `setContentOffset` on the chart's scroll view runs the snap but never calls the binding's
+    setter, so a test cannot read the reported label that way. A picked stretch keeps the accent
     ruler. A tap brings its period to the ruler
     (a bump of `scrollRequest`, so the getter is read again); a zoom opens on the followed
     period (`followedLabel`).

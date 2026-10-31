@@ -16,6 +16,18 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.4.2 - 2026-10-31
+
+The scroll that follows a ruler after the owner's third check on a device: the period selected at rest is the one under the ruler.
+
+### Fixed
+
+- With `followsScroll`, the banner and the selected bar or ring showed the period before the one under the ruler once the scroll had rested. The snap leaves the window's leading edge exactly between two periods, and Swift Charts then reports the earlier one as the scroll position. The chart now takes the period from the snap's own target (and from the period a tap brings to the ruler), so the selection at rest is always the bar or point centred under the ruler, in bar and line charts alike. Measured on the simulator: the snap itself brings every bar to the centre of the ruler.
+
+### Migration
+
+Nothing to change.
+
 ## 8.4.1 - 2026-10-31
 
 The scroll that follows a ruler after the owner's second check on a device: the selection is on the chart again.

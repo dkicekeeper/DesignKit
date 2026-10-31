@@ -334,6 +334,21 @@ struct ChartWindow {
     static func isPadding(_ label: String) -> Bool {
         label.hasPrefix("\u{2063}chart-padding-")
     }
+
+    /// The point in the middle of a window whose leading category is `leading` (a window that
+    /// follows the scroll); nil past the points.
+    func pointIndex(atLeading leading: Int) -> Int? {
+        let middle = leading + visibleCount / 2
+        guard categories.indices.contains(middle), !Self.isPadding(categories[middle]) else { return nil }
+        return middle - leadingPadding
+    }
+
+    /// The label of point `index`; nil past the points.
+    func label(at index: Int) -> String? {
+        let category = index + leadingPadding
+        guard index >= 0, categories.indices.contains(category), !Self.isPadding(categories[category]) else { return nil }
+        return categories[category]
+    }
 }
 
 // MARK: - Axis builders
