@@ -28,6 +28,11 @@ The scroll that follows a ruler after the owner's second check on a device: the 
 
 Nothing to change.
 
+### Gallery and tooling
+
+- The snapshots of a bar chart that follows the scroll are recorded again (the bar under the ruler is the chart's own).
+- The Gallery's `SelectionIndicator` badge names Tenra too: the merchants picked to combine (Tenra's #115).
+
 ## 8.4.0 - 2026-10-30
 
 The trend charts after the owner's check of Tenra 1.8 on a device: the X axis no longer runs its labels into each other or writes anything under the empty periods after the current one, a chart that scrolls under a ruler shows the period under it selected as a finger does, and three fixes on the calendar, the orb and a hero on colour.

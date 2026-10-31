@@ -159,7 +159,7 @@ private struct SelectionIndicatorPage: View {
         ComponentPage(
             name: "SelectionIndicator",
             summary: "The check circle of a selectable row: empty, or filled in its tint.",
-            apps: [.dalada]
+            apps: [.tenra, .dalada]
         ) {
             SelectionIndicator(isSelected: isSelected,
                                tint: [AppColors.accent, AppColors.success, AppColors.textTertiary][tint])
