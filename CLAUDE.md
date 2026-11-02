@@ -120,6 +120,7 @@ The port is pixel-identical: the layout code moves as it is, only its inputs cha
 
 Host hooks (set once in `App.init()`): `DesignKitTheme.accent`, `DesignKitFonts.registerIfNeeded()`,
 `DesignKitLogoLoader.loader`, `DesignKitPhotoLoader.loader` / `.cached` (3.1.0, `RemotePhoto`),
+`DesignKitIconPhotos.save` / `.isPhoto` (8.5.0, `IconPicker`'s Photo tab),
 `DesignKitCurrencyConverter.convert` / `.convertSync`, `DesignKitLogoCatalog` (the icon picker's
 brands). Add a new hook (same shape:
 a `public static var` closure/value in `DesignSupport` or `DesignTokens`, documented default)

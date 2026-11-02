@@ -265,7 +265,8 @@ struct RowControlView: View {
 
     /// A row with no side padding of its own (`.settings`) lives in a `List`, which pads it and
     /// draws a navigation chevron.
-    private var isInList: Bool { row.config.horizontalPadding == 0 }
+    /// A row of a system `List` (`.settings`), which draws a navigation row's chevron (8.5.0).
+    private var isInList: Bool { row.config.isListRow }
 
     private var titleColor: Color {
         if !isEnabled { return AppColors.Text.tertiary }
@@ -335,7 +336,8 @@ struct RowControlView: View {
     @ViewBuilder
     private func navigationRow(value: String?, destination: @escaping @MainActor () -> AnyView) -> some View {
         if isInList {
-            // The list adds the chevron after the row.
+            // The list adds the chevron after the row. The whole row opens it (8.5.0), not only
+            // its text and icon.
             NavigationLink {
                 destination()
             } label: {
@@ -344,6 +346,7 @@ struct RowControlView: View {
                         valueText(value, font: AppTypography.bodySmall)
                     }
                 }
+                .contentShape(Rectangle())
             }
         } else {
             NavigationLink {

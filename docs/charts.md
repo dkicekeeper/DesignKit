@@ -131,15 +131,20 @@ only its marks from a `TrendChartContext`.
     exactly the scroll position, so nothing moves. Meanwhile the marks scroll with the chart.
     8.4.0 drew them over the plot at the ruler (`ChartFollowedMarks`) instead: they rode with
     the ruler, off the line and off the bar while the chart moved (the owner's second check,
-    8.4.1). ⚠️ At rest the snap leaves the window's leading edge exactly between two
-    categories, and Swift Charts reports the one before it: the leading label put the period
-    before the ruler's in the banner and on the marks (the owner's third check, 8.4.2). The
-    snap's target is the truth instead: `ChartPeriodSnap` passes it to
-    `ChartFollowState.settle(atLeading:)` (a tap passes its period to `settle(at:)`), a
-    reported period one before it resolves to it (`report(_:)`), and the rest applies it; the
-    settle ends once a report shows the scroll arrived, or when none came. A programmatic
-    `setContentOffset` on the chart's scroll view runs the snap but never calls the binding's
-    setter, so a test cannot read the reported label that way. A picked stretch keeps the accent
+    8.4.1). **8.5.0: the scroll's exact offset is the truth.** The chart's scroll view is a
+    SwiftUI `HostingScrollView` (measured on the simulator), so `onScrollGeometryChange` gives its
+    offset and content width: `ChartWindow.place(of:)` turns them into the point under the ruler
+    (`round(offset / period)` with the leading padding, a period being the content over the
+    categories: 955 pt over 34, a hair off the plot's 309 pt over 11) and the leading category
+    (the one the edge is in, half a point of slack). The banner follows that point,
+    `onScrollPhaseChange(.idle)` (or `followRestDelay` without phases, a tap's scroll) moves the
+    selection. ⚠️ The binding's setter stores that leading category, never Swift Charts'
+    report: at rest the edge sits exactly between two categories, Swift Charts reports the one
+    before, and SwiftUI re-applies a binding whose value differs from the offset (the probe: an
+    offset set by hand went back to the binding's label). Storing the report made a redraw at
+    rest slide the chart back a period (builds 64 and 65); 8.4.2's settle on the snap's target
+    fixed the banner but not the slide. A programmatic `setContentOffset` runs the snap but
+    never calls the binding's setter. Pinned by `ChartWindowPlaceTests`. A picked stretch keeps the accent
     ruler. A tap brings its period to the ruler
     (a bump of `scrollRequest`, so the getter is read again); a zoom opens on the followed
     period (`followedLabel`).

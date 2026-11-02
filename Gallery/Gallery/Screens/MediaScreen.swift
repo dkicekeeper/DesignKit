@@ -32,6 +32,7 @@ struct MediaScreen: View {
         AchievementProgressRowPage()
         ThumbnailPlaceholderPage()
         PhotoTilePage()
+        SquareImageCropperPage()
         RemotePhotoPage()
         PhotoStripPage()
         PhotoGridPage()
@@ -591,6 +592,58 @@ private struct ThumbnailPlaceholderPage: View {
         } controls: {
             ChoiceControl("Tint", selection: $tint, options: [("Accent", 0), ("Orange", 1), ("Teal", 2)])
         }
+    }
+}
+
+private struct SquareImageCropperPage: View {
+    @State private var cropping: GalleryCropSample?
+    @State private var result: UIImage?
+
+    var body: some View {
+        ComponentPage(
+            name: "SquareImageCropper",
+            summary: "Crops a picture to a square for an icon of the person's own: a finger moves it, two fingers zoom it, the page outside the square is veiled.",
+            since: "8.5.0",
+            apps: [],
+            notes: [
+                "IconPicker's Photo tab opens it after the photo library when the app sets DesignKitIconPhotos.save, which keeps the square and returns its icon.",
+                "The picture fills the square to start and never gets smaller than it; up to six times bigger.",
+                "SquareImageCropper.downsampled(_:) reads a big photo at 2048 px, upright; crop(_:square:scale:offset:outputSize:) is the pure crop.",
+            ]
+        ) {
+            VStack(spacing: AppSpacing.lg) {
+                PhotoTile(image: result, size: 120)
+                Button("Crop a photo") {
+                    cropping = GalleryCropSample(image: GalleryCropSample.picture())
+                }
+                .dsButton()
+            }
+            .fullScreenCover(item: $cropping) { sample in
+                SquareImageCropper(image: sample.image) { cropped in
+                    result = cropped
+                    cropping = nil
+                } onCancel: {
+                    cropping = nil
+                }
+            }
+        } controls: {
+            EmptyView()
+        }
+    }
+}
+
+/// A picture to crop: a 4:3 gallery photo drawn as an image.
+struct GalleryCropSample: Identifiable {
+    let id = UUID()
+    let image: UIImage
+
+    @MainActor
+    static func picture() -> UIImage {
+        let renderer = ImageRenderer(
+            content: GalleryPhotoView(photo: GalleryPhoto.samples[0]).frame(width: 400, height: 300)
+        )
+        renderer.scale = 2
+        return renderer.uiImage ?? UIImage()
     }
 }
 

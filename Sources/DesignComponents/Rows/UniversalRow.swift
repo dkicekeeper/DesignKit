@@ -247,19 +247,25 @@ public struct RowConfiguration: Sendable {
     public let horizontalPadding: CGFloat
     public let backgroundColor: Color
     public let cornerRadius: CGFloat
+    /// A row of a system `List` (8.5.0): the list draws a navigation row's chevron. Every
+    /// other row draws its own. 8.0.0 told the two apart by `horizontalPadding == 0`, which
+    /// `.standard` has too since then, so the rows of a card lost their chevron.
+    public let isListRow: Bool
 
     public init(
         spacing: CGFloat,
         verticalPadding: CGFloat,
         horizontalPadding: CGFloat,
         backgroundColor: Color,
-        cornerRadius: CGFloat
+        cornerRadius: CGFloat,
+        isListRow: Bool = false
     ) {
         self.spacing = spacing
         self.verticalPadding = verticalPadding
         self.horizontalPadding = horizontalPadding
         self.backgroundColor = backgroundColor
         self.cornerRadius = cornerRadius
+        self.isListRow = isListRow
     }
 
     // MARK: - Presets
@@ -285,7 +291,8 @@ public struct RowConfiguration: Sendable {
         verticalPadding: AppSpacing.xs,
         horizontalPadding: 0,
         backgroundColor: .clear,
-        cornerRadius: 0
+        cornerRadius: 0,
+        isListRow: true
     )
 
     /// Selectable row — for single-select lists (checkmark pattern).
@@ -333,7 +340,8 @@ public extension View {
         @ViewBuilder destination: () -> Destination
     ) -> some View {
         NavigationLink(destination: destination()) {
-            self
+            // The whole row opens it (8.5.0), not only its text and icon.
+            self.contentShape(Rectangle())
         }
     }
 
@@ -347,7 +355,8 @@ public extension View {
         action: @escaping () -> Void
     ) -> some View {
         Button(role: role, action: action) {
-            self
+            // The whole row is the button (8.5.0), not only its text and icon.
+            self.contentShape(Rectangle())
         }
     }
 

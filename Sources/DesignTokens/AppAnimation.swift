@@ -149,6 +149,8 @@ public struct BounceButtonStyle: ButtonStyle {
 
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
+            // The whole frame takes the tap (8.5.0), not only what is drawn in it.
+            .contentShape(Rectangle())
             .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
             .brightness(configuration.isPressed ? -0.05 : 0.0)
             .animation(AppAnimation.adaptiveSpring, value: configuration.isPressed)

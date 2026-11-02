@@ -57,6 +57,7 @@ public struct CardList<Data: RandomAccessCollection, Card: View>: View where Dat
     let mode: CardListMode
     @Binding var selection: Set<Data.Element.ID>
     let onMove: ((IndexSet, Int) -> Void)?
+    let onOpen: ((Data.Element) -> Void)?
     let card: (Data.Element) -> Card
 
     @State private var dragging: Data.Element.ID?
@@ -65,6 +66,9 @@ public struct CardList<Data: RandomAccessCollection, Card: View>: View where Dat
     ///   - mode: What the list is doing; the app keeps it (`cardListToolbar` switches it).
     ///   - selection: The picked items in `.selecting`.
     ///   - onMove: Moves items as `List`'s `onMove` does; `nil` when the order is fixed.
+    ///   - onOpen: Opens an item (8.5.0): a tap anywhere on its card or row, the card's padding
+    ///     included, calls it while browsing. Without it the item's own button or link takes
+    ///     the taps, and the `.cards` padding around it does nothing.
     ///   - card: An item's content. In `.browsing` it is the item as it is (a `NavigationLink`, a
     ///     context menu); in the other modes the list takes its taps.
     public init(
@@ -73,6 +77,7 @@ public struct CardList<Data: RandomAccessCollection, Card: View>: View where Dat
         mode: CardListMode = .browsing,
         selection: Binding<Set<Data.Element.ID>> = .constant([]),
         onMove: ((IndexSet, Int) -> Void)? = nil,
+        onOpen: ((Data.Element) -> Void)? = nil,
         @ViewBuilder card: @escaping (Data.Element) -> Card
     ) {
         self.data = data
@@ -80,6 +85,7 @@ public struct CardList<Data: RandomAccessCollection, Card: View>: View where Dat
         self.mode = mode
         self._selection = selection
         self.onMove = onMove
+        self.onOpen = onOpen
         self.card = card
     }
 
@@ -90,9 +96,9 @@ public struct CardList<Data: RandomAccessCollection, Card: View>: View where Dat
         case .cards:
             LazyVStack(spacing: AppSpacing.md) {
                 ForEach(data) { item in
-                    entry(item)
-                        .padding(AppSpacing.lg)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    // The padding is inside the item's tap target (8.5.0): the whole card opens
+                    // it, picks it or drags it.
+                    entry(item, inset: AppSpacing.lg)
                         .cardStyle()
                         .modifier(reorderable(item))
                 }
@@ -126,19 +132,29 @@ public struct CardList<Data: RandomAccessCollection, Card: View>: View where Dat
     // MARK: - An item in a mode
 
     @ViewBuilder
-    private func entry(_ item: Data.Element) -> some View {
+    private func entry(_ item: Data.Element, inset: CGFloat = 0) -> some View {
         switch mode {
         case .browsing:
-            card(item)
+            if let onOpen {
+                Button {
+                    onOpen(item)
+                } label: {
+                    padded(card(item), inset: inset)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            } else {
+                padded(card(item), inset: inset)
+            }
         case .selecting:
             let isSelected = selection.contains(item.id)
-            CardListEntry(leading: AppIconSize.lg + AppSpacing.md) {
+            padded(CardListEntry(leading: AppIconSize.lg + AppSpacing.md) {
                 SelectionIndicator(isSelected: isSelected)
             } content: {
                 card(item).allowsHitTesting(false)
             } trailing: {
                 EmptyView()
-            }
+            }, inset: inset)
             .selectableRow(isSelected: isSelected) {
                 HapticManager.selection()
                 if isSelected {
@@ -148,14 +164,26 @@ public struct CardList<Data: RandomAccessCollection, Card: View>: View where Dat
                 }
             }
         case .reordering:
-            CardListEntry(leading: 0) {
+            padded(CardListEntry(leading: 0) {
                 EmptyView()
             } content: {
                 card(item).allowsHitTesting(false)
             } trailing: {
                 Icon("line.3.horizontal", size: AppIconSize.lg)
                     .foregroundStyle(AppColors.Text.tertiary)
-            }
+            }, inset: inset)
+        }
+    }
+
+    /// A `.cards` item's padding inside its card; nothing for the other layouts.
+    @ViewBuilder
+    private func padded<Content: View>(_ content: Content, inset: CGFloat) -> some View {
+        if inset > 0 {
+            content
+                .padding(inset)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            content
         }
     }
 

@@ -26,8 +26,22 @@ enum GalleryLogos {
         Brand(name: "Cloudy", symbol: "cloud.fill", background: Color(red: 0.18, green: 0.44, blue: 0.93), foreground: .white),
     ]
 
+    /// Pictures picked in IconPicker's Photo tab (`DesignKitIconPhotos`), kept for the session.
+    @MainActor static var photos: [String: UIImage] = [:]
+
+    /// The Gallery's `DesignKitIconPhotos.save`: keeps the square and names it "photo:…".
+    @MainActor
+    static func savePhoto(_ image: UIImage) -> IconSource {
+        let key = "photo:\(UUID().uuidString)"
+        photos[key] = image
+        return .brandService(key)
+    }
+
     /// The Gallery's `DesignKitLogoLoader`: a picture for an invented brand, nil for the rest.
     static func load(_ name: String) async -> UIImage? {
+        if name.hasPrefix("photo:") {
+            return await MainActor.run { photos[name] }
+        }
         guard let brand = brands.first(where: { $0.name.caseInsensitiveCompare(name) == .orderedSame }) else {
             return nil
         }

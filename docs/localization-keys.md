@@ -93,6 +93,7 @@ text, not keys. A new key goes there as well.
 | `download.pause` | DownloadRow (default `pauseLabel`, VoiceOver) | `Pause` |
 | `download.start` | DownloadRow (default `downloadLabel`, VoiceOver) | `Download` |
 | `iconPicker.brandDomainHint` | IconPicker (logo search) | `Enter brand domain (e.g. netflix.com)` |
+| `iconPicker.choosePhoto` | IconPicker (the Photo tab's button, 8.5.0) | `Choose photo` |
 | `iconPicker.entertainment` | IconCatalog group title (`IconCatalogGroup.localizedTitle`) | `Entertainment` |
 | `iconPicker.foodAndDrinks` | IconCatalog group title (`IconCatalogGroup.localizedTitle`) | `Food & Drinks` |
 | `iconPicker.frequentlyUsed` | IconPicker | `Frequently Used` |
@@ -113,6 +114,9 @@ text, not keys. A new key goes there as well.
 | `iconPicker.logosTab` | IconPicker | `Logos` |
 | `iconPicker.moneyAndFinance` | IconCatalog group title (`IconCatalogGroup.localizedTitle`) | `Money & Finance` |
 | `iconPicker.onlineSearch` | IconPicker (logo search) | `Online` |
+| `iconPicker.photoFailed` | IconPicker (the Photo tab: a picture it could not use or keep, 8.5.0) | `The picture could not be used. Try another one.` |
+| `iconPicker.photoHint` | IconPicker (the Photo tab, 8.5.0) | `Your own logo from a picture, cropped to a square.` |
+| `iconPicker.photoTab` | IconPicker (the Photo tab, 8.5.0) | `Photo` |
 | `iconPicker.searchIcons` | IconPicker | `Search icons` |
 | `iconPicker.searchOnline` | IconPicker (logos tab) | `Search brand logo...` |
 | `iconPicker.shopping` | IconCatalog group title (`IconCatalogGroup.localizedTitle`) | `Shopping` |
@@ -130,6 +134,9 @@ text, not keys. A new key goes there as well.
 | `iconStyle.tint.monochrome` | IconStyle | — |
 | `iconStyle.tint.original` | IconStyle | — |
 | `iconStyle.tint.palette` | IconStyle | — |
+| `imageCropper.cancel` | SquareImageCropper (VoiceOver, ✕, 8.5.0) | `Cancel` |
+| `imageCropper.choose` | SquareImageCropper (VoiceOver, ✓, 8.5.0) | `Choose` |
+| `imageCropper.title` | SquareImageCropper (8.5.0) | `Move and scale` |
 | `insights.chart.bar` | ChartZoomControls | — |
 | `insights.chart.line` | ChartZoomControls | — |
 | `insights.other` | OrbChart | — |
