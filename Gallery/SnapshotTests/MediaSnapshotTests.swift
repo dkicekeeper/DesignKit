@@ -29,6 +29,14 @@ private struct SamplePhoto: Identifiable {
         SamplePhoto(id: 5, colors: [.yellow, .orange], symbol: "tent.fill"),
     ]
 
+    /// The first photo drawn as a 4:3 picture, for `SquareImageCropper`.
+    @MainActor
+    static func cropSample() -> UIImage {
+        let renderer = ImageRenderer(content: all[0].view.frame(width: 400, height: 300))
+        renderer.scale = 2
+        return renderer.uiImage ?? UIImage()
+    }
+
     var view: some View {
         LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing)
             .overlay {
@@ -50,6 +58,14 @@ extension ComponentSnapshots {
                     PhotoTile(image: nil)
                     PhotoTile(size: 120) { SamplePhoto.all[1].view }
                 }
+            )
+        }
+
+        /// The square crop (8.5.0): a 4:3 picture filling the square, the rest veiled.
+        @Test func squareImageCropper() async {
+            await assertComponentSnapshot(
+                SquareImageCropper(image: SamplePhoto.cropSample()) { _ in } onCancel: {}
+                    .frame(height: 420)
             )
         }
 

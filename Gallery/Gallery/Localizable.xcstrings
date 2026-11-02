@@ -837,6 +837,17 @@
         }
       }
     },
+    "iconPicker.choosePhoto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose photo"
+          }
+        }
+      }
+    },
     "iconPicker.entertainment" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1057,6 +1068,39 @@
         }
       }
     },
+    "iconPicker.photoFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The picture could not be used. Try another one."
+          }
+        }
+      }
+    },
+    "iconPicker.photoHint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your own logo from a picture, cropped to a square."
+          }
+        }
+      }
+    },
+    "iconPicker.photoTab" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo"
+          }
+        }
+      }
+    },
     "iconPicker.searchIcons" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1240,6 +1284,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Palette"
+          }
+        }
+      }
+    },
+    "imageCropper.cancel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "imageCropper.choose" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose"
+          }
+        }
+      }
+    },
+    "imageCropper.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move and scale"
           }
         }
       }

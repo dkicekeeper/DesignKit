@@ -333,7 +333,8 @@ public extension View {
         @ViewBuilder destination: () -> Destination
     ) -> some View {
         NavigationLink(destination: destination()) {
-            self
+            // The whole row opens it (8.5.0), not only its text and icon.
+            self.contentShape(Rectangle())
         }
     }
 
@@ -347,7 +348,8 @@ public extension View {
         action: @escaping () -> Void
     ) -> some View {
         Button(role: role, action: action) {
-            self
+            // The whole row is the button (8.5.0), not only its text and icon.
+            self.contentShape(Rectangle())
         }
     }
 

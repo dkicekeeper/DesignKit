@@ -309,7 +309,7 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
                 guard index != (follow.centerIndex ?? openingCenter) || hadRange else { return }
                 follow.leadingLabel = window.categories[index]
                 follow.follow(index, label: new)
-                follow.settle(at: index)
+                follow.restAfterScroll()
                 withAnimation(motion(AppAnimation.smooth)) { scrollRequest &+= 1 }
                 HapticManager.selection()
                 return
@@ -335,8 +335,6 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
             follow.leadingLabel = nil
             follow.centerIndex = nil
             follow.restingIndex = nil
-            follow.settlingIndex = nil
-            follow.reportedIndex = nil
             follow.window = window
         }
         .onChange(of: cache.labelsKey) { _, newKey in
@@ -449,18 +447,31 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
     // MARK: - Pieces
 
     /// The scroll position: where the window starts when the chart appears, or (following the
-    /// scroll) a binding that turns each new middle period into the banner's, with the scroll
-    /// coming to rest on whole periods.
+    /// scroll, 8.4.3) the period under the ruler read from the scroll's exact offset
+    /// (`onScrollGeometryChange`, the chart's own SwiftUI scroll view), resting on whole
+    /// periods. The binding holds the category at the leading edge as the offset puts it, so a
+    /// redraw that re-applies it moves nothing.
     @ViewBuilder
     private func scrolled<Content: View>(_ content: Content, window: ChartWindow, follows: Bool) -> some View {
         if follows {
             content
                 .chartScrollableAxes(.horizontal)
-                .chartScrollTargetBehavior(ChartPeriodSnap(visibleCount: window.visibleCount, follow: follow))
+                .chartScrollTargetBehavior(ChartPeriodSnap(
+                    categories: window.categories.count,
+                    visibleCount: window.visibleCount
+                ))
                 .chartScrollPosition(x: Binding(
                     get: { follow.leadingLabel ?? window.leadingLabel },
-                    set: { leading in followScroll(to: leading) }
+                    set: { leading in follow.leadingLabel = follow.exactLeadingLabel ?? leading }
                 ))
+                .onScrollGeometryChange(for: ChartScrollSpot.self) { geometry in
+                    ChartScrollSpot(offset: geometry.contentOffset.x, contentWidth: geometry.contentSize.width)
+                } action: { _, spot in
+                    followScroll(spot)
+                }
+                .onScrollPhaseChange { _, phase in
+                    if phase == .idle { follow.rest() }
+                }
         } else {
             content
                 .chartScrollableAxes(.horizontal)
@@ -468,19 +479,22 @@ struct TrendChartFrame<Point: ChartPoint, Plot: View>: View {
         }
     }
 
-    /// The window moved: the period in its middle goes to the banner, with a tick. Nothing
-    /// the chart reads changes, so the chart is not redrawn under the finger.
-    private func followScroll(to leading: String) {
-        guard leading != follow.leadingLabel else { return }
-        follow.leadingLabel = leading
-        guard range == nil, rawRange == nil,
-              let window = follow.window,
-              let reported = window.centerIndex(leadingLabel: leading, labelToIndex: cache.labelToIndex) else { return }
-        let index = follow.report(reported)
-        guard index != follow.centerIndex, cache.labels.indices.contains(index) else { return }
-        follow.follow(index, label: cache.labels[index])
+    /// The scroll moved: the period under the ruler, from the exact offset, goes to the banner
+    /// with a tick. Nothing the chart reads changes, so the chart is not redrawn under the
+    /// finger; the marks follow once the scroll rests.
+    private func followScroll(_ spot: ChartScrollSpot) {
+        guard let window = follow.window else { return }
+        let place = window.place(of: spot)
+        follow.exactLeadingLabel = place.leadingLabel
+        if let leading = place.leadingLabel { follow.leadingLabel = leading }
+        guard range == nil, rawRange == nil, let index = place.centerIndex,
+              cache.labels.indices.contains(index) else { return }
         follow.restAfterScroll()
-        HapticManager.selection()
+        guard index != follow.centerIndex else { return }
+        // The first offset is where the window opened: no tick for it.
+        let moved = follow.centerIndex != nil
+        follow.follow(index, label: cache.labels[index])
+        if moved { HapticManager.selection() }
     }
 
     /// The ruler following the scroll: a finger's, in the series' colour at the period under
@@ -595,70 +609,29 @@ final class ChartFollowState {
     var restingIndex: Int?
     @ObservationIgnored private var restTask: Task<Void, Never>?
 
-    /// The period the scroll is coming to rest on (8.4.2): the snap's target when a drag ends
-    /// (`ChartPeriodSnap`), the period a tap brings to the ruler. At rest the window's leading
-    /// edge sits exactly between two categories, and Swift Charts reports the one before it, so
-    /// the leading label put the period before the ruler's in the banner and on the marks (the
-    /// owner's check of build 64; measured on the simulator, the snap itself rests every bar
-    /// centred under the ruler). Until the scroll has arrived, that report reads as this period.
-    @ObservationIgnored var settlingIndex: Int?
-    /// The point the last reported leading label put under the ruler, before `report(_:)`
-    /// resolves it.
-    @ObservationIgnored var reportedIndex: Int?
-    /// A label was reported since the settle began: the rest waits for one at arrival.
-    @ObservationIgnored private var reportedWhileSettling = false
+    /// The category at the leading edge as the scroll's exact offset puts it (8.4.3). Swift
+    /// Charts reports, at rest, the category before it (the edge sits exactly between two), and
+    /// a redraw re-applied that report: the chart slid back a period (the owner's checks of
+    /// builds 64 and 65). The binding stores this instead.
+    @ObservationIgnored var exactLeadingLabel: String?
 
-    /// The scroll will rest with `index` under the ruler.
-    func settle(at index: Int) {
-        settlingIndex = index
-        reportedWhileSettling = false
-        if let reported = reportedIndex, reported == index - 1 {
-            show(index)
-        }
-        restAfterScroll()
+    /// The scroll came to rest (`ScrollPhase.idle`): the period under the ruler becomes the
+    /// marks' selection now.
+    func rest() {
+        restTask?.cancel()
+        guard restingIndex != centerIndex, centerIndex != nil else { return }
+        restingIndex = centerIndex
     }
 
-    /// A leading label Swift Charts reported, as the point under the ruler: while the scroll
-    /// settles on a known period, the one before it is that period.
-    func report(_ reported: Int) -> Int {
-        reportedIndex = reported
-        reportedWhileSettling = true
-        guard let target = settlingIndex, reported == target - 1 else { return reported }
-        return target
-    }
-
-    /// Puts point `index` in the banner.
-    private func show(_ index: Int) {
-        guard centerIndex != index, let label = window?.label(at: index) else { return }
-        follow(index, label: label)
-    }
-
-    /// The snap's target at the end of a drag, as the window's leading category.
-    func settle(atLeading leading: Int) {
-        guard let window, let index = window.pointIndex(atLeading: leading) else { return }
-        settle(at: index)
-    }
-
-    /// The scroll moved: once it has been still for `ChartMetrics.followRestDelay` (past the
-    /// snap to a whole period), the period under the ruler becomes the marks' selection: the
-    /// period it settles on when that is known. The settle ends at a rest once a report shows
-    /// the scroll arrived (that period or the one before it), or when none came (a short snap,
-    /// a tap's scroll); a rest in a long deceleration keeps it, so the report at arrival still
-    /// resolves.
+    /// The scroll moved: once it has been still for `ChartMetrics.followRestDelay`, the period
+    /// under the ruler becomes the marks' selection (when no `.idle` phase comes, as for a tap's
+    /// scroll).
     func restAfterScroll() {
         restTask?.cancel()
         restTask = Task { @MainActor [weak self] in
             try? await Task.sleep(for: ChartMetrics.followRestDelay)
             guard !Task.isCancelled, let self else { return }
-            if let target = self.settlingIndex {
-                self.show(target)
-                let arrived = self.reportedIndex.map { $0 == target || $0 == target - 1 } ?? true
-                if arrived || !self.reportedWhileSettling {
-                    self.settlingIndex = nil
-                }
-            }
-            guard self.restingIndex != self.centerIndex else { return }
-            self.restingIndex = self.centerIndex
+            self.rest()
         }
     }
 }
@@ -691,24 +664,27 @@ struct TrendChartIdentity: Hashable {
 }
 
 /// Following the scroll, the chart comes to rest with a period in the middle of the window,
-/// under the ruler: the scroll stops on whole periods (8.3.0). The window shows `visibleCount`
-/// periods across the plot, so a period is the plot's width over that.
+/// under the ruler: the scroll stops on whole periods (8.3.0). A period is the scroll's content
+/// over its categories (8.4.3; Swift Charts' own grid, measured on the simulator: 955 pt over
+/// 34 categories, a hair off the plot's width over the window).
 struct ChartPeriodSnap: ChartScrollTargetBehavior {
+    let categories: Int
     let visibleCount: Int
-    /// Told where the scroll rests (8.4.2): Swift Charts' own report at rest is a period early.
-    let follow: ChartFollowState
 
     func updateTarget(_ target: inout ScrollTarget, context: ChartScrollTargetBehaviorContext) {
-        let period = context.containerSize.width / CGFloat(max(visibleCount, 1))
+        let period = categories > 0
+            ? context.contentSize.width / CGFloat(categories)
+            : context.containerSize.width / CGFloat(max(visibleCount, 1))
         guard period > 0 else { return }
         let end = max(context.contentSize.width - context.containerSize.width, 0)
-        let x = min(max((target.rect.minX / period).rounded() * period, 0), end)
-        target.rect.origin.x = x
-        let leading = Int((x / period).rounded())
-        Task { @MainActor [follow] in
-            follow.settle(atLeading: leading)
-        }
+        target.rect.origin.x = min(max((target.rect.minX / period).rounded() * period, 0), end)
     }
+}
+
+/// The scroll of a chart that follows the ruler, as `onScrollGeometryChange` reads it.
+struct ChartScrollSpot: Equatable {
+    let offset: CGFloat
+    let contentWidth: CGFloat
 }
 
 /// Where a chart's window was centred.

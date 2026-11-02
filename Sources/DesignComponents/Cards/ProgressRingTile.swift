@@ -94,6 +94,9 @@ public struct ProgressRingTile: View {
                 // tiles without a ring lines up with their neighbours.
                 .frame(height: AppIconSize.Tile.xxl)
             }
+            // The whole tile takes the tap (8.5.0): the gap between the name and the circle,
+            // the corners of the ring's square.
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])

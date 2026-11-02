@@ -16,6 +16,48 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.5.0 - 2026-11-02
+
+The owner's check of Tenra 1.8 build 65: the period under a chart's ruler read from the scroll itself, a picture of one's own as an icon, and taps that reach the whole row or card.
+
+### Added
+
+- `SquareImageCropper(image:outputSize:onCrop:onCancel:)`: crops a picture to a square for an icon. A finger moves it, two fingers zoom it (never smaller than the square, up to six times), the page outside the square is veiled; Choose returns the square at `outputSize` pixels. `SquareImageCropper.downsampled(_:maxPixelSize:)` reads a big photo upright at 2048 px, `crop(_:square:scale:offset:outputSize:)` is the pure crop.
+- `DesignKitIconPhotos.save` and `.isPhoto`: a host hook. When the app keeps pictures, `IconPicker` gets a Photo tab (the photo library, then `SquareImageCropper`, then `save`, which returns the icon that shows the square); a picture picked before opens on that tab. Without the hook nothing changes.
+- `CardList(onOpen:)`: opens an item from a tap anywhere on its card or row, the `.cards` padding included.
+- Strings: `iconPicker.photoTab`, `iconPicker.photoHint`, `iconPicker.photoFailed`, `iconPicker.choosePhoto`, `imageCropper.title`, `imageCropper.cancel`, `imageCropper.choose`.
+
+### Changed
+
+- A chart with `followsScroll` reads the period under the ruler from the scroll's exact offset (`onScrollGeometryChange` on the chart's scroll view), and the selection follows once the scroll is idle (`onScrollPhaseChange`). The scroll position binding holds the category at the leading edge as the offset puts it. In 8.4.2, at rest Swift Charts reported the category before the edge, and a redraw re-applied that report, so the chart slid back a period after it stopped. The snap counts a period as the content over its categories, Swift Charts' own grid.
+- The whole row or card takes the tap, not only its text and icons: `UniversalRow` rows with `.navigation`, `.picker` and `.action`, `.actionRow`, `.navigationRow`, `AmountRow`, `ProgressRingTile`, and every `.bounce` button. In `CardList(.cards)` the padding is inside the item's tap target while selecting and reordering, and while browsing with `onOpen`.
+
+### Fixed
+
+- The 8.4.2 settle on the snap's target (`ChartFollowState.settle`, `report`) is gone with the exact offset.
+
+### Migration
+
+Optional, to make whole cards open a `CardList(.cards)` item:
+
+```swift
+// Before: the card's padding took no taps
+CardList(accounts, mode: mode, selection: $selection, onMove: move) { account in
+    Button { open(account) } label: { AccountContent(account) }
+}
+// After
+CardList(accounts, mode: mode, selection: $selection, onMove: move, onOpen: open) { account in
+    AccountContent(account)
+}
+```
+
+To offer pictures in `IconPicker`, set `DesignKitIconPhotos.save` (keep the square, return its `IconSource`) and `isPhoto`, and add the seven strings.
+
+### Gallery and tooling
+
+- A `SquareImageCropper` page in Media & Identity; the Gallery keeps the pictures picked in IconPicker's Photo tab for the session.
+- Unit tests: `SquareImageCropperTests` (the crop), `ChartWindowPlaceTests` (the period under the ruler from an offset, with the numbers measured on the simulator).
+
 ## 8.4.2 - 2026-10-31
 
 The scroll that follows a ruler after the owner's third check on a device: the period selected at rest is the one under the ruler.

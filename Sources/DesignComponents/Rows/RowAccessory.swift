@@ -335,7 +335,8 @@ struct RowControlView: View {
     @ViewBuilder
     private func navigationRow(value: String?, destination: @escaping @MainActor () -> AnyView) -> some View {
         if isInList {
-            // The list adds the chevron after the row.
+            // The list adds the chevron after the row. The whole row opens it (8.5.0), not only
+            // its text and icon.
             NavigationLink {
                 destination()
             } label: {
@@ -344,6 +345,7 @@ struct RowControlView: View {
                         valueText(value, font: AppTypography.bodySmall)
                     }
                 }
+                .contentShape(Rectangle())
             }
         } else {
             NavigationLink {

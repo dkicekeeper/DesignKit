@@ -4,12 +4,14 @@
 //
 //  Picks an icon: an SF Symbol from the catalog (grouped, with a search across eleven
 //  languages), or a brand logo from the host's catalog (DesignKitLogoCatalog) or any
-//  domain typed in. A sheet with its own navigation bar; picking closes it. Ported from
+//  domain typed in, or (8.5.0) the person's own picture cropped to a square, when the app keeps
+//  pictures (DesignKitIconPhotos). A sheet with its own navigation bar; picking closes it. Ported from
 //  Tenra's IconPickerView: the symbol catalog moved here with it (IconCatalog), the brand
 //  list stays in the app behind the hook.
 //
 
 import SwiftUI
+import PhotosUI
 import DesignTokens
 import DesignSupport
 
@@ -29,17 +31,19 @@ public struct IconPicker: View {
     @State private var mode: Mode = .icons
 
     enum Mode: Hashable, CaseIterable {
-        case icons, logos
+        case icons, logos, photo
 
         var title: String {
             switch self {
             case .icons: return String(localized: "iconPicker.iconsTab", defaultValue: "Icons")
             case .logos: return String(localized: "iconPicker.logosTab", defaultValue: "Logos")
+            case .photo: return String(localized: "iconPicker.photoTab", defaultValue: "Photo")
             }
         }
     }
 
-    /// - Parameter allowsLogos: The logos tab, when the app has set `DesignKitLogoCatalog`.
+    /// - Parameter allowsLogos: The logos tab, when the app has set `DesignKitLogoCatalog`, and
+    ///   the photo tab, when it has set `DesignKitIconPhotos.save` (8.5.0).
     public init(selection: Binding<IconSource?>, allowsLogos: Bool = true) {
         self._selection = selection
         self.allowsLogos = allowsLogos
@@ -47,6 +51,20 @@ public struct IconPicker: View {
 
     private var showsLogos: Bool {
         allowsLogos && !DesignKitLogoCatalog.sections().isEmpty
+    }
+
+    private var showsPhoto: Bool {
+        allowsLogos && DesignKitIconPhotos.save != nil
+    }
+
+    private var modes: [Mode] {
+        Mode.allCases.filter { mode in
+            switch mode {
+            case .icons: return true
+            case .logos: return showsLogos
+            case .photo: return showsPhoto
+            }
+        }
     }
 
     public var body: some View {
@@ -57,17 +75,19 @@ public struct IconPicker: View {
                     IconPickerSymbolsTab(selection: $selection)
                 case .logos:
                     IconPickerLogosTab(selection: $selection)
+                case .photo:
+                    IconPickerPhotoTab(selection: $selection)
                 }
             }
             // The soft edge under the tabs and the navigation bar, named (5.1.0): built with
             // Xcode 27 the style as it comes is hard (docs/gotchas.md).
             .scrollEdgeEffectStyle(.soft, for: .top)
             .safeAreaBar(edge: .top) {
-                if showsLogos {
+                if modes.count > 1 {
                     SegmentedPicker(
                         title: "",
                         selection: $mode,
-                        options: Mode.allCases.map { (label: $0.title, value: $0) }
+                        options: modes.map { (label: $0.title, value: $0) }
                     )
                     .screenPadding()
                     .padding(.vertical, AppSpacing.md)
@@ -89,6 +109,10 @@ public struct IconPicker: View {
             }
         }
         .softScrollEdges()
+        .onAppear {
+            // A picture the person picked before opens on its tab.
+            if let selection, showsPhoto, DesignKitIconPhotos.isPhoto(selection) { mode = .photo }
+        }
     }
 }
 
@@ -290,5 +314,112 @@ private struct IconPickerLogosTab: View {
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+}
+
+// MARK: - Photo
+
+/// The person's own picture (8.5.0): pick one from the library, crop it to a square
+/// (`SquareImageCropper`), the app keeps it (`DesignKitIconPhotos.save`).
+private struct IconPickerPhotoTab: View {
+    @Binding var selection: IconSource?
+    @Environment(\.dismiss) private var dismiss
+    @State private var item: PhotosPickerItem?
+    @State private var picked: PickedPhoto?
+    @State private var isWorking = false
+    @State private var failed = false
+
+    private struct PickedPhoto: Identifiable {
+        let id = UUID()
+        let image: UIImage
+    }
+
+    private var currentPhoto: IconSource? {
+        selection.flatMap { DesignKitIconPhotos.isPhoto($0) ? $0 : nil }
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: AppSpacing.xl) {
+                if let currentPhoto {
+                    Icon(source: currentPhoto, size: AppIconSize.Tile.xxl)
+                        .frame(width: AppIconSize.Tile.xxl, height: AppIconSize.Tile.xxl)
+                        .clipShape(.rect(cornerRadius: AppRadius.lg))
+                } else {
+                    Icon("photo.on.rectangle", size: AppIconSize.Tile.lg, tint: .monochrome(AppColors.Text.secondary))
+                }
+                Text(String(localized: "iconPicker.photoHint", defaultValue: "Your own logo from a picture, cropped to a square."))
+                    .font(AppTypography.body)
+                    .foregroundStyle(AppColors.Text.secondary)
+                    .multilineTextAlignment(.center)
+                if failed {
+                    Text(String(localized: "iconPicker.photoFailed", defaultValue: "The picture could not be used. Try another one."))
+                        .font(AppTypography.bodySmall)
+                        .foregroundStyle(AppColors.destructive)
+                        .multilineTextAlignment(.center)
+                }
+                PhotosPicker(selection: $item, matching: .images) {
+                    Group {
+                        if isWorking {
+                            ProgressView()
+                        } else {
+                            Text(String(localized: "iconPicker.choosePhoto", defaultValue: "Choose photo"))
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .dsButton(disabled: isWorking)
+                .disabled(isWorking)
+            }
+            .screenPadding()
+            .padding(.vertical, AppSpacing.xxl)
+        }
+        .onChange(of: item) { _, newItem in
+            guard let newItem else { return }
+            load(newItem)
+        }
+        .fullScreenCover(item: $picked) { photo in
+            SquareImageCropper(image: photo.image) { cropped in
+                keep(cropped)
+            } onCancel: {
+                picked = nil
+                item = nil
+            }
+        }
+    }
+
+    private func load(_ newItem: PhotosPickerItem) {
+        isWorking = true
+        failed = false
+        Task {
+            let data = try? await newItem.loadTransferable(type: Data.self)
+            let image = await Task.detached(priority: .userInitiated) {
+                data.flatMap { SquareImageCropper.downsampled($0) }
+            }.value
+            isWorking = false
+            if let image {
+                picked = PickedPhoto(image: image)
+            } else {
+                failed = true
+                item = nil
+            }
+        }
+    }
+
+    private func keep(_ cropped: UIImage) {
+        picked = nil
+        item = nil
+        isWorking = true
+        Task {
+            let source = await DesignKitIconPhotos.save?(cropped)
+            isWorking = false
+            if let source {
+                HapticManager.selection()
+                selection = source
+                dismiss()
+            } else {
+                failed = true
+            }
+        }
     }
 }

@@ -335,19 +335,23 @@ struct ChartWindow {
         label.hasPrefix("\u{2063}chart-padding-")
     }
 
-    /// The point in the middle of a window whose leading category is `leading` (a window that
-    /// follows the scroll); nil past the points.
-    func pointIndex(atLeading leading: Int) -> Int? {
-        let middle = leading + visibleCount / 2
-        guard categories.indices.contains(middle), !Self.isPadding(categories[middle]) else { return nil }
-        return middle - leadingPadding
-    }
-
-    /// The label of point `index`; nil past the points.
-    func label(at index: Int) -> String? {
-        let category = index + leadingPadding
-        guard index >= 0, categories.indices.contains(category), !Self.isPadding(categories[category]) else { return nil }
-        return categories[category]
+    /// Where a window that follows the scroll stands (8.4.3), from the scroll's exact offset:
+    /// the point under the ruler in its middle (nil past the points), and the category at its
+    /// leading edge as the binding should hold it.
+    ///
+    /// A period is the content over the categories. The ruler is the window's middle, inside
+    /// category `offset / period + visibleCount / 2` rounded down, which is the point
+    /// `round(offset / period)` with the leading padding. The leading category is the one the
+    /// edge is in, half a point of slack included: at rest the edge sits on a boundary, where
+    /// Swift Charts reports the category before.
+    func place(of spot: ChartScrollSpot) -> (centerIndex: Int?, leadingLabel: String?) {
+        guard !categories.isEmpty, spot.contentWidth > 0 else { return (nil, nil) }
+        let period = spot.contentWidth / CGFloat(categories.count)
+        let last = categories.count - 1
+        let leading = min(max(Int(((spot.offset + 0.5) / period).rounded(.down)), 0), last)
+        let middle = min(max(Int((spot.offset / period).rounded()) + visibleCount / 2, 0), last)
+        let center = Self.isPadding(categories[middle]) ? nil : middle - leadingPadding
+        return (center, categories[leading])
     }
 }
 

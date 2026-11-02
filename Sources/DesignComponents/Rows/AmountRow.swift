@@ -188,16 +188,21 @@ public struct AmountRow: View {
     }
 
     public var body: some View {
-        switch style {
-        case .list:
-            listRow
-        case .info:
-            if dynamicTypeSize.isAccessibilitySize {
-                stackedInfoRow
-            } else {
-                infoRow
+        Group {
+            switch style {
+            case .list:
+                listRow
+            case .info:
+                if dynamicTypeSize.isAccessibilitySize {
+                    stackedInfoRow
+                } else {
+                    infoRow
+                }
             }
         }
+        // In an app's button the whole row takes the tap (8.5.0), the space between the name
+        // and the amount too.
+        .contentShape(Rectangle())
     }
 
     // MARK: - List style (BalanceRow, ProgressRingRow before 2.1)

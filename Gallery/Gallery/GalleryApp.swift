@@ -42,6 +42,12 @@ struct GalleryApp: App {
         // Invented brands with logos drawn on the fly (GalleryLogos), for PackedCircleIcons and
         // Icon; any other name has none.
         DesignKitLogoLoader.loader = { await GalleryLogos.load($0) }
+        // IconPicker's Photo tab (8.5.0): the squares picked stay for the session.
+        DesignKitIconPhotos.save = { await GalleryLogos.savePhoto($0) }
+        DesignKitIconPhotos.isPhoto = { source in
+            if case .brandService(let key) = source { return key.hasPrefix("photo:") }
+            return false
+        }
         // Stand-in photos for RemotePhoto (GalleryPhotos): held ones show at once, the others
         // arrive after a moment, as from the network.
         GalleryPhotos.install()
