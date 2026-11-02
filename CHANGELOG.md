@@ -25,11 +25,13 @@ The owner's check of Tenra 1.8 build 65: the period under a chart's ruler read f
 - `SquareImageCropper(image:outputSize:onCrop:onCancel:)`: crops a picture to a square for an icon. A finger moves it, two fingers zoom it (never smaller than the square, up to six times), the page outside the square is veiled; Choose returns the square at `outputSize` pixels. `SquareImageCropper.downsampled(_:maxPixelSize:)` reads a big photo upright at 2048 px, `crop(_:square:scale:offset:outputSize:)` is the pure crop.
 - `DesignKitIconPhotos.save` and `.isPhoto`: a host hook. When the app keeps pictures, `IconPicker` gets a Photo tab (the photo library, then `SquareImageCropper`, then `save`, which returns the icon that shows the square); a picture picked before opens on that tab. Without the hook nothing changes.
 - `CardList(onOpen:)`: opens an item from a tap anywhere on its card or row, the `.cards` padding included.
+- `RowConfiguration(isListRow:)` (default `false`; `.settings` sets it): a row of a system `List`, which draws a navigation row's chevron.
 - Strings: `iconPicker.photoTab`, `iconPicker.photoHint`, `iconPicker.photoFailed`, `iconPicker.choosePhoto`, `imageCropper.title`, `imageCropper.cancel`, `imageCropper.choose`.
 
 ### Changed
 
 - A chart with `followsScroll` reads the period under the ruler from the scroll's exact offset (`onScrollGeometryChange` on the chart's scroll view), and the selection follows once the scroll is idle (`onScrollPhaseChange`). The scroll position binding holds the category at the leading edge as the offset puts it. In 8.4.2, at rest Swift Charts reported the category before the edge, and a redraw re-applied that report, so the chart slid back a period after it stopped. The snap counts a period as the content over its categories, Swift Charts' own grid.
+- A `UniversalRow` with `.navigation` or `.picker` in a card (`FormSection`, `CardList`) draws its chevron again, after its value, as documented since 7.0.0. 8.0.0 told a `List` row from a card's by `horizontalPadding == 0`, which `.standard` also has since then, so every card row lost its chevron and took the List's smaller value font (the owner's call, Tenra build 65). Only `.settings` rows leave the chevron to the List.
 - The whole row or card takes the tap, not only its text and icons: `UniversalRow` rows with `.navigation`, `.picker` and `.action`, `.actionRow`, `.navigationRow`, `AmountRow`, `ProgressRingTile`, and every `.bounce` button. In `CardList(.cards)` the padding is inside the item's tap target while selecting and reordering, and while browsing with `onOpen`.
 
 ### Fixed

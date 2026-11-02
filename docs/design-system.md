@@ -531,7 +531,8 @@ FormSection {
 | no accessory, `titleColor: AppColors.accent` | the label of a `PhotosPicker`, a `ShareLink` (the init is `nonisolated`) | `ActionRowLabel` |
 
 `config:` is `.standard` (a `FormSection` or `CardList` card, the default; 8.0.0: 16 pt above and
-below, none at the sides, a 56 pt row), `.settings` (a `List`, which pads
+below, none at the sides, a 56 pt row; its `.navigation` and `.picker` rows draw their own
+chevron, again since 8.5.0), `.settings` (a `List`, `isListRow`, which pads
 the row and draws a navigation chevron) or `.info` (a detail inside a padded container). A
 disabled row (`.disabled(true)`) greys its title and icon. `UniversalRow(_:leadingIcon:…)` takes
 any icon (a logo, a coloured tile). The twelve rows it replaced are gone in 7.0.0
