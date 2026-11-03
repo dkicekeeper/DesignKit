@@ -5,7 +5,7 @@
 //  One entry of a schedule (payments, instalments, sessions): a done / not-done mark, a title
 //  and a date, an amount and an optional detail line. Entries not done yet are dimmed.
 //  Like every row it owns its vertical padding (the `.info` preset's) and none horizontally:
-//  the container insets it.
+//  the container insets it. In a `FormSection` its divider starts at the title (8.6.0).
 //  Ported from Tenra's AmortizationScheduleRow; the mapping from a loan's amortization entry
 //  (number, date format, interest copy) stays in Tenra as an adapter.
 //
@@ -50,6 +50,9 @@ public struct ScheduleRow: View {
         self.isDone = isDone
     }
 
+    /// Where the title starts: the mark and the space after it.
+    static let dividerInset = AppIconSize.lg + AppSpacing.md
+
     public var body: some View {
         HStack(alignment: .top, spacing: AppSpacing.md) {
             Icon(isDone ? "checkmark.circle.fill" : "circle", size: AppIconSize.lg, scalesWithText: false)
@@ -82,6 +85,8 @@ public struct ScheduleRow: View {
         .padding(.vertical, RowConfiguration.info.verticalPadding)
         .futureTransactionStyle(isFuture: !isDone)
         .accessibilityElement(children: .combine)
+        // In a `FormSection` the divider under it starts at its title, after the mark (8.6.0).
+        .rowDividerInset(Self.dividerInset)
     }
 }
 
@@ -104,5 +109,6 @@ public struct ScheduleRowSkeleton: View {
         .shimmer()
         .padding(.vertical, RowConfiguration.info.verticalPadding)
         .skeletonLoadingLabel()
+        .rowDividerInset(ScheduleRow.dividerInset)
     }
 }

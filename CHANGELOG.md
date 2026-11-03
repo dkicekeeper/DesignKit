@@ -27,6 +27,7 @@ One vertical rhythm for every row of a card (the owner's call, Tenra's row audit
 - `TransactionRow` and `TransactionRowSkeleton` pad 12 pt (`AppSpacing.md`; 8 before).
 - `ChecklistRow` and `ChecklistRowSkeleton` pad 12 pt by default (8 since 8.1.0).
 - `FormSection`'s header stands 12 pt above its card (8 before). The footer stays 12 pt under it.
+- `ScheduleRow` and `TransactionRow` (and their skeletons) say where their text starts (`rowDividerInset`): in a `FormSection` the divider under them starts after the mark or the 44 pt icon, not at the card's padding.
 - docs/design-system.md §10: a list of rows in a card hand-built is `spacing: 0` with a `RowDivider` between rows and the card padded only at the sides; spacing rows `AppSpacing.sm` without dividers is no longer a pattern.
 
 ### Migration
