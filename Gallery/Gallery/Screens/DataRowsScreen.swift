@@ -479,7 +479,7 @@ private struct ChecklistRowPage: View {
             apps: [.dalada],
             canvas: .fill,
             notes: [
-                "A row of a glass section (8.1.0): it pads itself 8 pt above and below (verticalPadding), and the divider under it starts at its title, after the circle. verticalPadding: 0 in a stack that spaces its rows or a List.",
+                "A row of a glass section (8.1.0): it pads itself 12 pt above and below (verticalPadding), and the divider under it starts at its title, after the circle. verticalPadding: 0 in a stack that spaces its rows or a List.",
             ]
         ) {
             FormSection {

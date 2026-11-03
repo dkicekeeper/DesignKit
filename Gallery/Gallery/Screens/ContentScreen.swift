@@ -190,7 +190,7 @@ private struct FormSectionPage: View {
             apps: [.tenra, .dalada],
             canvas: .fill,
             notes: [
-                "Rows pad themselves only vertically (UniversalRow .standard, 16 pt: a 56 pt row); the card pads them 16 pt at the sides (docs/design-system.md §10).",
+                "Rows pad themselves only vertically (UniversalRow .standard, 12 pt: a 48 pt row); the card pads them 16 pt at the sides, and the header stands 12 pt above it (docs/design-system.md §10).",
                 "No Divider between rows: the section draws a RowDivider under the upper row's text, 16 pt short of the card's edge. A custom row with something before its text says where with .rowDividerInset(_:).",
                 "One row: a menu in a one-row section is the case iOS 26 once collapsed into its popover on glass. Tap it on a device (TestFlight) to check the menu opens from the row.",
             ]

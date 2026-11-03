@@ -161,7 +161,7 @@ public struct TransactionRow: View {
                 }
             }
         }
-        .padding(.vertical, AppSpacing.sm)
+        .padding(.vertical, AppSpacing.md)
         .futureTransactionStyle(isFuture: isPending)
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
@@ -318,7 +318,7 @@ public struct TransactionRowSkeleton: View {
             Spacer()
             SkeletonText(AppTypography.body, width: 80)
         }
-        .padding(.vertical, AppSpacing.sm)
+        .padding(.vertical, AppSpacing.md)
         .shimmer()
         .skeletonLoadingLabel()
     }

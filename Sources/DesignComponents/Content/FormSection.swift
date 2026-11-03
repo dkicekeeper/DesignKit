@@ -18,8 +18,9 @@ import DesignSupport
 /// A titled group of rows on a Liquid Glass card (8.0.0: one look for forms, settings and
 /// short lists).
 ///
-/// The card pads its rows at the sides (`AppSpacing.lg`); the rows pad themselves only
-/// vertically (`UniversalRow`'s `.standard`, docs/design-system.md §10). Between two rows the
+/// The header stands 12 pt above the card (8.6.0). The card pads its rows at the sides
+/// (`AppSpacing.lg`); the rows pad themselves only vertically, 12 pt (`UniversalRow`'s
+/// `.standard`, docs/design-system.md §10). Between two rows the
 /// section draws a `RowDivider` under the upper row's text, short of the card's trailing edge
 /// by its padding; a custom row with something before its text says where with
 /// `.rowDividerInset(_:)`. A row that scrolls under the card's edges (chips with their inset)
@@ -49,7 +50,9 @@ public struct FormSection<Content: View>: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+        // 12 pt between the header and the card, and between the card and the footer (8.6.0;
+        // the header stood 8 pt above the card before).
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
             // Header; an empty one is left out (5.0.0).
             if let header, !header.isEmpty {
                 HStack {
@@ -73,7 +76,6 @@ public struct FormSection<Content: View>: View {
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.Text.secondary)
                     .padding(.horizontal, AppSpacing.lg)
-                    .padding(.top, AppSpacing.xs)
             }
         }
     }

@@ -271,13 +271,14 @@ public struct RowConfiguration: Sendable {
     // MARK: - Presets
 
     /// Standard form row (default)
-    /// V: 16pt / H: 0 (8.0.0; 12 / 16 before): the row pads only vertically, its card pads it
-    /// at the sides (`FormSection`, `CardList`, a `cardStyle()` card with padding), as
-    /// docs/design-system.md §10 says. A row is 56 pt with a 24 pt icon.
+    /// V: 12pt / H: 0 (8.6.0: one vertical padding for every row of a card; 16 in 8.0.0, 12 / 16
+    /// before): the row pads only vertically, its card pads it at the sides (`FormSection`,
+    /// `CardList`, a `cardStyle()` card padded at the sides), as docs/design-system.md §10 says.
+    /// A row is 48 pt with a 24 pt icon.
     /// Used for: the rows of a `FormSection` card (`UniversalRow`'s default).
     public static let standard = RowConfiguration(
         spacing: AppSpacing.md,
-        verticalPadding: AppSpacing.lg,
+        verticalPadding: AppSpacing.md,
         horizontalPadding: 0,
         backgroundColor: .clear,
         cornerRadius: 0
@@ -318,12 +319,13 @@ public struct RowConfiguration: Sendable {
         cornerRadius: 0
     )
 
-    /// Info row style — display-only component, always inside a padded container.
-    /// V: 8pt / H: 0 — container (detail card VStack with .padding(.lg)) owns horizontal spacing.
+    /// Info row style — display-only component, always inside a container padded at the sides.
+    /// V: 12pt (8.6.0; 8 before) / H: 0 — the container (a `FormSection`, a detail card padded
+    /// `lg` at the sides) owns horizontal spacing. The same height as `.standard`.
     /// Used for a detail row (`accessory: .info`) inside a padded container (a detail card).
     public static let info = RowConfiguration(
         spacing: AppSpacing.md,
-        verticalPadding: AppSpacing.sm,
+        verticalPadding: AppSpacing.md,
         horizontalPadding: 0,
         backgroundColor: .clear,
         cornerRadius: 0

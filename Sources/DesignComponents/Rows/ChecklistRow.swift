@@ -20,7 +20,8 @@ import DesignSupport
 ///              accessoryLabel: "From gear") { … }
 /// ```
 ///
-/// A row of a glass section (8.1.0): it pads itself `AppSpacing.sm` above and below, and the
+/// A row of a glass section (8.1.0): it pads itself `AppSpacing.md` above and below (8.6.0;
+/// `sm` before), as every row of a card does, and the
 /// divider under it starts at its title, after the circle. In a stack that spaces its rows,
 /// or a `List`, pass `verticalPadding: 0` (before 8.1.0 it had no padding of its own).
 public struct ChecklistRow: View {
@@ -39,7 +40,7 @@ public struct ChecklistRow: View {
     ///   - tint: The checked circle.
     ///   - accessorySystemImage: A small mark on the right (where the item came from).
     ///   - accessoryLabel: The mark's VoiceOver label.
-    ///   - verticalPadding: Above and below the row: `AppSpacing.sm` in a glass section, 0 in a
+    ///   - verticalPadding: Above and below the row: `AppSpacing.md` in a glass section, 0 in a
     ///     stack that spaces its rows or a `List`.
     public init(
         _ title: String,
@@ -47,7 +48,7 @@ public struct ChecklistRow: View {
         tint: Color = AppColors.success,
         accessorySystemImage: String? = nil,
         accessoryLabel: String? = nil,
-        verticalPadding: CGFloat = AppSpacing.sm,
+        verticalPadding: CGFloat = AppSpacing.md,
         onToggle: @escaping () -> Void
     ) {
         self.title = title
@@ -193,7 +194,7 @@ enum ChecklistMetrics {
 public struct ChecklistRowSkeleton: View {
     let verticalPadding: CGFloat
 
-    public init(verticalPadding: CGFloat = AppSpacing.sm) {
+    public init(verticalPadding: CGFloat = AppSpacing.md) {
         self.verticalPadding = verticalPadding
     }
 
