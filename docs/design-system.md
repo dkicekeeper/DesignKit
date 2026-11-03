@@ -168,8 +168,8 @@ Circle().fill(AppColors.Palette.teal.color)         // SwiftUI
 |-------|-------|---------|
 | `xxs` | 2 | Minimum micro spacing |
 | `xs` | 4 | Icon-to-text inline gaps |
-| `sm` | 8 | Row vertical padding, small gaps |
-| `md` | 12 | Default VStack/HStack spacing |
+| `sm` | 8 | Small gaps |
+| `md` | 12 | Default VStack/HStack spacing; every row's vertical padding and the gap from a `SectionHeader` to its card (8.6.0) |
 | `lg` | 16 | Screen horizontal padding (`.screenPadding()`), card content padding (`.cardContentPadding()`), between-card spacing |
 | `xl` | 20 | Between major sections |
 | `xxl` | 24 | Between screen sections |
@@ -409,8 +409,9 @@ FormSection(header: "Payment", footer: "Charged on the 17th of every month") {
 ```
 
 - The card is `cardStyle()` (Liquid Glass behind the rows) and pads its rows `lg` at the sides;
-  the rows pad themselves only vertically (`UniversalRow`'s `.standard`, 16 pt: a row is 56 pt
-  with its 24 pt icon, §10).
+  the rows pad themselves only vertically (`UniversalRow`'s `.standard`, 12 pt: a row is 48 pt
+  with its 24 pt icon, §10; 16 pt and 56 pt in 8.0.0 to 8.5.0). The header stands 12 pt above the
+  card, the footer 12 pt under it (8.6.0; the header stood 8 pt above it before).
 - **No `Divider()` between rows** *(8.0.0)*: the section draws a `RowDivider` between each two
   rows, under the upper row's text (after its icon) and 16 pt short of the card's trailing edge,
   as in a list of transactions. `UniversalRow` says where its text starts; a custom row with
@@ -530,8 +531,8 @@ FormSection {
 | `.textField(_:placeholder:keyboard:)` *(8.0.0)* | a value typed on the trailing edge (a bank's name, a rate): an inline `FormTextField`, VoiceOver names it by the title | `UniversalRow { title } trailing: { FormTextField(style: .inline) }` |
 | no accessory, `titleColor: AppColors.accent` | the label of a `PhotosPicker`, a `ShareLink` (the init is `nonisolated`) | `ActionRowLabel` |
 
-`config:` is `.standard` (a `FormSection` or `CardList` card, the default; 8.0.0: 16 pt above and
-below, none at the sides, a 56 pt row; its `.navigation` and `.picker` rows draw their own
+`config:` is `.standard` (a `FormSection` or `CardList` card, the default; 8.6.0: 12 pt above and
+below, none at the sides, a 48 pt row; its `.navigation` and `.picker` rows draw their own
 chevron, again since 8.5.0), `.settings` (a `List`, `isListRow`, which pads
 the row and draws a navigation chevron) or `.info` (a detail inside a padded container). A
 disabled row (`.disabled(true)`) greys its title and icon. `UniversalRow(_:leadingIcon:…)` takes
@@ -573,11 +574,11 @@ UniversalRow(
 
 | Preset | V-Padding | H-Padding | Context |
 |--------|-----------|-----------|---------|
-| `.standard` | 16 | 0 | Form rows in `FormSection` and `CardList` (8.0.0: 56 pt with a 24 pt icon; 12 × 16 before) |
+| `.standard` | 12 | 0 | Form rows in `FormSection` and `CardList` (8.6.0: 48 pt with a 24 pt icon; 16 × 0 in 8.0.0, 12 × 16 before) |
 | `.settings` | 4 | 0 | Settings list rows |
 | `.selectable` | 12 | 16 | Checkmark selection lists |
 | `.sheetList` | 12 | 16 | Modal selection sheets |
-| `.info` | 8 | 0 | Read-only label+value (container owns H-padding) |
+| `.info` | 12 | 0 | Read-only label+value (container owns H-padding; 8 before 8.6.0) |
 
 **Rows built on it** before 7.0.0 (`ToggleSettingsRow`, `ActionSettingsRow`,
 `NavigationSettingsRow`, `MenuPickerRow`, `NavigationPickerRow`, `DatePickerRow`, `StepperRow`,
@@ -621,10 +622,10 @@ Every row in `Views/Components/Rows/` follows these token rules. New rows MUST c
 **Shared row sub-components:** `AmountPercentage` (amount + %), `SpentBudgetText` (spent / budget), `DisclosureChevron`, `NetAmountRow`, `LimitProgressCard`. Reuse before building a new row.
 
 #### `NetAmountRow` *(1.1.0)*
-A label with a net amount (destructive when negative) and "+inflow −outflow" under it, or one amount (`singleValue`, `singleColor`) with no second line. Vertical padding of the `.info` preset (8; `AppSpacing.md` before 1.4.0); separate rows with `Divider()`. Tenra: `PeriodBreakdownRow` (period lists of the insights) is an adapter.
+A label with a net amount (destructive when negative) and "+inflow −outflow" under it, or one amount (`singleValue`, `singleColor`) with no second line. Vertical padding of the `.info` preset (12; 8 from 1.4.0 to 8.5.0); in a card, a `RowDivider` between rows (§10). Tenra: `PeriodBreakdownRow` (period lists of the insights) is an adapter.
 
 #### `ScheduleRow` *(1.1.0)*
-A schedule entry: a checked circle when `isDone` (the row is dimmed with `futureTransactionStyle` when not), title + date subtitle, the amount and an optional detail line under it (`detailColor`, `AppColors.expense` by default). Vertical padding of the `.info` preset (8; none before 1.4.0). Tenra: `AmortizationScheduleRow` (payment number, date format, interest) is an adapter.
+A schedule entry: a checked circle when `isDone` (the row is dimmed with `futureTransactionStyle` when not), title + date subtitle, the amount and an optional detail line under it (`detailColor`, `AppColors.expense` by default). Vertical padding of the `.info` preset (12; 8 from 1.4.0 to 8.5.0, none before). Tenra: `AmortizationScheduleRow` (payment number, date format, interest) is an adapter.
 
 #### `AmountRow` *(2.1.0)*
 A row about money: an icon, a name, and an amount, a share or a limit. It merges four rows that
@@ -2051,7 +2052,7 @@ name in italic without a logo); `.transfer(from:to:)` puts the accounts themselv
 amount's size (body semibold), the target after a turn arrow. A `note` closes it (caption
 secondary). The trailing edge: `amounts`, top to bottom (`FormattedAmountText`): an entry's
 second line is its equivalent at 70%, a transfer's two lines are its legs. `isPending` dims a
-future one (`futureTransactionStyle`). Vertical padding `sm`; `transitionSourceID` /
+future one (`futureTransactionStyle`). Vertical padding `md` (8.6.0; `sm` before); `transitionSourceID` /
 `transitionNamespace` make the icon a zoom source. At accessibility text sizes (3.0.0) the amounts
 go under the text, leading, so the title keeps its width. Tenra: `TransactionCardView` is an adapter.
 
@@ -2916,14 +2917,14 @@ with the iOS 27 SDK — Xcode 27; built with Xcode 26 the gate honours Reduce Mo
 |---|---|---|---|
 | **Card**: has its own surface | Its own: `.padding(AppSpacing.lg)` before `.cardStyle()`, inside the component | — | `TotalsCard`, `LimitProgressCard`, `ComparisonCard`, `CashFlowCard`, `ScoreCard`, `FinanceCard`, `EmptyCard`, `InsightsStatCard`, `SectionHeader(style: .card)` |
 | **Compact surface** | Its own, smaller | — | `MessageBanner` (`md`), `ChartSelectionBanner` (`lg` × `sm`) |
-| **Row**: no surface, lives in a container | Vertical only, from its `RowConfiguration` preset | The container's: a card's `.cardContentPadding()`, `List` / `Form` insets, or `.screenPadding()` | `InfoRow`, `AmountRow` (info style), `NetAmountRow`, `ScheduleRow` (`.info`, 8) |
+| **Row**: no surface, lives in a container | Vertical only, from its `RowConfiguration` preset | The container's: a card's `.cardContentPadding()`, `List` / `Form` insets, or `.screenPadding()` | `InfoRow`, `AmountRow` (info style), `NetAmountRow`, `ScheduleRow`, `TransactionRow` (`.info`, 12) |
 | **List row**: lives only in a `List` | None: the `List`'s row insets give both | `List` | `AmountRow(style: .list)` |
-| **Row in a `FormSection` or a `CardList`** | Vertical only (`.standard`: 16, 8.0.0; 12 × 16 before): the card pads its rows `lg` at the sides | The card's | `UniversalRow` (`config: .standard`, its default since 7.0.0), `FormTextField(style: .row)`, `ItemRow` (12, 8.1.0), `ChecklistRow` (8, 8.1.0), a `CardList(layout: .section)` row |
+| **Row in a `FormSection` or a `CardList`** | Vertical only (`.standard`: 12, 8.6.0; 16 in 8.0.0, 12 × 16 before): the card pads its rows `lg` at the sides | The card's | `UniversalRow` (`config: .standard`, its default since 7.0.0), `FormTextField(style: .row)`, `ItemRow` (12, 8.1.0), `ChecklistRow` (12, 8.6.0; 8 in 8.1.0), a `CardList(layout: .section)` row |
 | **Primitive** | None: the parent places it | — | `Badge`, `TrendBadge`, `FormattedAmountText`, `LinearProgressBar`, charts |
 
 Outer spacing is never a component's: the screen insets with `.screenPadding()` and spaces cards with its stack's `spacing`.
 
-A stack of rows in a card: `FormSection` (8.0.0), which pads them and draws the dividers; by hand, `spacing: 0` with a `RowDivider(inset:)` between rows and `.padding(.horizontal, AppSpacing.lg)` before `.cardStyle()`, or `AppSpacing.sm` without dividers (Tenra's detail list cards). The rows' own vertical padding does the rest.
+A stack of rows in a card: `FormSection` (8.0.0), which pads them and draws the dividers; by hand, `spacing: 0` with a `RowDivider(inset:)` between rows and `.padding(.horizontal, AppSpacing.lg)` before `.cardStyle()`, no vertical padding on the card: the rows' own 12 pt does it, at the card's edges too (8.6.0). A list of rows is never spaced without dividers (`AppSpacing.sm` without them was allowed up to 8.5.0). A header over the card stands 12 pt above it, as `FormSection`'s does.
 
 A section's rows stand back to back, so each needs its own vertical padding: a row that has none (a `List`-era row, a custom `HStack`) has its text on the dividers. Since 8.1.0 `ItemRow` and `ChecklistRow` pad themselves; a custom row pads itself (`.padding(.vertical, AppSpacing.md)`). The apps' `section_rows_lint.py` (CI) fails on a row of a section that does not, and on a link around an icon row without `.rowDividerInset`.
 
@@ -2933,8 +2934,8 @@ A section's rows stand back to back, so each needs its own vertical padding: a r
 
 | Preset | V padding | H padding |
 |--------|-----------|-----------|
-| `.standard` | 16 (8.0.0; 12 before) | 0 (8.0.0; 16 before): the card's |
-| `.info` | 8 | 0 |
+| `.standard` | 12 (8.6.0; 16 in 8.0.0, 12 before) | 0 (8.0.0; 16 before): the card's |
+| `.info` | 12 (8.6.0; 8 before) | 0 |
 | `.selectable` | 12 | 16 |
 | `.sheetList` | 12 | 16 |
 | `.settings` | 4 | 0 |

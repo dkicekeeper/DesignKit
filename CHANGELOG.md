@@ -16,6 +16,24 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.6.0 - 2026-11-03
+
+One vertical rhythm for every row of a card (the owner's call, Tenra's row audit): 12 pt above and below each row, 12 pt from a section's header to its card, a divider between rows everywhere.
+
+### Changed
+
+- `RowConfiguration.standard` pads its row 12 pt above and below (16 since 8.0.0): a form, settings or `CardList(.section)` row with a 24 pt icon is 48 pt (56 before). Every `UniversalRow` in a `FormSection` is shorter.
+- `RowConfiguration.info` pads its row 12 pt (8 before), the same as `.standard`: detail rows (`accessory: .info`, `.amount`), `AmountRow(style: .info)`, `NetAmountRow`, `ScheduleRow` and their skeletons are taller.
+- `TransactionRow` and `TransactionRowSkeleton` pad 12 pt (`AppSpacing.md`; 8 before).
+- `ChecklistRow` and `ChecklistRowSkeleton` pad 12 pt by default (8 since 8.1.0).
+- `FormSection`'s header stands 12 pt above its card (8 before). The footer stays 12 pt under it.
+- `ScheduleRow` and `TransactionRow` (and their skeletons) say where their text starts (`rowDividerInset`): in a `FormSection` the divider under them starts after the mark or the 44 pt icon, not at the card's padding.
+- docs/design-system.md §10: a list of rows in a card hand-built is `spacing: 0` with a `RowDivider` between rows and the card padded only at the sides; spacing rows `AppSpacing.sm` without dividers is no longer a pattern.
+
+### Migration
+
+Nothing to change in code. A card that stacks rows by hand pads itself only at the sides (`.padding(.horizontal, AppSpacing.lg)` before `.cardStyle()`), puts a `RowDivider` between its rows and its header 12 pt above it, so it matches `FormSection`. A row of the app's own in a section pads itself `AppSpacing.md`.
+
 ## 8.5.0 - 2026-11-02
 
 The owner's check of Tenra 1.8 build 65: the period under a chart's ruler read from the scroll itself, a picture of one's own as an icon, and taps that reach the whole row or card.

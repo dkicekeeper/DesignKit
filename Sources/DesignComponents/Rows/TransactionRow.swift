@@ -161,7 +161,9 @@ public struct TransactionRow: View {
                 }
             }
         }
-        .padding(.vertical, AppSpacing.sm)
+        .padding(.vertical, AppSpacing.md)
+        // In a `FormSection` the divider under it starts at its text, after the 44 pt icon (8.6.0).
+        .rowDividerInset(AppIconSize.Tile.sm + AppSpacing.md)
         .futureTransactionStyle(isFuture: isPending)
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
@@ -318,8 +320,9 @@ public struct TransactionRowSkeleton: View {
             Spacer()
             SkeletonText(AppTypography.body, width: 80)
         }
-        .padding(.vertical, AppSpacing.sm)
+        .padding(.vertical, AppSpacing.md)
         .shimmer()
         .skeletonLoadingLabel()
+        .rowDividerInset(AppIconSize.Tile.sm + AppSpacing.md)
     }
 }
