@@ -167,10 +167,13 @@ private struct DateButtonsDatePickerSheet: View {
 public extension View {
     /// Добавляет DateButtons через safeAreaInset, чтобы компонент поднимался вместе с клавиатурой
     /// Используется в формах с текстовыми полями (AccountActionView, EditTransactionView, QuickAddTransactionView)
+    /// `spotlightAnchor` (8.7.0) marks the buttons for a `.spotlight` above this view, for a hint
+    /// that they also save ("pick the day, and it is saved").
     func dateButtonsSafeArea(
         selectedDate: Binding<Date>,
         isDisabled: Bool = false,
         maxDate: Date? = nil,
+        spotlightAnchor: AnyHashable? = nil,
         onSave: @escaping (Date) -> Void
     ) -> some View {
         // The soft edge under the buttons, named (5.1.0): built with Xcode 27 the style as it
@@ -184,7 +187,21 @@ public extension View {
                     maxDate: maxDate,
                     onSave: onSave
                 )
+                .modifier(OptionalSpotlightAnchor(id: spotlightAnchor))
             }
+    }
+}
+
+/// `.spotlightAnchor(id)` when there is an id.
+private struct OptionalSpotlightAnchor: ViewModifier {
+    let id: AnyHashable?
+
+    func body(content: Content) -> some View {
+        if let id {
+            content.spotlightAnchor(id)
+        } else {
+            content
+        }
     }
 }
 

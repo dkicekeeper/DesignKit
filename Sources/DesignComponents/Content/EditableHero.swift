@@ -31,11 +31,14 @@ public struct EditableHero: View {
         public var showsCurrency: Bool
         /// The icon picker's logos tab.
         public var allowsLogos: Bool
+        /// A line under the amount saying what it is ("Starting balance, $"), 8.7.0.
+        public var amountCaption: String?
 
-        public init(showsAmount: Bool = false, showsCurrency: Bool = false, allowsLogos: Bool = true) {
+        public init(showsAmount: Bool = false, showsCurrency: Bool = false, allowsLogos: Bool = true, amountCaption: String? = nil) {
             self.showsAmount = showsAmount
             self.showsCurrency = showsCurrency
             self.allowsLogos = allowsLogos
+            self.amountCaption = amountCaption
         }
 
         /// An amount with its currency (an account, a subscription).
@@ -125,6 +128,13 @@ public struct EditableHero: View {
         VStack(spacing: AppSpacing.sm) {
             AmountInput(amount: $amount, baseFontSize: 48, placeholderColor: AppColors.Text.tertiary)
                 .padding(.horizontal, AppSpacing.lg)
+
+            if let caption = options.amountCaption {
+                Text(caption)
+                    .font(AppTypography.bodySmall)
+                    .foregroundStyle(AppColors.Text.secondary)
+                    .multilineTextAlignment(.center)
+            }
 
             if options.showsCurrency {
                 NavigationLink {

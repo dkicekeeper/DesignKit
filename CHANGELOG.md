@@ -16,9 +16,18 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
-## 8.6.1 - 2026-11-05
+## 8.7.0 - 2026-11-05
 
-Two things a newcomer met in Tenra's first run (its walkthrough of 2026-11-04).
+What a newcomer met in Tenra's first run (its walkthrough of 2026-11-04): hints that let the tap through, a starting balance that says what it is, row hints on the left, current currencies only.
+
+### Added
+
+- `dateButtonsSafeArea(selectedDate:isDisabled:maxDate:spotlightAnchor:onSave:)`: `spotlightAnchor` marks the date buttons for a `.spotlight` above the view, for a one-time hint that picking the day saves.
+- `EditableHero.Options.amountCaption`: a line under the amount saying what it is (Tenra's onboarding: "Starting balance, $").
+
+### Changed
+
+- `UniversalRow`'s hint is always leading-aligned and fills the row's width, whatever the screen around it centres. An onboarding page's centred text centred the hints' second lines.
 
 ### Fixed
 

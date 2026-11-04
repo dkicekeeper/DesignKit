@@ -138,10 +138,13 @@ public struct UniversalRow<Content: View, Trailing: View>: View {
             }
 
             if let hint {
+                // Leading whatever the screen around it centres (an onboarding page did).
                 Text(hint)
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.Text.secondary)
+                    .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.leading, hintLeadingPad)
                     .padding(.bottom, AppSpacing.xxs)
             }
