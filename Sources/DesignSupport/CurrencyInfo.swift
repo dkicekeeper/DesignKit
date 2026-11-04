@@ -34,8 +34,9 @@ public struct CurrencyInfo: Identifiable, Sendable, Equatable {
         var seen = Set<String>()
         var result: [CurrencyInfo] = []
 
-        for isoCurrency in Locale.Currency.isoCurrencies {
-            let code = isoCurrency.identifier
+        // Currencies in use: `Locale.Currency.isoCurrencies` also lists withdrawn ones (the
+        // Austrian schilling, the Deutsche Mark), which nobody keeps an account in.
+        for code in Locale.commonISOCurrencyCodes {
             guard !seen.contains(code) else { continue }
             seen.insert(code)
 

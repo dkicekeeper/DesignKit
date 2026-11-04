@@ -7,8 +7,9 @@
 //  screen. (Material: feature discovery; HIG: TipKit for tips, this for a guided tour.)
 //
 //  Mark views with `.spotlightAnchor(id)`; put `.spotlight($current)` on the screen. Setting
-//  `current` to another id moves the cut-out there; `nil` lifts it. A tap anywhere calls
-//  `onTap` (the next step), or lifts it.
+//  `current` to another id moves the cut-out there; `nil` lifts it. A tap on the dimmed area
+//  calls `onTap` (the next step), or lifts it; a tap in the cut-out reaches the view it lights
+//  (8.6.1).
 //
 //  The cut-out moves on a spring (a fade under Reduce Motion). VoiceOver reads the message and
 //  can dismiss it with the escape gesture.
@@ -92,9 +93,12 @@ private struct SpotlightOverlay<ID: Hashable>: View {
                 .map { proxy[$0].insetBy(dx: -padding, dy: -padding) }
             ZStack(alignment: .topLeading) {
                 if let hole, let current {
+                    // The dimmed area takes a tap (the next step, or lifts it); the cut-out lets
+                    // it through to the view it lights, so "tap the category" opens the category
+                    // instead of only closing the hint.
                     SpotlightShape(hole: hole, cornerRadius: cornerRadius)
                         .fill(Color.black.opacity(SpotlightMetrics.dim), style: FillStyle(eoFill: true))
-                        .contentShape(Rectangle())
+                        .contentShape(SpotlightShape(hole: hole, cornerRadius: cornerRadius), eoFill: true)
                         .onTapGesture { tap() }
                         .transition(.opacity)
                     if let text = message?(current) {

@@ -16,6 +16,19 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.6.1 - 2026-11-05
+
+Two things a newcomer met in Tenra's first run (its walkthrough of 2026-11-04).
+
+### Fixed
+
+- `.spotlight` lets a tap in its cut-out through to the view it lights. A tap on the dimmed area still calls `onTap` or lifts it. Before, the first tap on a lit view only closed the hint: Tenra's "Tap a category to add an expense" opened nothing, and its voice tour's stop orb did not stop on the first tap.
+- `CurrencyInfo.allCurrencies` lists currencies in use only (`Locale.commonISOCurrencyCodes`): withdrawn ones such as the Austrian schilling (ATS) and the Deutsche Mark (DEM) are gone from `CurrencyList` and every currency picker.
+
+### Gallery and tooling
+
+- `CurrencyInfoTests` pins the list: no ATS, DEM or FRF; KZT, USD, EUR, RUB and UZS present.
+
 ## 8.6.0 - 2026-11-03
 
 One vertical rhythm for every row of a card (the owner's call, Tenra's row audit): 12 pt above and below each row, 12 pt from a section's header to its card, a divider between rows everywhere.
