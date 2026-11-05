@@ -43,37 +43,49 @@ public nonisolated struct Formatting {
         return formatCurrencySmart(amount, currency: currency, showDecimalsWhenZero: true)
     }
 
+    /// Puts `symbol` on `number` ("1 234" → "1 234 ₸" or "₸1 234"). `number` carries its own
+    /// minus when `isNegative`; before the number the minus stays first ("-₸1 234").
+    public static func attachSymbol(
+        _ number: String,
+        symbol: String,
+        isNegative: Bool,
+        position: CurrencySymbolPosition
+    ) -> String {
+        switch position {
+        case .after:
+            return "\(number) \(symbol)"
+        case .before:
+            guard isNegative, let first = number.first, first == "-" || first == "\u{2212}" else {
+                return symbol + number
+            }
+            return "-" + symbol + number.dropFirst()
+        }
+    }
+
     /// Форматирует сумму с символом валюты с умной обработкой дробной части
     /// - Parameters:
     ///   - amount: Сумма
     ///   - currency: Код валюты
     ///   - showDecimalsWhenZero: Показывать ли .00 для целых чисел (по умолчанию из конфигурации)
+    ///   - configuration: symbol position, fractions, separators (default: the shared one)
     /// - Returns: Отформатированная строка (например, "1 234" или "1 234.56 ₸")
     public static func formatCurrencySmart(
         _ amount: Double,
         currency: String,
-        showDecimalsWhenZero: Bool = AmountDisplayConfiguration.shared.showDecimalsWhenZero
+        showDecimalsWhenZero: Bool? = nil,
+        configuration: AmountDisplayConfiguration = .shared
     ) -> String {
         let symbol = currencySymbol(for: currency)
-        let hasDecimals = amount.truncatingRemainder(dividingBy: 1) != 0
-
-        // Hot path: use cached formatter; only allocate a new one for the no-decimals variant
-        // (can't mutate the shared cached instance)
-        let numberFormatter: NumberFormatter
-        if !showDecimalsWhenZero && !hasDecimals {
-            let f = AmountDisplayConfiguration.shared.makeNumberFormatter()
-            f.minimumFractionDigits = 0
-            f.maximumFractionDigits = 0
-            numberFormatter = f
-        } else {
-            numberFormatter = AmountDisplayConfiguration.formatter
+        // An explicit `true` forces the fraction; `false` leaves it to `fractions`, which
+        // `.always` would otherwise override (the 1.x parameter only ever hid a zero fraction).
+        var configuration = configuration
+        if showDecimalsWhenZero == false, configuration.fractions == .always {
+            configuration.fractions = .whenPresent
         }
-
-        guard let formattedAmount = numberFormatter.string(from: NSNumber(value: amount)) else {
+        guard let formattedAmount = configuration.formattedNumber(amount, alwaysShowFraction: showDecimalsWhenZero == true) else {
             return String(format: "%.2f %@", amount, symbol)
         }
-
-        return "\(formattedAmount) \(symbol)"
+        return attachSymbol(formattedAmount, symbol: symbol, isNegative: amount < 0, position: configuration.symbolPosition)
     }
 
     // MARK: - Compact (abbreviated) amounts
@@ -95,23 +107,35 @@ public nonisolated struct Formatting {
         _ amount: Double,
         currency: String,
         maxFractionDigits: Int = 1,
-        locale: Locale = .current
+        locale: Locale = .current,
+        configuration: AmountDisplayConfiguration = .shared
     ) -> String {
-        "\(formatCompactNumber(amount, maxFractionDigits: maxFractionDigits, locale: locale)) \(currencySymbol(for: currency))"
+        attachSymbol(
+            formatCompactNumber(amount, maxFractionDigits: maxFractionDigits, locale: locale, configuration: configuration),
+            symbol: currencySymbol(for: currency),
+            isNegative: amount < 0,
+            position: configuration.symbolPosition
+        )
     }
 
     /// The number of `formatCurrencyCompact` without a currency ("1.2M", "1,2 млн"), for a
-    /// caller that puts its own unit after it.
+    /// caller that puts its own unit after it. A decimal separator other than the default
+    /// "." in `configuration` replaces the locale's ("1,2M"); the default leaves the locale's.
     public static func formatCompactNumber(
         _ amount: Double,
         maxFractionDigits: Int = 1,
-        locale: Locale = .current
+        locale: Locale = .current,
+        configuration: AmountDisplayConfiguration = .shared
     ) -> String {
         let style = FloatingPointFormatStyle<Double>
             .number
             .notation(.compactName)
             .precision(.fractionLength(0...max(0, maxFractionDigits)))
             .locale(locale)
-        return amount.formatted(style)
+        let text = amount.formatted(style)
+        let separator = configuration.decimalSeparator
+        guard separator != AmountDisplayConfiguration().decimalSeparator,
+              let localeSeparator = locale.decimalSeparator, localeSeparator != separator else { return text }
+        return text.replacingOccurrences(of: localeSeparator, with: separator)
     }
 }

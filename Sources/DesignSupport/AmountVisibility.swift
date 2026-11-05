@@ -46,9 +46,11 @@ public extension Formatting {
     /// What a hidden amount shows: "••••", then the currency's symbol when one is given
     /// ("•••• ₸"). For an amount the app writes into its own text under `.amountsHidden()`;
     /// `FormattedAmountText` hides itself.
-    static func hiddenAmount(currency: String? = nil) -> String {
+    static func hiddenAmount(currency: String? = nil, configuration: AmountDisplayConfiguration = .shared) -> String {
         let mark = "••••"
         guard let currency, !currency.isEmpty else { return mark }
+        // "₸ ••••" with the symbol before the number.
+        if configuration.symbolPosition == .before { return currencySymbol(for: currency) + " " + mark }
         return mark + " " + currencySymbol(for: currency)
     }
 }

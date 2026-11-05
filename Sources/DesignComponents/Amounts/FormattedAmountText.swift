@@ -161,11 +161,16 @@ public struct FormattedAmountText: View {
         return Text("\(run)\(unitRun)")
     }
 
+    /// The symbol stands before the number only for `.symbol`: a code, an image or no unit
+    /// keep their place after it.
+    private var symbolBefore: Bool {
+        currencyDisplay == .symbol && AmountDisplayConfiguration.shared.symbolPosition == .before
+    }
+
     private var formattedParts: (integer: String, decimal: String, symbol: String) {
         let symbol = Formatting.currencySymbol(for: currency)
-        let numberFormatter = AmountDisplayConfiguration.formatter
-
-        let formatted = numberFormatter.string(from: NSNumber(value: displayAmount)) ?? String(format: "%.2f", displayAmount)
+        let formatted = AmountDisplayConfiguration.shared.formattedNumber(displayAmount, alwaysShowFraction: showDecimalsWhenZero)
+            ?? String(format: "%.2f", displayAmount)
 
         // Разделяем на целую и дробную части
         let components = formatted.split(separator: Character(AmountDisplayConfiguration.shared.decimalSeparator))
@@ -176,12 +181,7 @@ public struct FormattedAmountText: View {
     }
 
     private var shouldShowDecimal: Bool {
-        // Если showDecimalsWhenZero = true, всегда показываем
-        if showDecimalsWhenZero {
-            return true
-        }
-        // Иначе показываем только если есть дробная часть
-        return amount.truncatingRemainder(dividingBy: 1) != 0
+        AmountDisplayConfiguration.shared.showsFraction(for: displayAmount, alwaysShow: showDecimalsWhenZero)
     }
 
     /// Single concatenated `Text` (one layout unit) so `.minimumScaleFactor` / line
@@ -197,7 +197,15 @@ public struct FormattedAmountText: View {
         // run's own font/weight/foregroundStyle, so the decimal run keeps its reduced
         // opacity exactly as before. Still ONE Text — that is what makes
         // `.minimumScaleFactor` scale the whole amount uniformly (see comment above).
-        let integerRun = Text(leadingText + parts.integer)
+        // Symbol before the number: sign, symbol, digits ("-₸1 234"); no unit run after.
+        var integerText = leadingText + parts.integer
+        var unitRun = unitRun
+        if symbolBefore {
+            let negative = parts.integer.hasPrefix("-")
+            integerText = leadingText + (negative ? "-" : "") + parts.symbol + (negative ? String(parts.integer.dropFirst()) : parts.integer)
+            unitRun = nil
+        }
+        let integerRun = Text(integerText)
             .font(numberFont).fontWeight(fontWeight).foregroundStyle(color)
         let decimalRun = Text(AmountDisplayConfiguration.shared.decimalSeparator + parts.decimal)
             .font(numberFont).fontWeight(fontWeight).foregroundStyle(color.opacity(decimalOpacity))
@@ -213,7 +221,9 @@ public struct FormattedAmountText: View {
 
     /// "•••• ₸": the number and sign hidden, the unit kept.
     private var hiddenText: Text {
-        withUnit(Text(verbatim: Formatting.hiddenAmount()).font(numberFont).fontWeight(fontWeight).foregroundStyle(color))
+        symbolBefore
+            ? Text(verbatim: Formatting.hiddenAmount(currency: currency)).font(numberFont).fontWeight(fontWeight).foregroundStyle(color)
+            : withUnit(Text(verbatim: Formatting.hiddenAmount()).font(numberFont).fontWeight(fontWeight).foregroundStyle(color))
     }
 
     // MARK: - Compact variants
@@ -223,8 +233,10 @@ public struct FormattedAmountText: View {
     /// significant figure, not a cents tail.
     private func compactText(digits: Int) -> Text {
         if currencyDisplay == .symbol {
-            // One run, as in 1.x.
-            return Text(leadingText + Formatting.formatCurrencyCompact(displayAmount, currency: currency, maxFractionDigits: digits))
+            // One run, as in 1.x. A symbol before the number follows the sign.
+            let compact = Formatting.formatCurrencyCompact(displayAmount, currency: currency, maxFractionDigits: digits)
+            let text = symbolBefore && compact.hasPrefix("-") ? "-" + leadingText + compact.dropFirst() : leadingText + compact
+            return Text(text)
                 .font(numberFont).fontWeight(fontWeight).foregroundStyle(color)
         }
         return withUnit(
@@ -260,7 +272,7 @@ public struct FormattedAmountText: View {
         case .symbol:
             return leadingText + Formatting.formatCurrencySmart(displayAmount, currency: currency, showDecimalsWhenZero: showDecimalsWhenZero)
         case .code, .systemImage, .numberOnly:
-            let number = AmountDisplayConfiguration.formatter.string(from: NSNumber(value: displayAmount))
+            let number = AmountDisplayConfiguration.shared.formattedNumber(displayAmount, alwaysShowFraction: showDecimalsWhenZero)
                 ?? String(format: "%.2f", displayAmount)
             return leadingText + number + (unitString.map { " " + $0 } ?? "")
         }
