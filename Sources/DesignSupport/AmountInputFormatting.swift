@@ -102,6 +102,63 @@ public enum AmountInputFormatting {
         return result
     }
 
+    /// What the live amount field renders: the text and the character offsets after which
+    /// the view adds a kern gap (a visual group mark that leaves the string stable for
+    /// `.numericText()`).
+    public struct LiveDisplay: Sendable, Equatable {
+        public var text: String
+        public var kernAfter: [Int]
+    }
+
+    /// Builds the live field's text from the raw typed string. A space-like group mark
+    /// (" ", U+00A0, U+202F) stays a kern gap, so the digits animate in place; any other
+    /// mark ("," "." "’") is inserted as text. The decimal mark is the configured one.
+    /// `secondaryGroupingSize` applies to both paths. Zero or empty shows "0".
+    public static func liveDisplay(
+        for rawAmount: String,
+        configuration: AmountDisplayConfiguration = .shared
+    ) -> LiveDisplay {
+        let cleaned = cleanAmountString(rawAmount)
+        if cleaned.isEmpty || cleaned == "-" { return LiveDisplay(text: "0", kernAfter: []) }
+        guard let decimal = Decimal(string: cleaned), decimal != 0 else {
+            return LiveDisplay(text: "0", kernAfter: [])
+        }
+
+        let isNegative = cleaned.hasPrefix("-")
+        let unsigned = isNegative ? String(cleaned.dropFirst()) : cleaned
+        let parts = unsigned.split(separator: ".", maxSplits: 1, omittingEmptySubsequences: false)
+        let digits = Array(parts[0])
+        let fraction = parts.count > 1 ? configuration.decimalSeparator + parts[1] : ""
+
+        let group = configuration.thousandsSeparator
+        let spaceLike = group.allSatisfy { $0 == " " || $0 == "\u{00A0}" || $0 == "\u{202F}" }
+        let secondary = (configuration.secondaryGroupingSize ?? 3) > 0
+            ? (configuration.secondaryGroupingSize ?? 3) : 3
+
+        // Digit indices after which a group boundary falls.
+        var boundaries = Set<Int>()
+        var fromRight = 3
+        while fromRight < digits.count {
+            boundaries.insert(digits.count - fromRight - 1)
+            fromRight += secondary
+        }
+
+        let prefix = isNegative ? "-" : ""
+        if spaceLike {
+            let offset = prefix.count
+            return LiveDisplay(
+                text: prefix + String(digits) + fraction,
+                kernAfter: boundaries.sorted().map { $0 + offset }
+            )
+        }
+        var text = prefix
+        for (i, ch) in digits.enumerated() {
+            text.append(ch)
+            if boundaries.contains(i) { text += group }
+        }
+        return LiveDisplay(text: text + fraction, kernAfter: [])
+    }
+
     /// Cleans text pasted from the clipboard. When it holds the configured decimal mark,
     /// the configured group mark is a grouping and goes first ("1,234.56" → "1234.56");
     /// otherwise the text is cleaned as typed (a lone "," or "." is the decimal point).
