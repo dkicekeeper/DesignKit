@@ -23,7 +23,7 @@ Fixes from the final review of 8.8.0's formats: grouping that no locale can chan
 ### Changed
 
 - With `separatorsOverrideLocale` the number format is the configured one alone: digits group by 3 from 1 000 on in every locale, after the first group by `secondaryGroupingSize` or by 3 when it is `nil`. Before, the device's locale still decided: es_ES, it_IT, pt_PT and pl_PL wrote "1234,56" under 10 000, en_IN kept "12,34,567.80" with no secondary grouping asked.
-- A currency symbol that ends in a letter, placed before the number, is followed by a no-break space: "CHF 1’234.50", "-CHF 1’234.50", "zł 1 234", hidden "CHF ••••". "₸1 234", "$1,234" and "€1.234,56" are unchanged. `Formatting.attachSymbol`, `formatCurrencySmart`, `formatCurrencyCompact`, `hiddenAmount` and `FormattedAmountText` follow it.
+- A currency symbol with a letter in it, placed before the number, is followed by a no-break space: "CHF 1’234.50", "-CHF 1’234.50", "R$ 1.234,56", "US$ 1,234", "лв. 1 234", "S/ 1 234", hidden "CHF ••••". Signs stay glued: "₸1 234", "$1,234", "€1.234,56", "£", "¥", "₹". `Formatting.attachSymbol`, `formatCurrencySmart`, `formatCurrencyCompact`, `hiddenAmount` and `FormattedAmountText` follow it.
 
 ### Fixed
 
@@ -33,7 +33,7 @@ Fixes from the final review of 8.8.0's formats: grouping that no locale can chan
 
 ### Gallery and tooling
 
-- `AmountGroupingTests` (grouping under es_ES, it_IT, pt_PT, pl_PL and en_IN, with and without the override), `AmountDisplayConcurrencyTests` (concurrent readers and writers of `shared` and of a store, the cached whole-number formatter) and new cases in `AmountDisplayOptionsTests` (`attachSymbol`, `hiddenAmount` before the number, the empty separator).
+- `AmountGroupingTests` (grouping under es_ES, it_IT, pt_PT, pl_PL and en_IN, with and without the override), `AmountDisplayConcurrencyTests` (concurrent readers and writers of `shared` and of a store, the cached whole-number formatter) and new cases in `AmountDisplayOptionsTests` (`attachSymbol` with signs and with letters, the Brazilian real, `hiddenAmount` before the number, the empty separator).
 
 ## 8.8.0 - 2026-11-05
 

@@ -197,8 +197,8 @@ public struct FormattedAmountText: View {
         // run's own font/weight/foregroundStyle, so the decimal run keeps its reduced
         // opacity exactly as before. Still ONE Text — that is what makes
         // `.minimumScaleFactor` scale the whole amount uniformly (see comment above).
-        // Symbol before the number: sign, symbol, digits ("-₸1 234", "CHF 1’234"); no unit run
-        // after.
+        // Symbol before the number: sign, symbol, digits ("-₸1 234", "CHF 1’234", "R$ 1.234");
+        // no unit run after.
         var integerText = leadingText + parts.integer
         var unitRun = unitRun
         if symbolBefore {

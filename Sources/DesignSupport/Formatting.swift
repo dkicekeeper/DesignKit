@@ -45,7 +45,8 @@ public nonisolated struct Formatting {
 
     /// Puts `symbol` on `number` ("1 234" → "1 234 ₸" or "₸1 234"). `number` carries its own
     /// minus when `isNegative`; before the number the minus stays first ("-₸1 234"). A symbol
-    /// that ends in a letter keeps a no-break space before the number ("CHF 1’234.50").
+    /// with a letter in it keeps a no-break space before the number ("CHF 1’234.50",
+    /// "R$ 1.234,56").
     public static func attachSymbol(
         _ number: String,
         symbol: String,
@@ -64,11 +65,17 @@ public nonisolated struct Formatting {
         }
     }
 
-    /// `symbol` as it stands before a number: "₸", "$", "€" touch it ("₸1 234"); a symbol that
-    /// ends in a letter is followed by a no-break space ("CHF 1’234.50", "zł 1 234"), else it
-    /// would read as one word with the digits.
+    /// `symbol` as it stands before a number: a sign touches it ("₸1 234", "$1,234", "€1.234,56",
+    /// "£", "¥", "₹"); a symbol with a letter anywhere in it is followed by a no-break space
+    /// ("CHF 1’234.50", "R$ 1.234,56", "US$ 1,234", "лв. 1 234", "S/ 1 234"), as those regions
+    /// write it and so it does not read as one word with the digits.
     static func symbolBeforeNumber(_ symbol: String) -> String {
-        symbol.last?.isLetter == true ? symbol + "\u{00A0}" : symbol
+        symbolHasALetter(symbol) ? symbol + "\u{00A0}" : symbol
+    }
+
+    /// Whether `symbol` has a letter in it ("CHF", "R$", "лв."), not only signs ("₸", "$").
+    static func symbolHasALetter(_ symbol: String) -> Bool {
+        symbol.contains { $0.isLetter }
     }
 
     /// Форматирует сумму с символом валюты с умной обработкой дробной части

@@ -37,6 +37,19 @@ struct AmountDisplayOptionsTests {
         #expect(Formatting.attachSymbol("-1 234", symbol: "₸", isNegative: true, position: .before) == "-₸1 234")
         #expect(Formatting.attachSymbol("\u{2212}1,234", symbol: "$", isNegative: true, position: .before) == "-$1,234")
         #expect(Formatting.attachSymbol("1.234,56", symbol: "€", isNegative: false, position: .before) == "€1.234,56")
+        #expect(Formatting.attachSymbol("1,234", symbol: "₹", isNegative: false, position: .before) == "₹1,234")
+        #expect(Formatting.attachSymbol("1,234", symbol: "£", isNegative: false, position: .before) == "£1,234")
+        #expect(Formatting.attachSymbol("1,234", symbol: "¥", isNegative: false, position: .before) == "¥1,234")
+    }
+
+    /// A symbol with a letter anywhere in it keeps the space too, as each region writes it:
+    /// "R$ 1.234,56" (Brazil), "US$ 1,234", "лв. 1 234", "S/ 1 234" (Peru).
+    @Test func attachSymbolBeforeSpacesASymbolWithALetter() {
+        #expect(Formatting.attachSymbol("1.234,56", symbol: "R$", isNegative: false, position: .before) == "R$\u{00A0}1.234,56")
+        #expect(Formatting.attachSymbol("-1.234,56", symbol: "R$", isNegative: true, position: .before) == "-R$\u{00A0}1.234,56")
+        #expect(Formatting.attachSymbol("1,234", symbol: "US$", isNegative: false, position: .before) == "US$\u{00A0}1,234")
+        #expect(Formatting.attachSymbol("1 234", symbol: "лв.", isNegative: false, position: .before) == "лв.\u{00A0}1 234")
+        #expect(Formatting.attachSymbol("1 234", symbol: "S/", isNegative: false, position: .before) == "S/\u{00A0}1 234")
     }
 
     /// A symbol of letters keeps a no-break space before the number: "CHF 1’234.50", not
@@ -65,6 +78,26 @@ struct AmountDisplayOptionsTests {
         #expect(Formatting.formatCurrencyCompact(
             1_200_000, currency: "CHF", locale: Locale(identifier: "en_US"), configuration: configuration
         ) == "CHF\u{00A0}1.2M")
+    }
+
+    /// Brazil's region puts the symbol first with "." and ",": "R$ 1.234,56", not "R$1.234,56".
+    @Test func brazilianRealBeforeTheNumber() {
+        let brazil: (inout AmountDisplayConfiguration) -> Void = {
+            $0.symbolPosition = .before
+            $0.thousandsSeparator = "."
+            $0.decimalSeparator = ","
+            $0.separatorsOverrideLocale = true
+        }
+        let symbol = Formatting.currencySymbol(for: "BRL")
+        #expect(symbol == "R$")
+        #expect(smart(1234.56, "BRL", brazil) == "R$\u{00A0}1.234,56")
+        #expect(smart(-1234.56, "BRL", brazil) == "-R$\u{00A0}1.234,56")
+        var configuration = AmountDisplayConfiguration()
+        configuration.symbolPosition = .before
+        #expect(Formatting.formatCurrencyCompact(
+            1_200_000, currency: "BRL", locale: Locale(identifier: "en_US"), configuration: configuration
+        ) == "R$\u{00A0}1.2M")
+        #expect(Formatting.hiddenAmount(currency: "BRL", configuration: configuration) == "R$\u{00A0}••••")
     }
 
     @Test func hiddenAmountFollowsTheSymbol() {
