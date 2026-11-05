@@ -16,6 +16,32 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.8.0 - 2026-11-05
+
+Formats a person picks in Tenra's Settings: where the currency symbol stands, when the cents show, how the digits group, which separators the amount field uses, and how a date reads. Every default stays as it was, so an app that sets nothing changes nothing.
+
+### Added
+
+- `AmountDisplayConfiguration.symbolPosition` (`CurrencySymbolPosition`: `.after` by default, `.before` for "₸1 234"; the sign stays first).
+- `AmountDisplayConfiguration.fractions` (`AmountFractions`: `.whenPresent` by default, `.always`, `.never` rounding half up and keeping the cents of an amount under one). `showDecimalsWhenZero` stays as a view of it.
+- `AmountDisplayConfiguration.secondaryGroupingSize`: the size of the groups after the first one ("12,34,567"); `nil` groups every 3 digits.
+- `AmountDisplayConfiguration.separatorsOverrideLocale`: whether the configured decimal and thousands separators also replace the locale's in abbreviated numbers ("1,2 млн") and chart axis labels. `false` by default.
+- `configuration:` on `Formatting.formatCurrencySmart`, `Formatting.formatCurrencyCompact` and `ChartValueFormat.compactString(_:locale:configuration:)`.
+- `AmountInputFormatting.displayAmount(for:configuration:)`, `cleanPastedAmount(_:configuration:)` and `liveDisplay(for:configuration:)`: the amount field shows and accepts the configured separators. A space-like group mark keeps its kern gap in the live field, any other mark is inserted as text.
+- `DesignKitDateFormat.day`: a host hook `(date, includeYear) -> String`. `MonthCalendar`'s week label ("3 нояб. – 9 нояб.") and `DateRangePickerSheet`'s period and boundary fields take their dates from it; with no hook they read as before.
+
+### Changed
+
+- Nothing visible without the new settings: `symbolPosition`, `fractions`, `secondaryGroupingSize`, `separatorsOverrideLocale` and `DesignKitDateFormat.day` default to the previous behaviour.
+
+### Fixed
+
+- Compact amounts swap the configured separators only between digits, so a "K", "M" or currency suffix is never touched.
+
+### Gallery and tooling
+
+- `CalendarWeekStartTests` pins that `MonthCalendar` and `CalendarRange` follow the `Calendar`'s `firstWeekday` (week start, weekday header) and that the date hook reaches the week label.
+
 ## 8.7.0 - 2026-11-05
 
 What a newcomer met in Tenra's first run (its walkthrough of 2026-11-04): hints that let the tap through, a starting balance that says what it is, row hints on the left, current currencies only.

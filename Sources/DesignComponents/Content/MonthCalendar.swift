@@ -308,7 +308,7 @@ public extension MonthCalendar where Accessory == EmptyView {
 
 /// Header texts. Fixed formats (not templates) so the strip reads "1 Jun – 7 Jun" and the
 /// month "June 2026" / "Июнь 2026" in every locale, as Tenra showed them.
-private enum CalendarText {
+enum CalendarText {
     private static let monthYearFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "LLLL yyyy"
@@ -328,6 +328,9 @@ private enum CalendarText {
     static func weekRange(_ week: CalendarPeriod, calendar: Calendar) -> String {
         let start = week.interval.start
         let end = calendar.date(byAdding: .day, value: 6, to: start) ?? start
+        if let hook = DesignKitDateFormat.day {
+            return "\(hook(start, false)) – \(hook(end, false))"
+        }
         return "\(dayMonthFormatter.string(from: start)) – \(dayMonthFormatter.string(from: end))"
     }
 }

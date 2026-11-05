@@ -164,7 +164,8 @@ private struct DateRangeSummary: View {
                 Text(verbatim: title)
                     .font(AppTypography.caption)
                     .foregroundStyle(isEditing ? AppColors.accent : AppColors.Text.secondary)
-                Text(verbatim: date.formatted(.dateTime.day().month(.abbreviated).year().locale(locale)))
+                Text(verbatim: DesignKitDateFormat.day?(date, true)
+                    ?? date.formatted(.dateTime.day().month(.abbreviated).year().locale(locale)))
                     .font(AppTypography.bodyEmphasis)
                     .foregroundStyle(AppColors.Text.primary)
                     .contentTransition(.numericText())
@@ -182,6 +183,10 @@ private struct DateRangeSummary: View {
 
     /// "Sep 12 – Oct 3, 2026", or one day.
     private var periodText: String {
+        if let hook = DesignKitDateFormat.day {
+            if range.lowerBound == range.upperBound { return hook(range.lowerBound, true) }
+            return "\(hook(range.lowerBound, true)) – \(hook(range.upperBound, true))"
+        }
         let style = Date.IntervalFormatStyle(date: .abbreviated, time: .omitted, locale: locale, calendar: calendar)
         if range.lowerBound == range.upperBound {
             return range.lowerBound.formatted(.dateTime.day().month(.abbreviated).year().locale(locale))

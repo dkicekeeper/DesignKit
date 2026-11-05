@@ -73,6 +73,7 @@ DesignKit ships no networking, persistence or FX. A host app wires these once, i
 | `DesignKitPhotoLoader.loader` / `.cached` *(3.1.0)* | `nil` → `RemotePhoto` downloads the URL itself and keeps nothing; nothing held | Photos `RemotePhoto` shows by key and URL: `loader` loads (the app's cache, then the network), `cached` returns a photo the app already holds, so it shows at once with no skeleton. `@MainActor`. Dalada: its `PhotoCache`, keyed by storage path. |
 | `DesignKitCurrencyConverter.convert` | `nil` → nothing rendered | FX for `ConvertedAmount` / `HeroSection(showBaseConversion:)` / `CurrencyAmountInput`. |
 | `DesignKitCurrencyConverter.convertSync` *(1.10.0)* | `nil` → `convert` is asked | Instant conversion from cached rates, so `CurrencyAmountInput` shows "≈ …" while the user types, and at once when the currencies change (1.14.0). |
+| `DesignKitDateFormat.day` *(8.8.0)* | `nil` → the locale's own dates | How a day reads: `(date, includeYear) -> String` ("3 ноября 2026", "03.11.2026", "2026-11-03"). `MonthCalendar`'s week label (no year) and `DateRangePickerSheet`'s period and boundary fields (year) use it. The first day of the week is the `Calendar` the app passes (`CalendarRange(calendar:)`); Tenra's Settings › Formats sets both. |
 | `DesignKitLogoCatalog.sections` / `.search` / `.domainSuffixes` *(1.10.0)* | no sections → no logos tab; `["com"]` | The brands `IconPicker` offers (titled sections of domain + name), its search, and the domains tried for a typed name (Tenra: `["com", "kz"]`). |
 | Localization keys | raw key shown | Components resolve `String(localized:)` in the **host app's** main bundle. The full key list is in [localization-keys.md](localization-keys.md). |
 
@@ -2794,6 +2795,10 @@ For signed deltas ("+1 200 ₸" / "−500 ₸"):
 - DO NOT compose with `String(format: "%@%@", "+", Formatting.formatCurrency(...))`.
 
 For income/expense `+`/`−` styling in transaction lists, pass the sign as `prefix:` and the colour as `color:` to `FormattedAmountText` (Tenra resolves both from the transaction type with its `TransactionDisplayHelper`).
+
+#### Display configuration *(8.8.0)*
+
+`AmountDisplayConfiguration.shared` carries what a person can set: `symbolPosition` (`.after` / `.before`), `fractions` (`.whenPresent` / `.always` / `.never`), `secondaryGroupingSize` (Indian "12,34,567"), the separators and `separatorsOverrideLocale` (the configured separators also in "1,2 M" and chart axes). The formatters (`FormattedAmountText`, `Formatting.formatCurrencySmart` / `formatCurrencyCompact`, `ChartValueFormat.compactString`) take an optional `configuration:` and default to `.shared`; the amount field reads it through `AmountInputFormatting.displayAmount` / `cleanPastedAmount` / `liveDisplay` (`configuration:`). Defaults reproduce the earlier output. Dates have their own hook, `DesignKitDateFormat.day` (§0.1).
 
 ### Currency Symbols
 
