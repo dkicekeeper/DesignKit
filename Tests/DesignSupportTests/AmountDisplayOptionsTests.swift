@@ -67,13 +67,27 @@ struct AmountDisplayOptionsTests {
     @Test func compactKeepsTheConfiguredPointInACommaLocale() {
         let russian = Locale(identifier: "ru_RU")
         var configuration = AmountDisplayConfiguration()
-        let native = Formatting.formatCurrencyCompact(1_200_000, currency: "KZT", locale: russian, configuration: configuration)
-        #expect(native.contains(","))
+        #expect(Formatting.formatCurrencyCompact(1_200_000, currency: "KZT", locale: russian, configuration: configuration)
+                == "1,2\u{00A0}млн ₸")
         configuration.separatorsOverrideLocale = true
         configuration.decimalSeparator = "."
-        let overridden = Formatting.formatCurrencyCompact(1_200_000, currency: "KZT", locale: russian, configuration: configuration)
-        #expect(overridden.contains("1.2"))
-        #expect(!overridden.contains(","))
+        configuration.thousandsSeparator = ","
+        // The locale's no-break space before the unit word is not a thousands separator.
+        #expect(Formatting.formatCurrencyCompact(1_200_000, currency: "KZT", locale: russian, configuration: configuration)
+                == "1.2\u{00A0}млн ₸")
+    }
+
+    @Test func configuredSeparatorsSwapOnlyInsideTheNumber() {
+        // The system writes no grouping in compact output ("1234T"), so the grouping branch
+        // is pinned on a hand-made string.
+        var configuration = AmountDisplayConfiguration()
+        configuration.separatorsOverrideLocale = true
+        configuration.decimalSeparator = ","
+        configuration.thousandsSeparator = "."
+        let text = Formatting.applyConfiguredSeparators(
+            "1,234.5 T, x", locale: Locale(identifier: "en_US"), configuration: configuration
+        )
+        #expect(text == "1.234,5 T, x")
     }
 
     @Test func showDecimalsWhenZeroMapsToFractions() {

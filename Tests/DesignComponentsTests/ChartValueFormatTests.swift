@@ -27,6 +27,17 @@ struct ChartValueFormatTests {
         let text = ChartValueFormat.compactString(
             1_200_000, locale: Locale(identifier: "en_US"), configuration: configuration
         )
-        #expect(text.contains("1,2"))
+        #expect(text == "1,2M")
+    }
+
+    @Test func keepsTheLocalesSpaceBeforeTheUnitWord() {
+        var configuration = AmountDisplayConfiguration()
+        configuration.separatorsOverrideLocale = true
+        configuration.decimalSeparator = "."
+        configuration.thousandsSeparator = ","
+        let text = ChartValueFormat.compactString(
+            1_200_000, locale: Locale(identifier: "ru_RU"), configuration: configuration
+        )
+        #expect(text == "1.2\u{00A0}млн")
     }
 }

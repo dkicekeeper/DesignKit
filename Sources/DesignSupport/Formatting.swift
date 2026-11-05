@@ -145,18 +145,26 @@ public nonisolated struct Formatting {
         guard configuration.separatorsOverrideLocale else { return text }
         let decimal = locale.decimalSeparator ?? "."
         let grouping = locale.groupingSeparator ?? ","
-        // One pass, so "," -> "." and "." -> "," do not undo each other.
+        // One pass, so "," -> "." and "." -> "," do not undo each other. A separator is swapped
+        // only between two digits: the locale's grouping space can also stand between the
+        // number and its unit word ("1,2 млн"), and that one is not a thousands separator.
+        let pairs = [(decimal, configuration.decimalSeparator), (grouping, configuration.thousandsSeparator)]
         var result = ""
         var index = text.startIndex
         while index < text.endIndex {
-            let rest = text[index...]
-            if rest.hasPrefix(decimal) {
-                result += configuration.decimalSeparator
-                index = text.index(index, offsetBy: decimal.count)
-            } else if rest.hasPrefix(grouping) {
-                result += configuration.thousandsSeparator
-                index = text.index(index, offsetBy: grouping.count)
-            } else {
+            let previousIsDigit = index > text.startIndex && text[text.index(before: index)].isNumber
+            var swapped = false
+            if previousIsDigit {
+                for (localeSeparator, configured) in pairs where text[index...].hasPrefix(localeSeparator) {
+                    let next = text.index(index, offsetBy: localeSeparator.count)
+                    guard next < text.endIndex, text[next].isNumber else { continue }
+                    result += configured
+                    index = next
+                    swapped = true
+                    break
+                }
+            }
+            if !swapped {
                 result.append(text[index])
                 index = text.index(after: index)
             }
