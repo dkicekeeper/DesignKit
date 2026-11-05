@@ -119,8 +119,8 @@ public nonisolated struct Formatting {
     }
 
     /// The number of `formatCurrencyCompact` without a currency ("1.2M", "1,2 млн"), for a
-    /// caller that puts its own unit after it. A decimal separator other than the default
-    /// "." in `configuration` replaces the locale's ("1,2M"); the default leaves the locale's.
+    /// caller that puts its own unit after it. With `configuration.separatorsOverrideLocale`
+    /// the configured separators replace the locale's ("1,2M"); otherwise the locale's stay.
     public static func formatCompactNumber(
         _ amount: Double,
         maxFractionDigits: Int = 1,
@@ -132,10 +132,35 @@ public nonisolated struct Formatting {
             .notation(.compactName)
             .precision(.fractionLength(0...max(0, maxFractionDigits)))
             .locale(locale)
-        let text = amount.formatted(style)
-        let separator = configuration.decimalSeparator
-        guard separator != AmountDisplayConfiguration().decimalSeparator,
-              let localeSeparator = locale.decimalSeparator, localeSeparator != separator else { return text }
-        return text.replacingOccurrences(of: localeSeparator, with: separator)
+        return applyConfiguredSeparators(amount.formatted(style), locale: locale, configuration: configuration)
+    }
+
+    /// `text`, a number formatted in `locale`, with the locale's decimal and grouping
+    /// separators swapped for the configured ones when `separatorsOverrideLocale` is on.
+    public static func applyConfiguredSeparators(
+        _ text: String,
+        locale: Locale,
+        configuration: AmountDisplayConfiguration = .shared
+    ) -> String {
+        guard configuration.separatorsOverrideLocale else { return text }
+        let decimal = locale.decimalSeparator ?? "."
+        let grouping = locale.groupingSeparator ?? ","
+        // One pass, so "," -> "." and "." -> "," do not undo each other.
+        var result = ""
+        var index = text.startIndex
+        while index < text.endIndex {
+            let rest = text[index...]
+            if rest.hasPrefix(decimal) {
+                result += configuration.decimalSeparator
+                index = text.index(index, offsetBy: decimal.count)
+            } else if rest.hasPrefix(grouping) {
+                result += configuration.thousandsSeparator
+                index = text.index(index, offsetBy: grouping.count)
+            } else {
+                result.append(text[index])
+                index = text.index(after: index)
+            }
+        }
+        return result
     }
 }

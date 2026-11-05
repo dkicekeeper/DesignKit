@@ -336,8 +336,17 @@ public enum ChartValueFormat {
     /// 1_500 → "1.5K", 500 → "500", -30_000 → "-30K"; in Russian "1,5 млн", "75 тыс.".
     /// 8.3.0: before, the thousands were rounded to whole numbers (1 500 → "2K", so the axis
     /// could show the wrong value) and every language read "K" and "M".
-    public static func compactString(_ value: Double) -> String {
-        value.formatted(.number.notation(.compactName))
+    /// With `configuration.separatorsOverrideLocale` the configured separators replace the locale's.
+    public static func compactString(
+        _ value: Double,
+        locale: Locale = .current,
+        configuration: AmountDisplayConfiguration = .shared
+    ) -> String {
+        Formatting.applyConfiguredSeparators(
+            value.formatted(.number.notation(.compactName).locale(locale)),
+            locale: locale,
+            configuration: configuration
+        )
     }
 
     /// Plain text of a value, for VoiceOver.

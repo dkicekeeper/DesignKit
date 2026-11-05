@@ -35,6 +35,11 @@ public struct AmountDisplayConfiguration: Equatable {
     /// When the fraction shows.
     public var fractions: AmountFractions = .whenPresent
 
+    /// Whether the configured decimal and thousands separators also replace the locale's in
+    /// abbreviated numbers ("1,2 млн", chart axis labels). `false` (default) keeps the
+    /// locale's; an app that lets the person pick separators sets `true`.
+    public var separatorsOverrideLocale: Bool = false
+
     /// Size of the groups after the first one ("12,34,567"); `nil` groups every 3 digits.
     public var secondaryGroupingSize: Int? = nil
 

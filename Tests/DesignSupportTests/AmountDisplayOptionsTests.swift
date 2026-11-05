@@ -55,12 +55,25 @@ struct AmountDisplayOptionsTests {
 
     @Test func compactFollowsSeparatorAndSymbol() {
         var configuration = AmountDisplayConfiguration()
+        configuration.separatorsOverrideLocale = true
         configuration.decimalSeparator = ","
         configuration.symbolPosition = .before
         let result = Formatting.formatCurrencyCompact(
             1_200_000, currency: "USD", locale: Locale(identifier: "en_US"), configuration: configuration
         )
         #expect(result == "$1,2M")
+    }
+
+    @Test func compactKeepsTheConfiguredPointInACommaLocale() {
+        let russian = Locale(identifier: "ru_RU")
+        var configuration = AmountDisplayConfiguration()
+        let native = Formatting.formatCurrencyCompact(1_200_000, currency: "KZT", locale: russian, configuration: configuration)
+        #expect(native.contains(","))
+        configuration.separatorsOverrideLocale = true
+        configuration.decimalSeparator = "."
+        let overridden = Formatting.formatCurrencyCompact(1_200_000, currency: "KZT", locale: russian, configuration: configuration)
+        #expect(overridden.contains("1.2"))
+        #expect(!overridden.contains(","))
     }
 
     @Test func showDecimalsWhenZeroMapsToFractions() {
