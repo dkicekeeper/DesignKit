@@ -49,8 +49,12 @@ public extension Formatting {
     static func hiddenAmount(currency: String? = nil, configuration: AmountDisplayConfiguration = .shared) -> String {
         let mark = "••••"
         guard let currency, !currency.isEmpty else { return mark }
-        // "₸ ••••" with the symbol before the number.
-        if configuration.symbolPosition == .before { return currencySymbol(for: currency) + " " + mark }
+        // "₸ ••••" with the symbol before the number; a symbol of letters keeps a no-break
+        // space, as before a number ("CHF ••••").
+        if configuration.symbolPosition == .before {
+            let symbol = currencySymbol(for: currency)
+            return symbol.last?.isLetter == true ? symbolBeforeNumber(symbol) + mark : symbol + " " + mark
+        }
         return mark + " " + currencySymbol(for: currency)
     }
 }

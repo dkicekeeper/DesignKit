@@ -32,6 +32,63 @@ struct AmountDisplayOptionsTests {
         #expect(smart(-1234) { $0.symbolPosition = .before } == "-₸1 234")
     }
 
+    @Test func attachSymbolBeforeGluesASignSymbol() {
+        #expect(Formatting.attachSymbol("1 234", symbol: "₸", isNegative: false, position: .before) == "₸1 234")
+        #expect(Formatting.attachSymbol("-1 234", symbol: "₸", isNegative: true, position: .before) == "-₸1 234")
+        #expect(Formatting.attachSymbol("\u{2212}1,234", symbol: "$", isNegative: true, position: .before) == "-$1,234")
+        #expect(Formatting.attachSymbol("1.234,56", symbol: "€", isNegative: false, position: .before) == "€1.234,56")
+    }
+
+    /// A symbol of letters keeps a no-break space before the number: "CHF 1’234.50", not
+    /// "CHF1’234.50".
+    @Test func attachSymbolBeforeSpacesALetterSymbol() {
+        #expect(Formatting.attachSymbol("1’234.50", symbol: "CHF", isNegative: false, position: .before) == "CHF\u{00A0}1’234.50")
+        #expect(Formatting.attachSymbol("-1’234.50", symbol: "CHF", isNegative: true, position: .before) == "-CHF\u{00A0}1’234.50")
+        #expect(Formatting.attachSymbol("1 234", symbol: "zł", isNegative: false, position: .before) == "zł\u{00A0}1 234")
+        #expect(Formatting.attachSymbol("1 234", symbol: "сом", isNegative: false, position: .before) == "сом\u{00A0}1 234")
+    }
+
+    @Test func attachSymbolAfterIsUnchanged() {
+        #expect(Formatting.attachSymbol("1 234", symbol: "₸", isNegative: false, position: .after) == "1 234 ₸")
+        #expect(Formatting.attachSymbol("-1’234.50", symbol: "CHF", isNegative: true, position: .after) == "-1’234.50 CHF")
+    }
+
+    @Test func letterSymbolBeforeInFormattedAmounts() {
+        let swiss: (inout AmountDisplayConfiguration) -> Void = {
+            $0.symbolPosition = .before
+            $0.thousandsSeparator = "’"
+        }
+        #expect(smart(1234.5, "CHF", swiss) == "CHF\u{00A0}1’234.50")
+        #expect(smart(-1234.5, "CHF", swiss) == "-CHF\u{00A0}1’234.50")
+        var configuration = AmountDisplayConfiguration()
+        configuration.symbolPosition = .before
+        #expect(Formatting.formatCurrencyCompact(
+            1_200_000, currency: "CHF", locale: Locale(identifier: "en_US"), configuration: configuration
+        ) == "CHF\u{00A0}1.2M")
+    }
+
+    @Test func hiddenAmountFollowsTheSymbol() {
+        var before = AmountDisplayConfiguration()
+        before.symbolPosition = .before
+        #expect(Formatting.hiddenAmount(currency: "KZT", configuration: before) == "₸ ••••")
+        #expect(Formatting.hiddenAmount(currency: "CHF", configuration: before) == "CHF\u{00A0}••••")
+        #expect(Formatting.hiddenAmount(currency: nil, configuration: before) == "••••")
+        let after = AmountDisplayConfiguration()
+        #expect(Formatting.hiddenAmount(currency: "KZT", configuration: after) == "•••• ₸")
+        #expect(Formatting.hiddenAmount(currency: "CHF", configuration: after) == "•••• CHF")
+    }
+
+    /// A locale with no grouping mark (or no decimal mark) has nothing to swap: the text comes
+    /// back as it is instead of looping on an empty prefix.
+    @Test func emptyLocaleSeparatorIsSkipped() {
+        var configuration = AmountDisplayConfiguration()
+        configuration.separatorsOverrideLocale = true
+        configuration.decimalSeparator = ","
+        configuration.thousandsSeparator = ""
+        #expect(Formatting.applyConfiguredSeparators("1234.5M", decimal: ".", grouping: "", configuration: configuration) == "1234,5M")
+        #expect(Formatting.applyConfiguredSeparators("1234M", decimal: "", grouping: "", configuration: configuration) == "1234M")
+    }
+
     @Test func fractionsAlways() {
         #expect(smart(1234) { $0.fractions = .always } == "1 234.00 ₸")
     }

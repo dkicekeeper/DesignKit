@@ -16,6 +16,25 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.8.1 - 2026-11-05
+
+Fixes from the final review of 8.8.0's formats: grouping that no locale can change once an app picks the separators, a shared configuration safe to change while other threads format, and a space after a symbol of letters placed before the number. An app that does not set `separatorsOverrideLocale` keeps its grouping.
+
+### Changed
+
+- With `separatorsOverrideLocale` the number format is the configured one alone: digits group by 3 from 1 000 on in every locale, after the first group by `secondaryGroupingSize` or by 3 when it is `nil`. Before, the device's locale still decided: es_ES, it_IT, pt_PT and pl_PL wrote "1234,56" under 10 000, en_IN kept "12,34,567.80" with no secondary grouping asked.
+- A currency symbol that ends in a letter, placed before the number, is followed by a no-break space: "CHF 1’234.50", "-CHF 1’234.50", "zł 1 234", hidden "CHF ••••". "₸1 234", "$1,234" and "€1.234,56" are unchanged. `Formatting.attachSymbol`, `formatCurrencySmart`, `formatCurrencyCompact`, `hiddenAmount` and `FormattedAmountText` follow it.
+
+### Fixed
+
+- `AmountDisplayConfiguration.shared` and its cached formatters sit behind one lock: a read returns a copy, a write replaces the value and drops the formatters. Writing it on the main thread while another thread formatted could release the cached `NumberFormatter` in use (a data race the Thread Sanitizer reports). A formatter handed out is never changed afterwards.
+- The whole-number formatter (`fractions: .never`, a round amount) is cached by configuration like the other one, instead of built on every call.
+- `Formatting.applyConfiguredSeparators` skips a locale separator that is empty instead of looping on it.
+
+### Gallery and tooling
+
+- `AmountGroupingTests` (grouping under es_ES, it_IT, pt_PT, pl_PL and en_IN, with and without the override), `AmountDisplayConcurrencyTests` (concurrent readers and writers of `shared` and of a store, the cached whole-number formatter) and new cases in `AmountDisplayOptionsTests` (`attachSymbol`, `hiddenAmount` before the number, the empty separator).
+
 ## 8.8.0 - 2026-11-05
 
 Formats a person picks in Tenra's Settings: where the currency symbol stands, when the cents show, how the digits group, which separators the amount field uses, and how a date reads. Every default stays as it was, so an app that sets nothing changes nothing.

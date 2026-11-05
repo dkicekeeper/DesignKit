@@ -44,7 +44,8 @@ public nonisolated struct Formatting {
     }
 
     /// Puts `symbol` on `number` ("1 234" → "1 234 ₸" or "₸1 234"). `number` carries its own
-    /// minus when `isNegative`; before the number the minus stays first ("-₸1 234").
+    /// minus when `isNegative`; before the number the minus stays first ("-₸1 234"). A symbol
+    /// that ends in a letter keeps a no-break space before the number ("CHF 1’234.50").
     public static func attachSymbol(
         _ number: String,
         symbol: String,
@@ -55,11 +56,19 @@ public nonisolated struct Formatting {
         case .after:
             return "\(number) \(symbol)"
         case .before:
+            let lead = symbolBeforeNumber(symbol)
             guard isNegative, let first = number.first, first == "-" || first == "\u{2212}" else {
-                return symbol + number
+                return lead + number
             }
-            return "-" + symbol + number.dropFirst()
+            return "-" + lead + number.dropFirst()
         }
+    }
+
+    /// `symbol` as it stands before a number: "₸", "$", "€" touch it ("₸1 234"); a symbol that
+    /// ends in a letter is followed by a no-break space ("CHF 1’234.50", "zł 1 234"), else it
+    /// would read as one word with the digits.
+    static func symbolBeforeNumber(_ symbol: String) -> String {
+        symbol.last?.isLetter == true ? symbol + "\u{00A0}" : symbol
     }
 
     /// Форматирует сумму с символом валюты с умной обработкой дробной части
@@ -142,13 +151,28 @@ public nonisolated struct Formatting {
         locale: Locale,
         configuration: AmountDisplayConfiguration = .shared
     ) -> String {
+        applyConfiguredSeparators(
+            text,
+            decimal: locale.decimalSeparator ?? ".",
+            grouping: locale.groupingSeparator ?? ",",
+            configuration: configuration
+        )
+    }
+
+    /// `applyConfiguredSeparators(_:locale:configuration:)` with the locale's separators given.
+    static func applyConfiguredSeparators(
+        _ text: String,
+        decimal: String,
+        grouping: String,
+        configuration: AmountDisplayConfiguration
+    ) -> String {
         guard configuration.separatorsOverrideLocale else { return text }
-        let decimal = locale.decimalSeparator ?? "."
-        let grouping = locale.groupingSeparator ?? ","
         // One pass, so "," -> "." and "." -> "," do not undo each other. A separator is swapped
         // only between two digits: the locale's grouping space can also stand between the
         // number and its unit word ("1,2 млн"), and that one is not a thousands separator.
+        // A locale with no mark has nothing to swap (an empty prefix would never advance).
         let pairs = [(decimal, configuration.decimalSeparator), (grouping, configuration.thousandsSeparator)]
+            .filter { !$0.0.isEmpty }
         var result = ""
         var index = text.startIndex
         while index < text.endIndex {
