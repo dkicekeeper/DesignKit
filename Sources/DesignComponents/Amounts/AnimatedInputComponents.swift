@@ -91,7 +91,10 @@ public struct AmountDigitDisplay: View {
     /// Kern scales with `.minimumScaleFactor` since it's part of the text render pass.
     private var attributedDisplay: AttributedString {
         let raw = displayAmount
-        var result = AttributedString(raw)
+        // Same character count as `raw` before the decimal mark, so group positions hold.
+        var result = AttributedString(
+            raw.replacingOccurrences(of: ".", with: AmountDisplayConfiguration.shared.decimalSeparator)
+        )
 
         // Skip leading minus when computing group boundaries
         let isNegative = raw.hasPrefix("-")
@@ -246,7 +249,7 @@ public struct AmountInput: View {
 
     private func pasteAmount() {
         guard let clipboardText = UIPasteboard.general.string else { return }
-        let cleaned = AmountInputFormatting.cleanAmountString(clipboardText)
+        let cleaned = AmountInputFormatting.cleanPastedAmount(clipboardText)
         guard !cleaned.isEmpty, Double(cleaned) != nil else { return }
         amount = cleaned
     }

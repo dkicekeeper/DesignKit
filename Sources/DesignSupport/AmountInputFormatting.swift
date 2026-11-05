@@ -71,22 +71,52 @@ public enum AmountInputFormatting {
 
     /// Converts a raw amount string into a user-facing display string with grouping.
     ///
+    /// The group mark, the decimal mark and the secondary group size come from
+    /// `configuration` (the defaults give "1 234.5"). The fraction stays as typed, so an
+    /// unfinished "1234." shows "1 234." and "0.0" is not collapsed while typing "0.05".
+    ///
     /// Rules:
-    /// - Empty or zero input → `"0"`
+    /// - Empty, "-" or a plain zero → `"0"`
     /// - Non-parseable input → cleaned raw string (preserves typing in progress)
-    /// - Valid Decimal → formatted with `displayFormatter`; falls back to `formatLargeNumber`
-    public static func displayAmount(for text: String) -> String {
+    public static func displayAmount(
+        for text: String,
+        configuration: AmountDisplayConfiguration = .shared
+    ) -> String {
         let cleaned = cleanAmountString(text)
 
-        if cleaned.isEmpty { return "0" }
+        if cleaned.isEmpty || cleaned == "-" { return "0" }
 
         guard let decimal = Decimal(string: cleaned) else { return cleaned }
+        if decimal == 0 && !cleaned.contains(".") { return "0" }
 
-        let number = NSDecimalNumber(decimal: decimal)
-        if number.compare(NSDecimalNumber.zero) == .orderedSame { return "0" }
+        let isNegative = cleaned.hasPrefix("-")
+        let unsigned = isNegative ? String(cleaned.dropFirst()) : cleaned
+        let parts = unsigned.split(separator: ".", maxSplits: 1, omittingEmptySubsequences: false)
+        let integer = groupDigits(
+            String(parts[0]),
+            separator: configuration.thousandsSeparator,
+            secondaryGroupingSize: configuration.secondaryGroupingSize
+        )
+        var result = (isNegative ? "-" : "") + (integer.isEmpty ? "0" : integer)
+        if parts.count > 1 { result += configuration.decimalSeparator + parts[1] }
+        return result
+    }
 
-        if let formatted = displayFormatter.string(from: number) { return formatted }
-        return formatLargeNumber(decimal)
+    /// Cleans text pasted from the clipboard. When it holds the configured decimal mark,
+    /// the configured group mark is a grouping and goes first ("1,234.56" → "1234.56");
+    /// otherwise the text is cleaned as typed (a lone "," or "." is the decimal point).
+    public static func cleanPastedAmount(
+        _ text: String,
+        configuration: AmountDisplayConfiguration = .shared
+    ) -> String {
+        var source = text
+        let group = configuration.thousandsSeparator
+        let decimal = configuration.decimalSeparator
+        if !group.isEmpty, group != decimal, source.contains(decimal) {
+            source = source.replacingOccurrences(of: group, with: "")
+        }
+        if decimal != "." { source = source.replacingOccurrences(of: decimal, with: ".") }
+        return cleanAmountString(source)
     }
 
     /// Formats a Decimal that `displayFormatter` could not handle,
@@ -99,12 +129,24 @@ public enum AmountInputFormatting {
         return "\(groupDigits(parts[0])).\(parts[1].prefix(2))"
     }
 
-    /// Groups digits in an integer string with space separators every 3 digits.
-    public static func groupDigits(_ s: String) -> String {
+    /// Groups digits in an integer string with `separator` every 3 digits, or every
+    /// `secondaryGroupingSize` digits after the first group of 3 when it is set.
+    public static func groupDigits(
+        _ s: String,
+        separator: String = " ",
+        secondaryGroupingSize: Int? = nil
+    ) -> String {
         var result = ""
-        for (i, char) in s.reversed().enumerated() {
-            if i > 0 && i % 3 == 0 { result = " " + result }
+        var sinceBreak = 0
+        var groupSize = 3
+        for char in s.reversed() {
+            if sinceBreak == groupSize {
+                result = separator + result
+                sinceBreak = 0
+                if let secondaryGroupingSize, secondaryGroupingSize > 0 { groupSize = secondaryGroupingSize }
+            }
             result = String(char) + result
+            sinceBreak += 1
         }
         return result
     }
