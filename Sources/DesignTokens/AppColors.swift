@@ -46,6 +46,12 @@ public enum AppColors {
     /// Configured per app via `DesignKitTheme.accent` (default: indigo).
     public nonisolated static var accent: Color { DesignKitTheme.accent }
 
+    /// The accent as a fill under white text or a white symbol (8.10.0): a primary button, the
+    /// person's own message, a send button, a picked day or icon. `readableFill` of the accent, so
+    /// white on it is 4.5:1 in both themes: Tenra's indigo is a step deeper in dark mode only,
+    /// Dalada's green a step deeper in both. Tints, outlines and tracks keep `accent`.
+    public nonisolated static var accentFill: Color { readableFill(DesignKitTheme.accent) }
+
     /// Destructive actions
     public nonisolated static let destructive = Status.negative
 
@@ -69,6 +75,11 @@ public enum AppColors {
     /// `nonisolated` so the nonisolated `InsightsService` can read it without a
     /// MainActor hop (`Color` is `Sendable`).
     public nonisolated static let income = Color(red: 0.13, green: 0.70, blue: 0.37)
+
+    /// Income as text (8.10.0): an amount of money in, a "paid" mark. `readable(income)`: 4.5:1 on
+    /// the page and on its tint (the bright `income` reads at 2.75:1 on white). Fills, bars, icons
+    /// on a plate and chart marks keep `income`.
+    public nonisolated static let incomeText = readable(income)
 
     /// Expense transactions.
     /// Сознательно НЕ красный (как могло бы подсказать "destructive"-чтение расхода):

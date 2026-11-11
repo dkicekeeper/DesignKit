@@ -309,8 +309,9 @@ rather than importing an app type.
   (`.chartDisplayOptions`), Tenra keeps its `OrbChart` over stacked bars, and `MiniBars` draws
   the weekdays on Tenra's new "By day" insight card.
 - Benchmark round 4 (2026-11, against Meta's Astryx, the owner approved the whole plan): 8.9.0.
-  Status text reads at WCAG AA (`AppColors.readable`, `Status.*Text`, `ContrastTests`; white on
-  Tenra's dark-mode indigo and Dalada's green and the income green are the apps' known issues),
+  Status text reads at WCAG AA (`AppColors.readable`, `Status.*Text`, `ContrastTests`); 8.10.0
+  (the owner's decision on the rest): white text sits on `AppColors.accentFill` (Tenra's indigo
+  deeper in dark mode, Dalada's green deeper) and income text is `AppColors.incomeText`,
   outcomes are spoken (`AccessibilityAnnouncer`), `InfoTip`, `RelativeTime`, `SearchablePicker`,
   Markdown replies with time and status, `ConversationDivider`; for the apps, one lint
   (`scripts/designkit_lint.py`), migrations for a major (`scripts/migrate.py`), the agent block

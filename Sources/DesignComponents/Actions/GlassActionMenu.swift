@@ -125,7 +125,8 @@ public struct GlassActionMenu: View {
                 .frame(width: GlassActionMenuMetrics.button, height: GlassActionMenuMetrics.button)
         }
         .buttonStyle(.plain)
-        .glassEffect(isOpen ? Glass.regular.interactive() : Glass.regular.tint(tint).interactive(), in: Circle())
+        // 8.10.0: the closed button's tint deep enough for its white symbol.
+        .glassEffect(isOpen ? Glass.regular.interactive() : Glass.regular.tint(AppColors.readableFill(tint)).interactive(), in: Circle())
         .glassEffectID("toggle", in: glass)
         .accessibilityLabel(Text(verbatim: isOpen
             ? String(localized: "menu.close", defaultValue: "Close")

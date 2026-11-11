@@ -183,7 +183,7 @@ private struct IconPickerSymbolsTab: View {
                         )
                     )
                     .frame(width: AppIconSize.Tile.xl, height: AppIconSize.Tile.xl)
-                    .background(isSelected ? AppColors.accent : AppColors.Background.neutral1)
+                    .background(isSelected ? AppColors.accentFill : AppColors.Background.neutral1)
                     .clipShape(.rect(cornerRadius: AppRadius.lg))
                 }
                 .buttonStyle(.plain)

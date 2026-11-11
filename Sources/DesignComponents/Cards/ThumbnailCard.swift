@@ -70,7 +70,7 @@ public struct ThumbnailCard<Picture: View, Details: View>: View {
                     Icon("bookmark.fill", size: AppIconSize.xs)
                         .foregroundStyle(AppColors.staticWhite)
                         .padding(AppSpacing.xs)
-                        .background(AppColors.accent, in: Circle())
+                        .background(AppColors.accentFill, in: Circle())
                         .padding(AppSpacing.xs)
                         .accessibilityElement(children: .ignore)
                         .accessibilityLabel(Text(verbatim: savedLabel ?? ThumbnailText.saved))

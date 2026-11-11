@@ -66,7 +66,7 @@ public struct StepTracker: View {
 
     private func connector(visible: Bool, done: Bool) -> some View {
         Rectangle()
-            .fill(visible ? (done ? AppColors.accent : AppColors.Background.neutral2) : .clear)
+            .fill(visible ? (done ? AppColors.accentFill : AppColors.Background.neutral2) : .clear)
             .frame(height: lineHeight)
             .frame(maxWidth: .infinity)
     }
@@ -75,7 +75,7 @@ public struct StepTracker: View {
     private func marker(_ index: Int) -> some View {
         ZStack {
             if index < current {
-                Circle().fill(AppColors.accent)
+                Circle().fill(AppColors.accentFill)
                 Icon("checkmark", size: circleSize * 0.45, scalesWithText: false)
                     .fontWeight(.bold)
                     .foregroundStyle(AppColors.staticWhite)
