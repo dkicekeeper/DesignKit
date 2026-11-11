@@ -123,12 +123,12 @@ public struct PendingItemCard<Content: View>: View {
             Label(String(localized: "pending.waiting", defaultValue: "Waiting to upload: it goes once you’re online"),
                   systemImage: "icloud.and.arrow.up")
                 .font(AppTypography.caption)
-                .foregroundStyle(AppColors.warning)
+                .foregroundStyle(AppColors.Status.warningText)
         case .failed(let message):
             Label(String(localized: "pending.failed", defaultValue: "Couldn’t upload"),
                   systemImage: "exclamationmark.triangle.fill")
                 .font(AppTypography.caption)
-                .foregroundStyle(AppColors.destructive)
+                .foregroundStyle(AppColors.Status.negativeText)
             if !message.isEmpty {
                 Text(verbatim: message)
                     .font(AppTypography.caption)

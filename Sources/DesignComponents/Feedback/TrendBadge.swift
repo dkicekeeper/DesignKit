@@ -77,8 +77,13 @@ public struct TrendBadge: View {
         self.color = color
     }
 
+    /// The colour of the trend: its pill is a pale tint of it.
+    private var baseColor: Color { color ?? direction.color }
+
+    /// The arrow and the number: white on a hero's colour, otherwise the trend's colour made
+    /// readable (8.9.0; the green "up" read at 2.2:1 on its pill in light mode).
     private var effectiveColor: Color {
-        heroTone == .onColor ? AppColors.Text.primaryOnDark : (color ?? direction.color)
+        heroTone == .onColor ? AppColors.Text.primaryOnDark : AppColors.readable(baseColor)
     }
 
     public var body: some View {
@@ -106,7 +111,7 @@ public struct TrendBadge: View {
             }
             .lineLimit(1)
             .foregroundStyle(effectiveColor)
-            .modifier(TrendPillModifier(isActive: style == .pill, color: effectiveColor, onColor: heroTone == .onColor))
+            .modifier(TrendPillModifier(isActive: style == .pill, color: baseColor, onColor: heroTone == .onColor))
             // Keep the pill's intrinsic width — never let a tight parent squeeze the
             // icon + percent into a wrap; ViewThatFits can then drop it to a new line.
             .fixedSize(horizontal: true, vertical: false)

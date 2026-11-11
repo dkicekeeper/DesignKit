@@ -300,10 +300,10 @@ public struct MessageComposer<Leading: View>: View {
         Label {
             Text(verbatim: message)
                 .font(AppTypography.caption)
-                .foregroundStyle(AppColors.destructive)
+                .foregroundStyle(AppColors.Status.negativeText)
         } icon: {
             Icon("exclamationmark.circle.fill", size: AppIconSize.sm)
-                .foregroundStyle(AppColors.destructive)
+                .foregroundStyle(AppColors.Status.negativeText)
         }
     }
 }

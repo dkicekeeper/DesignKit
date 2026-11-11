@@ -105,7 +105,7 @@ public struct DownloadRow: View {
         case .failed:
             Text(verbatim: caption)
                 .font(AppTypography.caption)
-                .foregroundStyle(AppColors.destructive)
+                .foregroundStyle(AppColors.Status.negativeText)
         }
     }
 

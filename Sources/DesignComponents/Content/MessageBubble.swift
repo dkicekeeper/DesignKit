@@ -101,10 +101,10 @@ public struct MessageBubble: View {
             }
             if let failure {
                 HStack(spacing: AppSpacing.xs) {
-                    Icon("exclamationmark.circle.fill", size: AppIconSize.xs, tint: .monochrome(AppColors.Status.negative))
+                    Icon("exclamationmark.circle.fill", size: AppIconSize.xs, tint: .monochrome(AppColors.Status.negativeText))
                     Text(failure)
                         .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.Status.negative)
+                        .foregroundStyle(AppColors.Status.negativeText)
                     if let onRetry {
                         Button(String(localized: "common.retry", defaultValue: "Retry"), action: onRetry)
                             .font(AppTypography.caption.weight(.semibold))

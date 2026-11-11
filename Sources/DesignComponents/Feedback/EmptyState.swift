@@ -194,7 +194,7 @@ public struct EmptyState: View {
             VStack(spacing: AppSpacing.sm) {
                 Text(title)
                     .font(AppTypography.h3)
-                    .foregroundStyle(AppColors.destructive)
+                    .foregroundStyle(AppColors.Status.negativeText)
 
                 if let description = description {
                     Text(description)

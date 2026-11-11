@@ -47,6 +47,11 @@ struct ColorsScreen: View {
         .init(name: "Status.negative", color: AppColors.Status.negative, use: "An error, a fall"),
         .init(name: "Status.warning", color: AppColors.Status.warning, use: "A warning"),
         .init(name: "Status.neutral", color: AppColors.Status.neutral, use: "Archived, paused"),
+        .init(name: "Status.infoText", color: AppColors.Status.infoText, use: "Info text and icons, 4.5:1 (8.9.0)"),
+        .init(name: "Status.positiveText", color: AppColors.Status.positiveText, use: "= Text.positive, 4.5:1"),
+        .init(name: "Status.negativeText", color: AppColors.Status.negativeText, use: "= Text.negative, 4.5:1"),
+        .init(name: "Status.warningText", color: AppColors.Status.warningText, use: "= Text.warning, 4.5:1"),
+        .init(name: "Status.neutralText", color: AppColors.Status.neutralText, use: "Neutral text and icons, 4.5:1"),
     ]
 
     private let border: [Token] = [
@@ -251,18 +256,20 @@ struct ColorsScreen: View {
 
     private var statusDemo: some View {
         VStack(spacing: AppSpacing.sm) {
-            statusRow("info.circle.fill", "Statement is ready", AppColors.Status.info, AppColors.Status.infoPale)
-            statusRow("checkmark.circle.fill", "Payment sent", AppColors.Status.positive, AppColors.Status.positivePale)
-            statusRow("exclamationmark.triangle.fill", "Card expires soon", AppColors.Status.warning, AppColors.Status.warningPale)
-            statusRow("xmark.octagon.fill", "Transfer failed", AppColors.Status.negative, AppColors.Status.negativePale)
-            statusRow("pause.circle.fill", "Subscription paused", AppColors.Status.neutral, AppColors.Status.neutralPale)
+            statusRow("info.circle.fill", "Statement is ready", AppColors.Status.infoText, AppColors.Status.infoPale)
+            statusRow("checkmark.circle.fill", "Payment sent", AppColors.Status.positiveText, AppColors.Status.positivePale)
+            statusRow("exclamationmark.triangle.fill", "Card expires soon", AppColors.Status.warningText, AppColors.Status.warningPale)
+            statusRow("xmark.octagon.fill", "Transfer failed", AppColors.Status.negativeText, AppColors.Status.negativePale)
+            statusRow("pause.circle.fill", "Subscription paused", AppColors.Status.neutralText, AppColors.Status.neutralPale)
         }
     }
 
-    private func statusRow(_ symbol: String, _ text: String, _ solid: Color, _ pale: Color) -> some View {
+    /// The status's readable colour (8.9.0) on its pale container: the icon, and a word in it.
+    private func statusRow(_ symbol: String, _ text: String, _ readable: Color, _ pale: Color) -> some View {
         HStack(spacing: AppSpacing.sm) {
-            Image(systemName: symbol).foregroundStyle(solid)
+            Image(systemName: symbol).foregroundStyle(readable)
             Text(text).font(AppTypography.bodySmall).foregroundStyle(AppColors.Text.primary)
+            Text("4.5:1").font(AppTypography.caption.weight(.semibold)).foregroundStyle(readable)
             Spacer()
         }
         .padding(AppSpacing.md)

@@ -12,8 +12,10 @@ import DesignSupport
 
 /// Capsule badge: short text with an optional SF Symbol.
 ///
-/// - `.tinted` — coloured text on a 12 % tint of the same colour (statuses, tags).
-/// - `.filled` — white text on a solid colour (counters that need attention).
+/// - `.tinted` — coloured text on a 12 % tint of the same colour (statuses, tags). The text is
+///   the colour made readable (`AppColors.readable`, 8.9.0): 4.5:1 on its tint in both themes.
+/// - `.filled` — white text on a solid colour (counters that need attention), deepened where
+///   white would not read on it (`AppColors.readableFill`, 8.9.0).
 ///
 /// ```swift
 /// Badge("Closed", color: AppColors.destructive)
@@ -48,10 +50,10 @@ public struct Badge: View {
         label
             .font(AppTypography.caption)
             .lineLimit(1)
-            .foregroundStyle(style == .filled ? AppColors.staticWhite : color)
+            .foregroundStyle(style == .filled ? AppColors.staticWhite : AppColors.readable(color))
             .padding(.horizontal, AppSpacing.sm)
             .padding(.vertical, AppSpacing.xxs)
-            .background(style == .filled ? color : AppColors.pale(color), in: Capsule())
+            .background(style == .filled ? AppColors.readableFill(color) : AppColors.pale(color), in: Capsule())
             .fixedSize()
     }
 

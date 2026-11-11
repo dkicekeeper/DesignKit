@@ -111,7 +111,7 @@ public struct CurrencyAmountInput: View {
             if let errorMessage {
                 Text(errorMessage)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.destructive)
+                    .foregroundStyle(AppColors.Status.negativeText)
                     .multilineTextAlignment(.center)
             }
         }

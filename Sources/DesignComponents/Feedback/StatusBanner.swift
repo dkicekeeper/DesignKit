@@ -34,6 +34,17 @@ public struct StatusBanner: View {
             }
         }
 
+        /// The icon on the pale container (8.9.0): the solid colour made readable.
+        var text: Color {
+            switch self {
+            case .info: return AppColors.Status.infoText
+            case .positive: return AppColors.Status.positiveText
+            case .negative: return AppColors.Status.negativeText
+            case .warning: return AppColors.Status.warningText
+            case .neutral: return AppColors.Status.neutralText
+            }
+        }
+
         var pale: Color {
             switch self {
             case .info: return AppColors.Status.infoPale
@@ -95,7 +106,7 @@ public struct StatusBanner: View {
     private func content(showsChevron: Bool) -> some View {
         HStack(alignment: .top, spacing: AppSpacing.sm) {
             Icon(systemImage ?? status.systemImage, size: style == .standard ? AppIconSize.sm : AppIconSize.xs)
-                .foregroundStyle(status.solid)
+                .foregroundStyle(status.text)
                 .accessibilityHidden(true)
 
             Text(text)
