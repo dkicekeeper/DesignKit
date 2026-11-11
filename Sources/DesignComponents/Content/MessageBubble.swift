@@ -117,6 +117,8 @@ public struct MessageBubble: View {
         .frame(maxWidth: .infinity, alignment: isOutgoing ? .trailing : .leading)
         .animation(AppAnimation.smooth, value: failure)
         .hapticCue(.fail, trigger: failure != nil) { _, failed in failed }
+        // 8.9.0: a failure that arrives is spoken; one the conversation opens with is not.
+        .voiceOverAnnouncement(failure)
         .onChange(of: failure != nil) { _, failed in
             if failed, !reduceMotion, designKitMotion { shakes += 1 }
         }

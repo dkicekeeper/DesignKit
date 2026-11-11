@@ -3,7 +3,7 @@
 //  DesignKit Gallery
 //
 //  Content and layout: folded text, timeline, month calendar, flow layout, form sections, the
-//  edit sheet and its hero, message bubbles.
+//  edit sheet and its hero, message bubbles, times that stay current.
 //
 
 import SwiftUI
@@ -30,6 +30,56 @@ struct ContentScreen: View {
         EditableHeroPage()
         ArticleBodyPage()
         MessageBubblePage()
+        RelativeTimePage()
+    }
+}
+
+private struct RelativeTimePage: View {
+    @State private var style: RelativeTime.Style = .relative
+    @State private var offset: TimeInterval = 5 * 60
+    /// The moment the page opened: the specimen's date is this, minus the chosen offset.
+    @State private var anchor = Date.now
+
+    private static let offsets: [(String, TimeInterval)] = [
+        ("20 seconds", 20), ("5 minutes", 5 * 60), ("3 hours", 3 * 3600),
+        ("A day", 26 * 3600), ("A week", 8 * 86_400), ("Over a year", 400 * 86_400),
+    ]
+
+    var body: some View {
+        ComponentPage(
+            name: "RelativeTime",
+            summary: "When something happened, or how long it has run, kept current on screen: “5 min. ago”, “Yesterday, 14:20”, “1 hr, 2 min”, “1:02:34”.",
+            since: "8.9.0",
+            apps: [],
+            notes: [
+                "Style it as text (.font, .foregroundStyle). .relative redraws every 30 seconds, .elapsed and .clock every second; .clock keeps its digits one width.",
+                "Under a minute “Just now”, under an hour minutes, the same day hours, the next day over “Yesterday, 14:20”, then the day (with the year in another year). The day follows DesignKitDateFormat.day.",
+                "VoiceOver reads the units in full (“5 minutes ago”). A long press on iPad or Mac shows the full date.",
+                "The texts alone: Formatting.relativeTime(_:), .elapsedTime(_:), .clockTime(_:).",
+            ]
+        ) {
+            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                Text(label)
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.Text.secondary)
+                RelativeTime(anchor.addingTimeInterval(-offset), style: style)
+                    .font(style == .clock ? AppTypography.numbers(AppTypography.h2) : AppTypography.body)
+                    .foregroundStyle(AppColors.Text.primary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } controls: {
+            ChoiceControl("Style", selection: $style, options: [("Relative", .relative), ("Elapsed", .elapsed), ("Clock", .clock)])
+            ChoiceControl(style == .relative ? "Happened" : "Started", selection: $offset, options: Self.offsets.map { ("\($0.0) ago", $0.1) })
+            ActionControl("Now", systemImage: "arrow.clockwise") { anchor = .now }
+        }
+    }
+
+    private var label: String {
+        switch style {
+        case .relative: "Commented"
+        case .elapsed: "On the trail for"
+        case .clock: "Session"
+        }
     }
 }
 

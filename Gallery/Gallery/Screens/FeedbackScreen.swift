@@ -27,6 +27,7 @@ struct FeedbackScreen: View {
         MessageBannerPage()
         InlineStatusTextPage()
         TooltipPage()
+        InfoTipPage()
         SpotlightPage()
         TypingIndicatorPage()
         EmptyStatePage()
@@ -379,6 +380,53 @@ private struct TooltipPage: View {
             }
         } else {
             Tooltip(text, arrowEdge: below ? .top : .bottom, arrowAlignment: arrowAlignment)
+        }
+    }
+}
+
+private struct InfoTipPage: View {
+    @State private var message = "Your savings rate, debts and spending against your limits, from 0 to 100. Recomputed every night."
+    @State private var hasTitle = true
+    @State private var asModifier = true
+
+    var body: some View {
+        ComponentPage(
+            name: "InfoTip",
+            summary: "An ⓘ next to the name of a value; a tap opens a popover that explains it.",
+            since: "8.9.0",
+            apps: [],
+            notes: [
+                "Text(\"Health score\").infoTip(message, title: \"Health score\") puts it after the label on its first line; InfoTip(message) stands anywhere.",
+                "A sentence or two: what the value means and how it is counted. A value the person tapped is a Tooltip.",
+                "The 16 pt glyph has a 44 pt target that takes no room. On iPhone the popover stays a popover and closes on a tap anywhere.",
+                "VoiceOver: “About <title>” (or “More information”), then the text.",
+            ]
+        ) {
+            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                if asModifier {
+                    Text("Health score")
+                        .font(AppTypography.bodySmall)
+                        .foregroundStyle(AppColors.Text.secondary)
+                        .infoTip(message, title: hasTitle ? "Health score" : nil)
+                } else {
+                    HStack(spacing: AppSpacing.xs) {
+                        Text("Health score")
+                            .font(AppTypography.bodySmall)
+                            .foregroundStyle(AppColors.Text.secondary)
+                        InfoTip(message, title: hasTitle ? "Health score" : nil)
+                    }
+                }
+                Text("72")
+                    .font(AppTypography.numbers(AppTypography.h2))
+                    .foregroundStyle(AppColors.Text.primary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(AppSpacing.lg)
+            .cardStyle()
+        } controls: {
+            ChoiceControl("Placement", selection: $asModifier, options: [(".infoTip modifier", true), ("InfoTip in an HStack", false)])
+            ToggleControl("Title", isOn: $hasTitle)
+            TextControl("Text", text: $message)
         }
     }
 }

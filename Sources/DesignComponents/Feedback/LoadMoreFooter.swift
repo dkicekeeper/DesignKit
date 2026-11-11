@@ -67,6 +67,14 @@ public struct LoadMoreFooter<Placeholder: View>: View {
             .frame(maxWidth: .infinity)
             .listRowSeparator(.hidden)
             .animation(AppAnimation.smooth, value: state)
+            // 8.9.0: a page that would not load is spoken when it fails.
+            .voiceOverAnnouncement(failureText)
+    }
+
+    /// The line `.failed` shows, nil in the other states.
+    private var failureText: String? {
+        guard case .failed(let message) = state else { return nil }
+        return message ?? String(localized: "loadMore.failed", defaultValue: "Couldn’t load more")
     }
 
     @ViewBuilder
@@ -84,10 +92,10 @@ public struct LoadMoreFooter<Placeholder: View>: View {
                 }
             }
             .transition(.opacity)
-        case .failed(let message):
+        case .failed:
             VStack(spacing: AppSpacing.sm) {
                 Label {
-                    Text(verbatim: message ?? String(localized: "loadMore.failed", defaultValue: "Couldn’t load more"))
+                    Text(verbatim: failureText ?? "")
                 } icon: {
                     Icon("exclamationmark.triangle", size: AppIconSize.xs)
                 }

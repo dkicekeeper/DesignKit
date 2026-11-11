@@ -94,6 +94,9 @@ public struct PendingItemCard<Content: View>: View {
         }
         .cardContentPadding()
         .cardStyle()
+        // 8.9.0: an upload that fails while the card is on screen is spoken; a card that opens
+        // already failed is read where it stands.
+        .voiceOverAnnouncement(failureAnnouncement)
         .confirmationDialog(
             Text(verbatim: discardConfirmation
                  ?? String(localized: "pending.discard.confirm", defaultValue: "Delete it? It won’t reach the server.")),
@@ -104,6 +107,13 @@ public struct PendingItemCard<Content: View>: View {
                 Task { await onDiscard() }
             }
         }
+    }
+
+    /// "Couldn’t upload. <reason>" in `.failed`, nil while waiting.
+    private var failureAnnouncement: String? {
+        guard case .failed(let message) = state else { return nil }
+        let failed = String(localized: "pending.failed", defaultValue: "Couldn’t upload")
+        return message.isEmpty ? failed : "\(failed). \(message)"
     }
 
     @ViewBuilder

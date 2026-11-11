@@ -104,6 +104,29 @@ extension ComponentSnapshots {
             )
         }
 
+        /// InfoTip (8.9.0): the glyph after a label, on its first line, at every text size. The
+        /// popover is the system's and is not drawn here.
+        @Test func infoTips() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    Text(verbatim: "Health score")
+                        .font(AppTypography.bodySmall)
+                        .foregroundStyle(AppColors.Text.secondary)
+                        .infoTip("Your savings rate, debts and spending, from 0 to 100.", title: "Health score")
+                    Text(verbatim: "Rolling average")
+                        .font(AppTypography.h4)
+                        .infoTip("The average of the last 30 days.")
+                    HStack(spacing: AppSpacing.xs) {
+                        Text(verbatim: "Difficulty")
+                            .font(AppTypography.body)
+                        InfoTip("From the climb, the length and the ground.")
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
         /// Tooltip (2.0.0) above and below its target, with text and with an amount.
         @Test func tooltips() async {
             await assertComponentSnapshot(

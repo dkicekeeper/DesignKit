@@ -2,7 +2,8 @@
 //  DisplaySnapshotTests.swift
 //  DesignKit Gallery snapshot tests
 //
-//  Badges, stat tiles, avatars, rating, timeline, calendar, expandable text, flow layout.
+//  Badges, stat tiles, avatars, rating, relative times, timeline, calendar, expandable text, flow
+//  layout.
 //
 
 import SwiftUI
@@ -75,6 +76,27 @@ extension ComponentSnapshots {
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+            )
+        }
+
+        /// RelativeTime (8.9.0). Only the forms that read the same whenever the test runs: a time
+        /// moments ago, minutes ago, a run of minutes, and a date in another year.
+        @Test func relativeTimes() async {
+            let now = Date.now
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    RelativeTime(now.addingTimeInterval(-10))
+                    RelativeTime(now.addingTimeInterval(-5 * 60 - 20))
+                        .foregroundStyle(AppColors.Text.secondary)
+                    RelativeTime(now.addingTimeInterval(-12 * 60 - 20), style: .elapsed)
+                        .font(AppTypography.h4)
+                    RelativeTime(Date(timeIntervalSince1970: 1_579_089_600))   // 15 January 2020, noon UTC
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppColors.Text.tertiary)
+                }
+                .font(AppTypography.body)
+                .frame(maxWidth: .infinity, alignment: .leading),
+                appearances: [.light, .largeText]
             )
         }
 

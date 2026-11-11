@@ -187,6 +187,8 @@ public struct MessageComposer<Leading: View>: View {
         }
         .animation(AppAnimation.contentSpring, value: quote)
         .animation(AppAnimation.contentSpring, value: errorMessage)
+        // 8.9.0: VoiceOver hears why the send failed when it happens.
+        .voiceOverAnnouncement(errorMessage)
         .animation(AppAnimation.contentSpring, value: showsCount)
         .animation(AppAnimation.fastAnimation, value: isSendEnabled)
         .animation(AppAnimation.fastAnimation, value: focusBinding.wrappedValue)
