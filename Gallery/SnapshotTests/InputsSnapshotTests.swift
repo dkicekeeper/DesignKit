@@ -333,6 +333,26 @@ extension ComponentSnapshots {
             )
         }
 
+        /// SearchablePicker (8.9.0) on its screen: the options in a glass card with their
+        /// icons and lines, one picked.
+        @Test func searchablePicker() async {
+            let options = [
+                SearchablePickerOption("Cafés", value: 1, subtitle: "Coffee, lunch out", systemImage: "cup.and.saucer.fill"),
+                SearchablePickerOption("Groceries", value: 2, systemImage: "cart.fill"),
+                SearchablePickerOption("Taxi", value: 3, subtitle: "Rides and parking", systemImage: "car.fill"),
+                SearchablePickerOption("Rent", value: 4, systemImage: "house.fill"),
+            ]
+            await assertComponentSnapshot(
+                NavigationStack {
+                    SearchablePicker(options, selection: .constant(Optional(2)))
+                        .navigationTitle("Category")
+                        .navigationBarTitleDisplayMode(.inline)
+                }
+                .frame(height: 520),
+                appearances: [.light, .dark]
+            )
+        }
+
         /// One row of glass buttons per snapshot.
         @Test func dateButtons() async {
             await assertComponentSnapshot(

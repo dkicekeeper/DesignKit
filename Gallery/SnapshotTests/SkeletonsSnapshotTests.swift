@@ -114,6 +114,13 @@ extension ComponentSnapshots {
             )
         }
 
+        /// SearchablePicker's options loading (8.9.0): one glass card of choice rows.
+        @Test func searchablePickerSkeleton() async {
+            await assertComponentSnapshot(
+                SearchablePickerSkeleton(rows: 4)
+            )
+        }
+
         @Test func remotePhotoSkeleton() async {
             await assertComponentSnapshot(
                 HStack(spacing: AppSpacing.md) {
