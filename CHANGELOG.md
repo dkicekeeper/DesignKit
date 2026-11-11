@@ -19,6 +19,7 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 ## 8.10.0 - 2026-11-11
 
 The three contrast pairs 8.9.0 left to the owner, decided: white text on the accent reads at 4.5:1 in both apps and both themes, and income has a text colour. Benchmark round 4, follow-up (docs/benchmark.md).
+[#102](https://github.com/dkicekeeper/DesignKit/pull/102)
 
 ### Added
 
@@ -49,7 +50,7 @@ Circle().fill(AppColors.accentFill).overlay { Icon("checkmark").foregroundStyle(
 
 - `ContrastTests`: white on the accent's fill (Tenra's indigo, Dalada's green) and income text pass in both themes; the three known issues of 8.9.0 are gone.
 - The Colors page shows `accentFill` and `incomeText`.
-- Snapshot references re-recorded where a primary button, an outgoing bubble or a send button is drawn in dark mode, and the Dalada accent snapshot.
+- Snapshot references re-recorded (25): primary buttons, outgoing bubbles, the composer's buttons, done steps, a period's ends and the action menu in dark mode; destructive buttons and the paid marks of `ScheduleRow` in both themes.
 
 ## 8.9.0 - 2026-11-11
 
