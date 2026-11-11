@@ -69,6 +69,7 @@ struct ColorsScreen: View {
         .init(name: "textSecondary", color: AppColors.textSecondary, use: "= Text.secondary"),
         .init(name: "textTertiary", color: AppColors.textTertiary, use: "= Text.tertiary"),
         .init(name: "accent", color: AppColors.accent, use: "DesignKitTheme.accent"),
+        .init(name: "accentFill", color: AppColors.accentFill, use: "Under white text, 4.5:1 (8.10.0)"),
         .init(name: "destructive", color: AppColors.destructive, use: "= Status.negative"),
         .init(name: "success", color: AppColors.success, use: "= Status.positive"),
         .init(name: "warning", color: AppColors.warning, use: "= Status.warning"),
@@ -76,7 +77,8 @@ struct ColorsScreen: View {
     ]
 
     private let financial: [Token] = [
-        .init(name: "income", color: AppColors.income, use: "Money in"),
+        .init(name: "income", color: AppColors.income, use: "Money in: fills, bars, icons"),
+        .init(name: "incomeText", color: AppColors.incomeText, use: "Money in as text, 4.5:1 (8.10.0)"),
         .init(name: "expense", color: AppColors.expense, use: "Money out (not red)"),
         .init(name: "transfer", color: AppColors.transfer, use: "Between own accounts"),
         .init(name: "planned", color: AppColors.planned, use: "= Status.info"),

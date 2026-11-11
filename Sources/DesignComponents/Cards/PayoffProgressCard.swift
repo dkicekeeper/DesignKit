@@ -121,7 +121,7 @@ public struct PayoffProgressCard<Accessory: View>: View {
                 case .done(let caption):
                     HStack(spacing: AppSpacing.xs) {
                         Icon("checkmark.circle.fill", size: AppIconSize.sm)
-                            .foregroundStyle(AppColors.income)
+                            .foregroundStyle(AppColors.incomeText)
                         Text(caption)
                             .font(AppTypography.bodySmall)
                             .foregroundStyle(AppColors.Text.secondary)

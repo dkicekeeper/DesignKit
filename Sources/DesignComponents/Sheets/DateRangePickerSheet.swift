@@ -331,7 +331,7 @@ struct DateRangeCalendar: View {
                 .frame(width: DateRangeCalendarMetrics.circle, height: DateRangeCalendarMetrics.circle)
                 .background {
                     if isEndpoint {
-                        Circle().fill(AppColors.accent)
+                        Circle().fill(AppColors.accentFill)
                             .transition(.scale(scale: 0.6).combined(with: .opacity))
                     }
                 }

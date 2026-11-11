@@ -65,10 +65,22 @@ public extension View {
 }
 
 /// The tint of a button of `appearance` and `role`; `nil` keeps the inherited one.
+///
+/// 8.10.0: a primary button's fill is the colour made readable under its white label
+/// (`AppColors.accentFill`, `readableFill` of the red); the text of a secondary or flat one is the
+/// colour made readable on the page (`AppColors.readable`).
 public func dsButtonTint(_ appearance: DSButtonAppearance, role: DSButtonRole) -> Color? {
     switch role {
-    case .normal: return appearance == .secondary ? nil : AppColors.accent
-    case .destructive: return AppColors.Status.negative
+    case .normal:
+        switch appearance {
+        case .primary: return AppColors.accentFill
+        case .secondary: return nil
+        case .flat: return AppColors.readable(AppColors.accent)
+        }
+    case .destructive:
+        return appearance == .primary
+            ? AppColors.readableFill(AppColors.Status.negative)
+            : AppColors.Status.negativeText
     case .neutral: return AppColors.Text.primary
     }
 }

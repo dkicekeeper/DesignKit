@@ -16,6 +16,41 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.10.0 - 2026-11-11
+
+The three contrast pairs 8.9.0 left to the owner, decided: white text on the accent reads at 4.5:1 in both apps and both themes, and income has a text colour. Benchmark round 4, follow-up (docs/benchmark.md).
+
+### Added
+
+- `AppColors.accentFill`: the accent as a fill under white text or a white symbol, `readableFill(accent)`.
+- `AppColors.incomeText`: money in as text, `readable(income)`, 4.5:1 on the page in both themes.
+
+### Changed
+
+- A primary `DSButton` (and `.dsButton(.primary)`) fills with `AppColors.accentFill`: in Tenra the indigo is a step deeper in dark mode only (white on it read at 3.5:1), in Dalada the green is a step deeper in both themes (4.25:1 and 2.7:1 before). A destructive primary button fills with the red made readable; a secondary or flat destructive one writes in `Status.negativeText`, a flat one in the accent made readable.
+- The same fill under white in the person's own `MessageBubble`, `MessageComposer`'s send and voice buttons, `DateRangePickerSheet`'s ends of the period, `StepTracker`'s done steps, a picked icon in `IconPicker`, `ThumbnailCard`'s mark and `GlassActionMenu`'s closed button.
+- `PayoffProgressCard`'s and `ScheduleRow`'s "paid" marks are in `AppColors.incomeText`.
+- Tints, outlines, tracks, selection circles, fills, bars and chart marks keep `accent` and `income`.
+
+### Migration
+
+Nothing to change in code. An app's own white text on its accent sits on `AppColors.accentFill`; its income amounts in text take `AppColors.incomeText`:
+
+```swift
+// before
+FormattedAmountText(amount, currency: currency, color: AppColors.income)
+Circle().fill(AppColors.accent).overlay { Icon("checkmark").foregroundStyle(.white) }
+// 8.10.0
+FormattedAmountText(amount, currency: currency, color: AppColors.incomeText)
+Circle().fill(AppColors.accentFill).overlay { Icon("checkmark").foregroundStyle(.white) }
+```
+
+### Gallery and tooling
+
+- `ContrastTests`: white on the accent's fill (Tenra's indigo, Dalada's green) and income text pass in both themes; the three known issues of 8.9.0 are gone.
+- The Colors page shows `accentFill` and `incomeText`.
+- Snapshot references re-recorded where a primary button, an outgoing bubble or a send button is drawn in dark mode, and the Dalada accent snapshot.
+
 ## 8.9.0 - 2026-11-11
 
 Benchmark round 4, against Meta's Astryx (docs/benchmark.md): status text that reads at WCAG AA, outcomes spoken to VoiceOver, an explanation for a number, times that stay current, a long list with search and "Create", an assistant's answers in Markdown, and tooling the apps run from the version they pin: one lint, a component reference, migrations for a major.

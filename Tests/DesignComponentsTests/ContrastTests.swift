@@ -6,9 +6,9 @@
 //  the page and on its pale container, a category's colour made readable on its own tint, white
 //  on a filled badge and on the accents. 4.5:1 is AA for body text and icons.
 //
-//  A pair that is the apps' own choice and does not pass yet is a known issue here (Tenra's
-//  indigo and Dalada's green under white text in dark mode, the income green on white): it is
-//  reported, and the test fails once it passes, so the note is removed with the cause.
+//  8.10.0: white text sits on `AppColors.accentFill` (the accent made readable as a fill) and
+//  income text is `AppColors.incomeText`, so the accents and income pass too; the apps' raw
+//  accents and the bright `income` stay for tints, fills and charts.
 //
 
 import SwiftUI
@@ -87,40 +87,40 @@ struct ContrastTests {
         }
     }
 
-    @Test("White on Tenra's indigo accent: it reads in light mode, 3.5:1 in dark mode (its choice)")
-    func tenraAccent() {
-        let light = AppColors.contrastRatio(AppColors.Text.onAccent, Color.indigo, in: Self.light)
-        #expect(light >= Self.minimum, "white on indigo, light: \(light)")
-        // iOS 26's dark indigo is lighter than white text needs; a deeper accent is Tenra's call.
-        withKnownIssue("The system indigo in dark mode is too light for white text") {
-            let dark = AppColors.contrastRatio(AppColors.Text.onAccent, Color.indigo, in: Self.dark)
-            #expect(dark >= Self.minimum, "white on indigo, dark: \(dark)")
-        }
-    }
-
     /// Dalada's AccentColor: light #2E8B57, dark #3CB371 (as the Gallery's Dalada theme).
-    @Test("White on Dalada's green accent: 4.3:1 in light mode, 2.7:1 in dark mode (its choice)")
-    func daladaAccent() {
-        let green = Color(UIColor { traits in
-            traits.userInterfaceStyle == .dark
-                ? UIColor(red: 0x3C / 255, green: 0xB3 / 255, blue: 0x71 / 255, alpha: 1)
-                : UIColor(red: 0x2E / 255, green: 0x8B / 255, blue: 0x57 / 255, alpha: 1)
-        })
-        withKnownIssue("Dalada's accent is too light for white text; a deeper green is its decision") {
+    private static let daladaGreen = Color(UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(red: 0x3C / 255, green: 0xB3 / 255, blue: 0x71 / 255, alpha: 1)
+            : UIColor(red: 0x2E / 255, green: 0x8B / 255, blue: 0x57 / 255, alpha: 1)
+    })
+
+    @Test("White reads on the accent's fill: Tenra's indigo and Dalada's green, both themes (8.10.0)")
+    func accentFills() {
+        let accents: [(String, Color)] = [("Tenra's indigo", .indigo), ("Dalada's green", Self.daladaGreen)]
+        for (name, accent) in accents {
             for (mode, traits) in Self.modes {
-                let ratio = AppColors.contrastRatio(AppColors.Text.onAccent, green, in: traits)
-                #expect(ratio >= Self.minimum, "white on Dalada's green, \(mode): \(ratio)")
+                let ratio = AppColors.contrastRatio(AppColors.Text.onAccent, AppColors.readableFill(accent), in: traits)
+                #expect(ratio >= Self.minimum, "white on \(name), \(mode): \(ratio)")
             }
         }
     }
 
-    @Test("The income green on the page: 2.75:1 in light mode (Tenra's look, decided apart)")
-    func incomeGreen() {
-        withKnownIssue("AppColors.income is lighter than text needs in light mode") {
-            let ratio = AppColors.contrastRatio(AppColors.income, AppColors.Background.base, in: Self.light)
-            #expect(ratio >= Self.minimum, "income on white: \(ratio)")
+    @Test("The accent's fill is the accent where white already reads on it (Tenra's indigo, light)")
+    func accentFillKeepsAReadableAccent() {
+        let fill = UIColor(AppColors.readableFill(.indigo)).resolvedColor(with: Self.light)
+        let indigo = UIColor(Color.indigo).resolvedColor(with: Self.light)
+        var a = (r: CGFloat(0), g: CGFloat(0), b: CGFloat(0), alpha: CGFloat(0))
+        var b = a
+        fill.getRed(&a.r, green: &a.g, blue: &a.b, alpha: &a.alpha)
+        indigo.getRed(&b.r, green: &b.g, blue: &b.b, alpha: &b.alpha)
+        #expect(abs(a.r - b.r) < 0.01 && abs(a.g - b.g) < 0.01 && abs(a.b - b.b) < 0.01)
+    }
+
+    @Test("Income as text reads on the page in both themes (8.10.0)")
+    func incomeText() {
+        for (mode, traits) in Self.modes {
+            let ratio = AppColors.contrastRatio(AppColors.incomeText, AppColors.Background.base, in: traits)
+            #expect(ratio >= Self.minimum, "income text, \(mode): \(ratio)")
         }
-        let dark = AppColors.contrastRatio(AppColors.income, AppColors.Background.base, in: Self.dark)
-        #expect(dark >= Self.minimum, "income on black: \(dark)")
     }
 }

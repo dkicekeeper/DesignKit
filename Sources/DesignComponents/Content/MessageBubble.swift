@@ -147,7 +147,8 @@ public struct MessageBubble: View {
                     .padding(.horizontal, AppSpacing.md)
                     .padding(.vertical, AppSpacing.sm)
                     .background(
-                        isOutgoing ? AppColors.accent : AppColors.Background.neutral1,
+                        // 8.10.0: white text reads on the person's own bubble in both themes.
+                        isOutgoing ? AppColors.accentFill : AppColors.Background.neutral1,
                         in: RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous)
                     )
                     .opacity(failure == nil ? 1 : MessageBubbleMetrics.failedOpacity)

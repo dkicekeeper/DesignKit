@@ -224,7 +224,7 @@ public struct MessageComposer<Leading: View>: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(isEnabled ? AppColors.accent : AppColors.Background.neutral2)
+                    .fill(isEnabled ? AppColors.accentFill : AppColors.Background.neutral2)
                 Icon("mic.fill", size: AppIconSize.sm, scalesWithText: false)
                     .fontWeight(.bold)
                     .foregroundStyle(isEnabled ? AppColors.staticWhite : AppColors.Text.tertiary)
@@ -242,7 +242,7 @@ public struct MessageComposer<Leading: View>: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(isSendEnabled || isSending ? AppColors.accent : AppColors.Background.neutral2)
+                    .fill(isSendEnabled || isSending ? AppColors.accentFill : AppColors.Background.neutral2)
                 if isSending {
                     ProgressView()
                         .controlSize(.small)
@@ -263,7 +263,7 @@ public struct MessageComposer<Leading: View>: View {
     private func quoteView(_ quote: MessageQuote) -> some View {
         HStack(spacing: AppSpacing.sm) {
             Capsule()
-                .fill(AppColors.accent)
+                .fill(AppColors.accentFill)
                 .frame(width: 3)
 
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {

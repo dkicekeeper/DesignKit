@@ -56,7 +56,7 @@ public struct ScheduleRow: View {
     public var body: some View {
         HStack(alignment: .top, spacing: AppSpacing.md) {
             Icon(isDone ? "checkmark.circle.fill" : "circle", size: AppIconSize.lg, scalesWithText: false)
-                .foregroundStyle(isDone ? AppColors.income : AppColors.Text.secondary)
+                .foregroundStyle(isDone ? AppColors.incomeText : AppColors.Text.secondary)
 
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(title)
