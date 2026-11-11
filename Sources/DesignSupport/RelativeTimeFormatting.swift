@@ -78,6 +78,39 @@ public extension Formatting {
         return date.formatted(style)
     }
 
+    /// The title of a day in a conversation or a feed (8.9.0): "Today", "Yesterday", then the day
+    /// ("3 Nov", with the year in another year), from the `DesignKitDateFormat.day` hook when the
+    /// app sets it. A day ahead reads "Tomorrow".
+    static func dayTitle(
+        _ date: Date,
+        now: Date = .now,
+        calendar: Calendar = .current,
+        locale: Locale = .current,
+        day: (@Sendable (_ date: Date, _ includeYear: Bool) -> String)? = DesignKitDateFormat.day
+    ) -> String {
+        let days = calendar.dateComponents([.day], from: calendar.startOfDay(for: now),
+                                           to: calendar.startOfDay(for: date)).day ?? 0
+        if abs(days) <= 1 {
+            let relative = RelativeDateTimeFormatter()
+            relative.locale = locale
+            relative.calendar = calendar
+            relative.dateTimeStyle = .named
+            relative.unitsStyle = .full
+            relative.formattingContext = .beginningOfSentence
+            return relative.localizedString(from: DateComponents(day: days))
+        }
+        let includeYear = !calendar.isDate(date, equalTo: now, toGranularity: .year)
+        if let day {
+            return day(date, includeYear)
+        }
+        var style = Date.FormatStyle(locale: locale, calendar: calendar, timeZone: calendar.timeZone)
+            .day().month(.wide)
+        if includeYear {
+            style = style.year()
+        }
+        return date.formatted(style)
+    }
+
     /// How long something has run: "42 sec" under a minute, "5 min" under an hour, "1 hr, 2 min"
     /// past it (`.abbreviated`), or "42 seconds", "1 hour, 2 minutes" (`.full`).
     static func elapsedTime(

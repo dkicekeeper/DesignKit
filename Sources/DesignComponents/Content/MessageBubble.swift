@@ -7,6 +7,10 @@
 //  the bubble, with a retry. Rich replies (cards, charts) are the app's own views laid out under
 //  an incoming bubble or in its place.
 //
+//  8.9.0 (benchmark round 4: Astryx's ChatMessage and its metadata): an answer in Markdown
+//  (`MessageBubble(markdown:)`: paragraphs, lists, headings, notes, bold and links), and the time
+//  and the state of a message under it ("14:20 · Read").
+//
 //  Motion (5.2.0): `.transition(.messageBubble(role))` on a new message grows the person's own
 //  from its bottom trailing corner, where the field is, and brings a reply in from its bottom
 //  leading corner. A message that fails shakes once, its failure line rises in under it, and
@@ -23,6 +27,8 @@ import DesignSupport
 /// MessageBubble("How much did I spend on cafés?")                              // mine
 /// MessageBubble("Here is October so far.", role: .incoming)
 /// MessageBubble(text, failure: "No connection") { Task { await retry() } }    // not sent
+/// MessageBubble(markdown: answer)                                              // an assistant's reply
+/// MessageBubble(text, time: sentAt, status: .read)                             // "14:20 · Read" under it
 /// ```
 ///
 /// The bubble grows to about 80% of the width and leaves the rest empty on the far side; the text
@@ -47,17 +53,74 @@ public struct MessageBubble: View {
         case incoming
     }
 
-    let text: String
+    /// Where a message the person sent stands (8.9.0), said after its time under the bubble.
+    public enum Status: Hashable, Sendable {
+        /// On its way: "Sending…".
+        case sending
+        /// The other side has it: "Sent".
+        case sent
+        /// The other side has read it: "Read".
+        case read
+
+        var title: String {
+            switch self {
+            case .sending: String(localized: "message.sending", defaultValue: "Sending…")
+            case .sent: String(localized: "message.sent", defaultValue: "Sent")
+            case .read: String(localized: "message.read", defaultValue: "Read")
+            }
+        }
+    }
+
+    /// Plain text, or Markdown read into blocks once.
+    private enum MessageContent {
+        case text(String)
+        case markdown([ArticleBody.Block])
+    }
+
+    private let content: MessageContent
     let role: Role
+    let time: Date?
+    let status: Status?
     let failure: String?
     let onRetry: (() -> Void)?
 
     /// - Parameters:
+    ///   - time: When it was sent; shown under the bubble on its side (8.9.0).
+    ///   - status: Where the person's own message stands, after the time (8.9.0).
     ///   - failure: Why the message was not sent; shown under the bubble in red.
     ///   - onRetry: Adds a Retry button next to the failure.
-    public init(_ text: String, role: Role = .outgoing, failure: String? = nil, onRetry: (() -> Void)? = nil) {
-        self.text = text
+    public init(
+        _ text: String,
+        role: Role = .outgoing,
+        time: Date? = nil,
+        status: Status? = nil,
+        failure: String? = nil,
+        onRetry: (() -> Void)? = nil
+    ) {
+        self.content = .text(text)
         self.role = role
+        self.time = time
+        self.status = status
+        self.failure = failure
+        self.onRetry = onRetry
+    }
+
+    /// A reply written in Markdown (8.9.0): paragraphs (a single line break kept), `-` and `1.`
+    /// lists, `#` headings in the bubble's own size, `>` notes, **bold**, *italic* and links
+    /// (`ArticleBody.Block.parse(markdown:)`). An answer is the other side's, so `role` is
+    /// `.incoming` by default.
+    public init(
+        markdown: String,
+        role: Role = .incoming,
+        time: Date? = nil,
+        status: Status? = nil,
+        failure: String? = nil,
+        onRetry: (() -> Void)? = nil
+    ) {
+        self.content = .markdown(ArticleBody.Block.parse(markdown: markdown))
+        self.role = role
+        self.time = time
+        self.status = status
         self.failure = failure
         self.onRetry = onRetry
     }
@@ -74,9 +137,11 @@ public struct MessageBubble: View {
         VStack(alignment: isOutgoing ? .trailing : .leading, spacing: AppSpacing.xs) {
             HStack(spacing: 0) {
                 if isOutgoing { Spacer(minLength: MessageBubbleMetrics.farSideMargin) }
-                Text(text)
+                bubbleContent
                     .font(AppTypography.body)
                     .foregroundStyle(isOutgoing ? AppColors.Text.onAccent : AppColors.Text.primary)
+                    // A link in the person's own message is white on the accent, underlined.
+                    .tint(isOutgoing ? AppColors.Text.onAccent : AppColors.accent)
                     .multilineTextAlignment(.leading)
                     .textSelection(.enabled)
                     .padding(.horizontal, AppSpacing.md)
@@ -98,6 +163,13 @@ public struct MessageBubble: View {
                         CubicKeyframe(0, duration: step)
                     }
                 if !isOutgoing { Spacer(minLength: MessageBubbleMetrics.farSideMargin) }
+            }
+            if failure == nil, let meta = metaLine {
+                Text(verbatim: meta)
+                    .font(AppTypography.caption2)
+                    .foregroundStyle(AppColors.Text.tertiary)
+                    .padding(.horizontal, AppSpacing.xs)
+                    .contentTransition(.opacity)
             }
             if let failure {
                 HStack(spacing: AppSpacing.xs) {
@@ -122,7 +194,76 @@ public struct MessageBubble: View {
         .onChange(of: failure != nil) { _, failed in
             if failed, !reduceMotion, designKitMotion { shakes += 1 }
         }
+        .animation(AppAnimation.smooth, value: status)
         .accessibilityElement(children: .combine)
+    }
+
+    @ViewBuilder
+    private var bubbleContent: some View {
+        switch content {
+        case .text(let text):
+            Text(text)
+        case .markdown(let blocks):
+            MessageMarkdown(blocks: blocks, isOutgoing: isOutgoing)
+        }
+    }
+
+    /// "14:20 · Read", "14:20", "Sending…"; nil with neither.
+    private var metaLine: String? {
+        let parts = [time.map { $0.formatted(date: .omitted, time: .shortened) }, status?.title].compactMap { $0 }
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
+    }
+}
+
+/// The blocks of a Markdown reply in a bubble: in the bubble's own size and colour (headings only
+/// bolder), lists with their markers, a note behind a bar.
+private struct MessageMarkdown: View {
+    let blocks: [ArticleBody.Block]
+    let isOutgoing: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            ForEach(Array(blocks.enumerated()), id: \.offset) { _, block in
+                view(of: block)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func view(of block: ArticleBody.Block) -> some View {
+        switch block {
+        case .heading(let text, _):
+            inlineMarkdown(text)
+                .fontWeight(.semibold)
+                .accessibilityAddTraits(.isHeader)
+        case .paragraph(let text):
+            inlineMarkdown(text)
+        case .bullets(let items):
+            list(items) { _ in "•" }
+        case .steps(let items):
+            list(items) { index in "\(index + 1)." }
+        case .note(let text):
+            HStack(alignment: .top, spacing: AppSpacing.sm) {
+                Capsule()
+                    .fill(isOutgoing ? AppColors.Text.onAccent.opacity(0.6) : AppColors.accent)
+                    .frame(width: MessageBubbleMetrics.noteBar)
+                inlineMarkdown(text)
+                    .opacity(0.85)
+            }
+            .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func list(_ items: [String], marker: @escaping (Int) -> String) -> some View {
+        VStack(alignment: .leading, spacing: AppSpacing.xs) {
+            ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+                HStack(alignment: .firstTextBaseline, spacing: AppSpacing.sm) {
+                    Text(verbatim: marker(index))
+                        .monospacedDigit()
+                    inlineMarkdown(item)
+                }
+            }
+        }
     }
 }
 
@@ -175,6 +316,8 @@ private struct MessageBubbleEntrance: ViewModifier {
 public enum MessageBubbleMetrics {
     /// The empty side: the bubble never reaches the far edge.
     public static let farSideMargin: CGFloat = 56
+    /// The bar beside a note in a Markdown reply.
+    static let noteBar: CGFloat = 3
     /// A message that was not sent is drawn faded.
     static let failedOpacity: Double = 0.6
     /// The shake of a failed message: how far the bubble swings (then less each way), and how

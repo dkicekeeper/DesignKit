@@ -63,6 +63,29 @@ extension ComponentSnapshots {
             )
         }
 
+        /// 8.9.0: a reply in Markdown (a heading, a paragraph with bold, a list, a note), the
+        /// person's message with its state under it, a day and an event across the conversation.
+        /// No times: they would change from run to run.
+        @Test func conversation() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.md) {
+                    ConversationDivider(date: .now)
+                    MessageBubble("How much did I spend on cafés?", status: .read)
+                    MessageBubble(markdown: """
+                    ## October so far
+                    You spent **42,300 ₸** on cafés.
+                    - Coffee: 18,400 ₸
+                    - Lunch out: 23,900 ₸
+                    > Most of it on weekdays.
+                    """)
+                    ConversationDivider("Ten changed the October budget", systemImage: "pencil")
+                    MessageBubble("Thanks!", status: .sending)
+                }
+                .frame(width: 360),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
         /// 4.6.0: prompts in one row and wrapped.
         @Test func suggestionChips() async {
             await assertComponentSnapshot(

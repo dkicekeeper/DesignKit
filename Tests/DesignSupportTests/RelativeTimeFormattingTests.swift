@@ -68,6 +68,18 @@ struct RelativeTimeFormattingTests {
         #expect(!lastWeek.contains("2026"))
     }
 
+    @Test func dayTitlesNameTodayAndYesterdayThenTheDay() {
+        func title(_ offset: TimeInterval, day: (@Sendable (Date, Bool) -> String)? = nil) -> String {
+            Formatting.dayTitle(Self.now.addingTimeInterval(offset), now: Self.now,
+                                calendar: Self.calendar, locale: Self.locale, day: day)
+        }
+        #expect(title(-3600) == "Today")
+        #expect(title(-86_400) == "Yesterday")
+        #expect(title(86_400) == "Tomorrow")
+        #expect(title(-8 * 86_400).contains("November"))
+        #expect(title(-400 * 86_400) { _, includeYear in includeYear ? "with year" : "no year" } == "with year")
+    }
+
     @Test func elapsedTimePicksTheUnitByLength() {
         let seconds = Formatting.elapsedTime(42, locale: Self.locale)
         #expect(seconds.contains("42"))

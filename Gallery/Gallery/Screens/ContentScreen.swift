@@ -30,7 +30,54 @@ struct ContentScreen: View {
         EditableHeroPage()
         ArticleBodyPage()
         MessageBubblePage()
+        ConversationDividerPage()
         RelativeTimePage()
+    }
+}
+
+private struct ConversationDividerPage: View {
+    @State private var state: SpecimenState = .content
+    @State private var kind = 0
+    @State private var event = "Ten changed the October budget"
+
+    var body: some View {
+        ComponentPage(
+            name: "ConversationDivider",
+            summary: "A line across a conversation: the day the next messages are from, or something that happened in it.",
+            since: "8.9.0",
+            apps: [],
+            canvas: .fill,
+            notes: [
+                "ConversationDivider(date:) reads “Today”, “Yesterday”, then the day (Formatting.dayTitle, the DesignKitDateFormat.day hook); VoiceOver hears it as a heading.",
+                "ConversationDivider(_:systemImage:) for an event: “Alex joined”, “Ten changed the budget”.",
+            ]
+        ) {
+            if state == .loading {
+                ConversationDividerSkeleton()
+            } else {
+                VStack(spacing: AppSpacing.sm) {
+                    MessageBubble("How much did I spend on cafés?", time: Date.now.addingTimeInterval(-90_000), status: .read)
+                    divider
+                    MessageBubble("And on taxis?", time: .now, status: .sent)
+                }
+            }
+        } controls: {
+            StateControl(state: $state)
+            ChoiceControl("Divider", selection: $kind, options: [("Today", 0), ("A week ago", 1), ("Last year", 2), ("Event", 3)])
+            if kind == 3 {
+                TextControl("Event", text: $event)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var divider: some View {
+        switch kind {
+        case 1: ConversationDivider(date: Date.now.addingTimeInterval(-7 * 86_400))
+        case 2: ConversationDivider(date: Date.now.addingTimeInterval(-400 * 86_400))
+        case 3: ConversationDivider(event, systemImage: "pencil")
+        default: ConversationDivider(date: .now)
+        }
     }
 }
 
@@ -543,6 +590,17 @@ private struct MessageBubblePage: View {
     @State private var failed = false
     @State private var state: SpecimenState = .content
     @State private var sent: [Sent] = []
+    @State private var markdown = false
+    @State private var showsTime = true
+    @State private var status: MessageBubble.Status? = .read
+
+    private static let markdownReply = """
+    ## October so far
+    You spent **42,300 ₸** on cafés, a little more than in September.
+    - Coffee: 18,400 ₸
+    - Lunch out: 23,900 ₸
+    > Most of it on weekdays, before noon.
+    """
 
     var body: some View {
         ComponentPage(
@@ -556,18 +614,31 @@ private struct MessageBubblePage: View {
                 "A new message enters with .transition(.messageBubble(role)): the person's own grows from the field's corner, a reply comes into focus on the left. The history a chat opens with does not move.",
                 "Not sent: the bubble shakes once, the failure line rises in, the error haptic plays. Under Reduce Motion only the fades stay.",
                 "Rich replies (cards, charts) are the app's own views under an incoming bubble or in its place.",
+                "8.9.0: MessageBubble(markdown:) reads an answer's paragraphs, lists, headings, notes, bold and links; time: and status: put “14:20 · Read” under the bubble. Strings: message.sending, message.sent, message.read.",
             ]
         ) {
             if state == .loading {
                 MessageBubbleSkeleton(role: incoming ? .incoming : .outgoing)
             } else {
                 VStack(spacing: AppSpacing.sm) {
-                    MessageBubble(
-                        text,
-                        role: incoming ? .incoming : .outgoing,
-                        failure: failed ? "No connection" : nil,
-                        onRetry: failed ? { failed = false } : nil
-                    )
+                    if markdown {
+                        MessageBubble(
+                            markdown: Self.markdownReply,
+                            role: incoming ? .incoming : .outgoing,
+                            time: showsTime ? Date.now.addingTimeInterval(-120) : nil,
+                            failure: failed ? "No connection" : nil,
+                            onRetry: failed ? { failed = false } : nil
+                        )
+                    } else {
+                        MessageBubble(
+                            text,
+                            role: incoming ? .incoming : .outgoing,
+                            time: showsTime ? Date.now.addingTimeInterval(-120) : nil,
+                            status: incoming ? nil : status,
+                            failure: failed ? "No connection" : nil,
+                            onRetry: failed ? { failed = false } : nil
+                        )
+                    }
                     ForEach(sent.suffix(4)) { message in
                         MessageBubble(message.text, role: message.role)
                             .transition(.messageBubble(message.role))
@@ -577,8 +648,11 @@ private struct MessageBubblePage: View {
             }
         } controls: {
             StateControl(state: $state)
+            ChoiceControl("Content", selection: $markdown, options: [("Text", false), ("Markdown reply", true)])
             TextControl("Text", text: $text)
             ToggleControl("Incoming", isOn: $incoming)
+            ToggleControl("Time", isOn: $showsTime)
+            ChoiceControl("Status", selection: $status, options: [("None", nil), ("Sending", .sending), ("Sent", .sent), ("Read", .read)])
             ToggleControl("Not sent", isOn: $failed)
             ActionControl("Send", systemImage: "arrow.up.circle.fill", action: send)
             ActionControl("Clear the conversation", systemImage: "xmark.circle") { sent = [] }

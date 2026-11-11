@@ -108,6 +108,7 @@ extension ComponentSnapshots {
                     }
                     MessageBubbleSkeleton()
                     MessageBubbleSkeleton(role: .outgoing)
+                    ConversationDividerSkeleton()
                     SuggestionChipsSkeleton()
                 }
                 .frame(width: 360, alignment: .leading)
