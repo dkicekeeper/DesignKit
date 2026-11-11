@@ -43,6 +43,22 @@ way), `AmountDigitDisplay`, `AmountPercentage`, `AnimatedTitleInput` (inside `Ed
 `.attentionPulse`, `.grain`, `.accentGlow`, `.ripple`, `.dissolve`, `.textReveal`,
 `.scrollReveal`, `.staggeredEntrance`, `.hapticCue`, `ScrambleText`.
 
+## 8.9.0: proposals for the new components
+
+Benchmark round 4 (docs/benchmark.md, against Meta's Astryx) added these; no app uses them yet.
+
+| Component | Tenra | Dalada |
+|---|---|---|
+| `InfoTip` | the Financial Health score and its parts, an insight's rolling average or forecast, "spent per day" | a route's difficulty, a rating, a streak's rule |
+| `RelativeTime` | History's "today 14:20" rows, the backups' "updated 2 min ago", a statement import | comments, threads and reviews ("5 min. ago"), `LiveSessionBar`'s running time (`.clock`) |
+| `SearchablePicker` | a transaction's category and subcategory (with "Create"), link payments | a trip's gear (several, with "Create"), a place's type |
+| `MessageBubble(markdown:time:status:)` | Ten's answers in Markdown, the time under a message | a thread's messages with time and "Read" |
+| `ConversationDivider` | the chat's days, "Ten changed the budget" | a thread's days, "Alex joined" |
+| `AccessibilityAnnouncer` | "Saved", "Imported 120 transactions", a sync that finished | "Trip saved", an upload that finished |
+| `AppColors.Status.*Text`, `AppColors.readable` | its own status texts on tints (a category's badge) | rule statuses, map legends on a tint |
+| `scripts/designkit_lint.py` | in place of `scripts/design_lint.py` and `section_rows_lint.py` (`--source Tenra`) | the same (`--source ios/Dalada --source ios/DaladaWidgets --source ios/Packages/DaladaKit/Sources`) |
+| `scripts/sync_agents_block.py` | its CLAUDE.md, after each pin bump in `designkit.yml` | the same |
+
 ## Ten (ParticleCreature) in Tenra
 
 Since Tenra#79 Tenra's code uses all of the creature: both styles, `CreatureGlyph` (tab, toolbar,

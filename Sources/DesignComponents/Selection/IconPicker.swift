@@ -355,7 +355,7 @@ private struct IconPickerPhotoTab: View {
                 if failed {
                     Text(String(localized: "iconPicker.photoFailed", defaultValue: "The picture could not be used. Try another one."))
                         .font(AppTypography.bodySmall)
-                        .foregroundStyle(AppColors.destructive)
+                        .foregroundStyle(AppColors.Status.negativeText)
                         .multilineTextAlignment(.center)
                 }
                 PhotosPicker(selection: $item, matching: .images) {

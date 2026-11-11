@@ -112,6 +112,9 @@ public struct MessageBanner: View {
 
             HapticManager.notification(type: type.hapticType)
         }
+        // 8.9.0: the banner is the event, so VoiceOver hears it when it appears (and when its
+        // message changes in place); it goes away on its own and would be missed otherwise.
+        .voiceOverAnnouncement(message, onAppear: true)
     }
 
     private var bannerContent: some View {

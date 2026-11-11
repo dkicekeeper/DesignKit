@@ -63,6 +63,29 @@ extension ComponentSnapshots {
             )
         }
 
+        /// 8.9.0: a reply in Markdown (a heading, a paragraph with bold, a list, a note), the
+        /// person's message with its state under it, a day and an event across the conversation.
+        /// No times: they would change from run to run.
+        @Test func conversation() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.md) {
+                    ConversationDivider(date: .now)
+                    MessageBubble("How much did I spend on cafés?", status: .read)
+                    MessageBubble(markdown: """
+                    ## October so far
+                    You spent **42,300 ₸** on cafés.
+                    - Coffee: 18,400 ₸
+                    - Lunch out: 23,900 ₸
+                    > Most of it on weekdays.
+                    """)
+                    ConversationDivider("Ten changed the October budget", systemImage: "pencil")
+                    MessageBubble("Thanks!", status: .sending)
+                }
+                .frame(width: 360),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
         /// 4.6.0: prompts in one row and wrapped.
         @Test func suggestionChips() async {
             await assertComponentSnapshot(
@@ -330,6 +353,26 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 DateRangePickerSheet(range: start...end) { _ in }
                     .frame(height: 640)
+            )
+        }
+
+        /// SearchablePicker (8.9.0) on its screen: the options in a glass card with their
+        /// icons and lines, one picked.
+        @Test func searchablePicker() async {
+            let options = [
+                SearchablePickerOption("Cafés", value: 1, subtitle: "Coffee, lunch out", systemImage: "cup.and.saucer.fill"),
+                SearchablePickerOption("Groceries", value: 2, systemImage: "cart.fill"),
+                SearchablePickerOption("Taxi", value: 3, subtitle: "Rides and parking", systemImage: "car.fill"),
+                SearchablePickerOption("Rent", value: 4, systemImage: "house.fill"),
+            ]
+            await assertComponentSnapshot(
+                NavigationStack {
+                    SearchablePicker(options, selection: .constant(Optional(2)))
+                        .navigationTitle("Category")
+                        .navigationBarTitleDisplayMode(.inline)
+                }
+                .frame(height: 520),
+                appearances: [.light, .dark]
             )
         }
 

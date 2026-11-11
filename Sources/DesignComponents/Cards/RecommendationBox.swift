@@ -26,7 +26,8 @@ public struct RecommendationBox: View {
     public var body: some View {
         HStack(alignment: .top, spacing: AppSpacing.sm) {
             Icon(icon, size: AppIconSize.sm, scalesWithText: false)
-                .foregroundStyle(color)
+                // 8.9.0: readable on its pale tint.
+                .foregroundStyle(AppColors.readable(color))
 
             Text(text)
                 .font(AppTypography.bodySmall)

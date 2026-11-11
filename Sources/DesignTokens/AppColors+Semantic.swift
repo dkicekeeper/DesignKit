@@ -27,12 +27,14 @@ public extension AppColors {
         public nonisolated static let tertiary = Color.gray
         /// Interactive text and icons: links, text buttons. The app's accent.
         public nonisolated static var action: Color { DesignKitTheme.accent }
-        /// A positive value or label: a rise, money in, "done".
-        public nonisolated static let positive = Color.green
-        /// A negative value or label: a fall, an error.
-        public nonisolated static let negative = Color.red
-        /// A warning label or icon.
-        public nonisolated static let warning = Color.orange
+        /// A positive value or label: a rise, money in, "done". Since 8.9.0 the green of
+        /// `Status.positive` deep enough to read (`AppColors.readable`): 4.5:1 on the page and on
+        /// its pale container.
+        public nonisolated static let positive = Status.positiveText
+        /// A negative value or label: a fall, an error. Readable red (8.9.0).
+        public nonisolated static let negative = Status.negativeText
+        /// A warning label or icon. Readable orange (8.9.0).
+        public nonisolated static let warning = Status.warningText
         /// Text and icons on an accent fill (a filled button, a badge).
         public nonisolated static let onAccent = Color.white
 
@@ -115,6 +117,19 @@ public extension AppColors {
         public nonisolated static let warningPale = AppColors.pale(warning)
         /// Container of a neutral block.
         public nonisolated static let neutralPale = AppColors.pale(neutral)
+
+        /// Status text and icons on the page or on the status's `…Pale` container (8.9.0): the
+        /// solid colour made readable (`AppColors.readable`), at least 4.5:1 in both themes. The
+        /// solid colours themselves stay for fills, tracks and charts.
+        public nonisolated static let infoText = AppColors.readable(info)
+        /// Positive text and icons, readable (8.9.0).
+        public nonisolated static let positiveText = AppColors.readable(positive)
+        /// Negative text and icons, readable (8.9.0).
+        public nonisolated static let negativeText = AppColors.readable(negative)
+        /// Warning text and icons, readable (8.9.0).
+        public nonisolated static let warningText = AppColors.readable(warning)
+        /// Neutral text and icons, readable (8.9.0).
+        public nonisolated static let neutralText = AppColors.readable(neutral)
     }
 
     // MARK: - Border
@@ -155,5 +170,115 @@ public extension AppColors {
     /// A colour with its own light and dark values.
     nonisolated static func dynamic(light: UIColor, dark: UIColor) -> Color {
         Color(UIColor { traits in traits.userInterfaceStyle == .dark ? dark : light })
+    }
+
+    // MARK: - Contrast (8.9.0)
+
+    /// `color` as text or an icon that reads: the same hue, a step deeper in light mode or a step
+    /// lighter in dark mode, just enough for 4.5:1 (WCAG AA for body text) against its own
+    /// `pale(_:)` container on a card, and so against the page too. A colour that already reads
+    /// stays as it is (the indigo accent in light mode, the system green in dark mode).
+    ///
+    /// ```swift
+    /// Text("Overdue").foregroundStyle(AppColors.readable(category.color))
+    ///     .background(AppColors.pale(category.color), in: Capsule())
+    /// ```
+    ///
+    /// The system orange becomes a deep amber in light mode (2.0:1 → 4.5:1), the green a forest
+    /// green, the red a brick red. Fills, progress tracks and chart marks keep the solid colour.
+    nonisolated static func readable(_ color: Color) -> Color {
+        let base = UIColor(color)
+        return Color(UIColor { traits in
+            let dark = traits.userInterfaceStyle == .dark
+            let solid = base.resolvedColor(with: traits)
+            let surface = dark ? ColorContrast.darkCard : UIColor.white
+            let container = ColorContrast.composite(solid.withAlphaComponent(dark ? 0.24 : 0.12), over: surface)
+            return ColorContrast.adjusted(solid, toward: dark ? .white : .black,
+                                          reaching: ColorContrast.textMinimum, against: container)
+        })
+    }
+
+    /// `color` as a fill white text reads on (`Badge(style: .filled)`): the same hue deepened
+    /// until white on it is 4.5:1, in both themes. A deep enough colour stays as it is.
+    nonisolated static func readableFill(_ color: Color) -> Color {
+        let base = UIColor(color)
+        return Color(UIColor { traits in
+            ColorContrast.adjusted(base.resolvedColor(with: traits), toward: .black,
+                                   reaching: ColorContrast.textMinimum, against: .white)
+        })
+    }
+
+    /// The WCAG contrast ratio of two colours, from 1 (the same) to 21 (black on white). Both are
+    /// resolved for `traits`; a translucent colour is laid over the other one first.
+    nonisolated static func contrastRatio(
+        _ foreground: Color,
+        _ background: Color,
+        in traits: UITraitCollection = UITraitCollection(userInterfaceStyle: .light)
+    ) -> Double {
+        let back = UIColor(background).resolvedColor(with: traits)
+        let opaqueBack = ColorContrast.composite(back, over: traits.userInterfaceStyle == .dark ? .black : .white)
+        let front = ColorContrast.composite(UIColor(foreground).resolvedColor(with: traits), over: opaqueBack)
+        return ColorContrast.ratio(front, opaqueBack)
+    }
+}
+
+/// The arithmetic behind `AppColors.readable` and `contrastRatio` (WCAG 2.x relative luminance).
+enum ColorContrast {
+    /// Body text and icons: WCAG AA.
+    nonisolated static let textMinimum: Double = 4.5
+    /// The card a dark-mode badge sits on (`Background.elevation1`).
+    nonisolated static var darkCard: UIColor { UIColor(white: 28 / 255, alpha: 1) }
+
+    nonisolated static func components(_ color: UIColor) -> (r: CGFloat, g: CGFloat, b: CGFloat, a: CGFloat) {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        if !color.getRed(&r, green: &g, blue: &b, alpha: &a) {
+            var white: CGFloat = 0
+            color.getWhite(&white, alpha: &a)
+            (r, g, b) = (white, white, white)
+        }
+        // Extended sRGB (a P3 colour) can step outside 0...1.
+        return (min(max(r, 0), 1), min(max(g, 0), 1), min(max(b, 0), 1), a)
+    }
+
+    nonisolated static func luminance(_ color: UIColor) -> Double {
+        let c = components(color)
+        func linear(_ channel: CGFloat) -> Double {
+            let v = Double(channel)
+            return v <= 0.04045 ? v / 12.92 : pow((v + 0.055) / 1.055, 2.4)
+        }
+        return 0.2126 * linear(c.r) + 0.7152 * linear(c.g) + 0.0722 * linear(c.b)
+    }
+
+    nonisolated static func ratio(_ a: UIColor, _ b: UIColor) -> Double {
+        let la = luminance(a), lb = luminance(b)
+        return (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
+    }
+
+    /// `foreground` (with its alpha) laid over an opaque `background`.
+    nonisolated static func composite(_ foreground: UIColor, over background: UIColor) -> UIColor {
+        let f = components(foreground), b = components(background)
+        return UIColor(red: f.r * f.a + b.r * (1 - f.a),
+                       green: f.g * f.a + b.g * (1 - f.a),
+                       blue: f.b * f.a + b.b * (1 - f.a),
+                       alpha: 1)
+    }
+
+    /// `color` mixed with `target` (black or white) just enough to reach `minimum` against
+    /// `background`; unchanged when it already does.
+    nonisolated static func adjusted(_ color: UIColor, toward target: UIColor, reaching minimum: Double,
+                                     against background: UIColor) -> UIColor {
+        let opaque = composite(color, over: background)
+        guard ratio(opaque, background) < minimum else { return opaque }
+        let c = components(opaque), t = components(target)
+        func mixed(_ amount: CGFloat) -> UIColor {
+            UIColor(red: c.r + (t.r - c.r) * amount, green: c.g + (t.g - c.g) * amount,
+                    blue: c.b + (t.b - c.b) * amount, alpha: 1)
+        }
+        var low: CGFloat = 0, high: CGFloat = 1
+        for _ in 0..<16 {
+            let middle = (low + high) / 2
+            if ratio(mixed(middle), background) >= minimum { high = middle } else { low = middle }
+        }
+        return mixed(high)
     }
 }

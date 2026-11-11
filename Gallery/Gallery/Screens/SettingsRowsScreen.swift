@@ -98,6 +98,12 @@ private struct UniversalRowPage: View {
                 "The icon is a glyph in the accent, 24 pt in every row (7.0.0), so the titles of a card line up. role: .destructive turns the title and the icon red.",
                 "It replaced ToggleSettingsRow, ActionSettingsRow, ActionRowLabel, NavigationSettingsRow, CheckmarkRow, MenuPickerRow, NavigationPickerRow, DatePickerRow, StepperRow, SliderRow, ColorPickerRow and InfoRow, removed in 7.0.0 (docs/migration-7.0.md).",
                 "The generic UniversalRow(config:leadingIcon:hint:content:trailing:) stays for a row none of these is.",
+            ],
+            dos: [
+                "Use it for every row of a form card and a settings list, with its accessory.",
+            ],
+            donts: [
+                "Build a row from an HStack: it loses the padding, the icon size and the divider inset.",
             ]
         ) {
             InRowHost(host: host) {

@@ -40,7 +40,7 @@
 | Module | Contents |
 |---|---|
 | `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases, `Palette` 3.7.0), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, `softScrollEdges` 5.4.0, inline field styles), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
-| `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `Icon` (a brand logo is `Icon(source: .brandService(name))`; `BrandLogoView` was removed in 2.0.0), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `RecentSearches` and `SearchMatch` (search suggestions, 3.5.0), `HapticManager`, `HapticCue` (haptics by meaning, 2.3.0), `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitPhotoLoader` (3.1.0), `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
+| `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `Icon` (a brand logo is `Icon(source: .brandService(name))`; `BrandLogoView` was removed in 2.0.0), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `RecentSearches` and `SearchMatch` (search suggestions, 3.5.0), `Formatting.relativeTime` / `elapsedTime` / `clockTime` / `dayTitle` (8.9.0), `AccessibilityAnnouncer` and `.voiceOverAnnouncement` (8.9.0), `HapticManager`, `HapticCue` (haptics by meaning, 2.3.0), `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitPhotoLoader` (3.1.0), `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
 | `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons") |
 
 **Names (2.0.0).** A component is named for what it is, without `View` or `App`: `SectionHeader`,
@@ -57,8 +57,10 @@ The tokens keep their prefix (`AppColors`, `AppSpacing`, `AppIconSize`, …): a 
 is not a view, and `Color` / `Font` would clash with SwiftUI. The button is `DSButton` because
 `Button` is SwiftUI's.
 
-Coverage against Apple HIG, Material 3, Fluent 2, Carbon, Polaris and Atlassian, and the next
-candidates: [benchmark.md](benchmark.md).
+Coverage against Apple HIG, Material 3, Fluent 2, Carbon, Polaris, Atlassian and Astryx, and the next
+candidates: [benchmark.md](benchmark.md). One entry per component (what it is for, its initialisers,
+rules, do and don't, its skeleton), generated from the Gallery and the sources:
+[components.md](components.md) (8.9.0); the short version for an app's agent: [agents.md](agents.md).
 
 ### 0.1 Host-app hooks
 
@@ -110,6 +112,7 @@ Modifiers:
 - **`OnDark` / `OnLight`**: the same value in both themes, for content on photos, gradients and coloured headers (a trip photo in Dalada, `AuroraBackground`, an accent hero).
 - **`Pale`**: a tinted container behind status text, badges and icons. `AppColors.pale(_:)` makes one from any colour (a category colour too): 12% in light, 24% in dark. Since 1.8.0 every tinted container in DesignKit uses it, so they are equally strong everywhere: `Badge` (tinted), `TrendBadge` (pill), `RecommendationBox`, `HeroSymbol`, `Avatar` (initials), the round icons of `LimitProgressCard` and `AmountRow`'s tinted icon, `ActivityTimeline` markers, the `ScoreGaugeCard` grade and `TargetProgressCard` badge, `MonthCalendar`'s today, `TagInput` chips and the calculator's operator keys. Progress tracks and chart fills are not containers and keep their own opacity.
 - **Opaque** (`Border.opaque`): no transparency, for outlines that overlap.
+- **Readable** *(8.9.0)*: `AppColors.readable(_:)` makes a colour text or an icon that reads at 4.5:1 (WCAG AA for body text) on its own `pale(_:)` container and on the page: the same hue a step deeper in light mode, a step lighter in dark mode, unchanged when it already reads (the indigo accent in light mode). The system orange and green read at 2:1 on their tints in light mode, red 3:1, blue 3.4:1; made readable they are a deep amber, a forest green, a brick red. `readableFill(_:)` deepens a fill under white text (`Badge(.filled)`); `contrastRatio(_:_:in:)` measures a pair. Fills, tracks and chart marks keep the solid colours. `ContrastTests` pins the tokens, every category colour and the accents.
 
 **`AppColors.Text`** — text and icons
 
@@ -136,7 +139,7 @@ Modifiers:
 | `fillOnDark` / `fillOnLight` | white 15% / black 5% | Translucent container on dark / light photos, both themes |
 | `overlayOnImage` | black 30% | Darkens a photo under text |
 
-**`AppColors.Status`** — banners, badges, notices: `info` (`.blue`), `positive` (`.green`), `negative` (`.red`), `warning` (`.orange`), `neutral` (`.gray`), each with a `…Pale` container (`AppColors.pale`).
+**`AppColors.Status`** — banners, badges, notices: `info` (`.blue`), `positive` (`.green`), `negative` (`.red`), `warning` (`.orange`), `neutral` (`.gray`), each with a `…Pale` container (`AppColors.pale`) and *(8.9.0)* a `…Text` colour for its text and icons (`AppColors.readable` of the solid one: `infoText`, `positiveText`, `negativeText`, `warningText`, `neutralText`). `Text.positive`, `.negative` and `.warning` are the `…Text` colours since 8.9.0. The solid colours stay for fills, icons on a fill and charts.
 
 **`AppColors.Border`** — `normal` (`.separator`), `opaque` (`.opaqueSeparator`), `selected` (accent), `darkModeOnly` (clear in light, white 10% in dark: a hairline around logos, avatars and images that would melt into black), `onDark` (white 10%), `onLight` (black 5%).
 
@@ -962,6 +965,7 @@ UniversalCarousel(config: .filter) {
 
 
 **`.carouselItemTransition(isEnabled:)`** *(1.10.0)*: a card in a carousel dims to 75% and shrinks to 95% as it scrolls off (`scrollTransition(.interactive)`). Pass `false` for a carousel too short to scroll. Tenra: the accounts carousel (`isEnabled: accounts.count >= 3`).
+
 #### `UniversalFilterButton`
 Filter chip in two modes.
 
@@ -1216,6 +1220,21 @@ by that edge of the screen: the bubble runs on to the side with room, and a cent
 over the real screen is `.spotlight`, which keeps its message off the edges by itself. A hint
 longer than the bubble's widest, 280 pt, wraps into lines (5.5.0; it ran on in one line past the
 screen); a value in one line stays one line.
+
+#### `InfoTip` *(8.9.0)*
+An ⓘ after the name of a value; a tap opens a popover with a sentence or two on what it means or
+how it is counted. `Tooltip` is a value over what was tapped; this is an explanation the person
+asks for.
+
+```swift
+Text("Health score").infoTip("Savings, debts and limits, from 0 to 100.", title: "Health score")
+HStack { Text("Rolling average"); InfoTip("The last 30 days, recomputed nightly.") }
+```
+
+The glyph is `AppIconSize.sm` in `Text.secondary` (white on a hero's colour), its target 44 pt
+without taking room; on iPhone the popover stays a popover (`presentationCompactAdaptation`).
+VoiceOver: "About <title>" or "More information" (`infoTip.about`, `infoTip.label`). No skeleton:
+it explains, it shows no data.
 
 #### `MessageBanner`
 Transient animated feedback banner.
@@ -1673,6 +1692,20 @@ ActivityTimeline(checkins) { checkin in
 Not lazy (put long histories in a `ScrollView` and page the data). Named "Activity" to avoid
 SwiftUI's `TimelineView` and WidgetKit's `TimelineEntry`.
 
+#### `RelativeTime` *(8.9.0)*
+A time kept current on screen: `.relative` "Just now", "5 min. ago", "3 hr. ago", "Yesterday,
+14:20", then the day ("3 Nov", the year in another year; `DesignKitDateFormat.day` when the app
+sets it); `.elapsed` "42 sec", "5 min", "1 hr, 2 min"; `.clock` "0:42", "1:02:34" in one-width
+digits. Styled as text. `.relative` redraws every 30 s, the others every second (`TimelineView`).
+VoiceOver reads the units in full; `.help` shows the full date on iPad and Mac. The texts alone:
+`Formatting.relativeTime(_:)`, `elapsedTime(_:)`, `clockTime(_:)`. Strings: `time.justNow`,
+`time.dayAndTime`.
+
+```swift
+RelativeTime(comment.createdAt).font(AppTypography.caption).foregroundStyle(AppColors.Text.tertiary)
+RelativeTime(session.startedAt, style: .clock).font(AppTypography.numbers(AppTypography.h3))
+```
+
 #### `TagInput` *(0.7.0)*
 Free-form tags as removable chips, a field for the next one, and matching suggestions.
 
@@ -1683,6 +1716,26 @@ TagInput(String(localized: "gear.tags.placeholder"), tags: $item.tags, suggestio
 Return or a comma adds; duplicates (ignoring case) and blanks are dropped; `maxTags` hides the
 field when full. VoiceOver on ×: key `tags.remove` ("Remove %@"). A fixed set of options →
 `ChipPicker`.
+
+#### `SearchablePicker` *(8.9.0)*
+A screen's list to pick from when there are too many options to scan: the system search narrows
+them (title or subtitle, any case, any accents), the row's circle picks, and a name no option has
+offers "Create “…”" first.
+
+```swift
+NavigationStack {
+    SearchablePicker(options, selection: $categoryID, dismissesOnSelection: true) { name in
+        store.addCategory(named: name).id      // nil: nothing created
+    }
+    .navigationTitle("Category")
+}
+SearchablePicker(gear, selection: $gearIDs)    // several: Binding<Set<Value>>
+```
+
+`SearchablePickerOption(title, value:, subtitle:, systemImage:, iconColor:)`; the options stand in
+one `FormSection` of `UniversalRow(accessory: .checkmark)`. It must be inside a
+`NavigationStack`, where the search field lives. "Nothing found" is an `EmptyState(.compact)`.
+`SearchablePickerSkeleton(rows:)`. Strings: `picker.search`, `picker.create`, `picker.noResults`.
 
 #### `.dsSearchSuggestions` *(3.5.0)*
 Lines under the **system** search field: the recent queries while it is empty, then the app's
@@ -2372,6 +2425,19 @@ leading corner (85%, a 6 pt blur); only a fade under Reduce Motion and `.designK
 Give it to messages that arrive while the chat is open, not to the history it opens with. Rich
 replies are the app's own views. `MessageBubbleSkeleton(role:)`.
 
+*(8.9.0)* `MessageBubble(markdown:)` (`.incoming` by default) draws an answer's blocks in the
+bubble's own size: paragraphs (a single line break kept), `-` and `1.` lists, `#` headings a little
+bolder, `>` notes behind a bar, **bold**, *italic* and links (white on the accent in the person's
+own bubble); `ArticleBody.Block.parse(markdown:)` reads them. `time:` and `status:`
+(`.sending`, `.sent`, `.read`; `message.*` strings) put "14:20 · Read" under the bubble on its side.
+A failure that arrives is announced to VoiceOver.
+
+#### `ConversationDivider` *(8.9.0)*
+A centred caption between hairlines across a conversation: `ConversationDivider(date:)` ("Today",
+"Yesterday", then the day: `Formatting.dayTitle`), a heading for VoiceOver's rotor; or an event,
+`ConversationDivider("Ten changed the budget", systemImage: "pencil")`.
+`ConversationDividerSkeleton()`.
+
 #### `SuggestionChips`
 Prompts a person can send with a tap: `SuggestionChips(suggestions, systemImage:, layout:) {
 send($0) }`. `.scroll` is one row that scrolls sideways (`inset:` keeps the first chip off the
@@ -2565,7 +2631,8 @@ Single-select picker?
 ├── Few options (2-5) in form → UniversalRow(accessory: .menu)
 ├── 2-4 exclusive modes → SegmentedPicker
 ├── Chips (filters, tags, "All") → ChipPicker
-└── Many options (a long list, with search) → UniversalRow(accessory: .picker)
+├── Many options on a screen of their own → UniversalRow(accessory: .picker)
+└── Too many to scan, with search (and "Create") → SearchablePicker (one or several, 8.9.0)
 
 Currency?
 └── CurrencyPickerMenu (inside EditableHero and CurrencyAmountInput, automatic);
@@ -2663,6 +2730,13 @@ A notice that stays on the screen or in a card?
 
 Persistent form validation?
 └── InlineStatusText (.error/.warning/.info/.success)
+
+What a number means, how it is counted?
+└── InfoTip / .infoTip(_:title:) (8.9.0); a value over what was tapped → Tooltip
+
+The outcome of an app's own action, for VoiceOver?
+└── AccessibilityAnnouncer.announce(_:) (8.9.0; MessageBanner and DesignKit's failure states
+    announce their own)
 
 Entity lifecycle status?
 └── StatusIndicatorBadge (.active/.paused/.archived/.pending)

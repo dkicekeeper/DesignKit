@@ -2,7 +2,8 @@
 //  SelectionScreen.swift
 //  DesignKit Gallery
 //
-//  Selection: segments, chips, rating, the check circle, quick dates, the icon picker.
+//  Selection: segments, chips, rating, the check circle, quick dates, the icon picker, a long
+//  list with search.
 //
 
 import SwiftUI
@@ -29,6 +30,93 @@ struct SelectionScreen: View {
         SnapCardPickerPage()
         OptionCardPickerPage()
         PickerCarouselPage()
+        SearchablePickerPage()
+    }
+}
+
+private struct SearchablePickerPage: View {
+    @State private var state: SpecimenState = .content
+    @State private var multiple = false
+    @State private var creates = true
+    @State private var isPresented = false
+    @State private var single: String? = "Cafés"
+    @State private var several: Set<String> = ["Tent", "Headlamp"]
+    @State private var categories: [(String, String, String?)] = [
+        ("Cafés", "cup.and.saucer.fill", "Coffee, lunch out"), ("Groceries", "cart.fill", nil),
+        ("Taxi", "car.fill", "Rides and parking"), ("Rent", "house.fill", nil),
+        ("Health", "cross.case.fill", "Pharmacy, doctors"), ("Gifts", "gift.fill", nil),
+        ("Subscriptions", "repeat", "Music, video, cloud"), ("Travel", "airplane", nil),
+    ]
+    @State private var gear = ["Tent", "Sleeping bag", "Headlamp", "Stove", "Water filter", "Trekking poles", "Rain jacket"]
+
+    var body: some View {
+        ComponentPage(
+            name: "SearchablePicker",
+            summary: "A list too long to scan: the system search narrows it, one option or several are picked with the row's circle, and a name nothing has offers “Create”.",
+            since: "8.9.0",
+            apps: [],
+            notes: [
+                "A screen's content: put it in a NavigationStack (a pushed screen, or a sheet with its own stack), where the search field lives.",
+                "selection: Binding<Value?> picks one (dismissesOnSelection: true closes the screen on a pick); Binding<Set<Value>> picks several.",
+                "The search keeps the options whose title or subtitle contains the text, any case, any accents. onCreate adds the typed name and returns its value, which is picked.",
+                "Loading: SearchablePickerSkeleton. Strings: picker.search, picker.create, picker.noResults.",
+            ],
+            dos: [
+                "Use it when the list is too long to scan (about 10 options and more).",
+                "Pass onCreate when a person can add the missing option (a category, a tag).",
+            ],
+            donts: [
+                "Use it for a few options: a menu row or ChipPicker shows them at once.",
+                "Put it outside a NavigationStack: the search field lives in the navigation bar.",
+            ]
+        ) {
+            if state == .loading {
+                SearchablePickerSkeleton(rows: 4)
+            } else {
+                VStack(spacing: AppSpacing.md) {
+                    Text(summary)
+                        .font(AppTypography.bodyEmphasis)
+                        .multilineTextAlignment(.center)
+                    DSButton(multiple ? "Pick the gear" : "Pick a category", systemImage: "magnifyingglass",
+                             appearance: .secondary, fullWidth: true) { isPresented = true }
+                }
+                .sheet(isPresented: $isPresented) {
+                    NavigationStack {
+                        picker
+                            .navigationTitle(multiple ? "Gear" : "Category")
+                            .navigationBarTitleDisplayMode(.inline)
+                            .toolbar {
+                                ToolbarItem(placement: .confirmationAction) {
+                                    Button("Done") { isPresented = false }
+                                }
+                            }
+                    }
+                }
+            }
+        } controls: {
+            StateControl(state: $state)
+            ChoiceControl("Selection", selection: $multiple, options: [("One", false), ("Several", true)])
+            ToggleControl("Create a missing name", isOn: $creates)
+        }
+    }
+
+    @ViewBuilder
+    private var picker: some View {
+        if multiple {
+            SearchablePicker(gear.map { SearchablePickerOption($0, value: $0) }, selection: $several,
+                             onCreate: creates ? { name in gear.append(name); return name } : nil)
+        } else {
+            SearchablePicker(categories.map { SearchablePickerOption($0.0, value: $0.0, subtitle: $0.2, systemImage: $0.1) },
+                             selection: $single, dismissesOnSelection: true,
+                             onCreate: creates ? { name in categories.append((name, "tag.fill", nil)); return name } : nil)
+        }
+    }
+
+    private var summary: String {
+        if multiple {
+            return several.isEmpty ? "No gear" : several.sorted().joined(separator: ", ")
+        }
+        return single ?? "No category"
     }
 }
 

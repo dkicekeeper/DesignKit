@@ -3,7 +3,7 @@
 //  DesignKit Gallery
 //
 //  Content and layout: folded text, timeline, month calendar, flow layout, form sections, the
-//  edit sheet and its hero, message bubbles.
+//  edit sheet and its hero, message bubbles, times that stay current.
 //
 
 import SwiftUI
@@ -30,6 +30,118 @@ struct ContentScreen: View {
         EditableHeroPage()
         ArticleBodyPage()
         MessageBubblePage()
+        ConversationDividerPage()
+        RelativeTimePage()
+    }
+}
+
+private struct ConversationDividerPage: View {
+    @State private var state: SpecimenState = .content
+    @State private var kind = 0
+    @State private var event = "Ten changed the October budget"
+
+    var body: some View {
+        ComponentPage(
+            name: "ConversationDivider",
+            summary: "A line across a conversation: the day the next messages are from, or something that happened in it.",
+            since: "8.9.0",
+            apps: [],
+            canvas: .fill,
+            notes: [
+                "ConversationDivider(date:) reads “Today”, “Yesterday”, then the day (Formatting.dayTitle, the DesignKitDateFormat.day hook); VoiceOver hears it as a heading.",
+                "ConversationDivider(_:systemImage:) for an event: “Alex joined”, “Ten changed the budget”.",
+            ],
+            dos: [
+                "Put a day divider before the first message of each day.",
+                "Name an event the way a person would say it: “Ten changed the October budget”.",
+            ],
+            donts: [
+                "Use it as a section header outside a conversation (that is SectionHeader).",
+            ]
+        ) {
+            if state == .loading {
+                ConversationDividerSkeleton()
+            } else {
+                VStack(spacing: AppSpacing.sm) {
+                    MessageBubble("How much did I spend on cafés?", time: Date.now.addingTimeInterval(-90_000), status: .read)
+                    divider
+                    MessageBubble("And on taxis?", time: .now, status: .sent)
+                }
+            }
+        } controls: {
+            StateControl(state: $state)
+            ChoiceControl("Divider", selection: $kind, options: [("Today", 0), ("A week ago", 1), ("Last year", 2), ("Event", 3)])
+            if kind == 3 {
+                TextControl("Event", text: $event)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var divider: some View {
+        switch kind {
+        case 1: ConversationDivider(date: Date.now.addingTimeInterval(-7 * 86_400))
+        case 2: ConversationDivider(date: Date.now.addingTimeInterval(-400 * 86_400))
+        case 3: ConversationDivider(event, systemImage: "pencil")
+        default: ConversationDivider(date: .now)
+        }
+    }
+}
+
+private struct RelativeTimePage: View {
+    @State private var style: RelativeTime.Style = .relative
+    @State private var offset: TimeInterval = 5 * 60
+    /// The moment the page opened: the specimen's date is this, minus the chosen offset.
+    @State private var anchor = Date.now
+
+    private static let offsets: [(String, TimeInterval)] = [
+        ("20 seconds", 20), ("5 minutes", 5 * 60), ("3 hours", 3 * 3600),
+        ("A day", 26 * 3600), ("A week", 8 * 86_400), ("Over a year", 400 * 86_400),
+    ]
+
+    var body: some View {
+        ComponentPage(
+            name: "RelativeTime",
+            summary: "When something happened, or how long it has run, kept current on screen: “5 min. ago”, “Yesterday, 14:20”, “1 hr, 2 min”, “1:02:34”.",
+            since: "8.9.0",
+            apps: [],
+            notes: [
+                "Style it as text (.font, .foregroundStyle). .relative redraws every 30 seconds, .elapsed and .clock every second; .clock keeps its digits one width.",
+                "Under a minute “Just now”, under an hour minutes, the same day hours, the next day over “Yesterday, 14:20”, then the day (with the year in another year). The day follows DesignKitDateFormat.day.",
+                "VoiceOver reads the units in full (“5 minutes ago”). A long press on iPad or Mac shows the full date.",
+                "The texts alone: Formatting.relativeTime(_:), .elapsedTime(_:), .clockTime(_:).",
+            ],
+            dos: [
+                "Show when something happened in a feed, a comment, a history row.",
+                "Use .clock for a running session and give it a numbers font.",
+            ],
+            donts: [
+                "Format the date by hand next to it: older dates follow DesignKitDateFormat.day.",
+                "Use it for a date the person picks or plans (that is a date row).",
+            ]
+        ) {
+            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                Text(label)
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.Text.secondary)
+                RelativeTime(anchor.addingTimeInterval(-offset), style: style)
+                    .font(style == .clock ? AppTypography.numbers(AppTypography.h2) : AppTypography.body)
+                    .foregroundStyle(AppColors.Text.primary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } controls: {
+            ChoiceControl("Style", selection: $style, options: [("Relative", .relative), ("Elapsed", .elapsed), ("Clock", .clock)])
+            ChoiceControl(style == .relative ? "Happened" : "Started", selection: $offset, options: Self.offsets.map { ("\($0.0) ago", $0.1) })
+            ActionControl("Now", systemImage: "arrow.clockwise") { anchor = .now }
+        }
+    }
+
+    private var label: String {
+        switch style {
+        case .relative: "Commented"
+        case .elapsed: "On the trail for"
+        case .clock: "Session"
+        }
     }
 }
 
@@ -193,6 +305,13 @@ private struct FormSectionPage: View {
                 "Rows pad themselves only vertically (UniversalRow .standard, 12 pt: a 48 pt row); the card pads them 16 pt at the sides, and the header stands 12 pt above it (docs/design-system.md §10).",
                 "No Divider between rows: the section draws a RowDivider under the upper row's text, 16 pt short of the card's edge. A custom row with something before its text says where with .rowDividerInset(_:).",
                 "One row: a menu in a one-row section is the case iOS 26 once collapsed into its popover on glass. Tap it on a device (TestFlight) to check the menu opens from the row.",
+            ],
+            dos: [
+                "Put a form's or a settings list's rows in it: it draws the glass card and the dividers.",
+            ],
+            donts: [
+                "Use the system Form or a List for a form.",
+                "Add dividers between its rows yourself.",
             ]
         ) {
             NavigationStack {
@@ -493,6 +612,17 @@ private struct MessageBubblePage: View {
     @State private var failed = false
     @State private var state: SpecimenState = .content
     @State private var sent: [Sent] = []
+    @State private var markdown = false
+    @State private var showsTime = true
+    @State private var status: MessageBubble.Status? = .read
+
+    private static let markdownReply = """
+    ## October so far
+    You spent **42,300 ₸** on cafés, a little more than in September.
+    - Coffee: 18,400 ₸
+    - Lunch out: 23,900 ₸
+    > Most of it on weekdays, before noon.
+    """
 
     var body: some View {
         ComponentPage(
@@ -506,18 +636,39 @@ private struct MessageBubblePage: View {
                 "A new message enters with .transition(.messageBubble(role)): the person's own grows from the field's corner, a reply comes into focus on the left. The history a chat opens with does not move.",
                 "Not sent: the bubble shakes once, the failure line rises in, the error haptic plays. Under Reduce Motion only the fades stay.",
                 "Rich replies (cards, charts) are the app's own views under an incoming bubble or in its place.",
+                "8.9.0: MessageBubble(markdown:) reads an answer's paragraphs, lists, headings, notes, bold and links; time: and status: put “14:20 · Read” under the bubble. Strings: message.sending, message.sent, message.read.",
+            ],
+            dos: [
+                "Use markdown: for an assistant's answers, plain text for what people type.",
+                "Show time and status under the person's own messages where delivery matters.",
+            ],
+            donts: [
+                "Put cards or charts inside the bubble: lay them out under it.",
+                "Animate the history a conversation opens with: only new messages enter.",
             ]
         ) {
             if state == .loading {
                 MessageBubbleSkeleton(role: incoming ? .incoming : .outgoing)
             } else {
                 VStack(spacing: AppSpacing.sm) {
-                    MessageBubble(
-                        text,
-                        role: incoming ? .incoming : .outgoing,
-                        failure: failed ? "No connection" : nil,
-                        onRetry: failed ? { failed = false } : nil
-                    )
+                    if markdown {
+                        MessageBubble(
+                            markdown: Self.markdownReply,
+                            role: incoming ? .incoming : .outgoing,
+                            time: showsTime ? Date.now.addingTimeInterval(-120) : nil,
+                            failure: failed ? "No connection" : nil,
+                            onRetry: failed ? { failed = false } : nil
+                        )
+                    } else {
+                        MessageBubble(
+                            text,
+                            role: incoming ? .incoming : .outgoing,
+                            time: showsTime ? Date.now.addingTimeInterval(-120) : nil,
+                            status: incoming ? nil : status,
+                            failure: failed ? "No connection" : nil,
+                            onRetry: failed ? { failed = false } : nil
+                        )
+                    }
                     ForEach(sent.suffix(4)) { message in
                         MessageBubble(message.text, role: message.role)
                             .transition(.messageBubble(message.role))
@@ -527,8 +678,11 @@ private struct MessageBubblePage: View {
             }
         } controls: {
             StateControl(state: $state)
+            ChoiceControl("Content", selection: $markdown, options: [("Text", false), ("Markdown reply", true)])
             TextControl("Text", text: $text)
             ToggleControl("Incoming", isOn: $incoming)
+            ToggleControl("Time", isOn: $showsTime)
+            ChoiceControl("Status", selection: $status, options: [("None", nil), ("Sending", .sending), ("Sent", .sent), ("Read", .read)])
             ToggleControl("Not sent", isOn: $failed)
             ActionControl("Send", systemImage: "arrow.up.circle.fill", action: send)
             ActionControl("Clear the conversation", systemImage: "xmark.circle") { sent = [] }

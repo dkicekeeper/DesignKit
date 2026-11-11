@@ -37,6 +37,7 @@ public struct InlineStatusText: View {
     public var body: some View {
         Text(message)
             .font(AppTypography.caption)
-            .foregroundStyle(type.color)
+            // 8.9.0: readable on the page (the green and orange were 2.2:1 in light mode).
+            .foregroundStyle(AppColors.readable(type.color))
     }
 }

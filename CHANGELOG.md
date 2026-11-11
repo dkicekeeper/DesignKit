@@ -16,6 +16,57 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.9.0 - 2026-11-11
+
+Benchmark round 4, against Meta's Astryx (docs/benchmark.md): status text that reads at WCAG AA, outcomes spoken to VoiceOver, an explanation for a number, times that stay current, a long list with search and "Create", an assistant's answers in Markdown, and tooling the apps run from the version they pin: one lint, a component reference, migrations for a major.
+[#100](https://github.com/dkicekeeper/DesignKit/pull/100)
+
+### Added
+
+- `AppColors.readable(_:)`: a colour as text or an icon that reads at 4.5:1 on its own `pale(_:)` container and on the page, the same hue a step deeper in light mode or lighter in dark mode, unchanged when it already reads. `AppColors.readableFill(_:)`: a fill white text reads on. `AppColors.contrastRatio(_:_:in:)`: the WCAG ratio of two colours.
+- `AppColors.Status.infoText`, `.positiveText`, `.negativeText`, `.warningText`, `.neutralText`: status text and icons at 4.5:1 in both themes.
+- `AccessibilityAnnouncer.announce(_:)` and `.voiceOverAnnouncement(_:onAppear:)` in `DesignSupport`: an outcome spoken once, from what finished.
+- `InfoTip` and `.infoTip(_:title:)`: an info glyph after a label; a tap opens a popover that explains the value. Strings: `infoTip.label`, `infoTip.about`.
+- `RelativeTime` (`.relative`, `.elapsed`, `.clock`): "Just now", "5 min. ago", "Yesterday, 14:20", then the day; "1 hr, 2 min"; "1:02:34"; kept current on screen. The texts: `Formatting.relativeTime(_:)`, `.elapsedTime(_:)`, `.clockTime(_:)`, `.dayTitle(_:)`; an older day follows `DesignKitDateFormat.day`. Strings: `time.justNow`, `time.dayAndTime`.
+- `SearchablePicker` and `SearchablePickerOption`: a screen's list to pick one option (`Binding<Value?>`, `dismissesOnSelection:`) or several (`Binding<Set<Value>>`) under the system search, with "Create" for a name no option has (`onCreate:`) and "Nothing found"; `SearchablePickerSkeleton`. Strings: `picker.search`, `picker.create`, `picker.noResults`.
+- `MessageBubble(markdown:)`: an answer's paragraphs, lists, headings, notes, bold and links in the bubble's own size. `time:` and `status:` (`MessageBubble.Status`: `.sending`, `.sent`, `.read`) put "14:20 · Read" under a bubble. Strings: `message.sending`, `message.sent`, `message.read`.
+- `ArticleBody.Block.parse(markdown:)`: plain Markdown read into an article's blocks.
+- `ConversationDivider` (`date:` or an event with a symbol) and `ConversationDividerSkeleton`: a day or an event across a conversation.
+
+### Changed
+
+- Status text is readable in light mode, where the system colours read at 2:1 to 3.4:1 on their tints: `Badge(.tinted)` text, `TrendBadge`'s arrow and number, `StatusBanner`'s and `RecommendationBox`'s icons, `InlineStatusText`, and the error captions of `FormTextField`, `MessageComposer`, `MessageBubble`, `CurrencyAmountInput`, `DownloadRow`, `IconPicker`, `EmptyState(.error)` and `PendingItemCard` take the readable colour: green, orange, red and grey a step deeper. Their containers and every fill, track and chart keep the solid colours.
+- `AppColors.Text.positive`, `.negative` and `.warning` are the readable status colours (`Status.*Text`) in place of the system green, red and orange.
+- `Badge(.filled)` deepens a fill white does not read on (the system green, orange and red).
+- `MessageBanner` is announced to VoiceOver when it appears and when its message changes; `MessageBubble` and `MessageComposer` announce a send that failed, `LoadMoreFooter` a page that would not load, `PendingItemCard` an upload that failed while it is on screen.
+
+### Migration
+
+Nothing to change in code. A text of an app's own in a status colour on its tint reads with `AppColors.readable(color)` (or `AppColors.Status.*Text`); a list too long to scan can be a `SearchablePicker`:
+
+```swift
+// before
+Text("Overdue").foregroundStyle(AppColors.Status.warning)
+// 8.9.0
+Text("Overdue").foregroundStyle(AppColors.Status.warningText)
+
+NavigationStack {
+    SearchablePicker(options, selection: $categoryID, dismissesOnSelection: true) { name in
+        store.addCategory(named: name).id
+    }
+}
+```
+
+The lint the apps keep in two copies moves here: `python3 <DesignKit>/scripts/designkit_lint.py all --source <folders>` in place of `scripts/design_lint.py` and `scripts/section_rows_lint.py` (the same rules and baseline, plus no `.swipeActions` and no system `Form`). The agent block: `python3 <DesignKit>/scripts/sync_agents_block.py CLAUDE.md` after each pin bump.
+
+### Gallery and tooling
+
+- Gallery pages for `InfoTip`, `RelativeTime`, `SearchablePicker` and `ConversationDivider`; `MessageBubble`'s page shows a Markdown reply, its time and status; the Colors page shows the readable status colours.
+- Component pages have a "Do and don't" panel (`ComponentPage(dos:donts:)`), filled in for twelve components.
+- Snapshot tests: `infoTips`, `relativeTimes`, `searchablePicker`, `conversation`, `searchablePickerSkeleton`; the status components' references change with their colours.
+- Unit tests: `ContrastTests` (status tokens, every category colour made readable, filled badges, the accents; white on Tenra's indigo in dark mode (3.5:1) and on Dalada's green, and the income green on white (2.75:1), are known issues for the apps to decide), `RelativeTimeFormattingTests`, `SearchablePickerTests`, `ArticleMarkdownTests`.
+- `scripts/designkit_lint.py` (the apps' design and section-rows lints in one, with tests), `scripts/migrate.py` and `scripts/migrations/` (rewrites and TODOs for a major, 7.0.0 and 8.0.0 written from their guides), `scripts/sync_agents_block.py` and docs/agents.md, and docs/components.md with docs/components.json (one entry per Gallery page, generated by `.github/scripts/components_reference.py`; CI fails when stale).
+
 ## 8.8.1 - 2026-11-05
 
 Fixes from the final review of 8.8.0's formats: grouping that no locale can change once an app picks the separators, a shared configuration safe to change while other threads format, and a space after a symbol of letters placed before the number. An app that does not set `separatorsOverrideLocale` keeps its grouping.

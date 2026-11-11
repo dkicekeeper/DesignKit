@@ -169,6 +169,8 @@ enum CanvasStyle {
 /// 3. **Controls** — its state (default, loading = its skeleton, empty, error, disabled) and
 ///    its parameters.
 /// 4. **Notes** — a rule or two from docs/design-system.md.
+/// 5. **Do / Don't** (8.9.0) — how to use it and how not to, side by side; docs/components.md
+///    carries them too (`.github/scripts/components_reference.py`).
 struct ComponentPage<Preview: View, Controls: View>: View {
     let name: String
     let summary: String
@@ -179,6 +181,10 @@ struct ComponentPage<Preview: View, Controls: View>: View {
     /// The values of the component's `style:` parameter, in the API's own names; none when it
     /// has no such parameter.
     var styles: [String] = []
+    /// What to do with it, a line each (8.9.0).
+    var dos: [String] = []
+    /// What not to do with it, a line each (8.9.0).
+    var donts: [String] = []
     @ViewBuilder var preview: Preview
     @ViewBuilder var controls: Controls
 
@@ -210,6 +216,17 @@ struct ComponentPage<Preview: View, Controls: View>: View {
                     .formCardStyle(radius: AppRadius.lg)
                 }
             }
+            if !dos.isEmpty || !donts.isEmpty {
+                PanelSection("Do and don't") {
+                    VStack(alignment: .leading, spacing: AppSpacing.md) {
+                        GuidanceList(lines: dos, isDo: true)
+                        GuidanceList(lines: donts, isDo: false)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(AppSpacing.lg)
+                    .formCardStyle(radius: AppRadius.lg)
+                }
+            }
         }
         .containerValue(\.showcaseTitle, name)
         .containerValue(\.showcaseIsComponent, true)
@@ -225,6 +242,8 @@ extension ComponentPage where Controls == EmptyView {
         canvas: CanvasStyle = .standard,
         notes: [String] = [],
         styles: [String] = [],
+        dos: [String] = [],
+        donts: [String] = [],
         @ViewBuilder preview: () -> Preview
     ) {
         self.name = name
@@ -234,8 +253,37 @@ extension ComponentPage where Controls == EmptyView {
         self.canvas = canvas
         self.notes = notes
         self.styles = styles
+        self.dos = dos
+        self.donts = donts
         self.preview = preview()
         self.controls = EmptyView()
+    }
+}
+
+/// The lines of "Do" (a green check each) or "Don't" (a red cross), under their word.
+private struct GuidanceList: View {
+    let lines: [String]
+    let isDo: Bool
+
+    var body: some View {
+        if !lines.isEmpty {
+            VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                Text(isDo ? "Do" : "Don't")
+                    .font(AppTypography.bodySmall.weight(.semibold))
+                    .foregroundStyle(isDo ? AppColors.Status.positiveText : AppColors.Status.negativeText)
+                ForEach(lines, id: \.self) { line in
+                    Label {
+                        Text(line)
+                            .font(AppTypography.bodySmall)
+                            .foregroundStyle(AppColors.textPrimary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    } icon: {
+                        Image(systemName: isDo ? "checkmark.circle.fill" : "xmark.circle.fill")
+                            .foregroundStyle(isDo ? AppColors.Status.positiveText : AppColors.Status.negativeText)
+                    }
+                }
+            }
+        }
     }
 }
 

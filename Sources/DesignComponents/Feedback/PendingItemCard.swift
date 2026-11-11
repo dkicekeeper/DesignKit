@@ -94,6 +94,9 @@ public struct PendingItemCard<Content: View>: View {
         }
         .cardContentPadding()
         .cardStyle()
+        // 8.9.0: an upload that fails while the card is on screen is spoken; a card that opens
+        // already failed is read where it stands.
+        .voiceOverAnnouncement(failureAnnouncement)
         .confirmationDialog(
             Text(verbatim: discardConfirmation
                  ?? String(localized: "pending.discard.confirm", defaultValue: "Delete it? It won’t reach the server.")),
@@ -106,6 +109,13 @@ public struct PendingItemCard<Content: View>: View {
         }
     }
 
+    /// "Couldn’t upload. <reason>" in `.failed`, nil while waiting.
+    private var failureAnnouncement: String? {
+        guard case .failed(let message) = state else { return nil }
+        let failed = String(localized: "pending.failed", defaultValue: "Couldn’t upload")
+        return message.isEmpty ? failed : "\(failed). \(message)"
+    }
+
     @ViewBuilder
     private var status: some View {
         switch state {
@@ -113,12 +123,12 @@ public struct PendingItemCard<Content: View>: View {
             Label(String(localized: "pending.waiting", defaultValue: "Waiting to upload: it goes once you’re online"),
                   systemImage: "icloud.and.arrow.up")
                 .font(AppTypography.caption)
-                .foregroundStyle(AppColors.warning)
+                .foregroundStyle(AppColors.Status.warningText)
         case .failed(let message):
             Label(String(localized: "pending.failed", defaultValue: "Couldn’t upload"),
                   systemImage: "exclamationmark.triangle.fill")
                 .font(AppTypography.caption)
-                .foregroundStyle(AppColors.destructive)
+                .foregroundStyle(AppColors.Status.negativeText)
             if !message.isEmpty {
                 Text(verbatim: message)
                     .font(AppTypography.caption)
