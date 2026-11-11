@@ -19,6 +19,7 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 ## 8.9.0 - 2026-11-11
 
 Benchmark round 4, against Meta's Astryx (docs/benchmark.md): status text that reads at WCAG AA, outcomes spoken to VoiceOver, an explanation for a number, times that stay current, a long list with search and "Create", an assistant's answers in Markdown, and tooling the apps run from the version they pin: one lint, a component reference, migrations for a major.
+[#100](https://github.com/dkicekeeper/DesignKit/pull/100)
 
 ### Added
 
