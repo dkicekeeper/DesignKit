@@ -50,6 +50,13 @@ private struct ConversationDividerPage: View {
             notes: [
                 "ConversationDivider(date:) reads “Today”, “Yesterday”, then the day (Formatting.dayTitle, the DesignKitDateFormat.day hook); VoiceOver hears it as a heading.",
                 "ConversationDivider(_:systemImage:) for an event: “Alex joined”, “Ten changed the budget”.",
+            ],
+            dos: [
+                "Put a day divider before the first message of each day.",
+                "Name an event the way a person would say it: “Ten changed the October budget”.",
+            ],
+            donts: [
+                "Use it as a section header outside a conversation (that is SectionHeader).",
             ]
         ) {
             if state == .loading {
@@ -103,6 +110,14 @@ private struct RelativeTimePage: View {
                 "Under a minute “Just now”, under an hour minutes, the same day hours, the next day over “Yesterday, 14:20”, then the day (with the year in another year). The day follows DesignKitDateFormat.day.",
                 "VoiceOver reads the units in full (“5 minutes ago”). A long press on iPad or Mac shows the full date.",
                 "The texts alone: Formatting.relativeTime(_:), .elapsedTime(_:), .clockTime(_:).",
+            ],
+            dos: [
+                "Show when something happened in a feed, a comment, a history row.",
+                "Use .clock for a running session and give it a numbers font.",
+            ],
+            donts: [
+                "Format the date by hand next to it: older dates follow DesignKitDateFormat.day.",
+                "Use it for a date the person picks or plans (that is a date row).",
             ]
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
@@ -290,6 +305,13 @@ private struct FormSectionPage: View {
                 "Rows pad themselves only vertically (UniversalRow .standard, 12 pt: a 48 pt row); the card pads them 16 pt at the sides, and the header stands 12 pt above it (docs/design-system.md §10).",
                 "No Divider between rows: the section draws a RowDivider under the upper row's text, 16 pt short of the card's edge. A custom row with something before its text says where with .rowDividerInset(_:).",
                 "One row: a menu in a one-row section is the case iOS 26 once collapsed into its popover on glass. Tap it on a device (TestFlight) to check the menu opens from the row.",
+            ],
+            dos: [
+                "Put a form's or a settings list's rows in it: it draws the glass card and the dividers.",
+            ],
+            donts: [
+                "Use the system Form or a List for a form.",
+                "Add dividers between its rows yourself.",
             ]
         ) {
             NavigationStack {
@@ -615,6 +637,14 @@ private struct MessageBubblePage: View {
                 "Not sent: the bubble shakes once, the failure line rises in, the error haptic plays. Under Reduce Motion only the fades stay.",
                 "Rich replies (cards, charts) are the app's own views under an incoming bubble or in its place.",
                 "8.9.0: MessageBubble(markdown:) reads an answer's paragraphs, lists, headings, notes, bold and links; time: and status: put “14:20 · Read” under the bubble. Strings: message.sending, message.sent, message.read.",
+            ],
+            dos: [
+                "Use markdown: for an assistant's answers, plain text for what people type.",
+                "Show time and status under the person's own messages where delivery matters.",
+            ],
+            donts: [
+                "Put cards or charts inside the bubble: lay them out under it.",
+                "Animate the history a conversation opens with: only new messages enter.",
             ]
         ) {
             if state == .loading {

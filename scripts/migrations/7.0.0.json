@@ -1,0 +1,25 @@
+{
+  "guide": "docs/migration-7.0.md",
+  "rewrite": [
+    {"pattern": "\\bSliderRowSkeleton\\(", "replace": "UniversalRowSkeleton.slider(", "note": "SliderRowSkeleton → UniversalRowSkeleton.slider"},
+    {"pattern": "\\bInfoRowSkeleton\\(", "replace": "UniversalRowSkeleton.info(", "note": "InfoRowSkeleton → UniversalRowSkeleton.info"},
+    {"pattern": "\\bColorPickerRowSkeleton\\(", "replace": "UniversalRowSkeleton.colors(", "note": "ColorPickerRowSkeleton → UniversalRowSkeleton.colors"},
+    {"pattern": "PackedCircleIconsStyle\\.fan\\b", "replace": "PackedCircleIconsStyle.shelf", "note": "PackedCircleIconsStyle.fan → .shelf"}
+  ],
+  "todo": [
+    {"pattern": "\\bToggleSettingsRow\\(", "note": "ToggleSettingsRow → UniversalRow(title, icon:, hint:, config:, accessory: .toggle(isOn))"},
+    {"pattern": "\\bActionSettingsRow\\(", "note": "ActionSettingsRow → UniversalRow(title, icon:, role: isDestructive ? .destructive : .standard, config:, accessory: .action(action))"},
+    {"pattern": "\\bActionRowLabel\\(", "note": "ActionRowLabel → UniversalRow(title, icon:, iconColor: tint, titleColor:, config:) with .contentShape(Rectangle())"},
+    {"pattern": "\\bNavigationSettingsRow\\(", "note": "NavigationSettingsRow → UniversalRow(title, icon:, value:, config: .settings, accessory: .navigation { destination })"},
+    {"pattern": "\\bCheckmarkRow\\(", "note": "CheckmarkRow → UniversalRow(title, leadingIcon:, value:, config:, accessory: .checkmark(isSelected:action:))"},
+    {"pattern": "\\bMenuPickerRow\\b", "note": "MenuPickerRow → UniversalRow(title, icon:, accessory: .menu(selection, options:)); a convenience init becomes an options list"},
+    {"pattern": "\\bNavigationPickerRow\\(", "note": "NavigationPickerRow → UniversalRow(title, icon:, config: .settings for .list, accessory: .picker(selection, options:))"},
+    {"pattern": "\\bDatePickerRow\\(", "note": "DatePickerRow → UniversalRow(title, icon:, accessory: .date(selection, components:, from:, through:))"},
+    {"pattern": "\\bStepperRow\\(", "note": "StepperRow → UniversalRow(title, icon:, accessory: .stepper(value, in:, step:, format:))"},
+    {"pattern": "\\bSliderRow\\(", "note": "SliderRow → UniversalRow(title, icon:, hint:, config:, accessory: .slider(value, in:, step:, valueText:))"},
+    {"pattern": "\\bColorPickerRow\\(", "note": "ColorPickerRow → UniversalRow(title, accessory: .colors(selection, palette:)); drop the padding around it"},
+    {"pattern": "\\bInfoRow\\(", "note": "InfoRow → UniversalRow(label, icon:, config: .info, accessory: .info(value)) or .amount(amount, currency:, prefix:)"},
+    {"pattern": "StatusIndicatorBadge(?:Skeleton)?\\([^)]*\\bfont:", "note": "StatusIndicatorBadge(font:) → size: with an AppIconSize (md for the old default)"},
+    {"pattern": "Image\\(systemName:[^)]*\\)\\s*\\.font\\(\\.system\\(size:", "note": "A component's symbol is an Icon(name, size: AppIconSize…, scalesWithText: false) (the 7.0 icon rule)"}
+  ]
+}

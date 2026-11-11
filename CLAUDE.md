@@ -48,16 +48,21 @@ Gallery/               showcase app (xcodegen; the .xcodeproj is not in git): Fo
                        skeleton), usage notes; an Updates screen reads CHANGELOG.md; ships to
                        TestFlight (docs/testflight.md)
 Gallery/SnapshotTests/ snapshot tests hosted in the Gallery app; references in __Snapshots__
-scripts/               snapshot-tests.sh (CI and local runs of the snapshot tests)
+scripts/               snapshot-tests.sh (CI and local runs of the snapshot tests); for the apps
+                       (8.9.0): designkit_lint.py (their design and section-rows lint, run from
+                       the pinned version), migrate.py + migrations/ (rewrites and TODOs for a
+                       major), sync_agents_block.py (docs/agents.md into an app's CLAUDE.md)
 .github/scripts/       changelog.py (CI's Changelog job, release notes), gallery_badges.py (CI's
-                       Gallery badges job: each page's `apps:` against Tenra's and Dalada's code)
+                       Gallery badges job: each page's `apps:` against Tenra's and Dalada's code),
+                       components_reference.py (docs/components.md + .json; CI fails when stale)
 Shaders/               Metal sources (Ripple, EdgeGlow, Grain, Holographic, Dissolve) + build.sh;
                        CI compiles them into the .metallib files in Sources/DesignComponents/
                        Resources/Shaders (.github/workflows/shaders.yml), so apps need no Metal
                        Toolchain (docs/motion.md §6)
 Tests/                 swift-testing unit tests (formatting, ExpressionEvaluator, calculator
                        model) — run by CI on an iOS Simulator
-docs/                  design-system.md, charts.md, gotchas.md, localization-keys.md, benchmark.md
+docs/                  design-system.md, components.md (+ .json, generated), agents.md, charts.md,
+                       gotchas.md, localization-keys.md, benchmark.md
 CHANGELOG.md           every release, newest first: what it added and changed, how to move an
                        app to it (the GitHub Release notes and the Gallery's Updates screen)
 ```
@@ -156,7 +161,9 @@ rather than importing an app type.
    what the component does), with a control for each parameter and a `StateControl` whose
    "Loading" shows its skeleton (plus Empty / Error / Disabled when it has them); a new screen
    needs `xcodegen generate`. Its `apps:` names the apps whose code uses it: CI's `Gallery
-   badges` job compares them with Tenra's and Dalada's sources (5.2.0). Add a snapshot test in `Gallery/SnapshotTests` (the skeleton's in
+   badges` job compares them with Tenra's and Dalada's sources (5.2.0). Give it `dos:` / `donts:` when
+   there is a way it is misused (8.9.0), then `python3 .github/scripts/components_reference.py write`
+   (CI fails on a stale docs/components.md). Add a snapshot test in `Gallery/SnapshotTests` (the skeleton's in
    `SkeletonsSnapshotTests`; one Liquid Glass card per snapshot; `named:` tells them apart),
    then record it with a manual CI run, `record_snapshots: missing` (docs/snapshots.md).
 5. Add any new `String(localized:)` key to `docs/localization-keys.md` and its English value
@@ -301,6 +308,14 @@ rather than importing an app type.
   person turns the extras on and off in a `ChartSwitcher` menu kept for every chart
   (`.chartDisplayOptions`), Tenra keeps its `OrbChart` over stacked bars, and `MiniBars` draws
   the weekdays on Tenra's new "By day" insight card.
+- Benchmark round 4 (2026-11, against Meta's Astryx, the owner approved the whole plan): 8.9.0.
+  Status text reads at WCAG AA (`AppColors.readable`, `Status.*Text`, `ContrastTests`; white on
+  Tenra's dark-mode indigo and Dalada's green and the income green are the apps' known issues),
+  outcomes are spoken (`AccessibilityAnnouncer`), `InfoTip`, `RelativeTime`, `SearchablePicker`,
+  Markdown replies with time and status, `ConversationDivider`; for the apps, one lint
+  (`scripts/designkit_lint.py`), migrations for a major (`scripts/migrate.py`), the agent block
+  (docs/agents.md) and the component reference (docs/components.md). Moving the apps onto the lint
+  and the block is their sessions' step (docs/adoption.md).
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.
@@ -310,6 +325,8 @@ rather than importing an app type.
 | Working on… | Read first |
 |---|---|
 | Tokens, modifiers, any component, amount formatting, animation rules | [docs/design-system.md](docs/design-system.md) |
+| One component: what it is for, initialisers, rules, do and don't, skeleton (generated) | [docs/components.md](docs/components.md) |
+| DesignKit's rules for an app's agent (the block the apps' CLAUDE.md carries) | [docs/agents.md](docs/agents.md) |
 | Charts, progress, gauges, OrbChart, Swift Charts patterns | [docs/charts.md](docs/charts.md) |
 | Motion and effects: springs, budgets, SF Symbol motion, transitions, celebrations, Reduce Motion | [docs/motion.md](docs/motion.md) |
 | Package traps (public API, Xcode 26/27, bundles) and SwiftUI layout traps | [docs/gotchas.md](docs/gotchas.md) |

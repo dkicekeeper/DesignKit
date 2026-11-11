@@ -137,12 +137,17 @@ text, not keys. A new key goes there as well.
 | `imageCropper.cancel` | SquareImageCropper (VoiceOver, ✕, 8.5.0) | `Cancel` |
 | `imageCropper.choose` | SquareImageCropper (VoiceOver, ✓, 8.5.0) | `Choose` |
 | `imageCropper.title` | SquareImageCropper (8.5.0) | `Move and scale` |
+| `infoTip.about` | InfoTip (VoiceOver name when it has a title, arg `%@`, 8.9.0) | `About %@` |
+| `infoTip.label` | InfoTip (VoiceOver name, 8.9.0) | `More information` |
 | `insights.chart.bar` | ChartZoomControls | — |
 | `insights.chart.line` | ChartZoomControls | — |
 | `insights.other` | OrbChart | — |
 | `loadMore.failed` | LoadMoreFooter (`.failed` without a message, 4.1.0) | `Couldn’t load more` |
 | `menu.close` | GlassActionMenu (VoiceOver on the open menu's button) | `Close` |
 | `menu.open` | GlassActionMenu (VoiceOver on the closed button) | `Actions` |
+| `message.read` | MessageBubble (`status: .read`, after the time, 8.9.0) | `Read` |
+| `message.sending` | MessageBubble (`status: .sending`, 8.9.0) | `Sending…` |
+| `message.sent` | MessageBubble (`status: .sent`, 8.9.0) | `Sent` |
 | `moneyEntry.invalidAmount` | AmountEntrySheet (Save with no amount) | `Enter an amount` |
 | `moneyEntry.notePlaceholder` | AmountEntrySheet (default `notePlaceholder`) | `Note` |
 | `notification.permission.allow` | NotificationPermissionPrompt | — |
@@ -159,6 +164,9 @@ text, not keys. A new key goes there as well.
 | `pending.waiting` | PendingItemCard (status) | `Waiting to upload: it goes once you’re online` |
 | `photo.open` | PhotoStrip, PhotoCarousel (default `openLabel`), PhotoGrid (VoiceOver without `label`) | `Open photo` |
 | `photo.remove` | PhotoStrip (default `removeLabel`, VoiceOver) | `Remove photo` |
+| `picker.create` | SearchablePicker (the row that adds the typed name, arg `%@`, 8.9.0) | `Create “%@”` |
+| `picker.noResults` | SearchablePicker (nothing matches, 8.9.0) | `Nothing found` |
+| `picker.search` | SearchablePicker (the search field's placeholder, 8.9.0) | `Search` |
 | `progress.importing` | ImportProgressSheet | — |
 | `rating.bar` | RatingSummary (VoiceOver on a bar, 4.1.0; format: star, count) | `Rating %1$lld: %2$lld reviews` |
 | `rating.pick %lld %lld` | RatingPicker (VoiceOver: "4 out of 5") | — |
@@ -188,6 +196,8 @@ text, not keys. A new key goes there as well.
 | `textInput.characterCount` | MessageComposer / FormTextField `limit:` (VoiceOver on the count, 4.1.0; format: count, limit) | `%1$lld of %2$lld characters` |
 | `thumbnail.saved` | ThumbnailCard, ThumbnailRow (VoiceOver on the bookmark; `savedLabel` replaces it) | `Saved` |
 | `thumbnail.verified` | ThumbnailCard, ThumbnailRow (VoiceOver on the seal; `verifiedLabel` replaces it) | `Verified` |
+| `time.dayAndTime` | Formatting.relativeTime, RelativeTime ("Yesterday, 14:20", args `%@ %@`, 8.9.0) | `%@, %@` |
+| `time.justNow` | Formatting.relativeTime, RelativeTime (under a minute, 8.9.0) | `Just now` |
 | `timeFilter.customPeriod` | DateRangePickerSheet (default `title`) | `Custom period` |
 | `timeFilter.from` | DateRangePickerSheet (default `fromTitle`) | `From` |
 | `timeFilter.to` | DateRangePickerSheet (default `toTitle`) | `To` |

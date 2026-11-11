@@ -1,0 +1,15 @@
+{
+  "guide": "docs/migration-8.0.md",
+  "rewrite": [
+    {"pattern": "(FormSection\\([^)]*?),\\s*style:\\s*\\.(?:card|glass)\\s*\\)", "replace": "\\1)", "note": "FormSection(style: .card / .glass) → FormSection(header:footer:)"},
+    {"pattern": "FormSection\\(\\s*style:\\s*\\.(?:card|glass)\\s*\\)", "replace": "FormSection()", "note": "FormSection(style:) → FormSection()"},
+    {"pattern": "(SectionHeader\\([^)]*?),\\s*style:\\s*\\.compact\\s*\\)", "replace": "\\1)", "note": "SectionHeader(style: .compact) → SectionHeader(_:)"},
+    {"pattern": "SectionHeaderSkeleton\\(\\s*style:\\s*\\.compact\\s*\\)", "replace": "SectionHeaderSkeleton()", "note": "SectionHeaderSkeleton(style: .compact) → SectionHeaderSkeleton()"}
+  ],
+  "todo": [
+    {"pattern": "^\\s*Divider\\(\\)", "note": "Inside a FormSection, remove the Divider: the section draws a RowDivider under the upper row's text"},
+    {"pattern": "\\.swipeActions\\s*[({]", "note": "No swipe actions: a CardList's long press shows Edit and Delete, its toolbar selects, reorders and adds"},
+    {"pattern": "\\bForm\\s*\\{", "note": "A form is FormSection glass cards on the page, not the system Form"},
+    {"pattern": "\\.listStyle\\(\\.insetGrouped\\)", "note": "A list of things a person keeps is a CardList; settings are FormSection cards"}
+  ]
+}

@@ -60,6 +60,14 @@ private struct SearchablePickerPage: View {
                 "selection: Binding<Value?> picks one (dismissesOnSelection: true closes the screen on a pick); Binding<Set<Value>> picks several.",
                 "The search keeps the options whose title or subtitle contains the text, any case, any accents. onCreate adds the typed name and returns its value, which is picked.",
                 "Loading: SearchablePickerSkeleton. Strings: picker.search, picker.create, picker.noResults.",
+            ],
+            dos: [
+                "Use it when the list is too long to scan (about 10 options and more).",
+                "Pass onCreate when a person can add the missing option (a category, a tag).",
+            ],
+            donts: [
+                "Use it for a few options: a menu row or ChipPicker shows them at once.",
+                "Put it outside a NavigationStack: the search field lives in the navigation bar.",
             ]
         ) {
             if state == .loading {

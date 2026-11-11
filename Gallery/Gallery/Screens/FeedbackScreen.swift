@@ -173,7 +173,15 @@ private struct BadgePage: View {
             summary: "A short label in a capsule: tinted (pale background, coloured text) or filled.",
             since: "0.4.0",
             apps: [.tenra, .dalada],
-            styles: ["tinted", "filled"]
+            styles: ["tinted", "filled"],
+            dos: [
+                "Name a status or a tag in a word or two: “Paid”, “Overdue”.",
+                "Use .filled only for a count that needs attention.",
+            ],
+            donts: [
+                "Make it a button.",
+                "Colour its text yourself: the tint is made readable for you.",
+            ]
         ) {
             if state == .loading {
                 BadgeSkeleton(width: 96)
@@ -261,7 +269,13 @@ private struct StatusBannerPage: View {
             since: "1.7.0",
             apps: [.tenra, .dalada],
             canvas: .fill,
-            styles: ["standard", "compact"]
+            styles: ["standard", "compact"],
+            dos: [
+                "Keep a state on screen while it lasts: offline, a statement ready, a card expiring.",
+            ],
+            donts: [
+                "Use it for the outcome of an action that comes and goes: that is MessageBanner.",
+            ]
         ) {
             if state == .loading {
                 StatusBannerSkeleton(style: compact ? .compact : .standard)
@@ -289,7 +303,14 @@ private struct MessageBannerPage: View {
             name: "MessageBanner",
             summary: "A floating banner on glass after something happened: saved, failed, a warning; with an action.",
             apps: [.tenra],
-            canvas: .fill
+            canvas: .fill,
+            dos: [
+                "Confirm an action briefly (“Saved”), with Undo or Retry when there is one.",
+            ],
+            donts: [
+                "Keep it for a state that lasts: that is StatusBanner.",
+                "Announce it to VoiceOver yourself: it does on appear.",
+            ]
         ) {
             if hasAction {
                 MessageBanner(message: "Couldn't sync the last changes.", type: type, actionTitle: "Retry") {}
@@ -342,6 +363,13 @@ private struct TooltipPage: View {
                 "A hint longer than 280 pt wraps into lines (5.5.0); a value stays on one line.",
                 "Give the target a higher zIndex than its neighbours while the tooltip shows.",
                 "It shows a value already on screen, on a tap, so it has no skeleton.",
+            ],
+            dos: [
+                "Show a short value over what was tapped: the amount of a bar.",
+                "Anchor it in an overlay with .tooltipAnchor so it never moves the layout.",
+            ],
+            donts: [
+                "Write paragraphs in it: an explanation is an InfoTip.",
             ]
         ) {
             RoundedRectangle(cornerRadius: AppRadius.md)
@@ -400,6 +428,14 @@ private struct InfoTipPage: View {
                 "A sentence or two: what the value means and how it is counted. A value the person tapped is a Tooltip.",
                 "The 16 pt glyph has a 44 pt target that takes no room. On iPhone the popover stays a popover and closes on a tap anywhere.",
                 "VoiceOver: “About <title>” (or “More information”), then the text.",
+            ],
+            dos: [
+                "Explain what a number means or how it is counted, in a sentence or two.",
+                "Put it after the label it explains: Text(label).infoTip(text, title: label).",
+            ],
+            donts: [
+                "Hide something the person needs to act: say it on the screen.",
+                "Use it for a value the person tapped (that is a Tooltip) or for errors.",
             ]
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
@@ -480,7 +516,14 @@ private struct EmptyStatePage: View {
                 "The icon draws itself on (2.2.0) in an SF Symbols 7 gradient (2.3.0); the error icon wiggles once.",
                 "Artwork (4.13.0): EmptyState(title:description:actionTitle:action:) { … } puts any picture in place of the icon, such as an app's mascot pointing at the button.",
             ],
-            styles: ["standard", "compact", "error"]
+            styles: ["standard", "compact", "error"],
+            dos: [
+                "Say what is missing and the one action that fixes it.",
+                "Use style: .error with Retry when loading failed.",
+            ],
+            donts: [
+                "Show it while the list is loading: that is the skeleton.",
+            ]
         ) {
             if mascot {
                 EmptyState(

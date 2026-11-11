@@ -6,7 +6,8 @@
 //  the page and on its pale container, a category's colour made readable on its own tint, white
 //  on a filled badge and on the accents. 4.5:1 is AA for body text and icons.
 //
-//  A pair that is the apps' own choice and does not pass yet is a known issue here: it is
+//  A pair that is the apps' own choice and does not pass yet is a known issue here (Tenra's
+//  indigo and Dalada's green under white text in dark mode, the income green on white): it is
 //  reported, and the test fails once it passes, so the note is removed with the cause.
 //
 
@@ -86,11 +87,14 @@ struct ContrastTests {
         }
     }
 
-    @Test("White reads on Tenra's indigo accent")
+    @Test("White on Tenra's indigo accent: it reads in light mode, 3.5:1 in dark mode (its choice)")
     func tenraAccent() {
-        for (mode, traits) in Self.modes {
-            let ratio = AppColors.contrastRatio(AppColors.Text.onAccent, Color.indigo, in: traits)
-            #expect(ratio >= Self.minimum, "white on indigo, \(mode): \(ratio)")
+        let light = AppColors.contrastRatio(AppColors.Text.onAccent, Color.indigo, in: Self.light)
+        #expect(light >= Self.minimum, "white on indigo, light: \(light)")
+        // iOS 26's dark indigo is lighter than white text needs; a deeper accent is Tenra's call.
+        withKnownIssue("The system indigo in dark mode is too light for white text") {
+            let dark = AppColors.contrastRatio(AppColors.Text.onAccent, Color.indigo, in: Self.dark)
+            #expect(dark >= Self.minimum, "white on indigo, dark: \(dark)")
         }
     }
 

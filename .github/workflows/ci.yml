@@ -38,6 +38,14 @@ jobs:
       - uses: actions/checkout@v5
       - name: Check CHANGELOG.md
         run: python3 .github/scripts/changelog.py check
+      # The lint the apps run from the DesignKit version they pin (8.9.0).
+      - name: Test the apps' lint and migrations (scripts/designkit_lint.py, scripts/migrate.py)
+        run: |
+          python3 scripts/test_designkit_lint.py
+          python3 scripts/test_migrate.py
+      # docs/components.md and .json follow the Gallery's pages and the sources (8.9.0).
+      - name: Check the component reference
+        run: python3 .github/scripts/components_reference.py check
 
   # The Gallery's app badges (`apps:` on each ComponentPage) name the apps whose code uses the
   # component, read from Tenra's and Dalada's sources (5.2.0), so they follow the apps.
