@@ -19,3 +19,7 @@ Package.resolved
 # Gallery build output and the snapshot test log (scripts/snapshot-tests.sh)
 Gallery/build/
 Gallery/snapshot-test.log
+
+# Python bytecode cache (the scripts in .github/scripts)
+__pycache__/
+*.pyc
