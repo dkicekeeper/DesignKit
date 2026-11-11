@@ -324,7 +324,7 @@ rather than importing an app type.
 | Moving an app to 6.0 (`OptionCardPicker`'s `style:` and `OptionCard` removed) | [docs/migration-6.0.md](docs/migration-6.0.md) |
 | Moving an app to 7.0 (the twelve rows → `UniversalRow(accessory:)`, the icon rule) | [docs/migration-7.0.md](docs/migration-7.0.md) |
 | Moving an app to 8.0 (glass sections and their dividers, `CardList`, `.compact` and `style:` removed) | [docs/migration-8.0.md](docs/migration-8.0.md) |
-| What exists vs Apple HIG / Material / Fluent / Carbon / Polaris / Atlassian, next candidates | [docs/benchmark.md](docs/benchmark.md) |
+| What exists vs Apple HIG / Material / Fluent / Carbon / Polaris / Atlassian / Astryx, next candidates | [docs/benchmark.md](docs/benchmark.md) |
 | Components no app uses yet and where they could go (for the app sessions) | [docs/adoption.md](docs/adoption.md) |
 | Where a component goes (Gallery sections, source folders), how its Gallery page is built | [docs/gallery-structure.md](docs/gallery-structure.md) |
 | How an app uses DesignKit (its adapters, screens, effects in use) | Tenra's `docs/design-system.md`, Dalada's `CLAUDE.md` («Компоненты интерфейса») |

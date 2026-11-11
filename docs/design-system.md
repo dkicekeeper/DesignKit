@@ -57,7 +57,7 @@ The tokens keep their prefix (`AppColors`, `AppSpacing`, `AppIconSize`, …): a 
 is not a view, and `Color` / `Font` would clash with SwiftUI. The button is `DSButton` because
 `Button` is SwiftUI's.
 
-Coverage against Apple HIG, Material 3, Fluent 2, Carbon, Polaris and Atlassian, and the next
+Coverage against Apple HIG, Material 3, Fluent 2, Carbon, Polaris, Atlassian and Astryx, and the next
 candidates: [benchmark.md](benchmark.md).
 
 ### 0.1 Host-app hooks
