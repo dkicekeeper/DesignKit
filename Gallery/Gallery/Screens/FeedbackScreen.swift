@@ -476,7 +476,7 @@ private struct TypingIndicatorPage: View {
             name: "TypingIndicator",
             summary: "Three dots rising in a wave in a bubble: a reply is on its way, an assistant is thinking.",
             since: "2.2.0",
-            apps: [.tenra],
+            apps: [],
             canvas: .tall(minHeight: 120),
             notes: [
                 "Insert it with .transition(.popIn) under the last message.",
@@ -664,6 +664,7 @@ private struct ProgressOverlayPage: View {
 private struct NoticeCardPage: View {
     @State private var showsLeading = true
     @State private var hasAction = true
+    @State private var hasSecondAction = false
     @State private var canHide = true
     @State private var state: SpecimenState = .content
     @State private var log = ""
@@ -679,6 +680,7 @@ private struct NoticeCardPage: View {
                 "What the message is, when it shows and what the action does stay in the app.",
                 "The leading view comes at its own size, NoticeCardMetrics.leadingSize (48 pt) for a mascot or an icon; hide it from VoiceOver when it says nothing.",
                 "5.2.0: the action moved into the text's column, so it starts where the text does.",
+                "8.11.0: a second action in the neutral colour after the first (secondaryActionTitle, secondaryAction), for what the person can do about the message without opening anything; under the first when the two do not fit in a line.",
                 "Strings: common.hide (the hide button's VoiceOver name, unless hideLabel is given).",
             ]
         ) {
@@ -692,6 +694,9 @@ private struct NoticeCardPage: View {
                         actionTitle: hasAction ? "Go through it" : nil,
                         actionSystemImage: "sparkles",
                         action: hasAction ? { log = "Go through it" } : nil,
+                        secondaryActionTitle: hasSecondAction ? "Pause" : nil,
+                        secondaryActionSystemImage: "pause",
+                        secondaryAction: hasSecondAction ? { log = "Pause" } : nil,
                         onHide: canHide ? { log = "Hidden" } : nil
                     ) {
                         if showsLeading {
@@ -711,6 +716,7 @@ private struct NoticeCardPage: View {
             StateControl(state: $state)
             ToggleControl("Picture", isOn: $showsLeading)
             ToggleControl("Action", isOn: $hasAction)
+            ToggleControl("Second action", isOn: $hasSecondAction)
             ToggleControl("Hide button", isOn: $canHide)
         }
     }

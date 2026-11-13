@@ -16,6 +16,24 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.11.0 - 2026-11-13
+
+`NoticeCard` takes a second action, for what the person can do about a message without opening anything ("Pause" on a charge that comes tomorrow). For Tenra's assistant: Ten's messages get a one-tap button.
+[#103](https://github.com/dkicekeeper/DesignKit/pull/103)
+
+### Added
+
+- `NoticeCard(…, secondaryActionTitle:secondaryActionSystemImage:secondaryAction:)`: a second flat button after the first, in the neutral colour. It shows only with `secondaryAction`, and goes under the first when the two do not fit in a line (large text, a narrow card). A card without it looks as before.
+
+### Migration
+
+Nothing to change in code.
+
+### Gallery and tooling
+
+- Gallery: the NoticeCard page has a "Second action" switch; a snapshot of the card with two actions (light, dark, large text).
+- Gallery badges follow the apps: Tenra's chat no longer shows `TypingIndicator` (the step it is on shimmers instead), and `RelativeTime` is used by Tenra and Dalada.
+
 ## 8.10.0 - 2026-11-11
 
 The three contrast pairs 8.9.0 left to the owner, decided: white text on the accent reads at 4.5:1 in both apps and both themes, and income has a text colour. Benchmark round 4, follow-up (docs/benchmark.md).

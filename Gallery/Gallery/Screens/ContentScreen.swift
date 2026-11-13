@@ -104,7 +104,7 @@ private struct RelativeTimePage: View {
             name: "RelativeTime",
             summary: "When something happened, or how long it has run, kept current on screen: “5 min. ago”, “Yesterday, 14:20”, “1 hr, 2 min”, “1:02:34”.",
             since: "8.9.0",
-            apps: [],
+            apps: [.tenra, .dalada],
             notes: [
                 "Style it as text (.font, .foregroundStyle). .relative redraws every 30 seconds, .elapsed and .clock every second; .clock keeps its digits one width.",
                 "Under a minute “Just now”, under an hour minutes, the same day hours, the next day over “Yesterday, 14:20”, then the day (with the year in another year). The day follows DesignKitDateFormat.day.",

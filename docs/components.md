@@ -1715,7 +1715,7 @@ init(_ message: String, title: String? = nil)
 
 Three dots rising in a wave in a bubble: a reply is on its way, an assistant is thinking.
 
-Since 2.2.0 · Apps: Tenra
+Since 2.2.0 · Apps: none yet
 
 - `TypingIndicator` in `Sources/DesignComponents/Feedback/TypingIndicator.swift`
   Three dots in a wave, in a bubble.
@@ -1824,13 +1824,14 @@ Since 4.14.0 · Apps: Tenra
   "🫧 A payment is due tomorrow / Internet, 12 000 ₸ ……… ✕" and "✨ Go through it" under it.
 
 ```swift
-init(title: String, message: String, actionTitle: String? = nil, actionSystemImage: String? = nil, action: (() -> Void)? = nil, hideLabel: String = String(localized: "common.hide", defaultValue: "Hide"), onHide: (() -> Void)? = nil, @ViewBuilder leading: () -> Leading)
-init(title: String, message: String, actionTitle: String? = nil, actionSystemImage: String? = nil, action: (() -> Void)? = nil, hideLabel: String = String(localized: "common.hide", defaultValue: "Hide"), onHide: (() -> Void)? = nil)
+init(title: String, message: String, actionTitle: String? = nil, actionSystemImage: String? = nil, action: (() -> Void)? = nil, secondaryActionTitle: String? = nil, secondaryActionSystemImage: String? = nil, secondaryAction: (() -> Void)? = nil, hideLabel: String = String(localized: "common.hide", defaultValue: "Hide"), onHide: (() -> Void)? = nil, @ViewBuilder leading: () -> Leading)
+init(title: String, message: String, actionTitle: String? = nil, actionSystemImage: String? = nil, action: (() -> Void)? = nil, secondaryActionTitle: String? = nil, secondaryActionSystemImage: String? = nil, secondaryAction: (() -> Void)? = nil, hideLabel: String = String(localized: "common.hide", defaultValue: "Hide"), onHide: (() -> Void)? = nil)
 ```
 
 - What the message is, when it shows and what the action does stay in the app.
 - The leading view comes at its own size, NoticeCardMetrics.leadingSize (48 pt) for a mascot or an icon; hide it from VoiceOver when it says nothing.
 - 5.2.0: the action moved into the text's column, so it starts where the text does.
+- 8.11.0: a second action in the neutral colour after the first (secondaryActionTitle, secondaryAction), for what the person can do about the message without opening anything; under the first when the two do not fit in a line.
 - Strings: common.hide (the hide button's VoiceOver name, unless hideLabel is given).
 
 ### .spotlight
@@ -2308,7 +2309,7 @@ init(date: Date)
 
 When something happened, or how long it has run, kept current on screen: “5 min. ago”, “Yesterday, 14:20”, “1 hr, 2 min”, “1:02:34”.
 
-Since 8.9.0 · Apps: none yet
+Since 8.9.0 · Apps: Dalada, Tenra
 
 - `RelativeTime` in `Sources/DesignComponents/Content/RelativeTime.swift`
   When something happened, or how long it has run, kept current.
