@@ -476,7 +476,7 @@ private struct TypingIndicatorPage: View {
             name: "TypingIndicator",
             summary: "Three dots rising in a wave in a bubble: a reply is on its way, an assistant is thinking.",
             since: "2.2.0",
-            apps: [.tenra],
+            apps: [],
             canvas: .tall(minHeight: 120),
             notes: [
                 "Insert it with .transition(.popIn) under the last message.",

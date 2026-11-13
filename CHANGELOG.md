@@ -32,6 +32,7 @@ Nothing to change in code.
 ### Gallery and tooling
 
 - Gallery: the NoticeCard page has a "Second action" switch; a snapshot of the card with two actions (light, dark, large text).
+- Gallery badges follow the apps: Tenra's chat no longer shows `TypingIndicator` (the step it is on shimmers instead), and `RelativeTime` is used by Tenra and Dalada.
 
 ## 8.10.0 - 2026-11-11
 

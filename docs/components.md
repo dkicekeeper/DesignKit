@@ -1715,7 +1715,7 @@ init(_ message: String, title: String? = nil)
 
 Three dots rising in a wave in a bubble: a reply is on its way, an assistant is thinking.
 
-Since 2.2.0 · Apps: Tenra
+Since 2.2.0 · Apps: none yet
 
 - `TypingIndicator` in `Sources/DesignComponents/Feedback/TypingIndicator.swift`
   Three dots in a wave, in a bubble.
@@ -2309,7 +2309,7 @@ init(date: Date)
 
 When something happened, or how long it has run, kept current on screen: “5 min. ago”, “Yesterday, 14:20”, “1 hr, 2 min”, “1:02:34”.
 
-Since 8.9.0 · Apps: none yet
+Since 8.9.0 · Apps: Dalada, Tenra
 
 - `RelativeTime` in `Sources/DesignComponents/Content/RelativeTime.swift`
   When something happened, or how long it has run, kept current.
