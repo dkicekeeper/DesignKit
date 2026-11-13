@@ -19,6 +19,7 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 ## 8.11.0 - 2026-11-13
 
 `NoticeCard` takes a second action, for what the person can do about a message without opening anything ("Pause" on a charge that comes tomorrow). For Tenra's assistant: Ten's messages get a one-tap button.
+[#103](https://github.com/dkicekeeper/DesignKit/pull/103)
 
 ### Added
 
