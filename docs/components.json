@@ -3184,6 +3184,7 @@
       "What the message is, when it shows and what the action does stay in the app.",
       "The leading view comes at its own size, NoticeCardMetrics.leadingSize (48 pt) for a mascot or an icon; hide it from VoiceOver when it says nothing.",
       "5.2.0: the action moved into the text's column, so it starts where the text does.",
+      "8.11.0: a second action in the neutral colour after the first (secondaryActionTitle, secondaryAction), for what the person can do about the message without opening anything; under the first when the two do not fit in a line.",
       "Strings: common.hide (the hide button's VoiceOver name, unless hideLabel is given)."
     ],
     "dos": [],
@@ -3194,8 +3195,8 @@
         "file": "Sources/DesignComponents/Feedback/NoticeCard.swift",
         "doc": "\"🫧 A payment is due tomorrow / Internet, 12 000 ₸ ……… ✕\" and \"✨ Go through it\" under it.",
         "initialisers": [
-          "init(title: String, message: String, actionTitle: String? = nil, actionSystemImage: String? = nil, action: (() -> Void)? = nil, hideLabel: String = String(localized: \"common.hide\", defaultValue: \"Hide\"), onHide: (() -> Void)? = nil, @ViewBuilder leading: () -> Leading)",
-          "init(title: String, message: String, actionTitle: String? = nil, actionSystemImage: String? = nil, action: (() -> Void)? = nil, hideLabel: String = String(localized: \"common.hide\", defaultValue: \"Hide\"), onHide: (() -> Void)? = nil)"
+          "init(title: String, message: String, actionTitle: String? = nil, actionSystemImage: String? = nil, action: (() -> Void)? = nil, secondaryActionTitle: String? = nil, secondaryActionSystemImage: String? = nil, secondaryAction: (() -> Void)? = nil, hideLabel: String = String(localized: \"common.hide\", defaultValue: \"Hide\"), onHide: (() -> Void)? = nil, @ViewBuilder leading: () -> Leading)",
+          "init(title: String, message: String, actionTitle: String? = nil, actionSystemImage: String? = nil, action: (() -> Void)? = nil, secondaryActionTitle: String? = nil, secondaryActionSystemImage: String? = nil, secondaryAction: (() -> Void)? = nil, hideLabel: String = String(localized: \"common.hide\", defaultValue: \"Hide\"), onHide: (() -> Void)? = nil)"
         ],
         "skeleton": "NoticeCardSkeleton"
       }

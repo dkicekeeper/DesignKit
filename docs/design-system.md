@@ -2231,8 +2231,10 @@ when it says nothing), the title (`bodyEmphasis`) and the message (`bodySmall`, 
 hide button on the trailing edge (`DSButton`, icon only, flat, neutral, small; `hideLabel` for
 VoiceOver, `common.hide` by default; none without `onHide`) and the action under the message in
 the text's column, so it starts where the text does (`DSButton`, flat, small; none without
-`action`; 5.2.0, under the picture before). What the
-message is, when it shows and what the action does stay in the app. Tenra: "Ten writes" on Home.
+`action`; 5.2.0, under the picture before), and a second action after it in the neutral colour
+(`secondaryActionTitle`, `secondaryAction`; 8.11.0), under the first when the two do not fit in a
+line. What the
+message is, when it shows and what the actions do stay in the app. Tenra: "Ten writes" on Home.
 Skeleton: `NoticeCardSkeleton(leadingSize:showsAction:)`.
 
 #### `VoiceOrbButton`

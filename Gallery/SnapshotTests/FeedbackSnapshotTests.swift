@@ -297,6 +297,24 @@ extension ComponentSnapshots {
                 named: "full",
                 appearances: [.light, .dark, .largeText]
             )
+            // 8.11.0: a second, neutral action after the first.
+            await assertComponentSnapshot(
+                NoticeCard(
+                    title: "A payment is due tomorrow",
+                    message: "Internet, 12 000 ₸. There is enough on the card.",
+                    actionTitle: "Go through it",
+                    actionSystemImage: "sparkles",
+                    action: {},
+                    secondaryActionTitle: "Pause",
+                    secondaryActionSystemImage: "pause",
+                    secondaryAction: {},
+                    onHide: {}
+                ) {
+                    Icon(source: .sfSymbol("bell.fill"), size: AppIconSize.xl)
+                },
+                named: "two-actions",
+                appearances: [.light, .dark, .largeText]
+            )
             await assertComponentSnapshot(
                 NoticeCard(title: "Backup finished", message: "Every account and transaction is saved."),
                 named: "text",
