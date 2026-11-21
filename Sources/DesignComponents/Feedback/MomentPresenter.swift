@@ -49,8 +49,8 @@ public final class MomentPresenter {
     /// app's windows: over sheets, the tab bar and navigation. Returns false and shows nothing
     /// while another moment is up, or when there is no foreground-active window scene.
     ///
-    /// - Parameter onDismissed: Runs once the moment has gone, however it went: after the
-    ///   button's action, or after `dismiss()`.
+    /// - Parameter onDismissed: Runs once the moment has closed itself and its window has gone,
+    ///   after the button's action (not after `dismiss()`).
     @discardableResult
     public func present<Content: View>(
         onDismissed: (() -> Void)? = nil,
@@ -84,13 +84,11 @@ public final class MomentPresenter {
         return true
     }
 
-    /// Removes the moment at once, without its exit (e.g. the app went to the background). No
-    /// button action runs; `onDismissed` does.
+    /// Removes the moment at once, without its exit (e.g. the app went to the background).
+    /// Neither a button's action nor `onDismissed` runs: the caller knows the moment went.
     public func dismiss() {
         guard window != nil else { return }
-        let dismissed = onDismissed
         tearDown()
-        dismissed?()
     }
 
     /// The moment has played its exit: the window goes, then the action, then `onDismissed`.

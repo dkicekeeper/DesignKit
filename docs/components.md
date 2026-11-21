@@ -1813,6 +1813,37 @@ func progressOverlay(isPresented: Bool, title: String, message: String? = nil) -
 ```
 
 - For a restore, a migration, an import that must finish first. Disable the screen under it at the call site.
+- hero: (8.12.0) takes the spinner's place: a view that shows the progress itself, such as a ParticleCreature in .working(progress:), sized by the host.
+
+### MomentOverlay · MomentPresenter
+
+A moment of success over the whole screen, without a card: the screen dims and blurs, the hero springs in with a title and a line under it, confetti for a celebration, buttons at the bottom.
+
+Since 8.12.0 · Apps: Tenra
+
+- `MomentOverlay` in `Sources/DesignComponents/Feedback/MomentOverlay.swift`
+  A moment of success over the whole screen, without a card: the screen behind dims and blurs, the hero springs in at the centre with a title and a line or two under it, and buttons wait at the bottom.
+- `MomentPresenter` in `Sources/DesignComponents/Feedback/MomentPresenter.swift`
+  Presents a `MomentOverlay` over the whole app, in a window of its own.
+
+```swift
+init(title: String, message: String? = nil, celebrates: Bool = false, primary: MomentAction? = nil, dismissTitle: String, onDismiss: @escaping () -> Void = {}, @ViewBuilder hero: () -> Hero, @ViewBuilder reward: () -> Reward)
+init(title: String, message: String? = nil, celebrates: Bool = false, primary: MomentAction? = nil, dismissTitle: String, onDismiss: @escaping () -> Void = {}, @ViewBuilder hero: () -> Hero)
+```
+
+- MomentPresenter.shared.present { MomentOverlay(…) } shows it over the whole app, sheets, tab bar and navigation included, in a window of its own; it refuses while another moment is up.
+- Every close plays the exit first. The primary button runs primary.action; any other close (the dismiss button, a tap outside the hero and the buttons, a swipe down, VoiceOver's escape) runs onDismiss. In the presenter the window goes before the action, so the action may navigate or open a sheet.
+- celebrates: confetti behind the hero and the success haptic; otherwise a light tap. Under Reduce Motion it comes and goes by opacity only; the haptic stays.
+- The hero is sized by the host and read by VoiceOver with the title. The title and the message are announced, and focus moves into the moment.
+- No skeleton: a moment shows no data that loads. No strings of its own: every text comes from the host.
+- The blur is a material over the app's windows; check it on a device.
+
+- Do: Only good news: a goal reached, a debt settled, a month inside the budgets, a reward earned.
+- Do: One at a time: queue the next moment in the presenter's onDismissed.
+- Do: A title of a few words and a line or two; the hero and the reward say the rest.
+- Don't: A warning, an error or anything the person must act on: that is a StatusBanner, a MessageBanner or an alert.
+- Don't: A moment for every small step: a like or a saved form is a .sparkleBurst or a MessageBanner.
+- Don't: Buttons inside the hero: the action is primary:, what the moment gives is reward:.
 
 ### NoticeCard
 
