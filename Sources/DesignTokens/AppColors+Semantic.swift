@@ -89,6 +89,13 @@ public extension AppColors {
         public nonisolated static let fillOnLight = Color.black.opacity(0.05)
         /// Darkens a photo under text or controls. The same in both themes.
         public nonisolated static let overlayOnImage = Color.black.opacity(0.3)
+        /// Dims the whole app under something shown over all of it (8.12.0, `MomentOverlay`), laid
+        /// over a material that blurs the app: a light veil in light mode (black 15%), so text in
+        /// the primary colour reads on it, a deep one in dark mode (black 45%).
+        public nonisolated static let scrim = AppColors.dynamic(
+            light: UIColor.black.withAlphaComponent(0.15),
+            dark: UIColor.black.withAlphaComponent(0.45)
+        )
     }
 
     // MARK: - Status
