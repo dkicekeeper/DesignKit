@@ -41,7 +41,7 @@
 |---|---|
 | `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases, `Palette` 3.7.0), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, `softScrollEdges` 5.4.0, inline field styles), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
 | `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `Icon` (a brand logo is `Icon(source: .brandService(name))`; `BrandLogoView` was removed in 2.0.0), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `RecentSearches` and `SearchMatch` (search suggestions, 3.5.0), `Formatting.relativeTime` / `elapsedTime` / `clockTime` / `dayTitle` (8.9.0), `AccessibilityAnnouncer` and `.voiceOverAnnouncement` (8.9.0), `HapticManager`, `HapticCue` (haptics by meaning, 2.3.0), `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitPhotoLoader` (3.1.0), `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
-| `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons") |
+| `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons"); since 8.12.0 `MomentOverlay`, `MomentAction` and `MomentPresenter` (a moment of success over the whole app, in a window of its own) |
 
 **Names (2.0.0).** A component is named for what it is, without `View` or `App`: `SectionHeader`,
 `EmptyState`, `Avatar`, `Badge`, `Icon`, `DSButton`. The names before 2.0 were deprecated
@@ -139,6 +139,7 @@ Modifiers:
 | `fill` | `.tertiarySystemFill` | Translucent container on any surface, glass included |
 | `fillOnDark` / `fillOnLight` | white 15% / black 5% | Translucent container on dark / light photos, both themes |
 | `overlayOnImage` | black 30% | Darkens a photo under text |
+| `scrim` *(8.12.0)* | black 10% / 45% | Dims the whole app under a `MomentOverlay`, over the material that blurs it |
 
 **`AppColors.Status`** — banners, badges, notices: `info` (`.blue`), `positive` (`.green`), `negative` (`.red`), `warning` (`.orange`), `neutral` (`.gray`), each with a `…Pale` container (`AppColors.pale`) and *(8.9.0)* a `…Text` colour for its text and icons (`AppColors.readable` of the solid one: `infoText`, `positiveText`, `negativeText`, `warningText`, `neutralText`). `Text.positive`, `.negative` and `.warning` are the `…Text` colours since 8.9.0. The solid colours stay for fills, icons on a fill and charts.
 
@@ -1237,6 +1238,61 @@ without taking room; on iPhone the popover stays a popover (`presentationCompact
 VoiceOver: "About <title>" or "More information" (`infoTip.about`, `infoTip.label`). No skeleton:
 it explains, it shows no data.
 
+#### `MomentOverlay` / `MomentPresenter` *(8.12.0)*
+A big moment of success over the whole screen, without a card (the owner's decision for Tenra's
+assistant): a goal reached, a debt settled, a month inside the budgets, an accessory earned. The
+screen behind dims and blurs (`.regularMaterial` under `AppColors.Background.scrim`, edge to edge);
+the hero, any view the host sizes (Tenra: a `ParticleCreature` with a mood, a gesture and a line),
+grows in at the centre from 60 % on `AppAnimation.expressive`; the title (`h2`), a line or two
+(`body`, secondary), an optional reward and the buttons rise in after it (`.riseIn`'s 12 pt and
+4 pt blur on `AppAnimation.smooth`, 0.1 / 0.18 / 0.24 s later). `celebrates: true` bursts
+`.celebration` confetti behind the hero with the success haptic; otherwise a light tap.
+
+```swift
+MomentPresenter.shared.present(onDismissed: { moments.next() }) {
+    MomentOverlay(
+        title: "Goal reached",
+        message: "A new bike: 250 000 saved.",
+        celebrates: true,
+        primary: MomentAction("See the goal") { router.open(goal) },
+        dismissTitle: "Close"
+    ) {
+        ParticleCreature(mood: .celebrating).frame(width: 220, height: 220)
+    } reward: {
+        AccessoryPreview(accessory)      // optional: what the moment gives
+    }
+}
+```
+
+- **Buttons**: the primary one (`DSButton(.primary)`) over the dismiss one (`.flat`), full width
+  at the bottom inside the safe area; without a primary the dismiss button is the filled one.
+- **Every close plays the exit first** (everything fades on `AppAnimation.snappy`, the hero
+  shrinks to 92 %), then runs `primary.action` for the primary button or `onDismiss` for any
+  other close: the dismiss button, a tap on the scrim outside the hero and the buttons (the
+  text counts as scrim), a swipe down (the content follows the finger; from the top only when it
+  scrolls) and VoiceOver's escape.
+- **Over the whole app**: `MomentPresenter.shared.present` puts it in a `UIWindow` of its own on
+  the foreground-active scene, at `.alert - 1` (above the app's windows, so over its sheets, tab
+  bar and navigation; below system alerts and an app lock at `.alert + 1`), with a clear
+  `UIHostingController` root, the app window's `overrideUserInterfaceStyle` (else its root
+  controller's) and `DesignKitTheme.accent` as its tint. It is visible only while a moment is up
+  and never key; a close removes it, then runs the button's action (which may navigate or open a
+  sheet), then `onDismissed`. One at a time: `present` returns false while a moment is up or
+  with no foreground-active scene. `dismiss()` removes it at once, without the exit or any
+  callback (the app going to the background). The blur is a material on the window's scrim, so
+  it blurs the app's windows under it: to be checked on a device.
+- **Inline**: a host may show it itself (the Gallery, a snapshot); it plays its exit and calls
+  the action, and the host removes it.
+- **Accessibility**: modal (`.isModal`, `accessibilityViewIsModal` on the window), focus moves in
+  (screen changed), the title and the message are announced (`AccessibilityAnnouncer`), the
+  title is a header, the hero is one element read with the title after its own label.
+- **Reduce Motion / `.designKitMotion(false)`**: it comes and goes by opacity only, no pop, rise,
+  shrink or confetti; the haptics stay.
+- **Layout**: centred vertically, at most 480 pt wide; the hero, text and reward scroll when they
+  do not fit (the largest text sizes, a small phone), the buttons stay at the bottom.
+- Only good news, one at a time. A warning, an error or something to act on is a `StatusBanner`,
+  a `MessageBanner` or an alert. No strings of its own; no skeleton (it shows no data that loads).
+
 #### `MessageBanner`
 Transient animated feedback banner.
 
@@ -2197,6 +2253,10 @@ VoiceOver: `pager.previous` / `pager.next`. Tenra: the insight period pagers.
 The screen dims (black 45%) and an `.ultraThinMaterial` panel (`AppRadius.lg`) shows a large
 spinner in the accent, the title (bodyEmphasis) and a message (secondary). Disable the screen
 under it at the call site. Tenra: restoring a backup.
+
+Since 8.12.0 `.progressOverlay(isPresented:title:message:hero:)` (and `ProgressOverlay(title:message:hero:)`)
+puts a view in the spinner's place, one that shows the progress itself, sized by the host:
+Tenra's mascot in `.working(progress:)` over a backup's restore. Without `hero:` it is as before.
 
 ### From Tenra's last audit *(4.14.0)*
 

@@ -58,6 +58,7 @@ matches the version the app builds with. Do not edit the block in the app; chang
 | Photos | `RemotePhoto`, `PhotoTile`, `PhotoGrid`, `PhotoCarousel`, `PhotoViewer` |
 | Edit sheet | `EditSheetContainer`, `EditableHero`, `AmountEntrySheet` |
 | A moment of success | `.celebration`, `.completionMoment` |
+| A big moment of success over the whole app (a goal reached, a reward earned) | `MomentOverlay` through `MomentPresenter.shared.present` |
 
 ## Check before pushing
 

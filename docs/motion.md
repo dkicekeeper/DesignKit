@@ -96,6 +96,12 @@ Insert with a spring: `withAnimation(AppAnimation.bouncy) { isShown = true }`.
 | `TypingIndicator` | three dots in a wave | 30 fps while allowed | a reply on its way, an assistant thinking |
 | `.borderGlow` (1.x) | a static halo round a card | see its docs | "working on it" |
 
+**8.12.0: a moment over the whole app**
+
+| Effect | What | Cost | Use |
+|---|---|---|---|
+| `MomentOverlay` (with `MomentPresenter`) | the app dims and blurs (a material under `Background.scrim`), the hero grows in from 60 % on `expressive`, the text, reward and buttons rise in after it (0.1 / 0.18 / 0.24 s), confetti behind the hero when it celebrates; every close fades it on `snappy` with the hero shrinking to 92 %, then runs the action. Opacity only under Reduce Motion; the haptic stays | one material and a few springs; the confetti's canvas for 1.4 s | a goal reached, a debt settled, a reward earned: rare, one at a time |
+
 **4.6.0: a character**
 
 | Effect | What | Cost | Use |
