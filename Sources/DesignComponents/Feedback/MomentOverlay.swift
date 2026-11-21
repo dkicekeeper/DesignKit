@@ -174,7 +174,7 @@ public struct MomentOverlay<Hero: View, Reward: View>: View {
     /// The dim and the blur over the app, edge to edge.
     private var scrim: some View {
         Rectangle()
-            .fill(.thinMaterial)
+            .fill(.regularMaterial)
             .overlay(AppColors.Background.scrim)
             .ignoresSafeArea()
             .opacity(isShown ? 1 : 0)
@@ -188,6 +188,8 @@ public struct MomentOverlay<Hero: View, Reward: View>: View {
     private var moment: some View {
         VStack(spacing: AppSpacing.xl) {
             hero
+                // The hero's whole frame is the hero: a tap on it does not close the moment.
+                .contentShape(Rectangle())
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel { label in
                     label
