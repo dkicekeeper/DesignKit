@@ -134,7 +134,8 @@ extension ComponentSnapshots {
         /// fill on the white page; under `.fill` the greys inside a card (a tile's plate, chips, a
         /// track, a skeleton) stay a step darker than it. The glass twins look as before 8.12.0.
         @Test func surfaceStyles() async {
-            for (surface, name) in [(SurfaceStyle.glass, "glass"), (.fill, "fill")] {
+            let styles: [(SurfaceStyle, String)] = [(.glass, "glass"), (.fill, "fill")]
+            for (surface, name) in styles {
                 await assertComponentSnapshot(
                     FormSection(header: "Trip") {
                         UniversalRow("Reminder", icon: "clock", accessory: .toggle(.constant(true)))
