@@ -45,7 +45,7 @@ Under `.fill`, an app's own neutral shape inside a card fills with `.surfaceNeut
 ### Gallery and tooling
 
 - Gallery: a Surfaces menu in the toolbar (Glass, Fill) draws every page either way, on the white or black canvas under Fill; Foundations › Surfaces opens on a `SurfaceStyle` page that sets one block of a section, a card and chips to glass or fill.
-- A snapshot of a section and a card under `.fill` (light, dark).
+- Snapshots of a section and a card on glass and under `.fill` (light, dark).
 
 ## 8.11.0 - 2026-11-13
 
