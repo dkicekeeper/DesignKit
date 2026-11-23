@@ -173,7 +173,7 @@ private struct DateRangeSummary: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, AppSpacing.md)
             .padding(.vertical, AppSpacing.sm)
-            .background(AppColors.Background.neutral1, in: RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+            .background(.surfaceNeutral1, in: RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
             .selectionOutline(isEditing, cornerRadius: AppRadius.md)
             .contentShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
         }

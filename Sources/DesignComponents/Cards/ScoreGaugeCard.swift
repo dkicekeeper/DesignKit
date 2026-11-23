@@ -94,6 +94,7 @@ public struct ScoreGaugeCard: View {
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.surfaceStyle) private var surface
 
     /// - Parameters:
     ///   - score: `nil` when it cannot be computed: the gauge stays empty and the number reads "—".
@@ -443,7 +444,7 @@ public struct ScoreGaugeCard: View {
         .multilineTextAlignment(.center)
         .padding(.horizontal, AppSpacing.md)
         .padding(.vertical, AppSpacing.xs)
-        .modifier(HeroCapsule(onColor: onColor, fill: capsuleFill(AppColors.Background.neutral1)))
+        .modifier(HeroCapsule(onColor: onColor, fill: capsuleFill(surface.neutral1)))
     }
 }
 

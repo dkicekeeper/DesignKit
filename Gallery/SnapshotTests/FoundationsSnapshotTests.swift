@@ -130,6 +130,37 @@ extension ComponentSnapshots {
             )
         }
 
+        /// `SurfaceStyle.fill` (8.12.0): the surfaces a grey fill on the white page, no glass; the
+        /// greys inside a card (a tile's plate, chips, a track, a skeleton) stay a step darker.
+        @Test func fillSurfaces() async {
+            await assertComponentSnapshot(
+                FormSection(header: "Trip") {
+                    UniversalRow("Reminder", icon: "clock", accessory: .toggle(.constant(true)))
+                    ChipPicker("Bite", options: ["None", "Weak", "Good"], selection: .constant("Good"),
+                               inset: AppSpacing.lg) { $0 }
+                        .padding(.vertical, AppSpacing.sm)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .surfaceStyle(.fill),
+                named: "section"
+            )
+            await assertComponentSnapshot(
+                HStack(spacing: AppSpacing.md) {
+                    Icon(source: .sfSymbol("cart.fill"), size: AppIconSize.Tile.sm)
+                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                        Text(verbatim: "Groceries").font(AppTypography.h4)
+                        LinearProgressBar(value: 0.6, animatesOnAppear: false)
+                        SkeletonText(AppTypography.bodySmall, width: 120)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .cardContentPadding()
+                .cardStyle()
+                .surfaceStyle(.fill),
+                named: "card"
+            )
+        }
+
         /// Dalada's green accent through `DesignKitTheme.accent`: everything tinted follows it.
         @Test func daladaAccent() async {
             let saved = DesignKitTheme.accent

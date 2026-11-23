@@ -248,7 +248,7 @@ public struct MonthCalendar<Item: Identifiable, Marker: View, Accessory: View>: 
                             .font(.system(size: AppIconSize.sm, weight: .bold))
                             .foregroundStyle(AppColors.Text.secondary)
                             .frame(width: AppIconSize.md, height: AppIconSize.md)
-                            .background(Circle().fill(AppColors.Background.neutral1))
+                            .background(Circle().fill(.surfaceNeutral1))
                             .transition(.scale(scale: AppAnimation.facepileHiddenScale).combined(with: .opacity))
                     }
                 }

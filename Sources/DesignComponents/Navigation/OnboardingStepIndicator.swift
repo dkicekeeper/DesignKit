@@ -84,9 +84,15 @@ public struct OnboardingStepIndicator: View {
     }
 }
 
+/// A glass capsule; the grey of a card under `SurfaceStyle.fill` (8.12.0).
 private struct GlassCapsuleModifier: ViewModifier {
-    public func body(content: Content) -> some View {
-        content.glassEffect(.regular, in: Capsule())
+    @Environment(\.surfaceStyle) private var surface
+
+    func body(content: Content) -> some View {
+        switch surface {
+        case .glass: content.glassEffect(.regular, in: Capsule())
+        case .fill: content.background(AppColors.Background.neutral1, in: Capsule())
+        }
     }
 }
 

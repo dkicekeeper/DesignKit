@@ -379,6 +379,7 @@ private struct PreviewCanvas<Content: View>: View {
 
     @State private var scheme: ColorScheme?
     @Environment(\.colorScheme) private var systemScheme
+    @Environment(\.surfaceStyle) private var surface
 
     private var effectiveScheme: ColorScheme { scheme ?? systemScheme }
 
@@ -438,8 +439,11 @@ private struct PreviewCanvas<Content: View>: View {
         }
     }
 
+    /// Grey, so glass shows; the page itself (white, black) under grey cards (8.12.0), which
+    /// would melt into the grey.
     private var canvasFill: Color {
-        effectiveScheme == .dark ? Color(white: 0.11) : Color(white: 0.95)
+        if surface == .fill { return effectiveScheme == .dark ? .black : .white }
+        return effectiveScheme == .dark ? Color(white: 0.11) : Color(white: 0.95)
     }
 }
 

@@ -89,9 +89,7 @@ public struct MessageBanner: View {
     public var body: some View {
         bannerContent
             .clipShape(.rect(cornerRadius: AppRadius.xl))
-            .glassEffect(.regular
-                .tint(type.tintColor.opacity(0.15))
-                .interactive())
+            .modifier(BannerSurface(tint: type.tintColor))
         // Under Reduce Motion the banner is a feedback surface, so the opacity fade
         // stays — only the scale/offset movement is dropped.
         .scaleEffect(isVisible || reduceMotion ? 1 : BannerAnimation.hiddenScale)
@@ -148,6 +146,25 @@ public struct MessageBanner: View {
             }
         }
         .padding(AppSpacing.md)
+    }
+}
+
+/// The banner's surface: interactive glass tinted with its type's colour at 15%; under
+/// `SurfaceStyle.fill` (8.12.0) the grey of a card under the colour's pale tint, opaque, so it
+/// reads over the content it floats on.
+private struct BannerSurface: ViewModifier {
+    let tint: Color
+    @Environment(\.surfaceStyle) private var surface
+
+    func body(content: Content) -> some View {
+        switch surface {
+        case .glass:
+            content.glassEffect(.regular.tint(tint.opacity(0.15)).interactive())
+        case .fill:
+            content
+                .background(AppColors.pale(tint), in: .rect(cornerRadius: AppRadius.xl))
+                .background(AppColors.Background.neutral1, in: .rect(cornerRadius: AppRadius.xl))
+        }
     }
 }
 

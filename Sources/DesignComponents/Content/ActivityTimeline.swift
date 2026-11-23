@@ -82,7 +82,7 @@ public struct ActivityTimeline<Item: Identifiable, Content: View>: View {
         .background(alignment: .topLeading) {
             if !isLast {
                 Rectangle()
-                    .fill(AppColors.Background.neutral2)
+                    .fill(.surfaceNeutral2)
                     .frame(width: Self.lineWidth)
                     .frame(maxHeight: .infinity)
                     .padding(.top, Self.markerSize)

@@ -123,7 +123,8 @@ use: Tenra's `BudgetProgressRow` became `LimitProgressCard`, its `AmortizationSc
 became `ScheduleRow`, and the app keeps a thin adapter under the old name that maps its model.
 The port is pixel-identical: the layout code moves as it is, only its inputs change.
 
-Host hooks (set once in `App.init()`): `DesignKitTheme.accent`, `DesignKitFonts.registerIfNeeded()`,
+Host hooks (set once in `App.init()`): `DesignKitTheme.accent`, `DesignKitTheme.surface` (8.12.0,
+`.glass` or a grey `.fill`), `DesignKitFonts.registerIfNeeded()`,
 `DesignKitLogoLoader.loader`, `DesignKitPhotoLoader.loader` / `.cached` (3.1.0, `RemotePhoto`),
 `DesignKitIconPhotos.save` / `.isPhoto` (8.5.0, `IconPicker`'s Photo tab),
 `DesignKitCurrencyConverter.convert` / `.convertSync`, `DesignKitLogoCatalog` (the icon picker's
@@ -317,6 +318,10 @@ rather than importing an app type.
   (`scripts/designkit_lint.py`), migrations for a major (`scripts/migrate.py`), the agent block
   (docs/agents.md) and the component reference (docs/components.md). Moving the apps onto the lint
   and the block is their sessions' step (docs/adoption.md).
+- Surfaces without glass (8.12.0, the owner's request for Platina): `DesignKitTheme.surface = .fill`
+  draws cards, sections, chips, tiles and icon plates as an opaque grey on the white page, and the
+  neutral shapes inside them as translucent fills (`.surfaceNeutral1` / `.surfaceNeutral2`).
+  Buttons and floating chrome stay glass; Tenra and Dalada keep the default `.glass`.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.

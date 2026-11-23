@@ -447,7 +447,7 @@ public struct HeroHalfGaugeSkeleton: View {
                     context.stroke(
                         geometry.arc(from: -geometry.half - BleedGaugeGeometry.overrun,
                                      to: geometry.half + BleedGaugeGeometry.overrun),
-                        with: .color(Skeleton.fill),
+                        with: .style(Skeleton.fill),
                         style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
                     )
                 }
