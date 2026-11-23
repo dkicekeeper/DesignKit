@@ -19,6 +19,7 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 ## 8.12.0 - 2026-11-23
 
 Surfaces can be a grey fill instead of Liquid Glass: an app on the white page that wants less glass (Platina) sets `DesignKitTheme.surface = .fill` once, and its cards, sections, chips, tiles and icon plates become an opaque grey. Tenra and Dalada keep the glass, the default; nothing changes for them.
+[#104](https://github.com/dkicekeeper/DesignKit/pull/104)
 
 ### Added
 
