@@ -1819,7 +1819,7 @@ func progressOverlay(isPresented: Bool, title: String, message: String? = nil) -
 
 A moment of success over the whole screen, without a card: the screen dims and blurs, the hero springs in with a title and a line under it, confetti for a celebration, buttons at the bottom.
 
-Since 8.13.0 · Apps: Tenra
+Since 8.13.0 · Apps: none yet
 
 - `MomentOverlay` in `Sources/DesignComponents/Feedback/MomentOverlay.swift`
   A moment of success over the whole screen, without a card: the screen behind dims and blurs, the hero springs in at the centre with a title and a line or two under it, and buttons wait at the bottom.
