@@ -17,8 +17,9 @@ xcodebuild build -project Gallery.xcodeproj -scheme Gallery \
 ```
 
 Code is often written in a Linux container where SwiftUI cannot compile. **CI is the compiler
-there**: `.github/workflows/ci.yml` builds the package, the Gallery, and **Dalada against this
-checkout** on macOS for every push to `main` and `claude/**`. Push, then read the job logs.
+there**: `.github/workflows/ci.yml` builds the package, the Gallery, and **Dalada and Tenra
+against this checkout** on macOS for every push to `main` and `claude/**`, and runs the unit and
+snapshot tests. Push, then read the job logs.
 
 **Snapshot tests** (`Gallery/SnapshotTests`, hosted in the Gallery app) compare components with
 reference PNGs in light, dark and large text; CI's `Snapshot tests` job fails on a visual
@@ -34,7 +35,8 @@ push to `main` that touches `Sources/`, `Gallery/`, `Package.swift` or `VERSION`
 ```
 Sources/
 ├── DesignTokens/      leaf — colors, spacing, radius, icon sizes, typography (Inter), animation,
-│                      modifiers, button styles, AmbientMotionGate, DesignKitTheme, fonts
+│                      modifiers, surfaces (SurfaceStyle: glass or a grey fill, 8.12.0), button
+│                      styles, AmbientMotionGate, DesignKitTheme, fonts
 ├── DesignSupport/     → DesignTokens — icons (IconSource/IconStyle/Icon),
 │                      formatting, haptics, DominantColorExtractor, host hooks
 └── DesignComponents/  → DesignTokens + DesignSupport — by what a component does (1.13.0,
@@ -60,9 +62,11 @@ Shaders/               Metal sources (Ripple, EdgeGlow, Grain, Holographic, Diss
                        Resources/Shaders (.github/workflows/shaders.yml), so apps need no Metal
                        Toolchain (docs/motion.md §6)
 Tests/                 swift-testing unit tests (formatting, ExpressionEvaluator, calculator
-                       model) — run by CI on an iOS Simulator
+                       model, contrast, calendars, chart windows, search, shaders, surfaces, …)
+                       — run by CI on an iOS Simulator
 docs/                  design-system.md, components.md (+ .json, generated), agents.md, charts.md,
-                       gotchas.md, localization-keys.md, benchmark.md
+                       motion.md, gotchas.md, localization-keys.md, snapshots.md, testflight.md,
+                       gallery-structure.md, adoption.md, benchmark.md, migration-X.0.md
 CHANGELOG.md           every release, newest first: what it added and changed, how to move an
                        app to it (the GitHub Release notes and the Gallery's Updates screen)
 ```
@@ -76,6 +80,10 @@ consumers `import DesignTokens` / `DesignSupport` / `DesignComponents` as needed
 |---|---|---|
 | Dalada | `ios/Packages/DaladaKit/Package.swift`, `exact: "X.Y.Z"` | Swift 6, iOS 26; green accent via `DesignKitTheme.accent`; uses tokens, `cardStyle`, buttons, `EmptyState`, `SectionHeader`, `RecommendationBox`, `PlusTabLabel`, since 1.12.0 `MessageComposer` and the community and progress components (people, comments, threads, reviews, reactions, achievements, checklists, stats, streak, thumbnails), since 2.7.0 effects (`.holographic`, `.interactiveTilt`, `.celebration`, `.completionMoment`, `.dissolve`, `AuroraBackground`), and since 2.8.0 its photos (`PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `PhotoViewer`), share pictures (`ShareCardSheet`, `ShareCardFrame`), `LiveSessionBar`, `DownloadRow`, `ArticleBody`, `ChipPicker(allTitle:)` and `PersonRow(style: .card)`, since 3.0.0 its forms (`EditSheetContainer`, `FormSection`, the form rows), and since 3.1.0 its photo loading (`RemotePhoto` over its `PhotoCache` through `DesignKitPhotoLoader`), `ChipPicker(inset:)` in form cards and a row label for its photo pickers (a `UniversalRow` since 7.0.0, as are all its form rows), since 3.5.0 search suggestions (`.dsSearchSuggestions` in places and people search), since 5.3.0 (its 0919342, docs/adoption.md) `StatusBanner` on offline maps, `.spotlight` over the map's buttons, `StepTracker` for a new place, `HeroSymbol` in its placeholders, `OnboardingStepIndicator` after the first sign-in, `AvatarGroup` for a trip's members, `TagInput` and `FlowLayout` for gear tags, and `.skeletonReveal` wherever a skeleton gives way, with thin adapters over its models (its `ShareCard.Style.dalada`). Its guide to DesignKit: `CLAUDE.md`, «Компоненты интерфейса» (a table from what a screen needs to the components) |
 | Tenra | `Tenra.xcodeproj` package reference, exact version | Reference look. `Tenra/Utils/DesignKitBridge.swift` re-exports the three modules, wires the host hooks and keeps the Tenra-model adapters (custom category colours, logo registry, breakdown → `DonutSlice`, the stat-card sparkline). Since 2.9.0 its transaction rows (`TransactionRow` under `TransactionCardView`), account and category card pickers (`SnapCardPicker`), live transcript (`StreamingText`), custom period sheet (`DateRangePickerSheet`), background options (`OptionCardPicker`), voice cards (`.cascadeIn`), period pagers (`PagerArrows`) and backup overlay (`.progressOverlay`) are DesignKit's too, as thin adapters over its models. Its Finances cards use `PackedCircleIcons(style: .shelf)` (4.5.0; whole 48 pt tiles in a 160 pt row since 4.15.0, 36 pt in a pocket from 4.5.1, the rest in "+N"; 4.4.0's shelf replaced 3.3.0's `.fan`). Since 3.5.0 search suggestions (`.dsSearchSuggestions`: History with its categories and subcategories, link payments, subcategory search). Since 4.6.0 the pieces of its AI assistant: `ParticleCreature` (the mascot), `MessageBubble`, `SuggestionChips`; since 4.8.0 its tab (`CreatureTabLabel` over `CreatureGlyph`) and its field's attach menu and microphone (`MessageComposer(leading:onVoice:)`). Since 4.10.0 Ten speaks in words of light and gestures (`speech:`, `.creatureGesture`), since 4.11.0 it lives on its own and thinks pictures (`.creatureAmbience`, `CreatureSpeech(symbol:label:)`), since 4.12.0 it wears accessories (`accessory:`: holidays, a crown, its wardrobe), since 4.13.0 it stands in its empty lists (`EmptyState(…) { artwork }`, a line and a point at the button). Since 4.14.0 the last generic views it drew itself: `AmountEntrySheet` (money towards a goal or a debt), `ListCard` (its assistant's cards; `FormSection(style: .glass)` since 5.0.0), `NoticeCard` ("Ten writes"), `VoiceOrbButton` (the voice stop orb), `PickerCarousel` (Ten's wardrobe) and `NavigationPickerRow(style: .list)` (Settings' voice language; since 7.0.0 every form and settings row of it is a `UniversalRow`). Since 5.3.0 (its #79, docs/adoption.md) every mood, emotion and gesture of Ten (`.working(progress:)` while a statement is read, gesture haptics on reactions, `.creatureFollowsTilt()` on Home, `ParticleCreature.image` on notifications), `MessageBubbleTransition` and `TypingIndicator` in the chat, `OptionCardPicker` for Home's background (a carousel of previews only since 6.0.0), and `StatusBanner`, `HeroSymbol`, `StepTracker`, `Tooltip`, `LiveAmountText`, `SpentBudgetText`, `.sparkleBurst`. Since 8.2.0 its assets are `HoldingCard`s (`AssetCard`, its #105). Its guide: `docs/design-system.md` (the bridge, every adapter and the component under it, screen patterns, amount rules) |
+
+**Platina** (2026-11) is a third app, in development: it wants less glass, so 8.12.0 added grey
+surfaces for it (`DesignKitTheme.surface = .fill`). CI does not build it yet, and the Gallery's
+badges know only Tenra and Dalada.
 
 A consumer sees a DesignKit change when its pin moves. Each app's **DesignKit update** workflow
 (`.github/workflows/designkit.yml` in the app) checks for a newer release tag daily, bumps the
@@ -141,7 +149,7 @@ rather than importing an app type.
    2.0.0, docs/migration-2.0.md); tokens keep their `App` prefix (`AppColors`, `AppSpacing`).
    A variant of an existing component is a parameter or a style of it, not a new view
    (`DSButton(iconPlacement: .top)`, `SectionHeader(style: .card)`); a row of a form or a
-   settings list is `UniversalRow(_:icon:accessory:)` (7.0.0), in a `FormSection` glass card that
+   settings list is `UniversalRow(_:icon:accessory:)` (7.0.0), in a `FormSection` card that
    draws its dividers (8.0.0), and a list of things a person keeps is a `CardList`. Every symbol is an `Icon`: under
    44 pt a glyph with no plate, from 44 pt a tile on its plate (7.0.0, the owner's rule); iOS's
    own bars, menus, swipe actions, tabs and segments, and a symbol inside a line of text, are the

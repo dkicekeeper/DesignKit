@@ -68,12 +68,10 @@ text, not keys. A new key goes there as well.
 | `common.cancel` | DateButtons, DateRangePickerSheet (Cancel) | `Cancel` (DateRangePickerSheet) |
 | `common.changeIcon` | EditableHero (VoiceOver on the icon) | `Change icon` |
 | `common.close` | PhotoViewer (default `closeTitle`), ShareCardSheet (the close button) | `Close` |
-| `common.color` | ColorPickerRow | — |
 | `common.hide` | NoticeCard (the hide button's VoiceOver name, default `hideLabel`) | `Hide` |
 | `common.locked` | PickerCarousel (a closed option, VoiceOver; default `lockedLabel`) | `Locked` |
 | `common.retry` | PendingItemCard (Retry, 3.6.0), LoadMoreFooter (4.1.0), MessageBubble (a message not sent, 4.6.0) | `Retry` |
 | `common.select` | DateButtons | — |
-| `common.startDate` | DatePickerRow | — |
 | `composer.cancelQuote` | MessageComposer (VoiceOver on the quote's ×) | `Remove quote` |
 | `composer.send` | MessageComposer (VoiceOver on the send button) | `Send` |
 | `composer.voice` | MessageComposer (VoiceOver on the microphone, 4.8.0) | `Dictate` |

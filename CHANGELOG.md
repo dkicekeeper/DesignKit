@@ -46,6 +46,8 @@ Under `.fill`, an app's own neutral shape inside a card fills with `.surfaceNeut
 
 - Gallery: a Surfaces menu in the toolbar (Glass, Fill) draws every page either way, on the white or black canvas under Fill; Foundations › Surfaces opens on a `SurfaceStyle` page that sets one block of a section, a card and chips to glass or fill.
 - Snapshots of a section and a card on glass and under `.fill` (light, dark).
+- Docs brought up to date: docs/design-system.md shows the two surfaces side by side (from the snapshot references), lists the `IconStyle` presets as the code has them (`.roundedLogo`, `.serviceLogo` and the glass presets are circles; there is no `.bankLogo`) and corrects §10 and the paths of `BlurSlideTransition` and `AccentGlow`; docs/gallery-structure.md's sections list what the Gallery has (`UniversalRow` for the rows 7.0.0 removed, `CalendarHeatmap`, `MiniBars`, `CreatureTabLabel`, `CreatureGlyph`, `SquareImageCropper`, `OnboardingPageContainer`, `.heroBackground`); README and CLAUDE.md name 8.x, Platina, Tenra's CI job and every doc; a gotcha for `neutral1` on a grey card.
+- The keys `common.color` and `common.startDate`, unused since 7.0.0, left docs/localization-keys.md and the Gallery's strings.
 
 ## 8.11.0 - 2026-11-13
 
