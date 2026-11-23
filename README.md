@@ -1,12 +1,13 @@
 # DesignKit
 
 A reusable SwiftUI design system extracted from the **Tenra** iOS app and shared with
-**Dalada**. Tokens, components and motion rules are Tenra's (the reference implementation);
+**Dalada** and **Platina**. Tokens, components and motion rules are Tenra's (the reference implementation);
 this package makes them versioned and reusable.
 
-> Status: **8.x.** Both apps consume the package (Tenra since 0.3.0) and pick up new releases
-> automatically; design-system changes are made here. A third app, Platina, is in development;
-> 8.12.0's grey surfaces instead of Liquid Glass (`DesignKitTheme.surface = .fill`) are for it. What each version added and changed, and
+> Status: **8.x.** Tenra (since 0.3.0) and Dalada pick up new releases automatically; Platina, in
+> development, moves its pin by hand. Design-system changes are made here. Since 8.12.0 Platina
+> and Dalada draw their surfaces as a grey fill instead of Liquid Glass
+> (`DesignKitTheme.surface = .fill`); Tenra keeps the glass. What each version added and changed, and
 > how to move an app to it: [CHANGELOG.md](CHANGELOG.md).
 
 ## Run the Gallery

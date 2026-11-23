@@ -1,6 +1,6 @@
 # DesignKit for an app's agent
 
-The short version of DesignKit's rules for a session working in Tenra or Dalada (8.9.0, benchmark
+The short version of DesignKit's rules for a session working in Tenra, Dalada or Platina (8.9.0, benchmark
 round 4: Astryx's `init`, which writes such a block into an app's AGENTS.md). Each app's
 **DesignKit update** workflow puts this file into the app's CLAUDE.md between the
 `designkit:agents` markers when it moves the pin (`scripts/sync_agents_block.py`), so it always
