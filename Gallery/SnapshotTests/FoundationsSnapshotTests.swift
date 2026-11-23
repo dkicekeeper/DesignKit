@@ -130,6 +130,41 @@ extension ComponentSnapshots {
             )
         }
 
+        /// `SurfaceStyle` (8.12.0): the same section and card on Liquid Glass and as the grey
+        /// fill on the white page; under `.fill` the greys inside a card (a tile's plate, chips, a
+        /// track, a skeleton) stay a step darker than it. The glass twins look as before 8.12.0.
+        @Test func surfaceStyles() async {
+            let styles: [(SurfaceStyle, String)] = [(.glass, "glass"), (.fill, "fill")]
+            for (surface, name) in styles {
+                await assertComponentSnapshot(
+                    FormSection(header: "Trip") {
+                        UniversalRow("Reminder", icon: "clock", accessory: .toggle(.constant(true)))
+                        ChipPicker("Bite", options: ["None", "Weak", "Good"], selection: .constant("Good"),
+                                   inset: AppSpacing.lg) { $0 }
+                            .padding(.vertical, AppSpacing.sm)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .surfaceStyle(surface),
+                    named: "section-\(name)"
+                )
+                await assertComponentSnapshot(
+                    HStack(spacing: AppSpacing.md) {
+                        Icon(source: .sfSymbol("cart.fill"), size: AppIconSize.Tile.sm)
+                        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                            Text(verbatim: "Groceries").font(AppTypography.h4)
+                            LinearProgressBar(value: 0.6, animatesOnAppear: false)
+                            SkeletonText(AppTypography.bodySmall, width: 120)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .cardContentPadding()
+                    .cardStyle()
+                    .surfaceStyle(surface),
+                    named: "card-\(name)"
+                )
+            }
+        }
+
         /// Dalada's green accent through `DesignKitTheme.accent`: everything tinted follows it.
         @Test func daladaAccent() async {
             let saved = DesignKitTheme.accent

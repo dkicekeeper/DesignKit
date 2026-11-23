@@ -48,6 +48,8 @@ public struct Icon: View {
     let style: IconStyle
     /// A glyph's side as the text size scales it (7.0.0); a tile keeps `style.size`.
     @ScaledMetric private var scaledSide: CGFloat
+    /// Glass plates and the neutral plate follow it (8.12.0).
+    @Environment(\.surfaceStyle) private var surface
 
     // MARK: - Initializers
 
@@ -130,16 +132,34 @@ public struct Icon: View {
 
     /// What the icon sits on: a tile's plate (its style's colour, else the neutral fill; with
     /// glass, the glass and the colour if any), nothing for a glyph. A logo keeps its style's.
+    ///
+    /// 8.12.0: under `SurfaceStyle.fill` a glass plate is the neutral fill instead (the style's
+    /// colour if it has one), and the neutral greys become the surface's (`surface.neutral1`,
+    /// `.neutral2`), so a plate still reads on a grey card, whose own colour is `neutral1`.
     private var plateColor: Color? {
-        if isLogo { return style.backgroundColor }
-        guard isTile else { return nil }
-        if style.hasGlassEffect { return style.backgroundColor }
-        return style.backgroundColor ?? AppColors.Background.neutral1
+        guard isTile || isLogo else { return nil }
+        let color: Color?
+        if style.hasGlassEffect {
+            color = surface == .glass ? style.backgroundColor : (style.backgroundColor ?? AppColors.Background.neutral1)
+        } else {
+            color = isLogo ? style.backgroundColor : (style.backgroundColor ?? AppColors.Background.neutral1)
+        }
+        return color.map(onSurface)
     }
 
-    /// Glass on a tile or a logo; a glyph has no plate to be glass.
+    /// `neutral1` and `neutral2` (the presets' plates: `.categoryIcon`, `.placeholder`, an
+    /// unearned medal) as the surface draws them; any other colour as it is.
+    private func onSurface(_ color: Color) -> Color {
+        guard surface == .fill else { return color }
+        if color == AppColors.Background.neutral1 { return surface.neutral1 }
+        if color == AppColors.Background.neutral2 { return surface.neutral2 }
+        return color
+    }
+
+    /// Glass on a tile or a logo; a glyph has no plate to be glass. None under
+    /// `SurfaceStyle.fill` (8.12.0): the plate is a fill there.
     private var hasGlass: Bool {
-        style.hasGlassEffect && (isTile || isLogo)
+        style.hasGlassEffect && (isTile || isLogo) && surface == .glass
     }
 
     /// Размер контента с учетом padding

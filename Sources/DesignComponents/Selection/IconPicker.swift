@@ -183,7 +183,7 @@ private struct IconPickerSymbolsTab: View {
                         )
                     )
                     .frame(width: AppIconSize.Tile.xl, height: AppIconSize.Tile.xl)
-                    .background(isSelected ? AppColors.accentFill : AppColors.Background.neutral1)
+                    .background(isSelected ? AnyShapeStyle(AppColors.accentFill) : AnyShapeStyle(.surfaceNeutral1))
                     .clipShape(.rect(cornerRadius: AppRadius.lg))
                 }
                 .buttonStyle(.plain)
@@ -247,7 +247,7 @@ private struct IconPickerLogosTab: View {
                     Button { pick(entry.domain) } label: {
                         Icon(source: .brandService(entry.domain), size: AppIconSize.Tile.md)
                             .frame(width: AppIconSize.Tile.xl, height: AppIconSize.Tile.xl)
-                            .background(isSelected ? AppColors.pale(AppColors.accent) : AppColors.Background.neutral1)
+                            .background(isSelected ? AnyShapeStyle(AppColors.pale(AppColors.accent)) : AnyShapeStyle(.surfaceNeutral1))
                             .clipShape(.rect(cornerRadius: AppRadius.lg))
                             .selectionOutline(isSelected, cornerRadius: AppRadius.lg)
                     }

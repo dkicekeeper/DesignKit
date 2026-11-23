@@ -57,7 +57,8 @@ Removed / Fixed / Migration / Gallery and tooling (текст через `Articl
 что он читается.
 
 Основы (6): **Colors**, **Typography**, **Spacing & Radius**, **Icon Sizes**, **Surfaces**
-(`cardStyle`, `formCardStyle`, `filterChipStyle`, стекло), **Motion** (пружины по назначению,
+(`SurfaceStyle`: стекло или серая заливка, 8.12.0; `cardStyle`, `formCardStyle`,
+`filterChipStyle`), **Motion** (пружины по назначению,
 длительности, анимации SF Symbols, переходы `.popIn` / `.riseIn`, проявление текста, появление при
 прокрутке, появление контента, `AmbientMotionGate`; с 2.3.0 прорисовка графиков `.chartDrawIn`,
 `SkeletonReveal`, `.scrollHero`, хаптики `HapticCue`; docs/motion.md).
@@ -71,21 +72,21 @@ Gallery — сколько в нём компонентов; оно считае
 |---|---|---|
 | **Actions** | `DSButton` (иконка слева, справа, сверху или одна; вид × роль × размер, форма, загрузка), `.dsButton`, `.bounce`, `ReactionButton`, `GlassActionMenu` (2.3.0), `AmountVisibilityToggle`, `UniversalFilterButton`, `SuggestionChips` (4.6.0), `VoiceOrbButton` (4.14.0) | M3 Actions, HIG Menus and actions |
 | **Text Input** | `FormTextField`, `AnimatedTitleInput`, `MessageComposer`, `TagInput`, `SearchSuggestions` (`.dsSearchSuggestions`, 3.5.0) | M3 Text inputs |
-| **Selection** | `SegmentedPicker`, `ChipPicker`, `RatingPicker`, `SelectionIndicator`, `DateButtons`, `IconPicker`, `SnapCardPicker`, `OptionCardPicker` (2.9.0), `PickerCarousel` (4.14.0), `SearchablePicker` (8.9.0) | M3 Selection, HIG Selection and input |
+| **Selection** | `SegmentedPicker`, `ChipPicker`, `Rating` / `RatingPicker`, `SelectionIndicator`, `DateButtons`, `IconPicker`, `SnapCardPicker`, `OptionCardPicker` (2.9.0), `PickerCarousel` (4.14.0), `SearchablePicker` (8.9.0) | M3 Selection, HIG Selection and input |
 | **Amounts & Currency** | `AmountInput`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `CurrencyList`, `FormattedAmountText`, `LiveAmountText` (2.3.0), `ConvertedAmount`, `SpentBudgetText`, `AmountPercentage`, `RedactableAmount`, `CurrencyRow` (3.6.0) | своя область DesignKit (у Polaris — Money) |
-| **Rows: Settings & Forms** | `UniversalRow`, `InfoRow`, `NavigationSettingsRow`, `ToggleSettingsRow`, `ActionSettingsRow`, `ActionRowLabel` (3.1.0), `MenuPickerRow`, `NavigationPickerRow` (`.list` с 4.14.0), `StepperRow` (3.0.0), `SliderRow`, `DatePickerRow`, `ColorPickerRow`, `CheckmarkRow`, `DisclosureChevron` | M3 Lists |
+| **Rows: Settings & Forms** | `UniversalRow` (7.0.0: каждая строка формы и настроек, аксессуары `.info`, `.toggle`, `.navigation`, `.action`, `.checkmark`, `.menu`, `.picker`, `.date`, `.stepper`, `.slider`, `.colors`, `.textField`; двенадцать отдельных строк, от `InfoRow` до `ColorPickerRow`, удалены в 7.0.0), `DisclosureChevron` | M3 Lists |
 | **Rows: Data** | `AmountRow` (с 2.1.0 вместо `BalanceRow`, `BreakdownRow`, `ProgressRingRow`, `InsightEntityRow`), `NetAmountRow`, `ScheduleRow`, `PersonRow`, `CommentRow`, `ChecklistRow`, `ChecklistSummaryRow`, `ThumbnailRow`, `DownloadRow` (2.8.0), `TransactionRow` (2.9.0), `ItemRow`, `MetaLine` (3.6.0) | M3 Lists, Ant Data Display |
 | **Cards: Money** | `BalanceCard`, `SelectableBalanceCard`, `HoldingCard` (8.2.0), `FinanceCard`, `CashFlowCard`, `TotalsCard`, `ComparisonCard`, `RecurringPaymentCard`, `CalculationCard`, `WeightBreakdownCard` | M3 Containment |
 | **Cards: Progress & Stats** | `LimitProgressCard`, `TargetProgressCard`, `PayoffProgressCard`, `ScoreCard`, `ScoreGaugeCard` (стиль `.hero` с 4.2.0, «Open as a screen» показывает его на экране), `MetricCard`, `InsightsStatCard`, `StatTile`, `StatsStrip`, `StreakCard`, `ProgressRingTile`, `ProgressRingTileGrid` | Ant Statistic, Data Display |
 | **Cards: Content** | `ThreadCard`, `ReviewCard`, `ThumbnailCard`, `RecommendationBox`, `EmptyCard`, `RatingSummary` (4.1.0) | M3 Containment |
-| **Charts** | `LineChart`, `BarChart`, `ChartSwitcher`, `HeroSparkline`, `Sparkline`, `OrbChart`, `ChartSelectionBanner`, `ChartZoomControls` | HIG Content (Charts) |
-| **Progress & Gauges** | `LinearProgressBar`, `ProgressRing`, `ProportionBar`, `MiniProportionBar`, `HeroProportionBar`, `AmountComparisonBar`, `MiniDonut`, `MiniHalfGauge`, `HeroHalfGauge` (стиль `.bleed` и тон с 4.2.0), `MiniMilestoneGauge`, `HeroMilestoneGauge`, `MiniBarPair`, `HeroBarPair` | HIG Status (gauges, progress) |
+| **Charts** | `LineChart`, `BarChart`, `ChartSwitcher`, `CalendarHeatmap` (8.3.0), `HeroSparkline`, `Sparkline`, `OrbChart`, `ChartSelectionBanner`, `ChartZoomControls` | HIG Content (Charts) |
+| **Progress & Gauges** | `LinearProgressBar`, `ProgressRing`, `ProportionBar`, `MiniProportionBar`, `HeroProportionBar`, `AmountComparisonBar`, `MiniDonut`, `MiniHalfGauge`, `HeroHalfGauge` (стиль `.bleed` и тон с 4.2.0), `MiniMilestoneGauge`, `HeroMilestoneGauge`, `MiniBarPair`, `HeroBarPair`, `MiniBars` (8.3.0) | HIG Status (gauges, progress) |
 | **Status & Feedback** | `Badge`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `.spotlight` (2.6.0), `TypingIndicator`, `EmptyState`, `StepTracker`, `ImportProgressSheet`, `.progressOverlay` (2.9.0), примитивы скелетонов (`Skeleton`, `SkeletonText`, `SkeletonRow`), `PendingItemCard` (3.6.0), `LoadMoreFooter` (4.1.0), `NoticeCard` (4.14.0), `InfoTip` (8.9.0) | M3 Communication, Atlassian Messaging + Loading |
-| **Headers & Navigation** | `SectionHeader` (три стиля, `.card` с 2.0.0; с 3.2.0 иконки до и после заголовка в каждом, `.list` стал `.compact`, удалён в 4.0.0; `.compact` удалён в 8.0.0), `HeroSection`, `UniversalCarousel`, `OnboardingStepIndicator`, `PlusTabLabel`, `LiveSessionBar` (2.8.0), `PagerArrows` (2.9.0) | M3 Navigation, HIG Navigation and search |
-| **Media & Identity** | `Icon` (символы, картинки, логотипы брендов), `Avatar`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIcons`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ThumbnailPlaceholder`, фото (2.8.0: `PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `PhotoViewer`; 3.1.0: `RemotePhoto`), `ShareCardFrame`, `ParticleCreature` (4.6.0) | Atlassian Images and icons |
-| **Content & Layout** | `ExpandableText`, `ActivityTimeline`, `MonthCalendar`, `FlowLayout`, `FormSection`, `CardList` (8.0.0), `EditSheetContainer`, `EditableHero`, `ArticleBody` (2.8.0), `MessageBubble` (4.6.0), `ConversationDivider`, `RelativeTime` (8.9.0); `FormSection`'s glass style took 4.14.0's `ListCard` page (5.0.0), and since 8.0.0 every section is glass | HIG Layout and organization |
-| **Sheets & Flows** | `PromptSheet` (и праймер разрешения), `NotificationPermissionPrompt`, `OnboardingPager`, `OnboardingPage`, `LoopOnboardingHero`, `ShareCardSheet` (2.8.0), `DateRangePickerSheet` (2.9.0), `AmountEntrySheet` (4.14.0) | HIG Presentation, M3 Containment (sheets) |
-| **Effects** | `.celebration`, `.sparkleBurst`, `.shine`, `.attentionPulse`, `AuroraBackground`, `.interactiveTilt` (2.2.0), `.completionMoment`, `.ripple` / `.rippleOnTap` (2.3.0), `VoiceWave`, `EdgeGlow` (вместо `SiriGlow`, `SiriWave`, удалены в 3.0.0), `.thinkingShimmer` (2.4.0), `.grain` (2.5.0), `.holographic`, `.dissolve` (2.6.0), `.accentGlow`, `.borderBeam` / `.borderGlow` | — (своё: Liquid Glass, Siri) |
+| **Headers & Navigation** | `SectionHeader` (три стиля, `.card` с 2.0.0; с 3.2.0 иконки до и после заголовка в каждом, `.list` стал `.compact`, удалён в 4.0.0; `.compact` удалён в 8.0.0), `HeroSection`, `UniversalCarousel`, `OnboardingStepIndicator`, `PlusTabLabel`, `CreatureTabLabel` (4.8.0), `LiveSessionBar` (2.8.0), `PagerArrows` (2.9.0) | M3 Navigation, HIG Navigation and search |
+| **Media & Identity** | `Icon` (символы, картинки, логотипы брендов), `Avatar`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIcons`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ThumbnailPlaceholder`, `SquareImageCropper` (8.5.0), фото (2.8.0: `PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `PhotoViewer`; 3.1.0: `RemotePhoto`), `ShareCardFrame`, `ParticleCreature` (4.6.0), `CreatureGlyph` (4.8.0) | Atlassian Images and icons |
+| **Content & Layout** | `ExpandableText`, `ActivityTimeline`, `MonthCalendar`, `FlowLayout`, `FormSection`, `CardList` (8.0.0), `EditSheetContainer`, `EditableHero`, `ArticleBody` (2.8.0), `MessageBubble` (4.6.0), `ConversationDivider`, `RelativeTime` (8.9.0); `FormSection`'s glass style took 4.14.0's `ListCard` page (5.0.0), and since 8.0.0 every section is glass (or the grey of `SurfaceStyle.fill`, 8.12.0) | HIG Layout and organization |
+| **Sheets & Flows** | `PromptSheet` (и праймер разрешения), `NotificationPermissionPrompt`, `OnboardingPager`, `OnboardingPage`, `OnboardingPageContainer`, `LoopOnboardingHero`, `ShareCardSheet` (2.8.0), `DateRangePickerSheet` (2.9.0), `AmountEntrySheet` (4.14.0) | HIG Presentation, M3 Containment (sheets) |
+| **Effects** | `.celebration`, `.sparkleBurst`, `.shine`, `.attentionPulse`, `AuroraBackground`, `.interactiveTilt` (2.2.0), `.completionMoment`, `.ripple` / `.rippleOnTap` (2.3.0), `VoiceWave`, `EdgeGlow` (вместо `SiriGlow`, `SiriWave`, удалены в 3.0.0), `.thinkingShimmer` (2.4.0), `.grain` (2.5.0), `.holographic`, `.dissolve` (2.6.0), `.accentGlow`, `.borderBeam` / `.borderGlow`, `.heroBackground` (4.5.0) | — (своё: Liquid Glass, Siri) |
 
 Правило для нового компонента: раздел выбирается по тому, **что компонент делает**
 (действие, ввод, выбор, показ данных, статус, навигация), а если это строка или карточка — по
@@ -104,7 +105,10 @@ Gallery — сколько в нём компонентов; оно считае
    называет компонент (вне комментариев и строк); имя, под которым приложение берёт компонент
    (`.dsSearchSuggestions` у `SearchSuggestions`), — в `ALIASES` скрипта. `gallery_badges.py fix
    --tenra … --dalada …` переписывает бейджи сам.
-2. **Пример** на холсте (светлая подложка с рамкой): компонент в текущих параметрах.
+2. **Пример** на холсте (серая подложка с рамкой, на ней видно стекло; при поверхностях
+   Fill — страница приложения, белая или чёрная): компонент в текущих параметрах. Акцент
+   (Tenra / Dalada) и поверхности (Glass / Fill, 8.12.0) переключаются в меню на главной и
+   перерисовывают все страницы.
 3. **Параметры**: переключатели, сегменты, ползунки — то, что принимает компонент.
    Первая строка — **состояние**: обычное, загрузка (скелетон компонента), пусто, ошибка,
    выключено — какие есть у компонента.

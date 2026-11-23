@@ -16,6 +16,9 @@ public extension View {
     ///
     /// **Use when:** the chip triggers filtering, navigation, or any tap action
     /// (filter buttons, action menu triggers, segmented-style selectors in toolbars).
+    ///
+    /// Under `SurfaceStyle.fill` (8.12.0) the chip is a grey capsule (`.surfaceNeutral1`), the
+    /// selected one the accent's pale tint.
     func filterChipStyle(isSelected: Bool = false) -> some View {
         self
             .font(AppTypography.bodySmall.weight(.medium))
@@ -23,11 +26,7 @@ public extension View {
             .padding(.horizontal, AppSpacing.lg)
             .padding(.vertical, AppSpacing.sm)
             .clipShape(.rect(cornerRadius: AppRadius.xl))
-            .glassEffect(
-                isSelected
-                ? .regular.tint(AppColors.accent.opacity(0.2)).interactive()
-                : .regular.interactive()
-            )
+            .modifier(FilterChipSurface(isSelected: isSelected))
             .animation(AppAnimation.contentSpring, value: isSelected)
     }
 
@@ -45,13 +44,11 @@ public extension View {
     /// Liquid Glass blended each layer into the layers under it (darker in light mode, lighter
     /// in dark): a marker over an arc looked translucent, a label over its pale capsule changed
     /// colour. Behind it, the content keeps its exact colours; the card itself looks the same.
+    ///
+    /// 8.12.0: under `SurfaceStyle.fill` (`DesignKitTheme.surface`, `.surfaceStyle(_:)`) the card
+    /// is the opaque grey `AppColors.Background.neutral1` instead of glass, in the same shape.
     func cardStyle(radius: CGFloat = AppRadius.xl) -> some View {
-        self
-            .contentShape(Rectangle())
-            .clipShape(.rect(cornerRadius: radius))
-            .background {
-                Color.clear.glassEffect(.regular, in: .rect(cornerRadius: radius))
-            }
+        modifier(CardSurface(radius: radius))
     }
 
     /// The accent outline of a chosen option (5.0.0): one look for the cards and tiles a person
@@ -80,6 +77,49 @@ public extension View {
                 .ultraThinMaterial,
                 in: RoundedRectangle(cornerRadius: radius)
             )
+    }
+}
+
+/// The card behind `cardStyle()`: Liquid Glass, or the grey of `SurfaceStyle.fill` (8.12.0).
+private struct CardSurface: ViewModifier {
+    let radius: CGFloat
+    @Environment(\.surfaceStyle) private var surface
+
+    func body(content: Content) -> some View {
+        content
+            .contentShape(Rectangle())
+            .clipShape(.rect(cornerRadius: radius))
+            .background {
+                switch surface {
+                case .glass:
+                    Color.clear.glassEffect(.regular, in: .rect(cornerRadius: radius))
+                case .fill:
+                    Color.clear.background(AppColors.Background.neutral1, in: .rect(cornerRadius: radius))
+                }
+            }
+    }
+}
+
+/// The surface of `filterChipStyle()`: interactive glass, accent-tinted when selected; under
+/// `SurfaceStyle.fill` a grey capsule, the accent's pale tint when selected (8.12.0).
+private struct FilterChipSurface: ViewModifier {
+    let isSelected: Bool
+    @Environment(\.surfaceStyle) private var surface
+
+    func body(content: Content) -> some View {
+        switch surface {
+        case .glass:
+            content.glassEffect(
+                isSelected
+                ? .regular.tint(AppColors.accent.opacity(0.2)).interactive()
+                : .regular.interactive()
+            )
+        case .fill:
+            content.background(
+                isSelected ? AnyShapeStyle(AppColors.pale(AppColors.accent)) : AnyShapeStyle(.surfaceNeutral1),
+                in: Capsule()
+            )
+        }
     }
 }
 

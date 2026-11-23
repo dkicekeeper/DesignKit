@@ -52,6 +52,8 @@ public struct FormTextField: View {
     /// system keyboard. Defaults to the internal state — existing call sites are unchanged.
     private let externalFocus: FocusState<Bool>.Binding?
     @FocusState private var isFocused: Bool
+    /// The field's grey follows it (8.12.0): translucent on a grey card.
+    @Environment(\.surfaceStyle) private var surface
 
     /// The binding the TextField actually uses — external if the host provided one.
     private var focusBinding: FocusState<Bool>.Binding { externalFocus ?? $isFocused }
@@ -255,13 +257,13 @@ public struct FormTextField: View {
 
     private var backgroundForState: Color {
         if isDisabled {
-            return AppColors.Background.neutral1.opacity(0.3)
+            return surface.neutral1.opacity(0.3)
         } else if errorMessage != nil {
             return AppColors.destructive.opacity(0.05)
         } else if isFieldFocused {
             return AppColors.accent.opacity(0.04)
         } else {
-            return AppColors.Background.neutral1.opacity(0.5)
+            return surface.neutral1.opacity(0.5)
         }
     }
 

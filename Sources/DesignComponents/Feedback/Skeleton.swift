@@ -49,8 +49,9 @@ public struct Skeleton: View {
             .accessibilityHidden(true)
     }
 
-    /// The grey of every skeleton shape.
-    static let fill = AppColors.Background.neutral2
+    /// The grey of every skeleton shape: `neutral2`, translucent on a grey card under
+    /// `SurfaceStyle.fill` (8.12.0, `.surfaceNeutral2`).
+    static let fill = SurfaceNeutral(.neutral2)
 
     /// A circle: an avatar, a round icon, a dot.
     public static func circle(_ diameter: CGFloat) -> Skeleton {

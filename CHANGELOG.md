@@ -16,6 +16,40 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.12.0 - 2026-11-23
+
+Surfaces can be a grey fill instead of Liquid Glass: an app on the white page that wants less glass (Platina) sets `DesignKitTheme.surface = .fill` once, and its cards, sections, chips, tiles and icon plates become an opaque grey. Tenra and Dalada keep the glass, the default; nothing changes for them.
+[#104](https://github.com/dkicekeeper/DesignKit/pull/104)
+
+### Added
+
+- `SurfaceStyle` (`.glass`, `.fill`) and `DesignKitTheme.surface` (default `.glass`), a host hook set in `App.init()` next to the accent. Under `.fill` a surface is `AppColors.Background.neutral1` (`#F2F2F7` on the white page, `#1C1C1E` on black, a step lighter in a dark sheet), in the same shape, with no glass.
+- `.surfaceStyle(_:)` and `EnvironmentValues.surfaceStyle`: another style for a subtree (one glass card over a photo in an app of grey cards). The environment's default is `DesignKitTheme.surface`.
+- What follows it: `cardStyle()` and everything built on it (`FormSection`, `CardList`, every card, `SectionHeader(style: .card)`, `NoticeCard`, `PendingItemCard`), `filterChipStyle()` (and `ChipPicker`, `SuggestionChips`, `TagInput`, `UniversalFilterButton` on it), `ProgressRingTile`'s circle, an `Icon`'s glass plate (`.glassHero`, `.glassService`, `EditableHero`), `OnboardingStepIndicator` and `MessageBanner` (the grey under its colour's pale tint). A selected chip or tile takes the pale tint of its colour.
+- `SurfaceStyle.neutral1` / `.neutral2` and the shape styles `.surfaceNeutral1` / `.surfaceNeutral2` (`SurfaceNeutral`): `neutral1` and `neutral2` on glass; under `.fill`, where `neutral1` is the card's own grey, the translucent `tertiarySystemFill` and `secondarySystemFill`, a step darker than whatever lies under them (the page, a card, a card in a sheet). DesignKit's own neutral shapes inside a card use them: an icon tile's plate, `LinearProgressBar`'s and `AmountComparisonBar`'s tracks, skeletons, `StepTracker`, `ActivityTimeline`'s line, `CalendarHeatmap`'s empty days, `MonthCalendar`'s "+N", `AvatarGroup`'s "+N", `FormTextField`, `IconPicker`'s cells, `DateRangePickerSheet`'s fields and `ScoreGaugeCard`'s trend.
+- Buttons (`DSButton`, `.dsButton`, `.buttonStyle(.glass)` in `DateButtons`, `ChartZoomControls`, `ChartSwitcher`), the chrome that floats over content (`MessageComposer`, `GlassActionMenu`, the system's bars) and glass drawn as an effect on a coloured hero (`.glassBar`, `HeroMilestoneGauge`, `OrbChart`) stay Liquid Glass under both styles.
+
+### Migration
+
+Nothing to change in code: the default is `.glass`. An app that wants grey surfaces sets it once:
+
+```swift
+init() {
+    DesignKitTheme.accent = .teal
+    DesignKitTheme.surface = .fill
+    DesignKitFonts.registerIfNeeded()
+}
+```
+
+Under `.fill`, an app's own neutral shape inside a card fills with `.surfaceNeutral1` or `.surfaceNeutral2` rather than `AppColors.Background.neutral1` / `neutral2`, which would melt into the grey card.
+
+### Gallery and tooling
+
+- Gallery: a Surfaces menu in the toolbar (Glass, Fill) draws every page either way, on the white or black canvas under Fill; Foundations › Surfaces opens on a `SurfaceStyle` page that sets one block of a section, a card and chips to glass or fill.
+- Snapshots of a section and a card on glass and under `.fill` (light, dark).
+- Docs brought up to date: docs/design-system.md shows the two surfaces side by side (from the snapshot references), lists the `IconStyle` presets as the code has them (`.roundedLogo`, `.serviceLogo` and the glass presets are circles; there is no `.bankLogo`) and corrects §10 and the paths of `BlurSlideTransition` and `AccentGlow`; docs/gallery-structure.md's sections list what the Gallery has (`UniversalRow` for the rows 7.0.0 removed, `CalendarHeatmap`, `MiniBars`, `CreatureTabLabel`, `CreatureGlyph`, `SquareImageCropper`, `OnboardingPageContainer`, `.heroBackground`); README and CLAUDE.md name 8.x, Platina, Tenra's CI job and every doc; a gotcha for `neutral1` on a grey card.
+- The keys `common.color` and `common.startDate`, unused since 7.0.0, left docs/localization-keys.md and the Gallery's strings.
+
 ## 8.11.0 - 2026-11-13
 
 `NoticeCard` takes a second action, for what the person can do about a message without opening anything ("Pause" on a charge that comes tomorrow). For Tenra's assistant: Ten's messages get a one-tap button.

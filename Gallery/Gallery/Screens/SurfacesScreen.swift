@@ -2,11 +2,13 @@
 //  SurfacesScreen.swift
 //  DesignKit Gallery
 //
-//  Surfaces: the glass card, the form card, the filter chip, and the padding a card owns.
+//  Surfaces: glass or a grey fill (8.12.0), the card, the form card, the filter chip, and the
+//  padding a card owns.
 //
 
 import SwiftUI
 import DesignTokens
+import DesignSupport
 import DesignComponents
 
 struct SurfacesScreen: View {
@@ -18,9 +20,79 @@ struct SurfacesScreen: View {
 
     /// One page per surface; the Updates screen links to them (ComponentIndex).
     @ViewBuilder static var pages: some View {
+        SurfaceStylePage()
         CardStylePage()
         FormCardStylePage()
         FilterChipStylePage()
+    }
+}
+
+private struct SurfaceStylePage: View {
+    @State private var surface: SurfaceStyle = .fill
+    @State private var reminder = true
+    @State private var chip = 0
+    @State private var state: SpecimenState = .content
+
+    var body: some View {
+        ComponentPage(
+            name: "SurfaceStyle",
+            summary: "How the surfaces draw: Liquid Glass (Tenra, Dalada) or a grey fill on the white page with no glass. Set DesignKitTheme.surface once in App.init(); .surfaceStyle(_:) changes a subtree. The toolbar's Surfaces menu shows every page either way.",
+            since: "8.12.0",
+            apps: [],
+            canvas: .fill,
+            notes: [
+                "It reaches cardStyle() and everything on it (FormSection, CardList, the cards), filter chips, ProgressRingTile, an Icon's glass plate, OnboardingStepIndicator and MessageBanner.",
+                "Buttons (DSButton, .buttonStyle(.glass)), floating chrome (MessageComposer, GlassActionMenu, the system's bars) and glass drawn on a coloured hero stay Liquid Glass.",
+                "Under .fill the greys inside a card (an icon's plate, tracks, chips, skeletons) turn translucent, a step darker than the card: .surfaceNeutral1 and .surfaceNeutral2 for an app's own.",
+            ],
+            styles: [".glass", ".fill"],
+            dos: [
+                "Choose it once for the app, next to DesignKitTheme.accent.",
+                "Fill an app's own neutral shape inside a card with .surfaceNeutral1 or .surfaceNeutral2.",
+            ],
+            donts: [
+                "Don't use .fill on a grey page (systemGroupedBackground): the cards melt into it.",
+                "Don't put AppColors.Background.neutral1 inside a grey card: it is the card's own colour.",
+            ]
+        ) {
+            VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                if state == .loading {
+                    FormSection(header: "Trip") {
+                        UniversalRowSkeleton()
+                        UniversalRowSkeleton()
+                    }
+                } else {
+                    FormSection(header: "Trip") {
+                        UniversalRow("Reminder", icon: "clock", accessory: .toggle($reminder))
+                        UniversalRow("Route", icon: "map", accessory: .info("Big Almaty Lake"))
+                    }
+                }
+                HStack(spacing: AppSpacing.md) {
+                    Icon(source: .sfSymbol("cart.fill"), size: AppIconSize.Tile.sm)
+                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                        Text("Groceries").font(AppTypography.h4)
+                        LinearProgressBar(value: 0.6, animatesOnAppear: false)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .cardContentPadding()
+                .cardStyle()
+                HStack(spacing: AppSpacing.sm) {
+                    ForEach(Array(["All", "Hikes", "Lakes"].enumerated()), id: \.offset) { index, title in
+                        Text(title)
+                            .filterChipStyle(isSelected: chip == index)
+                            .onTapGesture { chip = index }
+                    }
+                }
+            }
+            // The page the surfaces lie on, whatever the Gallery's own canvas.
+            .padding(AppSpacing.lg)
+            .background(AppColors.Background.base, in: .rect(cornerRadius: AppRadius.lg))
+            .surfaceStyle(surface)
+        } controls: {
+            ChoiceControl("Surface", selection: $surface, options: [("Glass", .glass), ("Fill", .fill)])
+            StateControl(state: $state)
+        }
     }
 }
 
@@ -31,7 +103,7 @@ private struct CardStylePage: View {
     var body: some View {
         ComponentPage(
             name: ".cardStyle()",
-            summary: "The Liquid Glass display card. It adds no padding: the content pads itself (.cardContentPadding(), 16 pt).",
+            summary: "The display card: Liquid Glass, or a grey fill under SurfaceStyle.fill (8.12.0). It adds no padding: the content pads itself (.cardContentPadding(), 16 pt).",
             apps: [.tenra, .dalada],
             canvas: .fill,
             notes: [

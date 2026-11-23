@@ -176,7 +176,7 @@ commit, pull.
 |---|---|---|
 | `.tap` | light impact | |
 | `.select` | selection | `SegmentedPicker` (with `ChipPicker`, `Rating`, `IconPicker`, which play it already) |
-| `.tick` | rigid impact, 0.7 | `SliderRow`: every step of a stepped slider, either end of a smooth one |
+| `.tick` | rigid impact, 0.7 | `UniversalRow(accessory: .slider)` (`SliderRow` before 7.0.0): every step of a stepped slider, either end of a smooth one |
 | `.confirm` | success | `.completionMoment` |
 | `.warn` | warning | |
 | `.fail` | error | |

@@ -4,8 +4,9 @@ A reusable SwiftUI design system extracted from the **Tenra** iOS app and shared
 **Dalada**. Tokens, components and motion rules are Tenra's (the reference implementation);
 this package makes them versioned and reusable.
 
-> Status: **4.x.** Both apps consume the package (Tenra since 0.3.0) and pick up new releases
-> automatically; design-system changes are made here. What each version added and changed, and
+> Status: **8.x.** Both apps consume the package (Tenra since 0.3.0) and pick up new releases
+> automatically; design-system changes are made here. A third app, Platina, is in development;
+> 8.12.0's grey surfaces instead of Liquid Glass (`DesignKitTheme.surface = .fill`) are for it. What each version added and changed, and
 > how to move an app to it: [CHANGELOG.md](CHANGELOG.md).
 
 ## Run the Gallery
@@ -23,8 +24,9 @@ foundations and 17 component sections by what a component does
 ([docs/gallery-structure.md](docs/gallery-structure.md)); every component has a page with
 controls for its parameters and states.
 
-The Gallery also ships to **TestFlight** on every DesignKit update in `main` — with a
-Tenra / Dalada theme switch, so each app's accent can be checked on a device. Setup and details:
+The Gallery also ships to **TestFlight** on every DesignKit update in `main`, with a
+Tenra / Dalada theme switch (each app's accent) and a Glass / Fill surfaces switch (8.12.0), so
+both can be checked on a device. Setup and details:
 [docs/testflight.md](docs/testflight.md).
 
 ## Package layout
@@ -34,8 +36,9 @@ Three layered targets (each depends on the ones above it):
 ```
 Sources/
 ├── DesignTokens/      AppColors, CategoryColors, AppSpacing, AppRadius, AppIconSize,
-│                      AppTypography (+ bundled Inter), AppAnimation, AppModifiers,
-│                      DSButtonStyle (.dsButton), AmbientMotionGate, DesignKitTheme, DesignKitFonts
+│                      AppTypography (+ bundled Inter), AppAnimation, AppMotion, AppModifiers,
+│                      SurfaceStyle (glass or a grey fill), DSButtonStyle (.dsButton),
+│                      AmbientMotionGate, DesignKitTheme, DesignKitFonts
 ├── DesignSupport/     IconSource, IconStyle, Icon, Formatting, AmountFormatter,
 │                      AmountDisplayConfiguration, HapticManager, DominantColorExtractor,
 │                      host hooks (logos, FX)
@@ -44,7 +47,7 @@ Sources/
 ```
 
 Highlights of `DesignComponents`: `FinanceCard`, `InsightsStatCard`, `HeroSection`,
-`EditSheetContainer`, `FormSection`, `FormTextField`, `UniversalRow` (every form and settings row),
+`EditSheetContainer`, `FormSection`, `CardList`, `FormTextField`, `UniversalRow` (every form and settings row),
 `UniversalCarousel`, `UniversalFilterButton`, `MessageBanner`, `EmptyState`,
 `FormattedAmountText` (adaptive abbreviation), calculator keypad, `OrbChart`, `ProgressRing`,
 `LinearProgressBar`, Mini*/Hero* gauges and bar pairs, `AccentGlow`, `BlurSlideTransition`,
@@ -54,7 +57,7 @@ Highlights of `DesignComponents`: `FinanceCard`, `InsightsStatCard`, `HeroSectio
 
 ```swift
 // Package.swift
-.package(url: "https://github.com/dkicekeeper/DesignKit", exact: "4.1.0")
+.package(url: "https://github.com/dkicekeeper/DesignKit", exact: "8.12.0")
 // during development, point at a local checkout instead:
 .package(path: "../DesignKit")
 ```
@@ -68,6 +71,7 @@ import DesignComponents
 struct MyApp: App {
     init() {
         DesignKitTheme.accent = .teal                  // brand accent (default: indigo)
+        DesignKitTheme.surface = .fill                 // grey cards, no glass (default: .glass)
         DesignKitFonts.registerIfNeeded()              // Inter
         DesignKitLogoLoader.loader = { brand in await MyLogoService.image(for: brand) }
         DesignKitCurrencyConverter.convert = { amount, from, to in
@@ -86,11 +90,17 @@ the hooks above, and localized strings resolve in the app's own bundle
 
 Read [CLAUDE.md](CLAUDE.md) first — what belongs here, how to port a component from an app, API
 stability and versioning rules, Xcode 26/27 compatibility. CI (`.github/workflows/ci.yml`)
-builds the package, the Gallery and Dalada against every push.
+builds the package, the Gallery, Tenra and Dalada against every push, runs the unit and snapshot
+tests ([docs/snapshots.md](docs/snapshots.md)) and checks the changelog and the component
+reference.
 
-Docs: [CHANGELOG.md](CHANGELOG.md) · [design-system.md](docs/design-system.md) · [charts.md](docs/charts.md) ·
-[gotchas.md](docs/gotchas.md) · [localization-keys.md](docs/localization-keys.md) ·
-[testflight.md](docs/testflight.md) · [benchmark.md](docs/benchmark.md)
+Docs: [CHANGELOG.md](CHANGELOG.md) · [design-system.md](docs/design-system.md) ·
+[components.md](docs/components.md) · [agents.md](docs/agents.md) · [charts.md](docs/charts.md) ·
+[motion.md](docs/motion.md) · [gotchas.md](docs/gotchas.md) ·
+[localization-keys.md](docs/localization-keys.md) · [snapshots.md](docs/snapshots.md) ·
+[testflight.md](docs/testflight.md) · [gallery-structure.md](docs/gallery-structure.md) ·
+[adoption.md](docs/adoption.md) · [benchmark.md](docs/benchmark.md); moving an app across a
+major: `docs/migration-X.0.md` (2.0 to 8.0)
 
 ## Requirements
 

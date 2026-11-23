@@ -34,7 +34,8 @@ public struct ProgressRingTile: View {
     let transitionNamespace: Namespace.ID?
 
     /// - Parameters:
-    ///   - color: The symbol's colour; the glass is tinted with it at 30% when selected.
+    ///   - color: The symbol's colour; the glass is tinted with it at 30% when selected (its
+    ///     pale tint under `SurfaceStyle.fill`).
     ///   - progress: Draws the ring around the circle; `nil` hides it.
     ///   - transitionSourceID: With `transitionNamespace`, makes the circle (with its ring)
     ///     the source of a `.navigationTransition(.zoom(sourceID:in:))`.
@@ -79,12 +80,7 @@ public struct ProgressRingTile: View {
                     Icon(systemImage, size: AppIconSize.xl)
                         .foregroundStyle(color)
                         .frame(width: AppIconSize.Tile.xl, height: AppIconSize.Tile.xl)
-                        .glassEffect(
-                            isSelected
-                                ? .regular.tint(color.opacity(0.3)).interactive()
-                                : .regular.interactive(),
-                            in: .circle
-                        )
+                        .modifier(TileCircleSurface(color: color, isSelected: isSelected))
                 }
                 .matchedTransitionSourceIfPresent(
                     id: transitionSourceID,
@@ -100,6 +96,32 @@ public struct ProgressRingTile: View {
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+    }
+}
+
+/// The circle under the symbol: interactive glass, tinted with the colour at 30% when selected;
+/// under `SurfaceStyle.fill` (8.12.0) a grey circle (`.surfaceNeutral1`), the colour's pale tint
+/// when selected.
+private struct TileCircleSurface: ViewModifier {
+    let color: Color
+    let isSelected: Bool
+    @Environment(\.surfaceStyle) private var surface
+
+    func body(content: Content) -> some View {
+        switch surface {
+        case .glass:
+            content.glassEffect(
+                isSelected
+                    ? .regular.tint(color.opacity(0.3)).interactive()
+                    : .regular.interactive(),
+                in: .circle
+            )
+        case .fill:
+            content.background(
+                isSelected ? AnyShapeStyle(AppColors.pale(color)) : AnyShapeStyle(.surfaceNeutral1),
+                in: Circle()
+            )
+        }
     }
 }
 
