@@ -36,7 +36,7 @@ private struct SurfaceStylePage: View {
     var body: some View {
         ComponentPage(
             name: "SurfaceStyle",
-            summary: "How the surfaces draw: Liquid Glass (Tenra, Dalada) or a grey fill on the white page with no glass. Set DesignKitTheme.surface once in App.init(); .surfaceStyle(_:) changes a subtree. The toolbar's Surfaces menu shows every page either way.",
+            summary: "How the surfaces draw: Liquid Glass (Tenra) or a grey fill on the white page with no glass (Platina, Dalada). Set DesignKitTheme.surface once in App.init(); .surfaceStyle(_:) changes a subtree. The toolbar's Surfaces menu shows every page either way.",
             since: "8.12.0",
             apps: [],
             canvas: .fill,

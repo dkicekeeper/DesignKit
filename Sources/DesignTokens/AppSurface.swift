@@ -18,12 +18,13 @@ import SwiftUI
 /// over content (`MessageComposer`, `GlassActionMenu`, the system's bars) and glass drawn as an
 /// effect on a coloured hero (`.glassBar`, `OrbChart`) stay Liquid Glass under both.
 public enum SurfaceStyle: Hashable, Sendable {
-    /// Liquid Glass (the default): Tenra's and Dalada's look.
+    /// Liquid Glass (the default): Tenra's look.
     case glass
     /// An opaque grey, `AppColors.Background.neutral1` (`#F2F2F7` on the white page, `#1C1C1E` on
     /// black, a step lighter in a dark sheet), with no glass. The neutral containers inside it
     /// (an icon's plate, a track, a skeleton) turn translucent so they still read on the grey:
-    /// `SurfaceStyle.neutral1` / `.neutral2`, `.surfaceNeutral1` / `.surfaceNeutral2`.
+    /// `SurfaceStyle.neutral1` / `.neutral2`, `.surfaceNeutral1` / `.surfaceNeutral2`. Platina's
+    /// and Dalada's look.
     case fill
 }
 
