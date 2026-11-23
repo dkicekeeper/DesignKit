@@ -16,7 +16,7 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
-## 8.12.0 - 2026-11-21
+## 8.13.0 - 2026-11-23
 
 A moment of success over the whole app, without a card: the screen dims and blurs, a hero springs in at the centre with a title and a line under it, confetti for a celebration, the buttons at the bottom. For Tenra's assistant: Ten appears over the app when a goal is reached, a debt is settled or an accessory is earned. And `ProgressOverlay` takes a hero in its spinner's place (Ten at work over a backup's restore).
 

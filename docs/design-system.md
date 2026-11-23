@@ -41,7 +41,7 @@
 |---|---|
 | `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases, `Palette` 3.7.0), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, `softScrollEdges` 5.4.0, inline field styles), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
 | `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `Icon` (a brand logo is `Icon(source: .brandService(name))`; `BrandLogoView` was removed in 2.0.0), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `RecentSearches` and `SearchMatch` (search suggestions, 3.5.0), `Formatting.relativeTime` / `elapsedTime` / `clockTime` / `dayTitle` (8.9.0), `AccessibilityAnnouncer` and `.voiceOverAnnouncement` (8.9.0), `HapticManager`, `HapticCue` (haptics by meaning, 2.3.0), `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitPhotoLoader` (3.1.0), `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
-| `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons"); since 8.12.0 `MomentOverlay`, `MomentAction` and `MomentPresenter` (a moment of success over the whole app, in a window of its own) |
+| `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons"); since 8.13.0 `MomentOverlay`, `MomentAction` and `MomentPresenter` (a moment of success over the whole app, in a window of its own) |
 
 **Names (2.0.0).** A component is named for what it is, without `View` or `App`: `SectionHeader`,
 `EmptyState`, `Avatar`, `Badge`, `Icon`, `DSButton`. The names before 2.0 were deprecated
@@ -139,7 +139,7 @@ Modifiers:
 | `fill` | `.tertiarySystemFill` | Translucent container on any surface, glass included |
 | `fillOnDark` / `fillOnLight` | white 15% / black 5% | Translucent container on dark / light photos, both themes |
 | `overlayOnImage` | black 30% | Darkens a photo under text |
-| `scrim` *(8.12.0)* | black 10% / 45% | Dims the whole app under a `MomentOverlay`, over the material that blurs it |
+| `scrim` *(8.13.0)* | black 10% / 45% | Dims the whole app under a `MomentOverlay`, over the material that blurs it |
 
 **`AppColors.Status`** — banners, badges, notices: `info` (`.blue`), `positive` (`.green`), `negative` (`.red`), `warning` (`.orange`), `neutral` (`.gray`), each with a `…Pale` container (`AppColors.pale`) and *(8.9.0)* a `…Text` colour for its text and icons (`AppColors.readable` of the solid one: `infoText`, `positiveText`, `negativeText`, `warningText`, `neutralText`). `Text.positive`, `.negative` and `.warning` are the `…Text` colours since 8.9.0. The solid colours stay for fills, icons on a fill and charts.
 
@@ -1238,7 +1238,7 @@ without taking room; on iPhone the popover stays a popover (`presentationCompact
 VoiceOver: "About <title>" or "More information" (`infoTip.about`, `infoTip.label`). No skeleton:
 it explains, it shows no data.
 
-#### `MomentOverlay` / `MomentPresenter` *(8.12.0)*
+#### `MomentOverlay` / `MomentPresenter` *(8.13.0)*
 A big moment of success over the whole screen, without a card (the owner's decision for Tenra's
 assistant): a goal reached, a debt settled, a month inside the budgets, an accessory earned. The
 screen behind dims and blurs (`.regularMaterial` under `AppColors.Background.scrim`, edge to edge);
@@ -2254,7 +2254,7 @@ The screen dims (black 45%) and an `.ultraThinMaterial` panel (`AppRadius.lg`) s
 spinner in the accent, the title (bodyEmphasis) and a message (secondary). Disable the screen
 under it at the call site. Tenra: restoring a backup.
 
-Since 8.12.0 `.progressOverlay(isPresented:title:message:hero:)` (and `ProgressOverlay(title:message:hero:)`)
+Since 8.13.0 `.progressOverlay(isPresented:title:message:hero:)` (and `ProgressOverlay(title:message:hero:)`)
 puts a view in the spinner's place, one that shows the progress itself, sized by the host:
 Tenra's mascot in `.working(progress:)` over a backup's restore. Without `hero:` it is as before.
 

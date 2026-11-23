@@ -643,7 +643,7 @@ private struct ProgressOverlayPage: View {
             canvas: .tall(minHeight: 340),
             notes: [
                 "For a restore, a migration, an import that must finish first. Disable the screen under it at the call site.",
-                "hero: (8.12.0) takes the spinner's place: a view that shows the progress itself, such as a ParticleCreature in .working(progress:), sized by the host.",
+                "hero: (8.13.0) takes the spinner's place: a view that shows the progress itself, such as a ParticleCreature in .working(progress:), sized by the host.",
             ]
         ) {
             let screen = VStack(spacing: AppSpacing.md) {
@@ -692,7 +692,7 @@ private struct MomentOverlayPage: View {
         ComponentPage(
             name: "MomentOverlay · MomentPresenter",
             summary: "A moment of success over the whole screen, without a card: the screen dims and blurs, the hero springs in with a title and a line under it, confetti for a celebration, buttons at the bottom.",
-            since: "8.12.0",
+            since: "8.13.0",
             apps: [.tenra],
             canvas: .fill,
             notes: [

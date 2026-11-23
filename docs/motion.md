@@ -96,7 +96,7 @@ Insert with a spring: `withAnimation(AppAnimation.bouncy) { isShown = true }`.
 | `TypingIndicator` | three dots in a wave | 30 fps while allowed | a reply on its way, an assistant thinking |
 | `.borderGlow` (1.x) | a static halo round a card | see its docs | "working on it" |
 
-**8.12.0: a moment over the whole app**
+**8.13.0: a moment over the whole app**
 
 | Effect | What | Cost | Use |
 |---|---|---|---|
