@@ -11,7 +11,7 @@
 //  The card is an image, not a screen: its sizes are fixed points (360 wide, rendered at 3× to
 //  1080 px), so the type does not follow Dynamic Type and the colours do not follow the theme.
 //
-//  8.15.0 (Tenra's year in review, the founder: a shared picture should say which app it is):
+//  8.16.0 (Tenra's year in review, the founder: a shared picture should say which app it is):
 //  the app's icon before its name in the brand line, and the name in Inter as well as rounded.
 //
 
@@ -52,9 +52,9 @@ public enum ShareCard {
         public static let scale: CGFloat = 3
     }
 
-    /// How the brand line sets the app's name (8.15.0).
+    /// How the brand line sets the app's name (8.16.0).
     public enum BrandTypeface: Hashable, Sendable {
-        /// Rounded and heavy (the look before 8.15.0, Dalada's).
+        /// Rounded and heavy (the look before 8.16.0, Dalada's).
         case rounded
         /// Inter, DesignKit's typeface, bold (Tenra's).
         case inter
@@ -68,7 +68,7 @@ public enum ShareCard {
         public let bottom: Color
         /// The kicker over the title ("Fishing"), a track, an icon.
         public let accent: Color
-        /// The brand's name: rounded by default, Inter for an app set in it (8.15.0).
+        /// The brand's name: rounded by default, Inter for an app set in it (8.16.0).
         public let brandTypeface: BrandTypeface
 
         public init(top: Color, bottom: Color, accent: Color, brandTypeface: BrandTypeface = .rounded) {
@@ -96,7 +96,7 @@ enum ShareCardMetrics {
     static let siteSize: CGFloat = 11
     static let statValueSize: CGFloat = 24
     static let statTitleSize: CGFloat = 12
-    /// The app's icon before its name (8.15.0): a little taller than the name, with the
+    /// The app's icon before its name (8.16.0): a little taller than the name, with the
     /// home screen's corner (22.5 % of its side, continuous).
     static let brandIconSize: CGFloat = 30
     static let brandIconCorner: CGFloat = 0.225
@@ -114,7 +114,7 @@ enum ShareCardMetrics {
 ///
 /// The content is white; lay it out with fixed point sizes, as the card is an image.
 ///
-/// With the app's icon (8.15.0), the brand line shows which app the picture is from:
+/// With the app's icon (8.16.0), the brand line shows which app the picture is from:
 ///
 /// ```swift
 /// ShareCardFrame(
@@ -134,7 +134,7 @@ public struct ShareCardFrame<Content: View>: View {
     /// - Parameters:
     ///   - brand: The name at the bottom left ("Dalada").
     ///   - brandIcon: The app's icon before the name, in the home screen's rounded square
-    ///     (8.15.0). An app icon set cannot be read as an image: add the icon as an image set.
+    ///     (8.16.0). An app icon set cannot be read as an image: add the icon as an image set.
     ///   - site: At the bottom right, small ("dalada.kz").
     ///   - photo: Fills the card under a dark gradient; without it, the style's gradient.
     public init(

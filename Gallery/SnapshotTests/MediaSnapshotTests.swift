@@ -161,7 +161,7 @@ extension ComponentSnapshots {
             }
         }
 
-        // 8.15.0: the app's icon before its name, set in Inter.
+        // 8.16.0: the app's icon before its name, set in Inter.
         @Test func shareCardFrameBrandIcon() async {
             await assertComponentSnapshot(
                 ShareCardFrame(
