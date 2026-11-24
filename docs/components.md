@@ -2383,6 +2383,31 @@ init(spacing: CGFloat = AppSpacing.sm, lineSpacing: CGFloat = AppSpacing.sm, ali
 
 - alignment (2.9.0): each row leading, centred or trailing.
 
+### .readableWidth() · AppLayout
+
+A screen's content on an iPad or in a Mac window: a centred column of cards and text no wider than 720 pt, or a grid of cards side by side no wider than 1120 pt. On a phone nothing changes.
+
+Since 8.13.0 · Apps: none yet
+
+- `.readableWidth` in `Sources/DesignTokens/AppLayout.swift`
+  Keeps a screen's content in a centred column no wider than `width` (8.13.0): on an iPad or in a Mac window the cards and text stay readable instead of running across the screen; on a phone, narrower than the column, nothing changes. Put it on the scroll view's content, after `.screenPadding()`; the column grows with the person's text size.
+- `AppLayout` in `Sources/DesignTokens/AppLayout.swift`
+  How wide a screen's content runs on a large screen (8.13.0).
+
+```swift
+func readableWidth(_ width: CGFloat = AppLayout.readableWidth) -> some View
+```
+
+- Put it on the scroll view's content after .screenPadding(): the column's 720 pt include the margins, and the scroll bar stays at the screen's edge.
+- The column grows with the person's text size, as the system's readable width does.
+- A grid of cards: LazyVGrid(columns: AppLayout.cardColumns(), spacing: AppSpacing.lg) under .readableWidth(AppLayout.wideWidth). A phone holds one card in a row, an iPad two or three.
+- A list and what it opens side by side is the system's NavigationSplitView; each column's screen keeps its own .readableWidth() (docs/design-system.md, Large screens).
+
+- Do: Give every scrolling screen of an app that runs on an iPad or a Mac its column.
+- Do: Put cards that stand on their own (games, accounts, trips) in a card grid.
+- Don't: Check for an iPhone or a screen size: the column and the grid follow the width they get.
+- Don't: Put a form's rows in a card grid: a form is one column.
+
 ### FormSection
 
 A titled group of rows on a Liquid Glass card (8.0.0: one look for forms, settings and short lists). It pads its rows at the sides and draws the divider between them, under each row's text.

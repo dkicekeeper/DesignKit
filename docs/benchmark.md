@@ -109,6 +109,7 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
 | Типографика | 10–15 стилей, Dynamic Type | `AppTypography`: 10 стилей (h1–h4, body, bodySmall, caption…), Inter, Dynamic Type |
 | Отступы | 4/8-pt сетка | `AppSpacing`, 4-pt сетка |
 | Скругления | 4–6 ступеней | `AppRadius` |
+| Раскладка | Ширина колонки для чтения, адаптивная сетка (HIG Layout: readable content guide, size classes; M3 window size classes) | `AppLayout` и `.readableWidth()` (8.13.0): колонка до 720 pt на iPad и Mac, сетка карточек `cardColumns()`; список и деталь — системный `NavigationSplitView` |
 | Анимация | Токены длительности и кривых (M3 motion, Fluent motion) | `AppAnimation`, уважение Reduce Motion, `AmbientMotionGate` |
 | Глубина | Тени / elevation | Liquid Glass (`glassEffect`) вместо теней |
 

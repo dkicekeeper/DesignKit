@@ -16,6 +16,46 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.13.0 - 2026-11-24
+
+A screen on an iPad or in a Mac window: its content keeps to a centred column instead of running across the screen, and cards that stand on their own go side by side. For Platina on the iPad and the Mac; on a phone nothing changes.
+[#107](https://github.com/dkicekeeper/DesignKit/pull/107)
+
+### Added
+
+- `.readableWidth(_:)`: keeps a screen's content in a centred column no wider than `AppLayout.readableWidth` (720 pt, its margins included), on the scroll view's content after `.screenPadding()`. The column grows with the person's text size, as the system's readable width does. A phone (up to 440 pt) is narrower, so its screens look as before.
+- `AppLayout`: `readableWidth` (720 pt), `wideWidth` (1120 pt, the column of a grid of cards), `cardMinWidth` (320 pt) and `cardColumns(minimum:spacing:)`, the adaptive columns of a `LazyVGrid` of cards: one card in a row on a phone, two or three on an iPad, never more than three.
+
+### Migration
+
+Nothing changes until an app uses it. A scrolling screen of an app that runs on an iPad or a Mac takes the column:
+
+```swift
+ScrollView {
+    VStack(spacing: AppSpacing.lg) { … }
+        .screenPadding()
+        .readableWidth()
+}
+```
+
+Cards that stand on their own (games, accounts, trips) go in a grid in the wide column:
+
+```swift
+LazyVGrid(columns: AppLayout.cardColumns(), spacing: AppSpacing.lg) {
+    ForEach(games) { GameCard($0) }
+}
+.screenPadding()
+.readableWidth(AppLayout.wideWidth)
+```
+
+A list and what it opens side by side is the system's `NavigationSplitView`; each column's screen keeps its own `.readableWidth()` (docs/design-system.md, "Large screens: iPad and Mac").
+
+### Gallery and tooling
+
+- Gallery: Content & Layout › `.readableWidth() · AppLayout`, the same screen as an iPhone, an iPad mini, an iPad and a Mac window draw it, with the column or a grid of cards, and without the column to compare.
+- A snapshot of the column (at the default and a large text size) and of a grid of cards, drawn small to fit the phone the tests run on; unit tests for the columns a phone, an iPad and a wide window get.
+- docs/design-system.md: `AppLayout` among the tokens, `.readableWidth()` among the layout modifiers, and a view pattern for large screens (the column, a grid of cards, list and detail); docs/agents.md's table names them for the apps' agents.
+
 ## 8.12.0 - 2026-11-23
 
 Surfaces can be a grey fill instead of Liquid Glass: an app on the white page that wants less glass (Platina) sets `DesignKitTheme.surface = .fill` once, and its cards, sections, chips, tiles and icon plates become an opaque grey. Tenra and Dalada keep the glass, the default; nothing changes for them.

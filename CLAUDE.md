@@ -35,7 +35,8 @@ push to `main` that touches `Sources/`, `Gallery/`, `Package.swift` or `VERSION`
 
 ```
 Sources/
-├── DesignTokens/      leaf — colors, spacing, radius, icon sizes, typography (Inter), animation,
+├── DesignTokens/      leaf — colors, spacing, radius, icon sizes, layout (a large screen's
+│                      column, 8.13.0), typography (Inter), animation,
 │                      modifiers, surfaces (SurfaceStyle: glass or a grey fill, 8.12.0), button
 │                      styles, AmbientMotionGate, DesignKitTheme, fonts
 ├── DesignSupport/     → DesignTokens — icons (IconSource/IconStyle/Icon),
@@ -84,7 +85,8 @@ consumers `import DesignTokens` / `DesignSupport` / `DesignComponents` as needed
 
 **Platina** (2026-11, a PlayStation trophy tracker, in development) is the third consumer:
 `ios/project.yml` (XcodeGen), `exactVersion: "X.Y.Z"`, moved by hand (no DesignKit update
-workflow yet; its CI lints at the pinned version). Swift 6, iOS 26, iPhone only; accent
+workflow yet; its CI lints at the pinned version). Swift 6, iOS 26, iPhone and iPad (a Mac runs
+it as "Designed for iPad"; its content keeps to `.readableWidth()`, 8.13.0); accent
 `#3573BA` through `DesignKitTheme.accent`; since 8.12.0 (its #1) grey surfaces
 (`DesignKitTheme.surface = .fill`). All of its interface is DesignKit's: forms and lists
 (`FormSection`, `UniversalRow`, `CardList`, `ItemRow`, `ChecklistRow`), its assistant Plati
@@ -344,6 +346,10 @@ rather than importing an app type.
   neutral shapes inside them as translucent fills (`.surfaceNeutral1` / `.surfaceNeutral2`).
   Buttons and floating chrome stay glass. Platina (its #1) and Dalada (its #77, 1.0.4) use
   `.fill`; Tenra keeps the default `.glass`.
+- Large screens (8.13.0, for Platina on the iPad and the Mac): `.readableWidth()` keeps a screen's
+  content to a centred column (`AppLayout.readableWidth`, 720 pt, growing with the text size), and
+  `AppLayout.cardColumns()` puts cards side by side in the wide column (1120 pt). No checks for
+  the device; list and detail is the system's `NavigationSplitView` (docs/design-system.md §4).
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.
