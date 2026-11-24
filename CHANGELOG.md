@@ -51,6 +51,7 @@ ScrollView {
 - Gallery: Effects › `.heroBackground(picture:)`, a trip's hero on four photos, and "Open as a screen" with the bar's title appearing as the hero scrolls away.
 - A snapshot of a hero on a photo, light and dark (`heroOnPicture`).
 - docs/components.md lists every public overload of a modifier (`.heroBackground`, `.heroScrollEdge`, `.shine`), and a page named for one overload (`.heroBackground(picture:)`) shows that overload's doc.
+- The Gallery badges job matches a page of one overload by what an app writes for it (`PATTERNS` in `gallery_badges.py`): Tenra's `.heroBackground(color)` is the colour page's, not the picture's.
 
 ## 8.13.0 - 2026-11-24
 
