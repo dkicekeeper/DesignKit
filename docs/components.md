@@ -2207,6 +2207,7 @@ init(key: String, url: URL?, contentMode: ContentMode = .fill, placeholderKey: S
 - placeholderKey: a smaller version shown, with the shimmer over it, while this one loads (the thumbnail under the full photo).
 - No URL, or a failed load: the photo symbol.
 - .remotePhotoLoading(.still) (8.15.0): a still grey, or the small version blurred, with no shimmer and no symbol, for a picture behind text and buttons. .heroBackground(picture:) sets it.
+- .remotePhotoLoading(.hidden) (8.17.0): nothing while it loads, nor when it fails, for a cut-out figure over another picture. .heroBackground(picture:subject:) sets it on its figure.
 
 ### PhotoStrip
 
@@ -2884,6 +2885,7 @@ Since 8.14.0 · Apps: none yet
 ```swift
 func heroBackground(_ color: Color) -> some View
 func heroBackground<Picture: View>(clearHeight: CGFloat = HeroPictureMetrics.clearHeight, @ViewBuilder picture: () -> Picture) -> some View
+func heroBackground<Picture: View, Subject: View>(clearHeight: CGFloat = HeroPictureMetrics.clearHeight, @ViewBuilder picture: () -> Picture, @ViewBuilder subject: () -> Subject) -> some View
 ```
 
 - clearHeight (240 pt) is the room the hero leaves the picture below the bars: sharp, nothing over it but a title logo at its foot. From 48 pt above its end the picture blurs (40 pt) and darkens (55% black), through 120 pt below it.
@@ -2891,11 +2893,14 @@ func heroBackground<Picture: View>(clearHeight: CGFloat = HeroPictureMetrics.cle
 - Any view fills it: RemotePhoto (the app's loader and cache), an Image that is .resizable().scaledToFill(). It is cropped to the hero. While a RemotePhoto loads, a still dark fill (or its placeholderKey's small version, blurred) stands in: no shimmer behind the text (8.15.0).
 - Pulled down, the picture keeps to the screen's top and grows with the pull; scrolled up, it moves at half the content's pace, behind it (8.15.0, with .heroScrollEdge(); no parallax under Reduce Motion). “Open as a screen” shows both.
 - .heroScrollEdge(isHeroUnderBar:) on the scroll view: the picture reaches the screen's top, the bar's buttons and the status bar are light while it is under them, and the screen knows when to show the bar's title. “Open as a screen” shows it.
+- subject: (8.17.0) a cut-out figure in front of the picture, as a game's hero before its world: a square as wide as the hero, or as tall as the hero below the bars where that is less, centred, its top at the bars' foot. Blurred and darkened with the picture under the text; scrolled up, it moves at three quarters of the content's pace, the picture behind it at half. Nothing stands in for it while it loads or if it fails (RemotePhotoLoading.hidden). Turn on “Figure”.
 
 - Do: Centre the hero's content over the picture: the logo or name, a line of facts, the buttons.
 - Do: Put the name in the hero (a logo picture where there is one) and keep the bar's title empty until the hero scrolls away.
+- Do: With subject:, pass the backdrop the figure was drawn for as the picture.
 - Don't: Put text in the clear part of the picture, other than a title logo at its foot.
 - Don't: Lay a scrim or a gradient of your own over it.
+- Don't: Put a figure as subject: over a cover that already shows it: it stands twice.
 
 ### .completionMoment
 
@@ -2973,6 +2978,7 @@ Since 4.5.0 · Apps: Tenra
 ```swift
 func heroBackground(_ color: Color) -> some View
 func heroBackground<Picture: View>(clearHeight: CGFloat = HeroPictureMetrics.clearHeight, @ViewBuilder picture: () -> Picture) -> some View
+func heroBackground<Picture: View, Subject: View>(clearHeight: CGFloat = HeroPictureMetrics.clearHeight, @ViewBuilder picture: () -> Picture, @ViewBuilder subject: () -> Subject) -> some View
 func heroScrollEdge() -> some View
 func heroScrollEdge(isHeroUnderBar: Binding<Bool>) -> some View
 ```

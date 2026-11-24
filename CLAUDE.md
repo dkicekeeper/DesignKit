@@ -365,6 +365,11 @@ rather than importing an app type.
   by side there. And after the owner's look at 8.14.0's hero on a device: the picture stretches
   when pulled down and lags behind the content when scrolled, and waits for its `RemotePhoto`
   with a still dark fill (`RemotePhotoLoading.still`) instead of a shimmer.
+- A hero in two layers (8.17.0, the owner's review of Platina's mockup with three games):
+  `.heroBackground(clearHeight:picture:subject:)` stands a cut-out figure (a game's hero
+  character) in front of its backdrop, as wide as the screen just under the bars on a phone, with
+  a parallax of its own; `RemotePhotoLoading.hidden` keeps a figure that is loading or failed
+  out of sight.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.

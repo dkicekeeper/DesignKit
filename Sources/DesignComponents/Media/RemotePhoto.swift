@@ -60,6 +60,9 @@ public struct RemotePhoto: View {
                     .resizable()
                     .aspectRatio(contentMode: contentMode)
                     .transition(.skeletonReveal)
+            } else if loading == .hidden {
+                // A layer over another picture: nothing until it is there (8.17.0).
+                Color.clear
             } else if let placeholderKey, let placeholder = DesignKitPhotoLoader.cached?(placeholderKey) {
                 // The small version, sharpened by the large one; the shimmer says it is coming
                 // (still: blurred, so its few pixels read as colours).
@@ -107,6 +110,10 @@ public enum RemotePhotoLoading: Hashable, Sendable {
     /// picture behind text and buttons, where a moving shimmer is noise.
     /// `.heroBackground(picture:)` sets it.
     case still
+    /// Nothing while it loads, and nothing if it fails or has no address (8.17.0): a cut-out
+    /// figure laid over another picture, which shows alone until the figure is there.
+    /// `.heroBackground(picture:subject:)` sets it on its figure.
+    case hidden
 }
 
 public extension EnvironmentValues {
@@ -116,7 +123,8 @@ public extension EnvironmentValues {
 
 public extension View {
     /// How the `RemotePhoto`s inside look while they load (8.15.0): `.still` for a picture behind
-    /// text and buttons (`.heroBackground(picture:)` sets it on its picture).
+    /// text and buttons (`.heroBackground(picture:)` sets it on its picture), `.hidden` for a
+    /// cut-out figure over another picture (8.17.0).
     func remotePhotoLoading(_ loading: RemotePhotoLoading) -> some View {
         environment(\.remotePhotoLoading, loading)
     }
@@ -130,7 +138,7 @@ private struct RemotePhotoPlaceholderLook: ViewModifier {
         switch loading {
         case .skeleton:
             content.shimmer()
-        case .still:
+        case .still, .hidden:
             content.blur(radius: RemotePhotoMetrics.stillBlur, opaque: true)
         }
     }
