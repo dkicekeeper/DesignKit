@@ -16,6 +16,26 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.14.1 - 2026-11-24
+
+The Gallery and the docs brought up to date with the three apps: Platina's badges on the pages it uses, usage notes that still gave advice from before 8.0.0, and the plans in one place. No API changes.
+
+### Fixed
+
+- Doc comments that still gave advice from before 8.0.0: `cardStyle()` is the card for forms too (a menu inside opens from its row) and `formCardStyle()` is a Material card for a host that wants one; `DownloadRow` and `AmountRow` put Delete in a long press (`.contextMenu`, or the rows in a `CardList`), not in swipe actions.
+
+### Migration
+
+Nothing to change. The agents block (docs/agents.md, which an app's CLAUDE.md takes with the bump) gains a row for the top of a detail screen: `HeroSection` on colour (`.heroBackground(color)`) or on a picture (`.heroBackground(clearHeight:picture:)`), with `.heroScrollEdge()`.
+
+### Gallery and tooling
+
+- Platina is a consumer the Gallery knows: its badge on the 66 pages whose components its code uses (`ConsumerApp.platina`), and its accent (#3573BA) in the toolbar's theme menu.
+- CI's Gallery badges job checks Platina's code out with Tenra's and Dalada's (`platina_ref` for a manual run); `gallery_badges.py` takes `--platina`. When an app declares a type of a page's name (Platina's PSN model `Avatar`), only a file that imports one of DesignKit's modules counts. `SurfaceStyle` is matched by `DesignKitTheme.surface` and `SquareImageCropper` by `DesignKitIconPhotos.save`, the hooks that bring them in.
+- Gallery texts: `SectionHeader` lists its three styles (`.compact` went in 8.0.0); `DownloadRow` deletes with a long press and pads itself in a card; `.cardStyle()` and `.formCardStyle()` agree that menus open from a glass card; `FormSection`, `CardList` and `.filterChipStyle()` name the grey fill of 8.12.0; `AmountVisibilityToggle` no longer says Tenra uses it; `ItemRow` names where the three apps use it.
+- docs/components.md and .json carry Platina among the apps. docs/adoption.md is checked against the three apps' code (Tenra hints with `.spotlight` and no longer uses `TypingIndicator`; Dalada dropped `.dissolve` and `PlusTabLabel`; where 8.9.0's components went; a section for Platina). CLAUDE.md's consumers follow, and its Known Gaps lists what is next: benchmark round 4's P3 candidates, the assistant's list of actions, Platina in CI's build jobs and its own update workflow.
+- docs/design-system.md, docs/gallery-structure.md, docs/benchmark.md and docs/testflight.md: the swipe advice, `FormSection(style: .glass)` and the two-app wording that were left from earlier versions; TestFlight's What to Test is the version's notes on a release build.
+
 ## 8.14.0 - 2026-11-24
 
 A hero on a picture, as a film's page in Apple's TV app: a game's art or a trip's photo edge to edge from the screen's top, sharp where nothing is over it, flowing into its own colours, blurred and darkened, under the hero's text and buttons in white. For Platina's game screen: the game's art with its title logo, the progress and the session button over it.

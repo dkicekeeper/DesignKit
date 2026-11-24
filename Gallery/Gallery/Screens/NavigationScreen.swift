@@ -42,17 +42,17 @@ private struct SectionHeaderPage: View {
     var body: some View {
         ComponentPage(
             name: "SectionHeader",
-            summary: "The title over a section in four styles: default, compact (a List or Form section, or a screen's with the screen padding), large (a screen's sections) and card (a day in a transaction list), with symbols around the title and an optional action at the end of the line.",
-            apps: [.tenra, .dalada],
+            summary: "The title over a section in three styles: default (a form, a card, a List section, a screen's with the screen padding), large (a screen's own sections) and card (a day in a transaction list), with symbols around the title and an optional action at the end of the line.",
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: [
-                "Both symbols show in every style (3.2.0), in the title's font: the one before the title in the accent (the label's grey in compact), the one right after it in the tertiary grey. Tint colours both.",
+                "Both symbols show in every style (3.2.0), in the title's font: the one before the title in the accent, the one right after it in the tertiary grey. Tint colours both.",
                 "The symbol after the title says what the header does: chevron.forward for one that leads somewhere (wrap it in a NavigationLink), info.circle for one that explains.",
                 "The action (1.15.0) is any view: a NavigationLink “All”, a button, a spinner, a day's total. It takes bodySmall and sits inside the style's padding.",
-                "3.2.0: compact has no padding of its own, as list had; list, its old name, is removed in 4.0.0. On a screen, add .screenPadding().",
-                "2.0.0: SectionHeaderView before; SettingsSectionHeaderView is the compact style in a List, DateSectionHeaderView the card style with the day's total as the action.",
+                "8.0.0: one look for a section's title, bold and in sentence case, in a List's header too. compact, the small grey uppercase label, is removed (docs/migration-8.0.md); default has no padding of its own, so on a screen add .screenPadding().",
+                "2.0.0: SectionHeaderView before; DateSectionHeaderView is the card style with the day's total as the action.",
             ],
-            styles: ["default", "compact", "large", "card"]
+            styles: ["default", "large", "card"]
         ) {
             if state == .loading {
                 SectionHeaderSkeleton(style: style, showsTrailing: trailing != 0, showsIcon: showsIcon)
@@ -223,7 +223,7 @@ private struct CreatureTabLabelPage: View {
             name: "CreatureTabLabel",
             summary: "An assistant's tab: ParticleCreature's still glyph (twelve dots and two eyes) over a title, tinted by the bar.",
             since: "4.8.0",
-            apps: [.tenra],
+            apps: [.tenra, .platina],
             notes: [
                 "A tab item takes only an image and a text, so the live creature waits inside the screen the tab opens.",
                 "The glyph is CreatureGlyph.templateImage(): a template image, so the bar tints it like a symbol.",
@@ -248,7 +248,7 @@ private struct LiveSessionBarPage: View {
             name: "LiveSessionBar",
             summary: "Something going on above the tabs: a pulsing recording dot (a pause sign when paused), the running time, a detail; a tap opens it.",
             since: "2.8.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             canvas: .fill,
             notes: [
                 ".liveSessionAccessory(isEnabled:) puts it in the tab bar's bottom accessory (iOS 26.1). On iOS 26.0 nothing is shown: offer another way back (LiveSessionAccessory.isAvailable).",

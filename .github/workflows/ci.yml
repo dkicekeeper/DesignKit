@@ -17,6 +17,9 @@ on:
       tenra_ref:
         description: "Tenra branch to build against this DesignKit"
         default: main
+      platina_ref:
+        description: "Platina branch whose code the Gallery badges are checked against"
+        default: main
       record_snapshots:
         description: "Snapshot references to (re)write and commit to this branch (docs/snapshots.md)"
         type: choice
@@ -48,7 +51,8 @@ jobs:
         run: python3 .github/scripts/components_reference.py check
 
   # The Gallery's app badges (`apps:` on each ComponentPage) name the apps whose code uses the
-  # component, read from Tenra's and Dalada's sources (5.2.0), so they follow the apps.
+  # component, read from Tenra's, Dalada's and (8.14.1) Platina's sources (5.2.0), so they follow
+  # the apps.
   gallery-badges:
     name: Gallery badges
     runs-on: ubuntu-latest
@@ -67,8 +71,13 @@ jobs:
           repository: dkicekeeper/Dalada
           ref: ${{ inputs.dalada_ref || 'main' }}
           path: Dalada
+      - uses: actions/checkout@v5
+        with:
+          repository: dkicekeeper/Platina
+          ref: ${{ inputs.platina_ref || 'main' }}
+          path: Platina
       - name: Compare the badges with the apps' code
-        run: python3 DesignKit/.github/scripts/gallery_badges.py check --root DesignKit --tenra Tenra --dalada Dalada
+        run: python3 DesignKit/.github/scripts/gallery_badges.py check --root DesignKit --tenra Tenra --dalada Dalada --platina Platina
 
   package:
     name: Package + Gallery

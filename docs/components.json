@@ -6,6 +6,7 @@
     "since": "2.0.0",
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -100,7 +101,7 @@
   {
     "name": "AmountVisibilityToggle",
     "section": "Actions",
-    "summary": "The eye that hides every amount below it (.amountsHidden). Tenra puts it in the Home toolbar.",
+    "summary": "The eye that hides every amount below it (.amountsHidden), for the toolbar of a screen of amounts.",
     "since": "1.7.0",
     "apps": [],
     "styles": [],
@@ -125,6 +126,7 @@
     "summary": "A filter chip on Liquid Glass: a tap or a menu, with an optional icon and chevron.",
     "since": null,
     "apps": [
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -208,6 +210,7 @@
     "summary": "Ready-made things to say: chips under an answer or on an empty chat, each one a prompt sent with a tap. Nothing stays selected.",
     "since": "4.6.0",
     "apps": [
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -236,6 +239,7 @@
     "since": null,
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [
@@ -293,6 +297,7 @@
     "since": "1.12.0",
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -413,7 +418,9 @@
     "section": "Selection",
     "summary": "A list too long to scan: the system search narrows it, one option or several are picked with the row's circle, and a name nothing has offers “Create”.",
     "since": "8.9.0",
-    "apps": [],
+    "apps": [
+      "Platina"
+    ],
     "styles": [],
     "notes": [
       "A screen's content: put it in a NavigationStack (a pushed screen, or a sheet with its own stack), where the search field lives.",
@@ -449,6 +456,7 @@
     "since": null,
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -476,6 +484,7 @@
     "since": "0.4.0",
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -1034,6 +1043,7 @@
     "since": null,
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -1073,6 +1083,7 @@
     "since": null,
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -1212,10 +1223,11 @@
   {
     "name": "ItemRow",
     "section": "Rows: Data",
-    "summary": "A row for an item of the app's own: a symbol, the title with a badge, a description, lines of facts joined by \"·\" and an accessory. Dalada's trips, places, articles and gear; Tenra's backups and subcategories.",
+    "summary": "A row for an item of the app's own: a symbol, the title with a badge, a description, lines of facts joined by \"·\" and an accessory. Dalada's trips, places, articles, checklists and gear; Tenra's backups, subcategories and what its assistant remembers; Platina's play sessions and walkthroughs.",
     "since": "3.6.0",
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [
@@ -1250,6 +1262,7 @@
     "since": "3.6.0",
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -1333,7 +1346,8 @@
     "summary": "An item to tick off; struck through once done, an optional mark on the right.",
     "since": "1.12.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [
@@ -1359,7 +1373,8 @@
     "summary": "A checklist in a list: its title (a seal once complete), the day, the bar and “12 of 20”.",
     "since": "1.12.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [],
@@ -1383,7 +1398,8 @@
     "summary": "Something with a picture in a list: a 64 pt picture, the title with a seal and a bookmark, details.",
     "since": "1.12.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [],
@@ -1411,7 +1427,8 @@
     ],
     "styles": [],
     "notes": [
-      "The app formats the caption (sizes, percent) and adds .swipeActions to delete."
+      "The app formats the caption (sizes, percent) and puts Delete in a long press (.contextMenu): no swipe actions since 8.0.0.",
+      "Its own padding is a List row's (AppSpacing.xxs): in a FormSection card give it .padding(.vertical, AppSpacing.md), as Dalada's offline maps do."
     ],
     "dos": [],
     "donts": [],
@@ -1925,7 +1942,8 @@
     "summary": "Counters side by side in a card; two columns at accessibility text sizes.",
     "since": "1.12.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [],
@@ -1950,7 +1968,8 @@
     "summary": "A streak: a flame while it runs (grey once it stopped), what to do next, the best result.",
     "since": "1.12.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [],
@@ -2124,7 +2143,8 @@
     "summary": "A piece of advice in a pale box of its colour, with an icon.",
     "since": null,
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [],
@@ -2231,6 +2251,7 @@
     "summary": "Bars per period, one or several series side by side or stacked.",
     "since": "0.5.0",
     "apps": [
+      "Platina",
       "Tenra"
     ],
     "styles": [
@@ -2263,6 +2284,7 @@
     "summary": "Days as small squares, a week per column, tinted by their value; tap a day for its amount.",
     "since": "8.3.0",
     "apps": [
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -2416,6 +2438,7 @@
     "since": null,
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -2441,6 +2464,7 @@
     "summary": "A ring of progress around something (a category coin); red once over.",
     "since": null,
     "apps": [
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -2741,6 +2765,7 @@
     "since": "0.4.0",
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [
@@ -2829,6 +2854,7 @@
     "since": "1.7.0",
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [
@@ -2860,6 +2886,7 @@
     "summary": "A floating banner on glass after something happened: saved, failed, a warning; with an action.",
     "since": null,
     "apps": [
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -2981,7 +3008,9 @@
     "section": "Status & Feedback",
     "summary": "Three dots rising in a wave in a bubble: a reply is on its way, an assistant is thinking.",
     "since": "2.2.0",
-    "apps": [],
+    "apps": [
+      "Platina"
+    ],
     "styles": [],
     "notes": [
       "Insert it with .transition(.popIn) under the last message.",
@@ -3008,6 +3037,7 @@
     "since": null,
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [
@@ -3175,6 +3205,7 @@
     "summary": "A message the app writes to the person: a picture, a title and a line or two, a hide button and an action under the text, in line with it.",
     "since": "4.14.0",
     "apps": [
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -3232,24 +3263,24 @@
   {
     "name": "SectionHeader",
     "section": "Headers & Navigation",
-    "summary": "The title over a section in four styles: default, compact (a List or Form section, or a screen's with the screen padding), large (a screen's sections) and card (a day in a transaction list), with symbols around the title and an optional action at the end of the line.",
+    "summary": "The title over a section in three styles: default (a form, a card, a List section, a screen's with the screen padding), large (a screen's own sections) and card (a day in a transaction list), with symbols around the title and an optional action at the end of the line.",
     "since": null,
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [
       "default",
-      "compact",
       "large",
       "card"
     ],
     "notes": [
-      "Both symbols show in every style (3.2.0), in the title's font: the one before the title in the accent (the label's grey in compact), the one right after it in the tertiary grey. Tint colours both.",
+      "Both symbols show in every style (3.2.0), in the title's font: the one before the title in the accent, the one right after it in the tertiary grey. Tint colours both.",
       "The symbol after the title says what the header does: chevron.forward for one that leads somewhere (wrap it in a NavigationLink), info.circle for one that explains.",
       "The action (1.15.0) is any view: a NavigationLink “All”, a button, a spinner, a day's total. It takes bodySmall and sits inside the style's padding.",
-      "3.2.0: compact has no padding of its own, as list had; list, its old name, is removed in 4.0.0. On a screen, add .screenPadding().",
-      "2.0.0: SectionHeaderView before; SettingsSectionHeaderView is the compact style in a List, DateSectionHeaderView the card style with the day's total as the action."
+      "8.0.0: one look for a section's title, bold and in sentence case, in a List's header too. compact, the small grey uppercase label, is removed (docs/migration-8.0.md); default has no padding of its own, so on a screen add .screenPadding().",
+      "2.0.0: SectionHeaderView before; DateSectionHeaderView is the card style with the day's total as the action."
     ],
     "dos": [],
     "donts": [],
@@ -3374,6 +3405,7 @@
     "summary": "An assistant's tab: ParticleCreature's still glyph (twelve dots and two eyes) over a title, tinted by the bar.",
     "since": "4.8.0",
     "apps": [
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -3401,7 +3433,8 @@
     "summary": "Something going on above the tabs: a pulsing recording dot (a pause sign when paused), the running time, a detail; a tap opens it.",
     "since": "2.8.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [
@@ -3454,6 +3487,7 @@
     "since": null,
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -3507,6 +3541,7 @@
     "summary": "A character made of light: a swarm of particles in the shape of a sphere, a rim of light round it and a soft core of its colours inside, with a glowing robot face. Its moods are shapes: a gyroscope while thinking, a ring and waves of light while it answers, light filling it while it works, a coin; and faces: ^ ^, > <, hearts, slanted lids, a wink, a tear.",
     "since": "4.6.0",
     "apps": [
+      "Platina",
       "Tenra"
     ],
     "styles": [
@@ -3608,6 +3643,7 @@
     "since": "0.7.0",
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -3669,7 +3705,8 @@
     "summary": "A round medal: in its colour once earned, grey until then.",
     "since": "1.12.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [],
@@ -3717,7 +3754,8 @@
     "summary": "The achievement closest to being earned: “Up next:”, its title, the progress and a bar.",
     "since": "1.12.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [],
@@ -3764,7 +3802,9 @@
     "section": "Media & Identity",
     "summary": "Crops a picture to a square for an icon of the person's own: a finger moves it, two fingers zoom it, the page outside the square is veiled.",
     "since": "8.5.0",
-    "apps": [],
+    "apps": [
+      "Tenra"
+    ],
     "styles": [],
     "notes": [
       "IconPicker's Photo tab opens it after the photo library when the app sets DesignKitIconPhotos.save, which keeps the square and returns its icon.",
@@ -3791,7 +3831,8 @@
     "summary": "A photo cropped to a square on the muted background, with rounded corners: the tile of photo rows and grids, a picked photo's preview.",
     "since": "2.8.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [
@@ -3819,7 +3860,8 @@
     "summary": "A photo the app loads by key and URL: a skeleton while it loads, then the photo, coming into focus in its place.",
     "since": "3.1.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [
@@ -3925,7 +3967,8 @@
     "summary": "Photos full screen: swiped sideways, pinch or double-tap to zoom, drag the zoomed photo. An optional caption with \"2 / 5\" and a menu in the top bar.",
     "since": "2.8.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [
@@ -3954,7 +3997,8 @@
     "summary": "A picture to share in Stories or a chat: a photo under a dark gradient (or a gradient alone), the content from the top, the brand and the site at the bottom.",
     "since": "2.8.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [
@@ -3980,7 +4024,9 @@
     "section": "Content & Layout",
     "summary": "A line across a conversation: the day the next messages are from, or something that happened in it.",
     "since": "8.9.0",
-    "apps": [],
+    "apps": [
+      "Platina"
+    ],
     "styles": [],
     "notes": [
       "ConversationDivider(date:) reads “Today”, “Yesterday”, then the day (Formatting.dayTitle, the DesignKitDateFormat.day hook); VoiceOver hears it as a heading.",
@@ -4013,6 +4059,7 @@
     "since": "8.9.0",
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -4048,7 +4095,8 @@
     "summary": "Text folded to a few lines with “More” when it does not fit.",
     "since": "0.6.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [],
@@ -4072,7 +4120,8 @@
     "summary": "Events on a vertical line with a dot or a symbol for each.",
     "since": "0.7.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [],
@@ -4122,7 +4171,8 @@
     "summary": "A layout that wraps its views to new lines like words: tags, badges, chips.",
     "since": "0.7.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [
@@ -4147,7 +4197,9 @@
     "section": "Content & Layout",
     "summary": "A screen's content on an iPad or in a Mac window: a centred column of cards and text no wider than 720 pt, or a grid of cards side by side no wider than 1120 pt. On a phone nothing changes.",
     "since": "8.13.0",
-    "apps": [],
+    "apps": [
+      "Platina"
+    ],
     "styles": [],
     "notes": [
       "Put it on the scroll view's content after .screenPadding(): the column's 720 pt include the margins, and the scroll bar stays at the screen's edge.",
@@ -4185,10 +4237,11 @@
   {
     "name": "FormSection",
     "section": "Content & Layout",
-    "summary": "A titled group of rows on a Liquid Glass card (8.0.0: one look for forms, settings and short lists). It pads its rows at the sides and draws the divider between them, under each row's text.",
+    "summary": "A titled group of rows on a Liquid Glass card, or the grey of SurfaceStyle.fill (8.12.0); one look for forms, settings and short lists since 8.0.0. It pads its rows at the sides and draws the divider between them, under each row's text.",
     "since": null,
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -4223,11 +4276,12 @@
     "since": "8.0.0",
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [],
     "notes": [
-      "cards: a glass card per item, padded 16 pt; section: every item a row in one glass card, a divider under each row's text; stack: items that are cards already (a PayoffProgressCard), the circle and the handle beside them.",
+      "cards: a card per item (glass, or the grey fill), padded 16 pt; section: every item a row in one card, a divider under each row's text; stack: items that are cards already (a PayoffProgressCard), the circle and the handle beside them.",
       "cardListToolbar(mode:selection:allIDs:onAdd:onDeleteSelected:) is the same toolbar on every list: select, change the order, add; Done; Delete N under the list.",
       "Reordering: a long press lifts a card, moving it over another puts it there (a tick on each step). VoiceOver: move up, move down."
     ],
@@ -4252,6 +4306,7 @@
     "since": null,
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -4302,6 +4357,7 @@
     "since": "2.8.0",
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -4328,6 +4384,7 @@
     "summary": "One message in a conversation: the person's own on the right in the accent, the other side's on the left in grey. A message not sent says why, with Retry.",
     "since": "4.6.0",
     "apps": [
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -4419,7 +4476,8 @@
     "summary": "Onboarding pages with dots, Skip where allowed and each page's own buttons.",
     "since": "0.7.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [
@@ -4445,7 +4503,8 @@
     "summary": "One onboarding page: a hero symbol, a title, a message and an accessory.",
     "since": "0.7.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [],
@@ -4518,7 +4577,8 @@
     "summary": "Turns something into a picture to share: pick Stories or post, see the picture, send it with the system share sheet.",
     "since": "2.8.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [
@@ -4601,6 +4661,7 @@
     "since": "2.2.0",
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -4733,7 +4794,8 @@
     "summary": "Press and drag on the medal: it tilts towards the finger in 3D with a glare, and springs back on release.",
     "since": "2.2.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [
@@ -4816,6 +4878,7 @@
     "summary": "A band of aurora colour runs through the words while the app works on what was asked: “Listening…”, “Analysing…”, an insight on its way.",
     "since": "2.4.0",
     "apps": [
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -4931,7 +4994,9 @@
     "section": "Effects",
     "summary": "The top of a detail screen on a picture, as a film's page in Apple's TV app: a game's cover, a trip's photo, edge to edge from the screen's top. Sharp where nothing is over it, it flows into its own colours, blurred and darkened, under the hero's text and buttons, drawn in white in both modes; the hero ends on the page with an edge.",
     "since": "8.14.0",
-    "apps": [],
+    "apps": [
+      "Platina"
+    ],
     "styles": [],
     "notes": [
       "clearHeight (240 pt) is the room the hero leaves the picture below the bars: sharp, nothing over it but a title logo at its foot. From 48 pt above its end the picture blurs (40 pt) and darkens (55% black), through 120 pt below it.",
@@ -4966,7 +5031,8 @@
     "summary": "When something is done, a soft glow of its shape flares and fades behind it and the success haptic plays. Only the change plays it: a view that appears complete stays quiet.",
     "since": "2.3.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [],
     "notes": [
@@ -5030,6 +5096,7 @@
     "since": "2.6.0",
     "apps": [
       "Dalada",
+      "Platina",
       "Tenra"
     ],
     "styles": [],
@@ -5072,6 +5139,7 @@
     "summary": "The top of a detail screen on colour: a gradient of the colour from the screen's top edge, behind the navigation bar and the hero, fading into the page. In dark mode a tone deeper with the hero pieces in white; in light mode a pale tint with them in black.",
     "since": "4.5.0",
     "apps": [
+      "Platina",
       "Tenra"
     ],
     "styles": [],

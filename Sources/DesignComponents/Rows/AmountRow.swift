@@ -50,7 +50,8 @@ import DesignSupport
 /// icon whether a limit is set or not, so rows with and without one line up.
 ///
 /// Make it tappable with a `Button` (`.buttonStyle(.plain)`, `.contentShape(Rectangle())`) or a
-/// `NavigationLink` (`accessory: .chevron`), and add `.swipeActions` at the call site.
+/// `NavigationLink` (`accessory: .chevron`); Edit and Delete are a long press (`.contextMenu`, or
+/// the rows in a `CardList`), no swipe actions (8.0.0).
 public struct AmountRow: View {
     /// Where the value goes and how big the name is.
     public enum Style: Hashable, Sendable {

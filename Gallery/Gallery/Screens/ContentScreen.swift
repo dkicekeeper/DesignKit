@@ -47,7 +47,7 @@ private struct ConversationDividerPage: View {
             name: "ConversationDivider",
             summary: "A line across a conversation: the day the next messages are from, or something that happened in it.",
             since: "8.9.0",
-            apps: [],
+            apps: [.platina],
             canvas: .fill,
             notes: [
                 "ConversationDivider(date:) reads “Today”, “Yesterday”, then the day (Formatting.dayTitle, the DesignKitDateFormat.day hook); VoiceOver hears it as a heading.",
@@ -106,7 +106,7 @@ private struct RelativeTimePage: View {
             name: "RelativeTime",
             summary: "When something happened, or how long it has run, kept current on screen: “5 min. ago”, “Yesterday, 14:20”, “1 hr, 2 min”, “1:02:34”.",
             since: "8.9.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             notes: [
                 "Style it as text (.font, .foregroundStyle). .relative redraws every 30 seconds, .elapsed and .clock every second; .clock keeps its digits one width.",
                 "Under a minute “Just now”, under an hour minutes, the same day hours, the next day over “Yesterday, 14:20”, then the day (with the year in another year). The day follows DesignKitDateFormat.day.",
@@ -156,7 +156,7 @@ private struct ExpandableTextPage: View {
             name: "ExpandableText",
             summary: "Text folded to a few lines with “More” when it does not fit.",
             since: "0.6.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             canvas: .fill
         ) {
             if state == .loading {
@@ -184,7 +184,7 @@ private struct ActivityTimelinePage: View {
             name: "ActivityTimeline",
             summary: "Events on a vertical line with a dot or a symbol for each.",
             since: "0.7.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             canvas: .fill
         ) {
             if state == .loading {
@@ -267,7 +267,7 @@ private struct FlowLayoutPage: View {
             name: "FlowLayout",
             summary: "A layout that wraps its views to new lines like words: tags, badges, chips.",
             since: "0.7.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             canvas: .fill,
             notes: ["alignment (2.9.0): each row leading, centred or trailing."]
         ) {
@@ -304,7 +304,7 @@ private struct ReadableWidthPage: View {
             name: ".readableWidth() · AppLayout",
             summary: "A screen's content on an iPad or in a Mac window: a centred column of cards and text no wider than 720 pt, or a grid of cards side by side no wider than 1120 pt. On a phone nothing changes.",
             since: "8.13.0",
-            apps: [],
+            apps: [.platina],
             canvas: .fill,
             notes: [
                 "Put it on the scroll view's content after .screenPadding(): the column's 720 pt include the margins, and the scroll bar stays at the screen's edge.",
@@ -410,8 +410,8 @@ private struct FormSectionPage: View {
     var body: some View {
         ComponentPage(
             name: "FormSection",
-            summary: "A titled group of rows on a Liquid Glass card (8.0.0: one look for forms, settings and short lists). It pads its rows at the sides and draws the divider between them, under each row's text.",
-            apps: [.tenra, .dalada],
+            summary: "A titled group of rows on a Liquid Glass card, or the grey of SurfaceStyle.fill (8.12.0); one look for forms, settings and short lists since 8.0.0. It pads its rows at the sides and draws the divider between them, under each row's text.",
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: [
                 "Rows pad themselves only vertically (UniversalRow .standard, 12 pt: a 48 pt row); the card pads them 16 pt at the sides, and the header stands 12 pt above it (docs/design-system.md §10).",
@@ -498,10 +498,10 @@ private struct CardListPage: View {
             name: "CardList",
             summary: "The things a person keeps (accounts, deposits, loans, categories, trips) with one set of actions: open, select several and delete, change the order by dragging. A card per item, or every item a row in one card.",
             since: "8.0.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: [
-                "cards: a glass card per item, padded 16 pt; section: every item a row in one glass card, a divider under each row's text; stack: items that are cards already (a PayoffProgressCard), the circle and the handle beside them.",
+                "cards: a card per item (glass, or the grey fill), padded 16 pt; section: every item a row in one card, a divider under each row's text; stack: items that are cards already (a PayoffProgressCard), the circle and the handle beside them.",
                 "cardListToolbar(mode:selection:allIDs:onAdd:onDeleteSelected:) is the same toolbar on every list: select, change the order, add; Done; Delete N under the list.",
                 "Reordering: a long press lifts a card, moving it over another puts it there (a tick on each step). VoiceOver: move up, move down.",
             ]
@@ -586,7 +586,7 @@ private struct EditSheetContainerPage: View {
         ComponentPage(
             name: "EditSheetContainer",
             summary: "The shell of an edit sheet: navigation bar with Cancel and Save, a form inside.",
-            apps: [.tenra, .dalada]
+            apps: [.tenra, .dalada, .platina]
         ) {
             DSButton("Open the sheet", appearance: .secondary, fullWidth: true) { isPresented = true }
             .sheet(isPresented: $isPresented) {
@@ -688,7 +688,7 @@ private struct ArticleBodyPage: View {
             name: "ArticleBody",
             summary: "The text of an article: headings, paragraphs, bulleted and numbered lists, notes in a card; bold, italic and links inside a line.",
             since: "2.8.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: ["The app parses its article format into blocks; inline Markdown inside a block is DesignKit's."]
         ) {
@@ -741,7 +741,7 @@ private struct MessageBubblePage: View {
             name: "MessageBubble",
             summary: "One message in a conversation: the person's own on the right in the accent, the other side's on the left in grey. A message not sent says why, with Retry.",
             since: "4.6.0",
-            apps: [.tenra],
+            apps: [.tenra, .platina],
             canvas: .fill,
             notes: [
                 "The bubble grows to about 80% of the width; the text is selectable.",

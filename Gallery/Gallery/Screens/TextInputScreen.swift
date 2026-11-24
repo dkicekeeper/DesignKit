@@ -49,7 +49,7 @@ private struct FormTextFieldPage: View {
         ComponentPage(
             name: "FormTextField",
             summary: "A form field with focus, error, help and disabled states; inline styles sit in a row's trailing slot, row styles fill a FormSection row (3.0.0).",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: [
                 "Inline styles show no error or help text: put validation at the form level (InlineStatusText).",
@@ -131,7 +131,7 @@ private struct MessageComposerPage: View {
             name: "MessageComposer",
             summary: "The field at the bottom of a conversation: glass that grows to five lines, the send button inside, the quoted message, the send error; an attach slot and a microphone for an assistant.",
             since: "1.12.0",
-            apps: [.dalada, .tenra],
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: [
                 "Put it in safeAreaBar(edge: .bottom) so the list scrolls under the glass, with .scrollEdgeEffectStyle(.soft, for: .bottom) (built with Xcode 27 the edge as it comes is hard); give it the screen margins.",

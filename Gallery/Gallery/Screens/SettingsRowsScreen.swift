@@ -91,7 +91,7 @@ private struct UniversalRowPage: View {
         ComponentPage(
             name: "UniversalRow",
             summary: "The one row of a form card or a settings list (7.0.0): an icon, the title, what the row carries (accessory: a switch, a menu, a list, a date, a stepper, a slider, a check, a screen, an action, a value) and a hint.",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: [
                 "UniversalRow(_:icon:value:hint:role:config:accessory:). config: .standard in a FormSection card (the default), .settings in a List, .info inside a padded container.",
@@ -231,7 +231,7 @@ private struct DisclosureChevronPage: View {
         ComponentPage(
             name: "DisclosureChevron",
             summary: "The chevron at the end of a row that opens a screen; tertiary, sized to the text.",
-            apps: [.tenra, .dalada]
+            apps: [.tenra, .dalada, .platina]
         ) {
             DisclosureChevron()
         }

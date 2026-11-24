@@ -48,7 +48,7 @@ private struct DSButtonPage: View {
             name: "DSButton",
             summary: "The button of the design system: a title with an icon before, after or above it (or the icon alone), appearance × role × size, a loading state, full width or its own.",
             since: "2.0.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             notes: [
                 "Loading keeps the button's width, shows a spinner and blocks taps: DSButton(\"Save\", isLoading: saving).",
                 "Icon on top draws a tile (the actions under a detail screen's hero; EntityActionButton before 2.0). Give it the width: a row of them in an HStack.",
@@ -232,7 +232,7 @@ private struct AmountVisibilityTogglePage: View {
     var body: some View {
         ComponentPage(
             name: "AmountVisibilityToggle",
-            summary: "The eye that hides every amount below it (.amountsHidden). Tenra puts it in the Home toolbar.",
+            summary: "The eye that hides every amount below it (.amountsHidden), for the toolbar of a screen of amounts.",
             since: "1.7.0"
         ) {
             HStack(spacing: AppSpacing.md) {
@@ -257,7 +257,7 @@ private struct UniversalFilterButtonPage: View {
         ComponentPage(
             name: "UniversalFilterButton",
             summary: "A filter chip on Liquid Glass: a tap or a menu, with an optional icon and chevron.",
-            apps: [.tenra]
+            apps: [.tenra, .platina]
         ) {
             if asMenu {
                 UniversalFilterButton(title: period, isSelected: isSelected, showChevron: showsChevron) {
@@ -369,7 +369,7 @@ private struct SuggestionChipsPage: View {
             name: "SuggestionChips",
             summary: "Ready-made things to say: chips under an answer or on an empty chat, each one a prompt sent with a tap. Nothing stays selected.",
             since: "4.6.0",
-            apps: [.tenra],
+            apps: [.tenra, .platina],
             canvas: .fill,
             notes: [
                 "One scrolling row under an answer (inset: keeps the first chip off the edge); wrapped lines for the prompts of an empty chat.",

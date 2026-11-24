@@ -38,7 +38,7 @@ private struct SurfaceStylePage: View {
             name: "SurfaceStyle",
             summary: "How the surfaces draw: Liquid Glass (Tenra) or a grey fill on the white page with no glass (Platina, Dalada). Set DesignKitTheme.surface once in App.init(); .surfaceStyle(_:) changes a subtree. The toolbar's Surfaces menu shows every page either way.",
             since: "8.12.0",
-            apps: [],
+            apps: [.dalada, .platina],
             canvas: .fill,
             notes: [
                 "It reaches cardStyle() and everything on it (FormSection, CardList, the cards), filter chips, ProgressRingTile, an Icon's glass plate, OnboardingStepIndicator and MessageBanner.",
@@ -104,11 +104,11 @@ private struct CardStylePage: View {
         ComponentPage(
             name: ".cardStyle()",
             summary: "The display card: Liquid Glass, or a grey fill under SurfaceStyle.fill (8.12.0). It adds no padding: the content pads itself (.cardContentPadding(), 16 pt).",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: [
                 "A card pads itself; a row pads only vertically; a primitive not at all (design-system §10).",
-                "A card with native menus inside uses .formCardStyle(): glass would morph into the menu.",
+                "A card with a menu inside is a cardStyle() card too (FormSection, 8.0.0): the menu opens from its row. .formCardStyle() is a Material card for a host that wants one.",
             ]
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
@@ -161,7 +161,7 @@ private struct FilterChipStylePage: View {
     var body: some View {
         ComponentPage(
             name: ".filterChipStyle()",
-            summary: "An interactive chip on Liquid Glass; the selected one gets an accent tint.",
+            summary: "An interactive chip on Liquid Glass, or the grey fill under SurfaceStyle.fill (8.12.0); the selected one gets an accent tint.",
             apps: [.tenra, .dalada]
         ) {
             HStack(spacing: AppSpacing.sm) {

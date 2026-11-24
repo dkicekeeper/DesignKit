@@ -6,11 +6,12 @@
 import SwiftUI
 import DesignTokens
 
-/// Brand accents of the apps that consume DesignKit. The Gallery can preview either:
+/// Brand accents of the apps that consume DesignKit. The Gallery can preview any of them:
 /// `DesignKitTheme.accent` is read at render time, so switching re-renders the tree.
 enum GalleryTheme: String, CaseIterable, Identifiable {
     case tenra = "Tenra"
     case dalada = "Dalada"
+    case platina = "Platina"
 
     var id: String { rawValue }
 
@@ -23,6 +24,8 @@ enum GalleryTheme: String, CaseIterable, Identifiable {
                 ? UIColor(red: 0x3C / 255, green: 0xB3 / 255, blue: 0x71 / 255, alpha: 1)
                 : UIColor(red: 0x2E / 255, green: 0x8B / 255, blue: 0x57 / 255, alpha: 1)
         })
+        // Platina's AccentColor (#3573BA in both modes); it draws its surfaces as the grey fill.
+        case .platina: return Color(red: 0x35 / 255, green: 0x73 / 255, blue: 0xBA / 255)
         }
     }
 }
