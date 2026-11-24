@@ -2691,6 +2691,7 @@ Since 2.2.0 · Apps: Tenra
 
 ```swift
 func shine<Trigger: Equatable, S: Shape>(trigger: Trigger, in shape: S) -> some View
+func shine<Trigger: Equatable>(trigger: Trigger) -> some View
 ```
 
 - 0.8 s; clipped to the shape you pass (the card's AppRadius.xl by default). Off under Reduce Motion.
@@ -2844,6 +2845,29 @@ func borderGlow(isActive: Bool = true, colors: [Color] = [AppColors.accent, .pur
 - 2.4.0: the comet runs along the border itself, so it keeps one speed and length on every side and corner. A bright head with a bloom, a fading tail, a faint spill on the edge it passes.
 - beams: 2 runs a second comet opposite the first. Display rate while active; nothing under Reduce Motion.
 
+### .heroBackground(picture:)
+
+The top of a detail screen on a picture: a game's cover, a trip's photo, from the screen's top edge behind the navigation bar. Sharp at the top, it blurs and gives way to the page towards the hero's foot, so the hero's text and controls keep their own colours in light and dark mode.
+
+Since 8.14.0 · Apps: none yet
+
+- `.heroBackground` in `Sources/DesignComponents/Effects/HeroBackground.swift`
+  Lays a picture behind the hero (8.14.0): a game's cover, a trip's photo, a place. It fills the hero from the screen's top edge, sharp under the navigation bar, then blurs and gives way to the page towards the hero's foot, so the hero's text and controls, in their own colours, read over it in light and dark mode. Leave the top of the hero to the picture and start its text below that; put it on the hero at the top of a scroll view, edge to edge (pad what is inside), and `.heroScrollEdge()` on the scroll view.
+
+```swift
+func heroBackground(_ color: Color) -> some View
+func heroBackground<Picture: View>(@ViewBuilder picture: () -> Picture) -> some View
+```
+
+- Leave the top of the hero to the picture (room, an icon) and start the text from the middle: the picture is sharp down to 30% of its height, then blurred and veiled in the page's colour, 72% at the middle, all of it at the foot.
+- Any view fills it: RemotePhoto (the app's loader and cache), an Image that is .resizable().scaledToFill(). It is cropped to the hero.
+- .heroScrollEdge(isHeroUnderBar:) on the scroll view: the picture reaches the screen's top edge, and the screen knows while the hero is under the bar, to keep the bar's title empty while the hero shows it. “Open as a screen” shows both.
+
+- Do: Put the name in the hero and keep the bar's title empty until the hero scrolls away.
+- Do: Use the picture of the thing itself: a game's cover, a trip's photo.
+- Don't: Put text over the top of the picture: it is sharp there and nothing veils it.
+- Don't: Lay a scrim or a gradient of your own over it.
+
 ### .completionMoment
 
 When something is done, a soft glow of its shape flares and fades behind it and the success haptic plays. Only the change plays it: a view that appears complete stays quiet.
@@ -2919,7 +2943,9 @@ Since 4.5.0 · Apps: Tenra
 
 ```swift
 func heroBackground(_ color: Color) -> some View
+func heroBackground<Picture: View>(@ViewBuilder picture: () -> Picture) -> some View
 func heroScrollEdge() -> some View
+func heroScrollEdge(isHeroUnderBar: Binding<Bool>) -> some View
 ```
 
 - Dark mode: sets \.heroTone to .onColor, so HeroSection, TrendBadge, HeroHalfGauge, HeroBarPair, HeroSparkline, HeroMilestoneGauge and HeroProportionBar draw in white. Light mode (4.5.1): a pale tint, the tone stays .onSurface and the pieces draw as on the page, the text in black. ScoreGaugeCard(style: .hero) lies on it.

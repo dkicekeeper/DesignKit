@@ -16,6 +16,42 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.14.0 - 2026-11-24
+
+A hero on a picture: a game's cover or a trip's photo behind the top of a detail screen, from the screen's top edge, blurring and giving way to the page where the hero's text is. For Platina's game screen, whose header lies on the game's cover.
+[#108](https://github.com/dkicekeeper/DesignKit/pull/108)
+
+### Added
+
+- `.heroBackground(picture:)`: lays any view (`RemotePhoto`, an `Image` filled to its frame) behind the hero, cropped to it, from the screen's top edge behind the navigation bar. It is sharp down to 30% of its height, blurred from 60%, and veiled in the page's colour from a quarter of the way down (72% at the middle, all of it at the hero's foot), so the hero's text and controls keep their own colours in light and dark mode and the page goes on below without an edge.
+- `.heroScrollEdge(isHeroUnderBar:)`: `.heroScrollEdge()` that also tells the screen whether the hero is under the navigation bar, true at rest and false once the content after the hero scrolls under it. A screen whose hero shows its name keeps the bar's title empty while it is true.
+
+### Migration
+
+Nothing changes until an app uses it. A detail screen with a picture:
+
+```swift
+@State private var heroUnderBar = true
+
+ScrollView {
+    VStack(spacing: AppSpacing.xl) {
+        GameHero(game)                         // room for the picture, then the text
+            .heroBackground {
+                RemotePhoto(key: "cover-\(game.id)", url: game.coverURL)
+            }
+        …
+    }
+}
+.heroScrollEdge(isHeroUnderBar: $heroUnderBar)
+.navigationTitle(heroUnderBar ? "" : game.name)
+```
+
+### Gallery and tooling
+
+- Gallery: Effects › `.heroBackground(picture:)`, a trip's hero on four photos, and "Open as a screen" with the bar's title appearing as the hero scrolls away.
+- A snapshot of a hero on a photo, light and dark (`heroOnPicture`).
+- docs/components.md lists every public overload of a modifier (`.heroBackground`, `.heroScrollEdge`, `.shine`), and a page named for one overload (`.heroBackground(picture:)`) shows that overload's doc.
+
 ## 8.13.0 - 2026-11-24
 
 A screen on an iPad or in a Mac window: its content keeps to a centred column instead of running across the screen, and cards that stand on their own go side by side. For Platina on the iPad and the Mac; on a phone nothing changes.

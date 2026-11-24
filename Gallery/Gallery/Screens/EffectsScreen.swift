@@ -38,6 +38,7 @@ struct EffectsScreen: View {
         AccentGlowPage()
         BorderBeamPage()
         HeroBackgroundPage()
+        HeroPicturePage()
     }
 }
 
@@ -452,6 +453,112 @@ private struct BorderBeamPage: View {
             StepperControl("Comets", value: $beams, in: 1...2)
             SliderControl("Revolution", value: $duration, in: 1.5...6, step: 0.5) { "\($0.formatted(.number.precision(.fractionLength(1)))) s" }
         }
+    }
+}
+
+
+/// The top of a detail screen on a picture (8.14.0): a trip's photo behind its hero, sharp under
+/// the bar, blurred and veiled into the page where the hero's text is.
+private struct HeroPicturePage: View {
+    @State private var sample = 3
+
+    var body: some View {
+        ComponentPage(
+            name: ".heroBackground(picture:)",
+            summary: "The top of a detail screen on a picture: a game's cover, a trip's photo, from the screen's top edge behind the navigation bar. Sharp at the top, it blurs and gives way to the page towards the hero's foot, so the hero's text and controls keep their own colours in light and dark mode.",
+            since: "8.14.0",
+            apps: [],
+            canvas: .bleed,
+            notes: [
+                "Leave the top of the hero to the picture (room, an icon) and start the text from the middle: the picture is sharp down to 30% of its height, then blurred and veiled in the page's colour, 72% at the middle, all of it at the foot.",
+                "Any view fills it: RemotePhoto (the app's loader and cache), an Image that is .resizable().scaledToFill(). It is cropped to the hero.",
+                ".heroScrollEdge(isHeroUnderBar:) on the scroll view: the picture reaches the screen's top edge, and the screen knows while the hero is under the bar, to keep the bar's title empty while the hero shows it. “Open as a screen” shows both.",
+            ],
+            dos: [
+                "Put the name in the hero and keep the bar's title empty until the hero scrolls away.",
+                "Use the picture of the thing itself: a game's cover, a trip's photo.",
+            ],
+            donts: [
+                "Put text over the top of the picture: it is sharp there and nothing veils it.",
+                "Lay a scrim or a gradient of your own over it.",
+            ]
+        ) {
+            HeroPictureSample(sample: sample)
+                .heroBackground {
+                    RemotePhoto(key: GalleryPhotos.key(sample), url: GalleryPhotos.url(sample))
+                }
+        } controls: {
+            ChoiceControl("Picture", selection: $sample, options: [("Lake", 0), ("Dawn", 1), ("Night", 3), ("Camp", 5)])
+            NavigationLink {
+                HeroPictureScreen(sample: sample)
+            } label: {
+                Label("Open as a screen", systemImage: "iphone")
+                    .font(AppTypography.bodySmall.weight(.medium))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .tint(AppColors.accent)
+        }
+    }
+}
+
+/// A trip's hero: room for the picture, then its name, progress, numbers and an action.
+private struct HeroPictureSample: View {
+    let sample: Int
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.lg) {
+            // The picture's own room at the top.
+            Color.clear.frame(height: AppSpacing.xxxl * 3)
+            Text(verbatim: GalleryPhoto.samples[sample].caption)
+                .font(AppTypography.h2)
+                .foregroundStyle(AppColors.Text.primary)
+            VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                Text(verbatim: "68%")
+                    .font(AppTypography.h1)
+                    .monospacedDigit()
+                    .foregroundStyle(AppColors.Text.primary)
+                LinearProgressBar(value: 0.68, animatesOnAppear: false)
+            }
+            StatsStrip(items: [
+                .init(value: "12 km", title: "Distance"),
+                .init(value: "4 h", title: "Time"),
+                .init(value: "3", title: "Stops"),
+            ])
+            DSButton("Start trip", systemImage: "play.fill", fullWidth: true) {}
+        }
+        .screenPadding()
+        .padding(.bottom, AppSpacing.lg)
+    }
+}
+
+/// The picture hero where it lives: the bar's title empty while the hero shows the name.
+private struct HeroPictureScreen: View {
+    let sample: Int
+    @State private var heroUnderBar = true
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: AppSpacing.lg) {
+                HeroPictureSample(sample: sample)
+                    .heroBackground {
+                        RemotePhoto(key: GalleryPhotos.key(sample), url: GalleryPhotos.url(sample))
+                    }
+                VStack(spacing: AppSpacing.lg) {
+                    ForEach(["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"], id: \.self) { day in
+                        Text(verbatim: day)
+                            .font(AppTypography.bodyEmphasis)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .cardContentPadding()
+                            .cardStyle()
+                    }
+                }
+                .screenPadding()
+            }
+            .padding(.bottom, AppSpacing.lg)
+        }
+        .heroScrollEdge(isHeroUnderBar: $heroUnderBar)
+        .navigationTitle(heroUnderBar ? "" : GalleryPhoto.samples[sample].caption)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

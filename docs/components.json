@@ -4666,7 +4666,8 @@
         "file": "Sources/DesignComponents/Effects/Shine.swift",
         "doc": "A band of light sweeps across `shape` once each time `trigger` changes.",
         "initialisers": [
-          "func shine<Trigger: Equatable, S: Shape>(trigger: Trigger, in shape: S) -> some View"
+          "func shine<Trigger: Equatable, S: Shape>(trigger: Trigger, in shape: S) -> some View",
+          "func shine<Trigger: Equatable>(trigger: Trigger) -> some View"
         ],
         "skeleton": null
       }
@@ -4926,6 +4927,39 @@
     ]
   },
   {
+    "name": ".heroBackground(picture:)",
+    "section": "Effects",
+    "summary": "The top of a detail screen on a picture: a game's cover, a trip's photo, from the screen's top edge behind the navigation bar. Sharp at the top, it blurs and gives way to the page towards the hero's foot, so the hero's text and controls keep their own colours in light and dark mode.",
+    "since": "8.14.0",
+    "apps": [],
+    "styles": [],
+    "notes": [
+      "Leave the top of the hero to the picture (room, an icon) and start the text from the middle: the picture is sharp down to 30% of its height, then blurred and veiled in the page's colour, 72% at the middle, all of it at the foot.",
+      "Any view fills it: RemotePhoto (the app's loader and cache), an Image that is .resizable().scaledToFill(). It is cropped to the hero.",
+      ".heroScrollEdge(isHeroUnderBar:) on the scroll view: the picture reaches the screen's top edge, and the screen knows while the hero is under the bar, to keep the bar's title empty while the hero shows it. “Open as a screen” shows both."
+    ],
+    "dos": [
+      "Put the name in the hero and keep the bar's title empty until the hero scrolls away.",
+      "Use the picture of the thing itself: a game's cover, a trip's photo."
+    ],
+    "donts": [
+      "Put text over the top of the picture: it is sharp there and nothing veils it.",
+      "Lay a scrim or a gradient of your own over it."
+    ],
+    "code": [
+      {
+        "name": ".heroBackground",
+        "file": "Sources/DesignComponents/Effects/HeroBackground.swift",
+        "doc": "Lays a picture behind the hero (8.14.0): a game's cover, a trip's photo, a place. It fills the hero from the screen's top edge, sharp under the navigation bar, then blurs and gives way to the page towards the hero's foot, so the hero's text and controls, in their own colours, read over it in light and dark mode. Leave the top of the hero to the picture and start its text below that; put it on the hero at the top of a scroll view, edge to edge (pad what is inside), and `.heroScrollEdge()` on the scroll view.",
+        "initialisers": [
+          "func heroBackground(_ color: Color) -> some View",
+          "func heroBackground<Picture: View>(@ViewBuilder picture: () -> Picture) -> some View"
+        ],
+        "skeleton": null
+      }
+    ]
+  },
+  {
     "name": ".completionMoment",
     "section": "Effects",
     "summary": "When something is done, a soft glow of its shape flares and fades behind it and the success haptic plays. Only the change plays it: a view that appears complete stays quiet.",
@@ -5053,7 +5087,8 @@
         "file": "Sources/DesignComponents/Effects/HeroBackground.swift",
         "doc": "Lays the hero's gradient of `color` behind this view, from the screen's top edge and fading out below it (4.5.0): deep with DesignKit's hero pieces in white in dark mode, a pale tint with the pieces as on the page in light mode (4.5.1). Put it on the hero at the top of a scroll view, edge to edge (no `.screenPadding()` on it; pad what is inside), and `.heroScrollEdge()` on the scroll view. The hero takes the full width (5.2.0), its content centred in it.",
         "initialisers": [
-          "func heroBackground(_ color: Color) -> some View"
+          "func heroBackground(_ color: Color) -> some View",
+          "func heroBackground<Picture: View>(@ViewBuilder picture: () -> Picture) -> some View"
         ],
         "skeleton": null
       },
@@ -5062,7 +5097,8 @@
         "file": "Sources/DesignComponents/Effects/HeroBackground.swift",
         "doc": "On the scroll view of a screen with `.heroBackground(_:)` (4.5.0): keeps the navigation bar's soft scroll edge off while the hero's colour is under the bar, so the colour reaches the top of the screen, and brings it back once the content after the hero scrolls under the bar. The hero's gradient starts at the screen's top edge (4.5.1).",
         "initialisers": [
-          "func heroScrollEdge() -> some View"
+          "func heroScrollEdge() -> some View",
+          "func heroScrollEdge(isHeroUnderBar: Binding<Bool>) -> some View"
         ],
         "skeleton": null
       }

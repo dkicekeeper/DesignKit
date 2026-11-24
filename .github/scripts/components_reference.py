@@ -147,15 +147,25 @@ def signature(code):
     return re.sub(r",?\s+([)>\]])", r"\1", code)
 
 
-def declaration(texts, name):
-    """(file, doc, public initialisers) of a public type, or a public modifier `.name`."""
+def declaration(texts, name, label=None):
+    """(file, doc, public initialisers) of a public type, or a public modifier `.name`; for a
+    modifier, `label` (a page named `.name(label:)`) picks the overload whose doc is shown."""
     if name.startswith("."):
+        # Every public overload in the first file that declares one (8.14.0: `.heroBackground(_:)`
+        # and `.heroBackground(picture:)`); the doc is the first one's.
         func = re.escape(name[1:])
         for path, text in texts.items():
-            m = re.search(r"\n[ \t]*(?:public\s+|nonisolated\s+|@\w+\s+)*func\s+" + func + r"\b[^{]*", text)
-            if m and ("public extension" in text[:m.start()].split("\nextension")[-1] or "public func" in m.group(0)):
-                found = re.sub(r"^(?:public\s+|nonisolated\s+)+", "", signature(m.group(0)))
-                return path, doc_comment(text, m.start() + 1), [found]
+            found, doc = [], None
+            for m in re.finditer(r"\n[ \t]*(?:public\s+|nonisolated\s+|@\w+\s+)*func\s+" + func + r"\b[^{]*", text):
+                if "public extension" in text[:m.start()].split("\nextension")[-1] or "public func" in m.group(0):
+                    found.append(re.sub(r"^(?:public\s+|nonisolated\s+)+", "", signature(m.group(0))))
+                    named = label is not None and re.search(r"[(,]\s*(?:@\w+\s+)*" + re.escape(label) + r"\s*:", found[-1])
+                    if doc is None or named:
+                        doc = doc_comment(text, m.start() + 1)
+                    if named:
+                        label = None  # the first overload with the label keeps the doc
+            if found:
+                return path, doc, found
         return None
     for path, text in texts.items():
         m = re.search(r"\bpublic\s+(?:final\s+)?(?:struct|enum|class|protocol)\s+" + re.escape(name) + r"\b[^{]*\{", text)
@@ -188,8 +198,9 @@ def entries():
     result = []
     for page in pages():
         code = []
+        label = re.search(r"\((\w+):\)", page["name"])
         for token in tokens(page["name"]):
-            found = declaration(texts, token)
+            found = declaration(texts, token, label.group(1) if label else None)
             if not found:
                 continue
             path, doc, inits = found

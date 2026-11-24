@@ -350,6 +350,10 @@ rather than importing an app type.
   content to a centred column (`AppLayout.readableWidth`, 720 pt, growing with the text size), and
   `AppLayout.cardColumns()` puts cards side by side in the wide column (1120 pt). No checks for
   the device; list and detail is the system's `NavigationSplitView` (docs/design-system.md §4).
+- A hero on a picture (8.14.0, for Platina's game screen): `.heroBackground(picture:)` lays a
+  cover or a photo from the screen's top edge, sharp at the top and veiled into the page under the
+  hero's text; `.heroScrollEdge(isHeroUnderBar:)` lets a screen keep the bar's title empty while
+  the hero shows it.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.

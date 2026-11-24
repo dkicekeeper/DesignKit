@@ -18,6 +18,12 @@
 //  once the content after the hero scrolls under it; and it tells the gradient how far the
 //  screen's top edge is above the hero (4.5.1), so the gradient starts there, not under the bar.
 //
+//  `.heroBackground(picture:)` (8.14.0) lays a picture there instead of a colour: a game's
+//  cover, a trip's photo. Sharp under the navigation bar, it blurs and gives way to the page
+//  towards the hero's foot, so the hero's text, in its own colours, reads over it in both modes.
+//  `.heroScrollEdge(isHeroUnderBar:)` tells the screen while the hero is under the bar: a screen
+//  whose hero carries the title keeps the bar's title empty until then.
+//
 
 import SwiftUI
 import DesignTokens
@@ -78,6 +84,41 @@ public extension View {
     func heroScrollEdge() -> some View {
         modifier(HeroScrollEdgeModifier())
     }
+
+    /// Lays a picture behind the hero (8.14.0): a game's cover, a trip's photo, a place. It fills
+    /// the hero from the screen's top edge, sharp under the navigation bar, then blurs and gives
+    /// way to the page towards the hero's foot, so the hero's text and controls, in their own
+    /// colours, read over it in light and dark mode. Leave the top of the hero to the picture and
+    /// start its text below that; put it on the hero at the top of a scroll view, edge to edge
+    /// (pad what is inside), and `.heroScrollEdge()` on the scroll view.
+    ///
+    /// ```swift
+    /// ScrollView {
+    ///     VStack(spacing: AppSpacing.xl) {
+    ///         GameHero(game)                     // its text from the middle down
+    ///             .heroBackground {
+    ///                 RemotePhoto(key: "cover-\(game.id)", url: game.coverURL)
+    ///             }
+    ///         …
+    ///     }
+    /// }
+    /// .heroScrollEdge(isHeroUnderBar: $heroUnderBar)
+    /// .navigationTitle(heroUnderBar ? "" : game.name)
+    /// ```
+    ///
+    /// - Parameter picture: The picture, filling whatever frame it is given (`RemotePhoto`, an
+    ///   `Image` that is `.resizable().scaledToFill()`); it is cropped to the hero.
+    func heroBackground<Picture: View>(@ViewBuilder picture: () -> Picture) -> some View {
+        modifier(HeroPictureBackgroundModifier(picture: picture()))
+    }
+
+    /// `.heroScrollEdge()` that also tells the screen whether the hero is under the navigation
+    /// bar (8.14.0): true at rest, false once the content after the hero scrolls under the bar. A
+    /// screen whose hero shows its title keeps the bar's title empty while it is true; start the
+    /// binding at true.
+    func heroScrollEdge(isHeroUnderBar: Binding<Bool>) -> some View {
+        modifier(HeroScrollEdgeModifier(isHeroUnderBar: isHeroUnderBar))
+    }
 }
 
 enum HeroBackgroundMetrics {
@@ -94,6 +135,22 @@ enum HeroBackgroundMetrics {
     static let paleOpacity: Double = 0.3
     /// Colour above the screen's top edge, for a pull down past the top.
     static let overscroll: CGFloat = 600
+}
+
+/// `.heroBackground(picture:)` (8.14.0): where, down the picture (from the screen's top edge to
+/// the hero's foot), it blurs and the page's colour covers it.
+enum HeroPictureMetrics {
+    /// The blur that the picture gives way to, deep enough that no detail competes with text.
+    static let blur: CGFloat = 28
+    /// The picture is sharp down to here, behind the bars and the hero's top.
+    static let sharpUntil: CGFloat = 0.3
+    /// Fully blurred from here.
+    static let blurredFrom: CGFloat = 0.6
+    /// The page's colour over the picture: none at `sharpUntil`, then this much at the middle of
+    /// the hero's text, and all of it at the hero's foot, where the page goes on.
+    static let veil: [(location: CGFloat, opacity: Double)] = [
+        (0.25, 0), (0.5, 0.72), (0.75, 0.9), (1, 1),
+    ]
 }
 
 private struct HeroBackgroundModifier: ViewModifier {
@@ -193,6 +250,63 @@ struct HeroBackgroundMesh {
     }
 }
 
+private struct HeroPictureBackgroundModifier<Picture: View>: ViewModifier {
+    let picture: Picture
+    @State private var heroHeight: CGFloat = 0
+
+    func body(content: Content) -> some View {
+        content
+            .frame(maxWidth: .infinity)
+            .background {
+                HeroPictureFill(picture: picture)
+            }
+            .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
+                heroHeight = height
+            }
+            .preference(key: HeroBackgroundHeightKey.self, value: heroHeight)
+    }
+}
+
+/// The picture from the screen's top edge to the hero's foot: sharp at the top, a blurred copy
+/// over it lower down, and the page's colour over both towards the foot, where the page goes on.
+struct HeroPictureFill<Picture: View>: View {
+    let picture: Picture
+    /// From the hero's top up to the screen's top edge (`.heroScrollEdge()`).
+    @Environment(\.heroBarInset) private var barInset
+
+    var body: some View {
+        Color.clear
+            .overlay { picture }
+            .overlay {
+                picture
+                    .blur(radius: HeroPictureMetrics.blur, opaque: true)
+                    .mask {
+                        LinearGradient(
+                            stops: [
+                                .init(color: .clear, location: HeroPictureMetrics.sharpUntil),
+                                .init(color: .black, location: HeroPictureMetrics.blurredFrom),
+                            ],
+                            startPoint: .top, endPoint: .bottom
+                        )
+                    }
+            }
+            .overlay {
+                LinearGradient(
+                    stops: HeroPictureMetrics.veil.map { stop in
+                        Gradient.Stop(color: AppColors.Background.base.opacity(stop.opacity), location: stop.location)
+                    },
+                    startPoint: .top, endPoint: .bottom
+                )
+            }
+            .clipped()
+            // The picture from the screen's top edge, behind the status and navigation bars.
+            .padding(.top, -barInset)
+            .ignoresSafeArea(edges: .top)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+    }
+}
+
 /// The opaque height of the hero background inside a scroll view (0 without one).
 struct HeroBackgroundHeightKey: PreferenceKey {
     static let defaultValue: CGFloat = 0
@@ -202,6 +316,8 @@ struct HeroBackgroundHeightKey: PreferenceKey {
 }
 
 private struct HeroScrollEdgeModifier: ViewModifier {
+    /// Told whether the hero is under the bar (8.14.0, `.heroScrollEdge(isHeroUnderBar:)`).
+    var isHeroUnderBar: Binding<Bool>? = nil
     /// The hero's height, from its background.
     @State private var heroHeight: CGFloat = 0
     /// How far the content has scrolled from its resting place, in whole points.
@@ -231,6 +347,13 @@ private struct HeroScrollEdgeModifier: ViewModifier {
                 barInset = inset
             }
             .scrollEdgeEffectHidden(colourIsUnderBar, for: .top)
+            // Once the hero is measured: before that it reads as not under the bar, and a
+            // title kept empty at rest would flash in.
+            .onChange(of: colourIsUnderBar, initial: true) { _, isUnder in
+                if heroHeight > 0, let isHeroUnderBar, isHeroUnderBar.wrappedValue != isUnder {
+                    isHeroUnderBar.wrappedValue = isUnder
+                }
+            }
             // Once the cards are under the bar, its edge is the soft one, named (5.1.0): built
             // with Xcode 27 the style as it comes is hard (docs/gotchas.md).
             .scrollEdgeEffectStyle(.soft, for: .top)

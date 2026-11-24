@@ -7,7 +7,7 @@
 //  deep gradient in dark mode and as on the page, in black, on the pale one in light mode
 //  (4.5.1), each clipped to its own box (the gradient runs up and down past a hero on a
 //  screen), and `ScoreGaugeCard(amount:)` as a hero, as on a screen, a long amount shrunk to
-//  stay inside the arc (4.5.1).
+//  stay inside the arc (4.5.1); a hero on a photo (8.14.0, `.heroBackground(picture:)`).
 //
 
 import SwiftUI
@@ -28,6 +28,27 @@ extension ComponentSnapshots {
                     TrendBadge(direction: .up, changePercent: 12.4)
                 }
                 .onHeroColor(AppColors.warning)
+            )
+        }
+
+        /// A trip's hero on its photo (8.14.0, `.heroBackground(picture:)`): sharp at the top,
+        /// blurred and veiled in the page's colour under the text, the text and the button in
+        /// their own colours, in light and dark mode. The photo comes from the Gallery's loader.
+        @Test func heroOnPicture() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    Color.clear.frame(height: AppSpacing.xxxl * 2)
+                    Text(verbatim: "Camp at night")
+                        .font(AppTypography.h2)
+                        .foregroundStyle(AppColors.Text.primary)
+                    LinearProgressBar(value: 0.68, animatesOnAppear: false)
+                    DSButton("Start trip", systemImage: "play.fill", fullWidth: true) {}
+                }
+                .padding(AppSpacing.lg)
+                .heroBackground {
+                    RemotePhoto(key: "gallery-photo-3", url: URL(string: "https://gallery.invalid/photo/3.jpg"))
+                }
+                .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
             )
         }
 
