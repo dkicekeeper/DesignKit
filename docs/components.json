@@ -3827,7 +3827,8 @@
       "Fills the frame it is given and does not clip: put it in a PhotoTile, a grid cell, a card.",
       "placeholderKey: a smaller version shown, with the shimmer over it, while this one loads (the thumbnail under the full photo).",
       "No URL, or a failed load: the photo symbol.",
-      ".remotePhotoLoading(.still) (8.15.0): a still grey, or the small version blurred, with no shimmer and no symbol, for a picture behind text and buttons. .heroBackground(picture:) sets it."
+      ".remotePhotoLoading(.still) (8.15.0): a still grey, or the small version blurred, with no shimmer and no symbol, for a picture behind text and buttons. .heroBackground(picture:) sets it.",
+      ".remotePhotoLoading(.hidden) (8.17.0): nothing while it loads, nor when it fails, for a cut-out figure over another picture. .heroBackground(picture:subject:) sets it on its figure."
     ],
     "dos": [],
     "donts": [],
@@ -4975,15 +4976,18 @@
       "The hero's content is drawn in the dark scheme, so DesignKit's buttons, chips and text are their light-on-dark selves in light mode too, and hero pieces are white (\\.heroTone .onColor).",
       "Any view fills it: RemotePhoto (the app's loader and cache), an Image that is .resizable().scaledToFill(). It is cropped to the hero. While a RemotePhoto loads, a still dark fill (or its placeholderKey's small version, blurred) stands in: no shimmer behind the text (8.15.0).",
       "Pulled down, the picture keeps to the screen's top and grows with the pull; scrolled up, it moves at half the content's pace, behind it (8.15.0, with .heroScrollEdge(); no parallax under Reduce Motion). “Open as a screen” shows both.",
-      ".heroScrollEdge(isHeroUnderBar:) on the scroll view: the picture reaches the screen's top, the bar's buttons and the status bar are light while it is under them, and the screen knows when to show the bar's title. “Open as a screen” shows it."
+      ".heroScrollEdge(isHeroUnderBar:) on the scroll view: the picture reaches the screen's top, the bar's buttons and the status bar are light while it is under them, and the screen knows when to show the bar's title. “Open as a screen” shows it.",
+      "subject: (8.17.0) a cut-out figure in front of the picture, as a game's hero before its world: a square as wide as the hero, or as tall as the hero below the bars where that is less, centred, its top at the bars' foot. Blurred and darkened with the picture under the text; scrolled up, it moves at three quarters of the content's pace, the picture behind it at half. Nothing stands in for it while it loads or if it fails (RemotePhotoLoading.hidden). Turn on “Figure”."
     ],
     "dos": [
       "Centre the hero's content over the picture: the logo or name, a line of facts, the buttons.",
-      "Put the name in the hero (a logo picture where there is one) and keep the bar's title empty until the hero scrolls away."
+      "Put the name in the hero (a logo picture where there is one) and keep the bar's title empty until the hero scrolls away.",
+      "With subject:, pass the backdrop the figure was drawn for as the picture."
     ],
     "donts": [
       "Put text in the clear part of the picture, other than a title logo at its foot.",
-      "Lay a scrim or a gradient of your own over it."
+      "Lay a scrim or a gradient of your own over it.",
+      "Put a figure as subject: over a cover that already shows it: it stands twice."
     ],
     "code": [
       {
@@ -4992,7 +4996,8 @@
         "doc": "Lays a picture behind the hero, as a film's page in Apple's TV app does (8.14.0): a game's cover, a trip's photo, edge to edge from the screen's top edge. It is sharp down to `clearHeight` below the bars, the room the hero leaves it (a logo may stand at its foot), then flows into its own colours, blurred and darkened, under the hero's text and buttons, which are drawn in white (the dark scheme) in light and dark mode alike; the hero ends on the page with an edge. Put it on the hero at the top of a scroll view, edge to edge (pad what is inside), and `.heroScrollEdge()` on the scroll view: the picture then reaches the screen's top, and the bar's buttons and the status bar are light while it is under them.",
         "initialisers": [
           "func heroBackground(_ color: Color) -> some View",
-          "func heroBackground<Picture: View>(clearHeight: CGFloat = HeroPictureMetrics.clearHeight, @ViewBuilder picture: () -> Picture) -> some View"
+          "func heroBackground<Picture: View>(clearHeight: CGFloat = HeroPictureMetrics.clearHeight, @ViewBuilder picture: () -> Picture) -> some View",
+          "func heroBackground<Picture: View, Subject: View>(clearHeight: CGFloat = HeroPictureMetrics.clearHeight, @ViewBuilder picture: () -> Picture, @ViewBuilder subject: () -> Subject) -> some View"
         ],
         "skeleton": null
       }
@@ -5127,7 +5132,8 @@
         "doc": "Lays the hero's gradient of `color` behind this view, from the screen's top edge and fading out below it (4.5.0): deep with DesignKit's hero pieces in white in dark mode, a pale tint with the pieces as on the page in light mode (4.5.1). Put it on the hero at the top of a scroll view, edge to edge (no `.screenPadding()` on it; pad what is inside), and `.heroScrollEdge()` on the scroll view. The hero takes the full width (5.2.0), its content centred in it.",
         "initialisers": [
           "func heroBackground(_ color: Color) -> some View",
-          "func heroBackground<Picture: View>(clearHeight: CGFloat = HeroPictureMetrics.clearHeight, @ViewBuilder picture: () -> Picture) -> some View"
+          "func heroBackground<Picture: View>(clearHeight: CGFloat = HeroPictureMetrics.clearHeight, @ViewBuilder picture: () -> Picture) -> some View",
+          "func heroBackground<Picture: View, Subject: View>(clearHeight: CGFloat = HeroPictureMetrics.clearHeight, @ViewBuilder picture: () -> Picture, @ViewBuilder subject: () -> Subject) -> some View"
         ],
         "skeleton": null
       },

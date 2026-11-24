@@ -16,6 +16,36 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.17.0 - 2026-11-24
+
+A picture hero in two layers: a cut-out figure standing in front of its backdrop, as a game's page on a PlayStation stands its hero before its world. On a phone the figure shows whole under the bars, where the same art drawn into one wide cover and cropped to the phone's width showed a shoulder; scrolled, the figure rises in front of the backdrop. For Platina's game screen (the owner's review of its mockup with three games).
+[#112](https://github.com/dkicekeeper/DesignKit/pull/112)
+
+### Added
+
+- `.heroBackground(clearHeight:picture:subject:)`: `subject` is a cut-out figure (a picture with a transparent background) in front of `picture`, the backdrop it was drawn for. It gets a square as wide as the hero, or as tall as the hero below the bars where that is less (an iPad, a Mac window), centred, its top at the bars' foot; it is sharp in the clear part and blurred and darkened with the backdrop under the hero's text. Scrolled up, the backdrop lags behind the content by half and the figure by a quarter, so the figure rises in front of it (still under Reduce Motion and `.designKitMotion(false)`); pulled down, both grow with the pull.
+- `RemotePhotoLoading.hidden`: nothing while the photo loads, nor when it fails or has no URL, for a cut-out figure over another picture, which then shows alone. `.heroBackground(picture:subject:)` sets it on its figure.
+
+### Migration
+
+Nothing to change: `.heroBackground(clearHeight:picture:)` looks as before. A screen with a figure and its backdrop passes both:
+
+```swift
+GameHero(game)
+    .heroBackground(clearHeight: 256) {
+        RemotePhoto(key: "backdrop-\(game.id)", url: game.backdropURL)
+    } subject: {
+        RemotePhoto(key: "character-\(game.id)", url: game.characterURL)
+    }
+```
+
+An app that switches over `RemotePhotoLoading` adds the `.hidden` case.
+
+### Gallery and tooling
+
+- Gallery: Effects › `.heroBackground(picture:)` has a "Figure" switch: the sample's backdrop with a hiker in front of it, on the page and in "Open as a screen". Media › `RemotePhoto`'s "While loading" has "Hidden".
+- A snapshot of a hero with a figure in front of its backdrop (`heroOnPictureWithSubject`).
+
 ## 8.16.0 - 2026-11-24
 
 A shared picture says which app it is from: the app's icon before its name in the brand line, and the name in Inter. For Tenra's year in review, whose picture goes to Stories and chats.

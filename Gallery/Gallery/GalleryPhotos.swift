@@ -10,6 +10,9 @@
 //  arrives after `delay`, as from the network, and is held from then on; "…-pending" never
 //  arrives (the snapshot of a photo still loading).
 //
+//  The layers of a picture hero (8.17.0) are held too: "gallery-backdrop-<n>", the sample's
+//  gradient with no symbol, and "gallery-figure", a cut-out figure on a transparent square.
+//
 
 import SwiftUI
 import UIKit
@@ -39,7 +42,19 @@ enum GalleryPhotos {
         URL(string: "https://gallery.invalid/photo/\(index).jpg")!
     }
 
+    /// The key of sample `index` as a backdrop: its gradient with no symbol (8.17.0).
+    static func backdropKey(_ index: Int) -> String {
+        "gallery-backdrop-\(index)"
+    }
+
+    /// The key of the cut-out figure that stands in front of a backdrop (8.17.0).
+    static let figureKey = "gallery-figure"
+
+    /// An address for the figure; never fetched.
+    static let figureURL = URL(string: "https://gallery.invalid/figure.png")!
+
     static func cached(_ key: String) -> UIImage? {
+        if let layer = layerImage(key) { return layer }
         guard let index = sampleIndex(key) else { return nil }
         if key == self.key(index) || loaded.contains(key) {
             return image(index)
@@ -48,6 +63,7 @@ enum GalleryPhotos {
     }
 
     static func load(_ key: String) async -> UIImage? {
+        if let layer = layerImage(key) { return layer }
         guard let index = sampleIndex(key) else { return nil }
         if key.hasSuffix("-pending") {
             try? await Task.sleep(for: .seconds(3600))
@@ -64,6 +80,53 @@ enum GalleryPhotos {
               GalleryPhoto.samples.indices.contains(index)
         else { return nil }
         return index
+    }
+
+    private static var layers: [String: UIImage] = [:]
+
+    /// A hero's layer by key (8.17.0): a backdrop or the figure, or nil for any other key.
+    private static func layerImage(_ key: String) -> UIImage? {
+        if let image = layers[key] { return image }
+        let image: UIImage
+        if key == figureKey {
+            image = figure()
+        } else if key.hasPrefix("gallery-backdrop-"), let index = Int(key.dropFirst("gallery-backdrop-".count)),
+                  GalleryPhoto.samples.indices.contains(index) {
+            image = backdrop(index)
+        } else {
+            return nil
+        }
+        layers[key] = image
+        return image
+    }
+
+    /// The sample's gradient alone, 16:9, as a game's backdrop.
+    private static func backdrop(_ index: Int) -> UIImage {
+        let photo = GalleryPhoto.samples[index]
+        let size = CGSize(width: 640, height: 360)
+        return UIGraphicsImageRenderer(size: size).image { context in
+            let colors = photo.colors.map { UIColor($0).cgColor } as CFArray
+            if let gradient = CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(), colors: colors, locations: nil) {
+                context.cgContext.drawLinearGradient(gradient, start: .zero, end: CGPoint(x: size.width, y: size.height), options: [])
+            }
+        }
+    }
+
+    /// A hiker in white on a transparent square, with a soft shadow: a cut-out figure.
+    private static func figure() -> UIImage {
+        let size = CGSize(width: 480, height: 480)
+        let format = UIGraphicsImageRendererFormat()
+        format.opaque = false
+        return UIGraphicsImageRenderer(size: size, format: format).image { context in
+            let config = UIImage.SymbolConfiguration(pointSize: 300, weight: .regular)
+            guard let symbol = UIImage(systemName: "figure.hiking", withConfiguration: config)?
+                .withTintColor(.white, renderingMode: .alwaysOriginal) else { return }
+            let scale = min(size.width * 0.8 / symbol.size.width, size.height * 0.9 / symbol.size.height)
+            let drawn = CGSize(width: symbol.size.width * scale, height: symbol.size.height * scale)
+            let origin = CGPoint(x: (size.width - drawn.width) / 2, y: size.height - drawn.height)
+            context.cgContext.setShadow(offset: .zero, blur: 24, color: UIColor.black.withAlphaComponent(0.5).cgColor)
+            symbol.draw(in: CGRect(origin: origin, size: drawn))
+        }
     }
 
     /// The sample drawn as a 4:3 picture: its gradient and its symbol in white.

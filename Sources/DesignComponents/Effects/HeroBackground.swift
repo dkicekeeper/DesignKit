@@ -26,6 +26,12 @@
 //  `.heroScrollEdge(isHeroUnderBar:)` tells the screen while the hero is under the bar: a screen
 //  whose hero carries the title (a logo) keeps the bar's title empty until then.
 //
+//  `.heroBackground(picture:subject:)` (8.17.0) lays a cut-out figure in front of the picture, as
+//  a game's page on a PlayStation stands its hero before the world: as wide as the screen, or as
+//  tall as the hero where that is less, just under the bars, so a phone shows the figure whole
+//  where a wide cover cropped to its width showed a shoulder. Scrolled up, the figure moves
+//  faster than the picture behind it and slower than the content: depth.
+//
 
 import SwiftUI
 import DesignTokens
@@ -122,7 +128,45 @@ public extension View {
         clearHeight: CGFloat = HeroPictureMetrics.clearHeight,
         @ViewBuilder picture: () -> Picture
     ) -> some View {
-        modifier(HeroPictureBackgroundModifier(picture: picture(), clearHeight: clearHeight))
+        modifier(HeroPictureBackgroundModifier(picture: picture(), subject: EmptyView(), clearHeight: clearHeight))
+    }
+
+    /// `.heroBackground(clearHeight:picture:)` with a cut-out figure standing in front of the
+    /// picture (8.17.0), as a game's page on a PlayStation stands its hero before the world: a
+    /// game's character over its backdrop, each a layer of its own.
+    ///
+    /// The figure gets a square as wide as the hero, or as tall as the hero below the bars where
+    /// that is less (an iPad, a Mac window), centred, its top at the bars' foot: on a phone it
+    /// shows whole, where the same art drawn into one wide cover and cropped to the phone's width
+    /// showed a shoulder. It is part of the picture: sharp in the clear part, blurred and
+    /// darkened with it under the hero's text. Scrolled up, the picture lags behind the content
+    /// and the figure lags less, so it rises in front of the picture (still under Reduce Motion);
+    /// pulled down, both grow with the pull. While the figure loads, and if it fails, nothing
+    /// stands in for it (`RemotePhotoLoading.hidden`): the picture shows alone.
+    ///
+    /// ```swift
+    /// GameHero(game)
+    ///     .heroBackground(clearHeight: 256) {
+    ///         RemotePhoto(key: "backdrop-\(game.id)", url: game.backdropURL)
+    ///     } subject: {
+    ///         RemotePhoto(key: "character-\(game.id)", url: game.characterURL)
+    ///     }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - clearHeight: How far below the bars the picture stays sharp with nothing over it but
+    ///     the figure and a title logo at its foot (240 pt by default).
+    ///   - picture: The picture behind, filling whatever frame it is given; it is cropped to the
+    ///     hero.
+    ///   - subject: The figure in front: a picture with a transparent background (a PNG), filling
+    ///     the square it is given (`RemotePhoto`, an `Image` that is `.resizable().scaledToFill()`).
+    ///     Pass the backdrop it was drawn for as `picture`, not a cover that already shows it.
+    func heroBackground<Picture: View, Subject: View>(
+        clearHeight: CGFloat = HeroPictureMetrics.clearHeight,
+        @ViewBuilder picture: () -> Picture,
+        @ViewBuilder subject: () -> Subject
+    ) -> some View {
+        modifier(HeroPictureBackgroundModifier(picture: picture(), subject: subject(), clearHeight: clearHeight))
     }
 
     /// `.heroScrollEdge()` that also tells the screen whether the hero is under the navigation
@@ -166,6 +210,16 @@ public enum HeroPictureMetrics {
     /// Scrolled up, the picture moves at this share of the content's pace (8.15.0): behind the
     /// content, as a film's page in the TV app. Still under Reduce Motion.
     static let parallax: CGFloat = 0.5
+    /// Scrolled up, the figure in front of the picture lags behind the content by this share
+    /// (8.17.0): it moves at three quarters of the content's pace, the picture behind it at half,
+    /// so it rises in front of the picture. Still under Reduce Motion.
+    static let subjectParallax: CGFloat = 0.25
+
+    /// The side of the figure's square (8.17.0): as wide as the hero, or as tall as the hero
+    /// below the bars (`room`) where that is less.
+    static func subjectSide(width: CGFloat, room: CGFloat) -> CGFloat {
+        max(0, min(width, room))
+    }
 
     /// Where, as shares of the picture's height from the screen's top edge, it starts and
     /// finishes giving way; `clearEnd` is the end of the clear part from the same edge.
@@ -274,8 +328,9 @@ struct HeroBackgroundMesh {
     }
 }
 
-private struct HeroPictureBackgroundModifier<Picture: View>: ViewModifier {
+private struct HeroPictureBackgroundModifier<Picture: View, Subject: View>: ViewModifier {
     let picture: Picture
+    let subject: Subject
     let clearHeight: CGFloat
     @State private var heroHeight: CGFloat = 0
 
@@ -287,7 +342,7 @@ private struct HeroPictureBackgroundModifier<Picture: View>: ViewModifier {
             .environment(\.colorScheme, .dark)
             .environment(\.heroTone, .onColor)
             .background {
-                HeroPictureFill(picture: picture, clearHeight: clearHeight)
+                HeroPictureFill(picture: picture, subject: subject, clearHeight: clearHeight)
             }
             .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
                 heroHeight = height
@@ -303,8 +358,10 @@ private struct HeroPictureBackgroundModifier<Picture: View>: ViewModifier {
 /// Pulled down, the picture keeps to the screen's top and grows with the pull; scrolled up, it
 /// moves at half the content's pace (8.15.0). While it loads, a still dark fill, or its small
 /// version blurred, stands in: no shimmer behind the hero's text (`RemotePhotoLoading.still`).
-struct HeroPictureFill<Picture: View>: View {
+/// A figure in front of it (8.17.0) is a layer of the picture, with a parallax of its own.
+struct HeroPictureFill<Picture: View, Subject: View>: View {
     let picture: Picture
+    let subject: Subject
     let clearHeight: CGFloat
     /// From the hero's top up to the screen's top edge (`.heroScrollEdge()`).
     @Environment(\.heroBarInset) private var barInset
@@ -316,21 +373,29 @@ struct HeroPictureFill<Picture: View>: View {
     /// Pulled down: how far the picture reaches above the hero's top, to the screen's top edge.
     private var stretch: CGFloat { max(0, -scrolled) }
 
-    /// Scrolled up: how far the picture lags behind the content.
-    private var parallax: CGFloat {
-        reduceMotion || !motionEnabled ? 0 : max(0, scrolled) * HeroPictureMetrics.parallax
+    /// Scrolled up: how far a layer lags behind the content, at `share` of the scroll.
+    private func parallax(_ share: CGFloat) -> CGFloat {
+        reduceMotion || !motionEnabled ? 0 : max(0, scrolled) * share
     }
 
     var body: some View {
         GeometryReader { proxy in
             let blend = HeroPictureMetrics.blend(height: proxy.size.height, clearEnd: barInset + stretch + clearHeight)
+            let layers = HeroPictureLayers(
+                picture: picture,
+                subject: subject,
+                size: proxy.size,
+                barInset: barInset,
+                stretch: stretch,
+                parallax: parallax(HeroPictureMetrics.parallax),
+                subjectParallax: parallax(HeroPictureMetrics.subjectParallax)
+            )
             // Black under the picture: while it loads its still grey reads dark, as the picture
             // under the hero's white text will be.
             Color.black
-                .overlay { picture.offset(y: parallax) }
+                .overlay { layers }
                 .overlay {
-                    picture
-                        .offset(y: parallax)
+                    layers
                         .blur(radius: HeroPictureMetrics.blur, opaque: true)
                         .mask {
                             LinearGradient(
@@ -359,6 +424,40 @@ struct HeroPictureFill<Picture: View>: View {
         .remotePhotoLoading(.still)
         .allowsHitTesting(false)
         .accessibilityHidden(true)
+    }
+}
+
+/// The picture and the figure in front of it (8.17.0), in the fill's frame: from the screen's top
+/// edge to the hero's foot, `stretch` taller while pulled down.
+private struct HeroPictureLayers<Picture: View, Subject: View>: View {
+    let picture: Picture
+    let subject: Subject
+    let size: CGSize
+    let barInset: CGFloat
+    let stretch: CGFloat
+    let parallax: CGFloat
+    let subjectParallax: CGFloat
+
+    var body: some View {
+        // At rest the fill is the bars and the hero; pulled down, the figure grows with it.
+        let rest = size.height - stretch
+        let side = HeroPictureMetrics.subjectSide(width: size.width, room: rest - barInset)
+        let grow = rest > 0 ? size.height / rest : 1
+        ZStack(alignment: .top) {
+            picture
+                .frame(width: size.width, height: size.height)
+                .offset(y: parallax)
+            subject
+                .frame(width: side, height: side)
+                .clipped()
+                // Its top at the bars' foot: the figure stands under them, not behind them.
+                .padding(.top, barInset)
+                .scaleEffect(grow, anchor: .top)
+                .offset(y: subjectParallax)
+                // Nothing while it loads or if it fails: the picture shows alone.
+                .remotePhotoLoading(.hidden)
+        }
+        .frame(width: size.width, height: size.height, alignment: .top)
     }
 }
 
