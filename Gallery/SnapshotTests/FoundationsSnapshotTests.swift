@@ -207,7 +207,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// `AdaptiveColumns` (8.15.0), drawn small like the column above: a 110 pt side beside a
+        /// `AdaptiveColumns` (8.15.0), drawn small like the column above: a 130 pt side beside a
         /// main column of at least 150 pt fits in 320 pt, and in 240 pt the side folds under the
         /// main column. At a large text size both widths grow, so 320 pt folds it too.
         @Test func adaptiveColumns() async {
@@ -275,7 +275,7 @@ extension ComponentSnapshots {
 /// A trip's route with its weather and group beside it, at the small widths of the snapshot.
 private struct AdaptiveColumnsSpecimen: View {
     var body: some View {
-        AdaptiveColumns(sideWidth: 110, mainMinWidth: 150, spacing: AppSpacing.md) {
+        AdaptiveColumns(sideWidth: 130, mainMinWidth: 150, spacing: AppSpacing.md) {
             card("Route", symbol: "map.fill", detail: "Almaty, Big Almaty Lake, the observatory")
         } side: {
             card("Weather", symbol: "sun.max.fill", detail: "+18°, clear")

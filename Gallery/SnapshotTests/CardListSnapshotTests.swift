@@ -92,7 +92,7 @@ extension ComponentSnapshots {
                 }
                 .frame(width: 700)
                 .scaleEffect(0.5, anchor: .topLeading)
-                .frame(width: 350, height: 100, alignment: .topLeading)
+                .frame(width: 350, height: 110, alignment: .topLeading)
                 .surfaceStyle(.fill),
                 appearances: [.light]
             )
