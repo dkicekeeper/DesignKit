@@ -280,5 +280,141 @@ class ReferenceBuildTests(unittest.TestCase):
         self.assertTrue(result.stdout.startswith(("No release note", "Merging this would release")))
 
 
+class FakeGh:
+    """The gh CLI as the bot calls it: records each call; a release's notes are read from its file."""
+
+    def __init__(self):
+        self.calls = []
+        self.notes = {}
+
+    def __call__(self, *args):
+        self.calls.append(args)
+        if args[:2] == ("release", "create"):
+            with open(args[args.index("--notes-file") + 1], encoding="utf-8") as file:
+                self.notes[args[2]] = file.read()
+        return ""
+
+    def released(self):
+        return [call[2] for call in self.calls if call[:2] == ("release", "create")]
+
+
+def regenerate(root):
+    write(root, "docs/components.md", "# Components\n\nRegenerated.\n")
+
+
+class BotTests(unittest.TestCase):
+    """A bare remote, a developer's clone that merges PRs into main, and the bot's clone."""
+
+    def setUp(self):
+        self.dir = tempfile.TemporaryDirectory()
+        base = self.dir.name
+        self.remote = os.path.join(base, "remote.git")
+        self.dev = os.path.join(base, "dev")
+        self.bot = os.path.join(base, "bot")
+        os.makedirs(self.dev)
+        make_repo(self.dev)
+        git(base, "init", "-q", "--bare", "-b", "main", self.remote)
+        git(self.dev, "remote", "add", "origin", self.remote)
+        git(self.dev, "push", "-q", "origin", "main", "--tags")
+        git(base, "clone", "-q", self.remote, self.bot)
+        self.gh = FakeGh()
+
+    def tearDown(self):
+        self.dir.cleanup()
+
+    def merge_pr(self, number, files):
+        git(self.dev, "checkout", "-q", "-b", f"pr-{number}", "main")
+        commit(self.dev, files, f"PR {number}")
+        git(self.dev, "checkout", "-q", "main")
+        git(self.dev, "merge", "-q", "--no-ff", "-m", f"Merge pull request #{number} from o/pr-{number}", f"pr-{number}")
+        git(self.dev, "push", "-q", "origin", "main")
+
+    def run_bot(self, regen=regenerate):
+        return release.run_release(self.bot, today="2026-11-25", gh=self.gh, regenerate=regen, repo="o/r")
+
+    def remote_file(self, path):
+        return git(self.remote, "show", f"main:{path}")
+
+    def remote_tags(self):
+        return sorted(git(self.remote, "tag", "--list").split())
+
+    def test_run_one_note(self):
+        self.merge_pr(120, {".changes/a.md": NOTE.replace("A share card names its app.", "A card."),
+                            "Sources/A.swift": 'let since = "vNext"\n'})
+        self.assertEqual(self.run_bot(), "8.15.0")
+        self.assertEqual(self.remote_file("VERSION"), "8.15.0\n")
+        self.assertTrue(self.remote_file("CHANGELOG.md").startswith(
+            "# Changelog\n\nPreamble.\n\n## 8.15.0 - 2026-11-25\n\nA card.\n[#120](https://github.com/o/r/pull/120)\n\n### Added\n"))
+        self.assertEqual(self.remote_file("Sources/A.swift"), 'let since = "8.15.0"\n')
+        self.assertEqual(self.remote_file("docs/components.md"), "# Components\n\nRegenerated.\n")
+        self.assertEqual(git(self.remote, "ls-tree", "--name-only", "main", ".changes/").strip(), "")
+        self.assertEqual(git(self.remote, "log", "-1", "--format=%s|%an", "main").strip(), "Release 8.15.0|github-actions[bot]")
+        self.assertEqual(git(self.remote, "rev-parse", "8.15.0^{commit}"), git(self.remote, "rev-parse", "main"))
+        self.assertEqual(self.gh.released(), ["8.15.0"])
+        self.assertIn("A card.", self.gh.notes["8.15.0"])
+        self.assertIn("https://github.com/o/r/compare/8.14.0...8.15.0", self.gh.notes["8.15.0"])
+        self.assertIn(("workflow", "run", "testflight.yml", "--ref", "8.15.0"), self.gh.calls)
+
+    def test_run_no_note(self):
+        self.merge_pr(120, {"Sources/A.swift": "let a = 2\n"})
+        self.assertIsNone(self.run_bot())
+        self.assertEqual(self.remote_tags(), ["8.14.0"])
+        self.assertEqual(self.gh.released(), [])
+        self.assertEqual(git(self.remote, "log", "-1", "--format=%s", "main").strip(), "docs: regenerate the component reference")
+        self.assertIsNone(self.run_bot())  # nothing to regenerate any more: no new commit
+        self.assertEqual(git(self.remote, "log", "-1", "--format=%s", "main").strip(), "docs: regenerate the component reference")
+        self.assertEqual(len(git(self.remote, "log", "--format=%s", "main").splitlines()), 4)
+
+    def test_run_two_notes_make_one_release(self):
+        self.merge_pr(121, {".changes/b.md": FIX})
+        self.merge_pr(122, {".changes/a.md": NOTE})
+        self.assertEqual(self.run_bot(), "8.15.0")
+        changelog_text = self.remote_file("CHANGELOG.md")
+        self.assertIn("A fix.\n\nA share card names its app.\n[#121](https://github.com/o/r/pull/121), [#122](https://github.com/o/r/pull/122)\n", changelog_text)
+        self.assertEqual(self.remote_tags(), ["8.14.0", "8.15.0"])
+        self.assertEqual(git(self.remote, "ls-tree", "--name-only", "main", ".changes/").strip(), "")
+
+    def test_run_refuses_major_mismatch(self):
+        self.merge_pr(120, {".changes/a.md": NOTE.replace("bump: minor", "bump: major\nversion: 10.0.0")})
+        before = git(self.remote, "rev-parse", "main")
+        with self.assertRaises(release.ReleaseError):
+            self.run_bot()
+        self.assertEqual(git(self.remote, "rev-parse", "main"), before)
+        self.assertEqual(self.remote_tags(), ["8.14.0"])
+        self.assertEqual(self.gh.released(), [])
+
+    def test_run_tags_leftover_version_on_its_commit(self):
+        section = "## 8.15.0 - 2026-11-25\n\nLeft over.\n\n### Fixed\n\n- X.\n\n"
+        release_sha = commit(self.dev, {"VERSION": "8.15.0\n",
+                                        "CHANGELOG.md": CHANGELOG.replace("## 8.14.0", section + "## 8.14.0")}, "Release 8.15.0")
+        commit(self.dev, {"README.md": "Later.\n"}, "later")
+        git(self.dev, "push", "-q", "origin", "main")
+        self.assertIsNone(self.run_bot(regen=lambda root: None))
+        self.assertEqual(git(self.remote, "rev-parse", "8.15.0^{commit}").strip(), release_sha)
+        self.assertEqual(self.gh.released(), ["8.15.0"])
+        self.assertIn("Left over.", self.gh.notes["8.15.0"])
+
+    def test_run_retries_after_rejected_push(self):
+        self.merge_pr(120, {".changes/a.md": NOTE})
+        state = {"merged": False}
+
+        def regen_and_race(root):
+            regenerate(root)
+            if not state["merged"]:
+                state["merged"] = True
+                self.merge_pr(121, {".changes/b.md": FIX})
+
+        self.assertEqual(self.run_bot(regen=regen_and_race), "8.15.0")
+        self.assertIn("[#120](https://github.com/o/r/pull/120), [#121](https://github.com/o/r/pull/121)", self.remote_file("CHANGELOG.md"))
+        self.assertEqual(self.remote_tags(), ["8.14.0", "8.15.0"])
+        self.assertEqual(self.gh.released(), ["8.15.0"])
+
+    def test_notify_failure(self):
+        release.notify_failure(self.gh, [120], "https://github.com/o/r/actions/runs/1")
+        call = self.gh.calls[0]
+        self.assertEqual(call[:3], ("pr", "comment", "120"))
+        self.assertIn("https://github.com/o/r/actions/runs/1", call[call.index("--body") + 1])
+
+
 if __name__ == "__main__":
     unittest.main()

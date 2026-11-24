@@ -14,10 +14,12 @@ starts TestFlight.
 """
 
 import dataclasses
+import datetime
 import os
 import re
 import subprocess
 import sys
+import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -366,6 +368,167 @@ def preview(root):
         return None
     version_file = _read(root, "VERSION")
     return format_version(next_version(base_version(_tags(root), version_file), combine(fragments).bump))
+
+
+BOT = ("-c", "user.name=github-actions[bot]",
+       "-c", "user.email=41898282+github-actions[bot]@users.noreply.github.com")
+MERGED_PR = re.compile(r"^Merge pull request #(\d+)|\(#(\d+)\)$")
+
+
+class ReleaseError(RuntimeError):
+    """The bot stops before it commits anything."""
+
+
+def _publish(root, gh, repo, version, changelog_text):
+    """The GitHub Release of a tagged version: its CHANGELOG section and the compare link."""
+    body = changelog.section_in(changelog_text, version)
+    older = sorted((parse_version(t) for t in _tags(root) if parse_version(t) < parse_version(version)))
+    previous = format_version(older[-1]) if older else None
+    if body is None:
+        since = f"{previous}.." if previous else ""
+        log = _git(root, "log", "--no-merges", "--format=- %s", f"{since}{version}").splitlines()[:60]
+        body = f"Changes{' since ' + previous if previous else ''}:\n\n" + "\n".join(log)
+    if previous:
+        body += f"\n\n---\n\nCommits: https://github.com/{repo}/compare/{previous}...{version}\n"
+    with tempfile.NamedTemporaryFile("w", suffix=".md", delete=False, encoding="utf-8") as file:
+        file.write(body)
+    try:
+        gh("release", "create", version, "--verify-tag", "--title", f"DesignKit {version}", "--notes-file", file.name)
+    finally:
+        os.remove(file.name)
+
+
+def _tag(root, gh, repo, remote, version, sha):
+    _git(root, *BOT, "tag", "-a", version, sha, "-m", f"DesignKit {version}")
+    _git(root, "push", "-q", remote, f"refs/tags/{version}")
+    _publish(root, gh, repo, version, _show(root, sha, "CHANGELOG.md") or "")
+
+
+def _landed(root, path):
+    """The first-parent commit of the current branch that brought the note in."""
+    return _git(root, "log", "--first-parent", "--diff-filter=A", "--format=%H", "-1", "--", path).strip()
+
+
+def _pr_of(root, gh, repo, sha):
+    subject = _git(root, "log", "-1", "--format=%s", sha).strip()
+    match = MERGED_PR.search(subject)
+    if match:
+        return int(match.group(1) or match.group(2))
+    try:
+        numbers = gh("api", f"repos/{repo}/commits/{sha}/pulls", "--jq", ".[].number").split()
+    except Exception:  # noqa: BLE001 — a release without its PR link is still a release
+        return None
+    return int(numbers[0]) if numbers else None
+
+
+def pending_prs(root, gh, repo):
+    """The PRs whose notes are in .changes/ now (whom a failed run tells)."""
+    prs = {_pr_of(root, gh, repo, _landed(root, path)) for path in _notes_in(root) if _landed(root, path)}
+    return sorted(pr for pr in prs if pr)
+
+
+def notify_failure(gh, prs, run_url):
+    for pr in prs:
+        gh("pr", "comment", str(pr), "--body",
+           "The release bot could not release this PR's note after the merge: "
+           f"{run_url}\n\nFix what the run reports, then run the Release workflow again from "
+           "Actions (it picks up every note still in .changes/; docs/releasing.md).")
+
+
+def _commit_and_push(root, remote, branch, message):
+    _git(root, "add", "-A")
+    _git(root, *BOT, "commit", "-q", "-m", message)
+    pushed = subprocess.run(["git", "push", "-q", remote, f"HEAD:{branch}"], cwd=root, capture_output=True, text=True)
+    return pushed.returncode == 0
+
+
+def run_release(root, *, today, gh, regenerate, repo, remote="origin", branch="main", attempts=3, dispatch=True):
+    """The release bot: one release from the notes on main, or None without notes
+    (docs/releasing.md). Raises ReleaseError before committing anything wrong."""
+    for _ in range(attempts):
+        _git(root, "fetch", "-q", "--tags", "--force", remote, branch)
+        _git(root, "checkout", "-q", "-B", branch, f"{remote}/{branch}")
+        _git(root, "reset", "-q", "--hard", f"{remote}/{branch}")
+        tags = _tags(root)
+        current = _read(root, "VERSION").strip()
+        if current not in tags:
+            # An earlier run pushed its release commit and stopped, or the old scheme set VERSION.
+            sha = _git(root, "log", "-1", "--format=%H", "--", "VERSION").strip()
+            _tag(root, gh, repo, remote, current, sha)
+            tags = _tags(root)
+        notes = _notes_in(root)
+        if not notes:
+            regenerate(root)
+            if not _git(root, "status", "--porcelain"):
+                return None
+            if _commit_and_push(root, remote, branch, "docs: regenerate the component reference"):
+                return None
+            continue
+        order = {sha: i for i, sha in enumerate(_git(root, "rev-list", "--first-parent", "--reverse", "HEAD").split())}
+        landed = {path: _landed(root, path) for path in notes}
+        notes.sort(key=lambda path: (order.get(landed[path], len(order)), path))
+        problems = [p for path in notes for p in note_problems(_read(root, path), path)]
+        if problems:
+            raise ReleaseError("; ".join(problems))
+        combined = combine([parse_fragment(_read(root, path), path) for path in notes])
+        version = next_version(base_version(tags, current), combined.bump)
+        if combined.bump == "major" and combined.version != version:
+            raise ReleaseError(f"{combined.path}: the next major is {format_version(version)}, "
+                               f"the note says {format_version(combined.version)}")
+        if any(parse_version(tag) >= version for tag in tags):
+            raise ReleaseError(f"{format_version(version)} is not above every tag")
+        text = format_version(version)
+        prs = sorted({pr for pr in (_pr_of(root, gh, repo, landed[path]) for path in notes if landed[path]) if pr})
+        changelog_text = _read(root, "CHANGELOG.md")
+        section = render_section(text, release_date(today, changelog_text), combined, prs, repo)
+        changelog_text = insert_section(changelog_text, section)
+        with open(os.path.join(root, "CHANGELOG.md"), "w", encoding="utf-8") as file:
+            file.write(changelog_text)
+        with open(os.path.join(root, "VERSION"), "w", encoding="utf-8") as file:
+            file.write(text + "\n")
+        tracked = _git(root, "ls-files").splitlines()
+        replace_in_tree(root, tracked, text)
+        for path in notes:
+            os.remove(os.path.join(root, path))
+        regenerate(root)
+        problems = changelog.problems(changelog_text, text)
+        left = [path for path in tracked if not is_skipped(path) and os.path.isfile(os.path.join(root, path))
+                and has_bare_token(_text_of(os.path.join(root, path)) or "")]
+        if problems or left:
+            raise ReleaseError("; ".join(problems + [f"{path} keeps {TOKEN}" for path in left]))
+        if not _commit_and_push(root, remote, branch, f"Release {text}"):
+            continue  # main moved on: start again from it; its notes join this release
+        _tag(root, gh, repo, remote, text, _git(root, "rev-parse", "HEAD").strip())
+        if dispatch:
+            gh("workflow", "run", "testflight.yml", "--ref", text)
+        return text
+    raise ReleaseError(f"the push to {branch} was refused {attempts} times")
+
+
+def run_cli(root, dispatch=True):
+    repo = os.environ.get("GITHUB_REPOSITORY", "dkicekeeper/DesignKit")
+
+    def gh(*args):
+        return subprocess.run(["gh", *args], cwd=root, check=True, capture_output=True, text=True).stdout
+
+    def regenerate(tree):
+        subprocess.run([sys.executable, os.path.join(tree, ".github", "scripts", "components_reference.py"), "write"],
+                       cwd=tree, check=True)
+
+    today = datetime.datetime.now(datetime.timezone.utc).date().isoformat()
+    try:
+        version = run_release(root, today=today, gh=gh, regenerate=regenerate, repo=repo, dispatch=dispatch)
+    except Exception as error:  # noqa: BLE001 — every failure is reported on the PRs it holds up
+        print(f"::error::{error}")
+        run_url = (f"{os.environ.get('GITHUB_SERVER_URL', 'https://github.com')}/{repo}/actions/runs/"
+                   f"{os.environ.get('GITHUB_RUN_ID', '')}")
+        try:
+            notify_failure(gh, pending_prs(root, gh, repo), run_url)
+        except Exception as notify_error:  # noqa: BLE001
+            print(f"::warning::could not comment on the PRs: {notify_error}")
+        return 1
+    print(f"Released DesignKit {version}." if version else "No release note: nothing to release.")
+    return 0
 
 
 def main(argv):

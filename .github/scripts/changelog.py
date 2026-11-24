@@ -31,11 +31,16 @@ def releases(text):
     return out
 
 
-def section(version):
-    for name, _, body in releases((ROOT / "CHANGELOG.md").read_text()):
+def section_in(text, version):
+    """A version's section in a CHANGELOG text, without its heading, or None."""
+    for name, _, body in releases(text):
         if name == version:
             return "\n".join(body).strip()
     return None
+
+
+def section(version):
+    return section_in((ROOT / "CHANGELOG.md").read_text(), version)
 
 
 def line_problem(line):
@@ -50,7 +55,18 @@ def line_problem(line):
 
 
 def check():
-    text = (ROOT / "CHANGELOG.md").read_text()
+    errors = problems((ROOT / "CHANGELOG.md").read_text(), (ROOT / "VERSION").read_text().strip())
+    for error in errors:
+        print(f"::error file=CHANGELOG.md::{error}")
+    if errors:
+        sys.exit(1)
+    print(f"CHANGELOG.md: {len(releases((ROOT / 'CHANGELOG.md').read_text()))} releases, "
+          f"the newest is {(ROOT / 'VERSION').read_text().strip()}")
+
+
+def problems(text, version):
+    """What is wrong with a CHANGELOG text whose VERSION is `version` (release.py checks the text
+    it writes with it before committing)."""
     errors = []
     in_code = False
     for number, line in enumerate(text.splitlines(), 1):
@@ -80,14 +96,13 @@ def check():
             errors.append(f"{newer} ({newer_date}) is dated before {older} ({older_date})")
     if len(set(keys)) != len(keys):
         errors.append("a version is listed twice")
-    for version, _, body in found:
+    for name, _, body in found:
         order = [line[4:] for line in body if line.startswith("### ")]
         if not order:
-            errors.append(f"{version} has no section")
+            errors.append(f"{name} has no section")
         if order != sorted(order, key=SECTIONS.index):
-            errors.append(f"{version}: sections go {', '.join(SECTIONS)}")
+            errors.append(f"{name}: sections go {', '.join(SECTIONS)}")
 
-    version = (ROOT / "VERSION").read_text().strip()
     if not any(name == version for name, _, _ in found):
         errors.append(
             f"no section for VERSION {version}: a release PR adds `## {version} - YYYY-MM-DD` "
@@ -95,12 +110,7 @@ def check():
         )
     elif found[0][0] != version:
         errors.append(f"the newest section is {found[0][0]}, VERSION is {version}")
-
-    for error in errors:
-        print(f"::error file=CHANGELOG.md::{error}")
-    if errors:
-        sys.exit(1)
-    print(f"CHANGELOG.md: {len(found)} releases, the newest is {version}")
+    return errors
 
 
 def plain(text):
