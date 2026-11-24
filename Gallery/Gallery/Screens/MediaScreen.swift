@@ -682,6 +682,7 @@ private struct RemotePhotoPage: View {
     @State private var attempt = 0
     @State private var hasURL = true
     @State private var state: SpecimenState = .content
+    @State private var loading: RemotePhotoLoading = .skeleton
 
     var body: some View {
         ComponentPage(
@@ -694,6 +695,7 @@ private struct RemotePhotoPage: View {
                 "Fills the frame it is given and does not clip: put it in a PhotoTile, a grid cell, a card.",
                 "placeholderKey: a smaller version shown, with the shimmer over it, while this one loads (the thumbnail under the full photo).",
                 "No URL, or a failed load: the photo symbol.",
+                ".remotePhotoLoading(.still) (8.15.0): a still grey, or the small version blurred, with no shimmer and no symbol, for a picture behind text and buttons. .heroBackground(picture:) sets it.",
             ]
         ) {
             HStack(spacing: AppSpacing.md) {
@@ -710,10 +712,12 @@ private struct RemotePhotoPage: View {
                     }
                 }
             }
+            .remotePhotoLoading(loading)
             // A new attempt is a new photo: its task loads it again.
             .id(attempt)
         } controls: {
             StateControl(state: $state)
+            ChoiceControl("While loading", selection: $loading, options: [("Skeleton", RemotePhotoLoading.skeleton), ("Still", .still)])
             ToggleControl("URL", isOn: $hasURL)
             ActionControl("Load again", systemImage: "arrow.clockwise") { attempt += 1 }
         }

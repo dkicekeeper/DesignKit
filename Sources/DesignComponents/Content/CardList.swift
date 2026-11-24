@@ -25,6 +25,10 @@ public enum CardListLayout: Hashable, Sendable {
     /// Every item a card of its own already (a `PayoffProgressCard`, a `RecurringPaymentCard`):
     /// the list spaces them, and the circle and the handle of the modes sit beside the card.
     case stack
+    /// A glass card per item as `.cards`, side by side where the width holds more than one
+    /// (8.15.0): `AppLayout.cardColumns()`, two or three in a row on an iPad or in a Mac window
+    /// under `.readableWidth(AppLayout.wideWidth)`, one in a row on a phone.
+    case grid
 }
 
 /// What a `CardList` is doing (8.0.0).
@@ -38,8 +42,9 @@ public enum CardListMode: Hashable, Sendable {
 }
 
 /// A list of items on Liquid Glass (8.0.0): a card per item (`.cards`), every item a row
-/// in one card with a divider under each row's text (`.section`), or items that are cards
-/// already (`.stack`). In `.selecting` a tap picks an
+/// in one card with a divider under each row's text (`.section`), items that are cards
+/// already (`.stack`), or cards side by side on a large screen (`.grid`, 8.15.0). In
+/// `.selecting` a tap picks an
 /// item; in `.reordering` an item is dragged to its place (VoiceOver: move up, move down), and
 /// `onMove` gets the move as `List`'s `onMove` does.
 ///
@@ -107,6 +112,14 @@ public struct CardList<Data: RandomAccessCollection, Card: View>: View where Dat
             LazyVStack(spacing: AppSpacing.md) {
                 ForEach(data) { item in
                     entry(item)
+                        .modifier(reorderable(item))
+                }
+            }
+        case .grid:
+            LazyVGrid(columns: AppLayout.cardColumns(spacing: AppSpacing.md), spacing: AppSpacing.md) {
+                ForEach(data) { item in
+                    entry(item, inset: AppSpacing.lg)
+                        .cardStyle()
                         .modifier(reorderable(item))
                 }
             }
@@ -458,8 +471,8 @@ private struct CardListToolbar<ID: Hashable>: ViewModifier {
 
 // MARK: - Skeleton
 
-/// Placeholder of a `CardList` (8.0.0): its cards, or its one card of rows, with grey rows of
-/// an icon, a title and a value.
+/// Placeholder of a `CardList` (8.0.0): its cards (side by side for `.grid`, 8.15.0), or its one
+/// card of rows, with grey rows of an icon, a title and a value.
 public struct CardListSkeleton: View {
     let layout: CardListLayout
     let count: Int
@@ -475,10 +488,13 @@ public struct CardListSkeleton: View {
             case .cards, .stack:
                 VStack(spacing: AppSpacing.md) {
                     ForEach(0..<count, id: \.self) { _ in
-                        row
-                            .padding(AppSpacing.lg)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .cardStyle()
+                        card
+                    }
+                }
+            case .grid:
+                LazyVGrid(columns: AppLayout.cardColumns(spacing: AppSpacing.md), spacing: AppSpacing.md) {
+                    ForEach(0..<count, id: \.self) { _ in
+                        card
                     }
                 }
             case .section:
@@ -498,5 +514,12 @@ public struct CardListSkeleton: View {
 
     private var row: some View {
         UniversalRowSkeleton(config: .standard, iconStyle: .circle(size: AppIconSize.Tile.sm), trailing: .value)
+    }
+
+    private var card: some View {
+        row
+            .padding(AppSpacing.lg)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .cardStyle()
     }
 }

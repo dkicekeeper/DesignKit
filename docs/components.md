@@ -2206,6 +2206,7 @@ init(key: String, url: URL?, contentMode: ContentMode = .fill, placeholderKey: S
 - Fills the frame it is given and does not clip: put it in a PhotoTile, a grid cell, a card.
 - placeholderKey: a smaller version shown, with the shimmer over it, while this one loads (the thumbnail under the full photo).
 - No URL, or a failed load: the photo symbol.
+- .remotePhotoLoading(.still) (8.15.0): a still grey, or the small version blurred, with no shimmer and no symbol, for a picture behind text and buttons. .heroBackground(picture:) sets it.
 
 ### PhotoStrip
 
@@ -2400,13 +2401,37 @@ func readableWidth(_ width: CGFloat = AppLayout.readableWidth) -> some View
 
 - Put it on the scroll view's content after .screenPadding(): the column's 720 pt include the margins, and the scroll bar stays at the screen's edge.
 - The column grows with the person's text size, as the system's readable width does.
-- A grid of cards: LazyVGrid(columns: AppLayout.cardColumns(), spacing: AppSpacing.lg) under .readableWidth(AppLayout.wideWidth). A phone holds one card in a row, an iPad two or three.
+- A grid of cards: LazyVGrid(columns: AppLayout.cardColumns(), spacing: AppSpacing.lg) under .readableWidth(AppLayout.wideWidth), or CardList(layout: .grid) for the things a person keeps (8.15.0). A phone holds one card in a row, an iPad two or three.
 - A list and what it opens side by side is the system's NavigationSplitView; each column's screen keeps its own .readableWidth() (docs/design-system.md, Large screens).
 
 - Do: Give every scrolling screen of an app that runs on an iPad or a Mac its column.
 - Do: Put cards that stand on their own (games, accounts, trips) in a card grid.
 - Don't: Check for an iPhone or a screen size: the column and the grid follow the width they get.
 - Don't: Put a form's rows in a card grid: a form is one column.
+
+### AdaptiveColumns
+
+A screen's main column with a side column beside it when the width allows: on an iPad a trip's route with its weather and group beside it. Narrower, as on a phone, the screen's own narrow layout: chips that switch between the parts, or the side under the main column.
+
+Since 8.15.0 · Apps: none yet
+
+- `AdaptiveColumns` in `Sources/DesignComponents/Content/AdaptiveColumns.swift`
+  A main column and a side column side by side when they fit, the narrow layout when not (8.15.0).
+
+```swift
+init(sideWidth: CGFloat = AppLayout.sideColumnWidth, mainMinWidth: CGFloat = AppLayout.mainColumnMinWidth, spacing: CGFloat = AppSpacing.xxl, @ViewBuilder main: () -> Main, @ViewBuilder side: () -> Side, @ViewBuilder narrow: () -> Narrow)
+init(sideWidth: CGFloat = AppLayout.sideColumnWidth, mainMinWidth: CGFloat = AppLayout.mainColumnMinWidth, spacing: CGFloat = AppSpacing.xxl, @ViewBuilder main: () -> Main, @ViewBuilder side: () -> Side)
+```
+
+- What decides is the width the view gets: the main column's minimum (AppLayout.mainColumnMinWidth, 400 pt), the gap (24 pt) and the side (AppLayout.sideColumnWidth, 340 pt), 764 pt in all, more at a larger text size.
+- Put it on a scroll view's content after .screenPadding(), under .readableWidth(AppLayout.wideWidth): an iPad gets the columns, a phone and an iPad mini in portrait the narrow layout, and a Mac window switches as it is resized.
+- narrow: is the phone's screen as it is, often a ChipPicker over one part at a time; without it the side stacks under the main column.
+- The two layouts are different views: keep state (the picked chip, a filter) in the screen, not inside the columns.
+
+- Do: Put what the screen is for in the main column, and summaries, what comes next and the latest items in the side.
+- Do: Show in the side the cards the phone shows, so the person finds the same things.
+- Don't: Put a form in two columns: a form is one column.
+- Don't: Check for an iPad to choose the layout: a panel or a split window narrows the screen too.
 
 ### FormSection
 
@@ -2436,13 +2461,14 @@ The things a person keeps (accounts, deposits, loans, categories, trips) with on
 Since 8.0.0 · Apps: Dalada, Tenra
 
 - `CardList` in `Sources/DesignComponents/Content/CardList.swift`; skeleton `CardListSkeleton`
-  A list of items on Liquid Glass (8.0.0): a card per item (`.cards`), every item a row in one card with a divider under each row's text (`.section`), or items that are cards already (`.stack`). In `.selecting` a tap picks an item; in `.reordering` an item is dragged to its place (VoiceOver: move up, move down), and `onMove` gets the move as `List`'s `onMove` does.
+  A list of items on Liquid Glass (8.0.0): a card per item (`.cards`), every item a row in one card with a divider under each row's text (`.section`), items that are cards already (`.stack`), or cards side by side on a large screen (`.grid`, 8.15.0). In `.selecting` a tap picks an item; in `.reordering` an item is dragged to its place (VoiceOver: move up, move down), and `onMove` gets the move as `List`'s `onMove` does.
 
 ```swift
 init(_ data: Data, layout: CardListLayout = .cards, mode: CardListMode = .browsing, selection: Binding<Set<Data.Element.ID>> = .constant([]), onMove: ((IndexSet, Int) -> Void)? = nil, onOpen: ((Data.Element) -> Void)? = nil, @ViewBuilder card: @escaping (Data.Element) -> Card)
 ```
 
 - cards: a glass card per item, padded 16 pt; section: every item a row in one glass card, a divider under each row's text; stack: items that are cards already (a PayoffProgressCard), the circle and the handle beside them.
+- grid (8.15.0): the cards side by side in AppLayout.cardColumns() where the width holds two or more, on an iPad or in a Mac window under .readableWidth(AppLayout.wideWidth); one in a row on a phone, as here.
 - cardListToolbar(mode:selection:allIDs:onAdd:onDeleteSelected:) is the same toolbar on every list: select, change the order, add; Done; Delete N under the list.
 - Reordering: a long press lifts a card, moving it over another puts it there (a tick on each step). VoiceOver: move up, move down.
 
@@ -2861,7 +2887,8 @@ func heroBackground<Picture: View>(clearHeight: CGFloat = HeroPictureMetrics.cle
 
 - clearHeight (240 pt) is the room the hero leaves the picture below the bars: sharp, nothing over it but a title logo at its foot. From 48 pt above its end the picture blurs (40 pt) and darkens (55% black), through 120 pt below it.
 - The hero's content is drawn in the dark scheme, so DesignKit's buttons, chips and text are their light-on-dark selves in light mode too, and hero pieces are white (\.heroTone .onColor).
-- Any view fills it: RemotePhoto (the app's loader and cache), an Image that is .resizable().scaledToFill(). It is cropped to the hero.
+- Any view fills it: RemotePhoto (the app's loader and cache), an Image that is .resizable().scaledToFill(). It is cropped to the hero. While a RemotePhoto loads, a still dark fill (or its placeholderKey's small version, blurred) stands in: no shimmer behind the text (8.15.0).
+- Pulled down, the picture keeps to the screen's top and grows with the pull; scrolled up, it moves at half the content's pace, behind it (8.15.0, with .heroScrollEdge(); no parallax under Reduce Motion). “Open as a screen” shows both.
 - .heroScrollEdge(isHeroUnderBar:) on the scroll view: the picture reaches the screen's top, the bar's buttons and the status bar are light while it is under them, and the screen knows when to show the bar's title. “Open as a screen” shows it.
 
 - Do: Centre the hero's content over the picture: the logo or name, a line of facts, the buttons.

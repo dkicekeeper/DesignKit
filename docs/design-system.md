@@ -40,7 +40,7 @@
 
 | Module | Contents |
 |---|---|
-| `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases, `Palette` 3.7.0), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppLayout` (a large screen's column and card grid, 8.13.0), `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `readableWidth` 8.13.0, `chartAppear`, `staggeredEntrance`, `softScrollEdges` 5.4.0, inline field styles), `SurfaceStyle` with `.surfaceStyle(_:)` and the `.surfaceNeutral1` / `.surfaceNeutral2` fills (8.12.0, glass or a grey fill), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme` (`accent`, `surface`), `DesignKitFonts` (Inter) |
+| `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases, `Palette` 3.7.0), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppLayout` (a large screen's column and card grid, 8.13.0; its side column, 8.15.0), `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `readableWidth` 8.13.0, `chartAppear`, `staggeredEntrance`, `softScrollEdges` 5.4.0, inline field styles), `SurfaceStyle` with `.surfaceStyle(_:)` and the `.surfaceNeutral1` / `.surfaceNeutral2` fills (8.12.0, glass or a grey fill), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme` (`accent`, `surface`), `DesignKitFonts` (Inter) |
 | `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `Icon` (a brand logo is `Icon(source: .brandService(name))`; `BrandLogoView` was removed in 2.0.0), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `RecentSearches` and `SearchMatch` (search suggestions, 3.5.0), `Formatting.relativeTime` / `elapsedTime` / `clockTime` / `dayTitle` (8.9.0), `AccessibilityAnnouncer` and `.voiceOverAnnouncement` (8.9.0), `HapticManager`, `HapticCue` (haptics by meaning, 2.3.0), `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitPhotoLoader` (3.1.0), `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
 | `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons") |
 
@@ -261,6 +261,8 @@ than all of them, so its screens look as before.
 | `AppLayout.wideWidth` | 1120 pt | The column of a grid of cards (`.readableWidth(AppLayout.wideWidth)`): three cards side by side, never more |
 | `AppLayout.cardMinWidth` | 320 pt | The narrowest a card gets in a grid of cards: one in a row on a phone, two or three on an iPad |
 | `AppLayout.cardColumns(minimum:spacing:)` | `[GridItem]` | The adaptive columns of a `LazyVGrid` of cards, `AppSpacing.lg` apart |
+| `AppLayout.sideColumnWidth` *(8.15.0)* | 340 pt | The side column beside a screen's main column (`AdaptiveColumns`); it grows with the text size |
+| `AppLayout.mainColumnMinWidth` *(8.15.0)* | 400 pt | The narrowest the main column gets with a side column beside it; with the 24 pt gap the two need 764 pt, more at a larger text size |
 
 The view pattern is in §4, "Large screens: iPad and Mac".
 
@@ -492,6 +494,7 @@ ScrollView {
 | `.cards` (default) | a glass card per item, its content padded `lg` on every side, `md` between cards | accounts, deposits, debts, categories |
 | `.section` | every item a row in one glass card, a `RowDivider` under each row's text | subcategories, a short list of options |
 | `.stack` | items that are cards already (`PayoffProgressCard`, `TargetProgressCard`, `RecurringPaymentCard`), spaced `md`; the circle and the handle of the modes beside the card | loans, goals, subscriptions |
+| `.grid` *(8.15.0)* | a glass card per item as `.cards`, side by side in `AppLayout.cardColumns()` (`md` apart) where the width holds two or more: an iPad or a Mac window under `.readableWidth(AppLayout.wideWidth)`; one in a row on a phone | games, trips, accounts on a large screen |
 
 | Mode | What the item shows | A tap |
 |---|---|---|
@@ -794,7 +797,7 @@ FinanceCard(
 
 In dark mode `\.heroTone` inside it is `.onColor`, and DesignKit's hero pieces draw in white: `HeroSection` (white title, amount and metric; the subtitle semibold, so it is large text on the colour), `TrendBadge` (white, the pill a translucent white capsule), `HeroHalfGauge`, `HeroBarPair`, `HeroSparkline`, `HeroMilestoneGauge`, `HeroProportionBar` (charts.md). In light mode the tone stays `.onSurface` and they draw as on the page, marks in their colours, except that `HeroSection`'s amount and subtitle are black (grey on the page) and the subtitle semibold (`\.heroOnPale`, internal). A screen puts it on the hero at the top of its scroll view, edge to edge (no `.screenPadding()` on it; pad what is inside), and `.heroScrollEdge()` on the scroll view: iOS 26 fades the content under the navigation bar into the page (the soft scroll edge effect), which cut the colour off under the bar; `.heroScrollEdge()` keeps it off while the hero's colour is under the bar (the hero reports its height) and brings it back once the cards after it scroll under the bar. It also hands the scroll view's top inset (the bars) to the gradient through the environment, so the mesh starts at the screen's top edge; without it the mesh starts at the hero's top. Tenra's insight details and Financial Health use it, the colour by the insight's tone.
 
-`.heroBackground(clearHeight:picture:)` *(8.14.0)* lays a picture there instead, as a film's page in Apple's TV app does: any view that fills its frame (`RemotePhoto`, an `Image` that is `.resizable().scaledToFill()`), cropped to the hero and reaching up to the screen's top edge with `.heroScrollEdge()`. It is sharp down to `clearHeight` below the bars (240 pt by default, `HeroPictureMetrics.clearHeight`): the hero's room for the picture, with nothing over it but a title logo at its foot. From 48 pt above the end of that room a blurred copy (40 pt) and 55% black take over, complete 120 pt below it, so the hero's text and buttons lie on the picture's own colours, darkened. The hero's content is drawn in the dark scheme in both modes (white text, DesignKit's buttons and chips in their dark look, `\.heroTone` `.onColor`), centred over the picture, and the hero ends on the page with an edge. `.heroScrollEdge()` makes the bar's items and the status bar light while the picture is under them; `.heroScrollEdge(isHeroUnderBar:)` also tells the screen, so a hero that shows the name (or the logo) keeps the bar's title empty until it scrolls away. Lay no scrim of your own over it. Platina's game screen lies on the game's art with its title logo.
+`.heroBackground(clearHeight:picture:)` *(8.14.0)* lays a picture there instead, as a film's page in Apple's TV app does: any view that fills its frame (`RemotePhoto`, an `Image` that is `.resizable().scaledToFill()`), cropped to the hero and reaching up to the screen's top edge with `.heroScrollEdge()`. It is sharp down to `clearHeight` below the bars (240 pt by default, `HeroPictureMetrics.clearHeight`): the hero's room for the picture, with nothing over it but a title logo at its foot. From 48 pt above the end of that room a blurred copy (40 pt) and 55% black take over, complete 120 pt below it, so the hero's text and buttons lie on the picture's own colours, darkened. The hero's content is drawn in the dark scheme in both modes (white text, DesignKit's buttons and chips in their dark look, `\.heroTone` `.onColor`), centred over the picture, and the hero ends on the page with an edge. `.heroScrollEdge()` makes the bar's items and the status bar light while the picture is under them; `.heroScrollEdge(isHeroUnderBar:)` also tells the screen, so a hero that shows the name (or the logo) keeps the bar's title empty until it scrolls away. Lay no scrim of your own over it. *(8.15.0)* With `.heroScrollEdge()`, pulled down, the picture keeps to the screen's top and grows with the pull; scrolled up, it moves at half the content's pace (`HeroPictureMetrics.parallax`), still under Reduce Motion and `.designKitMotion(false)`. While a `RemotePhoto` in it loads, a still dark fill stands in (black under the picture, `RemotePhotoLoading.still`), or its `placeholderKey`'s small version blurred: no shimmer behind the hero's text. Platina's game screen lies on the game's art with its title logo, the game's icon as the placeholder.
 - **`PackedCircleIcons`**: circles sized by amount, packed without overlap. Since 2.9.0 they are
   glossy marbles (`style: .glossy`, the default): a white symbol on a marble of its item's `tint`
   (the accent without one); a brand logo fills its circle as the marble's skin. Over both, a
@@ -1377,7 +1380,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `ShareCardFrame` (and `ShareCardSheet` while it loads), `LiveSessionBar`, `DownloadRow`, `ArticleBody` (2.8.0) | `…Skeleton` (`PhotoTileSkeleton(size:cornerRadius:)`, `PhotoStripSkeleton(count:size:)`, `PhotoGridSkeleton(count:columns:style:)`, `ShareCardSkeleton(format:)`, `ArticleBodySkeleton(paragraphs:)`) |
 | `TransactionRow`, `OptionCardPicker`, `StreamingText`, `SnapCardPicker` (2.9.0) | `…Skeleton` (`TransactionRowSkeleton(showsDetails:)`, `StreamingTextSkeleton(font:)`, `SnapCardPickerSkeleton { the card's skeleton }`, `OptionCardPickerSkeleton()`, 6.0.0) |
 
-**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`, `CurrencyRow`, 3.6.0); `MetaLine` (3.6.0, a line inside a row that has the skeleton); `LoadMoreFooter` (4.1.0, the loading state itself); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); `AmountEntrySheet` and `VoiceOrbButton` (4.14.0: an input and a control); `ActionRowLabel` (3.1.0, a label); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `CreatureTabLabel`, `CreatureGlyph`, `MessageComposerAccessory`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
+**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`, `CurrencyRow`, 3.6.0); `MetaLine` (3.6.0, a line inside a row that has the skeleton); `LoadMoreFooter` (4.1.0, the loading state itself); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); `AmountEntrySheet` and `VoiceOrbButton` (4.14.0: an input and a control); `ActionRowLabel` (3.1.0, a label); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `CreatureTabLabel`, `CreatureGlyph`, `MessageComposerAccessory`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, `AdaptiveColumns` (8.15.0), the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
 
 #### `SkeletonText` *(1.7.0)*
 A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `Skeleton`. For a component, use its skeleton (above); `.skeleton(isLoading:)` redacts a real view in place, with the system's placeholder shapes.
@@ -1883,6 +1886,18 @@ scroll. `FlowLayout(spacing:lineSpacing:) { ForEach(tags, id: \.self) { Badge($0
 Inside the module a subview can join the one before it with no spacing (`FlowJoinsPrevious`,
 5.1.1): `StreamingText`'s words of a line written without spaces.
 
+#### `AdaptiveColumns` *(8.15.0)*
+A screen's main column with a side column beside it where the width allows, the narrow layout
+where not: on an iPad a game's trophies with its guide and sessions beside them, on a phone chips
+over one part at a time. `AdaptiveColumns { main } side: { cards } narrow: { phone layout }`;
+without `narrow:` the side stacks under the main column (`AdaptiveColumnsStack`). The columns
+show when `AppLayout.mainColumnMinWidth` (400 pt), the gap (`AppSpacing.xxl`) and
+`AppLayout.sideColumnWidth` (340 pt) fit, both widths scaled with the text size: what decides is
+the width the view gets (`ViewThatFits`), so a panel beside the screen or a narrower Mac window
+switches it too. The main column takes the rest of the width; the side's content is a column of
+cards `AppSpacing.lg` apart. The two layouts are different views, so state belongs in the screen.
+A layout: no skeleton (its content has them).
+
 #### `HeroSymbol` *(0.7.0)*
 Large SF Symbol on a disc of its tint at 12%: the picture of `OnboardingPage` and
 `PromptSheet`. `HeroSymbol(systemImage: "map", size: 96, tint: AppColors.success)`.
@@ -2030,7 +2045,10 @@ comes into focus in its place (`.skeletonReveal`). A photo the app already holds
 (`DesignKitPhotoLoader.cached`) shows at once. `placeholderKey:` shows a smaller version the app
 holds, with the shimmer over it, while this one loads (the thumbnail under the full photo in a
 viewer). No URL or a failed load: `PhotoPlaceholderSymbol`. It fills the frame and does not
-clip: the container (a `PhotoTile`, a grid cell) gives the shape.
+clip: the container (a `PhotoTile`, a grid cell) gives the shape. `.remotePhotoLoading(.still)`
+*(8.15.0)* is for a picture behind text and buttons: a still grey while it loads (or the
+`placeholderKey`'s small version, blurred), no shimmer and no photo symbol;
+`.heroBackground(picture:)` sets it.
 
 ```swift
 PhotoTile { RemotePhoto(key: photo.thumbnailPath, url: urls[photo.thumbnailPath]) }
@@ -2627,7 +2645,7 @@ Tenra builds every entity detail screen this way (its `EntityDetailScaffold`).
 .cards)`, a `CashFlowCard`, a grid of `ProgressRingTile`s, `FinanceCard` summaries with
 `PackedCircleIcons`. Tenra's Home and Finances tabs.
 
-### Large screens: iPad and Mac *(8.13.0)*
+### Large screens: iPad and Mac *(8.13.0, 8.15.0)*
 
 On an iPad, or in a Mac window ("Designed for iPad"), a screen gets several times a phone's
 width. The same screen works there without a check for the device: what changes follows the
@@ -2650,8 +2668,23 @@ ScrollView                                       cards that stand on their own
   so the scroll bar and the scroll edge effect stay at its edges. The column grows with the
   person's text size.
 - **A grid of cards.** Cards a person opens one by one (games, accounts, trips) go side by side
-  in `AppLayout.cardColumns()`: one in a row on a phone, two or three on an iPad. A form, a
+  in `AppLayout.cardColumns()`: one in a row on a phone, two or three on an iPad. The things a
+  person keeps stay a `CardList`, with `layout: .grid` *(8.15.0)*: the same taps, menus,
+  selection and dragging, in columns. A form, a
   settings list and rows in one card (`CardList(layout: .section)`) stay one column.
+- **A main column and a side column** *(8.15.0)*. A detail screen with one thing it is for and
+  summaries around it (a game's trophies with its guide, walkthrough and sessions) puts them side
+  by side in `AdaptiveColumns` under `.readableWidth(AppLayout.wideWidth)`, and keeps the phone's
+  layout for `narrow:` (often a `ChipPicker` over the parts). The width decides, so when a panel
+  opens beside the screen (`.inspector`), or a list beside it in a `NavigationSplitView`, the
+  screen goes back to its narrow layout.
+
+  ```
+  ScrollView
+  └── AdaptiveColumns { main } side: { cards } narrow: { chips + one part }
+      .screenPadding()
+      .readableWidth(AppLayout.wideWidth)      main | 340 pt side, or the phone's layout
+  ```
 - **List and detail.** A list and what it opens side by side is the system's
   `NavigationSplitView` (on a phone it collapses into a stack); each column's screen keeps its own
   `.readableWidth()`. A tab bar becomes a sidebar with `TabView { … }.tabViewStyle(.sidebarAdaptable)`.

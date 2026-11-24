@@ -36,7 +36,7 @@ push to `main` that touches `Sources/`, `Gallery/`, `Package.swift` or `VERSION`
 ```
 Sources/
 ├── DesignTokens/      leaf — colors, spacing, radius, icon sizes, layout (a large screen's
-│                      column, 8.13.0), typography (Inter), animation,
+│                      column, 8.13.0; its side column, 8.15.0), typography (Inter), animation,
 │                      modifiers, surfaces (SurfaceStyle: glass or a grey fill, 8.12.0), button
 │                      styles, AmbientMotionGate, DesignKitTheme, fonts
 ├── DesignSupport/     → DesignTokens — icons (IconSource/IconStyle/Icon),
@@ -356,6 +356,15 @@ rather than importing an app type.
   white text and buttons (the dark scheme in both modes), the bar light over it;
   `.heroScrollEdge(isHeroUnderBar:)` lets a screen keep the bar's title empty while the hero
   shows it.
+- A main column and a side column (8.15.0, the owner's review of Platina's large-screen mockup:
+  an iPad, a Mac window, an unfolded iPhone Duo): `AdaptiveColumns { main } side: { cards }
+  narrow: { the phone's layout }` puts summaries beside a detail screen's main column where
+  `AppLayout.mainColumnMinWidth` + gap + `AppLayout.sideColumnWidth` fit (764 pt, scaled with the
+  text size), and the phone's layout where not; the width the view gets decides, so a panel
+  beside the screen switches it too. `CardList(layout: .grid)` puts the things a person keeps side
+  by side there. And after the owner's look at 8.14.0's hero on a device: the picture stretches
+  when pulled down and lags behind the content when scrolled, and waits for its `RemotePhoto`
+  with a still dark fill (`RemotePhotoLoading.still`) instead of a shimmer.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.
