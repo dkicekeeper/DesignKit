@@ -888,7 +888,7 @@ private struct ShareCardFramePage: View {
             name: "ShareCardFrame",
             summary: "A picture to share in Stories or a chat: a photo under a dark gradient (or a gradient alone), the content from the top, the brand and the site at the bottom.",
             since: "2.8.0",
-            apps: [.dalada],
+            apps: [.tenra, .dalada],
             notes: [
                 "An image, not a screen: fixed point sizes (360 wide, rendered at 3× to 1080 px), the same colours in light and dark.",
                 "ShareCardSheet renders it, lets the person pick Stories or post, and shares it.",

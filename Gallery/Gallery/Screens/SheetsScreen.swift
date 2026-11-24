@@ -276,7 +276,7 @@ private struct ShareCardSheetPage: View {
             name: "ShareCardSheet",
             summary: "Turns something into a picture to share: pick Stories or post, see the picture, send it with the system share sheet.",
             since: "2.8.0",
-            apps: [.dalada],
+            apps: [.tenra, .dalada],
             notes: [
                 "The data loads when the sheet opens (the card's skeleton meanwhile); the picture is drawn on the phone with ImageRenderer, 1080 px wide.",
                 "load returning nil shows the error state.",

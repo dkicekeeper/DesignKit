@@ -1109,7 +1109,7 @@ init(title: String, value: String, systemImage: String? = nil, valueColor: Color
 
 Counters side by side in a card; two columns at accessibility text sizes.
 
-Since 1.12.0 · Apps: Dalada
+Since 1.12.0 · Apps: Dalada, Tenra
 
 - `StatsStrip` in `Sources/DesignComponents/Cards/StatsStrip.swift`; skeleton `StatsStripSkeleton`
   A card of counters.
@@ -2271,7 +2271,7 @@ init(_ items: [Item], selection: Item.ID, closeTitle: String = String(localized:
 
 A picture to share in Stories or a chat: a photo under a dark gradient (or a gradient alone), the content from the top, the brand and the site at the bottom.
 
-Since 2.8.0 · Apps: Dalada
+Since 2.8.0 · Apps: Dalada, Tenra
 
 - `ShareCardFrame` in `Sources/DesignComponents/Media/ShareCard.swift`
   A share card's frame: the photo or gradient, the content from the top, and the brand line.
@@ -2631,7 +2631,7 @@ init(symbol: String, config: LoopOnBoardingConfig = LoopOnBoardingConfig())
 
 Turns something into a picture to share: pick Stories or post, see the picture, send it with the system share sheet.
 
-Since 2.8.0 · Apps: Dalada
+Since 2.8.0 · Apps: Dalada, Tenra
 
 - `ShareCardSheet` in `Sources/DesignComponents/Sheets/ShareCardSheet.swift`
   Picks a format, previews the picture and shares it.

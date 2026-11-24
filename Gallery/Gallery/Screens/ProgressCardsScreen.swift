@@ -478,7 +478,7 @@ private struct StatsStripPage: View {
             name: "StatsStrip",
             summary: "Counters side by side in a card; two columns at accessibility text sizes.",
             since: "1.12.0",
-            apps: [.dalada],
+            apps: [.tenra, .dalada],
             canvas: .fill
         ) {
             if state == .loading {

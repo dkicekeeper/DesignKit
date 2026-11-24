@@ -1925,7 +1925,8 @@
     "summary": "Counters side by side in a card; two columns at accessibility text sizes.",
     "since": "1.12.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Tenra"
     ],
     "styles": [],
     "notes": [],
@@ -3955,7 +3956,8 @@
     "summary": "A picture to share in Stories or a chat: a photo under a dark gradient (or a gradient alone), the content from the top, the brand and the site at the bottom.",
     "since": "2.8.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Tenra"
     ],
     "styles": [],
     "notes": [
@@ -4555,7 +4557,8 @@
     "summary": "Turns something into a picture to share: pick Stories or post, see the picture, send it with the system share sheet.",
     "since": "2.8.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Tenra"
     ],
     "styles": [],
     "notes": [

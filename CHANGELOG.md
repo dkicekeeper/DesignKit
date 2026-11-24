@@ -43,6 +43,7 @@ ShareCardFrame(
 
 - Gallery: Media › `ShareCardFrame` has "App icon" and "Name" (Rounded, Inter) controls, with a stand-in icon.
 - A snapshot of a post with the icon and the name in Inter (`shareCardFrameBrandIcon`, `brandIcon`).
+- Gallery badges follow the apps: Tenra's year in review (1.9) uses `ShareCardFrame`, `ShareCardSheet` and `StatsStrip`.
 
 ## 8.15.0 - 2026-11-24
 
