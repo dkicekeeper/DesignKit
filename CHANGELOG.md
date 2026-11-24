@@ -37,6 +37,54 @@ Nothing to change. The agents block (docs/agents.md, which an app's CLAUDE.md ta
 - docs/components.md and .json carry Platina among the apps. docs/adoption.md is checked against the three apps' code (Tenra hints with `.spotlight` and no longer uses `TypingIndicator`; Dalada dropped `.dissolve` and `PlusTabLabel`; where 8.9.0's components went; a section for Platina). CLAUDE.md's consumers follow, and its Known Gaps lists what is next: benchmark round 4's P3 candidates, the assistant's list of actions, Platina in CI's build jobs and its own update workflow.
 - docs/design-system.md, docs/gallery-structure.md, docs/benchmark.md and docs/testflight.md: the swipe advice, `FormSection(style: .glass)` and the two-app wording that were left from earlier versions; TestFlight's What to Test is the version's notes on a release build.
 
+## 8.15.0 - 2026-11-24
+
+A main column with a side column beside it on a large screen, and a `CardList` in a grid: on an iPad a game's trophies with its guide, walkthrough and sessions beside them, the games a person goes for side by side; on a phone the screen as it is. For Platina's game screen on the iPad, the Mac and an unfolded iPhone Duo (the owner's review of its mockup). And the picture hero after the owner's look at it on a device: it stretches when pulled down, lags behind the content when scrolled, and waits for its picture without a shimmer.
+[#109](https://github.com/dkicekeeper/DesignKit/pull/109)
+
+### Added
+
+- `AdaptiveColumns(sideWidth:mainMinWidth:spacing:main:side:narrow:)`: the main column and a side column of cards side by side where both fit, the screen's own narrow layout (`narrow:`, often a `ChipPicker` over one part at a time) where not. What decides is the width the view gets, never the device, so a panel opening beside the screen or a narrower Mac window switches it too. Without `narrow:`, the side stacks under the main column (`AdaptiveColumnsStack`). A layout: no skeleton.
+- `CardListLayout.grid`: a `CardList`'s cards side by side in `AppLayout.cardColumns()` where the width holds two or more (an iPad or a Mac window under `.readableWidth(AppLayout.wideWidth)`), one in a row on a phone, with the same taps, menus, selection and dragging as `.cards`; `CardListSkeleton(layout: .grid)` too.
+- `RemotePhotoLoading` and `.remotePhotoLoading(_:)`: how the `RemotePhoto`s inside look while they load. `.skeleton` is the shimmer as before; `.still` is a still grey, or the `placeholderKey`'s small version blurred, with no shimmer and no photo symbol, for a picture behind text and buttons.
+- `AppLayout.sideColumnWidth` (340 pt) and `AppLayout.mainColumnMinWidth` (400 pt): the side column's width and the narrowest the main column gets beside it. With the 24 pt gap the two need 764 pt; both grow with the person's text size, so a larger text size keeps the narrow layout longer.
+
+### Changed
+
+- `.heroBackground(clearHeight:picture:)` with `.heroScrollEdge()`: pulled down, the picture keeps to the screen's top and grows with the pull; scrolled up, it moves at half the content's pace, behind it (still under Reduce Motion and `.designKitMotion(false)`). While a `RemotePhoto` in it loads, a still dark fill (or its `placeholderKey`'s small version, blurred) stands in, with black under the picture, instead of two shimmering skeletons, one of them blurred. The picture at rest looks as before.
+
+### Migration
+
+Nothing changes until an app uses it. A detail screen with summaries:
+
+```swift
+ScrollView {
+    AdaptiveColumns {
+        trophies
+    } side: {
+        guideSummary
+        walkthroughCard
+        sessionsCard
+    } narrow: {
+        ChipPicker(options: sections, selection: $section) { $0.title }
+        selectedSection
+    }
+    .screenPadding()
+    .readableWidth(AppLayout.wideWidth)
+}
+```
+
+Keep the picked chip and any filter in the screen: the two layouts are different views, so state inside them starts over when the width switches them.
+
+The games or trips a person keeps, side by side on a large screen: `CardList(items, layout: .grid)` under `.readableWidth(AppLayout.wideWidth)`. An app that switches over `CardListLayout` adds a `.grid` case.
+
+### Gallery and tooling
+
+- Content & Layout: an `AdaptiveColumns` page, a trip's route with its weather and group, on a phone, an iPad mini, an iPad and a Mac window drawn small, with chips or the side under the main column as the narrow layout.
+- Snapshot test `Foundations.adaptiveColumns`: the columns side by side and folded, drawn small, and folded at a large text size.
+- CardList: a Grid layout on its page; snapshot test `CardList.grid`, four cards two in a row at an iPad's width, drawn at half size.
+- RemotePhoto: a "While loading" choice (Skeleton, Still) on its page; `.heroBackground(picture:)`'s page notes the stretch and the parallax ("Open as a screen" shows them).
+
 ## 8.14.0 - 2026-11-24
 
 A hero on a picture, as a film's page in Apple's TV app: a game's art or a trip's photo edge to edge from the screen's top, sharp where nothing is over it, flowing into its own colours, blurred and darkened, under the hero's text and buttons in white. For Platina's game screen: the game's art with its title logo, the progress and the session button over it.

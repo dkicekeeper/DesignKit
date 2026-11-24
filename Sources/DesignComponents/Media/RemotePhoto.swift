@@ -33,6 +33,7 @@ public struct RemotePhoto: View {
 
     @State private var image: UIImage?
     @State private var failed = false
+    @Environment(\.remotePhotoLoading) private var loading
 
     /// - Parameters:
     ///   - key: What the app knows the photo by (a storage path): the cache's key, which a new
@@ -60,11 +61,17 @@ public struct RemotePhoto: View {
                     .aspectRatio(contentMode: contentMode)
                     .transition(.skeletonReveal)
             } else if let placeholderKey, let placeholder = DesignKitPhotoLoader.cached?(placeholderKey) {
-                // The small version, sharpened by the large one; the shimmer says it is coming.
+                // The small version, sharpened by the large one; the shimmer says it is coming
+                // (still: blurred, so its few pixels read as colours).
                 Image(uiImage: placeholder)
                     .resizable()
                     .aspectRatio(contentMode: contentMode)
-                    .shimmer()
+                    .modifier(RemotePhotoPlaceholderLook(loading: loading))
+                    .transition(.opacity)
+            } else if loading == .still {
+                // Behind text: a still fill while it loads, and where there is none.
+                Rectangle()
+                    .fill(Skeleton.fill)
                     .transition(.opacity)
             } else if failed || url == nil {
                 PhotoPlaceholderSymbol()
@@ -87,6 +94,46 @@ public struct RemotePhoto: View {
 enum RemotePhotoMetrics {
     /// The photo coming into focus: as long as `SkeletonReveal`.
     static let reveal: Double = 0.45
+    /// The small version under a `.still` photo: blurred so its few pixels read as colours.
+    static let stillBlur: CGFloat = 24
+}
+
+/// How a `RemotePhoto` looks while it loads (8.15.0).
+public enum RemotePhotoLoading: Hashable, Sendable {
+    /// The skeleton's grey with the shimmer, or the small version with the shimmer over it: a
+    /// photo in a tile, a grid, a card. The default.
+    case skeleton
+    /// A still grey, or the small version blurred, with no shimmer and no photo symbol: a
+    /// picture behind text and buttons, where a moving shimmer is noise.
+    /// `.heroBackground(picture:)` sets it.
+    case still
+}
+
+public extension EnvironmentValues {
+    /// How the `RemotePhoto`s inside look while they load (8.15.0).
+    @Entry var remotePhotoLoading: RemotePhotoLoading = .skeleton
+}
+
+public extension View {
+    /// How the `RemotePhoto`s inside look while they load (8.15.0): `.still` for a picture behind
+    /// text and buttons (`.heroBackground(picture:)` sets it on its picture).
+    func remotePhotoLoading(_ loading: RemotePhotoLoading) -> some View {
+        environment(\.remotePhotoLoading, loading)
+    }
+}
+
+/// The small version while the photo loads: under the shimmer, or blurred and still.
+private struct RemotePhotoPlaceholderLook: ViewModifier {
+    let loading: RemotePhotoLoading
+
+    func body(content: Content) -> some View {
+        switch loading {
+        case .skeleton:
+            content.shimmer()
+        case .still:
+            content.blur(radius: RemotePhotoMetrics.stillBlur, opaque: true)
+        }
+    }
 }
 
 // MARK: - Skeleton

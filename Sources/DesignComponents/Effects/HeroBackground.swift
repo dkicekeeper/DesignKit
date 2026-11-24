@@ -51,6 +51,9 @@ extension EnvironmentValues {
     /// navigation bar and the status bar), from `.heroScrollEdge()`: the hero's gradient starts
     /// there (4.5.1).
     @Entry var heroBarInset: CGFloat = 0
+    /// How far the content has scrolled from its resting place, from `.heroScrollEdge()`
+    /// (8.15.0): negative while it is pulled down. A picture hero stretches and moves by it.
+    @Entry var heroScrolled: CGFloat = 0
     /// Inside `.heroBackground(_:)` in light mode (4.5.1): on its pale tint, where a hero's text
     /// that is grey on the page is black.
     @Entry var heroOnPale: Bool = false
@@ -160,6 +163,9 @@ public enum HeroPictureMetrics {
     static let blendAbove: CGFloat = 48
     /// …and is blurred and shaded through this far below it.
     static let blendBelow: CGFloat = 120
+    /// Scrolled up, the picture moves at this share of the content's pace (8.15.0): behind the
+    /// content, as a film's page in the TV app. Still under Reduce Motion.
+    static let parallax: CGFloat = 0.5
 
     /// Where, as shares of the picture's height from the screen's top edge, it starts and
     /// finishes giving way; `clearEnd` is the end of the clear part from the same edge.
@@ -294,19 +300,37 @@ private struct HeroPictureBackgroundModifier<Picture: View>: ViewModifier {
 
 /// The picture from the screen's top edge to the hero's foot: sharp down to the end of the clear
 /// part, then a blurred copy and black over it take over, through `HeroPictureMetrics.blendBelow`.
+/// Pulled down, the picture keeps to the screen's top and grows with the pull; scrolled up, it
+/// moves at half the content's pace (8.15.0). While it loads, a still dark fill, or its small
+/// version blurred, stands in: no shimmer behind the hero's text (`RemotePhotoLoading.still`).
 struct HeroPictureFill<Picture: View>: View {
     let picture: Picture
     let clearHeight: CGFloat
     /// From the hero's top up to the screen's top edge (`.heroScrollEdge()`).
     @Environment(\.heroBarInset) private var barInset
+    /// How far the content has scrolled (`.heroScrollEdge()`), negative while pulled down.
+    @Environment(\.heroScrolled) private var scrolled
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.designKitMotion) private var motionEnabled
+
+    /// Pulled down: how far the picture reaches above the hero's top, to the screen's top edge.
+    private var stretch: CGFloat { max(0, -scrolled) }
+
+    /// Scrolled up: how far the picture lags behind the content.
+    private var parallax: CGFloat {
+        reduceMotion || !motionEnabled ? 0 : max(0, scrolled) * HeroPictureMetrics.parallax
+    }
 
     var body: some View {
         GeometryReader { proxy in
-            let blend = HeroPictureMetrics.blend(height: proxy.size.height, clearEnd: barInset + clearHeight)
-            Color.clear
-                .overlay { picture }
+            let blend = HeroPictureMetrics.blend(height: proxy.size.height, clearEnd: barInset + stretch + clearHeight)
+            // Black under the picture: while it loads its still grey reads dark, as the picture
+            // under the hero's white text will be.
+            Color.black
+                .overlay { picture.offset(y: parallax) }
                 .overlay {
                     picture
+                        .offset(y: parallax)
                         .blur(radius: HeroPictureMetrics.blur, opaque: true)
                         .mask {
                             LinearGradient(
@@ -326,9 +350,13 @@ struct HeroPictureFill<Picture: View>: View {
                 }
                 .clipped()
         }
-        // The picture from the screen's top edge, behind the status and navigation bars.
-        .padding(.top, -barInset)
+        // The picture from the screen's top edge, behind the status and navigation bars, and
+        // pulled down, still from that edge.
+        .padding(.top, -barInset - stretch)
         .ignoresSafeArea(edges: .top)
+        // Dark while it loads, as the picture under white text will be; no shimmer.
+        .environment(\.colorScheme, .dark)
+        .remotePhotoLoading(.still)
         .allowsHitTesting(false)
         .accessibilityHidden(true)
     }
@@ -402,5 +430,7 @@ private struct HeroScrollEdgeModifier: ViewModifier {
             .scrollEdgeEffectStyle(.soft, for: .top)
             // The hero's gradient starts at the screen's top edge.
             .environment(\.heroBarInset, barInset)
+            // A picture hero stretches when pulled down and lags behind when scrolled (8.15.0).
+            .environment(\.heroScrolled, scrolled)
     }
 }
