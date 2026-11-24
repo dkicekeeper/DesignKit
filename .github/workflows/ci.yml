@@ -51,7 +51,7 @@ jobs:
         run: python3 .github/scripts/components_reference.py check
 
   # The Gallery's app badges (`apps:` on each ComponentPage) name the apps whose code uses the
-  # component, read from Tenra's, Dalada's and (8.14.1) Platina's sources (5.2.0), so they follow
+  # component, read from Tenra's, Dalada's and (8.16.1) Platina's sources (5.2.0), so they follow
   # the apps.
   gallery-badges:
     name: Gallery badges

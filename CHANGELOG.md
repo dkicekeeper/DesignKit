@@ -16,7 +16,7 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
-## 8.14.1 - 2026-11-24
+## 8.16.1 - 2026-11-24
 
 The Gallery and the docs brought up to date with the three apps: Platina's badges on the pages it uses, usage notes that still gave advice from before 8.0.0, and the plans in one place. No API changes.
 
