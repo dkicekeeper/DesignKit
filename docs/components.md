@@ -2408,6 +2408,30 @@ func readableWidth(_ width: CGFloat = AppLayout.readableWidth) -> some View
 - Don't: Check for an iPhone or a screen size: the column and the grid follow the width they get.
 - Don't: Put a form's rows in a card grid: a form is one column.
 
+### AdaptiveColumns
+
+A screen's main column with a side column beside it when the width allows: on an iPad a trip's route with its weather and group beside it. Narrower, as on a phone, the screen's own narrow layout: chips that switch between the parts, or the side under the main column.
+
+Since 8.15.0 · Apps: none yet
+
+- `AdaptiveColumns` in `Sources/DesignComponents/Content/AdaptiveColumns.swift`
+  A main column and a side column side by side when they fit, the narrow layout when not (8.15.0).
+
+```swift
+init(sideWidth: CGFloat = AppLayout.sideColumnWidth, mainMinWidth: CGFloat = AppLayout.mainColumnMinWidth, spacing: CGFloat = AppSpacing.xxl, @ViewBuilder main: () -> Main, @ViewBuilder side: () -> Side, @ViewBuilder narrow: () -> Narrow)
+init(sideWidth: CGFloat = AppLayout.sideColumnWidth, mainMinWidth: CGFloat = AppLayout.mainColumnMinWidth, spacing: CGFloat = AppSpacing.xxl, @ViewBuilder main: () -> Main, @ViewBuilder side: () -> Side)
+```
+
+- What decides is the width the view gets: the main column's minimum (AppLayout.mainColumnMinWidth, 400 pt), the gap (24 pt) and the side (AppLayout.sideColumnWidth, 340 pt), 764 pt in all, more at a larger text size.
+- Put it on a scroll view's content after .screenPadding(), under .readableWidth(AppLayout.wideWidth): an iPad gets the columns, a phone and an iPad mini in portrait the narrow layout, and a Mac window switches as it is resized.
+- narrow: is the phone's screen as it is, often a ChipPicker over one part at a time; without it the side stacks under the main column.
+- The two layouts are different views: keep state (the picked chip, a filter) in the screen, not inside the columns.
+
+- Do: Put what the screen is for in the main column, and summaries, what comes next and the latest items in the side.
+- Do: Show in the side the cards the phone shows, so the person finds the same things.
+- Don't: Put a form in two columns: a form is one column.
+- Don't: Check for an iPad to choose the layout: a panel or a split window narrows the screen too.
+
 ### FormSection
 
 A titled group of rows on a Liquid Glass card (8.0.0: one look for forms, settings and short lists). It pads its rows at the sides and draws the divider between them, under each row's text.

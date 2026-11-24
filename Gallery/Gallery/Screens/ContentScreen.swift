@@ -3,8 +3,8 @@
 //  DesignKit Gallery
 //
 //  Content and layout: folded text, timeline, month calendar, flow layout, form sections, the
-//  edit sheet and its hero, message bubbles, times that stay current, the readable column and
-//  card grid of a large screen.
+//  edit sheet and its hero, message bubbles, times that stay current, the readable column, card
+//  grid and side column of a large screen.
 //
 
 import SwiftUI
@@ -26,6 +26,7 @@ struct ContentScreen: View {
         MonthCalendarPage()
         FlowLayoutPage()
         ReadableWidthPage()
+        AdaptiveColumnsPage()
         FormSectionPage()
         CardListPage()
         EditSheetContainerPage()
@@ -368,6 +369,116 @@ private struct ReadableWidthPage: View {
                     .cardStyle()
             }
         }
+    }
+}
+
+private struct AdaptiveColumnsPage: View {
+    private enum TripPart: String, CaseIterable, Hashable {
+        case route, weather, group
+
+        var title: String {
+            switch self {
+            case .route: "Route"
+            case .weather: "Weather"
+            case .group: "Group"
+            }
+        }
+    }
+
+    @State private var screen: CGFloat = 1194
+    @State private var chips = true
+    @State private var part: TripPart? = .route
+
+    var body: some View {
+        ComponentPage(
+            name: "AdaptiveColumns",
+            summary: "A screen's main column with a side column beside it when the width allows: on an iPad a trip's route with its weather and group beside it. Narrower, as on a phone, the screen's own narrow layout: chips that switch between the parts, or the side under the main column.",
+            since: "8.15.0",
+            apps: [],
+            canvas: .fill,
+            notes: [
+                "What decides is the width the view gets: the main column's minimum (AppLayout.mainColumnMinWidth, 400 pt), the gap (24 pt) and the side (AppLayout.sideColumnWidth, 340 pt), 764 pt in all, more at a larger text size.",
+                "Put it on a scroll view's content after .screenPadding(), under .readableWidth(AppLayout.wideWidth): an iPad gets the columns, a phone and an iPad mini in portrait the narrow layout, and a Mac window switches as it is resized.",
+                "narrow: is the phone's screen as it is, often a ChipPicker over one part at a time; without it the side stacks under the main column.",
+                "The two layouts are different views: keep state (the picked chip, a filter) in the screen, not inside the columns.",
+            ],
+            dos: [
+                "Put what the screen is for in the main column, and summaries, what comes next and the latest items in the side.",
+                "Show in the side the cards the phone shows, so the person finds the same things.",
+            ],
+            donts: [
+                "Put a form in two columns: a form is one column.",
+                "Check for an iPad to choose the layout: a panel or a split window narrows the screen too.",
+            ]
+        ) {
+            LayoutScreenPreview(width: screen) {
+                specimen
+                    .screenPadding()
+                    .readableWidth(AppLayout.wideWidth)
+            }
+        } controls: {
+            ChoiceControl("Screen", selection: $screen, options: [("iPhone", 402), ("iPad mini", 744), ("iPad", 1194), ("Mac", 1512)])
+            ChoiceControl("Narrow layout", selection: $chips, options: [("Chips", true), ("Side under main", false)])
+        }
+    }
+
+    @ViewBuilder private var specimen: some View {
+        if chips {
+            AdaptiveColumns {
+                route
+            } side: {
+                weather
+                group
+            } narrow: {
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    ChipPicker(options: TripPart.allCases, selection: $part) { $0.title }
+                    switch part ?? .route {
+                    case .route: route
+                    case .weather: weather
+                    case .group: group
+                    }
+                }
+            }
+        } else {
+            AdaptiveColumns {
+                route
+            } side: {
+                weather
+                group
+            }
+        }
+    }
+
+    private var route: some View {
+        FormSection(header: "Route") {
+            UniversalRow("Almaty", icon: "mappin", accessory: .info("08:00"))
+            UniversalRow("Big Almaty Lake", icon: "drop", accessory: .info("09:30"))
+            UniversalRow("The observatory", icon: "sparkles", accessory: .info("12:00"))
+            UniversalRow("Back in the city", icon: "house", accessory: .info("17:00"))
+        }
+    }
+
+    private var weather: some View {
+        sideCard("Weather", symbol: "sun.max.fill", detail: "+18°, clear; wind 4 m/s at the lake")
+    }
+
+    private var group: some View {
+        sideCard("Group", symbol: "person.2.fill", detail: "4 people; Aigerim drives")
+    }
+
+    private func sideCard(_ title: String, symbol: String, detail: String) -> some View {
+        HStack(spacing: AppSpacing.md) {
+            Icon(source: .sfSymbol(symbol), size: AppIconSize.Tile.sm)
+            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                Text(title).font(AppTypography.h4)
+                    .foregroundStyle(AppColors.textPrimary)
+                Text(detail).font(AppTypography.bodySmall)
+                    .foregroundStyle(AppColors.Text.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardContentPadding()
+        .cardStyle()
     }
 }
 

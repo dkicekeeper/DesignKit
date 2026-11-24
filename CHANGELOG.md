@@ -16,6 +16,44 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.15.0 - 2026-11-24
+
+A main column with a side column beside it on a large screen: on an iPad a game's trophies with its guide, walkthrough and sessions beside them, on a phone the screen as it is. For Platina's game screen on the iPad, the Mac and an unfolded iPhone Duo (the owner's review of its mockup).
+[#109](https://github.com/dkicekeeper/DesignKit/pull/109)
+
+### Added
+
+- `AdaptiveColumns(sideWidth:mainMinWidth:spacing:main:side:narrow:)`: the main column and a side column of cards side by side where both fit, the screen's own narrow layout (`narrow:`, often a `ChipPicker` over one part at a time) where not. What decides is the width the view gets, never the device, so a panel opening beside the screen or a narrower Mac window switches it too. Without `narrow:`, the side stacks under the main column (`AdaptiveColumnsStack`). A layout: no skeleton.
+- `AppLayout.sideColumnWidth` (340 pt) and `AppLayout.mainColumnMinWidth` (400 pt): the side column's width and the narrowest the main column gets beside it. With the 24 pt gap the two need 764 pt; both grow with the person's text size, so a larger text size keeps the narrow layout longer.
+
+### Migration
+
+Nothing changes until an app uses it. A detail screen with summaries:
+
+```swift
+ScrollView {
+    AdaptiveColumns {
+        trophies
+    } side: {
+        guideSummary
+        walkthroughCard
+        sessionsCard
+    } narrow: {
+        ChipPicker(options: sections, selection: $section) { $0.title }
+        selectedSection
+    }
+    .screenPadding()
+    .readableWidth(AppLayout.wideWidth)
+}
+```
+
+Keep the picked chip and any filter in the screen: the two layouts are different views, so state inside them starts over when the width switches them.
+
+### Gallery and tooling
+
+- Content & Layout: an `AdaptiveColumns` page, a trip's route with its weather and group, on a phone, an iPad mini, an iPad and a Mac window drawn small, with chips or the side under the main column as the narrow layout.
+- Snapshot test `Foundations.adaptiveColumns`: the columns side by side and folded, drawn small, and folded at a large text size.
+
 ## 8.14.0 - 2026-11-24
 
 A hero on a picture, as a film's page in Apple's TV app: a game's art or a trip's photo edge to edge from the screen's top, sharp where nothing is over it, flowing into its own colours, blurred and darkened, under the hero's text and buttons in white. For Platina's game screen: the game's art with its title logo, the progress and the session button over it.
