@@ -381,28 +381,42 @@ struct HeroPictureFill<Picture: View, Subject: View>: View {
     var body: some View {
         GeometryReader { proxy in
             let blend = HeroPictureMetrics.blend(height: proxy.size.height, clearEnd: barInset + stretch + clearHeight)
-            let layers = HeroPictureLayers(
-                picture: picture,
+            let backdrop = picture
+                .frame(width: proxy.size.width, height: proxy.size.height)
+                .offset(y: parallax(HeroPictureMetrics.parallax))
+            let figure = HeroPictureSubject(
                 subject: subject,
                 size: proxy.size,
                 barInset: barInset,
                 stretch: stretch,
-                parallax: parallax(HeroPictureMetrics.parallax),
-                subjectParallax: parallax(HeroPictureMetrics.subjectParallax)
+                parallax: parallax(HeroPictureMetrics.subjectParallax)
+            )
+            // Where the picture gives way: clear above `blend.start`, whole below `blend.end`.
+            let blurred = LinearGradient(
+                stops: [.init(color: .clear, location: blend.start), .init(color: .black, location: blend.end)],
+                startPoint: .top, endPoint: .bottom
+            )
+            let sharp = LinearGradient(
+                stops: [.init(color: .black, location: blend.start), .init(color: .clear, location: blend.end)],
+                startPoint: .top, endPoint: .bottom
             )
             // Black under the picture: while it loads its still grey reads dark, as the picture
             // under the hero's white text will be.
             Color.black
-                .overlay { layers }
+                .overlay { backdrop }
                 .overlay {
-                    layers
+                    backdrop
                         .blur(radius: HeroPictureMetrics.blur, opaque: true)
-                        .mask {
-                            LinearGradient(
-                                stops: [.init(color: .clear, location: blend.start), .init(color: .black, location: blend.end)],
-                                startPoint: .top, endPoint: .bottom
-                            )
-                        }
+                        .mask { blurred }
+                }
+                // The figure in front (8.17.0), sharp and then blurred as the picture is; its own
+                // blur keeps the transparency around it (an opaque blur of the two together drew
+                // the figure's square).
+                .overlay { figure.mask { sharp } }
+                .overlay {
+                    figure
+                        .blur(radius: HeroPictureMetrics.blur, opaque: false)
+                        .mask { blurred }
                 }
                 .overlay {
                     LinearGradient(
@@ -427,37 +441,30 @@ struct HeroPictureFill<Picture: View, Subject: View>: View {
     }
 }
 
-/// The picture and the figure in front of it (8.17.0), in the fill's frame: from the screen's top
-/// edge to the hero's foot, `stretch` taller while pulled down.
-private struct HeroPictureLayers<Picture: View, Subject: View>: View {
-    let picture: Picture
+/// The figure in front of the picture (8.17.0), in the fill's frame (from the screen's top edge to
+/// the hero's foot, `stretch` taller while pulled down): a square as wide as the hero, or as tall
+/// as the hero below the bars, centred, its top at the bars' foot.
+private struct HeroPictureSubject<Subject: View>: View {
     let subject: Subject
     let size: CGSize
     let barInset: CGFloat
     let stretch: CGFloat
     let parallax: CGFloat
-    let subjectParallax: CGFloat
 
     var body: some View {
         // At rest the fill is the bars and the hero; pulled down, the figure grows with it.
         let rest = size.height - stretch
         let side = HeroPictureMetrics.subjectSide(width: size.width, room: rest - barInset)
         let grow = rest > 0 ? size.height / rest : 1
-        ZStack(alignment: .top) {
-            picture
-                .frame(width: size.width, height: size.height)
-                .offset(y: parallax)
-            subject
-                .frame(width: side, height: side)
-                .clipped()
-                // Its top at the bars' foot: the figure stands under them, not behind them.
-                .padding(.top, barInset)
-                .scaleEffect(grow, anchor: .top)
-                .offset(y: subjectParallax)
-                // Nothing while it loads or if it fails: the picture shows alone.
-                .remotePhotoLoading(.hidden)
-        }
-        .frame(width: size.width, height: size.height, alignment: .top)
+        subject
+            .frame(width: side, height: side)
+            // Its top at the bars' foot: the figure stands under them, not behind them.
+            .padding(.top, barInset)
+            .scaleEffect(grow, anchor: .top)
+            .offset(y: parallax)
+            .frame(width: size.width, height: size.height, alignment: .top)
+            // Nothing while it loads or if it fails: the picture shows alone.
+            .remotePhotoLoading(.hidden)
     }
 }
 
