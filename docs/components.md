@@ -2691,6 +2691,7 @@ Since 2.2.0 · Apps: Tenra
 
 ```swift
 func shine<Trigger: Equatable, S: Shape>(trigger: Trigger, in shape: S) -> some View
+func shine<Trigger: Equatable>(trigger: Trigger) -> some View
 ```
 
 - 0.8 s; clipped to the shape you pass (the card's AppRadius.xl by default). Off under Reduce Motion.
@@ -2844,6 +2845,30 @@ func borderGlow(isActive: Bool = true, colors: [Color] = [AppColors.accent, .pur
 - 2.4.0: the comet runs along the border itself, so it keeps one speed and length on every side and corner. A bright head with a bloom, a fading tail, a faint spill on the edge it passes.
 - beams: 2 runs a second comet opposite the first. Display rate while active; nothing under Reduce Motion.
 
+### .heroBackground(picture:)
+
+The top of a detail screen on a picture, as a film's page in Apple's TV app: a game's cover, a trip's photo, edge to edge from the screen's top. Sharp where nothing is over it, it flows into its own colours, blurred and darkened, under the hero's text and buttons, drawn in white in both modes; the hero ends on the page with an edge.
+
+Since 8.14.0 · Apps: none yet
+
+- `.heroBackground` in `Sources/DesignComponents/Effects/HeroBackground.swift`
+  Lays a picture behind the hero, as a film's page in Apple's TV app does (8.14.0): a game's cover, a trip's photo, edge to edge from the screen's top edge. It is sharp down to `clearHeight` below the bars, the room the hero leaves it (a logo may stand at its foot), then flows into its own colours, blurred and darkened, under the hero's text and buttons, which are drawn in white (the dark scheme) in light and dark mode alike; the hero ends on the page with an edge. Put it on the hero at the top of a scroll view, edge to edge (pad what is inside), and `.heroScrollEdge()` on the scroll view: the picture then reaches the screen's top, and the bar's buttons and the status bar are light while it is under them.
+
+```swift
+func heroBackground(_ color: Color) -> some View
+func heroBackground<Picture: View>(clearHeight: CGFloat = HeroPictureMetrics.clearHeight, @ViewBuilder picture: () -> Picture) -> some View
+```
+
+- clearHeight (240 pt) is the room the hero leaves the picture below the bars: sharp, nothing over it but a title logo at its foot. From 48 pt above its end the picture blurs (40 pt) and darkens (55% black), through 120 pt below it.
+- The hero's content is drawn in the dark scheme, so DesignKit's buttons, chips and text are their light-on-dark selves in light mode too, and hero pieces are white (\.heroTone .onColor).
+- Any view fills it: RemotePhoto (the app's loader and cache), an Image that is .resizable().scaledToFill(). It is cropped to the hero.
+- .heroScrollEdge(isHeroUnderBar:) on the scroll view: the picture reaches the screen's top, the bar's buttons and the status bar are light while it is under them, and the screen knows when to show the bar's title. “Open as a screen” shows it.
+
+- Do: Centre the hero's content over the picture: the logo or name, a line of facts, the buttons.
+- Do: Put the name in the hero (a logo picture where there is one) and keep the bar's title empty until the hero scrolls away.
+- Don't: Put text in the clear part of the picture, other than a title logo at its foot.
+- Don't: Lay a scrim or a gradient of your own over it.
+
 ### .completionMoment
 
 When something is done, a soft glow of its shape flares and fades behind it and the success haptic plays. Only the change plays it: a view that appears complete stays quiet.
@@ -2919,7 +2944,9 @@ Since 4.5.0 · Apps: Tenra
 
 ```swift
 func heroBackground(_ color: Color) -> some View
+func heroBackground<Picture: View>(clearHeight: CGFloat = HeroPictureMetrics.clearHeight, @ViewBuilder picture: () -> Picture) -> some View
 func heroScrollEdge() -> some View
+func heroScrollEdge(isHeroUnderBar: Binding<Bool>) -> some View
 ```
 
 - Dark mode: sets \.heroTone to .onColor, so HeroSection, TrendBadge, HeroHalfGauge, HeroBarPair, HeroSparkline, HeroMilestoneGauge and HeroProportionBar draw in white. Light mode (4.5.1): a pale tint, the tone stays .onSurface and the pieces draw as on the page, the text in black. ScoreGaugeCard(style: .hero) lies on it.

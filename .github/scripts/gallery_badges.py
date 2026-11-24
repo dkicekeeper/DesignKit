@@ -11,7 +11,8 @@ does, so the badges follow the apps instead of what they used once.
 
 A component's names are the page's name split at " · ", "/" and "," ("Rating · RatingPicker" is
 Rating and RatingPicker; ".popIn · .riseIn" two modifiers), without what follows "(" or ":".
-A name the apps reach by another one (a modifier over a view, a helper) is in ALIASES. A use is a
+A name the apps reach by another one (a modifier over a view, a helper) is in ALIASES; a page of
+one overload of a modifier is matched by PATTERNS instead. A use is a
 whole word outside comments and string literals, in a file that does not declare a type of that name itself (an app's
 own view of the same name is not DesignKit's), or the name after its module
 (`DesignComponents.StreakCard`, as an app's adapter of the same name calls it).
@@ -46,6 +47,13 @@ ALIASES = {
     ".heroBackground": [".heroScrollEdge"],
     "LoadMoreFooter": [".onReachEnd"],
     "ShimmerModifier": [".shimmer"],
+}
+
+# Pages of one overload of a modifier (8.14.0): what an app writes for that overload alone, as
+# patterns, in place of the page's names (`.heroBackground` would match both overloads).
+PATTERNS = {
+    ".heroBackground": [r"\.heroBackground\((?!\s*(?:picture|clearHeight):)", r"\.heroScrollEdge\b"],
+    ".heroBackground(picture:)": [r"\.heroBackground\s*(?:\{|\(\s*(?:picture|clearHeight):)"],
 }
 
 COMMENT = re.compile(r"//.*")
@@ -122,8 +130,12 @@ def audit(root, app_roots):
     sources = {app: load_sources(path) for app, path in app_roots.items()}
     report = []
     for page in pages(root):
-        names = tokens(page["name"])
-        real = {app for app in APPS if any(uses(sources[app], token) for token in names)}
+        if page["name"] in PATTERNS:
+            patterns = [re.compile(p) for p in PATTERNS[page["name"]]]
+            real = {app for app in APPS if any(p.search(text) for p in patterns for text in sources[app])}
+        else:
+            names = tokens(page["name"])
+            real = {app for app in APPS if any(uses(sources[app], token) for token in names)}
         if real != page["apps"]:
             report.append((page, real))
     return report

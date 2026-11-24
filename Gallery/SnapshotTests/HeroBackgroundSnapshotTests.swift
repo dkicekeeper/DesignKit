@@ -7,7 +7,7 @@
 //  deep gradient in dark mode and as on the page, in black, on the pale one in light mode
 //  (4.5.1), each clipped to its own box (the gradient runs up and down past a hero on a
 //  screen), and `ScoreGaugeCard(amount:)` as a hero, as on a screen, a long amount shrunk to
-//  stay inside the arc (4.5.1).
+//  stay inside the arc (4.5.1); a hero on a photo (8.14.0, `.heroBackground(picture:)`).
 //
 
 import SwiftUI
@@ -28,6 +28,31 @@ extension ComponentSnapshots {
                     TrendBadge(direction: .up, changePercent: 12.4)
                 }
                 .onHeroColor(AppColors.warning)
+            )
+        }
+
+        /// A trip's hero on its photo (8.14.0, `.heroBackground(picture:)`), as a film's page in
+        /// the TV app: sharp at the top, its own colours blurred and darkened under the centred
+        /// text and buttons, which are white in light mode too. The photo comes from the
+        /// Gallery's loader.
+        @Test func heroOnPicture() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.md) {
+                    Text(verbatim: "Camp at night")
+                        .font(AppTypography.h1)
+                        .foregroundStyle(AppColors.Text.primary)
+                        .frame(maxWidth: .infinity, minHeight: AppSpacing.xxxl * 4, alignment: .bottom)
+                    Text(verbatim: "Hike \u{00B7} 2 days")
+                        .font(AppTypography.bodySmall)
+                        .foregroundStyle(AppColors.Text.secondary)
+                    DSButton("Start trip", systemImage: "play.fill", fullWidth: true) {}
+                    LinearProgressBar(value: 0.68, animatesOnAppear: false)
+                }
+                .padding(AppSpacing.lg)
+                .heroBackground(clearHeight: AppSpacing.xxxl * 3) {
+                    RemotePhoto(key: "gallery-photo-3", url: URL(string: "https://gallery.invalid/photo/3.jpg"))
+                }
+                .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
             )
         }
 

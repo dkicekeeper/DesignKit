@@ -38,6 +38,7 @@ struct EffectsScreen: View {
         AccentGlowPage()
         BorderBeamPage()
         HeroBackgroundPage()
+        HeroPicturePage()
     }
 }
 
@@ -452,6 +453,113 @@ private struct BorderBeamPage: View {
             StepperControl("Comets", value: $beams, in: 1...2)
             SliderControl("Revolution", value: $duration, in: 1.5...6, step: 0.5) { "\($0.formatted(.number.precision(.fractionLength(1)))) s" }
         }
+    }
+}
+
+
+/// The top of a detail screen on a picture (8.14.0), as a film's page in the TV app: a trip's
+/// photo, sharp at the top, flowing into its own dark colours under the hero's text and buttons.
+private struct HeroPicturePage: View {
+    @State private var sample = 3
+
+    var body: some View {
+        ComponentPage(
+            name: ".heroBackground(picture:)",
+            summary: "The top of a detail screen on a picture, as a film's page in Apple's TV app: a game's cover, a trip's photo, edge to edge from the screen's top. Sharp where nothing is over it, it flows into its own colours, blurred and darkened, under the hero's text and buttons, drawn in white in both modes; the hero ends on the page with an edge.",
+            since: "8.14.0",
+            apps: [],
+            canvas: .bleed,
+            notes: [
+                "clearHeight (240 pt) is the room the hero leaves the picture below the bars: sharp, nothing over it but a title logo at its foot. From 48 pt above its end the picture blurs (40 pt) and darkens (55% black), through 120 pt below it.",
+                "The hero's content is drawn in the dark scheme, so DesignKit's buttons, chips and text are their light-on-dark selves in light mode too, and hero pieces are white (\\.heroTone .onColor).",
+                "Any view fills it: RemotePhoto (the app's loader and cache), an Image that is .resizable().scaledToFill(). It is cropped to the hero.",
+                ".heroScrollEdge(isHeroUnderBar:) on the scroll view: the picture reaches the screen's top, the bar's buttons and the status bar are light while it is under them, and the screen knows when to show the bar's title. “Open as a screen” shows it.",
+            ],
+            dos: [
+                "Centre the hero's content over the picture: the logo or name, a line of facts, the buttons.",
+                "Put the name in the hero (a logo picture where there is one) and keep the bar's title empty until the hero scrolls away.",
+            ],
+            donts: [
+                "Put text in the clear part of the picture, other than a title logo at its foot.",
+                "Lay a scrim or a gradient of your own over it.",
+            ]
+        ) {
+            HeroPictureSample(sample: sample)
+                .heroBackground {
+                    RemotePhoto(key: GalleryPhotos.key(sample), url: GalleryPhotos.url(sample))
+                }
+        } controls: {
+            ChoiceControl("Picture", selection: $sample, options: [("Lake", 0), ("Dawn", 1), ("Night", 3), ("Camp", 5)])
+            NavigationLink {
+                HeroPictureScreen(sample: sample)
+            } label: {
+                Label("Open as a screen", systemImage: "iphone")
+                    .font(AppTypography.bodySmall.weight(.medium))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .tint(AppColors.accent)
+        }
+    }
+}
+
+/// A trip's hero, centred: room for the picture, the name where a logo would be, a line of facts,
+/// the buttons and a short description.
+private struct HeroPictureSample: View {
+    let sample: Int
+
+    var body: some View {
+        VStack(spacing: AppSpacing.lg) {
+            // The picture's own room, the name at its foot as a title logo would stand.
+            Text(verbatim: GalleryPhoto.samples[sample].caption)
+                .font(AppTypography.h1)
+                .foregroundStyle(AppColors.Text.primary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity, minHeight: HeroPictureMetrics.clearHeight - AppSpacing.lg, alignment: .bottom)
+            Text(verbatim: "Hike \u{00B7} 2 days \u{00B7} 12 km")
+                .font(AppTypography.bodySmall)
+                .foregroundStyle(AppColors.Text.secondary)
+            VStack(spacing: AppSpacing.sm) {
+                DSButton("Start trip", systemImage: "play.fill", fullWidth: true) {}
+                DSButton("Share", systemImage: "square.and.arrow.up", appearance: .secondary, fullWidth: true) {}
+            }
+            LinearProgressBar(value: 0.68, animatesOnAppear: false)
+            Text(verbatim: "68% of the way \u{00B7} 4 h on the trail \u{00B7} 3 stops")
+                .font(AppTypography.caption)
+                .foregroundStyle(AppColors.Text.secondary)
+        }
+        .screenPadding()
+        .padding(.bottom, AppSpacing.xl)
+    }
+}
+
+/// The picture hero where it lives: the bar's title empty while the hero shows the name.
+private struct HeroPictureScreen: View {
+    let sample: Int
+    @State private var heroUnderBar = true
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: AppSpacing.lg) {
+                HeroPictureSample(sample: sample)
+                    .heroBackground {
+                        RemotePhoto(key: GalleryPhotos.key(sample), url: GalleryPhotos.url(sample))
+                    }
+                VStack(spacing: AppSpacing.lg) {
+                    ForEach(["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"], id: \.self) { day in
+                        Text(verbatim: day)
+                            .font(AppTypography.bodyEmphasis)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .cardContentPadding()
+                            .cardStyle()
+                    }
+                }
+                .screenPadding()
+            }
+            .padding(.bottom, AppSpacing.lg)
+        }
+        .heroScrollEdge(isHeroUnderBar: $heroUnderBar)
+        .navigationTitle(heroUnderBar ? "" : GalleryPhoto.samples[sample].caption)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

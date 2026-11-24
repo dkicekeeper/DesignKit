@@ -16,6 +16,48 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.14.0 - 2026-11-24
+
+A hero on a picture, as a film's page in Apple's TV app: a game's art or a trip's photo edge to edge from the screen's top, sharp where nothing is over it, flowing into its own colours, blurred and darkened, under the hero's text and buttons in white. For Platina's game screen: the game's art with its title logo, the progress and the session button over it.
+[#108](https://github.com/dkicekeeper/DesignKit/pull/108)
+
+### Added
+
+- `.heroBackground(clearHeight:picture:)`: lays any view (`RemotePhoto`, an `Image` filled to its frame) behind the hero, cropped to it, from the screen's top edge behind the bars. It is sharp down to `clearHeight` below the bars (240 pt by default: the hero's room for the picture, a title logo at its foot); from 48 pt above that a 40 pt blur and 55% black take over, through 120 pt below it, so the picture's own colours lie under the hero's text. The hero's content is drawn in the dark scheme (white text, DesignKit's pieces in their dark look, `\.heroTone` `.onColor`) in light and dark mode alike, and the hero ends on the page with an edge.
+- `.heroScrollEdge(isHeroUnderBar:)`: `.heroScrollEdge()` that also tells the screen whether the hero is under the navigation bar, true at rest and false once the content after the hero scrolls under it. A screen whose hero shows its name (or logo) keeps the bar's title empty while it is true.
+- `HeroPictureMetrics.clearHeight`: the default room, 240 pt.
+
+### Changed
+
+- `.heroScrollEdge()` makes the navigation bar's items and the status bar light while a picture hero is under them (`.toolbarColorScheme(.dark)`), and leaves them to the system after. A colour hero is as before.
+
+### Migration
+
+Nothing changes until an app uses it. A detail screen on a picture:
+
+```swift
+@State private var heroUnderBar = true
+
+ScrollView {
+    VStack(spacing: AppSpacing.xl) {
+        GameHero(game)                         // room, the logo at its foot, then text and buttons
+            .heroBackground(clearHeight: 280) {
+                RemotePhoto(key: "art-\(game.id)", url: game.artURL)
+            }
+        …
+    }
+}
+.heroScrollEdge(isHeroUnderBar: $heroUnderBar)
+.navigationTitle(heroUnderBar ? "" : game.name)
+```
+
+### Gallery and tooling
+
+- Gallery: Effects › `.heroBackground(picture:)`, a trip's hero centred on four photos, and "Open as a screen" with the light bar over the picture and the bar's title appearing as the hero scrolls away.
+- A snapshot of a hero on a photo, light and dark (`heroOnPicture`).
+- docs/components.md lists every public overload of a modifier (`.heroBackground`, `.heroScrollEdge`, `.shine`), and a page named for one overload (`.heroBackground(picture:)`) shows that overload's doc.
+- The Gallery badges job matches a page of one overload by what an app writes for it (`PATTERNS` in `gallery_badges.py`): Tenra's `.heroBackground(color)` is the colour page's, not the picture's.
+
 ## 8.13.0 - 2026-11-24
 
 A screen on an iPad or in a Mac window: its content keeps to a centred column instead of running across the screen, and cards that stand on their own go side by side. For Platina on the iPad and the Mac; on a phone nothing changes.
