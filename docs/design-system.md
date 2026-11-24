@@ -494,6 +494,7 @@ ScrollView {
 | `.cards` (default) | a glass card per item, its content padded `lg` on every side, `md` between cards | accounts, deposits, debts, categories |
 | `.section` | every item a row in one glass card, a `RowDivider` under each row's text | subcategories, a short list of options |
 | `.stack` | items that are cards already (`PayoffProgressCard`, `TargetProgressCard`, `RecurringPaymentCard`), spaced `md`; the circle and the handle of the modes beside the card | loans, goals, subscriptions |
+| `.grid` *(8.15.0)* | a glass card per item as `.cards`, side by side in `AppLayout.cardColumns()` (`md` apart) where the width holds two or more: an iPad or a Mac window under `.readableWidth(AppLayout.wideWidth)`; one in a row on a phone | games, trips, accounts on a large screen |
 
 | Mode | What the item shows | A tap |
 |---|---|---|
@@ -2664,7 +2665,9 @@ ScrollView                                       cards that stand on their own
   so the scroll bar and the scroll edge effect stay at its edges. The column grows with the
   person's text size.
 - **A grid of cards.** Cards a person opens one by one (games, accounts, trips) go side by side
-  in `AppLayout.cardColumns()`: one in a row on a phone, two or three on an iPad. A form, a
+  in `AppLayout.cardColumns()`: one in a row on a phone, two or three on an iPad. The things a
+  person keeps stay a `CardList`, with `layout: .grid` *(8.15.0)*: the same taps, menus,
+  selection and dragging, in columns. A form, a
   settings list and rows in one card (`CardList(layout: .section)`) stay one column.
 - **A main column and a side column** *(8.15.0)*. A detail screen with one thing it is for and
   summaries around it (a game's trophies with its guide, walkthrough and sessions) puts them side

@@ -2,7 +2,7 @@
 //  CardListSnapshotTests.swift
 //  DesignKit Gallery snapshot tests
 //
-//  CardList (8.0.0) in its two layouts and three modes: the items as they are, with a circle
+//  CardList (8.0.0) in its layouts (the grid of 8.15.0 drawn small) and three modes: the items as they are, with a circle
 //  each while selecting, with a handle each while reordering. A `.cards` list is one card per
 //  snapshot (docs/snapshots.md: one Liquid Glass card per snapshot).
 //
@@ -73,6 +73,29 @@ extension ComponentSnapshots {
                     appearances: [.light, .dark]
                 )
             }
+        }
+
+        /// `.grid` (8.15.0) at an iPad's width, drawn at half size so the window fits the phone's
+        /// screen: four cards two in a row. Grey surfaces: glass cards side by side reflect each
+        /// other.
+        @Test func grid() async {
+            let accounts = CardListSample.accounts + [
+                CardListSample(id: 3, name: "Travel", symbol: "airplane", amount: "120 000 ₸"),
+            ]
+            await assertComponentSnapshot(
+                CardList(accounts, layout: .grid) { item in
+                    UniversalRow(
+                        item.name,
+                        leadingIcon: .sfSymbol(item.symbol, color: AppColors.accent, size: AppIconSize.Tile.sm),
+                        value: item.amount
+                    )
+                }
+                .frame(width: 700)
+                .scaleEffect(0.5, anchor: .topLeading)
+                .frame(width: 350, height: 100, alignment: .topLeading)
+                .surfaceStyle(.fill),
+                appearances: [.light]
+            )
         }
 
         private func sectionList(_ mode: CardListMode) -> some View {

@@ -310,7 +310,7 @@ private struct ReadableWidthPage: View {
             notes: [
                 "Put it on the scroll view's content after .screenPadding(): the column's 720 pt include the margins, and the scroll bar stays at the screen's edge.",
                 "The column grows with the person's text size, as the system's readable width does.",
-                "A grid of cards: LazyVGrid(columns: AppLayout.cardColumns(), spacing: AppSpacing.lg) under .readableWidth(AppLayout.wideWidth). A phone holds one card in a row, an iPad two or three.",
+                "A grid of cards: LazyVGrid(columns: AppLayout.cardColumns(), spacing: AppSpacing.lg) under .readableWidth(AppLayout.wideWidth), or CardList(layout: .grid) for the things a person keeps (8.15.0). A phone holds one card in a row, an iPad two or three.",
                 "A list and what it opens side by side is the system's NavigationSplitView; each column's screen keeps its own .readableWidth() (docs/design-system.md, Large screens).",
             ],
             dos: [
@@ -613,6 +613,7 @@ private struct CardListPage: View {
             canvas: .fill,
             notes: [
                 "cards: a glass card per item, padded 16 pt; section: every item a row in one glass card, a divider under each row's text; stack: items that are cards already (a PayoffProgressCard), the circle and the handle beside them.",
+                "grid (8.15.0): the cards side by side in AppLayout.cardColumns() where the width holds two or more, on an iPad or in a Mac window under .readableWidth(AppLayout.wideWidth); one in a row on a phone, as here.",
                 "cardListToolbar(mode:selection:allIDs:onAdd:onDeleteSelected:) is the same toolbar on every list: select, change the order, add; Done; Delete N under the list.",
                 "Reordering: a long press lifts a card, moving it over another puts it there (a tick on each step). VoiceOver: move up, move down.",
             ]
@@ -659,7 +660,7 @@ private struct CardListPage: View {
             .frame(height: 560)
         } controls: {
             StateControl(state: $state)
-            ChoiceControl("Layout", selection: $layout, options: [("Cards", .cards), ("Section", .section), ("Stack", .stack)])
+            ChoiceControl("Layout", selection: $layout, options: [("Cards", .cards), ("Section", .section), ("Stack", .stack), ("Grid", .grid)])
             ChoiceControl("Mode", selection: $mode, options: [("Browsing", .browsing), ("Selecting", .selecting), ("Reordering", .reordering)])
             ChoiceControl("Items", selection: $count, options: [("5", 5), ("12", 12), ("200", 200)])
         }
