@@ -472,7 +472,8 @@ private struct HeroPicturePage: View {
             notes: [
                 "clearHeight (240 pt) is the room the hero leaves the picture below the bars: sharp, nothing over it but a title logo at its foot. From 48 pt above its end the picture blurs (40 pt) and darkens (55% black), through 120 pt below it.",
                 "The hero's content is drawn in the dark scheme, so DesignKit's buttons, chips and text are their light-on-dark selves in light mode too, and hero pieces are white (\\.heroTone .onColor).",
-                "Any view fills it: RemotePhoto (the app's loader and cache), an Image that is .resizable().scaledToFill(). It is cropped to the hero.",
+                "Any view fills it: RemotePhoto (the app's loader and cache), an Image that is .resizable().scaledToFill(). It is cropped to the hero. While a RemotePhoto loads, a still dark fill (or its placeholderKey's small version, blurred) stands in: no shimmer behind the text (8.15.0).",
+                "Pulled down, the picture keeps to the screen's top and grows with the pull; scrolled up, it moves at half the content's pace, behind it (8.15.0, with .heroScrollEdge(); no parallax under Reduce Motion). “Open as a screen” shows both.",
                 ".heroScrollEdge(isHeroUnderBar:) on the scroll view: the picture reaches the screen's top, the bar's buttons and the status bar are light while it is under them, and the screen knows when to show the bar's title. “Open as a screen” shows it.",
             ],
             dos: [

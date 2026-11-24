@@ -18,14 +18,19 @@ adds its section here (CLAUDE.md, "API Stability & Versioning").
 
 ## 8.15.0 - 2026-11-24
 
-A main column with a side column beside it on a large screen, and a `CardList` in a grid: on an iPad a game's trophies with its guide, walkthrough and sessions beside them, the games a person goes for side by side; on a phone the screen as it is. For Platina's game screen on the iPad, the Mac and an unfolded iPhone Duo (the owner's review of its mockup).
+A main column with a side column beside it on a large screen, and a `CardList` in a grid: on an iPad a game's trophies with its guide, walkthrough and sessions beside them, the games a person goes for side by side; on a phone the screen as it is. For Platina's game screen on the iPad, the Mac and an unfolded iPhone Duo (the owner's review of its mockup). And the picture hero after the owner's look at it on a device: it stretches when pulled down, lags behind the content when scrolled, and waits for its picture without a shimmer.
 [#109](https://github.com/dkicekeeper/DesignKit/pull/109)
 
 ### Added
 
 - `AdaptiveColumns(sideWidth:mainMinWidth:spacing:main:side:narrow:)`: the main column and a side column of cards side by side where both fit, the screen's own narrow layout (`narrow:`, often a `ChipPicker` over one part at a time) where not. What decides is the width the view gets, never the device, so a panel opening beside the screen or a narrower Mac window switches it too. Without `narrow:`, the side stacks under the main column (`AdaptiveColumnsStack`). A layout: no skeleton.
 - `CardListLayout.grid`: a `CardList`'s cards side by side in `AppLayout.cardColumns()` where the width holds two or more (an iPad or a Mac window under `.readableWidth(AppLayout.wideWidth)`), one in a row on a phone, with the same taps, menus, selection and dragging as `.cards`; `CardListSkeleton(layout: .grid)` too.
+- `RemotePhotoLoading` and `.remotePhotoLoading(_:)`: how the `RemotePhoto`s inside look while they load. `.skeleton` is the shimmer as before; `.still` is a still grey, or the `placeholderKey`'s small version blurred, with no shimmer and no photo symbol, for a picture behind text and buttons.
 - `AppLayout.sideColumnWidth` (340 pt) and `AppLayout.mainColumnMinWidth` (400 pt): the side column's width and the narrowest the main column gets beside it. With the 24 pt gap the two need 764 pt; both grow with the person's text size, so a larger text size keeps the narrow layout longer.
+
+### Changed
+
+- `.heroBackground(clearHeight:picture:)` with `.heroScrollEdge()`: pulled down, the picture keeps to the screen's top and grows with the pull; scrolled up, it moves at half the content's pace, behind it (still under Reduce Motion and `.designKitMotion(false)`). While a `RemotePhoto` in it loads, a still dark fill (or its `placeholderKey`'s small version, blurred) stands in, with black under the picture, instead of two shimmering skeletons, one of them blurred. The picture at rest looks as before.
 
 ### Migration
 
@@ -57,6 +62,7 @@ The games or trips a person keeps, side by side on a large screen: `CardList(ite
 - Content & Layout: an `AdaptiveColumns` page, a trip's route with its weather and group, on a phone, an iPad mini, an iPad and a Mac window drawn small, with chips or the side under the main column as the narrow layout.
 - Snapshot test `Foundations.adaptiveColumns`: the columns side by side and folded, drawn small, and folded at a large text size.
 - CardList: a Grid layout on its page; snapshot test `CardList.grid`, four cards two in a row at an iPad's width, drawn at half size.
+- RemotePhoto: a "While loading" choice (Skeleton, Still) on its page; `.heroBackground(picture:)`'s page notes the stretch and the parallax ("Open as a screen" shows them).
 
 ## 8.14.0 - 2026-11-24
 

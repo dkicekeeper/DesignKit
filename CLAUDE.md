@@ -361,7 +361,10 @@ rather than importing an app type.
   narrow: { the phone's layout }` puts summaries beside a detail screen's main column where
   `AppLayout.mainColumnMinWidth` + gap + `AppLayout.sideColumnWidth` fit (764 pt, scaled with the
   text size), and the phone's layout where not; the width the view gets decides, so a panel
-  beside the screen switches it too.
+  beside the screen switches it too. `CardList(layout: .grid)` puts the things a person keeps side
+  by side there. And after the owner's look at 8.14.0's hero on a device: the picture stretches
+  when pulled down and lags behind the content when scrolled, and waits for its `RemotePhoto`
+  with a still dark fill (`RemotePhotoLoading.still`) instead of a shimmer.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.
