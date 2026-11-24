@@ -3,8 +3,13 @@ name: TestFlight
 # Every DesignKit update on main → a Gallery build in TestFlight. Same pipeline as Dalada's:
 # a GitHub-hosted Mac archives the Gallery, Xcode cloud-signs it with an App Store Connect API
 # key, and the build is uploaded. Version = VERSION, build = run number. "What to Test" is the
-# version's CHANGELOG.md section on a release build, the commits since the previous release tag
-# on any other. CHANGELOG.md is a path too: the Gallery's Updates screen shows it.
+# version's CHANGELOG.md section on a release build (a commit tagged with VERSION), the commits
+# since the previous release tag on any other. CHANGELOG.md is a path too: the Gallery's Updates
+# screen shows it.
+#
+# Releases are numbered at merge (docs/releasing.md): the release bot (release.yml) starts this
+# workflow on the release's tag, since its own commit starts nothing. The merge push that carries
+# a note in .changes/ is skipped here, as its version is not set yet.
 #
 # One-time setup (docs/testflight.md): the app record in App Store Connect and three repository
 # secrets — ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8 (the same Admin key Dalada uses works).
@@ -33,6 +38,9 @@ jobs:
     outputs:
       ready: ${{ steps.check.outputs.ready }}
     steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: .changes
       - id: check
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
@@ -43,7 +51,10 @@ jobs:
           for name in ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8; do
             [ -n "${!name}" ] || missing="$missing $name"
           done
-          if [ -z "$missing" ]; then
+          if [ "$GITHUB_EVENT_NAME" = "push" ] && ls .changes/*.md >/dev/null 2>&1; then
+            echo "::notice::A release note is on this commit: the release bot builds it (release.yml)"
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          elif [ -z "$missing" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
           elif [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
             echo "::error::Missing secrets:$missing (docs/testflight.md)"
@@ -186,9 +197,10 @@ jobs:
           mkdir -p "$RUNNER_TEMP/asc"
           printf '%s\n' "$ASC_KEY_P8" > "$RUNNER_TEMP/asc/key.p8"
           export ASC_KEY_PATH="$RUNNER_TEMP/asc/key.p8"
-          # A release build (this push changed VERSION): the version's CHANGELOG.md section.
-          # Any other build: the commits since the previous release tag (or the last 15).
-          if ! git diff --quiet HEAD^ HEAD -- VERSION 2>/dev/null \
+          # A release build (the commit is tagged with VERSION; the release bot starts it on the
+          # tag): the version's CHANGELOG.md section. Any other build: the commits since the
+          # previous release tag (or the last 15).
+          if git tag --points-at HEAD | grep -qx "$VERSION" \
              && NOTES=$(python3 .github/scripts/changelog.py plain "$VERSION"); then
             export WHATS_NEW="$(printf 'DesignKit %s\n\n%s' "$VERSION" "$NOTES")"
           else
