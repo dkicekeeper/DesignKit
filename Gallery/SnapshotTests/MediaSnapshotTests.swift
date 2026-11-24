@@ -15,6 +15,24 @@ import DesignSupport
 import DesignComponents
 
 /// A stand-in photo: a gradient with a symbol.
+/// A stand-in app icon for the share card's brand line: a symbol on a gradient, square.
+@MainActor
+private enum SampleAppIcon {
+    static let image: UIImage? = {
+        let renderer = ImageRenderer(content:
+            LinearGradient(colors: [.indigo, .purple], startPoint: .topLeading, endPoint: .bottomTrailing)
+                .overlay {
+                    Image(systemName: "paintpalette.fill")
+                        .font(.system(size: 30, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+                .frame(width: 60, height: 60)
+        )
+        renderer.scale = 3
+        return renderer.uiImage
+    }()
+}
+
 private struct SamplePhoto: Identifiable {
     let id: Int
     let colors: [Color]
@@ -149,7 +167,7 @@ extension ComponentSnapshots {
                 ShareCardFrame(
                     format: .post,
                     brand: "Tenra",
-                    brandIcon: GalleryAppIcon.image,
+                    brandIcon: SampleAppIcon.image,
                     style: ShareCard.Style(
                         top: ShareCard.Style.standard.top,
                         bottom: ShareCard.Style.standard.bottom,
