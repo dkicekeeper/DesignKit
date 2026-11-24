@@ -43,6 +43,7 @@ ShareCardFrame(
 
 - Gallery: Media › `ShareCardFrame` has "App icon" and "Name" (Rounded, Inter) controls, with a stand-in icon.
 - A snapshot of a post with the icon and the name in Inter (`shareCardFrameBrandIcon`, `brandIcon`).
+
 ## 8.15.0 - 2026-11-24
 
 A main column with a side column beside it on a large screen, and a `CardList` in a grid: on an iPad a game's trophies with its guide, walkthrough and sessions beside them, the games a person goes for side by side; on a phone the screen as it is. For Platina's game screen on the iPad, the Mac and an unfolded iPhone Duo (the owner's review of its mockup). And the picture hero after the owner's look at it on a device: it stretches when pulled down, lags behind the content when scrolled, and waits for its picture without a shimmer.
