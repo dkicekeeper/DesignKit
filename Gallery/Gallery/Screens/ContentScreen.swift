@@ -3,7 +3,8 @@
 //  DesignKit Gallery
 //
 //  Content and layout: folded text, timeline, month calendar, flow layout, form sections, the
-//  edit sheet and its hero, message bubbles, times that stay current.
+//  edit sheet and its hero, message bubbles, times that stay current, the readable column and
+//  card grid of a large screen.
 //
 
 import SwiftUI
@@ -24,6 +25,7 @@ struct ContentScreen: View {
         ActivityTimelinePage()
         MonthCalendarPage()
         FlowLayoutPage()
+        ReadableWidthPage()
         FormSectionPage()
         CardListPage()
         EditSheetContainerPage()
@@ -279,6 +281,116 @@ private struct FlowLayoutPage: View {
             StepperControl("Items", value: $count, in: 1...9)
             ChoiceControl("Alignment", selection: $alignment, options: [("Leading", 0), ("Center", 1), ("Trailing", 2)])
         }
+    }
+}
+
+private struct ReadableWidthPage: View {
+    @State private var screen: CGFloat = 1194
+    @State private var grid = false
+    @State private var readable = true
+    @State private var reminder = true
+
+    private let trips = [
+        ("Big Almaty Lake", "mountain.2.fill", 0.8),
+        ("Charyn Canyon", "sun.max.fill", 0.45),
+        ("Kolsai Lakes", "drop.fill", 0.6),
+        ("Altyn-Emel", "leaf.fill", 0.25),
+        ("Shymbulak", "snowflake", 1.0),
+        ("Turgen Falls", "water.waves", 0.35),
+    ]
+
+    var body: some View {
+        ComponentPage(
+            name: ".readableWidth() · AppLayout",
+            summary: "A screen's content on an iPad or in a Mac window: a centred column of cards and text no wider than 720 pt, or a grid of cards side by side no wider than 1120 pt. On a phone nothing changes.",
+            since: "8.13.0",
+            apps: [],
+            canvas: .fill,
+            notes: [
+                "Put it on the scroll view's content after .screenPadding(): the column's 720 pt include the margins, and the scroll bar stays at the screen's edge.",
+                "The column grows with the person's text size, as the system's readable width does.",
+                "A grid of cards: LazyVGrid(columns: AppLayout.cardColumns(), spacing: AppSpacing.lg) under .readableWidth(AppLayout.wideWidth). A phone holds one card in a row, an iPad two or three.",
+                "A list and what it opens side by side is the system's NavigationSplitView; each column's screen keeps its own .readableWidth() (docs/design-system.md, Large screens).",
+            ],
+            dos: [
+                "Give every scrolling screen of an app that runs on an iPad or a Mac its column.",
+                "Put cards that stand on their own (games, accounts, trips) in a card grid.",
+            ],
+            donts: [
+                "Check for an iPhone or a screen size: the column and the grid follow the width they get.",
+                "Put a form's rows in a card grid: a form is one column.",
+            ]
+        ) {
+            LayoutScreenPreview(width: screen) {
+                let content = specimen.screenPadding()
+                if readable {
+                    content.readableWidth(grid ? AppLayout.wideWidth : AppLayout.readableWidth)
+                } else {
+                    content
+                }
+            }
+        } controls: {
+            ChoiceControl("Screen", selection: $screen, options: [("iPhone", 402), ("iPad mini", 744), ("iPad", 1194), ("Mac", 1512)])
+            ChoiceControl("Content", selection: $grid, options: [("Column", false), ("Card grid", true)])
+            ToggleControl("Readable width", isOn: $readable)
+        }
+    }
+
+    @ViewBuilder private var specimen: some View {
+        if grid {
+            LazyVGrid(columns: AppLayout.cardColumns(), spacing: AppSpacing.lg) {
+                ForEach(trips, id: \.0) { title, symbol, progress in
+                    HStack(spacing: AppSpacing.md) {
+                        Icon(source: .sfSymbol(symbol), size: AppIconSize.Tile.sm)
+                        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                            Text(title).font(AppTypography.h4)
+                                .foregroundStyle(AppColors.textPrimary)
+                            LinearProgressBar(value: progress, animatesOnAppear: false)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .cardContentPadding()
+                    .cardStyle()
+                }
+            }
+        } else {
+            VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                FormSection(header: "Trip") {
+                    UniversalRow("Reminder", icon: "clock", accessory: .toggle($reminder))
+                    UniversalRow("Route", icon: "map", accessory: .info("Big Almaty Lake"))
+                    UniversalRow("Group", icon: "person.2", accessory: .info("4 people"))
+                }
+                Text("The lake lies at 2,500 m, an hour's drive above the city. The road closes after heavy snow; the last stretch is a walk of about forty minutes along the pipeline.")
+                    .font(AppTypography.body)
+                    .foregroundStyle(AppColors.textPrimary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .cardContentPadding()
+                    .cardStyle()
+            }
+        }
+    }
+}
+
+/// A screen `width` points wide drawn smaller to fit the page, so a phone shows how an iPad or a
+/// Mac window lays the content out.
+private struct LayoutScreenPreview<Content: View>: View {
+    let width: CGFloat
+    @ViewBuilder var content: Content
+
+    private var height: CGFloat { max(420, width * 0.62) }
+
+    var body: some View {
+        GeometryReader { proxy in
+            let scale = min(1, proxy.size.width / width)
+            VStack(spacing: 0) { content }
+                .padding(.vertical, AppSpacing.lg)
+                .frame(width: width, height: height, alignment: .top)
+                .background(AppColors.Background.base)
+                .scaleEffect(scale, anchor: .topLeading)
+        }
+        .aspectRatio(width / height, contentMode: .fit)
+        .clipShape(.rect(cornerRadius: AppRadius.lg))
+        .overlay(RoundedRectangle(cornerRadius: AppRadius.lg).strokeBorder(AppColors.Border.normal, lineWidth: 0.5))
     }
 }
 

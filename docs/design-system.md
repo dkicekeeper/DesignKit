@@ -40,7 +40,7 @@
 
 | Module | Contents |
 |---|---|
-| `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases, `Palette` 3.7.0), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, `softScrollEdges` 5.4.0, inline field styles), `SurfaceStyle` with `.surfaceStyle(_:)` and the `.surfaceNeutral1` / `.surfaceNeutral2` fills (8.12.0, glass or a grey fill), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme` (`accent`, `surface`), `DesignKitFonts` (Inter) |
+| `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases, `Palette` 3.7.0), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppLayout` (a large screen's column and card grid, 8.13.0), `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `readableWidth` 8.13.0, `chartAppear`, `staggeredEntrance`, `softScrollEdges` 5.4.0, inline field styles), `SurfaceStyle` with `.surfaceStyle(_:)` and the `.surfaceNeutral1` / `.surfaceNeutral2` fills (8.12.0, glass or a grey fill), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme` (`accent`, `surface`), `DesignKitFonts` (Inter) |
 | `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `Icon` (a brand logo is `Icon(source: .brandService(name))`; `BrandLogoView` was removed in 2.0.0), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `RecentSearches` and `SearchMatch` (search suggestions, 3.5.0), `Formatting.relativeTime` / `elapsedTime` / `clockTime` / `dayTitle` (8.9.0), `AccessibilityAnnouncer` and `.voiceOverAnnouncement` (8.9.0), `HapticManager`, `HapticCue` (haptics by meaning, 2.3.0), `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitPhotoLoader` (3.1.0), `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
 | `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons") |
 
@@ -250,6 +250,20 @@ deprecated in 1.13.0 are gone: `avatar` (40, now `xxl`), the old `xxl` (44, `Til
 
 There is no `AppSize` enum. Component-local sizes (cursor height/width, voice button diameter, CSV preview heights, etc.) live as numeric literals at use-site or as `private` constants in the component file. This is deliberate — global tokens are for 3+ shared use sites; everything else is local.
 
+### Layout (`AppLayout`) *(8.13.0)*
+
+How wide a screen's content runs on a large screen: an iPad, a Mac window. A phone is narrower
+than all of them, so its screens look as before.
+
+| Token | Value | Use |
+|---|---|---|
+| `AppLayout.readableWidth` | 720 pt | The widest a column of cards, rows and text runs, its margins included (`.readableWidth()`); it grows with the text size |
+| `AppLayout.wideWidth` | 1120 pt | The column of a grid of cards (`.readableWidth(AppLayout.wideWidth)`): three cards side by side, never more |
+| `AppLayout.cardMinWidth` | 320 pt | The narrowest a card gets in a grid of cards: one in a row on a phone, two or three on an iPad |
+| `AppLayout.cardColumns(minimum:spacing:)` | `[GridItem]` | The adaptive columns of a `LazyVGrid` of cards, `AppSpacing.lg` apart |
+
+The view pattern is in §4, "Large screens: iPad and Mac".
+
 ### Typography (`AppTypography`)
 
 All use Inter variable font with Dynamic Type scaling:
@@ -346,6 +360,7 @@ The 1.x tokens, still used by the components that have them:
 | `.formCardStyle(radius:)` | `.ultraThinMaterial` card background on every iOS. Same shape/padding contract as `cardStyle`. | A Material card for a host that wants one. `FormSection` used it up to 7.x, for fear that iOS 26's `glassEffect` would become the morph source of a menu inside it and collapse a one-row section into the popover; 8.0.0's probe on a device showed menus in glass cards work, and `FormSection` is glass (`cardStyle`) |
 | `.filterChipStyle(isSelected:)` | Glass chip styling with accent tint when selected; under `SurfaceStyle.fill` *(8.12.0)* a `.surfaceNeutral1` capsule, the accent's pale tint when selected. Animated selection transition | Filter buttons, `UniversalFilterButton` |
 | `.screenPadding()` | `.padding(.horizontal, AppSpacing.lg)` (16pt) | Screen-level horizontal insets |
+| `.readableWidth(_:)` *(8.13.0)* | A centred column no wider than `AppLayout.readableWidth` (720 pt, the margins included), scaled with the text size like the system's readable width; nothing on a phone, which is narrower | The content of every scroll view of an app that runs on an iPad or a Mac, after `.screenPadding()`; `AppLayout.wideWidth` for a grid of cards (§4, "Large screens") |
 | `.cardContentPadding()` | `.padding(AppSpacing.lg)` (16pt) | Internal card content padding — canonical, matches §10 |
 | `.futureTransactionStyle(isFuture:)` | `.opacity(0.55)` when future | Planned/future transaction rows |
 | `.chartAppear(delay:)` | Scale(0.94→1.0) + opacity entrance from bottom | Outermost chart container, scrollable list cards |
@@ -2609,6 +2624,38 @@ Tenra builds every entity detail screen this way (its `EntityDetailScaffold`).
 `ScrollView` → `VStack(spacing: AppSpacing.lg)`: `BalanceCard`s in a `UniversalCarousel(config:
 .cards)`, a `CashFlowCard`, a grid of `ProgressRingTile`s, `FinanceCard` summaries with
 `PackedCircleIcons`. Tenra's Home and Finances tabs.
+
+### Large screens: iPad and Mac *(8.13.0)*
+
+On an iPad, or in a Mac window ("Designed for iPad"), a screen gets several times a phone's
+width. The same screen works there without a check for the device: what changes follows the
+width the view gets.
+
+```
+ScrollView
+└── VStack(spacing: AppSpacing.lg) { … }        the phone's screen as it is
+    .screenPadding()
+    .readableWidth()                             a centred column, 720 pt at most
+
+ScrollView                                       cards that stand on their own
+└── LazyVGrid(columns: AppLayout.cardColumns(), spacing: AppSpacing.lg) { cards }
+    .screenPadding()
+    .readableWidth(AppLayout.wideWidth)          two or three in a row, 1120 pt at most
+```
+
+- **The column.** Every scrolling screen keeps its content to `.readableWidth()`: lines of text
+  stay readable and a switch stays near its label. The scroll view itself still fills the screen,
+  so the scroll bar and the scroll edge effect stay at its edges. The column grows with the
+  person's text size.
+- **A grid of cards.** Cards a person opens one by one (games, accounts, trips) go side by side
+  in `AppLayout.cardColumns()`: one in a row on a phone, two or three on an iPad. A form, a
+  settings list and rows in one card (`CardList(layout: .section)`) stay one column.
+- **List and detail.** A list and what it opens side by side is the system's
+  `NavigationSplitView` (on a phone it collapses into a stack); each column's screen keeps its own
+  `.readableWidth()`. A tab bar becomes a sidebar with `TabView { … }.tabViewStyle(.sidebarAdaptable)`.
+- **Sheets** are already a readable width on an iPad (the system's form sheet); nothing to add.
+- What a large screen lacks (Live Activities on a Mac, the camera) stays behind an availability
+  check in the app, never a check for the device.
 
 ### Empty, loading, error
 

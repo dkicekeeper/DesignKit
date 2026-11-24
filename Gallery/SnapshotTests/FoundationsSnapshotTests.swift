@@ -165,6 +165,48 @@ extension ComponentSnapshots {
             }
         }
 
+        /// `.readableWidth()` and `AppLayout.cardColumns()` (8.13.0), drawn small: the window
+        /// must fit the phone's screen, so a 240 pt column stands for the 720 pt one in a 360 pt
+        /// "screen" (the whole width at a large text size, where the column grows), and 150 pt
+        /// cards two in a row for the 320 pt ones on an iPad. Grey surfaces: glass cards side by
+        /// side reflect each other.
+        @Test func readableWidth() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    FormSection(header: "Trip") {
+                        UniversalRow("Reminder", icon: "clock", accessory: .toggle(.constant(true)))
+                    }
+                    Text(verbatim: "The lake lies at 2,500 m, an hour's drive above the city.")
+                        .font(AppTypography.body)
+                        .foregroundStyle(AppColors.textPrimary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .cardContentPadding()
+                        .cardStyle()
+                }
+                .readableWidth(240)
+                .background(AppColors.accent.opacity(0.08))
+                .surfaceStyle(.fill),
+                named: "column",
+                appearances: [.light, .largeText]
+            )
+            await assertComponentSnapshot(
+                LazyVGrid(columns: AppLayout.cardColumns(minimum: 150), spacing: AppSpacing.lg) {
+                    ForEach(["Big Almaty Lake", "Charyn Canyon", "Kolsai Lakes"], id: \.self) { title in
+                        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                            Icon(source: .sfSymbol("mountain.2.fill"), size: AppIconSize.lg)
+                            Text(verbatim: title).font(AppTypography.h4)
+                                .foregroundStyle(AppColors.textPrimary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .cardContentPadding()
+                        .cardStyle()
+                    }
+                }
+                .surfaceStyle(.fill),
+                named: "cardGrid"
+            )
+        }
+
         /// Dalada's green accent through `DesignKitTheme.accent`: everything tinted follows it.
         @Test func daladaAccent() async {
             let saved = DesignKitTheme.accent
