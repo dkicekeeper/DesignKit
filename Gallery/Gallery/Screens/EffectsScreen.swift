@@ -457,29 +457,30 @@ private struct BorderBeamPage: View {
 }
 
 
-/// The top of a detail screen on a picture (8.14.0): a trip's photo behind its hero, sharp under
-/// the bar, blurred and veiled into the page where the hero's text is.
+/// The top of a detail screen on a picture (8.14.0), as a film's page in the TV app: a trip's
+/// photo, sharp at the top, flowing into its own dark colours under the hero's text and buttons.
 private struct HeroPicturePage: View {
     @State private var sample = 3
 
     var body: some View {
         ComponentPage(
             name: ".heroBackground(picture:)",
-            summary: "The top of a detail screen on a picture: a game's cover, a trip's photo, from the screen's top edge behind the navigation bar. Sharp at the top, it blurs and gives way to the page towards the hero's foot, so the hero's text and controls keep their own colours in light and dark mode.",
+            summary: "The top of a detail screen on a picture, as a film's page in Apple's TV app: a game's cover, a trip's photo, edge to edge from the screen's top. Sharp where nothing is over it, it flows into its own colours, blurred and darkened, under the hero's text and buttons, drawn in white in both modes; the hero ends on the page with an edge.",
             since: "8.14.0",
             apps: [],
             canvas: .bleed,
             notes: [
-                "Leave the top of the hero to the picture (room, an icon) and start the text from the middle: the picture is sharp down to 30% of its height, then blurred and veiled in the page's colour, 72% at the middle, all of it at the foot.",
+                "clearHeight (240 pt) is the room the hero leaves the picture below the bars: sharp, nothing over it but a title logo at its foot. From 48 pt above its end the picture blurs (40 pt) and darkens (55% black), through 120 pt below it.",
+                "The hero's content is drawn in the dark scheme, so DesignKit's buttons, chips and text are their light-on-dark selves in light mode too, and hero pieces are white (\\.heroTone .onColor).",
                 "Any view fills it: RemotePhoto (the app's loader and cache), an Image that is .resizable().scaledToFill(). It is cropped to the hero.",
-                ".heroScrollEdge(isHeroUnderBar:) on the scroll view: the picture reaches the screen's top edge, and the screen knows while the hero is under the bar, to keep the bar's title empty while the hero shows it. “Open as a screen” shows both.",
+                ".heroScrollEdge(isHeroUnderBar:) on the scroll view: the picture reaches the screen's top, the bar's buttons and the status bar are light while it is under them, and the screen knows when to show the bar's title. “Open as a screen” shows it.",
             ],
             dos: [
-                "Put the name in the hero and keep the bar's title empty until the hero scrolls away.",
-                "Use the picture of the thing itself: a game's cover, a trip's photo.",
+                "Centre the hero's content over the picture: the logo or name, a line of facts, the buttons.",
+                "Put the name in the hero (a logo picture where there is one) and keep the bar's title empty until the hero scrolls away.",
             ],
             donts: [
-                "Put text over the top of the picture: it is sharp there and nothing veils it.",
+                "Put text in the clear part of the picture, other than a title logo at its foot.",
                 "Lay a scrim or a gradient of your own over it.",
             ]
         ) {
@@ -501,33 +502,33 @@ private struct HeroPicturePage: View {
     }
 }
 
-/// A trip's hero: room for the picture, then its name, progress, numbers and an action.
+/// A trip's hero, centred: room for the picture, the name where a logo would be, a line of facts,
+/// the buttons and a short description.
 private struct HeroPictureSample: View {
     let sample: Int
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.lg) {
-            // The picture's own room at the top.
-            Color.clear.frame(height: AppSpacing.xxxl * 3)
+        VStack(spacing: AppSpacing.lg) {
+            // The picture's own room, the name at its foot as a title logo would stand.
             Text(verbatim: GalleryPhoto.samples[sample].caption)
-                .font(AppTypography.h2)
+                .font(AppTypography.h1)
                 .foregroundStyle(AppColors.Text.primary)
-            VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                Text(verbatim: "68%")
-                    .font(AppTypography.h1)
-                    .monospacedDigit()
-                    .foregroundStyle(AppColors.Text.primary)
-                LinearProgressBar(value: 0.68, animatesOnAppear: false)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity, minHeight: HeroPictureMetrics.clearHeight - AppSpacing.lg, alignment: .bottom)
+            Text(verbatim: "Hike \u{00B7} 2 days \u{00B7} 12 km")
+                .font(AppTypography.bodySmall)
+                .foregroundStyle(AppColors.Text.secondary)
+            VStack(spacing: AppSpacing.sm) {
+                DSButton("Start trip", systemImage: "play.fill", fullWidth: true) {}
+                DSButton("Share", systemImage: "square.and.arrow.up", appearance: .secondary, fullWidth: true) {}
             }
-            StatsStrip(items: [
-                .init(value: "12 km", title: "Distance"),
-                .init(value: "4 h", title: "Time"),
-                .init(value: "3", title: "Stops"),
-            ])
-            DSButton("Start trip", systemImage: "play.fill", fullWidth: true) {}
+            LinearProgressBar(value: 0.68, animatesOnAppear: false)
+            Text(verbatim: "68% of the way \u{00B7} 4 h on the trail \u{00B7} 3 stops")
+                .font(AppTypography.caption)
+                .foregroundStyle(AppColors.Text.secondary)
         }
         .screenPadding()
-        .padding(.bottom, AppSpacing.lg)
+        .padding(.bottom, AppSpacing.xl)
     }
 }
 

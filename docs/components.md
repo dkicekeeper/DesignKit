@@ -2847,25 +2847,26 @@ func borderGlow(isActive: Bool = true, colors: [Color] = [AppColors.accent, .pur
 
 ### .heroBackground(picture:)
 
-The top of a detail screen on a picture: a game's cover, a trip's photo, from the screen's top edge behind the navigation bar. Sharp at the top, it blurs and gives way to the page towards the hero's foot, so the hero's text and controls keep their own colours in light and dark mode.
+The top of a detail screen on a picture, as a film's page in Apple's TV app: a game's cover, a trip's photo, edge to edge from the screen's top. Sharp where nothing is over it, it flows into its own colours, blurred and darkened, under the hero's text and buttons, drawn in white in both modes; the hero ends on the page with an edge.
 
 Since 8.14.0 · Apps: none yet
 
 - `.heroBackground` in `Sources/DesignComponents/Effects/HeroBackground.swift`
-  Lays a picture behind the hero (8.14.0): a game's cover, a trip's photo, a place. It fills the hero from the screen's top edge, sharp under the navigation bar, then blurs and gives way to the page towards the hero's foot, so the hero's text and controls, in their own colours, read over it in light and dark mode. Leave the top of the hero to the picture and start its text below that; put it on the hero at the top of a scroll view, edge to edge (pad what is inside), and `.heroScrollEdge()` on the scroll view.
+  Lays a picture behind the hero, as a film's page in Apple's TV app does (8.14.0): a game's cover, a trip's photo, edge to edge from the screen's top edge. It is sharp down to `clearHeight` below the bars, the room the hero leaves it (a logo may stand at its foot), then flows into its own colours, blurred and darkened, under the hero's text and buttons, which are drawn in white (the dark scheme) in light and dark mode alike; the hero ends on the page with an edge. Put it on the hero at the top of a scroll view, edge to edge (pad what is inside), and `.heroScrollEdge()` on the scroll view: the picture then reaches the screen's top, and the bar's buttons and the status bar are light while it is under them.
 
 ```swift
 func heroBackground(_ color: Color) -> some View
-func heroBackground<Picture: View>(@ViewBuilder picture: () -> Picture) -> some View
+func heroBackground<Picture: View>(clearHeight: CGFloat = HeroPictureMetrics.clearHeight, @ViewBuilder picture: () -> Picture) -> some View
 ```
 
-- Leave the top of the hero to the picture (room, an icon) and start the text from the middle: the picture is sharp down to 30% of its height, then blurred and veiled in the page's colour, 72% at the middle, all of it at the foot.
+- clearHeight (240 pt) is the room the hero leaves the picture below the bars: sharp, nothing over it but a title logo at its foot. From 48 pt above its end the picture blurs (40 pt) and darkens (55% black), through 120 pt below it.
+- The hero's content is drawn in the dark scheme, so DesignKit's buttons, chips and text are their light-on-dark selves in light mode too, and hero pieces are white (\.heroTone .onColor).
 - Any view fills it: RemotePhoto (the app's loader and cache), an Image that is .resizable().scaledToFill(). It is cropped to the hero.
-- .heroScrollEdge(isHeroUnderBar:) on the scroll view: the picture reaches the screen's top edge, and the screen knows while the hero is under the bar, to keep the bar's title empty while the hero shows it. “Open as a screen” shows both.
+- .heroScrollEdge(isHeroUnderBar:) on the scroll view: the picture reaches the screen's top, the bar's buttons and the status bar are light while it is under them, and the screen knows when to show the bar's title. “Open as a screen” shows it.
 
-- Do: Put the name in the hero and keep the bar's title empty until the hero scrolls away.
-- Do: Use the picture of the thing itself: a game's cover, a trip's photo.
-- Don't: Put text over the top of the picture: it is sharp there and nothing veils it.
+- Do: Centre the hero's content over the picture: the logo or name, a line of facts, the buttons.
+- Do: Put the name in the hero (a logo picture where there is one) and keep the bar's title empty until the hero scrolls away.
+- Don't: Put text in the clear part of the picture, other than a title logo at its foot.
 - Don't: Lay a scrim or a gradient of your own over it.
 
 ### .completionMoment
@@ -2943,7 +2944,7 @@ Since 4.5.0 · Apps: Tenra
 
 ```swift
 func heroBackground(_ color: Color) -> some View
-func heroBackground<Picture: View>(@ViewBuilder picture: () -> Picture) -> some View
+func heroBackground<Picture: View>(clearHeight: CGFloat = HeroPictureMetrics.clearHeight, @ViewBuilder picture: () -> Picture) -> some View
 func heroScrollEdge() -> some View
 func heroScrollEdge(isHeroUnderBar: Binding<Bool>) -> some View
 ```

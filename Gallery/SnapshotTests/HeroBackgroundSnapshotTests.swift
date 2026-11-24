@@ -31,21 +31,25 @@ extension ComponentSnapshots {
             )
         }
 
-        /// A trip's hero on its photo (8.14.0, `.heroBackground(picture:)`): sharp at the top,
-        /// blurred and veiled in the page's colour under the text, the text and the button in
-        /// their own colours, in light and dark mode. The photo comes from the Gallery's loader.
+        /// A trip's hero on its photo (8.14.0, `.heroBackground(picture:)`), as a film's page in
+        /// the TV app: sharp at the top, its own colours blurred and darkened under the centred
+        /// text and buttons, which are white in light mode too. The photo comes from the
+        /// Gallery's loader.
         @Test func heroOnPicture() async {
             await assertComponentSnapshot(
-                VStack(alignment: .leading, spacing: AppSpacing.md) {
-                    Color.clear.frame(height: AppSpacing.xxxl * 2)
+                VStack(spacing: AppSpacing.md) {
                     Text(verbatim: "Camp at night")
-                        .font(AppTypography.h2)
+                        .font(AppTypography.h1)
                         .foregroundStyle(AppColors.Text.primary)
-                    LinearProgressBar(value: 0.68, animatesOnAppear: false)
+                        .frame(maxWidth: .infinity, minHeight: AppSpacing.xxxl * 4, alignment: .bottom)
+                    Text(verbatim: "Hike \u{00B7} 2 days")
+                        .font(AppTypography.bodySmall)
+                        .foregroundStyle(AppColors.Text.secondary)
                     DSButton("Start trip", systemImage: "play.fill", fullWidth: true) {}
+                    LinearProgressBar(value: 0.68, animatesOnAppear: false)
                 }
                 .padding(AppSpacing.lg)
-                .heroBackground {
+                .heroBackground(clearHeight: AppSpacing.xxxl * 3) {
                     RemotePhoto(key: "gallery-photo-3", url: URL(string: "https://gallery.invalid/photo/3.jpg"))
                 }
                 .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))

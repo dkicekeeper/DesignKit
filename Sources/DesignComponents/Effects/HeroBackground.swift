@@ -18,11 +18,13 @@
 //  once the content after the hero scrolls under it; and it tells the gradient how far the
 //  screen's top edge is above the hero (4.5.1), so the gradient starts there, not under the bar.
 //
-//  `.heroBackground(picture:)` (8.14.0) lays a picture there instead of a colour: a game's
-//  cover, a trip's photo. Sharp under the navigation bar, it blurs and gives way to the page
-//  towards the hero's foot, so the hero's text, in its own colours, reads over it in both modes.
+//  `.heroBackground(picture:)` (8.14.0) lays a picture there instead of a colour, as a film's
+//  page in Apple's TV app does: a game's cover, a trip's photo, tall and edge to edge from the
+//  screen's top, sharp where nothing is over it, then flowing into its own colours, blurred and
+//  darkened, where the hero's text and buttons are, in white, in both modes; the hero ends on the
+//  page with an edge. The bar's buttons and the status bar are light while it is under them.
 //  `.heroScrollEdge(isHeroUnderBar:)` tells the screen while the hero is under the bar: a screen
-//  whose hero carries the title keeps the bar's title empty until then.
+//  whose hero carries the title (a logo) keeps the bar's title empty until then.
 //
 
 import SwiftUI
@@ -85,19 +87,21 @@ public extension View {
         modifier(HeroScrollEdgeModifier())
     }
 
-    /// Lays a picture behind the hero (8.14.0): a game's cover, a trip's photo, a place. It fills
-    /// the hero from the screen's top edge, sharp under the navigation bar, then blurs and gives
-    /// way to the page towards the hero's foot, so the hero's text and controls, in their own
-    /// colours, read over it in light and dark mode. Leave the top of the hero to the picture and
-    /// start its text below that; put it on the hero at the top of a scroll view, edge to edge
-    /// (pad what is inside), and `.heroScrollEdge()` on the scroll view.
+    /// Lays a picture behind the hero, as a film's page in Apple's TV app does (8.14.0): a game's
+    /// cover, a trip's photo, edge to edge from the screen's top edge. It is sharp down to
+    /// `clearHeight` below the bars, the room the hero leaves it (a logo may stand at its foot),
+    /// then flows into its own colours, blurred and darkened, under the hero's text and buttons,
+    /// which are drawn in white (the dark scheme) in light and dark mode alike; the hero ends on
+    /// the page with an edge. Put it on the hero at the top of a scroll view, edge to edge (pad
+    /// what is inside), and `.heroScrollEdge()` on the scroll view: the picture then reaches the
+    /// screen's top, and the bar's buttons and the status bar are light while it is under them.
     ///
     /// ```swift
     /// ScrollView {
     ///     VStack(spacing: AppSpacing.xl) {
-    ///         GameHero(game)                     // its text from the middle down
-    ///             .heroBackground {
-    ///                 RemotePhoto(key: "cover-\(game.id)", url: game.coverURL)
+    ///         GameHero(game)                     // room, the logo, then text and buttons
+    ///             .heroBackground(clearHeight: 280) {
+    ///                 RemotePhoto(key: "art-\(game.id)", url: game.artURL)
     ///             }
     ///         …
     ///     }
@@ -106,10 +110,16 @@ public extension View {
     /// .navigationTitle(heroUnderBar ? "" : game.name)
     /// ```
     ///
-    /// - Parameter picture: The picture, filling whatever frame it is given (`RemotePhoto`, an
-    ///   `Image` that is `.resizable().scaledToFill()`); it is cropped to the hero.
-    func heroBackground<Picture: View>(@ViewBuilder picture: () -> Picture) -> some View {
-        modifier(HeroPictureBackgroundModifier(picture: picture()))
+    /// - Parameters:
+    ///   - clearHeight: How far below the bars the picture stays sharp with nothing over it: the
+    ///     hero's room for it, down to the foot of a logo standing in it (240 pt by default).
+    ///   - picture: The picture, filling whatever frame it is given (`RemotePhoto`, an `Image`
+    ///     that is `.resizable().scaledToFill()`); it is cropped to the hero.
+    func heroBackground<Picture: View>(
+        clearHeight: CGFloat = HeroPictureMetrics.clearHeight,
+        @ViewBuilder picture: () -> Picture
+    ) -> some View {
+        modifier(HeroPictureBackgroundModifier(picture: picture(), clearHeight: clearHeight))
     }
 
     /// `.heroScrollEdge()` that also tells the screen whether the hero is under the navigation
@@ -137,20 +147,28 @@ enum HeroBackgroundMetrics {
     static let overscroll: CGFloat = 600
 }
 
-/// `.heroBackground(picture:)` (8.14.0): where, down the picture (from the screen's top edge to
-/// the hero's foot), it blurs and the page's colour covers it.
-enum HeroPictureMetrics {
-    /// The blur that the picture gives way to, deep enough that no detail competes with text.
-    static let blur: CGFloat = 28
-    /// The picture is sharp down to here, behind the bars and the hero's top.
-    static let sharpUntil: CGFloat = 0.3
-    /// Fully blurred from here.
-    static let blurredFrom: CGFloat = 0.6
-    /// The page's colour over the picture: none at `sharpUntil`, then this much at the middle of
-    /// the hero's text, and all of it at the hero's foot, where the page goes on.
-    static let veil: [(location: CGFloat, opacity: Double)] = [
-        (0.25, 0), (0.5, 0.72), (0.75, 0.9), (1, 1),
-    ]
+/// `.heroBackground(picture:)` (8.14.0): how the picture gives way to its own colours under the
+/// hero's text.
+public enum HeroPictureMetrics {
+    /// How far below the bars the picture stays sharp with nothing over it, by default.
+    public static let clearHeight: CGFloat = 240
+    /// The blur it flows into: its own colours, no detail that competes with text.
+    static let blur: CGFloat = 40
+    /// Black over the blurred picture: white text on it reads on a bright picture too.
+    static let shade: Double = 0.55
+    /// It starts giving way this far above the end of the clear part…
+    static let blendAbove: CGFloat = 48
+    /// …and is blurred and shaded through this far below it.
+    static let blendBelow: CGFloat = 120
+
+    /// Where, as shares of the picture's height from the screen's top edge, it starts and
+    /// finishes giving way; `clearEnd` is the end of the clear part from the same edge.
+    static func blend(height: CGFloat, clearEnd: CGFloat) -> (start: CGFloat, end: CGFloat) {
+        guard height > 0 else { return (0, 1) }
+        let start = min(max((clearEnd - blendAbove) / height, 0), 1)
+        let end = min(max((clearEnd + blendBelow) / height, start), 1)
+        return (start, end)
+    }
 }
 
 private struct HeroBackgroundModifier: ViewModifier {
@@ -252,58 +270,76 @@ struct HeroBackgroundMesh {
 
 private struct HeroPictureBackgroundModifier<Picture: View>: ViewModifier {
     let picture: Picture
+    let clearHeight: CGFloat
     @State private var heroHeight: CGFloat = 0
 
     func body(content: Content) -> some View {
         content
             .frame(maxWidth: .infinity)
+            // White on the picture's own dark colours, in both modes: DesignKit's pieces in their
+            // dark look, hero pieces in white.
+            .environment(\.colorScheme, .dark)
+            .environment(\.heroTone, .onColor)
             .background {
-                HeroPictureFill(picture: picture)
+                HeroPictureFill(picture: picture, clearHeight: clearHeight)
             }
             .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
                 heroHeight = height
             }
             .preference(key: HeroBackgroundHeightKey.self, value: heroHeight)
+            // `.heroScrollEdge()` makes the bar's items and the status bar light over it.
+            .preference(key: HeroIsDarkKey.self, value: true)
     }
 }
 
-/// The picture from the screen's top edge to the hero's foot: sharp at the top, a blurred copy
-/// over it lower down, and the page's colour over both towards the foot, where the page goes on.
+/// The picture from the screen's top edge to the hero's foot: sharp down to the end of the clear
+/// part, then a blurred copy and black over it take over, through `HeroPictureMetrics.blendBelow`.
 struct HeroPictureFill<Picture: View>: View {
     let picture: Picture
+    let clearHeight: CGFloat
     /// From the hero's top up to the screen's top edge (`.heroScrollEdge()`).
     @Environment(\.heroBarInset) private var barInset
 
     var body: some View {
-        Color.clear
-            .overlay { picture }
-            .overlay {
-                picture
-                    .blur(radius: HeroPictureMetrics.blur, opaque: true)
-                    .mask {
-                        LinearGradient(
-                            stops: [
-                                .init(color: .clear, location: HeroPictureMetrics.sharpUntil),
-                                .init(color: .black, location: HeroPictureMetrics.blurredFrom),
-                            ],
-                            startPoint: .top, endPoint: .bottom
-                        )
-                    }
-            }
-            .overlay {
-                LinearGradient(
-                    stops: HeroPictureMetrics.veil.map { stop in
-                        Gradient.Stop(color: AppColors.Background.base.opacity(stop.opacity), location: stop.location)
-                    },
-                    startPoint: .top, endPoint: .bottom
-                )
-            }
-            .clipped()
-            // The picture from the screen's top edge, behind the status and navigation bars.
-            .padding(.top, -barInset)
-            .ignoresSafeArea(edges: .top)
-            .allowsHitTesting(false)
-            .accessibilityHidden(true)
+        GeometryReader { proxy in
+            let blend = HeroPictureMetrics.blend(height: proxy.size.height, clearEnd: barInset + clearHeight)
+            Color.clear
+                .overlay { picture }
+                .overlay {
+                    picture
+                        .blur(radius: HeroPictureMetrics.blur, opaque: true)
+                        .mask {
+                            LinearGradient(
+                                stops: [.init(color: .clear, location: blend.start), .init(color: .black, location: blend.end)],
+                                startPoint: .top, endPoint: .bottom
+                            )
+                        }
+                }
+                .overlay {
+                    LinearGradient(
+                        stops: [
+                            .init(color: .black.opacity(0), location: blend.start),
+                            .init(color: .black.opacity(HeroPictureMetrics.shade), location: blend.end),
+                        ],
+                        startPoint: .top, endPoint: .bottom
+                    )
+                }
+                .clipped()
+        }
+        // The picture from the screen's top edge, behind the status and navigation bars.
+        .padding(.top, -barInset)
+        .ignoresSafeArea(edges: .top)
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+}
+
+/// A hero drawn in the dark scheme is at the top (`.heroBackground(picture:)`): the bar's items
+/// and the status bar go light over it.
+struct HeroIsDarkKey: PreferenceKey {
+    static let defaultValue = false
+    static func reduce(value: inout Bool, nextValue: () -> Bool) {
+        value = value || nextValue()
     }
 }
 
@@ -324,6 +360,8 @@ private struct HeroScrollEdgeModifier: ViewModifier {
     @State private var scrolled: CGFloat = 0
     /// The scroll view's top inset: the bars above its content.
     @State private var barInset: CGFloat = 0
+    /// The hero is a picture, drawn dark (`.heroBackground(picture:)`, 8.14.0).
+    @State private var heroIsDark = false
 
     /// While the content under the bar is still the hero's colour (the cards after the hero
     /// rise `AppSpacing.xxl` over its end).
@@ -336,6 +374,9 @@ private struct HeroScrollEdgeModifier: ViewModifier {
             .onPreferenceChange(HeroBackgroundHeightKey.self) { height in
                 heroHeight = height
             }
+            .onPreferenceChange(HeroIsDarkKey.self) { isDark in
+                heroIsDark = isDark
+            }
             .onScrollGeometryChange(for: CGFloat.self) { geometry in
                 (geometry.contentOffset.y + geometry.contentInsets.top).rounded()
             } action: { _, offset in
@@ -347,6 +388,8 @@ private struct HeroScrollEdgeModifier: ViewModifier {
                 barInset = inset
             }
             .scrollEdgeEffectHidden(colourIsUnderBar, for: .top)
+            // Light bar items and status bar over a picture hero, the system's own after it.
+            .toolbarColorScheme(heroIsDark && colourIsUnderBar ? .dark : nil, for: .navigationBar)
             // Once the hero is measured: before that it reads as not under the bar, and a
             // title kept empty at rest would flash in.
             .onChange(of: colourIsUnderBar, initial: true) { _, isUnder in
