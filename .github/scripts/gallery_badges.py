@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The Gallery's app badges against the apps' own code (5.2.0; Platina since 8.16.1).
+"""The Gallery's app badges against the apps' own code (5.2.0; Platina since 8.17.1).
 
 Each ComponentPage names the apps that use its component (`apps: [.tenra, .dalada, .platina]`). This reads
 every page of Gallery/Gallery/Screens, looks for the component's names in each app's Swift
@@ -17,7 +17,7 @@ whole word outside comments and string literals, in a file that does not declare
 own view of the same name is not DesignKit's), or the name after its module
 (`DesignComponents.StreakCard`, as an app's adapter of the same name calls it). When the app
 declares a type of that name anywhere, a use counts only in a file that imports one of
-DesignKit's modules (8.16.1: Platina's PSN model `Avatar`, used in a file of its own networking
+DesignKit's modules (8.17.1: Platina's PSN model `Avatar`, used in a file of its own networking
 package, is not DesignKit's `Avatar`).
 """
 

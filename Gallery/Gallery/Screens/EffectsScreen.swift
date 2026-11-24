@@ -461,6 +461,7 @@ private struct BorderBeamPage: View {
 /// photo, sharp at the top, flowing into its own dark colours under the hero's text and buttons.
 private struct HeroPicturePage: View {
     @State private var sample = 3
+    @State private var figure = false
 
     var body: some View {
         ComponentPage(
@@ -475,24 +476,26 @@ private struct HeroPicturePage: View {
                 "Any view fills it: RemotePhoto (the app's loader and cache), an Image that is .resizable().scaledToFill(). It is cropped to the hero. While a RemotePhoto loads, a still dark fill (or its placeholderKey's small version, blurred) stands in: no shimmer behind the text (8.15.0).",
                 "Pulled down, the picture keeps to the screen's top and grows with the pull; scrolled up, it moves at half the content's pace, behind it (8.15.0, with .heroScrollEdge(); no parallax under Reduce Motion). “Open as a screen” shows both.",
                 ".heroScrollEdge(isHeroUnderBar:) on the scroll view: the picture reaches the screen's top, the bar's buttons and the status bar are light while it is under them, and the screen knows when to show the bar's title. “Open as a screen” shows it.",
+                "subject: (8.17.0) a cut-out figure in front of the picture, as a game's hero before its world: a square as wide as the hero, or as tall as the hero below the bars where that is less, centred, its top at the bars' foot. Blurred and darkened with the picture under the text; scrolled up, it moves at three quarters of the content's pace, the picture behind it at half. Nothing stands in for it while it loads or if it fails (RemotePhotoLoading.hidden). Turn on “Figure”.",
             ],
             dos: [
                 "Centre the hero's content over the picture: the logo or name, a line of facts, the buttons.",
                 "Put the name in the hero (a logo picture where there is one) and keep the bar's title empty until the hero scrolls away.",
+                "With subject:, pass the backdrop the figure was drawn for as the picture.",
             ],
             donts: [
                 "Put text in the clear part of the picture, other than a title logo at its foot.",
                 "Lay a scrim or a gradient of your own over it.",
+                "Put a figure as subject: over a cover that already shows it: it stands twice.",
             ]
         ) {
             HeroPictureSample(sample: sample)
-                .heroBackground {
-                    RemotePhoto(key: GalleryPhotos.key(sample), url: GalleryPhotos.url(sample))
-                }
+                .heroPicture(sample: sample, figure: figure)
         } controls: {
             ChoiceControl("Picture", selection: $sample, options: [("Lake", 0), ("Dawn", 1), ("Night", 3), ("Camp", 5)])
+            ToggleControl("Figure", isOn: $figure)
             NavigationLink {
-                HeroPictureScreen(sample: sample)
+                HeroPictureScreen(sample: sample, figure: figure)
             } label: {
                 Label("Open as a screen", systemImage: "iphone")
                     .font(AppTypography.bodySmall.weight(.medium))
@@ -536,15 +539,14 @@ private struct HeroPictureSample: View {
 /// The picture hero where it lives: the bar's title empty while the hero shows the name.
 private struct HeroPictureScreen: View {
     let sample: Int
+    let figure: Bool
     @State private var heroUnderBar = true
 
     var body: some View {
         ScrollView {
             VStack(spacing: AppSpacing.lg) {
                 HeroPictureSample(sample: sample)
-                    .heroBackground {
-                        RemotePhoto(key: GalleryPhotos.key(sample), url: GalleryPhotos.url(sample))
-                    }
+                    .heroPicture(sample: sample, figure: figure)
                 VStack(spacing: AppSpacing.lg) {
                     ForEach(["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"], id: \.self) { day in
                         Text(verbatim: day)
@@ -561,6 +563,25 @@ private struct HeroPictureScreen: View {
         .heroScrollEdge(isHeroUnderBar: $heroUnderBar)
         .navigationTitle(heroUnderBar ? "" : GalleryPhoto.samples[sample].caption)
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private extension View {
+    /// The sample's photo behind the hero, or with `figure` its backdrop and a hiker in front of it
+    /// (8.17.0).
+    @ViewBuilder
+    func heroPicture(sample: Int, figure: Bool) -> some View {
+        if figure {
+            heroBackground {
+                RemotePhoto(key: GalleryPhotos.backdropKey(sample), url: GalleryPhotos.url(sample))
+            } subject: {
+                RemotePhoto(key: GalleryPhotos.figureKey, url: GalleryPhotos.figureURL)
+            }
+        } else {
+            heroBackground {
+                RemotePhoto(key: GalleryPhotos.key(sample), url: GalleryPhotos.url(sample))
+            }
+        }
     }
 }
 

@@ -143,7 +143,7 @@ struct ShowcaseCount<Pages: View>: View {
 enum ConsumerApp: String {
     case tenra = "Tenra"
     case dalada = "Dalada"
-    /// The third consumer (8.12.0), a PlayStation trophy tracker; its badges since 8.16.1.
+    /// The third consumer (8.12.0), a PlayStation trophy tracker; its badges since 8.17.1.
     case platina = "Platina"
 }
 

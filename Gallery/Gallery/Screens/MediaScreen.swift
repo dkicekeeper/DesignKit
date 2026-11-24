@@ -696,6 +696,7 @@ private struct RemotePhotoPage: View {
                 "placeholderKey: a smaller version shown, with the shimmer over it, while this one loads (the thumbnail under the full photo).",
                 "No URL, or a failed load: the photo symbol.",
                 ".remotePhotoLoading(.still) (8.15.0): a still grey, or the small version blurred, with no shimmer and no symbol, for a picture behind text and buttons. .heroBackground(picture:) sets it.",
+                ".remotePhotoLoading(.hidden) (8.17.0): nothing while it loads, nor when it fails, for a cut-out figure over another picture. .heroBackground(picture:subject:) sets it on its figure.",
             ]
         ) {
             HStack(spacing: AppSpacing.md) {
@@ -717,7 +718,7 @@ private struct RemotePhotoPage: View {
             .id(attempt)
         } controls: {
             StateControl(state: $state)
-            ChoiceControl("While loading", selection: $loading, options: [("Skeleton", RemotePhotoLoading.skeleton), ("Still", .still)])
+            ChoiceControl("While loading", selection: $loading, options: [("Skeleton", RemotePhotoLoading.skeleton), ("Still", .still), ("Hidden", .hidden)])
             ToggleControl("URL", isOn: $hasURL)
             ActionControl("Load again", systemImage: "arrow.clockwise") { attempt += 1 }
         }
@@ -888,7 +889,7 @@ private struct ShareCardFramePage: View {
             name: "ShareCardFrame",
             summary: "A picture to share in Stories or a chat: a photo under a dark gradient (or a gradient alone), the content from the top, the brand and the site at the bottom.",
             since: "2.8.0",
-            apps: [.dalada, .platina],
+            apps: [.tenra, .dalada, .platina],
             notes: [
                 "An image, not a screen: fixed point sizes (360 wide, rendered at 3× to 1080 px), the same colours in light and dark.",
                 "ShareCardSheet renders it, lets the person pick Stories or post, and shares it.",

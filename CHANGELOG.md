@@ -16,7 +16,7 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
-## 8.16.1 - 2026-11-24
+## 8.17.1 - 2026-11-24
 
 The Gallery and the docs brought up to date with the three apps: Platina's badges on the pages it uses, usage notes that still gave advice from before 8.0.0, and the plans in one place. No API changes.
 [#111](https://github.com/dkicekeeper/DesignKit/pull/111)
@@ -36,6 +36,36 @@ Nothing to change. The agents block (docs/agents.md, which an app's CLAUDE.md ta
 - Gallery texts: `SectionHeader` lists its three styles (`.compact` went in 8.0.0); `DownloadRow` deletes with a long press and pads itself in a card; `.cardStyle()` and `.formCardStyle()` agree that menus open from a glass card; `FormSection`, `CardList` and `.filterChipStyle()` name the grey fill of 8.12.0; `AmountVisibilityToggle` no longer says Tenra uses it; `ItemRow` names where the three apps use it.
 - docs/components.md and .json carry Platina among the apps. docs/adoption.md is checked against the three apps' code (Tenra hints with `.spotlight` and no longer uses `TypingIndicator`; Dalada dropped `.dissolve` and `PlusTabLabel`; where 8.9.0's components went; a section for Platina). CLAUDE.md's consumers follow, and its Known Gaps lists what is next: benchmark round 4's P3 candidates, the assistant's list of actions, Platina in CI's build jobs and its own update workflow.
 - docs/design-system.md, docs/gallery-structure.md, docs/benchmark.md and docs/testflight.md: the swipe advice, `FormSection(style: .glass)` and the two-app wording that were left from earlier versions; TestFlight's What to Test is the version's notes on a release build.
+
+## 8.17.0 - 2026-11-24
+
+A picture hero in two layers: a cut-out figure standing in front of its backdrop, as a game's page on a PlayStation stands its hero before its world. On a phone the figure shows whole under the bars, where the same art drawn into one wide cover and cropped to the phone's width showed a shoulder; scrolled, the figure rises in front of the backdrop. For Platina's game screen (the owner's review of its mockup with three games).
+[#112](https://github.com/dkicekeeper/DesignKit/pull/112)
+
+### Added
+
+- `.heroBackground(clearHeight:picture:subject:)`: `subject` is a cut-out figure (a picture with a transparent background) in front of `picture`, the backdrop it was drawn for. It gets a square as wide as the hero, or as tall as the hero below the bars where that is less (an iPad, a Mac window), centred, its top at the bars' foot; it is sharp in the clear part and blurred and darkened with the backdrop under the hero's text. Scrolled up, the backdrop lags behind the content by half and the figure by a quarter, so the figure rises in front of it (still under Reduce Motion and `.designKitMotion(false)`); pulled down, both grow with the pull.
+- `RemotePhotoLoading.hidden`: nothing while the photo loads, nor when it fails or has no URL, for a cut-out figure over another picture, which then shows alone. `.heroBackground(picture:subject:)` sets it on its figure.
+
+### Migration
+
+Nothing to change: `.heroBackground(clearHeight:picture:)` looks as before. A screen with a figure and its backdrop passes both:
+
+```swift
+GameHero(game)
+    .heroBackground(clearHeight: 256) {
+        RemotePhoto(key: "backdrop-\(game.id)", url: game.backdropURL)
+    } subject: {
+        RemotePhoto(key: "character-\(game.id)", url: game.characterURL)
+    }
+```
+
+An app that switches over `RemotePhotoLoading` adds the `.hidden` case.
+
+### Gallery and tooling
+
+- Gallery: Effects › `.heroBackground(picture:)` has a "Figure" switch: the sample's backdrop with a hiker in front of it, on the page and in "Open as a screen". Media › `RemotePhoto`'s "While loading" has "Hidden".
+- A snapshot of a hero with a figure in front of its backdrop (`heroOnPictureWithSubject`).
 
 ## 8.16.0 - 2026-11-24
 

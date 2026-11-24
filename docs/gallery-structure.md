@@ -106,7 +106,7 @@ Gallery — сколько в нём компонентов; оно считае
    (`.dsSearchSuggestions` у `SearchSuggestions`, хук `DesignKitTheme.surface` у `SurfaceStyle`),
    — в `ALIASES` скрипта. Если у приложения есть свой тип с тем же именем (модель `Avatar` в
    Platina), засчитывается только файл, который импортирует модуль DesignKit. Platina читается с
-   8.16.1. `gallery_badges.py fix --tenra … --dalada … --platina …` переписывает бейджи сам.
+   8.17.1. `gallery_badges.py fix --tenra … --dalada … --platina …` переписывает бейджи сам.
 2. **Пример** на холсте (серая подложка с рамкой, на ней видно стекло; при поверхностях
    Fill — страница приложения, белая или чёрная): компонент в текущих параметрах. Акцент
    (Tenra / Dalada / Platina) и поверхности (Glass / Fill, 8.12.0) переключаются в меню на главной и

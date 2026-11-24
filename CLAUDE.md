@@ -98,7 +98,7 @@ it as "Designed for iPad"; its content keeps to `.readableWidth()`, 8.13.0); acc
 `ExpandableText`), picking (`SearchablePicker`), its game screen
 (`.heroBackground(clearHeight:picture:)`, 8.14.0), sharing (`ShareCardSheet`). Its guide:
 `CLAUDE.md` («DesignKit») and `docs/PLAN.md` §4. CI does not build it here yet; the Gallery's badges
-read its code since 8.16.1 (CI's `Gallery badges` job checks it out with Tenra and Dalada).
+read its code since 8.17.1 (CI's `Gallery badges` job checks it out with Tenra and Dalada).
 
 **Dalada since 8.12.0** (its #77, version 1.0.4) draws its surfaces as a grey fill too
 (`DesignKitTheme.surface = .fill` in its `AppEnvironment`); Tenra keeps Liquid Glass.
@@ -188,7 +188,7 @@ rather than importing an app type.
    what the component does), with a control for each parameter and a `StateControl` whose
    "Loading" shows its skeleton (plus Empty / Error / Disabled when it has them); a new screen
    needs `xcodegen generate`. Its `apps:` names the apps whose code uses it: CI's `Gallery
-   badges` job compares them with Tenra's, Dalada's and Platina's sources (5.2.0; Platina 8.16.1). Give it `dos:` / `donts:` when
+   badges` job compares them with Tenra's, Dalada's and Platina's sources (5.2.0; Platina 8.17.1). Give it `dos:` / `donts:` when
    there is a way it is misused (8.9.0), then `python3 .github/scripts/components_reference.py write`
    (CI fails on a stale docs/components.md). Add a snapshot test in `Gallery/SnapshotTests` (the skeleton's in
    `SkeletonsSnapshotTests`; one Liquid Glass card per snapshot; `named:` tells them apart),
@@ -368,10 +368,15 @@ rather than importing an app type.
   by side there. And after the owner's look at 8.14.0's hero on a device: the picture stretches
   when pulled down and lags behind the content when scrolled, and waits for its `RemotePhoto`
   with a still dark fill (`RemotePhotoLoading.still`) instead of a shimmer.
+- A hero in two layers (8.17.0, the owner's review of Platina's mockup with three games):
+  `.heroBackground(clearHeight:picture:subject:)` stands a cut-out figure (a game's hero
+  character) in front of its backdrop, as wide as the screen just under the bars on a phone, with
+  a parallax of its own; `RemotePhotoLoading.hidden` keeps a figure that is loading or failed
+  out of sight.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.
-- What is next (2026-11-24, the docs and Gallery audit of 8.16.1): benchmark round 4's P3
+- What is next (2026-11-24, the docs and Gallery audit of 8.17.1): benchmark round 4's P3
   candidates, each when an app asks for it (docs/benchmark.md 13 a data palette, 14 an exit
   motion, 15 spacing that grows with Dynamic Type, 20 `FormSection(isExpanded:)`,
   `FlowLayout(maxRows:)`, a banner over a sheet, a status dot on `Avatar`, 23 the code of a page's

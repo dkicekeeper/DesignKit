@@ -4,7 +4,7 @@ A list for the app sessions (5.2.0, the owner's review): DesignKit components no
 screens that load without the reveal the rest of the app has. Each line is a proposal, not a
 decision; the app's session decides and does the work in the app. When an app starts using a
 component, CI's `Gallery badges` job asks for the Gallery page's `apps:` to name it
-([gallery-structure.md](gallery-structure.md)); it reads Tenra, Dalada and, since 8.16.1, Platina.
+([gallery-structure.md](gallery-structure.md)); it reads Tenra, Dalada and, since 8.17.1, Platina.
 
 Checked against the three apps' `main` on 2026-11-24 (Tenra at DesignKit 8.11.0, Dalada at 8.12.0,
 Platina at 8.14.0).
@@ -70,7 +70,7 @@ Benchmark round 4 (docs/benchmark.md, against Meta's Astryx) added these. Where 
 
 Platina (2026-11, a PlayStation trophy tracker) draws all of its interface with DesignKit, on the
 grey surfaces (`DesignKitTheme.surface = .fill`, 8.12.0) and in a column on the iPad and the Mac
-(`.readableWidth()`, 8.13.0); the Gallery's pages carry its badge since 8.16.1. The first app to
+(`.readableWidth()`, 8.13.0); the Gallery's pages carry its badge since 8.17.1. The first app to
 use `SearchablePicker`, `ConversationDivider`, `MessageBubble(markdown:)`, `.readableWidth()` and
 `.heroBackground(clearHeight:picture:)` (its game screen, 8.14.0); its profile puts its sections
 side by side on an iPad (`AppLayout.cardColumns`) and its play days in a `CalendarHeatmap`. Not used
