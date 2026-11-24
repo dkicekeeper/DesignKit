@@ -16,6 +16,34 @@ Each release lists what applies to it, in this order:
 Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
 adds its section here (CLAUDE.md, "API Stability & Versioning").
 
+## 8.16.0 - 2026-11-24
+
+A shared picture says which app it is from: the app's icon before its name in the brand line, and the name in Inter. For Tenra's year in review, whose picture goes to Stories and chats.
+[#110](https://github.com/dkicekeeper/DesignKit/pull/110)
+
+### Added
+
+- `ShareCardFrame(format:brand:brandIcon:site:photo:style:content:)`: `brandIcon` is the app's icon, drawn 30 pt before the name in the home screen's rounded square (continuous corners, 22.5 % of its side). Without it the brand line is as before.
+- `ShareCard.BrandTypeface` (`.rounded`, `.inter`) and `ShareCard.Style(top:bottom:accent:brandTypeface:)`: `.inter` sets the name in Inter bold; `.rounded` (the default) keeps the rounded heavy name.
+
+### Migration
+
+Nothing to change in code: a card without the new arguments looks as before. An app that wants its icon on the picture adds the icon as an image set (an app icon set cannot be read as an image) and passes it:
+
+```swift
+ShareCardFrame(
+    format: .story,
+    brand: "Tenra",
+    brandIcon: UIImage(named: "LaunchIcon"),
+    style: ShareCard.Style(top: …, bottom: …, accent: …, brandTypeface: .inter)
+) { … }
+```
+
+### Gallery and tooling
+
+- Gallery: Media › `ShareCardFrame` has "App icon" and "Name" (Rounded, Inter) controls, with a stand-in icon.
+- A snapshot of a post with the icon and the name in Inter (`shareCardFrameBrandIcon`, `brandIcon`).
+
 ## 8.15.0 - 2026-11-24
 
 A main column with a side column beside it on a large screen, and a `CardList` in a grid: on an iPad a game's trophies with its guide, walkthrough and sessions beside them, the games a person goes for side by side; on a phone the screen as it is. For Platina's game screen on the iPad, the Mac and an unfolded iPhone Duo (the owner's review of its mockup). And the picture hero after the owner's look at it on a device: it stretches when pulled down, lags behind the content when scrolled, and waits for its picture without a shimmer.

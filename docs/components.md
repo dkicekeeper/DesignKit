@@ -2277,11 +2277,12 @@ Since 2.8.0 · Apps: Dalada
   A share card's frame: the photo or gradient, the content from the top, and the brand line.
 
 ```swift
-init(format: ShareCard.Format, brand: String, site: String? = nil, photo: UIImage? = nil, style: ShareCard.Style = .standard, @ViewBuilder content: () -> Content)
+init(format: ShareCard.Format, brand: String, brandIcon: UIImage? = nil, site: String? = nil, photo: UIImage? = nil, style: ShareCard.Style = .standard, @ViewBuilder content: () -> Content)
 ```
 
 - An image, not a screen: fixed point sizes (360 wide, rendered at 3× to 1080 px), the same colours in light and dark.
 - ShareCardSheet renders it, lets the person pick Stories or post, and shares it.
+- 8.16.0: brandIcon puts the app's icon before its name, in the home screen's rounded square, and ShareCard.Style(brandTypeface: .inter) sets the name in Inter, so a shared picture says which app it is from.
 
 ## Content & Layout
 
