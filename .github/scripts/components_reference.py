@@ -8,8 +8,12 @@ usage notes and do / don't lines (`ComponentPage`), the file it lives in, its do
 public initialisers and its skeleton. An app session greps docs/components.md for `### Name`
 instead of reading docs/design-system.md whole; docs/components.json is the same as data.
 
-    python3 .github/scripts/components_reference.py write   # regenerate both files
-    python3 .github/scripts/components_reference.py check   # CI: fails when they are stale
+    python3 .github/scripts/components_reference.py write   # regenerate both files (the release bot)
+    python3 .github/scripts/components_reference.py build   # CI: builds both, writes nothing
+    python3 .github/scripts/components_reference.py check   # fails when the files are stale
+
+Since release numbers are given at merge (docs/releasing.md) the release bot writes the files on
+main after each merge; a PR leaves them alone, so two PRs never conflict over them.
 """
 
 import json
@@ -255,12 +259,15 @@ def markdown(items):
 
 
 def main(argv):
-    if not argv or argv[0] not in ("write", "check"):
+    if not argv or argv[0] not in ("write", "check", "build"):
         print(__doc__)
         return 2
     items = entries()
     text = markdown(items)
     data = json.dumps(items, indent=2, ensure_ascii=False) + "\n"
+    if argv[0] == "build":
+        print(f"docs/components.md builds ({len(items)} components).")
+        return 0
     if argv[0] == "write":
         open(MARKDOWN, "w", encoding="utf-8").write(text)
         open(JSON, "w", encoding="utf-8").write(data)

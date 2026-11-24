@@ -4,6 +4,7 @@ CHANGELOG section, the vNext token, the branch check and the release bot (docs/r
 Run: python3 .github/scripts/test_release.py (CI's Changelog job runs it)."""
 
 import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -48,6 +49,11 @@ A fix.
 ### Gallery and tooling
 - A snapshot.
 """
+
+
+def read_bytes(path):
+    with open(path, "rb") as file:
+        return file.read()
 
 
 class NoteTests(unittest.TestCase):
@@ -136,16 +142,142 @@ class TokenTests(unittest.TestCase):
             def write(path, data):
                 full = os.path.join(root, path)
                 os.makedirs(os.path.dirname(full), exist_ok=True)
-                open(full, "wb").write(data)
+                with open(full, "wb") as file:
+                    file.write(data)
             write("a.swift", b'since: "vNext"\n')
             write(".changes/n.md", b"Added in vNext.\n")
             write("b.png", b"\0vNext")
             write("c.md", b"Nothing here.\n")
             changed = release.replace_in_tree(root, ["a.swift", ".changes/n.md", "b.png", "c.md"], "8.15.0")
             self.assertEqual(changed, ["a.swift"])
-            self.assertEqual(open(os.path.join(root, "a.swift"), "rb").read(), b'since: "8.15.0"\n')
-            self.assertEqual(open(os.path.join(root, ".changes/n.md"), "rb").read(), b"Added in vNext.\n")
-            self.assertEqual(open(os.path.join(root, "b.png"), "rb").read(), b"\0vNext")
+            self.assertEqual(read_bytes(os.path.join(root, "a.swift")), b'since: "8.15.0"\n')
+            self.assertEqual(read_bytes(os.path.join(root, ".changes/n.md")), b"Added in vNext.\n")
+            self.assertEqual(read_bytes(os.path.join(root, "b.png")), b"\0vNext")
+
+
+GIT_ENV = {
+    "GIT_AUTHOR_NAME": "Test", "GIT_AUTHOR_EMAIL": "test@example.com",
+    "GIT_COMMITTER_NAME": "Test", "GIT_COMMITTER_EMAIL": "test@example.com",
+    "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1",
+}
+CHANGELOG = "# Changelog\n\nPreamble.\n\n## 8.14.0 - 2026-11-24\n\nOld.\n\n### Added\n\n- A thing.\n"
+
+
+def git(root, *args):
+    env = dict(os.environ, **GIT_ENV)
+    return subprocess.run(["git", *args], cwd=root, env=env, check=True,
+                          capture_output=True, text=True).stdout
+
+
+def write(root, path, text):
+    full = os.path.join(root, path)
+    os.makedirs(os.path.dirname(full) or root, exist_ok=True)
+    with open(full, "w", encoding="utf-8") as file:
+        file.write(text)
+
+
+def commit(root, files, message="change"):
+    for path, text in files.items():
+        if text is None:
+            git(root, "rm", "-q", path)
+        else:
+            write(root, path, text)
+            git(root, "add", path)
+    git(root, "commit", "-q", "-m", message)
+    return git(root, "rev-parse", "HEAD").strip()
+
+
+def make_repo(root):
+    """A repository on main at 8.14.0, tagged."""
+    git(root, "init", "-q", "-b", "main")
+    commit(root, {"VERSION": "8.14.0\n", "CHANGELOG.md": CHANGELOG,
+                  "Sources/A.swift": "let a = 1\n", "docs/components.md": "# Components\n"}, "start")
+    git(root, "tag", "8.14.0")
+
+
+class BranchCheckTests(unittest.TestCase):
+    def setUp(self):
+        self.dir = tempfile.TemporaryDirectory()
+        self.root = self.dir.name
+        make_repo(self.root)
+        git(self.root, "checkout", "-q", "-b", "feature")
+
+    def tearDown(self):
+        self.dir.cleanup()
+
+    def check(self):
+        return release.check_branch(self.root, "main")
+
+    def test_check_clean_note(self):
+        commit(self.root, {".changes/feature-2026-11-24-a.md": NOTE,
+                           "Sources/A.swift": 'let a = 1 // since: "vNext"\n'})
+        self.assertEqual(self.check(), ([], []))
+
+    def test_check_version_edit(self):
+        commit(self.root, {".changes/n.md": NOTE, "VERSION": "8.15.0\n"})
+        errors, _ = self.check()
+        self.assertTrue(any("VERSION" in e for e in errors), errors)
+
+    def test_check_changelog_heading(self):
+        commit(self.root, {".changes/n.md": NOTE,
+                           "CHANGELOG.md": CHANGELOG.replace("## 8.14.0", "## 8.15.0 - 2026-11-24\n\nNew.\n\n### Fixed\n\n- X.\n\n## 8.14.0")})
+        errors, _ = self.check()
+        self.assertTrue(any("CHANGELOG" in e and "8.15.0" in e for e in errors), errors)
+
+    def test_check_token_without_note(self):
+        commit(self.root, {"Sources/A.swift": 'let a = 1 // since vNext\n'})
+        errors, _ = self.check()
+        self.assertTrue(any("vNext" in e for e in errors), errors)
+
+    def test_check_token_in_backticks_needs_no_note(self):
+        commit(self.root, {"README.md": "Write `vNext` where the version goes.\n"})
+        self.assertEqual(self.check()[0], [])
+
+    def test_check_reference_edit(self):
+        commit(self.root, {".changes/n.md": NOTE, "docs/components.md": "# Components\n\nMore.\n"})
+        errors, _ = self.check()
+        self.assertTrue(any("docs/components.md" in e for e in errors), errors)
+
+    def test_check_bad_note(self):
+        commit(self.root, {".changes/n.md": NOTE.replace("minor", "patch")})
+        errors, _ = self.check()
+        self.assertTrue(any(e.startswith(".changes/n.md") and "Added" in e for e in errors), errors)
+
+    def test_check_major_number(self):
+        major = NOTE.replace("bump: minor", "bump: major\nversion: 10.0.0")
+        commit(self.root, {".changes/n.md": major})
+        errors, _ = self.check()
+        self.assertTrue(any("9.0.0" in e for e in errors), errors)
+        commit(self.root, {".changes/n.md": major.replace("10.0.0", "9.0.0")})
+        self.assertEqual(self.check()[0], [])
+
+    def test_check_code_without_note(self):
+        commit(self.root, {"Sources/A.swift": "let a = 2\n"})
+        errors, warnings = self.check()
+        self.assertEqual(errors, [])
+        self.assertEqual(len(warnings), 1)
+
+    def test_preview(self):
+        self.assertIsNone(release.preview(self.root))
+        commit(self.root, {".changes/n.md": NOTE})
+        self.assertEqual(release.preview(self.root), "8.15.0")
+
+
+class ReferenceBuildTests(unittest.TestCase):
+    def test_build_writes_nothing(self):
+        script = os.path.join(HERE, "components_reference.py")
+        markdown = os.path.join(HERE, "..", "..", "docs", "components.md")
+        before = os.stat(markdown).st_mtime_ns
+        result = subprocess.run([sys.executable, script, "build"], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("builds", result.stdout)
+        self.assertEqual(os.stat(markdown).st_mtime_ns, before)
+
+    def test_cli_next_without_notes(self):
+        result = subprocess.run([sys.executable, os.path.join(HERE, "release.py"), "next"],
+                                capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue(result.stdout.startswith(("No release note", "Merging this would release")))
 
 
 if __name__ == "__main__":

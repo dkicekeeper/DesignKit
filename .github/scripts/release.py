@@ -16,6 +16,7 @@ starts TestFlight.
 import dataclasses
 import os
 import re
+import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -260,3 +261,134 @@ def replace_in_tree(root, paths, version):
                 file.write(new)
             changed.append(path)
     return changed
+
+
+REFERENCE = ("docs/components.md", "docs/components.json")
+CODE_DIRS = ("Sources/", "Gallery/")
+
+
+def _git(root, *args):
+    return subprocess.run(["git", *args], cwd=root, check=True, capture_output=True, text=True).stdout
+
+
+def _show(root, ref, path):
+    """The file at ref, or None where it does not exist."""
+    result = subprocess.run(["git", "show", f"{ref}:{path}"], cwd=root, capture_output=True, text=True)
+    return result.stdout if result.returncode == 0 else None
+
+
+def _tags(root, merged=None):
+    args = ["tag", "--list"] + (["--merged", merged] if merged else [])
+    return [tag for tag in _git(root, *args).split() if VERSION_TEXT.match(tag)]
+
+
+def _is_note(path):
+    return path.startswith(NOTES_DIR + "/") and path.endswith(".md")
+
+
+def check_branch(root, base):
+    """(errors, warnings) of the branch at HEAD against base: a PR declares its release in a note
+    and leaves VERSION, the CHANGELOG headings and the component reference to the bot."""
+    errors, warnings = [], []
+    fork = _git(root, "merge-base", base, "HEAD").strip()
+    changed = {}
+    for line in _git(root, "diff", "--name-status", "--no-renames", fork, "HEAD").splitlines():
+        status, path = line.split("\t", 1)
+        changed[path] = status
+    if "VERSION" in changed:
+        errors.append("VERSION: the release bot writes it at merge; a PR declares its release in "
+                      f"{NOTES_DIR}/<name>.md (docs/releasing.md)")
+    if "CHANGELOG.md" in changed:
+        before = {v for v, _, _ in changelog.releases(_show(root, fork, "CHANGELOG.md") or "")}
+        after = [v for v, _, _ in changelog.releases(_show(root, "HEAD", "CHANGELOG.md") or "")]
+        for version in after:
+            if version not in before:
+                errors.append(f"CHANGELOG.md: the section ## {version} is the release bot's to write; "
+                              f"put its text in {NOTES_DIR}/<name>.md")
+    for path in REFERENCE:
+        if path in changed:
+            errors.append(f"{path}: the release bot regenerates it after the merge; leave it out of the PR "
+                          "(components_reference.py build checks it builds)")
+    notes = [path for path, status in changed.items() if _is_note(path) and status != "D"]
+    majors = []
+    for path in notes:
+        text = _show(root, "HEAD", path) or ""
+        problems = note_problems(text, path)
+        errors += problems
+        if not problems:
+            fragment = parse_fragment(text, path)
+            if fragment.bump == "major":
+                majors.append(fragment)
+    if len(majors) > 1:
+        errors.append("more than one major note: one major at a time")
+    if majors:
+        want = next_version(base_version(_tags(root, fork), _show(root, fork, "VERSION") or "0.0.0"), "major")
+        for fragment in majors:
+            if fragment.version != want:
+                errors.append(f"{fragment.path}: the next major is {format_version(want)}, "
+                              f"not {format_version(fragment.version)}")
+    if not notes:
+        diff = _git(root, "diff", "-U0", "--no-renames", fork, "HEAD")
+        current = None
+        for line in diff.splitlines():
+            if line.startswith("+++ "):
+                current = line[6:] if line.startswith("+++ b/") else None
+            elif line.startswith("+") and current and not is_skipped(current) and has_bare_token(line[1:]):
+                errors.append(f"{current}: {TOKEN} stands for this PR's version, so the PR needs a note "
+                              f"in {NOTES_DIR}/ (or write `{TOKEN}` in backticks for the word itself)")
+                break
+        if any(path.startswith(CODE_DIRS) for path in changed):
+            warnings.append(f"Sources/ or Gallery/ changed without a note in {NOTES_DIR}/: no release; "
+                            "add a note if this should ship (docs/releasing.md)")
+    return errors, warnings
+
+
+def _read(root, path):
+    with open(os.path.join(root, path), encoding="utf-8") as file:
+        return file.read()
+
+
+def _notes_in(root):
+    folder = os.path.join(root, NOTES_DIR)
+    if not os.path.isdir(folder):
+        return []
+    return sorted(f"{NOTES_DIR}/{name}" for name in os.listdir(folder) if name.endswith(".md"))
+
+
+def preview(root):
+    """The version the notes now in .changes/ would get if merged now, or None without notes."""
+    fragments = []
+    for path in _notes_in(root):
+        text = _read(root, path)
+        if not note_problems(text, path):
+            fragments.append(parse_fragment(text, path))
+    if not fragments:
+        return None
+    version_file = _read(root, "VERSION")
+    return format_version(next_version(base_version(_tags(root), version_file), combine(fragments).bump))
+
+
+def main(argv):
+    root = os.path.normpath(os.path.join(HERE, "..", ".."))
+    if len(argv) == 3 and argv[0] == "check" and argv[1] == "--base":
+        errors, warnings = check_branch(root, argv[2])
+        for warning in warnings:
+            print(f"::warning::{warning}")
+        for error in errors:
+            print(f"::error::{error}")
+        if not errors:
+            print("The branch's release notes are in order.")
+        return 1 if errors else 0
+    if argv == ["next"]:
+        version = preview(root)
+        print(f"Merging this would release {version}." if version else
+              f"No release note in {NOTES_DIR}/: merging this releases nothing.")
+        return 0
+    if argv and argv[0] == "run":
+        return run_cli(root, dispatch="--no-dispatch" not in argv)
+    print(__doc__)
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
