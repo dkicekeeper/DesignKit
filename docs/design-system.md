@@ -2096,6 +2096,12 @@ is a number (24 pt bold rounded) over its caption (12 pt, 70%). Fixed sizes on p
 card is an image, not a screen. Dalada: the trip, catch and place cards are its own content in
 the frame, with its teal style.
 
+The brand line (8.16.0) can say which app the picture is from: `brandIcon:` puts the app's icon
+(30 pt) before its name, in the home screen's rounded square (22.5 % continuous corners), and
+`ShareCard.Style(…, brandTypeface: .inter)` sets the name in Inter bold instead of rounded heavy
+(`.rounded`, the default). An app icon set cannot be read as an image: the app adds its icon as
+an image set too. Tenra: the year in review's picture, its icon and its name in Inter.
+
 #### `ShareCardSheet`
 `ShareCardSheet(previewTitle:formats:load:message:card:)`: a segmented format picker
 (`share.format`), the picture (drawn with `ImageRenderer` when the data arrives and when the

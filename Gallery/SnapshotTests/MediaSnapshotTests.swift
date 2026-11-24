@@ -15,6 +15,24 @@ import DesignSupport
 import DesignComponents
 
 /// A stand-in photo: a gradient with a symbol.
+/// A stand-in app icon for the share card's brand line: a symbol on a gradient, square.
+@MainActor
+private enum SampleAppIcon {
+    static let image: UIImage? = {
+        let renderer = ImageRenderer(content:
+            LinearGradient(colors: [.indigo, .purple], startPoint: .topLeading, endPoint: .bottomTrailing)
+                .overlay {
+                    Image(systemName: "paintpalette.fill")
+                        .font(.system(size: 30, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+                .frame(width: 60, height: 60)
+        )
+        renderer.scale = 3
+        return renderer.uiImage
+    }()
+}
+
 private struct SamplePhoto: Identifiable {
     let id: Int
     let colors: [Color]
@@ -141,6 +159,34 @@ extension ComponentSnapshots {
                     appearances: [.light]
                 )
             }
+        }
+
+        // 8.16.0: the app's icon before its name, set in Inter.
+        @Test func shareCardFrameBrandIcon() async {
+            await assertComponentSnapshot(
+                ShareCardFrame(
+                    format: .post,
+                    brand: "Tenra",
+                    brandIcon: SampleAppIcon.image,
+                    style: ShareCard.Style(
+                        top: ShareCard.Style.standard.top,
+                        bottom: ShareCard.Style.standard.bottom,
+                        accent: ShareCard.Style.standard.accent,
+                        brandTypeface: .inter
+                    )
+                ) {
+                    Text("My 2026 in Tenra")
+                        .font(.system(size: 30, weight: .bold))
+                    Spacer(minLength: 0)
+                    HStack(alignment: .top, spacing: 12) {
+                        ShareCardStat(value: "21%", title: "Of income kept")
+                        ShareCardStat(value: "1,284", title: "Records")
+                    }
+                },
+                named: "brandIcon",
+                width: ShareCard.Format.post.width,
+                appearances: [.light]
+            )
         }
 
         @Test func downloadRows() async {
