@@ -38,6 +38,17 @@ def section(version):
     return None
 
 
+def line_problem(line):
+    """What is wrong with a line of release text outside code, or None (release.py checks the
+    notes in .changes/ with it too)."""
+    if "—" in line:
+        return "an em dash; use a colon, a comma or two sentences"
+    if any(0x2700 <= ord(c) <= 0x27BF or ord(c) >= 0x1F000 for c in line):
+        # App Store Connect refuses them in TestFlight's What to Test (✓ and ✕ did, 5.0.0).
+        return "a dingbat or an emoji, which TestFlight's What to Test refuses; use words"
+    return None
+
+
 def check():
     text = (ROOT / "CHANGELOG.md").read_text()
     errors = []
@@ -53,11 +64,8 @@ def check():
             errors.append(f"line {number}: unknown section {line[4:]!r} (one of {', '.join(SECTIONS)})")
         elif line.startswith("#### "):
             errors.append(f"line {number}: no headings below ###")
-        elif "—" in line:
-            errors.append(f"line {number}: an em dash; use a colon, a comma or two sentences")
-        elif any(0x2700 <= ord(c) <= 0x27BF or ord(c) >= 0x1F000 for c in line):
-            # App Store Connect refuses them in TestFlight's What to Test (✓ and ✕ did, 5.0.0).
-            errors.append(f"line {number}: a dingbat or an emoji, which TestFlight's What to Test refuses; use words")
+        elif line_problem(line):
+            errors.append(f"line {number}: {line_problem(line)}")
     if in_code:
         errors.append("a code block is not closed")
 
