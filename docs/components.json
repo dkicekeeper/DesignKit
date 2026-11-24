@@ -4241,7 +4241,9 @@
     "section": "Content & Layout",
     "summary": "A screen's main column with a side column beside it when the width allows: on an iPad a trip's route with its weather and group beside it. Narrower, as on a phone, the screen's own narrow layout: chips that switch between the parts, or the side under the main column.",
     "since": "8.15.0",
-    "apps": [],
+    "apps": [
+      "Platina"
+    ],
     "styles": [],
     "notes": [
       "What decides is the width the view gets: the main column's minimum (AppLayout.mainColumnMinWidth, 400 pt), the gap (24 pt) and the side (AppLayout.sideColumnWidth, 340 pt), 764 pt in all, more at a larger text size.",

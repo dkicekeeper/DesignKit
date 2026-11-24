@@ -2415,7 +2415,7 @@ func readableWidth(_ width: CGFloat = AppLayout.readableWidth) -> some View
 
 A screen's main column with a side column beside it when the width allows: on an iPad a trip's route with its weather and group beside it. Narrower, as on a phone, the screen's own narrow layout: chips that switch between the parts, or the side under the main column.
 
-Since 8.15.0 · Apps: none yet
+Since 8.15.0 · Apps: Platina
 
 - `AdaptiveColumns` in `Sources/DesignComponents/Content/AdaptiveColumns.swift`
   A main column and a side column side by side when they fit, the narrow layout when not (8.15.0).
