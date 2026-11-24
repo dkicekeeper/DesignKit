@@ -80,5 +80,38 @@ class NoteTests(unittest.TestCase):
         self.assertEqual(release.format_version((9, 0, 0)), "9.0.0")
 
 
+class VersionTests(unittest.TestCase):
+    def test_versions(self):
+        self.assertEqual(release.base_version(["8.13.0", "8.9.0", "8.14.0", "x"], "8.12.0\n"), (8, 14, 0))
+        self.assertEqual(release.base_version(["8.14.0"], "8.16.1\n"), (8, 16, 1))
+        self.assertEqual(release.next_version((8, 16, 1), "patch"), (8, 16, 2))
+        self.assertEqual(release.next_version((8, 16, 1), "minor"), (8, 17, 0))
+        self.assertEqual(release.next_version((8, 16, 1), "major"), (9, 0, 0))
+
+    def test_combine_two_notes(self):
+        a = release.parse_fragment(NOTE, ".changes/a.md")
+        b = release.parse_fragment(FIX, ".changes/b.md")
+        c = release.combine([a, b])
+        self.assertEqual(c.bump, "minor")
+        self.assertEqual(c.intro, "A share card names its app.\n\nA fix.")
+        self.assertEqual(list(c.sections), ["Added", "Fixed", "Gallery and tooling"])
+        self.assertEqual(c.sections["Gallery and tooling"], ["- A snapshot.", "- A snapshot."])
+
+    def test_section_and_insert(self):
+        head = "# Changelog\n\nPreamble.\n\n## 8.14.0 - 2026-11-24\n\nOld.\n"
+        self.assertEqual(release.release_date("2026-11-23", head), "2026-11-24")
+        self.assertEqual(release.release_date("2026-11-25", head), "2026-11-25")
+        section = release.render_section("8.15.0", "2026-11-24", release.parse_fragment(NOTE), [109, 110], "dkicekeeper/DesignKit")
+        self.assertTrue(section.startswith(
+            "## 8.15.0 - 2026-11-24\n\nA share card names its app.\n"
+            "[#109](https://github.com/dkicekeeper/DesignKit/pull/109), [#110](https://github.com/dkicekeeper/DesignKit/pull/110)\n\n### Added\n"))
+        self.assertTrue(section.endswith("- A snapshot.\n"))
+        self.assertNotIn("[#", release.render_section("8.15.0", "2026-11-24", release.parse_fragment(NOTE), [], "o/r"))
+        out = release.insert_section(head, section)
+        self.assertLess(out.index("## 8.15.0"), out.index("## 8.14.0"))
+        self.assertTrue(out.startswith("# Changelog\n\nPreamble.\n\n## 8.15.0"))
+        self.assertIn("- A snapshot.\n\n## 8.14.0", out)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -149,3 +149,64 @@ def note_problems(text, path):
         return fragment_problems(parse_fragment(text, path))
     except FragmentError as error:
         return [str(error)]
+
+
+def base_version(tags, version_file):
+    """The higher of the latest X.Y.Z tag and VERSION: what the next release counts from."""
+    known = [parse_version(tag) for tag in tags if VERSION_TEXT.match(tag.strip())]
+    return max(known + [parse_version(version_file)])
+
+
+def next_version(base, bump):
+    major, minor, patch = base
+    if bump == "major":
+        return (major + 1, 0, 0)
+    if bump == "minor":
+        return (major, minor + 1, 0)
+    if bump == "patch":
+        return (major, minor, patch + 1)
+    raise ValueError(f"bump is {bump!r}, one of {', '.join(BUMPS)}")
+
+
+def combine(fragments):
+    """One release from several notes (quick merges): the highest bump, the intros and each
+    section's items in the notes' order."""
+    bump = max((f.bump for f in fragments), key=BUMPS.index)
+    versions = [f.version for f in fragments if f.version is not None]
+    sections = {}
+    for name in SECTIONS:
+        lines = []
+        for fragment in fragments:
+            lines += fragment.sections.get(name, [])
+        if lines:
+            sections[name] = lines
+    return Fragment(
+        path=", ".join(f.path for f in fragments),
+        bump=bump,
+        version=max(versions) if versions else None,
+        intro="\n\n".join(f.intro for f in fragments if f.intro),
+        sections=sections,
+    )
+
+
+def release_date(today, changelog_text):
+    """Today, but never before the section the new one goes above (changelog.py checks it)."""
+    found = changelog.releases(changelog_text)
+    return max(today, found[0][1]) if found else today
+
+
+def render_section(version, date, fragment, prs, repo):
+    lines = [f"## {version} - {date}", "", fragment.intro]
+    if prs:
+        lines.append(", ".join(f"[#{n}](https://github.com/{repo}/pull/{n})" for n in prs))
+    for name, body in fragment.sections.items():
+        lines += ["", f"### {name}", ""] + body
+    return "\n".join(lines) + "\n"
+
+
+def insert_section(changelog_text, section):
+    """The new section goes above the first release, after the preamble."""
+    match = re.search(r"^## ", changelog_text, re.M)
+    if not match:
+        return changelog_text.rstrip("\n") + "\n\n" + section
+    return changelog_text[:match.start()] + section + "\n" + changelog_text[match.start():]
