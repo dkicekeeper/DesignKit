@@ -285,7 +285,8 @@ def _tags(root, merged=None):
 
 
 def _is_note(path):
-    return path.startswith(NOTES_DIR + "/") and path.endswith(".md")
+    """A note is a .md file directly in .changes/: the bot reads no other."""
+    return path.startswith(NOTES_DIR + "/") and path.endswith(".md") and path.count("/") == 1
 
 
 def check_branch(root, base):
@@ -311,6 +312,9 @@ def check_branch(root, base):
         if path in changed:
             errors.append(f"{path}: the release bot regenerates it after the merge; leave it out of the PR "
                           "(components_reference.py build checks it builds)")
+    for path, status in changed.items():
+        if path.startswith(NOTES_DIR + "/") and not _is_note(path) and status != "D":
+            errors.append(f"{path}: a note is a .md file directly in {NOTES_DIR}/; the release bot reads no other")
     notes = [path for path, status in changed.items() if _is_note(path) and status != "D"]
     majors = []
     for path in notes:
@@ -398,10 +402,24 @@ def _publish(root, gh, repo, version, changelog_text):
         os.remove(file.name)
 
 
-def _tag(root, gh, repo, remote, version, sha):
+def _tag(root, remote, version, sha):
     _git(root, *BOT, "tag", "-a", version, sha, "-m", f"DesignKit {version}")
     _git(root, "push", "-q", remote, f"refs/tags/{version}")
+
+
+def _finish(root, gh, repo, version, dispatch):
+    """A tagged version's GitHub Release, when it has none yet; and the TestFlight build of a
+    release the bot committed (a person's commit that set VERSION was built by its own push).
+    So a run after one that stopped between its tag and its build completes the release."""
+    try:
+        gh("release", "view", version)
+        return
+    except subprocess.CalledProcessError:
+        pass
+    sha = _git(root, "rev-parse", f"{version}^{{commit}}").strip()
     _publish(root, gh, repo, version, _show(root, sha, "CHANGELOG.md") or "")
+    if dispatch and _git(root, "log", "-1", "--format=%an", sha).strip() == "github-actions[bot]":
+        gh("workflow", "run", "testflight.yml", "--ref", version)
 
 
 def _landed(root, path):
@@ -436,32 +454,43 @@ def notify_failure(gh, prs, run_url):
 
 
 def _commit_and_push(root, remote, branch, message):
+    """Commits everything and pushes it: (pushed, git's reason when it was refused)."""
     _git(root, "add", "-A")
     _git(root, *BOT, "commit", "-q", "-m", message)
     pushed = subprocess.run(["git", "push", "-q", remote, f"HEAD:{branch}"], cwd=root, capture_output=True, text=True)
-    return pushed.returncode == 0
+    return pushed.returncode == 0, (pushed.stderr or pushed.stdout).strip()
 
 
 def run_release(root, *, today, gh, regenerate, repo, remote="origin", branch="main", attempts=3, dispatch=True):
     """The release bot: one release from the notes on main, or None without notes
     (docs/releasing.md). Raises ReleaseError before committing anything wrong."""
+    refused = ""
     for _ in range(attempts):
         _git(root, "fetch", "-q", "--tags", "--force", remote, branch)
         _git(root, "checkout", "-q", "-B", branch, f"{remote}/{branch}")
         _git(root, "reset", "-q", "--hard", f"{remote}/{branch}")
         tags = _tags(root)
         current = _read(root, "VERSION").strip()
+        if not VERSION_TEXT.match(current):
+            raise ReleaseError(f"VERSION is {current!r}, not X.Y.Z")
         if current not in tags:
-            # An earlier run pushed its release commit and stopped, or the old scheme set VERSION.
-            sha = _git(root, "log", "-1", "--format=%H", "--", "VERSION").strip()
-            _tag(root, gh, repo, remote, current, sha)
+            # An earlier run pushed its release commit and stopped, or the old scheme set VERSION:
+            # tag the commit on main's own line that set it (a merge, not the PR's commit).
+            highest = max((parse_version(tag) for tag in tags), default=(0, 0, 0))
+            if parse_version(current) < highest:
+                raise ReleaseError(f"VERSION {current} is below the tag {format_version(highest)}: "
+                                   "tagged, it would be a release no app ever takes")
+            sha = _git(root, "log", "-1", "--first-parent", "--format=%H", "--", "VERSION").strip()
+            _tag(root, remote, current, sha)
             tags = _tags(root)
+        _finish(root, gh, repo, current, dispatch)
         notes = _notes_in(root)
         if not notes:
             regenerate(root)
             if not _git(root, "status", "--porcelain"):
                 return None
-            if _commit_and_push(root, remote, branch, "docs: regenerate the component reference"):
+            pushed, refused = _commit_and_push(root, remote, branch, "docs: regenerate the component reference")
+            if pushed:
                 return None
             continue
         order = {sha: i for i, sha in enumerate(_git(root, "rev-list", "--first-parent", "--reverse", "HEAD").split())}
@@ -496,33 +525,44 @@ def run_release(root, *, today, gh, regenerate, repo, remote="origin", branch="m
                 and has_bare_token(_text_of(os.path.join(root, path)) or "")]
         if problems or left:
             raise ReleaseError("; ".join(problems + [f"{path} keeps {TOKEN}" for path in left]))
-        if not _commit_and_push(root, remote, branch, f"Release {text}"):
+        pushed, refused = _commit_and_push(root, remote, branch, f"Release {text}")
+        if not pushed:
             continue  # main moved on: start again from it; its notes join this release
-        _tag(root, gh, repo, remote, text, _git(root, "rev-parse", "HEAD").strip())
-        if dispatch:
-            gh("workflow", "run", "testflight.yml", "--ref", text)
+        _tag(root, remote, text, _git(root, "rev-parse", "HEAD").strip())
+        _finish(root, gh, repo, text, dispatch)
         return text
-    raise ReleaseError(f"the push to {branch} was refused {attempts} times")
+    raise ReleaseError(f"the push to {branch} was refused {attempts} times; the last time: {refused}")
 
 
-def run_cli(root, dispatch=True):
-    repo = os.environ.get("GITHUB_REPOSITORY", "dkicekeeper/DesignKit")
-
+def _gh(root):
     def gh(*args):
         return subprocess.run(["gh", *args], cwd=root, check=True, capture_output=True, text=True).stdout
+    return gh
 
-    def regenerate(tree):
-        subprocess.run([sys.executable, os.path.join(tree, ".github", "scripts", "components_reference.py"), "write"],
-                       cwd=tree, check=True)
 
-    today = datetime.datetime.now(datetime.timezone.utc).date().isoformat()
+def _regenerate(tree):
+    subprocess.run([sys.executable, os.path.join(tree, ".github", "scripts", "components_reference.py"), "write"],
+                   cwd=tree, check=True)
+
+
+def run_cli(root, dispatch=True, *, gh=None, regenerate=None, repo=None, today=None,
+            remote="origin", branch="main"):
+    repo = repo or os.environ.get("GITHUB_REPOSITORY", "dkicekeeper/DesignKit")
+    gh = gh or _gh(root)
+    today = today or datetime.datetime.now(datetime.timezone.utc).date().isoformat()
     try:
-        version = run_release(root, today=today, gh=gh, regenerate=regenerate, repo=repo, dispatch=dispatch)
+        version = run_release(root, today=today, gh=gh, regenerate=regenerate or _regenerate, repo=repo,
+                              remote=remote, branch=branch, dispatch=dispatch)
     except Exception as error:  # noqa: BLE001 — every failure is reported on the PRs it holds up
-        print(f"::error::{error}")
+        reason = str(error)
+        if isinstance(error, subprocess.CalledProcessError):
+            reason += f": {(error.stderr or error.output or '').strip()}"
+        print(f"::error::{reason}")
         run_url = (f"{os.environ.get('GITHUB_SERVER_URL', 'https://github.com')}/{repo}/actions/runs/"
                    f"{os.environ.get('GITHUB_RUN_ID', '')}")
         try:
+            # The notes as main has them: the run may have deleted them from the tree already.
+            _git(root, "reset", "-q", "--hard", f"{remote}/{branch}")
             notify_failure(gh, pending_prs(root, gh, repo), run_url)
         except Exception as notify_error:  # noqa: BLE001
             print(f"::warning::could not comment on the PRs: {notify_error}")

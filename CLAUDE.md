@@ -27,9 +27,10 @@ reference PNGs in light, dark and large text; CI's `Snapshot tests` job fails on
 difference. An intentional change is re-recorded by a manual CI run with `record_snapshots`
 (`missing` / `failed` / `all`): [docs/snapshots.md](docs/snapshots.md).
 
-**TestFlight**: `.github/workflows/testflight.yml` archives the Gallery and uploads it on every
-push to `main` that touches `Sources/`, `Gallery/`, `Package.swift` or `VERSION` (version =
-`VERSION`, build = run number); a release's build is started by the release bot on its tag.
+**TestFlight**: `.github/workflows/testflight.yml` archives the Gallery and uploads it (version =
+`VERSION`, build = run number). A release's build is started by the release bot on the release's
+tag; any other push to `main` that touches `Sources/`, `Gallery/` or `Package.swift` builds too,
+except a merge that carries a release note (its version is not set until the bot runs).
 Setup and troubleshooting: [docs/testflight.md](docs/testflight.md).
 
 **Releases are numbered at merge**: a PR adds a note in `.changes/` and writes the token
@@ -121,7 +122,7 @@ fails here first (manual runs take `dalada_ref` / `tenra_ref` to check an app br
   local package override: drag the local DesignKit folder into the app's project), CI builds
   every consumer, merge → release tag → each app's update workflow bumps it. Tenra's look stays
   the reference: a visual change to a shared component is a design decision, called out under
-  **Changed** in the release's CHANGELOG.md section.
+  `### Changed` in the PR's release note (`.changes/`, which becomes the CHANGELOG.md section).
 - **Before that:** DesignKit was synced FROM Tenra's own copy: three-way merge per file
   (base = the Tenra commit of the previous sync, theirs = Tenra `main`, ours = DesignKit),
   keeping DesignKit's `public` API and parameterization. The log below records those syncs.
@@ -391,6 +392,7 @@ rather than importing an app type.
 | Package traps (public API, Xcode 26/27, bundles) and SwiftUI layout traps | [docs/gotchas.md](docs/gotchas.md) |
 | Localized strings used by components | [docs/localization-keys.md](docs/localization-keys.md) |
 | Gallery TestFlight pipeline | [docs/testflight.md](docs/testflight.md) |
+| Cutting a release: the note in `.changes/`, the version token, what the release bot does, recovering a failed run | [docs/releasing.md](docs/releasing.md) |
 | Snapshot tests: what is covered, recording references, the pinned Xcode | [docs/snapshots.md](docs/snapshots.md) |
 | What each version added and changed, and how to move an app to it (also the Gallery's Updates screen) | [CHANGELOG.md](CHANGELOG.md) |
 | Moving an app to 2.0 (renames, `DSButton`, icon sizes, visual changes) | [docs/migration-2.0.md](docs/migration-2.0.md) |

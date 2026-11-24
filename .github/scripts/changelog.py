@@ -105,8 +105,8 @@ def problems(text, version):
 
     if not any(name == version for name, _, _ in found):
         errors.append(
-            f"no section for VERSION {version}: a release PR adds `## {version} - YYYY-MM-DD` "
-            "to CHANGELOG.md"
+            f"no section for VERSION {version}: the release bot writes `## {version} - YYYY-MM-DD` "
+            "from the notes in .changes/ (docs/releasing.md)"
         )
     elif found[0][0] != version:
         errors.append(f"the newest section is {found[0][0]}, VERSION is {version}")

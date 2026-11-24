@@ -28,8 +28,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # CHANGELOG.md is well formed and has a section for VERSION, so a release PR carries its
-  # notes (release.yml publishes them; the Gallery's Updates screen shows them).
+  # CHANGELOG.md is well formed and has a section for VERSION; on a branch, its release note in
+  # .changes/ is well formed and it leaves the release bot's files alone (release.yml numbers,
+  # writes and publishes the release at merge; the Gallery's Updates screen shows it).
   changelog:
     name: Changelog
     runs-on: ubuntu-latest

@@ -3,6 +3,8 @@
 CHANGELOG section, the vNext token, the branch check and the release bot (docs/releasing.md).
 Run: python3 .github/scripts/test_release.py (CI's Changelog job runs it)."""
 
+import contextlib
+import io
 import os
 import subprocess
 import sys
@@ -238,6 +240,11 @@ class BranchCheckTests(unittest.TestCase):
         errors, _ = self.check()
         self.assertTrue(any("docs/components.md" in e for e in errors), errors)
 
+    def test_check_nested_note(self):
+        commit(self.root, {".changes/sub/x.md": NOTE, "Sources/A.swift": 'let a = "vNext"\n'})
+        errors, _ = self.check()
+        self.assertTrue(any(".changes/sub/x.md" in e for e in errors), errors)
+
     def test_check_bad_note(self):
         commit(self.root, {".changes/n.md": NOTE.replace("minor", "patch")})
         errors, _ = self.check()
@@ -281,17 +288,29 @@ class ReferenceBuildTests(unittest.TestCase):
 
 
 class FakeGh:
-    """The gh CLI as the bot calls it: records each call; a release's notes are read from its file."""
+    """The gh CLI as the bot calls it: records each call; a release's notes are read from its file.
+    `published` are the GitHub Releases that exist; `fail` lists call prefixes that fail once."""
 
-    def __init__(self):
+    def __init__(self, published=("8.14.0",), fail=()):
         self.calls = []
         self.notes = {}
+        self.published = set(published)
+        self.fail = list(fail)
 
     def __call__(self, *args):
         self.calls.append(args)
+        for index, prefix in enumerate(self.fail):
+            if args[:len(prefix)] == prefix:
+                del self.fail[index]
+                raise subprocess.CalledProcessError(1, ["gh", *args], output="", stderr="HTTP 403: Resource not accessible by integration")
+        if args[:2] == ("release", "view"):
+            if args[2] not in self.published:
+                raise subprocess.CalledProcessError(1, ["gh", *args], output="", stderr="release not found")
+            return ""
         if args[:2] == ("release", "create"):
             with open(args[args.index("--notes-file") + 1], encoding="utf-8") as file:
                 self.notes[args[2]] = file.read()
+            self.published.add(args[2])
         return ""
 
     def released(self):
@@ -393,6 +412,81 @@ class BotTests(unittest.TestCase):
         self.assertEqual(git(self.remote, "rev-parse", "8.15.0^{commit}").strip(), release_sha)
         self.assertEqual(self.gh.released(), ["8.15.0"])
         self.assertIn("Left over.", self.gh.notes["8.15.0"])
+        # A person's commit set VERSION (the old way): its push built TestFlight already.
+        self.assertFalse(any(call[:2] == ("workflow", "run") for call in self.gh.calls))
+
+    def test_run_tags_leftover_merge_on_main(self):
+        section = "## 8.15.0 - 2026-11-25\n\nThe old way.\n\n### Fixed\n\n- X.\n\n"
+        git(self.dev, "checkout", "-q", "-b", "pr-130", "main")
+        commit(self.dev, {"VERSION": "8.15.0\n", "CHANGELOG.md": CHANGELOG.replace("## 8.14.0", section + "## 8.14.0")}, "8.15.0")
+        git(self.dev, "checkout", "-q", "main")
+        commit(self.dev, {"Sources/Other.swift": "let other = 1\n"}, "other")
+        git(self.dev, "merge", "-q", "--no-ff", "-m", "Merge pull request #130 from o/pr-130", "pr-130")
+        git(self.dev, "push", "-q", "origin", "main")
+        self.assertIsNone(self.run_bot(regen=lambda root: None))
+        self.assertEqual(git(self.remote, "rev-parse", "8.15.0^{commit}"), git(self.remote, "rev-parse", "main"))
+
+    def test_leftover_below_a_tag_is_refused(self):
+        commit(self.dev, {"VERSION": "8.13.5\n"}, "stale")
+        git(self.dev, "push", "-q", "origin", "main")
+        with self.assertRaises(release.ReleaseError):
+            self.run_bot(regen=lambda root: None)
+        self.assertEqual(self.remote_tags(), ["8.14.0"])
+
+    def test_leftover_not_a_version_is_refused(self):
+        commit(self.dev, {"VERSION": "next\n"}, "garbage")
+        git(self.dev, "push", "-q", "origin", "main")
+        with self.assertRaises(release.ReleaseError):
+            self.run_bot(regen=lambda root: None)
+        self.assertEqual(self.remote_tags(), ["8.14.0"])
+
+    def test_rerun_finishes_a_half_published_release(self):
+        self.merge_pr(120, {".changes/a.md": NOTE})
+        self.gh = FakeGh(fail=[("release", "create")])
+        with self.assertRaises(subprocess.CalledProcessError):
+            self.run_bot()
+        self.assertEqual(self.remote_tags(), ["8.14.0", "8.15.0"])
+        self.assertNotIn("8.15.0", self.gh.published)
+        self.assertIsNone(self.run_bot())
+        self.assertIn("8.15.0", self.gh.published)
+        self.assertIn(("workflow", "run", "testflight.yml", "--ref", "8.15.0"), self.gh.calls)
+
+    def test_run_says_why_the_push_was_refused(self):
+        self.merge_pr(120, {".changes/a.md": NOTE})
+        number = [130]
+
+        def always_race(root):
+            regenerate(root)
+            number[0] += 1
+            self.merge_pr(number[0], {f".changes/n{number[0]}.md": FIX})
+
+        with self.assertRaises(release.ReleaseError) as caught:
+            self.run_bot(regen=always_race)
+        self.assertIn("rejected", str(caught.exception))
+
+    def run_cli(self, regen=regenerate):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            status = release.run_cli(self.bot, gh=self.gh, regenerate=regen, repo="o/r", today="2026-11-25")
+        return status, out.getvalue()
+
+    def test_cli_failure_comments_on_the_pr(self):
+        self.merge_pr(120, {".changes/a.md": NOTE})
+
+        def broken(root):
+            raise RuntimeError("the generator broke")
+
+        status, out = self.run_cli(regen=broken)
+        self.assertEqual(status, 1)
+        self.assertIn("the generator broke", out)
+        self.assertTrue(any(call[:3] == ("pr", "comment", "120") for call in self.gh.calls), self.gh.calls)
+
+    def test_cli_prints_the_command_error(self):
+        self.merge_pr(120, {".changes/a.md": NOTE})
+        self.gh = FakeGh(fail=[("release", "create")])
+        status, out = self.run_cli()
+        self.assertEqual(status, 1)
+        self.assertIn("HTTP 403", out)
 
     def test_run_retries_after_rejected_push(self):
         self.merge_pr(120, {".changes/a.md": NOTE})
