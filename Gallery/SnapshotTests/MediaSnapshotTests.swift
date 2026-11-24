@@ -143,6 +143,34 @@ extension ComponentSnapshots {
             }
         }
 
+        // 8.15.0: the app's icon before its name, set in Inter.
+        @Test func shareCardFrameBrandIcon() async {
+            await assertComponentSnapshot(
+                ShareCardFrame(
+                    format: .post,
+                    brand: "Tenra",
+                    brandIcon: GalleryAppIcon.image,
+                    style: ShareCard.Style(
+                        top: ShareCard.Style.standard.top,
+                        bottom: ShareCard.Style.standard.bottom,
+                        accent: ShareCard.Style.standard.accent,
+                        brandTypeface: .inter
+                    )
+                ) {
+                    Text("My 2026 in Tenra")
+                        .font(.system(size: 30, weight: .bold))
+                    Spacer(minLength: 0)
+                    HStack(alignment: .top, spacing: 12) {
+                        ShareCardStat(value: "21%", title: "Of income kept")
+                        ShareCardStat(value: "1,284", title: "Records")
+                    }
+                },
+                named: "brandIcon",
+                width: ShareCard.Format.post.width,
+                appearances: [.light]
+            )
+        }
+
         @Test func downloadRows() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.md) {

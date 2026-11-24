@@ -880,19 +880,34 @@ private struct GalleryReportMenu: View {
 private struct ShareCardFramePage: View {
     @State private var format: ShareCard.Format = .story
     @State private var hasPhoto = false
+    @State private var hasIcon = false
+    @State private var typeface: ShareCard.BrandTypeface = .rounded
 
     var body: some View {
         ComponentPage(
             name: "ShareCardFrame",
             summary: "A picture to share in Stories or a chat: a photo under a dark gradient (or a gradient alone), the content from the top, the brand and the site at the bottom.",
             since: "2.8.0",
-            apps: [.dalada],
+            apps: [.dalada, .tenra],
             notes: [
                 "An image, not a screen: fixed point sizes (360 wide, rendered at 3× to 1080 px), the same colours in light and dark.",
                 "ShareCardSheet renders it, lets the person pick Stories or post, and shares it.",
+                "8.15.0: brandIcon puts the app's icon before its name, in the home screen's rounded square, and ShareCard.Style(brandTypeface: .inter) sets the name in Inter, so a shared picture says which app it is from.",
             ]
         ) {
-            ShareCardFrame(format: format, brand: "Dalada", site: "dalada.kz", photo: hasPhoto ? GallerySharePhoto.image : nil) {
+            ShareCardFrame(
+                format: format,
+                brand: "Dalada",
+                brandIcon: hasIcon ? GalleryAppIcon.image : nil,
+                site: "dalada.kz",
+                photo: hasPhoto ? GallerySharePhoto.image : nil,
+                style: ShareCard.Style(
+                    top: ShareCard.Style.standard.top,
+                    bottom: ShareCard.Style.standard.bottom,
+                    accent: ShareCard.Style.standard.accent,
+                    brandTypeface: typeface
+                )
+            ) {
                 GalleryShareCardContent(format: format)
             }
             .scaleEffect(0.6)
@@ -900,6 +915,8 @@ private struct ShareCardFramePage: View {
         } controls: {
             ChoiceControl("Format", selection: $format, options: ShareCard.Format.allCases.map { ($0.title, $0) })
             ToggleControl("Photo", isOn: $hasPhoto)
+            ToggleControl("App icon", isOn: $hasIcon)
+            ChoiceControl("Name", selection: $typeface, options: [("Rounded", .rounded), ("Inter", .inter)])
         }
     }
 }
@@ -931,6 +948,28 @@ struct GalleryShareCardContent: View {
 
 /// A photo for the share card specimens, drawn once from a `GalleryPhoto`.
 @MainActor
+/// A stand-in app icon for the brand line: a symbol on the accent's gradient, square (the frame
+/// rounds it).
+enum GalleryAppIcon {
+    static let image: UIImage? = {
+        let renderer = ImageRenderer(content:
+            LinearGradient(
+                colors: [AppColors.accent, AppColors.Palette.violet.color],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .overlay {
+                Image(systemName: "paintpalette.fill")
+                    .font(.system(size: 30, weight: .semibold))
+                    .foregroundStyle(.white)
+            }
+            .frame(width: 60, height: 60)
+        )
+        renderer.scale = 3
+        return renderer.uiImage
+    }()
+}
+
 enum GallerySharePhoto {
     static let image: UIImage? = {
         let renderer = ImageRenderer(content: GalleryPhotoView(photo: GalleryPhoto.samples[1]).frame(width: 360, height: 640))
