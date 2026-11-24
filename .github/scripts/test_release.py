@@ -5,6 +5,7 @@ Run: python3 .github/scripts/test_release.py (CI's Changelog job runs it)."""
 
 import os
 import sys
+import tempfile
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -111,6 +112,40 @@ class VersionTests(unittest.TestCase):
         self.assertLess(out.index("## 8.15.0"), out.index("## 8.14.0"))
         self.assertTrue(out.startswith("# Changelog\n\nPreamble.\n\n## 8.15.0"))
         self.assertIn("- A snapshot.\n\n## 8.14.0", out)
+
+
+class TokenTests(unittest.TestCase):
+    def test_replace_token_cases(self):
+        text = 'since: "vNext"\n(vNext)\nAdded in vNext.\nWrite `vNext` here.\nvNextFoo xvNext\n'
+        out, n = release.replace_token(text, "8.15.0")
+        self.assertEqual(out, 'since: "8.15.0"\n(8.15.0)\nAdded in 8.15.0.\nWrite `vNext` here.\nvNextFoo xvNext\n')
+        self.assertEqual(n, 3)
+        self.assertFalse(release.has_bare_token(out))
+        self.assertTrue(release.has_bare_token(text))
+
+    def test_skip_list(self):
+        for path in (".changes/a.md", ".github/workflows/ci.yml", ".github/scripts/release.py",
+                     ".github/scripts/test_release.py", "docs/releasing.md", "docs/superpowers/plans/p.md"):
+            self.assertTrue(release.is_skipped(path), path)
+        for path in ("CLAUDE.md", "Gallery/Gallery/Screens/MediaScreen.swift", "docs/design-system.md",
+                     ".github/scripts/changelog.py"):
+            self.assertFalse(release.is_skipped(path), path)
+
+    def test_replace_in_tree(self):
+        with tempfile.TemporaryDirectory() as root:
+            def write(path, data):
+                full = os.path.join(root, path)
+                os.makedirs(os.path.dirname(full), exist_ok=True)
+                open(full, "wb").write(data)
+            write("a.swift", b'since: "vNext"\n')
+            write(".changes/n.md", b"Added in vNext.\n")
+            write("b.png", b"\0vNext")
+            write("c.md", b"Nothing here.\n")
+            changed = release.replace_in_tree(root, ["a.swift", ".changes/n.md", "b.png", "c.md"], "8.15.0")
+            self.assertEqual(changed, ["a.swift"])
+            self.assertEqual(open(os.path.join(root, "a.swift"), "rb").read(), b'since: "8.15.0"\n')
+            self.assertEqual(open(os.path.join(root, ".changes/n.md"), "rb").read(), b"Added in vNext.\n")
+            self.assertEqual(open(os.path.join(root, "b.png"), "rb").read(), b"\0vNext")
 
 
 if __name__ == "__main__":

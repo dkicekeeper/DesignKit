@@ -27,6 +27,13 @@ NOTES_DIR = ".changes"
 BUMPS = ("patch", "minor", "major")
 SECTIONS = changelog.SECTIONS
 VERSION_TEXT = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
+# The bare token: no backtick right before or after it (`vNext` in backticks is the word itself,
+# as docs about the mechanism write it), not part of a longer word.
+BARE_TOKEN = re.compile(r"(?<![`\w])vNext(?![`\w])")
+# What the bot never rewrites: the notes (it deletes them), workflows (GITHUB_TOKEN may not push
+# them), itself, its tests, and the documents that describe the token.
+SKIPPED = (".changes/", ".github/workflows/", ".github/scripts/release.py",
+           ".github/scripts/test_release.py", "docs/releasing.md", "docs/superpowers/")
 
 
 class FragmentError(ValueError):
@@ -210,3 +217,46 @@ def insert_section(changelog_text, section):
     if not match:
         return changelog_text.rstrip("\n") + "\n\n" + section
     return changelog_text[:match.start()] + section + "\n" + changelog_text[match.start():]
+
+
+def replace_token(text, version):
+    return BARE_TOKEN.subn(version, text)
+
+
+def has_bare_token(text):
+    return BARE_TOKEN.search(text) is not None
+
+
+def is_skipped(path):
+    path = path.replace(os.sep, "/")
+    return any(path == entry or (entry.endswith("/") and path.startswith(entry)) for entry in SKIPPED)
+
+
+def _text_of(full_path):
+    """The file's text, or None for a binary file (a NUL in its first 8 KB) or one not UTF-8."""
+    with open(full_path, "rb") as file:
+        data = file.read()
+    if b"\0" in data[:8192]:
+        return None
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        return None
+
+
+def replace_in_tree(root, paths, version):
+    """Replaces the bare token in each tracked text file that is not skipped; the changed paths."""
+    changed = []
+    for path in paths:
+        full = os.path.join(root, path)
+        if is_skipped(path) or not os.path.isfile(full):
+            continue
+        text = _text_of(full)
+        if text is None:
+            continue
+        new, count = replace_token(text, version)
+        if count:
+            with open(full, "w", encoding="utf-8", newline="") as file:
+                file.write(new)
+            changed.append(path)
+    return changed
