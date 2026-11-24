@@ -888,7 +888,7 @@ private struct ShareCardFramePage: View {
             name: "ShareCardFrame",
             summary: "A picture to share in Stories or a chat: a photo under a dark gradient (or a gradient alone), the content from the top, the brand and the site at the bottom.",
             since: "2.8.0",
-            apps: [.dalada, .tenra],
+            apps: [.dalada],
             notes: [
                 "An image, not a screen: fixed point sizes (360 wide, rendered at 3× to 1080 px), the same colours in light and dark.",
                 "ShareCardSheet renders it, lets the person pick Stories or post, and shares it.",
@@ -946,10 +946,9 @@ struct GalleryShareCardContent: View {
     }
 }
 
-/// A photo for the share card specimens, drawn once from a `GalleryPhoto`.
-@MainActor
 /// A stand-in app icon for the brand line: a symbol on the accent's gradient, square (the frame
 /// rounds it).
+@MainActor
 enum GalleryAppIcon {
     static let image: UIImage? = {
         let renderer = ImageRenderer(content:
@@ -970,6 +969,8 @@ enum GalleryAppIcon {
     }()
 }
 
+/// A photo for the share card specimens, drawn once from a `GalleryPhoto`.
+@MainActor
 enum GallerySharePhoto {
     static let image: UIImage? = {
         let renderer = ImageRenderer(content: GalleryPhotoView(photo: GalleryPhoto.samples[1]).frame(width: 360, height: 640))

@@ -2271,7 +2271,7 @@ init(_ items: [Item], selection: Item.ID, closeTitle: String = String(localized:
 
 A picture to share in Stories or a chat: a photo under a dark gradient (or a gradient alone), the content from the top, the brand and the site at the bottom.
 
-Since 2.8.0 · Apps: Dalada, Tenra
+Since 2.8.0 · Apps: Dalada
 
 - `ShareCardFrame` in `Sources/DesignComponents/Media/ShareCard.swift`
   A share card's frame: the photo or gradient, the content from the top, and the brand line.

@@ -3955,8 +3955,7 @@
     "summary": "A picture to share in Stories or a chat: a photo under a dark gradient (or a gradient alone), the content from the top, the brand and the site at the bottom.",
     "since": "2.8.0",
     "apps": [
-      "Dalada",
-      "Tenra"
+      "Dalada"
     ],
     "styles": [],
     "notes": [
