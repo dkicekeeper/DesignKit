@@ -92,7 +92,7 @@ extension ComponentSnapshots {
                     HStack(spacing: AppSpacing.lg) {
                         SelectionIndicator(isSelected: true)
                         SelectionIndicator(isSelected: false)
-                        SelectionIndicator(isSelected: true, tint: AppColors.success)
+                        SelectionIndicator(isSelected: true, tint: AppColors.Status.positive)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -161,7 +161,7 @@ extension ComponentSnapshots {
                     SectionHeader("Insights", systemImage: "sparkles", trailingSystemImage: "chevron.forward",
                                   style: .large)
                     SectionHeader("Goals", systemImage: "target", trailingSystemImage: "chevron.forward",
-                                  tint: AppColors.success)
+                                  tint: AppColors.Status.positive)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
                 named: "styles",
@@ -276,7 +276,7 @@ extension ComponentSnapshots {
                         "Camp by the river",
                         meta: [MetaLine([
                             .label("Friends", systemImage: "person.2"),
-                            .label("Pending", systemImage: "hourglass", tint: AppColors.warning),
+                            .label("Pending", systemImage: "hourglass", tint: AppColors.Status.warning),
                         ], separator: .space)],
                         leading: .symbol("tent")
                     ) {
@@ -292,7 +292,7 @@ extension ComponentSnapshots {
                     ItemRow("Spinning rod", meta: [MetaLine([.text("Shimano"), .text("×2"), .text("620 g")])],
                             titleFont: AppTypography.body) {
                         Image(systemName: "wrench.and.screwdriver")
-                            .foregroundStyle(AppColors.warning)
+                            .foregroundStyle(AppColors.Status.warning)
                     }
                 },
                 named: "standard",

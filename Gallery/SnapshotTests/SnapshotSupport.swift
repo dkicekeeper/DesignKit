@@ -33,6 +33,14 @@ enum SnapshotAppearance: String, CaseIterable {
 /// Light and dark: what every component snapshot covers.
 let lightAndDark: [SnapshotAppearance] = [.light, .dark]
 
+/// Money in and a transfer for the money components' snapshots, as Tenra defines them in its
+/// DesignKitBridge (DesignKit has no finance colours since vNext). Same values as before, so
+/// the references do not change.
+enum SampleColors {
+    static let income = Color(red: 0.13, green: 0.70, blue: 0.37)
+    static let transfer = Color(red: 0.0, green: 0.75, blue: 0.85)
+}
+
 /// Root suite: snapshots run one at a time (each one shows its own window).
 @MainActor
 @Suite(.serialized)
@@ -41,7 +49,7 @@ struct ComponentSnapshots {}
 /// Renders `view` at `width` points and asserts it matches the reference images, one per
 /// appearance (`<test>.light.png`, `<test>.dark.png`, `<test>.largeText.png`).
 ///
-/// The view sits on `AppColors.bgBase` with `AppSpacing.lg` around it, animations off; the PNG
+/// The view sits on `AppColors.Background.page` with `AppSpacing.lg` around it, animations off; the PNG
 /// is the view's own frame.
 ///
 /// - Parameter named: Tells several snapshots of one test apart (`<test>.<named>-<appearance>.png`).
@@ -142,7 +150,7 @@ enum ComponentRenderer {
             .fixedSize(horizontal: false, vertical: true)
             .padding(AppSpacing.lg)
             .padding(margin)
-            .background(AppColors.bgBase)
+            .background(AppColors.Background.page)
             .environment(\.colorScheme, appearance.colorScheme)
             .environment(\.locale, Locale(identifier: "en_US"))
             // Skeletons stand still: the shimmer moves on a clock, so no two frames match.

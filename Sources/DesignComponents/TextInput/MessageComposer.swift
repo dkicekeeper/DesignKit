@@ -227,7 +227,7 @@ public struct MessageComposer<Leading: View>: View {
                     .fill(isEnabled ? AnyShapeStyle(AppColors.accentFill) : AnyShapeStyle(AppColors.Background.containerStrong))
                 Icon("mic.fill", size: AppIconSize.sm, scalesWithText: false)
                     .fontWeight(.bold)
-                    .foregroundStyle(isEnabled ? AppColors.staticWhite : AppColors.Text.tertiary)
+                    .foregroundStyle(isEnabled ? AppColors.Text.primaryOnDark : AppColors.Text.tertiary)
             }
             .frame(width: MessageComposerMetrics.buttonSize, height: MessageComposerMetrics.buttonSize)
         }
@@ -246,11 +246,11 @@ public struct MessageComposer<Leading: View>: View {
                 if isSending {
                     ProgressView()
                         .controlSize(.small)
-                        .tint(AppColors.staticWhite)
+                        .tint(AppColors.Text.primaryOnDark)
                 } else {
                     Icon("arrow.up", size: AppIconSize.sm, scalesWithText: false)
                         .fontWeight(.bold)
-                        .foregroundStyle(isSendEnabled ? AppColors.staticWhite : AppColors.Text.tertiary)
+                        .foregroundStyle(isSendEnabled ? AppColors.Text.primaryOnDark : AppColors.Text.tertiary)
                 }
             }
             .frame(width: MessageComposerMetrics.buttonSize, height: MessageComposerMetrics.buttonSize)

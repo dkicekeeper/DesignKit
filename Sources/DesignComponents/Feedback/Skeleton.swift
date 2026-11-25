@@ -238,7 +238,7 @@ private struct ShimmerModifier: ViewModifier {
         let bandWidth = max(width * 0.6, 80)
         let x = -bandWidth + (width + bandWidth) * phase
         return LinearGradient(
-            colors: [.clear, AppColors.staticWhite.opacity(0.35), .clear],
+            colors: [.clear, AppColors.Text.primaryOnDark.opacity(0.35), .clear],
             startPoint: .leading,
             endPoint: .trailing
         )

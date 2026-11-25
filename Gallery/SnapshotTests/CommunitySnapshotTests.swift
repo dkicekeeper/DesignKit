@@ -45,7 +45,7 @@ extension ComponentSnapshots {
                         text: AttributedString("Thin near the north shore, fine in the bay."),
                         quote: MessageQuote(title: "Aida", text: "Was anyone on the lake this weekend?")
                     ) {
-                        Image(systemName: "ellipsis").foregroundStyle(AppColors.textTertiary)
+                        Image(systemName: "ellipsis").foregroundStyle(AppColors.Text.tertiary)
                     } actions: {
                         ReactionButton(systemImage: "hand.thumbsup", selectedSystemImage: "hand.thumbsup.fill",
                                        count: 12, isSelected: true, accessibilityLabel: "12") {}
@@ -80,7 +80,7 @@ extension ComponentSnapshots {
                     subtitle: "Visited in May 2026",
                     text: "Quiet spot, clean water, a good road until the last two kilometres."
                 ) {
-                    Image(systemName: "ellipsis").foregroundStyle(AppColors.textTertiary)
+                    Image(systemName: "ellipsis").foregroundStyle(AppColors.Text.tertiary)
                 } actions: {
                     ReactionButton(systemImage: "lightbulb", selectedSystemImage: "lightbulb.fill",
                                    count: 3, isSelected: false, title: "Helpful · 3", accessibilityLabel: "Helpful") {}

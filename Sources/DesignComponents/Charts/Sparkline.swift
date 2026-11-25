@@ -184,7 +184,7 @@ public struct Sparkline: View {
                    let maxIdx = vals.indices.max(by: { vals[$0] < vals[$1] }),
                    let minIdx = vals.indices.min(by: { vals[$0] < vals[$1] }),
                    maxIdx != minIdx {
-                    for (idx, color) in [(maxIdx, AppColors.success), (minIdx, AppColors.destructive)] {
+                    for (idx, color) in [(maxIdx, AppColors.Status.positive), (minIdx, AppColors.Status.negative)] {
                         let c = plotPoint(index: idx, value: vals[idx])
                         let dotRect = CGRect(
                             x: c.x - endDotRadius, y: c.y - endDotRadius,

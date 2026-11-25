@@ -27,10 +27,13 @@ public struct ScheduleRow: View {
     let currency: String
     let detail: String?
     let detailColor: Color
+    let doneColor: Color
     let isDone: Bool
 
     /// - Parameters:
     ///   - detail: A line under the amount (the interest part of a payment, for example).
+    ///   - doneColor: The checked mark (vNext): `Status.positive` unless the app has its own
+    ///     (Tenra's income green), made readable.
     ///   - isDone: Checked mark when `true`; dimmed row with an empty circle otherwise.
     public init(
         title: String,
@@ -38,7 +41,8 @@ public struct ScheduleRow: View {
         amount: Double,
         currency: String,
         detail: String? = nil,
-        detailColor: Color = AppColors.expense,
+        detailColor: Color = AppColors.Text.primary,
+        doneColor: Color = AppColors.Status.positive,
         isDone: Bool
     ) {
         self.title = title
@@ -47,6 +51,7 @@ public struct ScheduleRow: View {
         self.currency = currency
         self.detail = detail
         self.detailColor = detailColor
+        self.doneColor = doneColor
         self.isDone = isDone
     }
 
@@ -56,7 +61,7 @@ public struct ScheduleRow: View {
     public var body: some View {
         HStack(alignment: .top, spacing: AppSpacing.md) {
             Icon(isDone ? "checkmark.circle.fill" : "circle", size: AppIconSize.lg, scalesWithText: false)
-                .foregroundStyle(isDone ? AppColors.incomeText : AppColors.Text.secondary)
+                .foregroundStyle(isDone ? AppColors.readable(doneColor) : AppColors.Text.secondary)
 
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(title)

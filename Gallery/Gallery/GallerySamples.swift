@@ -11,12 +11,17 @@ import DesignTokens
 import DesignComponents
 
 enum GallerySamples {
+    /// Money in and a transfer, as Tenra defines them in its DesignKitBridge (DesignKit has no
+    /// finance colours since vNext): what a finance app passes to the money components.
+    static let income = Color(red: 0.13, green: 0.70, blue: 0.37)
+    static let transfer = Color(red: 0.0, green: 0.75, blue: 0.85)
+
     /// Spending by category, shares adding up to 100.
     static let slices: [DonutSlice] = [
         DonutSlice(id: "food", amount: 42_000, color: AppColors.accent, label: "Food", percentage: 42),
-        DonutSlice(id: "rent", amount: 30_000, color: AppColors.success, label: "Rent", percentage: 30),
-        DonutSlice(id: "fun", amount: 18_000, color: AppColors.warning, label: "Fun", percentage: 18),
-        DonutSlice(id: "misc", amount: 10_000, color: AppColors.transfer, label: "Misc", percentage: 10),
+        DonutSlice(id: "rent", amount: 30_000, color: AppColors.Status.positive, label: "Rent", percentage: 30),
+        DonutSlice(id: "fun", amount: 18_000, color: AppColors.Status.warning, label: "Fun", percentage: 18),
+        DonutSlice(id: "misc", amount: 10_000, color: GallerySamples.transfer, label: "Misc", percentage: 10),
     ]
 
     /// Category tiles: within the limit, over it, no limit.
@@ -34,11 +39,11 @@ enum GallerySamples {
     ]
 
     static let income = ChartSeries<ChartValuePoint>.keyed(
-        "income", name: "Income", coloring: .solid(AppColors.success))
+        "income", name: "Income", coloring: .solid(AppColors.Status.positive))
     static let expenses = ChartSeries<ChartValuePoint>.keyed(
-        "expenses", name: "Expenses", coloring: .solid(AppColors.destructive))
+        "expenses", name: "Expenses", coloring: .solid(AppColors.Status.negative))
     static let netFlow = ChartSeries<ChartValuePoint>(
-        id: "net", name: "Net", coloring: .signed(positive: AppColors.success, negative: AppColors.destructive),
+        id: "net", name: "Net", coloring: .signed(positive: AppColors.Status.positive, negative: AppColors.Status.negative),
         baseline: .signed
     ) { $0["income"] - $0["expenses"] }
     static let distance = ChartSeries<ChartValuePoint>.keyed(

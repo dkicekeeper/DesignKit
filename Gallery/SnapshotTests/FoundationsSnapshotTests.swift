@@ -28,7 +28,7 @@ extension ComponentSnapshots {
                     Text(verbatim: "Caption").font(AppTypography.caption)
                     Text(verbatim: "Caption 2").font(AppTypography.caption2)
                 }
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
                 .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light, .largeText]
             )
@@ -83,7 +83,7 @@ extension ComponentSnapshots {
                         }
                     }
                 }
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
                 .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light]
             )
@@ -113,7 +113,7 @@ extension ComponentSnapshots {
                         .font(AppTypography.h4)
                     Text(verbatim: "cardStyle() is a Liquid Glass surface")
                         .font(AppTypography.bodySmall)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .cardContentPadding()
@@ -178,7 +178,7 @@ extension ComponentSnapshots {
                     }
                     Text(verbatim: "The lake lies at 2,500 m, an hour's drive above the city.")
                         .font(AppTypography.body)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .cardContentPadding()
                         .cardStyle()
@@ -195,7 +195,7 @@ extension ComponentSnapshots {
                         VStack(alignment: .leading, spacing: AppSpacing.sm) {
                             Icon(source: .sfSymbol("mountain.2.fill"), size: AppIconSize.lg)
                             Text(verbatim: title).font(AppTypography.h4)
-                                .foregroundStyle(AppColors.textPrimary)
+                                .foregroundStyle(AppColors.Text.primary)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .cardContentPadding()
@@ -287,7 +287,7 @@ private struct AdaptiveColumnsSpecimen: View {
         VStack(alignment: .leading, spacing: AppSpacing.xs) {
             Icon(source: .sfSymbol(symbol), size: AppIconSize.lg)
             Text(verbatim: title).font(AppTypography.h4)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
             Text(verbatim: detail).font(AppTypography.bodySmall)
                 .foregroundStyle(AppColors.Text.secondary)
         }

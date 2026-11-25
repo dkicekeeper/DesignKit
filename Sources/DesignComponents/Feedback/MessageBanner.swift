@@ -53,9 +53,9 @@ public struct MessageBanner: View {
 
         var tintColor: Color {
             switch self {
-            case .success: return AppColors.success
-            case .error: return AppColors.destructive
-            case .warning: return AppColors.warning
+            case .success: return AppColors.Status.positive
+            case .error: return AppColors.Status.negative
+            case .warning: return AppColors.Status.warning
             case .info: return AppColors.accent
             }
         }

@@ -26,7 +26,7 @@ extension ComponentSnapshots {
                                 source: .sfSymbol(icon.symbol),
                                 style: .circle(size: AppIconSize.xxl, tint: .monochrome(.white), backgroundColor: icon.color)
                             )
-                            .overlay(Circle().strokeBorder(AppColors.bgBase, lineWidth: 2))
+                            .overlay(Circle().strokeBorder(AppColors.Background.page, lineWidth: 2))
                         }
                     }
                 },
@@ -47,7 +47,7 @@ extension ComponentSnapshots {
                     title: "Income",
                     amount: 640_000,
                     currency: "KZT",
-                    color: AppColors.income,
+                    color: SampleColors.income,
                     previous: 580_000,
                     upIsGood: true
                 ),
@@ -59,14 +59,14 @@ extension ComponentSnapshots {
                     title: "Expenses",
                     amount: 921_300,
                     currency: "KZT",
-                    color: AppColors.expense,
+                    color: AppColors.Text.primary,
                     previous: 870_000,
                     upIsGood: false
                 ) {
                     ProportionBar(
                         ratio: 0.7,
-                        leftColor: AppColors.destructive,
-                        rightColor: AppColors.bgMuted,
+                        leftColor: AppColors.Status.negative,
+                        rightColor: SurfaceStyle.glass.containerStrong,
                         height: 6,
                         animatesOnAppear: false
                     )
@@ -137,7 +137,7 @@ private enum CardsSample {
 
     static let accountIcons = [
         AccountIcon(symbol: "creditcard.fill", color: AppColors.accent),
-        AccountIcon(symbol: "banknote.fill", color: AppColors.success),
-        AccountIcon(symbol: "wallet.bifold.fill", color: AppColors.warning),
+        AccountIcon(symbol: "banknote.fill", color: AppColors.Status.positive),
+        AccountIcon(symbol: "wallet.bifold.fill", color: AppColors.Status.warning),
     ]
 }

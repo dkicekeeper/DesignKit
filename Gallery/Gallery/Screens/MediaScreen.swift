@@ -61,7 +61,7 @@ private struct IconPage: View {
     private var iconTint: IconTint {
         switch tint {
         case 1: return .monochrome(AppColors.accent)
-        case 2: return .hierarchical(AppColors.success)
+        case 2: return .hierarchical(AppColors.Status.positive)
         default: return .original
         }
     }
@@ -400,7 +400,7 @@ private struct HeroSymbolPage: View {
                 HeroSymbolSkeleton(size: size)
             } else {
                 HeroSymbol(systemImage: "map", size: size,
-                           tint: [AppColors.accent, AppColors.success, AppColors.warning][tint])
+                           tint: [AppColors.accent, AppColors.Status.positive, AppColors.Status.warning][tint])
             }
         } controls: {
             StateControl(state: $state)
@@ -420,9 +420,9 @@ private struct PackedCircleIconsPage: View {
 
     private let items = [
         PackedCircleItem(id: "1", iconSource: .sfSymbol("creditcard.fill"), amount: 1_250_000, tint: AppColors.accent),
-        PackedCircleItem(id: "2", iconSource: .sfSymbol("banknote.fill"), amount: 480_000, tint: AppColors.success),
-        PackedCircleItem(id: "3", iconSource: .sfSymbol("wallet.bifold.fill"), amount: 220_000, tint: AppColors.warning),
-        PackedCircleItem(id: "4", iconSource: .sfSymbol("bitcoinsign.circle.fill"), amount: 90_000, tint: AppColors.transfer),
+        PackedCircleItem(id: "2", iconSource: .sfSymbol("banknote.fill"), amount: 480_000, tint: AppColors.Status.positive),
+        PackedCircleItem(id: "3", iconSource: .sfSymbol("wallet.bifold.fill"), amount: 220_000, tint: AppColors.Status.warning),
+        PackedCircleItem(id: "4", iconSource: .sfSymbol("bitcoinsign.circle.fill"), amount: 90_000, tint: GallerySamples.transfer),
         PackedCircleItem(id: "5", iconSource: .sfSymbol("building.columns.fill"), amount: 40_000, tint: .purple),
         PackedCircleItem(id: "6", iconSource: .sfSymbol("chart.line.uptrend.xyaxis"), amount: 25_000, tint: .teal),
         PackedCircleItem(id: "7", iconSource: .sfSymbol("house.fill"), amount: 12_000, tint: .pink),

@@ -179,7 +179,7 @@ private struct IconPickerSymbolsTab: View {
                         source: .sfSymbol(symbol),
                         style: .circle(
                             size: AppIconSize.Tile.md,
-                            tint: .monochrome(isSelected ? AppColors.staticWhite : AppColors.Text.primary)
+                            tint: .monochrome(isSelected ? AppColors.Text.primaryOnDark : AppColors.Text.primary)
                         )
                     )
                     .frame(width: AppIconSize.Tile.xl, height: AppIconSize.Tile.xl)

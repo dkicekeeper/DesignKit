@@ -409,7 +409,7 @@ private struct AccentGlowPage: View {
             Color.clear
                 .frame(height: 260)
                 .accentGlow(
-                    [AppColors.accent, AppColors.success, .orange][tint],
+                    [AppColors.accent, AppColors.Status.positive, .orange][tint],
                     edge: edge == 0 ? .top : .bottom,
                     style: style,
                     drifts: drifts
@@ -766,8 +766,8 @@ private struct HeroBackgroundPage: View {
     @State private var chart = 0
 
     private static let tones: [(String, Color)] = [
-        ("Positive", AppColors.success), ("Neutral", AppColors.accent),
-        ("Warning", AppColors.warning), ("Critical", AppColors.destructive),
+        ("Positive", AppColors.Status.positive), ("Neutral", AppColors.accent),
+        ("Warning", AppColors.Status.warning), ("Critical", AppColors.Status.negative),
     ]
 
     private var color: Color { Self.tones[tone].1 }
@@ -823,7 +823,7 @@ private struct HeroBackgroundSample: View {
             }
             switch chart {
             case 0:
-                HeroBarPair(previous: 252_000, current: 284_000, color: AppColors.warning, currency: "KZT")
+                HeroBarPair(previous: 252_000, current: 284_000, color: AppColors.Status.warning, currency: "KZT")
             case 1:
                 HeroSparkline(dataPoints: Array(GallerySamples.months.suffix(8)), series: GallerySamples.distance,
                               markExtremes: true)

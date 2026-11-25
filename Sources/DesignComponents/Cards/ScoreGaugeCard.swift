@@ -18,10 +18,10 @@ import DesignSupport
 ///
 /// ```swift
 /// ScoreGaugeCard(score: 72, zoneTicks: [40, 70], grade: "Good",
-///                color: AppColors.success, subtitle: "You're on track")
+///                color: AppColors.Status.positive, subtitle: "You're on track")
 ///
 /// // The top of a screen, edge to edge (4.2.0)
-/// ScoreGaugeCard(score: 84, zoneTicks: [40, 70], grade: "Excellent", color: AppColors.success,
+/// ScoreGaugeCard(score: 84, zoneTicks: [40, 70], grade: "Excellent", color: AppColors.Status.positive,
 ///                subtitle: "Your financial health", style: .hero, showsMaximum: true,
 ///                trend: .init(direction: .up, changePercent: 17, caption: "than last month"))
 /// ```
@@ -135,7 +135,7 @@ public struct ScoreGaugeCard: View {
     ///
     /// ```swift
     /// ScoreGaugeCard(value: 12.4, unit: "%", maxScore: 40, zoneTicks: [10, 20],
-    ///                grade: "Below target", color: AppColors.warning,
+    ///                grade: "Below target", color: AppColors.Status.warning,
     ///                subtitle: "Target: 20% of income", decodesScore: true, style: .hero)
     /// ```
     ///
@@ -173,7 +173,7 @@ public struct ScoreGaugeCard: View {
     /// ```swift
     /// // A large expense against the usual one
     /// ScoreGaugeCard(amount: 84_900, currency: "KZT", maxValue: 84_900 * 1.15, norm: 6_100,
-    ///                grade: "14× the usual", color: AppColors.destructive,
+    ///                grade: "14× the usual", color: AppColors.Status.negative,
     ///                subtitle: "Furniture, 3 Oct", style: .hero)
     /// ```
     ///
@@ -357,7 +357,7 @@ public struct ScoreGaugeCard: View {
 
     /// A capsule's fill on the page; frosted white on the pale gradient (4.5.1).
     private func capsuleFill(_ fill: Color) -> Color {
-        onGradient ? AppColors.staticWhite.opacity(ScoreHeroMetrics.paleCapsuleOpacity) : fill
+        onGradient ? AppColors.Text.primaryOnDark.opacity(ScoreHeroMetrics.paleCapsuleOpacity) : fill
     }
 
     private var capsuleLayout: AnyLayout {
@@ -455,7 +455,7 @@ private struct HeroCapsule: ViewModifier {
     let fill: Color
 
     func body(content: Content) -> some View {
-        content.background(onColor ? AppColors.staticWhite.opacity(0.2) : fill, in: Capsule())
+        content.background(onColor ? AppColors.Text.primaryOnDark.opacity(0.2) : fill, in: Capsule())
     }
 }
 

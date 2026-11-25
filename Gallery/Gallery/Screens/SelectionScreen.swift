@@ -250,7 +250,7 @@ private struct SelectionIndicatorPage: View {
             apps: [.tenra, .dalada]
         ) {
             SelectionIndicator(isSelected: isSelected,
-                               tint: [AppColors.accent, AppColors.success, AppColors.textTertiary][tint])
+                               tint: [AppColors.accent, AppColors.Status.positive, AppColors.Text.tertiary][tint])
                 .onTapGesture { isSelected.toggle() }
         } controls: {
             ToggleControl("Selected", isOn: $isSelected)
@@ -275,7 +275,7 @@ private struct DateButtonsPage: View {
                 DateButtons(selectedDate: $date, isDisabled: disabled) { _ in }
                 Text(date, format: .dateTime.day().month().year())
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
         } controls: {
             ToggleControl("Disabled", isOn: $disabled)
@@ -417,7 +417,7 @@ private struct OptionCardPickerPage: View {
     @ViewBuilder
     private func artwork(_ background: Background) -> some View {
         switch background {
-        case .none: Rectangle().fill(AppColors.bgBase)
+        case .none: Rectangle().fill(AppColors.Background.page)
         case .gradient: AuroraBackground(motion: moves ? .drift : .still).opacity(intensity)
         case .photo: GalleryPhotoView(photo: GalleryPhoto.samples[0]).blur(radius: blursPhoto ? 8 : 0, opaque: true)
         }

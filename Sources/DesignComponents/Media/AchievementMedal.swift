@@ -38,7 +38,7 @@ public struct AchievementMedal: View {
             source: .sfSymbol(systemImage),
             style: .circle(
                 size: size,
-                tint: .monochrome(isEarned ? AppColors.staticWhite : AppColors.Text.tertiary),
+                tint: .monochrome(isEarned ? AppColors.Text.primaryOnDark : AppColors.Text.tertiary),
                 backgroundColor: isEarned ? color : SurfaceStyle.glass.containerStrong,
                 padding: size * 0.24
             )

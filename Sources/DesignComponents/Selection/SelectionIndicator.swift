@@ -21,7 +21,7 @@ public struct SelectionIndicator: View {
     let isSelected: Bool
     let tint: Color
 
-    /// - Parameter tint: colour of the filled check (default accent; e.g. `AppColors.success`
+    /// - Parameter tint: colour of the filled check (default accent; e.g. `AppColors.Status.positive`
     ///   for a done checklist item, `AppColors.Text.tertiary` for a disabled, already-owned one).
     public init(
         isSelected: Bool,

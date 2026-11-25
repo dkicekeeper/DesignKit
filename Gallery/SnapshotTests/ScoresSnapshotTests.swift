@@ -19,12 +19,12 @@ extension ComponentSnapshots {
         @Test func scoreGaugeCards() async {
             await assertComponentSnapshot(
                 ScoreGaugeCard(score: 72, zoneTicks: [40, 70], grade: "Good",
-                               color: AppColors.success, subtitle: "You're on track"),
+                               color: AppColors.Status.positive, subtitle: "You're on track"),
                 named: "score"
             )
             await assertComponentSnapshot(
                 ScoreGaugeCard(score: nil, zoneTicks: [40, 70], grade: "Not enough data",
-                               color: AppColors.textSecondary,
+                               color: AppColors.Text.secondary,
                                subtitle: "Add a month of income to see your score"),
                 named: "noScore"
             )
@@ -34,14 +34,14 @@ extension ComponentSnapshots {
         /// and on the page.
         @Test func scoreGaugeHero() async {
             await assertComponentSnapshot(
-                ScoreGaugeCard(score: 84, zoneTicks: [40, 70], grade: "Excellent", color: AppColors.success,
+                ScoreGaugeCard(score: 84, zoneTicks: [40, 70], grade: "Excellent", color: AppColors.Status.positive,
                                subtitle: "Your financial health", style: .hero, showsMaximum: true,
                                trend: .init(direction: .up, changePercent: 17, caption: "than last month")),
                 named: "onColor",
                 appearances: [.light, .dark, .largeText]
             )
             await assertComponentSnapshot(
-                ScoreGaugeCard(score: 46, zoneTicks: [40, 70], grade: "Fair", color: AppColors.warning,
+                ScoreGaugeCard(score: 46, zoneTicks: [40, 70], grade: "Fair", color: AppColors.Status.warning,
                                subtitle: "Room to improve", style: .hero, tone: .onSurface, showsMaximum: true),
                 named: "onSurface"
             )
@@ -52,20 +52,20 @@ extension ComponentSnapshots {
         @Test func scoreGaugeHeroRate() async {
             await assertComponentSnapshot(
                 ScoreGaugeCard(value: 12.4, unit: "%", maxScore: 40, zoneTicks: [10, 20], grade: "Below target",
-                               color: AppColors.warning, subtitle: "Target: 20% of income", style: .hero,
+                               color: AppColors.Status.warning, subtitle: "Target: 20% of income", style: .hero,
                                trend: .init(direction: .down, change: "−1.6 pp", caption: "since last month"))
             )
         }
 
         @Test func scoreCards() async {
             await assertComponentSnapshot(
-                ScoreCard(title: "Health score", grade: "Good", score: 72, color: AppColors.success),
+                ScoreCard(title: "Health score", grade: "Good", score: 72, color: AppColors.Status.positive),
                 named: "good",
                 appearances: [.light, .dark, .largeText]
             )
             await assertComponentSnapshot(
                 ScoreCard(title: "Health score", grade: "Needs attention", score: 34,
-                          color: AppColors.destructive),
+                          color: AppColors.Status.negative),
                 named: "needsAttention",
                 appearances: [.light, .dark, .largeText]
             )
@@ -75,7 +75,7 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 TargetProgressCard(
                     systemImage: "banknote.fill",
-                    color: AppColors.success,
+                    color: AppColors.Status.positive,
                     title: "Savings rate",
                     badge: "Weight 30%",
                     summary: "Score 50 of 100",
@@ -90,7 +90,7 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 TargetProgressCard(
                     systemImage: "gauge.with.dots.needle.33percent",
-                    color: AppColors.warning,
+                    color: AppColors.Status.warning,
                     title: "Budgets",
                     badge: "Weight 25%",
                     currentLabel: "Current", currentValue: "—",

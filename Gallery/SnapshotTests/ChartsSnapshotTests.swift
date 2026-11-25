@@ -22,7 +22,7 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {
                     LinearProgressBar(value: 0.35, animatesOnAppear: false)
-                    LinearProgressBar(percentage: 112, isOverBudget: true, color: AppColors.warning, animatesOnAppear: false)
+                    LinearProgressBar(percentage: 112, isOverBudget: true, color: AppColors.Status.warning, animatesOnAppear: false)
                     HStack(spacing: AppSpacing.lg) {
                         ProgressRing(progress: 0.45, size: AppIconSize.Tile.xxl, lineWidth: 5, animatesOnAppear: false, showsTrack: true)
                         ProgressRing(
@@ -45,8 +45,8 @@ extension ComponentSnapshots {
                 VStack(alignment: .leading, spacing: AppSpacing.sm) {
                     FormattedAmountText(amount: 1_234_567.89, currency: "KZT", fontSize: AppTypography.h2)
                     FormattedAmountText(amount: 4_990, currency: "USD")
-                    FormattedAmountText(amount: -350.5, currency: "EUR", color: AppColors.destructive)
-                    FormattedAmountText(amount: 12_000, currency: "KZT", prefix: "+", color: AppColors.income)
+                    FormattedAmountText(amount: -350.5, currency: "EUR", color: AppColors.Status.negative)
+                    FormattedAmountText(amount: 12_000, currency: "KZT", prefix: "+", color: SampleColors.income)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light, .largeText]
@@ -59,7 +59,7 @@ extension ComponentSnapshots {
                     Sparkline(values: [3, 5, 4, 8, 6, 9, 7, 11], height: 48)
                     Sparkline(
                         values: [4, -2, 3, -5, 1, 6, -1],
-                        coloring: .signed(positive: AppColors.success, negative: AppColors.destructive),
+                        coloring: .signed(positive: AppColors.Status.positive, negative: AppColors.Status.negative),
                         baseline: .signed,
                         height: 48,
                         markExtremes: true
@@ -129,7 +129,7 @@ extension ComponentSnapshots {
         @Test func referenceLinesAndRecords() async {
             await assertComponentSnapshot(
                 BarChart(dataPoints: ChartSample.months, series: ChartSample.expenses, todayText: "Today",
-                         referenceLines: [.average(), .value(470_000, label: "Limit", aboveColor: AppColors.warning)],
+                         referenceLines: [.average(), .value(470_000, label: "Limit", aboveColor: AppColors.Status.warning)],
                          marksExtremes: true),
                 named: "bar"
             )
@@ -152,7 +152,7 @@ extension ComponentSnapshots {
         /// 8.3.0: sixteen weeks of days up to a fixed day, Monday first.
         @Test func calendarHeatmap() async {
             await assertComponentSnapshot(
-                CalendarHeatmap(values: ChartSample.days, weeks: 16, color: AppColors.destructive,
+                CalendarHeatmap(values: ChartSample.days, weeks: 16, color: AppColors.Status.negative,
                                 valueFormat: .currency("KZT"), today: ChartSample.today, calendar: ChartSample.calendar),
                 appearances: [.light, .dark, .largeText]
             )
@@ -167,7 +167,7 @@ extension ComponentSnapshots {
         }
 
         @Test func heroSparkline() async {
-            let income = ChartSeries<ChartValuePoint>.keyed("income", name: "Income", coloring: .solid(AppColors.success))
+            let income = ChartSeries<ChartValuePoint>.keyed("income", name: "Income", coloring: .solid(AppColors.Status.positive))
 
             await assertComponentSnapshot(
                 HeroSparkline(
@@ -197,7 +197,7 @@ extension ComponentSnapshots {
                         MiniProportionBar(segments: ChartSample.slices)
                             .frame(maxWidth: .infinity)
                     }
-                    ProportionBar(ratio: 0.65, leftColor: AppColors.income, rightColor: AppColors.bgMuted, animatesOnAppear: false)
+                    ProportionBar(ratio: 0.65, leftColor: SampleColors.income, rightColor: SurfaceStyle.glass.containerStrong, animatesOnAppear: false)
                     HeroProportionBar(segments: ChartSample.slices, currency: "KZT")
                 }
             )
@@ -211,13 +211,13 @@ extension ComponentSnapshots {
                         norm: 0.5,
                         maxValue: 1,
                         zoneTicks: [0.3, 0.7],
-                        color: AppColors.success,
+                        color: AppColors.Status.positive,
                         diameter: 220,
                         animatesOnAppear: false
                     )
                     HeroMilestoneGauge(value: 4.2, target: 6, maxValue: 12, color: AppColors.accent, animatesOnAppear: false)
                     HStack(spacing: AppSpacing.lg) {
-                        MiniHalfGauge(value: 0.62, norm: 0.5, maxValue: 1, color: AppColors.success)
+                        MiniHalfGauge(value: 0.62, norm: 0.5, maxValue: 1, color: AppColors.Status.positive)
                         MiniMilestoneGauge(value: 4.2, target: 6, maxValue: 12, color: AppColors.accent)
                     }
                 }
@@ -230,15 +230,15 @@ extension ComponentSnapshots {
         /// snapshot can be (its window adds 2 × 40 pt and must fit the 440 pt screen).
         @Test func bleedGauges() async {
             await assertComponentSnapshot(
-                HeroHalfGauge(value: 0.62, maxValue: 1, zoneTicks: [0.4, 0.7], color: AppColors.success,
+                HeroHalfGauge(value: 0.62, maxValue: 1, zoneTicks: [0.4, 0.7], color: AppColors.Status.positive,
                               style: .bleed, lineWidth: 28, animatesOnAppear: false),
                 named: "onSurface"
             )
             await assertComponentSnapshot(
-                HeroHalfGauge(value: 0.84, maxValue: 1, zoneTicks: [0.4, 0.7], color: AppColors.destructive,
+                HeroHalfGauge(value: 0.84, maxValue: 1, zoneTicks: [0.4, 0.7], color: AppColors.Status.negative,
                               style: .bleed, tone: .onColor, lineWidth: 28, animatesOnAppear: false)
                     .padding(.vertical, AppSpacing.lg)
-                    .background(AppColors.destructive),
+                    .background(AppColors.Status.negative),
                 named: "onColor"
             )
             await assertComponentSnapshot(
@@ -266,7 +266,7 @@ extension ComponentSnapshots {
                     MiniBars(values: ChartSample.weekdays, color: AppColors.accent,
                              labels: ["M", "T", "W", "T", "F", "S", "S"])
                         .frame(width: 120)
-                    MiniBars(values: ChartSample.weekdays, highlighted: 2, color: AppColors.destructive)
+                    MiniBars(values: ChartSample.weekdays, highlighted: 2, color: AppColors.Status.negative)
                         .frame(width: 120)
                 }
                 .frame(maxWidth: .infinity),
@@ -306,8 +306,8 @@ extension ComponentSnapshots {
         @Test func chartSelectionBanner() async {
             await assertComponentSnapshot(
                 ChartSelectionBanner(title: "January 2026", entries: [
-                    .init(value: 480_000, color: AppColors.success),
-                    .init(value: 275_000, color: AppColors.destructive),
+                    .init(value: 480_000, color: AppColors.Status.positive),
+                    .init(value: 275_000, color: AppColors.Status.negative),
                 ], format: .currency("KZT")),
                 named: "twoValues",
                 appearances: [.light, .dark, .largeText]
@@ -321,8 +321,8 @@ extension ComponentSnapshots {
             // 8.3.0: the series' names (the legend) and a note after the title.
             await assertComponentSnapshot(
                 ChartSelectionBanner(title: "January 2026", note: "so far", entries: [
-                    .init(value: 480_000, color: AppColors.success, label: "Income"),
-                    .init(value: 275_000, color: AppColors.destructive, label: "Expenses"),
+                    .init(value: 480_000, color: AppColors.Status.positive, label: "Income"),
+                    .init(value: 275_000, color: AppColors.Status.negative, label: "Expenses"),
                 ], format: .currency("KZT")),
                 named: "legend",
                 appearances: [.light, .dark, .largeText]
@@ -330,9 +330,9 @@ extension ComponentSnapshots {
             // 8.3.0: the change from the period before, lines under the value, a record.
             await assertComponentSnapshot(
                 ChartSelectionBanner(title: "March 2026", entries: [
-                    .init(value: 560_000, color: AppColors.success, label: "Income", changePercent: 12.4, better: .higher,
+                    .init(value: 560_000, color: AppColors.Status.positive, label: "Income", changePercent: 12.4, better: .higher,
                           details: [.init("A year ago", value: 498_000)], isRecord: true),
-                    .init(value: 470_000, color: AppColors.destructive, label: "Expenses", changePercent: 6.1, better: .lower,
+                    .init(value: 470_000, color: AppColors.Status.negative, label: "Expenses", changePercent: 6.1, better: .lower,
                           details: [.init("Forecast", value: 520_000)]),
                 ], format: .currency("KZT")),
                 named: "details",
@@ -374,7 +374,7 @@ private enum ChartSample {
 
     /// Income with its forecast for June and a year ago for every month.
     static let incomeWithExtras = ChartSeries<ChartValuePoint>.keyed(
-        "income", name: "Income", coloring: .solid(AppColors.success), better: .higher,
+        "income", name: "Income", coloring: .solid(AppColors.Status.positive), better: .higher,
         projectedKey: "incomeForecast", comparisonKey: "incomeLastYear")
 
     /// Six months of spending by category, no dates.
@@ -422,14 +422,14 @@ private enum ChartSample {
     /// Spending by weekday, Monday first: Saturday the most.
     static let weekdays: [Double] = [18_000, 12_500, 15_000, 14_000, 22_000, 31_000, 9_500]
 
-    static let income = ChartSeries<ChartValuePoint>.keyed("income", name: "Income", coloring: .solid(AppColors.success))
-    static let expenses = ChartSeries<ChartValuePoint>.keyed("expenses", name: "Expenses", coloring: .solid(AppColors.destructive))
+    static let income = ChartSeries<ChartValuePoint>.keyed("income", name: "Income", coloring: .solid(AppColors.Status.positive))
+    static let expenses = ChartSeries<ChartValuePoint>.keyed("expenses", name: "Expenses", coloring: .solid(AppColors.Status.negative))
 
     /// A spending breakdown for the orb, donut and proportion bars.
     static let slices: [DonutSlice] = [
         DonutSlice(id: "food", amount: 42_000, color: AppColors.accent, label: "Food", percentage: 42),
-        DonutSlice(id: "rent", amount: 30_000, color: AppColors.success, label: "Rent", percentage: 30),
-        DonutSlice(id: "fun", amount: 18_000, color: AppColors.warning, label: "Fun", percentage: 18),
-        DonutSlice(id: "misc", amount: 10_000, color: AppColors.transfer, label: "Misc", percentage: 10),
+        DonutSlice(id: "rent", amount: 30_000, color: AppColors.Status.positive, label: "Rent", percentage: 30),
+        DonutSlice(id: "fun", amount: 18_000, color: AppColors.Status.warning, label: "Fun", percentage: 18),
+        DonutSlice(id: "misc", amount: 10_000, color: SampleColors.transfer, label: "Misc", percentage: 10),
     ]
 }

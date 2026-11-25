@@ -14,7 +14,7 @@ import DesignSupport
 ///
 /// ```swift
 /// HeroSymbol(systemImage: "bell.badge")
-/// HeroSymbol(systemImage: "map", size: 96, tint: AppColors.success)
+/// HeroSymbol(systemImage: "map", size: 96, tint: AppColors.Status.positive)
 /// ```
 ///
 /// Decorative: hidden from VoiceOver, the title next to it says what it is.

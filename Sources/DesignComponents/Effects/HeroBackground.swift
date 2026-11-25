@@ -78,7 +78,7 @@ public extension View {
     ///     VStack(spacing: AppSpacing.xl) {
     ///         VStack { HeroSection(…); HeroBarPair(…) }
     ///             .padding(.bottom, AppSpacing.xxl)
-    ///             .heroBackground(AppColors.warning)
+    ///             .heroBackground(AppColors.Status.warning)
     ///         DetailCard(…).padding(.top, -AppSpacing.xxl)   // rises over the fade
     ///     }
     /// }

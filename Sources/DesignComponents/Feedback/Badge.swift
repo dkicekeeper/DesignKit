@@ -18,8 +18,8 @@ import DesignSupport
 ///   white would not read on it (`AppColors.readableFill`, 8.9.0).
 ///
 /// ```swift
-/// Badge("Closed", color: AppColors.destructive)
-/// Badge("3", systemImage: "person.badge.plus", color: AppColors.destructive, style: .filled)
+/// Badge("Closed", color: AppColors.Status.negative)
+/// Badge("3", systemImage: "person.badge.plus", color: AppColors.Status.negative, style: .filled)
 /// ```
 ///
 /// For an icon-only lifecycle status use `StatusIndicatorBadge`; for a trend use `TrendBadge`.
@@ -50,7 +50,7 @@ public struct Badge: View {
         label
             .font(AppTypography.caption)
             .lineLimit(1)
-            .foregroundStyle(style == .filled ? AppColors.staticWhite : AppColors.readable(color))
+            .foregroundStyle(style == .filled ? AppColors.Text.primaryOnDark : AppColors.readable(color))
             .padding(.horizontal, AppSpacing.sm)
             .padding(.vertical, AppSpacing.xxs)
             .background(style == .filled ? AppColors.readableFill(color) : AppColors.pale(color), in: Capsule())

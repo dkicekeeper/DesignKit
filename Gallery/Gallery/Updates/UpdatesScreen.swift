@@ -267,7 +267,7 @@ extension Changelog.Release {
     }
 
     var kindTint: Color {
-        isMajor ? AppColors.warning : isPatch ? AppColors.Status.neutral : AppColors.accent
+        isMajor ? AppColors.Status.warning : isPatch ? AppColors.Status.neutral : AppColors.accent
     }
 
     /// "13 Oct 2026".
@@ -300,9 +300,9 @@ extension Changelog.Section.Kind {
 
     var tint: Color {
         switch self {
-        case .added: AppColors.success
-        case .changed, .deprecated: AppColors.warning
-        case .removed: AppColors.destructive
+        case .added: AppColors.Status.positive
+        case .changed, .deprecated: AppColors.Status.warning
+        case .removed: AppColors.Status.negative
         case .fixed, .migration: AppColors.accent
         case .tooling: AppColors.Status.neutral
         }

@@ -82,7 +82,7 @@ extension ComponentSnapshots {
                     InlineStatusText(message: "Synced a minute ago", type: .success)
                     RecommendationBox(
                         text: "Fishing is banned here until 15 June.",
-                        color: AppColors.destructive,
+                        color: AppColors.Status.negative,
                         icon: "nosign"
                     )
                 }

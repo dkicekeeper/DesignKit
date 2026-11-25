@@ -87,12 +87,12 @@ public enum IconTint: Equatable, Hashable {
 
     /// Success color (для income категорий)
     public static var successMonochrome: IconTint {
-        .monochrome(AppColors.success)
+        .monochrome(AppColors.Status.positive)
     }
 
     /// Destructive color (для expense важных действий)
     public static var destructiveMonochrome: IconTint {
-        .monochrome(AppColors.destructive)
+        .monochrome(AppColors.Status.negative)
     }
 }
 

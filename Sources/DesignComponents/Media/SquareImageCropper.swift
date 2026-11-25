@@ -75,7 +75,7 @@ public struct SquareImageCropper: View {
                     lastOffset = offset
                 }
             }
-            .background(AppColors.bgBase)
+            .background(AppColors.Background.page)
             .navigationTitle(String(localized: "imageCropper.title", defaultValue: "Move and scale"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -202,7 +202,7 @@ private struct CropVeil: View {
                     path.addRect(CGRect(origin: .zero, size: geometry.size))
                     path.addRoundedRect(in: rect, cornerSize: CGSize(width: AppRadius.lg, height: AppRadius.lg))
                 }
-                .fill(AppColors.bgBase.opacity(0.72), style: FillStyle(eoFill: true))
+                .fill(AppColors.Background.page.opacity(0.72), style: FillStyle(eoFill: true))
                 RoundedRectangle(cornerRadius: AppRadius.lg)
                     .stroke(AppColors.Text.primary.opacity(0.6), lineWidth: 1)
                     .frame(width: side, height: side)

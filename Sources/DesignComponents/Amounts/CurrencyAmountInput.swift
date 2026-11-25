@@ -93,7 +93,7 @@ public struct CurrencyAmountInput: View {
                 AmountInput(
                     amount: $amount,
                     baseFontSize: 56,
-                    color: errorMessage != nil ? AppColors.destructive : AppColors.Text.primary,
+                    color: errorMessage != nil ? AppColors.Status.negative : AppColors.Text.primary,
                     autoFocus: true,
                     showContextMenu: true,
                     onAmountChange: onAmountChange
