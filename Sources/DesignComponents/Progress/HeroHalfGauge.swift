@@ -233,7 +233,7 @@ public struct HeroHalfGauge: View {
             Circle()
                 .fill(arcColor)
             Circle()
-                .fill(tone == .onColor ? color : AppColors.Background.base)
+                .fill(tone == .onColor ? AnyShapeStyle(color) : AnyShapeStyle(.surfaceBackground))
                 .frame(width: markerDiameter / 1.6, height: markerDiameter / 1.6)
         }
         .frame(width: markerDiameter, height: markerDiameter)

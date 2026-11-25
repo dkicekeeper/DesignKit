@@ -203,7 +203,7 @@ public struct TransactionRow: View {
                 Icon(badgeSystemImage, size: AppIconSize.sm, scalesWithText: false)
                     .foregroundStyle(.primary)
                     .padding(AppSpacing.xs)
-                    .background(AppColors.bgBase)
+                    .background(.surfaceBackground)
                     .clipShape(Circle())
                     .offset(x: -TransactionRowMetrics.badgeOffset, y: -TransactionRowMetrics.badgeOffset)
             }
