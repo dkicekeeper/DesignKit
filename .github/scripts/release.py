@@ -187,7 +187,11 @@ def combine(fragments):
     for name in SECTIONS:
         lines = []
         for fragment in fragments:
-            lines += fragment.sections.get(name, [])
+            body = fragment.sections.get(name, [])
+            # Two notes' prose stays two paragraphs; their items stay one list.
+            if lines and body and not (lines[-1].startswith("- ") and body[0].startswith("- ")):
+                lines.append("")
+            lines += body
         if lines:
             sections[name] = lines
     return Fragment(
@@ -454,8 +458,9 @@ def notify_failure(gh, prs, run_url):
 
 
 def _commit_and_push(root, remote, branch, message):
-    """Commits everything and pushes it: (pushed, git's reason when it was refused)."""
-    _git(root, "add", "-A")
+    """Commits the tracked files it changed and pushes them: (pushed, git's reason when it was
+    refused). Only tracked files: a stray file a tool left in the checkout never reaches main."""
+    _git(root, "add", "-u")
     _git(root, *BOT, "commit", "-q", "-m", message)
     pushed = subprocess.run(["git", "push", "-q", remote, f"HEAD:{branch}"], cwd=root, capture_output=True, text=True)
     return pushed.returncode == 0, (pushed.stderr or pushed.stdout).strip()

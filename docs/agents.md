@@ -13,8 +13,8 @@ script with the bump. Do not edit the block in the app; change it here.
   for, its initialisers, rules, do and don't, its skeleton. `docs/components.json` is the same as
   data. The full rules: `docs/design-system.md`.
 - The Gallery app (TestFlight) shows every component with its parameters and states.
-- A missing component goes to DesignKit by PR (CLAUDE.md, "Porting a component"); the app keeps a
-  thin adapter over its model.
+- A missing component goes to DesignKit by PR (CLAUDE.md, "Porting a component"), or by an issue
+  from the "Component request" template; the app keeps a thin adapter over its model.
 
 ## The rules
 

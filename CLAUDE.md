@@ -18,8 +18,9 @@ xcodebuild build -project Gallery.xcodeproj -scheme Gallery \
 ```
 
 Code is often written in a Linux container where SwiftUI cannot compile. **CI is the compiler
-there**: `.github/workflows/ci.yml` builds the package, the Gallery, and **Dalada and Tenra
-against this checkout** on macOS for every push to `main` and `claude/**`, and runs the unit and
+there**: `.github/workflows/ci.yml` builds the package, the Gallery, and **Dalada, Tenra and
+Platina against this checkout** on macOS (Platina on GitHub's Xcode 27 image) for every push to
+`main` and `claude/**`, and runs the unit and
 snapshot tests. Push, then read the job logs.
 
 **Snapshot tests** (`Gallery/SnapshotTests`, hosted in the Gallery app) compare components with
@@ -106,23 +107,26 @@ it as "Designed for iPad"; its content keeps to `.readableWidth()`, 8.13.0); acc
 `.holographic`), sessions (`LiveSessionBar`, `RelativeTime`), guides (`ArticleBody`,
 `ExpandableText`), picking (`SearchablePicker`), its game screen
 (`.heroBackground(clearHeight:picture:)`, 8.14.0), sharing (`ShareCardSheet`). Its guide:
-`CLAUDE.md` («DesignKit») and `docs/PLAN.md` §4. CI does not build it here yet; the Gallery's badges
-read its code since 8.17.1 (CI's `Gallery badges` job checks it out with Tenra and Dalada).
+`CLAUDE.md` («DesignKit») and `docs/PLAN.md` §4. CI's `platina` job builds it against this checkout
+on GitHub's Xcode 27 image, as its own CI does (since vNext), and the Gallery's badges read its code
+since 8.17.1 (CI's `Gallery badges` job checks it out with Tenra and Dalada).
 
 **Dalada since 8.12.0** (its #77, version 1.0.4) draws its surfaces as a grey fill too
 (`DesignKitTheme.surface = .fill` in its `AppEnvironment`); Tenra keeps Liquid Glass.
 
 A consumer sees a DesignKit change when its pin moves. Each app's **DesignKit update** workflow
 (`.github/workflows/designkit.yml` in the app) checks for a newer release tag daily, bumps the
-pin, builds and tests, and commits the bump to the app's `main` when green. CI's `dalada` and
-`tenra` jobs build both apps against the current checkout, so a change that would break one
-fails here first (manual runs take `dalada_ref` / `tenra_ref` to check an app branch).
+pin, builds and tests, and commits the bump to the app's `main` when green (Platina has no such
+workflow yet). CI's `dalada`, `tenra` and `platina` jobs build the three apps against the current
+checkout, so a change that would break one fails here first (manual runs take `dalada_ref` /
+`tenra_ref` / `platina_ref` to check an app branch).
 
 ## Source of Truth & Sync
 
 - **Since 2026-10 (DesignKit 0.3.0):** both apps consume DesignKit, and it is the only place
   design-system code lives. Apps add or change components by PR here (develop with Xcode's
-  local package override: drag the local DesignKit folder into the app's project), CI builds
+  local package override: drag the local DesignKit folder into the app's project), or ask for one
+  with the issue template "Component request" (`.github/ISSUE_TEMPLATE/`), CI builds
   every consumer, merge → release tag → each app's update workflow bumps it. Tenra's look stays
   the reference: a visual change to a shared component is a design decision, called out under
   `### Changed` in the PR's release note (`.changes/`, which becomes the CHANGELOG.md section).
@@ -395,10 +399,10 @@ rather than importing an app type.
   candidates, each when an app asks for it (docs/benchmark.md 13 a data palette, 14 an exit
   motion, 15 spacing that grows with Dynamic Type, 20 `FormSection(isExpanded:)`,
   `FlowLayout(maxRows:)`, a banner over a sheet, a status dot on `Avatar`, 23 the code of a page's
-  configuration in the Gallery, 24 a Patterns section of whole screens, 28 an issue template to
-  ask for a component), the assistant's list of actions once Tenra shows one, anatomy on the
-  pages of composite cards and rows; Platina in CI's build jobs and its own DesignKit update
-  workflow; the adoption proposals in [docs/adoption.md](docs/adoption.md) for the app sessions.
+  configuration in the Gallery, 24 a Patterns section of whole screens), the assistant's list of
+  actions once Tenra shows one, anatomy on the pages of composite cards and rows; Platina's own
+  DesignKit update workflow (its CI job here and the issue template, 28, came in vNext); the
+  adoption proposals in [docs/adoption.md](docs/adoption.md) for the app sessions.
 - Release numbers given at merge (2026-11, the owner's decision after parallel sessions'
   PRs collided on numbers and on `VERSION`, CHANGELOG.md and docs/components.md): a PR declares
   its release in `.changes/`, the bot numbers, writes and tags it on `main`
