@@ -44,11 +44,11 @@ ALIASES = {
     "Springs by purpose": ["AppAnimation.snappy", "AppAnimation.smooth", "AppAnimation.bouncy", "AppAnimation.expressive", "MotionBudget"],
     "Symbol motion": [".symbolMagicReplace", ".symbolBounce", ".symbolPulse", ".symbolWiggle", ".symbolBreathe", ".symbolDrawOn"],
     "HapticCue": [".hapticCue"],
-    # An app explains a label with the modifier as often as with the view (8.9.0).
-    "InfoTip": [".infoTip"],
     "AmountRow: a list of limits": ["AmountRow"],
     "MessageComposer": [".messageComposerAccessory", "MessageComposerAccessory"],
     "HeroBackground": [".heroBackground", ".heroScrollEdge"],
+    # The modifier puts it after a label (Dalada's pressure, 8.9.0).
+    "InfoTip": [".infoTip"],
     ".heroBackground": [".heroScrollEdge"],
     "LoadMoreFooter": [".onReachEnd"],
     "ShimmerModifier": [".shimmer"],
