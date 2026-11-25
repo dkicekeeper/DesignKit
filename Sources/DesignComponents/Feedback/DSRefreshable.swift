@@ -60,9 +60,11 @@ struct DSRefreshableModifier: ViewModifier {
                 await MainActor.run { clock.finish(at: .now) }
             }
             .onScrollGeometryChange(for: CGFloat.self) { geometry in
-                -(geometry.contentOffset.y + geometry.contentInsets.top)
+                // Only past the top: ordinary scrolling stays 0, so the action does not run on
+                // every frame of it.
+                max(0, -(geometry.contentOffset.y + geometry.contentInsets.top))
             } action: { _, newValue in
-                pull = max(0, newValue)
+                pull = newValue
                 clock.pull(pull, at: .now)
             }
             .overlay(alignment: .top) {
