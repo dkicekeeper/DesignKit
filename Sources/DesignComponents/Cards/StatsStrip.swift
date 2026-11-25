@@ -26,7 +26,7 @@ import DesignSupport
 /// itself and draws its own glass. For one figure with a trend, `StatTile`.
 ///
 /// A counter that needs explaining (how it is counted, where it comes from) takes `info:`
-/// (vNext): an `InfoTip` after its caption, on the caption's first line.
+/// (8.19.0): an `InfoTip` after its caption, on the caption's first line.
 ///
 /// ```swift
 /// .init(value: "1.8%", title: "of players",
@@ -38,7 +38,7 @@ public struct StatsStrip: View {
     public struct Item: Identifiable, Sendable {
         public let value: String
         public let title: String
-        /// What the counter means, in an `InfoTip` after its caption (vNext): a sentence or two.
+        /// What the counter means, in an `InfoTip` after its caption (8.19.0): a sentence or two.
         public let info: String?
         /// The tip's heading, the counter's name (the caption is often only its unit); `nil`
         /// shows the text alone, and VoiceOver names the tip "More information".
@@ -47,7 +47,7 @@ public struct StatsStrip: View {
 
         /// - Parameters:
         ///   - info: What the counter means and how it is counted, in an `InfoTip` after the
-        ///     caption (vNext).
+        ///     caption (8.19.0).
         ///   - infoTitle: The tip's heading, the counter's full name.
         public init(value: String, title: String, info: String? = nil, infoTitle: String? = nil) {
             self.value = value

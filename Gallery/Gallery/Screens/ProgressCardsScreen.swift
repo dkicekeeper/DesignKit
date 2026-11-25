@@ -489,7 +489,7 @@ private struct StatsStripPage: View {
             apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: [
-                "info: (vNext) puts an InfoTip after a counter's caption: how the number is counted, where it comes from. infoTitle: is its heading, the counter's full name when the caption is only a unit.",
+                "info: (8.19.0) puts an InfoTip after a counter's caption: how the number is counted, where it comes from. infoTitle: is its heading, the counter's full name when the caption is only a unit.",
             ]
         ) {
             if state == .loading {

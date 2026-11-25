@@ -152,7 +152,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// StatsStrip (vNext): a counter with `info:`, its InfoTip after the caption, beside one
+        /// StatsStrip (8.19.0): a counter with `info:`, its InfoTip after the caption, beside one
         /// without; the popover is the system's and is not drawn here.
         @Test func statsStripWithInfo() async {
             await assertComponentSnapshot(
