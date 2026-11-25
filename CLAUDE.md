@@ -1,7 +1,8 @@
 # DesignKit — Project Guide for Claude
 
-SwiftUI design system shared by **Tenra** (personal finance, the reference implementation) and
-**Dalada** (outdoor trips). One package, three layered targets, a Gallery app, no app logic.
+SwiftUI design system shared by **Tenra** (personal finance, the reference implementation),
+**Dalada** (outdoor trips) and **Platina** (PlayStation trophies). One package, three layered
+targets, a Gallery app, no app logic.
 
 ## Quick Start
 
@@ -17,24 +18,33 @@ xcodebuild build -project Gallery.xcodeproj -scheme Gallery \
 ```
 
 Code is often written in a Linux container where SwiftUI cannot compile. **CI is the compiler
-there**: `.github/workflows/ci.yml` builds the package, the Gallery, and **Dalada against this
-checkout** on macOS for every push to `main` and `claude/**`. Push, then read the job logs.
+there**: `.github/workflows/ci.yml` builds the package, the Gallery, and **Dalada and Tenra
+against this checkout** on macOS for every push to `main` and `claude/**`, and runs the unit and
+snapshot tests. Push, then read the job logs.
 
 **Snapshot tests** (`Gallery/SnapshotTests`, hosted in the Gallery app) compare components with
 reference PNGs in light, dark and large text; CI's `Snapshot tests` job fails on a visual
 difference. An intentional change is re-recorded by a manual CI run with `record_snapshots`
 (`missing` / `failed` / `all`): [docs/snapshots.md](docs/snapshots.md).
 
-**TestFlight**: `.github/workflows/testflight.yml` archives the Gallery and uploads it on every
-push to `main` that touches `Sources/`, `Gallery/`, `Package.swift` or `VERSION` (version =
-`VERSION`, build = run number). Setup and troubleshooting: [docs/testflight.md](docs/testflight.md).
+**TestFlight**: `.github/workflows/testflight.yml` archives the Gallery and uploads it (version =
+`VERSION`, build = run number). A release's build is started by the release bot on the release's
+tag; any other push to `main` that touches `Sources/`, `Gallery/` or `Package.swift` builds too,
+except a merge that carries a release note (its version is not set until the bot runs).
+Setup and troubleshooting: [docs/testflight.md](docs/testflight.md).
+
+**Releases are numbered at merge**: a PR adds a note in `.changes/` and writes the token
+`vNext` where its version goes; the release bot (`.github/workflows/release.yml`) gives it the
+next number after the merge ([docs/releasing.md](docs/releasing.md)).
 
 ## Package Layout
 
 ```
 Sources/
-├── DesignTokens/      leaf — colors, spacing, radius, icon sizes, typography (Inter), animation,
-│                      modifiers, button styles, AmbientMotionGate, DesignKitTheme, fonts
+├── DesignTokens/      leaf — colors, spacing, radius, icon sizes, layout (a large screen's
+│                      column, 8.13.0; its side column, 8.15.0), typography (Inter), animation,
+│                      modifiers, surfaces (SurfaceStyle: glass or a grey fill, 8.12.0), button
+│                      styles, AmbientMotionGate, DesignKitTheme, fonts
 ├── DesignSupport/     → DesignTokens — icons (IconSource/IconStyle/Icon),
 │                      formatting, haptics, DominantColorExtractor, host hooks
 └── DesignComponents/  → DesignTokens + DesignSupport — by what a component does (1.13.0,
@@ -53,16 +63,22 @@ scripts/               snapshot-tests.sh (CI and local runs of the snapshot test
                        the pinned version), migrate.py + migrations/ (rewrites and TODOs for a
                        major), sync_agents_block.py (docs/agents.md into an app's CLAUDE.md)
 .github/scripts/       changelog.py (CI's Changelog job, release notes), gallery_badges.py (CI's
-                       Gallery badges job: each page's `apps:` against Tenra's and Dalada's code),
-                       components_reference.py (docs/components.md + .json; CI fails when stale)
+                       Gallery badges job: each page's `apps:` against Tenra's, Dalada's and
+                       Platina's code),
+                       components_reference.py (docs/components.md + .json; the release bot
+                       writes them), release.py (release notes, the branch check, the release
+                       bot; docs/releasing.md)
+.changes/              release notes of the PRs not released yet, one file each (docs/releasing.md)
 Shaders/               Metal sources (Ripple, EdgeGlow, Grain, Holographic, Dissolve) + build.sh;
                        CI compiles them into the .metallib files in Sources/DesignComponents/
                        Resources/Shaders (.github/workflows/shaders.yml), so apps need no Metal
                        Toolchain (docs/motion.md §6)
 Tests/                 swift-testing unit tests (formatting, ExpressionEvaluator, calculator
-                       model) — run by CI on an iOS Simulator
+                       model, contrast, calendars, chart windows, search, shaders, surfaces, …)
+                       — run by CI on an iOS Simulator
 docs/                  design-system.md, components.md (+ .json, generated), agents.md, charts.md,
-                       gotchas.md, localization-keys.md, benchmark.md
+                       motion.md, gotchas.md, localization-keys.md, snapshots.md, testflight.md,
+                       gallery-structure.md, adoption.md, benchmark.md, migration-X.0.md
 CHANGELOG.md           every release, newest first: what it added and changed, how to move an
                        app to it (the GitHub Release notes and the Gallery's Updates screen)
 ```
@@ -74,8 +90,27 @@ consumers `import DesignTokens` / `DesignSupport` / `DesignComponents` as needed
 
 | App | How it depends | Notes |
 |---|---|---|
-| Dalada | `ios/Packages/DaladaKit/Package.swift`, `exact: "X.Y.Z"` | Swift 6, iOS 26; green accent via `DesignKitTheme.accent`; uses tokens, `cardStyle`, buttons, `EmptyState`, `SectionHeader`, `RecommendationBox`, `PlusTabLabel`, since 1.12.0 `MessageComposer` and the community and progress components (people, comments, threads, reviews, reactions, achievements, checklists, stats, streak, thumbnails), since 2.7.0 effects (`.holographic`, `.interactiveTilt`, `.celebration`, `.completionMoment`, `.dissolve`, `AuroraBackground`), and since 2.8.0 its photos (`PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `PhotoViewer`), share pictures (`ShareCardSheet`, `ShareCardFrame`), `LiveSessionBar`, `DownloadRow`, `ArticleBody`, `ChipPicker(allTitle:)` and `PersonRow(style: .card)`, since 3.0.0 its forms (`EditSheetContainer`, `FormSection`, the form rows), and since 3.1.0 its photo loading (`RemotePhoto` over its `PhotoCache` through `DesignKitPhotoLoader`), `ChipPicker(inset:)` in form cards and a row label for its photo pickers (a `UniversalRow` since 7.0.0, as are all its form rows), since 3.5.0 search suggestions (`.dsSearchSuggestions` in places and people search), since 5.3.0 (its 0919342, docs/adoption.md) `StatusBanner` on offline maps, `.spotlight` over the map's buttons, `StepTracker` for a new place, `HeroSymbol` in its placeholders, `OnboardingStepIndicator` after the first sign-in, `AvatarGroup` for a trip's members, `TagInput` and `FlowLayout` for gear tags, and `.skeletonReveal` wherever a skeleton gives way, with thin adapters over its models (its `ShareCard.Style.dalada`). Its guide to DesignKit: `CLAUDE.md`, «Компоненты интерфейса» (a table from what a screen needs to the components) |
-| Tenra | `Tenra.xcodeproj` package reference, exact version | Reference look. `Tenra/Utils/DesignKitBridge.swift` re-exports the three modules, wires the host hooks and keeps the Tenra-model adapters (custom category colours, logo registry, breakdown → `DonutSlice`, the stat-card sparkline). Since 2.9.0 its transaction rows (`TransactionRow` under `TransactionCardView`), account and category card pickers (`SnapCardPicker`), live transcript (`StreamingText`), custom period sheet (`DateRangePickerSheet`), background options (`OptionCardPicker`), voice cards (`.cascadeIn`), period pagers (`PagerArrows`) and backup overlay (`.progressOverlay`) are DesignKit's too, as thin adapters over its models. Its Finances cards use `PackedCircleIcons(style: .shelf)` (4.5.0; whole 48 pt tiles in a 160 pt row since 4.15.0, 36 pt in a pocket from 4.5.1, the rest in "+N"; 4.4.0's shelf replaced 3.3.0's `.fan`). Since 3.5.0 search suggestions (`.dsSearchSuggestions`: History with its categories and subcategories, link payments, subcategory search). Since 4.6.0 the pieces of its AI assistant: `ParticleCreature` (the mascot), `MessageBubble`, `SuggestionChips`; since 4.8.0 its tab (`CreatureTabLabel` over `CreatureGlyph`) and its field's attach menu and microphone (`MessageComposer(leading:onVoice:)`). Since 4.10.0 Ten speaks in words of light and gestures (`speech:`, `.creatureGesture`), since 4.11.0 it lives on its own and thinks pictures (`.creatureAmbience`, `CreatureSpeech(symbol:label:)`), since 4.12.0 it wears accessories (`accessory:`: holidays, a crown, its wardrobe), since 4.13.0 it stands in its empty lists (`EmptyState(…) { artwork }`, a line and a point at the button). Since 4.14.0 the last generic views it drew itself: `AmountEntrySheet` (money towards a goal or a debt), `ListCard` (its assistant's cards; `FormSection(style: .glass)` since 5.0.0), `NoticeCard` ("Ten writes"), `VoiceOrbButton` (the voice stop orb), `PickerCarousel` (Ten's wardrobe) and `NavigationPickerRow(style: .list)` (Settings' voice language; since 7.0.0 every form and settings row of it is a `UniversalRow`). Since 5.3.0 (its #79, docs/adoption.md) every mood, emotion and gesture of Ten (`.working(progress:)` while a statement is read, gesture haptics on reactions, `.creatureFollowsTilt()` on Home, `ParticleCreature.image` on notifications), `MessageBubbleTransition` and `TypingIndicator` in the chat, `OptionCardPicker` for Home's background (a carousel of previews only since 6.0.0), and `StatusBanner`, `HeroSymbol`, `StepTracker`, `Tooltip`, `LiveAmountText`, `SpentBudgetText`, `.sparkleBurst`. Since 8.2.0 its assets are `HoldingCard`s (`AssetCard`, its #105). Its guide: `docs/design-system.md` (the bridge, every adapter and the component under it, screen patterns, amount rules) |
+| Dalada | `ios/Packages/DaladaKit/Package.swift`, `exact: "X.Y.Z"` | Swift 6, iOS 26; green accent via `DesignKitTheme.accent`; uses tokens, `cardStyle`, buttons, `EmptyState`, `SectionHeader`, `RecommendationBox`, since 1.12.0 `MessageComposer` and the community and progress components (people, comments, threads, reviews, reactions, achievements, checklists, stats, streak, thumbnails), since 2.7.0 effects (`.holographic`, `.interactiveTilt`, `.celebration`, `.completionMoment`, `AuroraBackground`; `.dissolve` and `PlusTabLabel` it has dropped since), and since 2.8.0 its photos (`PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `PhotoViewer`), share pictures (`ShareCardSheet`, `ShareCardFrame`), `LiveSessionBar`, `DownloadRow`, `ArticleBody`, `ChipPicker(allTitle:)` and `PersonRow(style: .card)`, since 3.0.0 its forms (`EditSheetContainer`, `FormSection`, the form rows), and since 3.1.0 its photo loading (`RemotePhoto` over its `PhotoCache` through `DesignKitPhotoLoader`), `ChipPicker(inset:)` in form cards and a row label for its photo pickers (a `UniversalRow` since 7.0.0, as are all its form rows), since 3.5.0 search suggestions (`.dsSearchSuggestions` in places and people search), since 5.3.0 (its 0919342, docs/adoption.md) `StatusBanner` on offline maps, `.spotlight` over the map's buttons, `StepTracker` for a new place, `HeroSymbol` in its placeholders, `OnboardingStepIndicator` after the first sign-in, `AvatarGroup` for a trip's members, `TagInput` and `FlowLayout` for gear tags, and `.skeletonReveal` wherever a skeleton gives way, with thin adapters over its models (its `ShareCard.Style.dalada`). Its guide to DesignKit: `CLAUDE.md`, «Компоненты интерфейса» (a table from what a screen needs to the components) |
+| Tenra | `Tenra.xcodeproj` package reference, exact version | Reference look. `Tenra/Utils/DesignKitBridge.swift` re-exports the three modules, wires the host hooks and keeps the Tenra-model adapters (custom category colours, logo registry, breakdown → `DonutSlice`, the stat-card sparkline). Since 2.9.0 its transaction rows (`TransactionRow` under `TransactionCardView`), account and category card pickers (`SnapCardPicker`), live transcript (`StreamingText`), custom period sheet (`DateRangePickerSheet`), background options (`OptionCardPicker`), voice cards (`.cascadeIn`), period pagers (`PagerArrows`) and backup overlay (`.progressOverlay`) are DesignKit's too, as thin adapters over its models. Its Finances cards use `PackedCircleIcons(style: .shelf)` (4.5.0; whole 48 pt tiles in a 160 pt row since 4.15.0, 36 pt in a pocket from 4.5.1, the rest in "+N"; 4.4.0's shelf replaced 3.3.0's `.fan`). Since 3.5.0 search suggestions (`.dsSearchSuggestions`: History with its categories and subcategories, link payments, subcategory search). Since 4.6.0 the pieces of its AI assistant: `ParticleCreature` (the mascot), `MessageBubble`, `SuggestionChips`; since 4.8.0 its tab (`CreatureTabLabel` over `CreatureGlyph`) and its field's attach menu and microphone (`MessageComposer(leading:onVoice:)`). Since 4.10.0 Ten speaks in words of light and gestures (`speech:`, `.creatureGesture`), since 4.11.0 it lives on its own and thinks pictures (`.creatureAmbience`, `CreatureSpeech(symbol:label:)`), since 4.12.0 it wears accessories (`accessory:`: holidays, a crown, its wardrobe), since 4.13.0 it stands in its empty lists (`EmptyState(…) { artwork }`, a line and a point at the button). Since 4.14.0 the last generic views it drew itself: `AmountEntrySheet` (money towards a goal or a debt), `ListCard` (its assistant's cards; `FormSection(style: .glass)` since 5.0.0), `NoticeCard` ("Ten writes"), `VoiceOrbButton` (the voice stop orb), `PickerCarousel` (Ten's wardrobe) and `NavigationPickerRow(style: .list)` (Settings' voice language; since 7.0.0 every form and settings row of it is a `UniversalRow`). Since 5.3.0 (its #79, docs/adoption.md) every mood, emotion and gesture of Ten (`.working(progress:)` while a statement is read, gesture haptics on reactions, `.creatureFollowsTilt()` on Home, `ParticleCreature.image` on notifications), `MessageBubbleTransition` in the chat (its step in words under `.thinkingShimmer` while Ten thinks, in place of 5.3.0's `TypingIndicator`), `OptionCardPicker` for Home's background (a carousel of previews only since 6.0.0), and `StatusBanner`, `HeroSymbol`, `StepTracker`, `.spotlight` (its first-launch hints), `LiveAmountText`, `SpentBudgetText`, `.sparkleBurst`. Since 8.2.0 its assets are `HoldingCard`s (`AssetCard`, its #105). Its guide: `docs/design-system.md` (the bridge, every adapter and the component under it, screen patterns, amount rules) |
+
+**Platina** (2026-11, a PlayStation trophy tracker, in development) is the third consumer:
+`ios/project.yml` (XcodeGen), `exactVersion: "X.Y.Z"`, moved by hand (no DesignKit update
+workflow yet; its CI lints at the pinned version, and the bump runs `sync_agents_block.py`). Swift 6, iOS 26, iPhone and iPad (a Mac runs
+it as "Designed for iPad"; its content keeps to `.readableWidth()`, 8.13.0); accent
+`#3573BA` through `DesignKitTheme.accent`; since 8.12.0 (its #1) grey surfaces
+(`DesignKitTheme.surface = .fill`). All of its interface is DesignKit's: forms and lists
+(`FormSection`, `UniversalRow`, `CardList`, `ItemRow`, `ChecklistRow`), its assistant Plati
+(`ParticleCreature`, `CreatureTabLabel`, `MessageBubble(markdown:)`, `ConversationDivider`,
+`MessageComposer`, `TypingIndicator`, `SuggestionChips`), progress and trophies (`ProgressRing`,
+`LinearProgressBar`, `StreakCard`, `CalendarHeatmap`, `BarChart`, `AchievementMedal`,
+`.holographic`), sessions (`LiveSessionBar`, `RelativeTime`), guides (`ArticleBody`,
+`ExpandableText`), picking (`SearchablePicker`), its game screen
+(`.heroBackground(clearHeight:picture:)`, 8.14.0), sharing (`ShareCardSheet`). Its guide:
+`CLAUDE.md` («DesignKit») and `docs/PLAN.md` §4. CI does not build it here yet; the Gallery's badges
+read its code since 8.17.1 (CI's `Gallery badges` job checks it out with Tenra and Dalada).
+
+**Dalada since 8.12.0** (its #77, version 1.0.4) draws its surfaces as a grey fill too
+(`DesignKitTheme.surface = .fill` in its `AppEnvironment`); Tenra keeps Liquid Glass.
 
 A consumer sees a DesignKit change when its pin moves. Each app's **DesignKit update** workflow
 (`.github/workflows/designkit.yml` in the app) checks for a newer release tag daily, bumps the
@@ -90,7 +125,7 @@ fails here first (manual runs take `dalada_ref` / `tenra_ref` to check an app br
   local package override: drag the local DesignKit folder into the app's project), CI builds
   every consumer, merge → release tag → each app's update workflow bumps it. Tenra's look stays
   the reference: a visual change to a shared component is a design decision, called out under
-  **Changed** in the release's CHANGELOG.md section.
+  `### Changed` in the PR's release note (`.changes/`, which becomes the CHANGELOG.md section).
 - **Before that:** DesignKit was synced FROM Tenra's own copy: three-way merge per file
   (base = the Tenra commit of the previous sync, theirs = Tenra `main`, ours = DesignKit),
   keeping DesignKit's `public` API and parameterization. The log below records those syncs.
@@ -123,7 +158,8 @@ use: Tenra's `BudgetProgressRow` became `LimitProgressCard`, its `AmortizationSc
 became `ScheduleRow`, and the app keeps a thin adapter under the old name that maps its model.
 The port is pixel-identical: the layout code moves as it is, only its inputs change.
 
-Host hooks (set once in `App.init()`): `DesignKitTheme.accent`, `DesignKitFonts.registerIfNeeded()`,
+Host hooks (set once in `App.init()`): `DesignKitTheme.accent`, `DesignKitTheme.surface` (8.12.0,
+`.glass` or a grey `.fill`), `DesignKitFonts.registerIfNeeded()`,
 `DesignKitLogoLoader.loader`, `DesignKitPhotoLoader.loader` / `.cached` (3.1.0, `RemotePhoto`),
 `DesignKitIconPhotos.save` / `.isPhoto` (8.5.0, `IconPicker`'s Photo tab),
 `DesignKitCurrencyConverter.convert` / `.convertSync`, `DesignKitLogoCatalog` (the icon picker's
@@ -140,7 +176,7 @@ rather than importing an app type.
    2.0.0, docs/migration-2.0.md); tokens keep their `App` prefix (`AppColors`, `AppSpacing`).
    A variant of an existing component is a parameter or a style of it, not a new view
    (`DSButton(iconPlacement: .top)`, `SectionHeader(style: .card)`); a row of a form or a
-   settings list is `UniversalRow(_:icon:accessory:)` (7.0.0), in a `FormSection` glass card that
+   settings list is `UniversalRow(_:icon:accessory:)` (7.0.0), in a `FormSection` card that
    draws its dividers (8.0.0), and a list of things a person keeps is a `CardList`. Every symbol is an `Icon`: under
    44 pt a glyph with no plate, from 44 pt a tile on its plate (7.0.0, the owner's rule); iOS's
    own bars, menus, swipe actions, tabs and segments, and a symbol inside a line of text, are the
@@ -161,35 +197,41 @@ rather than importing an app type.
    what the component does), with a control for each parameter and a `StateControl` whose
    "Loading" shows its skeleton (plus Empty / Error / Disabled when it has them); a new screen
    needs `xcodegen generate`. Its `apps:` names the apps whose code uses it: CI's `Gallery
-   badges` job compares them with Tenra's and Dalada's sources (5.2.0). Give it `dos:` / `donts:` when
-   there is a way it is misused (8.9.0), then `python3 .github/scripts/components_reference.py write`
-   (CI fails on a stale docs/components.md). Add a snapshot test in `Gallery/SnapshotTests` (the skeleton's in
+   badges` job compares them with Tenra's, Dalada's and Platina's sources (5.2.0; Platina 8.17.1). Give it `dos:` / `donts:` when
+   there is a way it is misused (8.9.0); its `since:` is the token `vNext`, which the release bot
+   turns into the number. `python3 .github/scripts/components_reference.py build` shows the
+   page reads; the release bot writes docs/components.md after the merge. Add a snapshot test in `Gallery/SnapshotTests` (the skeleton's in
    `SkeletonsSnapshotTests`; one Liquid Glass card per snapshot; `named:` tells them apart),
    then record it with a manual CI run, `record_snapshots: missing` (docs/snapshots.md).
 5. Add any new `String(localized:)` key to `docs/localization-keys.md` and its English value
    to `Gallery/Gallery/Localizable.xcstrings`.
 6. Update `docs/design-system.md` (§0 inventory + the component's section), and add the
-   component under **Added** in the release's CHANGELOG.md section (with the app view it
-   replaces under **Migration**).
+   component under `### Added` in the PR's note in `.changes/` (with the app view it replaces
+   under `### Migration`).
 7. Push; CI must be green on the package, Gallery, snapshot, Dalada and Tenra jobs.
 
 ## API Stability & Versioning
 
 - Semantic versioning with git tags (`0.2.0`, …). Consumers pin a version (`exact:` or
   `.upToNextMinor(from:)`), never a branch.
-- **Cutting a release:** bump `VERSION` and add its section at the top of
-  [CHANGELOG.md](CHANGELOG.md) in the PR that should ship. On merge,
-  `.github/workflows/release.yml` tags that commit `X.Y.Z` and creates a GitHub Release whose
-  notes are that section (tags are created by Actions — the Claude session's git proxy only
-  pushes branches). TestFlight's Gallery build carries the same version, with the section as
-  "What to Test", and the Gallery's Updates screen shows it.
-- **A CHANGELOG section** is `## X.Y.Z - YYYY-MM-DD`, a line or two on what the release is with
-  its PR link, then the sections that apply, in this order: `### Added` (new API), `### Changed`
-  (what looks or behaves differently in an app after the bump), `### Deprecated` (old → new),
-  `### Removed` (majors only), `### Fixed`, `### Migration` (what an app changes, old → new, a
-  code block where the API changes) and `### Gallery and tooling`. English, no em dashes, one
-  level of `- ` items. CI's `Changelog` job (`.github/scripts/changelog.py check`) fails when
-  the section for `VERSION` is missing or the format is off.
+- **Cutting a release:** the PR that should ship adds a note, `.changes/<branch>-<date>-<word>.md`,
+  with `bump: patch | minor | major` (a major also `version: X.0.0`) and the release's text,
+  and writes the token `vNext` wherever it would name its version. It never edits `VERSION`,
+  the `## X.Y.Z` headings of CHANGELOG.md or docs/components.md(.json). On merge, the release
+  bot (`.github/workflows/release.yml`, `.github/scripts/release.py run`) gives the notes the
+  next number, writes the CHANGELOG section with the PR link, `VERSION` and the component
+  reference, replaces the token, commits `Release X.Y.Z`, tags it and creates the GitHub Release
+  whose notes are that section (tags are created by Actions; the Claude session's git proxy
+  only pushes branches), then starts TestFlight's Gallery build on the tag, with the section as
+  "What to Test"; the Gallery's Updates screen shows it. CI's `Changelog` job checks the branch
+  and says what a merge would release now ([docs/releasing.md](docs/releasing.md)).
+- **A release's text** (the note, then the CHANGELOG section the bot makes of it) is a line or
+  two on what the release is, then the sections that apply, in this order: `### Added` (new
+  API), `### Changed` (what looks or behaves differently in an app after the bump),
+  `### Deprecated` (old → new), `### Removed` (majors only), `### Fixed`, `### Migration` (what
+  an app changes, old → new, a code block where the API changes) and `### Gallery and tooling`.
+  English, no em dashes, one level of `- ` items. CI's `Changelog` job
+  (`.github/scripts/changelog.py check`, `release.py check`) fails when the format is off.
 - **Never remove or rename public API in a minor release.** Deprecate with
   `@available(*, deprecated, message: "… Use X.")` naming the replacement; remove only in the
   next major, once no consumer uses it. Tenra retiring a component is not a reason to delete it
@@ -317,9 +359,51 @@ rather than importing an app type.
   (`scripts/designkit_lint.py`), migrations for a major (`scripts/migrate.py`), the agent block
   (docs/agents.md) and the component reference (docs/components.md). Moving the apps onto the lint
   and the block is their sessions' step (docs/adoption.md).
+- Surfaces without glass (8.12.0, the owner's request for Platina): `DesignKitTheme.surface = .fill`
+  draws cards, sections, chips, tiles and icon plates as an opaque grey on the white page, and the
+  neutral shapes inside them as translucent fills (`.surfaceNeutral1` / `.surfaceNeutral2`).
+  Buttons and floating chrome stay glass. Platina (its #1) and Dalada (its #77, 1.0.4) use
+  `.fill`; Tenra keeps the default `.glass`.
+- Large screens (8.13.0, for Platina on the iPad and the Mac): `.readableWidth()` keeps a screen's
+  content to a centred column (`AppLayout.readableWidth`, 720 pt, growing with the text size), and
+  `AppLayout.cardColumns()` puts cards side by side in the wide column (1120 pt). No checks for
+  the device; list and detail is the system's `NavigationSplitView` (docs/design-system.md §4).
+- A hero on a picture (8.14.0, for Platina's game screen, the owner's reference a film's page in
+  Apple's TV app): `.heroBackground(clearHeight:picture:)` lays art edge to edge from the screen's
+  top, sharp in the hero's room, then blurred and darkened into its own colours under the hero's
+  white text and buttons (the dark scheme in both modes), the bar light over it;
+  `.heroScrollEdge(isHeroUnderBar:)` lets a screen keep the bar's title empty while the hero
+  shows it.
+- A main column and a side column (8.15.0, the owner's review of Platina's large-screen mockup:
+  an iPad, a Mac window, an unfolded iPhone Duo): `AdaptiveColumns { main } side: { cards }
+  narrow: { the phone's layout }` puts summaries beside a detail screen's main column where
+  `AppLayout.mainColumnMinWidth` + gap + `AppLayout.sideColumnWidth` fit (764 pt, scaled with the
+  text size), and the phone's layout where not; the width the view gets decides, so a panel
+  beside the screen switches it too. `CardList(layout: .grid)` puts the things a person keeps side
+  by side there. And after the owner's look at 8.14.0's hero on a device: the picture stretches
+  when pulled down and lags behind the content when scrolled, and waits for its `RemotePhoto`
+  with a still dark fill (`RemotePhotoLoading.still`) instead of a shimmer.
+- A hero in two layers (8.17.0, the owner's review of Platina's mockup with three games):
+  `.heroBackground(clearHeight:picture:subject:)` stands a cut-out figure (a game's hero
+  character) in front of its backdrop, as wide as the screen just under the bars on a phone, with
+  a parallax of its own; `RemotePhotoLoading.hidden` keeps a figure that is loading or failed
+  out of sight.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.
+- What is next (2026-11-24, the docs and Gallery audit of 8.17.1): benchmark round 4's P3
+  candidates, each when an app asks for it (docs/benchmark.md 13 a data palette, 14 an exit
+  motion, 15 spacing that grows with Dynamic Type, 20 `FormSection(isExpanded:)`,
+  `FlowLayout(maxRows:)`, a banner over a sheet, a status dot on `Avatar`, 23 the code of a page's
+  configuration in the Gallery, 24 a Patterns section of whole screens, 28 an issue template to
+  ask for a component), the assistant's list of actions once Tenra shows one, anatomy on the
+  pages of composite cards and rows; Platina in CI's build jobs and its own DesignKit update
+  workflow; the adoption proposals in [docs/adoption.md](docs/adoption.md) for the app sessions.
+- Release numbers given at merge (2026-11, the owner's decision after parallel sessions'
+  PRs collided on numbers and on `VERSION`, CHANGELOG.md and docs/components.md): a PR declares
+  its release in `.changes/`, the bot numbers, writes and tags it on `main`
+  ([docs/releasing.md](docs/releasing.md)). The PRs open at the switch (#109, #110, #111, #112)
+  went out the old way first; one still open the old way (#105) moves its section into a note.
 
 ## Reference Docs
 
@@ -333,6 +417,7 @@ rather than importing an app type.
 | Package traps (public API, Xcode 26/27, bundles) and SwiftUI layout traps | [docs/gotchas.md](docs/gotchas.md) |
 | Localized strings used by components | [docs/localization-keys.md](docs/localization-keys.md) |
 | Gallery TestFlight pipeline | [docs/testflight.md](docs/testflight.md) |
+| Cutting a release: the note in `.changes/`, the version token, what the release bot does, recovering a failed run | [docs/releasing.md](docs/releasing.md) |
 | Snapshot tests: what is covered, recording references, the pinned Xcode | [docs/snapshots.md](docs/snapshots.md) |
 | What each version added and changed, and how to move an app to it (also the Gallery's Updates screen) | [CHANGELOG.md](CHANGELOG.md) |
 | Moving an app to 2.0 (renames, `DSButton`, icon sizes, visual changes) | [docs/migration-2.0.md](docs/migration-2.0.md) |
@@ -345,4 +430,4 @@ rather than importing an app type.
 | What exists vs Apple HIG / Material / Fluent / Carbon / Polaris / Atlassian / Astryx, next candidates | [docs/benchmark.md](docs/benchmark.md) |
 | Components no app uses yet and where they could go (for the app sessions) | [docs/adoption.md](docs/adoption.md) |
 | Where a component goes (Gallery sections, source folders), how its Gallery page is built | [docs/gallery-structure.md](docs/gallery-structure.md) |
-| How an app uses DesignKit (its adapters, screens, effects in use) | Tenra's `docs/design-system.md`, Dalada's `CLAUDE.md` («Компоненты интерфейса») |
+| How an app uses DesignKit (its adapters, screens, effects in use) | Tenra's `docs/design-system.md`, Dalada's `CLAUDE.md` («Компоненты интерфейса»), Platina's `CLAUDE.md` («DesignKit») and `docs/PLAN.md` §4 |

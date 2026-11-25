@@ -124,7 +124,7 @@ private struct OnboardingPagerPage: View {
             name: "OnboardingPager",
             summary: "Onboarding pages with dots, Skip where allowed and each page's own buttons.",
             since: "0.7.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             notes: [
                 "Parallax (2.3.0): as a page swipes, its HeroSymbol moves slower than the text and shrinks and fades a little. Off under Reduce Motion.",
             ]
@@ -145,7 +145,7 @@ private struct OnboardingPagePage: View {
             name: "OnboardingPage",
             summary: "One onboarding page: a hero symbol, a title, a message and an accessory.",
             since: "0.7.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             canvas: .tall(minHeight: 420)
         ) {
             if showsAccessory {
@@ -276,7 +276,7 @@ private struct ShareCardSheetPage: View {
             name: "ShareCardSheet",
             summary: "Turns something into a picture to share: pick Stories or post, see the picture, send it with the system share sheet.",
             since: "2.8.0",
-            apps: [.dalada],
+            apps: [.tenra, .dalada, .platina],
             notes: [
                 "The data loads when the sheet opens (the card's skeleton meanwhile); the picture is drawn on the phone with ImageRenderer, 1080 px wide.",
                 "load returning nil shows the error state.",

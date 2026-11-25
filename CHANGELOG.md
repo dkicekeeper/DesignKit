@@ -13,47 +13,271 @@ Each release lists what applies to it, in this order:
 - **Migration**: what to change in an app, old → new, with code where the API changes.
 - **Gallery and tooling**: the Gallery app, the tests and CI; nothing changes in an app.
 
-Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
-adds its section here (CLAUDE.md, "API Stability & Versioning").
+Versions follow semantic versioning; apps pin an exact version. A PR declares its release in a
+note in `.changes/`; at the merge the release bot gives it the next number and writes its section
+here (docs/releasing.md).
 
-## 8.13.0 - 2026-11-23
+## 8.17.2 - 2026-11-25
 
-A moment of success over the whole app, without a card: the screen dims and blurs, a hero springs in at the centre with a title and a line under it, confetti for a celebration, the buttons at the bottom. For Tenra's assistant: Ten appears over the app when a goal is reached, a debt is settled or an accessory is earned. And `ProgressOverlay` takes a hero in its spinner's place (Ten at work over a backup's restore).
-[#105](https://github.com/dkicekeeper/DesignKit/pull/105)
-
-### Added
-
-- `MomentOverlay(title:message:celebrates:primary:dismissTitle:onDismiss:hero:reward:)`, and the same without `reward:`: the hero (any view, sized by the host) grows in on the expressive spring, the title, message, reward and buttons rise in after it. `celebrates` plays confetti behind the hero with the success haptic, otherwise a light tap. Every close plays the exit (everything fades, the hero shrinks a little), then runs `primary.action` for the primary button or `onDismiss` for any other close: the dismiss button, a tap outside the hero and the buttons, a swipe down, VoiceOver's escape. Under Reduce Motion and `.designKitMotion(false)` it comes and goes by opacity only. VoiceOver moves into it, hears the title and the message, and reads the hero with the title. No strings of its own, no skeleton.
-- `MomentAction(_:action:)`: a moment's primary button.
-- `MomentPresenter.shared`: `present(onDismissed:_:)` shows a moment over the whole app, sheets, tab bar and navigation included, in a window of its own above the app's windows and below system alerts, with the app's own light or dark choice and its accent; it returns false while another moment is up or with no foreground-active scene. A close removes the window first, then runs the button's action (it may navigate or open a sheet), then `onDismissed`. `dismiss()` removes the moment at once, without its exit or any callback; `isPresenting` tells whether one is up. Unavailable in app extensions.
-- `AppColors.Background.scrim`: dims the app under a moment, over the material that blurs it (black 10% in light mode, 45% in dark mode).
-- `.progressOverlay(isPresented:title:message:hero:)` and `ProgressOverlay(title:message:hero:)`: a view in the spinner's place that shows the progress itself, sized by the host. Without `hero:` the overlay looks as before.
+Release numbers are given at merge: a PR declares its release in a note in `.changes/` and writes `vNext` where its version goes, and a bot on `main` numbers, writes and tags it. Parallel PRs no longer collide on numbers or conflict over `VERSION`, CHANGELOG.md and docs/components.md. This release is the bot's first.
+[#114](https://github.com/dkicekeeper/DesignKit/pull/114)
 
 ### Migration
 
-Nothing to change in code. A moment over the whole app:
-
-```swift
-MomentPresenter.shared.present(onDismissed: { moments.next() }) {
-    MomentOverlay(
-        title: "Goal reached",
-        message: "A new bike: 250 000 saved.",
-        celebrates: true,
-        primary: MomentAction("See the goal") { router.open(goal) },
-        dismissTitle: "Close"
-    ) {
-        ParticleCreature(mood: .celebrating).frame(width: 220, height: 220)
-    }
-}
-```
-
-The blur of the app's windows under the moment's window is to be checked on a device.
+- Nothing changes in an app. A DesignKit PR adds a note in `.changes/` instead of bumping `VERSION` and writing its CHANGELOG section (docs/releasing.md).
 
 ### Gallery and tooling
 
-- Gallery: a MomentOverlay page in Status & Feedback, over a screen of an app, with its title, message, celebration, primary button, reward and the hero's mood, and "Show over everything" through `MomentPresenter.shared`; the ProgressOverlay page has a "With hero" switch; the Colors page lists `Background.scrim`.
-- Snapshot tests: `OverlaySnapshotTests`, the moment with its primary button and reward (light, dark, large text) and with the dismiss button alone (light, dark), and `ProgressOverlay` with a hero (light, dark). References are recorded by CI (`record_snapshots: missing`).
-- docs/components.md and docs/agents.md list the moment.
+- `.github/scripts/release.py`: the release notes (`.changes/<name>.md`, `bump:` and, for a major, `version:`), the token, the branch check (`release.py check --base origin/main`, in CI's Changelog job, with what a merge would release in the run's summary) and the release bot (`release.py run`), with its tests in `.github/scripts/test_release.py`.
+- `release.yml` runs the bot on every push to `main`: the next version, the CHANGELOG section with the PR links, `VERSION`, the token replaced, the component reference regenerated, the commit `Release X.Y.Z`, the tag, the GitHub Release and the TestFlight build on the tag. A `VERSION` left untagged is tagged first; a failed run comments on the PRs it holds up.
+- TestFlight skips the merge push that carries a note and takes a release build's What to Test from the tag on it.
+- docs/components.md and .json are the bot's: CI checks that they build (`components_reference.py build`), a PR leaves them alone.
+- docs/releasing.md, and CLAUDE.md, CHANGELOG.md's preamble, docs/testflight.md and docs/gallery-structure.md on the new way.
+- `gallery_badges.py` finds a hero modifier called without a receiver, inside an app's own `View` extension (Platina's game screen), so the picture hero's page keeps its Platina badge.
+
+## 8.17.1 - 2026-11-24
+
+The Gallery and the docs brought up to date with the three apps: Platina's badges on the pages it uses, usage notes that still gave advice from before 8.0.0, and the plans in one place. No API changes.
+[#111](https://github.com/dkicekeeper/DesignKit/pull/111)
+
+### Fixed
+
+- Doc comments that still gave advice from before 8.0.0: `cardStyle()` is the card for forms too (a menu inside opens from its row) and `formCardStyle()` is a Material card for a host that wants one; `DownloadRow` and `AmountRow` put Delete in a long press (`.contextMenu`, or the rows in a `CardList`), not in swipe actions.
+
+### Migration
+
+Nothing to change. The agents block (docs/agents.md, which an app's CLAUDE.md takes with the bump) gains a row for the top of a detail screen: `HeroSection` on colour (`.heroBackground(color)`) or on a picture (`.heroBackground(clearHeight:picture:)`), with `.heroScrollEdge()`.
+
+### Gallery and tooling
+
+- Platina is a consumer the Gallery knows: its badge on the 67 pages whose components its code uses (`ConsumerApp.platina`), and its accent (#3573BA) in the toolbar's theme menu.
+- Tenra's badge on `ShareCardFrame`, `ShareCardSheet` and `StatsStrip`, which its year in review uses.
+- CI's Gallery badges job checks Platina's code out with Tenra's and Dalada's (`platina_ref` for a manual run); `gallery_badges.py` takes `--platina`. When an app declares a type of a page's name (Platina's PSN model `Avatar`), only a file that imports one of DesignKit's modules counts. `SurfaceStyle` is matched by `DesignKitTheme.surface` and `SquareImageCropper` by `DesignKitIconPhotos.save`, the hooks that bring them in.
+- Gallery texts: `SectionHeader` lists its three styles (`.compact` went in 8.0.0); `DownloadRow` deletes with a long press and pads itself in a card; `.cardStyle()` and `.formCardStyle()` agree that menus open from a glass card; `FormSection`, `CardList` and `.filterChipStyle()` name the grey fill of 8.12.0; `AmountVisibilityToggle` no longer says Tenra uses it; `ItemRow` names where the three apps use it.
+- docs/components.md and .json carry Platina among the apps. docs/adoption.md is checked against the three apps' code (Tenra hints with `.spotlight` and no longer uses `TypingIndicator`; Dalada dropped `.dissolve` and `PlusTabLabel`; where 8.9.0's components went; a section for Platina). CLAUDE.md's consumers follow, and its Known Gaps lists what is next: benchmark round 4's P3 candidates, the assistant's list of actions, Platina in CI's build jobs and its own update workflow.
+- docs/design-system.md, docs/gallery-structure.md, docs/benchmark.md and docs/testflight.md: the swipe advice, `FormSection(style: .glass)` and the two-app wording that were left from earlier versions; TestFlight's What to Test is the version's notes on a release build.
+
+## 8.17.0 - 2026-11-24
+
+A picture hero in two layers: a cut-out figure standing in front of its backdrop, as a game's page on a PlayStation stands its hero before its world. On a phone the figure shows whole under the bars, where the same art drawn into one wide cover and cropped to the phone's width showed a shoulder; scrolled, the figure rises in front of the backdrop. For Platina's game screen (the owner's review of its mockup with three games).
+[#112](https://github.com/dkicekeeper/DesignKit/pull/112)
+
+### Added
+
+- `.heroBackground(clearHeight:picture:subject:)`: `subject` is a cut-out figure (a picture with a transparent background) in front of `picture`, the backdrop it was drawn for. It gets a square as wide as the hero, or as tall as the hero below the bars where that is less (an iPad, a Mac window), centred, its top at the bars' foot; it is sharp in the clear part and blurred and darkened with the backdrop under the hero's text. Scrolled up, the backdrop lags behind the content by half and the figure by a quarter, so the figure rises in front of it (still under Reduce Motion and `.designKitMotion(false)`); pulled down, both grow with the pull.
+- `RemotePhotoLoading.hidden`: nothing while the photo loads, nor when it fails or has no URL, for a cut-out figure over another picture, which then shows alone. `.heroBackground(picture:subject:)` sets it on its figure.
+
+### Migration
+
+Nothing to change: `.heroBackground(clearHeight:picture:)` looks as before. A screen with a figure and its backdrop passes both:
+
+```swift
+GameHero(game)
+    .heroBackground(clearHeight: 256) {
+        RemotePhoto(key: "backdrop-\(game.id)", url: game.backdropURL)
+    } subject: {
+        RemotePhoto(key: "character-\(game.id)", url: game.characterURL)
+    }
+```
+
+An app that switches over `RemotePhotoLoading` adds the `.hidden` case.
+
+### Gallery and tooling
+
+- Gallery: Effects › `.heroBackground(picture:)` has a "Figure" switch: the sample's backdrop with a hiker in front of it, on the page and in "Open as a screen". Media › `RemotePhoto`'s "While loading" has "Hidden".
+- A snapshot of a hero with a figure in front of its backdrop (`heroOnPictureWithSubject`).
+
+## 8.16.0 - 2026-11-24
+
+A shared picture says which app it is from: the app's icon before its name in the brand line, and the name in Inter. For Tenra's year in review, whose picture goes to Stories and chats.
+[#110](https://github.com/dkicekeeper/DesignKit/pull/110)
+
+### Added
+
+- `ShareCardFrame(format:brand:brandIcon:site:photo:style:content:)`: `brandIcon` is the app's icon, drawn 30 pt before the name in the home screen's rounded square (continuous corners, 22.5 % of its side). Without it the brand line is as before.
+- `ShareCard.BrandTypeface` (`.rounded`, `.inter`) and `ShareCard.Style(top:bottom:accent:brandTypeface:)`: `.inter` sets the name in Inter bold; `.rounded` (the default) keeps the rounded heavy name.
+
+### Migration
+
+Nothing to change in code: a card without the new arguments looks as before. An app that wants its icon on the picture adds the icon as an image set (an app icon set cannot be read as an image) and passes it:
+
+```swift
+ShareCardFrame(
+    format: .story,
+    brand: "Tenra",
+    brandIcon: UIImage(named: "LaunchIcon"),
+    style: ShareCard.Style(top: …, bottom: …, accent: …, brandTypeface: .inter)
+) { … }
+```
+
+### Gallery and tooling
+
+- Gallery: Media › `ShareCardFrame` has "App icon" and "Name" (Rounded, Inter) controls, with a stand-in icon.
+- A snapshot of a post with the icon and the name in Inter (`shareCardFrameBrandIcon`, `brandIcon`).
+
+## 8.15.0 - 2026-11-24
+
+A main column with a side column beside it on a large screen, and a `CardList` in a grid: on an iPad a game's trophies with its guide, walkthrough and sessions beside them, the games a person goes for side by side; on a phone the screen as it is. For Platina's game screen on the iPad, the Mac and an unfolded iPhone Duo (the owner's review of its mockup). And the picture hero after the owner's look at it on a device: it stretches when pulled down, lags behind the content when scrolled, and waits for its picture without a shimmer.
+[#109](https://github.com/dkicekeeper/DesignKit/pull/109)
+
+### Added
+
+- `AdaptiveColumns(sideWidth:mainMinWidth:spacing:main:side:narrow:)`: the main column and a side column of cards side by side where both fit, the screen's own narrow layout (`narrow:`, often a `ChipPicker` over one part at a time) where not. What decides is the width the view gets, never the device, so a panel opening beside the screen or a narrower Mac window switches it too. Without `narrow:`, the side stacks under the main column (`AdaptiveColumnsStack`). A layout: no skeleton.
+- `CardListLayout.grid`: a `CardList`'s cards side by side in `AppLayout.cardColumns()` where the width holds two or more (an iPad or a Mac window under `.readableWidth(AppLayout.wideWidth)`), one in a row on a phone, with the same taps, menus, selection and dragging as `.cards`; `CardListSkeleton(layout: .grid)` too.
+- `RemotePhotoLoading` and `.remotePhotoLoading(_:)`: how the `RemotePhoto`s inside look while they load. `.skeleton` is the shimmer as before; `.still` is a still grey, or the `placeholderKey`'s small version blurred, with no shimmer and no photo symbol, for a picture behind text and buttons.
+- `AppLayout.sideColumnWidth` (340 pt) and `AppLayout.mainColumnMinWidth` (400 pt): the side column's width and the narrowest the main column gets beside it. With the 24 pt gap the two need 764 pt; both grow with the person's text size, so a larger text size keeps the narrow layout longer.
+
+### Changed
+
+- `.heroBackground(clearHeight:picture:)` with `.heroScrollEdge()`: pulled down, the picture keeps to the screen's top and grows with the pull; scrolled up, it moves at half the content's pace, behind it (still under Reduce Motion and `.designKitMotion(false)`). While a `RemotePhoto` in it loads, a still dark fill (or its `placeholderKey`'s small version, blurred) stands in, with black under the picture, instead of two shimmering skeletons, one of them blurred. The picture at rest looks as before.
+
+### Migration
+
+Nothing changes until an app uses it. A detail screen with summaries:
+
+```swift
+ScrollView {
+    AdaptiveColumns {
+        trophies
+    } side: {
+        guideSummary
+        walkthroughCard
+        sessionsCard
+    } narrow: {
+        ChipPicker(options: sections, selection: $section) { $0.title }
+        selectedSection
+    }
+    .screenPadding()
+    .readableWidth(AppLayout.wideWidth)
+}
+```
+
+Keep the picked chip and any filter in the screen: the two layouts are different views, so state inside them starts over when the width switches them.
+
+The games or trips a person keeps, side by side on a large screen: `CardList(items, layout: .grid)` under `.readableWidth(AppLayout.wideWidth)`. An app that switches over `CardListLayout` adds a `.grid` case.
+
+### Gallery and tooling
+
+- Content & Layout: an `AdaptiveColumns` page, a trip's route with its weather and group, on a phone, an iPad mini, an iPad and a Mac window drawn small, with chips or the side under the main column as the narrow layout.
+- Snapshot test `Foundations.adaptiveColumns`: the columns side by side and folded, drawn small, and folded at a large text size.
+- CardList: a Grid layout on its page; snapshot test `CardList.grid`, four cards two in a row at an iPad's width, drawn at half size.
+- RemotePhoto: a "While loading" choice (Skeleton, Still) on its page; `.heroBackground(picture:)`'s page notes the stretch and the parallax ("Open as a screen" shows them).
+
+## 8.14.0 - 2026-11-24
+
+A hero on a picture, as a film's page in Apple's TV app: a game's art or a trip's photo edge to edge from the screen's top, sharp where nothing is over it, flowing into its own colours, blurred and darkened, under the hero's text and buttons in white. For Platina's game screen: the game's art with its title logo, the progress and the session button over it.
+[#108](https://github.com/dkicekeeper/DesignKit/pull/108)
+
+### Added
+
+- `.heroBackground(clearHeight:picture:)`: lays any view (`RemotePhoto`, an `Image` filled to its frame) behind the hero, cropped to it, from the screen's top edge behind the bars. It is sharp down to `clearHeight` below the bars (240 pt by default: the hero's room for the picture, a title logo at its foot); from 48 pt above that a 40 pt blur and 55% black take over, through 120 pt below it, so the picture's own colours lie under the hero's text. The hero's content is drawn in the dark scheme (white text, DesignKit's pieces in their dark look, `\.heroTone` `.onColor`) in light and dark mode alike, and the hero ends on the page with an edge.
+- `.heroScrollEdge(isHeroUnderBar:)`: `.heroScrollEdge()` that also tells the screen whether the hero is under the navigation bar, true at rest and false once the content after the hero scrolls under it. A screen whose hero shows its name (or logo) keeps the bar's title empty while it is true.
+- `HeroPictureMetrics.clearHeight`: the default room, 240 pt.
+
+### Changed
+
+- `.heroScrollEdge()` makes the navigation bar's items and the status bar light while a picture hero is under them (`.toolbarColorScheme(.dark)`), and leaves them to the system after. A colour hero is as before.
+
+### Migration
+
+Nothing changes until an app uses it. A detail screen on a picture:
+
+```swift
+@State private var heroUnderBar = true
+
+ScrollView {
+    VStack(spacing: AppSpacing.xl) {
+        GameHero(game)                         // room, the logo at its foot, then text and buttons
+            .heroBackground(clearHeight: 280) {
+                RemotePhoto(key: "art-\(game.id)", url: game.artURL)
+            }
+        …
+    }
+}
+.heroScrollEdge(isHeroUnderBar: $heroUnderBar)
+.navigationTitle(heroUnderBar ? "" : game.name)
+```
+
+### Gallery and tooling
+
+- Gallery: Effects › `.heroBackground(picture:)`, a trip's hero centred on four photos, and "Open as a screen" with the light bar over the picture and the bar's title appearing as the hero scrolls away.
+- A snapshot of a hero on a photo, light and dark (`heroOnPicture`).
+- docs/components.md lists every public overload of a modifier (`.heroBackground`, `.heroScrollEdge`, `.shine`), and a page named for one overload (`.heroBackground(picture:)`) shows that overload's doc.
+- The Gallery badges job matches a page of one overload by what an app writes for it (`PATTERNS` in `gallery_badges.py`): Tenra's `.heroBackground(color)` is the colour page's, not the picture's.
+
+## 8.13.0 - 2026-11-24
+
+A screen on an iPad or in a Mac window: its content keeps to a centred column instead of running across the screen, and cards that stand on their own go side by side. For Platina on the iPad and the Mac; on a phone nothing changes.
+[#107](https://github.com/dkicekeeper/DesignKit/pull/107)
+
+### Added
+
+- `.readableWidth(_:)`: keeps a screen's content in a centred column no wider than `AppLayout.readableWidth` (720 pt, its margins included), on the scroll view's content after `.screenPadding()`. The column grows with the person's text size, as the system's readable width does. A phone (up to 440 pt) is narrower, so its screens look as before.
+- `AppLayout`: `readableWidth` (720 pt), `wideWidth` (1120 pt, the column of a grid of cards), `cardMinWidth` (320 pt) and `cardColumns(minimum:spacing:)`, the adaptive columns of a `LazyVGrid` of cards: one card in a row on a phone, two or three on an iPad, never more than three.
+
+### Migration
+
+Nothing changes until an app uses it. A scrolling screen of an app that runs on an iPad or a Mac takes the column:
+
+```swift
+ScrollView {
+    VStack(spacing: AppSpacing.lg) { … }
+        .screenPadding()
+        .readableWidth()
+}
+```
+
+Cards that stand on their own (games, accounts, trips) go in a grid in the wide column:
+
+```swift
+LazyVGrid(columns: AppLayout.cardColumns(), spacing: AppSpacing.lg) {
+    ForEach(games) { GameCard($0) }
+}
+.screenPadding()
+.readableWidth(AppLayout.wideWidth)
+```
+
+A list and what it opens side by side is the system's `NavigationSplitView`; each column's screen keeps its own `.readableWidth()` (docs/design-system.md, "Large screens: iPad and Mac").
+
+### Gallery and tooling
+
+- Gallery: Content & Layout › `.readableWidth() · AppLayout`, the same screen as an iPhone, an iPad mini, an iPad and a Mac window draw it, with the column or a grid of cards, and without the column to compare.
+- A snapshot of the column (at the default and a large text size) and of a grid of cards, drawn small to fit the phone the tests run on; unit tests for the columns a phone, an iPad and a wide window get.
+- docs/design-system.md: `AppLayout` among the tokens, `.readableWidth()` among the layout modifiers, and a view pattern for large screens (the column, a grid of cards, list and detail); docs/agents.md's table names them for the apps' agents.
+
+## 8.12.0 - 2026-11-23
+
+Surfaces can be a grey fill instead of Liquid Glass: an app on the white page that wants less glass (Platina) sets `DesignKitTheme.surface = .fill` once, and its cards, sections, chips, tiles and icon plates become an opaque grey. Tenra and Dalada keep the glass, the default; nothing changes for them.
+[#104](https://github.com/dkicekeeper/DesignKit/pull/104)
+
+### Added
+
+- `SurfaceStyle` (`.glass`, `.fill`) and `DesignKitTheme.surface` (default `.glass`), a host hook set in `App.init()` next to the accent. Under `.fill` a surface is `AppColors.Background.neutral1` (`#F2F2F7` on the white page, `#1C1C1E` on black, a step lighter in a dark sheet), in the same shape, with no glass.
+- `.surfaceStyle(_:)` and `EnvironmentValues.surfaceStyle`: another style for a subtree (one glass card over a photo in an app of grey cards). The environment's default is `DesignKitTheme.surface`.
+- What follows it: `cardStyle()` and everything built on it (`FormSection`, `CardList`, every card, `SectionHeader(style: .card)`, `NoticeCard`, `PendingItemCard`), `filterChipStyle()` (and `ChipPicker`, `SuggestionChips`, `TagInput`, `UniversalFilterButton` on it), `ProgressRingTile`'s circle, an `Icon`'s glass plate (`.glassHero`, `.glassService`, `EditableHero`), `OnboardingStepIndicator` and `MessageBanner` (the grey under its colour's pale tint). A selected chip or tile takes the pale tint of its colour.
+- `SurfaceStyle.neutral1` / `.neutral2` and the shape styles `.surfaceNeutral1` / `.surfaceNeutral2` (`SurfaceNeutral`): `neutral1` and `neutral2` on glass; under `.fill`, where `neutral1` is the card's own grey, the translucent `tertiarySystemFill` and `secondarySystemFill`, a step darker than whatever lies under them (the page, a card, a card in a sheet). DesignKit's own neutral shapes inside a card use them: an icon tile's plate, `LinearProgressBar`'s and `AmountComparisonBar`'s tracks, skeletons, `StepTracker`, `ActivityTimeline`'s line, `CalendarHeatmap`'s empty days, `MonthCalendar`'s "+N", `AvatarGroup`'s "+N", `FormTextField`, `IconPicker`'s cells, `DateRangePickerSheet`'s fields and `ScoreGaugeCard`'s trend.
+- Buttons (`DSButton`, `.dsButton`, `.buttonStyle(.glass)` in `DateButtons`, `ChartZoomControls`, `ChartSwitcher`), the chrome that floats over content (`MessageComposer`, `GlassActionMenu`, the system's bars) and glass drawn as an effect on a coloured hero (`.glassBar`, `HeroMilestoneGauge`, `OrbChart`) stay Liquid Glass under both styles.
+
+### Migration
+
+Nothing to change in code: the default is `.glass`. An app that wants grey surfaces sets it once:
+
+```swift
+init() {
+    DesignKitTheme.accent = .teal
+    DesignKitTheme.surface = .fill
+    DesignKitFonts.registerIfNeeded()
+}
+```
+
+Under `.fill`, an app's own neutral shape inside a card fills with `.surfaceNeutral1` or `.surfaceNeutral2` rather than `AppColors.Background.neutral1` / `neutral2`, which would melt into the grey card.
+
+### Gallery and tooling
+
+- Gallery: a Surfaces menu in the toolbar (Glass, Fill) draws every page either way, on the white or black canvas under Fill; Foundations › Surfaces opens on a `SurfaceStyle` page that sets one block of a section, a card and chips to glass or fill.
+- Snapshots of a section and a card on glass and under `.fill` (light, dark).
+- Docs brought up to date: docs/design-system.md shows the two surfaces side by side (from the snapshot references), lists the `IconStyle` presets as the code has them (`.roundedLogo`, `.serviceLogo` and the glass presets are circles; there is no `.bankLogo`) and corrects §10 and the paths of `BlurSlideTransition` and `AccentGlow`; docs/gallery-structure.md's sections list what the Gallery has (`UniversalRow` for the rows 7.0.0 removed, `CalendarHeatmap`, `MiniBars`, `CreatureTabLabel`, `CreatureGlyph`, `SquareImageCropper`, `OnboardingPageContainer`, `.heroBackground`); README and CLAUDE.md name 8.x, Platina, Tenra's CI job and every doc; a gotcha for `neutral1` on a grey card.
+- The keys `common.color` and `common.startDate`, unused since 7.0.0, left docs/localization-keys.md and the Gallery's strings.
 
 ## 8.11.0 - 2026-11-13
 

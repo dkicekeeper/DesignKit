@@ -88,7 +88,7 @@ public struct AvatarGroup: View {
                     .monospacedDigit()
                     .foregroundStyle(AppColors.Text.secondary)
                     .frame(width: size, height: size)
-                    .background(AppColors.Background.neutral2, in: Circle())
+                    .background(.surfaceNeutral2, in: Circle())
                     .overlay(Circle().stroke(AppColors.Background.base, lineWidth: ring))
             }
         }

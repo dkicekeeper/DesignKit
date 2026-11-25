@@ -2,7 +2,7 @@
 //  MomentOverlay.swift
 //  DesignKit
 //
-//  A big moment of success over the whole screen (8.13.0): a goal reached, a debt settled, a month
+//  A big moment of success over the whole screen (vNext): a goal reached, a debt settled, a month
 //  inside the budgets, a reward earned. No card: the screen behind dims and blurs, the hero (any
 //  view: a mascot, a medal, a symbol) springs in at the centre, a title and a line or two rise in
 //  under it, an optional reward under them, confetti behind the hero for a celebration. Buttons at

@@ -16,6 +16,9 @@ public extension View {
     ///
     /// **Use when:** the chip triggers filtering, navigation, or any tap action
     /// (filter buttons, action menu triggers, segmented-style selectors in toolbars).
+    ///
+    /// Under `SurfaceStyle.fill` (8.12.0) the chip is a grey capsule (`.surfaceNeutral1`), the
+    /// selected one the accent's pale tint.
     func filterChipStyle(isSelected: Bool = false) -> some View {
         self
             .font(AppTypography.bodySmall.weight(.medium))
@@ -23,11 +26,7 @@ public extension View {
             .padding(.horizontal, AppSpacing.lg)
             .padding(.vertical, AppSpacing.sm)
             .clipShape(.rect(cornerRadius: AppRadius.xl))
-            .glassEffect(
-                isSelected
-                ? .regular.tint(AppColors.accent.opacity(0.2)).interactive()
-                : .regular.interactive()
-            )
+            .modifier(FilterChipSurface(isSelected: isSelected))
             .animation(AppAnimation.contentSpring, value: isSelected)
     }
 
@@ -35,23 +34,21 @@ public extension View {
     /// Padding НЕ добавляется — ответственность за отступы лежит на содержимом
     /// (строки используют собственный padding; произвольный контент добавляет .padding перед вызовом).
     ///
-    /// **Use this for display cards** (AccountCard, LoanCard, HealthScoreCard, hero
-    /// sections, etc.). For interactive form sections that contain `Picker(.menu)` /
-    /// `Menu` triggers, use `formCardStyle()` instead — `glassEffect` is the morph
-    /// source for iOS 26 menus, and a single-row section collapses the whole row into
-    /// the popover at tap.
+    /// **Use this for every card** (AccountCard, LoanCard, HealthScoreCard, hero sections) and,
+    /// since 8.0.0, for form sections too: `FormSection` and `CardList` are built on it, and a
+    /// `Picker(.menu)` / `Menu` inside opens from its row (a device probe showed it; the fear that
+    /// glass would become the menu's morph source and collapse a one-row section into the popover
+    /// came from an early iOS 26 build, docs/gotchas.md).
     ///
     /// 3.0.0: the glass is drawn behind the content, not applied to it. Applied to the content,
     /// Liquid Glass blended each layer into the layers under it (darker in light mode, lighter
     /// in dark): a marker over an arc looked translucent, a label over its pale capsule changed
     /// colour. Behind it, the content keeps its exact colours; the card itself looks the same.
+    ///
+    /// 8.12.0: under `SurfaceStyle.fill` (`DesignKitTheme.surface`, `.surfaceStyle(_:)`) the card
+    /// is the opaque grey `AppColors.Background.neutral1` instead of glass, in the same shape.
     func cardStyle(radius: CGFloat = AppRadius.xl) -> some View {
-        self
-            .contentShape(Rectangle())
-            .clipShape(.rect(cornerRadius: radius))
-            .background {
-                Color.clear.glassEffect(.regular, in: .rect(cornerRadius: radius))
-            }
+        modifier(CardSurface(radius: radius))
     }
 
     /// The accent outline of a chosen option (5.0.0): one look for the cards and tiles a person
@@ -64,22 +61,60 @@ public extension View {
         )
     }
 
-    /// Card chrome for form-like containers that host interactive controls
-    /// (`Picker(.menu)`, `Menu`, etc.). Uses `.ultraThinMaterial` on every iOS
-    /// version instead of `.glassEffect` because iOS 26's Liquid Glass surface
-    /// becomes the morph-source for any native menu trigger inside it — in a
-    /// single-row `FormSection` the glass-rect ≈ row bounds and the entire row
-    /// collapses into the popover at tap.
-    ///
-    /// **Use this for `FormSection`, `BudgetSettingsSection`, and any other
-    /// container that wraps rows users tap to open menus.** Use `cardStyle()`
-    /// (above) for non-interactive display cards.
+    /// A Material card (`.ultraThinMaterial` on every iOS), for a host that wants one; the same
+    /// shape and padding contract as `cardStyle()`. `FormSection` used it up to 7.x, for fear
+    /// that iOS 26's Liquid Glass would become the morph source of a menu inside it and collapse
+    /// a one-row section into the popover; since 8.0.0 `FormSection` is glass (`cardStyle()`),
+    /// and menus open from their row there. It does not follow `SurfaceStyle`.
     func formCardStyle(radius: CGFloat = AppRadius.xl) -> some View {
         self
             .background(
                 .ultraThinMaterial,
                 in: RoundedRectangle(cornerRadius: radius)
             )
+    }
+}
+
+/// The card behind `cardStyle()`: Liquid Glass, or the grey of `SurfaceStyle.fill` (8.12.0).
+private struct CardSurface: ViewModifier {
+    let radius: CGFloat
+    @Environment(\.surfaceStyle) private var surface
+
+    func body(content: Content) -> some View {
+        content
+            .contentShape(Rectangle())
+            .clipShape(.rect(cornerRadius: radius))
+            .background {
+                switch surface {
+                case .glass:
+                    Color.clear.glassEffect(.regular, in: .rect(cornerRadius: radius))
+                case .fill:
+                    Color.clear.background(AppColors.Background.neutral1, in: .rect(cornerRadius: radius))
+                }
+            }
+    }
+}
+
+/// The surface of `filterChipStyle()`: interactive glass, accent-tinted when selected; under
+/// `SurfaceStyle.fill` a grey capsule, the accent's pale tint when selected (8.12.0).
+private struct FilterChipSurface: ViewModifier {
+    let isSelected: Bool
+    @Environment(\.surfaceStyle) private var surface
+
+    func body(content: Content) -> some View {
+        switch surface {
+        case .glass:
+            content.glassEffect(
+                isSelected
+                ? .regular.tint(AppColors.accent.opacity(0.2)).interactive()
+                : .regular.interactive()
+            )
+        case .fill:
+            content.background(
+                isSelected ? AnyShapeStyle(AppColors.pale(AppColors.accent)) : AnyShapeStyle(.surfaceNeutral1),
+                in: Capsule()
+            )
+        }
     }
 }
 

@@ -5,7 +5,7 @@
 //  The screen waits for something it cannot do without (2.9.0): the screen dims, and a panel of
 //  material in the middle shows a spinner, what is happening and what it means ("Restoring the
 //  backup" / "The app will be ready in a moment"). For a restore, a migration, an import that
-//  must finish first. Ported from Tenra's RestoreProgressOverlay. Since 8.13.0 a hero (a mascot
+//  must finish first. Ported from Tenra's RestoreProgressOverlay. Since vNext a hero (a mascot
 //  at work) can take the spinner's place: it shows the progress itself.
 //
 
@@ -32,7 +32,7 @@ public extension View {
     }
 
     /// Dims the view and shows a progress panel with `hero` in the spinner's place while
-    /// `isPresented` (8.13.0): a view that shows the progress itself, sized by the host.
+    /// `isPresented` (vNext): a view that shows the progress itself, sized by the host.
     ///
     /// ```swift
     /// SettingsList()
@@ -62,7 +62,7 @@ public extension View {
 public struct ProgressOverlay: View {
     let title: String
     let message: String?
-    /// The view in the spinner's place (8.13.0); `nil` shows the spinner.
+    /// The view in the spinner's place (vNext); `nil` shows the spinner.
     let hero: AnyView?
 
     public init(title: String, message: String? = nil) {
@@ -71,7 +71,7 @@ public struct ProgressOverlay: View {
         self.hero = nil
     }
 
-    /// The panel with `hero` in the spinner's place (8.13.0): a view that shows the progress
+    /// The panel with `hero` in the spinner's place (vNext): a view that shows the progress
     /// itself (a mascot at work), sized by the host.
     public init<Hero: View>(title: String, message: String? = nil, @ViewBuilder hero: () -> Hero) {
         self.title = title

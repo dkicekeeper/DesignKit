@@ -96,7 +96,7 @@ Insert with a spring: `withAnimation(AppAnimation.bouncy) { isShown = true }`.
 | `TypingIndicator` | three dots in a wave | 30 fps while allowed | a reply on its way, an assistant thinking |
 | `.borderGlow` (1.x) | a static halo round a card | see its docs | "working on it" |
 
-**8.13.0: a moment over the whole app**
+**vNext: a moment over the whole app**
 
 | Effect | What | Cost | Use |
 |---|---|---|---|
@@ -182,7 +182,7 @@ commit, pull.
 |---|---|---|
 | `.tap` | light impact | |
 | `.select` | selection | `SegmentedPicker` (with `ChipPicker`, `Rating`, `IconPicker`, which play it already) |
-| `.tick` | rigid impact, 0.7 | `SliderRow`: every step of a stepped slider, either end of a smooth one |
+| `.tick` | rigid impact, 0.7 | `UniversalRow(accessory: .slider)` (`SliderRow` before 7.0.0): every step of a stepped slider, either end of a smooth one |
 | `.confirm` | success | `.completionMoment` |
 | `.warn` | warning | |
 | `.fail` | error | |

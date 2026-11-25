@@ -38,6 +38,7 @@ struct EffectsScreen: View {
         AccentGlowPage()
         BorderBeamPage()
         HeroBackgroundPage()
+        HeroPicturePage()
     }
 }
 
@@ -51,7 +52,7 @@ private struct CelebrationPage: View {
             name: ".celebration",
             summary: "Confetti bursts from a view with the success haptic: a goal reached, a debt paid off, an achievement, a trip finished.",
             since: "2.2.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .tall(minHeight: 260),
             notes: [
                 "Rare by design: a burst on every tap stops meaning anything.",
@@ -219,7 +220,7 @@ private struct InteractiveTiltPage: View {
             name: ".interactiveTilt",
             summary: "Press and drag on the medal: it tilts towards the finger in 3D with a glare, and springs back on release.",
             since: "2.2.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             canvas: .tall(minHeight: 240),
             notes: ["For an object shown on its own (a medal, a card's detail); in a scrolling list it would fight the scroll."]
         ) {
@@ -338,7 +339,7 @@ private struct ThinkingShimmerPage: View {
             name: ".thinkingShimmer",
             summary: "A band of aurora colour runs through the words while the app works on what was asked: “Listening…”, “Analysing…”, an insight on its way.",
             since: "2.4.0",
-            apps: [.tenra],
+            apps: [.tenra, .platina],
             notes: [
                 "A skeleton's shimmer says content is coming; this one says the app is working on your request.",
                 "One gradient masked by the text, 30 fps while active. Under Reduce Motion the text is drawn in the still aurora gradient.",
@@ -455,6 +456,135 @@ private struct BorderBeamPage: View {
     }
 }
 
+
+/// The top of a detail screen on a picture (8.14.0), as a film's page in the TV app: a trip's
+/// photo, sharp at the top, flowing into its own dark colours under the hero's text and buttons.
+private struct HeroPicturePage: View {
+    @State private var sample = 3
+    @State private var figure = false
+
+    var body: some View {
+        ComponentPage(
+            name: ".heroBackground(picture:)",
+            summary: "The top of a detail screen on a picture, as a film's page in Apple's TV app: a game's cover, a trip's photo, edge to edge from the screen's top. Sharp where nothing is over it, it flows into its own colours, blurred and darkened, under the hero's text and buttons, drawn in white in both modes; the hero ends on the page with an edge.",
+            since: "8.14.0",
+            apps: [.platina],
+            canvas: .bleed,
+            notes: [
+                "clearHeight (240 pt) is the room the hero leaves the picture below the bars: sharp, nothing over it but a title logo at its foot. From 48 pt above its end the picture blurs (40 pt) and darkens (55% black), through 120 pt below it.",
+                "The hero's content is drawn in the dark scheme, so DesignKit's buttons, chips and text are their light-on-dark selves in light mode too, and hero pieces are white (\\.heroTone .onColor).",
+                "Any view fills it: RemotePhoto (the app's loader and cache), an Image that is .resizable().scaledToFill(). It is cropped to the hero. While a RemotePhoto loads, a still dark fill (or its placeholderKey's small version, blurred) stands in: no shimmer behind the text (8.15.0).",
+                "Pulled down, the picture keeps to the screen's top and grows with the pull; scrolled up, it moves at half the content's pace, behind it (8.15.0, with .heroScrollEdge(); no parallax under Reduce Motion). “Open as a screen” shows both.",
+                ".heroScrollEdge(isHeroUnderBar:) on the scroll view: the picture reaches the screen's top, the bar's buttons and the status bar are light while it is under them, and the screen knows when to show the bar's title. “Open as a screen” shows it.",
+                "subject: (8.17.0) a cut-out figure in front of the picture, as a game's hero before its world: a square as wide as the hero, or as tall as the hero below the bars where that is less, centred, its top at the bars' foot. Blurred and darkened with the picture under the text; scrolled up, it moves at three quarters of the content's pace, the picture behind it at half. Nothing stands in for it while it loads or if it fails (RemotePhotoLoading.hidden). Turn on “Figure”.",
+            ],
+            dos: [
+                "Centre the hero's content over the picture: the logo or name, a line of facts, the buttons.",
+                "Put the name in the hero (a logo picture where there is one) and keep the bar's title empty until the hero scrolls away.",
+                "With subject:, pass the backdrop the figure was drawn for as the picture.",
+            ],
+            donts: [
+                "Put text in the clear part of the picture, other than a title logo at its foot.",
+                "Lay a scrim or a gradient of your own over it.",
+                "Put a figure as subject: over a cover that already shows it: it stands twice.",
+            ]
+        ) {
+            HeroPictureSample(sample: sample)
+                .heroPicture(sample: sample, figure: figure)
+        } controls: {
+            ChoiceControl("Picture", selection: $sample, options: [("Lake", 0), ("Dawn", 1), ("Night", 3), ("Camp", 5)])
+            ToggleControl("Figure", isOn: $figure)
+            NavigationLink {
+                HeroPictureScreen(sample: sample, figure: figure)
+            } label: {
+                Label("Open as a screen", systemImage: "iphone")
+                    .font(AppTypography.bodySmall.weight(.medium))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .tint(AppColors.accent)
+        }
+    }
+}
+
+/// A trip's hero, centred: room for the picture, the name where a logo would be, a line of facts,
+/// the buttons and a short description.
+private struct HeroPictureSample: View {
+    let sample: Int
+
+    var body: some View {
+        VStack(spacing: AppSpacing.lg) {
+            // The picture's own room, the name at its foot as a title logo would stand.
+            Text(verbatim: GalleryPhoto.samples[sample].caption)
+                .font(AppTypography.h1)
+                .foregroundStyle(AppColors.Text.primary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity, minHeight: HeroPictureMetrics.clearHeight - AppSpacing.lg, alignment: .bottom)
+            Text(verbatim: "Hike \u{00B7} 2 days \u{00B7} 12 km")
+                .font(AppTypography.bodySmall)
+                .foregroundStyle(AppColors.Text.secondary)
+            VStack(spacing: AppSpacing.sm) {
+                DSButton("Start trip", systemImage: "play.fill", fullWidth: true) {}
+                DSButton("Share", systemImage: "square.and.arrow.up", appearance: .secondary, fullWidth: true) {}
+            }
+            LinearProgressBar(value: 0.68, animatesOnAppear: false)
+            Text(verbatim: "68% of the way \u{00B7} 4 h on the trail \u{00B7} 3 stops")
+                .font(AppTypography.caption)
+                .foregroundStyle(AppColors.Text.secondary)
+        }
+        .screenPadding()
+        .padding(.bottom, AppSpacing.xl)
+    }
+}
+
+/// The picture hero where it lives: the bar's title empty while the hero shows the name.
+private struct HeroPictureScreen: View {
+    let sample: Int
+    let figure: Bool
+    @State private var heroUnderBar = true
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: AppSpacing.lg) {
+                HeroPictureSample(sample: sample)
+                    .heroPicture(sample: sample, figure: figure)
+                VStack(spacing: AppSpacing.lg) {
+                    ForEach(["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"], id: \.self) { day in
+                        Text(verbatim: day)
+                            .font(AppTypography.bodyEmphasis)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .cardContentPadding()
+                            .cardStyle()
+                    }
+                }
+                .screenPadding()
+            }
+            .padding(.bottom, AppSpacing.lg)
+        }
+        .heroScrollEdge(isHeroUnderBar: $heroUnderBar)
+        .navigationTitle(heroUnderBar ? "" : GalleryPhoto.samples[sample].caption)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private extension View {
+    /// The sample's photo behind the hero, or with `figure` its backdrop and a hiker in front of it
+    /// (8.17.0).
+    @ViewBuilder
+    func heroPicture(sample: Int, figure: Bool) -> some View {
+        if figure {
+            heroBackground {
+                RemotePhoto(key: GalleryPhotos.backdropKey(sample), url: GalleryPhotos.url(sample))
+            } subject: {
+                RemotePhoto(key: GalleryPhotos.figureKey, url: GalleryPhotos.figureURL)
+            }
+        } else {
+            heroBackground {
+                RemotePhoto(key: GalleryPhotos.key(sample), url: GalleryPhotos.url(sample))
+            }
+        }
+    }
+}
+
 #Preview { NavigationStack { EffectsScreen() } }
 
 /// The moment something is done (2.3.0).
@@ -467,7 +597,7 @@ private struct CompletionMomentPage: View {
             name: ".completionMoment",
             summary: "When something is done, a soft glow of its shape flares and fades behind it and the success haptic plays. Only the change plays it: a view that appears complete stays quiet.",
             since: "2.3.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             notes: [
                 "Built in: ProgressRing(celebratesCompletion: true) also draws a checkmark in; ChecklistSummaryRow's bar and TargetProgressCard's bar glow when they reach the end.",
                 "On your own view: .completionMoment(isComplete: goal.progress >= 1, in: RoundedRectangle(cornerRadius: AppRadius.xl)).",
@@ -549,7 +679,7 @@ private struct HolographicPage: View {
             name: ".holographic",
             summary: "A holographic foil: rainbow bands slide across the surface as your finger moves over it, with a sheen where the light falls. Drag over the medal and the card.",
             since: "2.6.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             notes: [
                 "Pairs with .interactiveTilt(in:), which tilts the same surface towards the finger.",
                 "One Metal colour effect, redrawn only while the finger moves or the light settles back.",
@@ -647,7 +777,7 @@ private struct HeroBackgroundPage: View {
             name: ".heroBackground",
             summary: "The top of a detail screen on colour: a gradient of the colour from the screen's top edge, behind the navigation bar and the hero, fading into the page. In dark mode a tone deeper with the hero pieces in white; in light mode a pale tint with them in black.",
             since: "4.5.0",
-            apps: [.tenra],
+            apps: [.tenra, .platina],
             canvas: .bleed,
             notes: [
                 "Dark mode: sets \\.heroTone to .onColor, so HeroSection, TrendBadge, HeroHalfGauge, HeroBarPair, HeroSparkline, HeroMilestoneGauge and HeroProportionBar draw in white. Light mode (4.5.1): a pale tint, the tone stays .onSurface and the pieces draw as on the page, the text in black. ScoreGaugeCard(style: .hero) lies on it.",

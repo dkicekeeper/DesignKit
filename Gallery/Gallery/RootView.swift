@@ -6,11 +6,12 @@
 import SwiftUI
 import DesignTokens
 
-/// Brand accents of the apps that consume DesignKit. The Gallery can preview either:
+/// Brand accents of the apps that consume DesignKit. The Gallery can preview any of them:
 /// `DesignKitTheme.accent` is read at render time, so switching re-renders the tree.
 enum GalleryTheme: String, CaseIterable, Identifiable {
     case tenra = "Tenra"
     case dalada = "Dalada"
+    case platina = "Platina"
 
     var id: String { rawValue }
 
@@ -23,12 +24,17 @@ enum GalleryTheme: String, CaseIterable, Identifiable {
                 ? UIColor(red: 0x3C / 255, green: 0xB3 / 255, blue: 0x71 / 255, alpha: 1)
                 : UIColor(red: 0x2E / 255, green: 0x8B / 255, blue: 0x57 / 255, alpha: 1)
         })
+        // Platina's AccentColor (#3573BA in both modes); it draws its surfaces as the grey fill.
+        case .platina: return Color(red: 0x35 / 255, green: 0x73 / 255, blue: 0xBA / 255)
         }
     }
 }
 
 struct RootView: View {
     @State private var theme: GalleryTheme = .tenra
+    /// The surfaces of every page (8.12.0): Liquid Glass, or the grey fill of an app such as
+    /// Platina. `DesignKitTheme.surface` is read at render time, as the accent is.
+    @State private var surface: SurfaceStyle = .glass
     /// Which page shows which component, for the links in the release notes.
     @State private var componentIndex = ComponentIndex()
 
@@ -95,6 +101,13 @@ struct RootView: View {
                     }
                     .pickerStyle(.menu)
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Picker("Surfaces", selection: surfaceSelection) {
+                        Text("Glass").tag(SurfaceStyle.glass)
+                        Text("Fill").tag(SurfaceStyle.fill)
+                    }
+                    .pickerStyle(.menu)
+                }
             }
             .safeAreaInset(edge: .bottom) {
                 Text(versionLine)
@@ -107,8 +120,20 @@ struct RootView: View {
         .softScrollEdges()
         .environment(\.componentIndex, componentIndex)
         .tint(AppColors.accent)
-        // Tokens are static reads: a new identity re-renders every screen with the new accent.
-        .id(theme)
+        // Tokens are static reads: a new identity re-renders every screen with the new accent
+        // and surfaces.
+        .id("\(theme.rawValue)-\(surface)")
+    }
+
+    /// Sets the surfaces BEFORE the state change, as the accent (8.12.0).
+    private var surfaceSelection: Binding<SurfaceStyle> {
+        Binding(
+            get: { surface },
+            set: { newSurface in
+                DesignKitTheme.surface = newSurface
+                surface = newSurface
+            }
+        )
     }
 
     /// Sets the accent BEFORE the state change, so the re-render already reads the new value.
@@ -126,7 +151,7 @@ struct RootView: View {
         let info = Bundle.main.infoDictionary
         let version = info?["CFBundleShortVersionString"] as? String ?? "?"
         let build = info?["CFBundleVersion"] as? String ?? "?"
-        return "DesignKit \(version) (\(build)) · \(theme.rawValue) theme"
+        return "DesignKit \(version) (\(build)) · \(theme.rawValue) theme · \(surface == .glass ? "glass" : "fill") surfaces"
     }
 
     private func row<Destination: View>(

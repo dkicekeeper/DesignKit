@@ -37,6 +37,7 @@ public struct CalendarHeatmap: View {
     let emptyMessage: String?
 
     @State private var selectedDay: Date?
+    @Environment(\.surfaceStyle) private var surface
 
     /// - Parameters:
     ///   - values: a value per day; dates are read by their day in `calendar`, and values of
@@ -125,7 +126,7 @@ public struct CalendarHeatmap: View {
             Text(String(localized: "chart.less", defaultValue: "Less"))
             ForEach(0..<HeatmapMetrics.levels, id: \.self) { level in
                 RoundedRectangle(cornerRadius: HeatmapMetrics.corner)
-                    .fill(HeatmapModel.fill(level: level, color: color))
+                    .fill(HeatmapModel.fill(level: level, color: color, surface: surface))
                     .frame(width: HeatmapMetrics.legendCell, height: HeatmapMetrics.legendCell)
             }
             Text(String(localized: "chart.more", defaultValue: "More"))
@@ -198,10 +199,10 @@ struct HeatmapModel {
         return symbols.indices.contains(index) ? symbols[index] : ""
     }
 
-    /// The step's colour: the empty grey, then the colour at a quarter, a half, three quarters
-    /// and in full.
-    static func fill(level: Int, color: Color) -> Color {
-        level == 0 ? AppColors.Background.neutral2 : color.opacity(Double(level) / Double(HeatmapMetrics.levels - 1))
+    /// The step's colour: the empty grey (the surface's, 8.12.0), then the colour at a quarter, a
+    /// half, three quarters and in full.
+    static func fill(level: Int, color: Color, surface: SurfaceStyle) -> Color {
+        level == 0 ? surface.neutral2 : color.opacity(Double(level) / Double(HeatmapMetrics.levels - 1))
     }
 }
 
@@ -220,6 +221,7 @@ private struct HeatmapGrid: View {
     let color: Color
     let selected: Date
     let onSelect: (Date) -> Void
+    @Environment(\.surfaceStyle) private var surface
 
     private var step: CGFloat { HeatmapMetrics.cell + HeatmapMetrics.gap }
 
@@ -251,7 +253,7 @@ private struct HeatmapGrid: View {
                     let level = model.level(of: model.value(on: day))
                     context.fill(
                         Path(roundedRect: rect, cornerRadius: HeatmapMetrics.corner),
-                        with: .color(HeatmapModel.fill(level: level, color: color))
+                        with: .color(HeatmapModel.fill(level: level, color: color, surface: surface))
                     )
                     if day == selected {
                         context.stroke(
@@ -363,7 +365,7 @@ public struct CalendarHeatmapSkeleton: View {
                         let rect = CGRect(x: CGFloat(column) * step, y: CGFloat(row) * step,
                                           width: HeatmapMetrics.cell, height: HeatmapMetrics.cell)
                         context.fill(Path(roundedRect: rect, cornerRadius: HeatmapMetrics.corner),
-                                     with: .color(Skeleton.fill))
+                                     with: .style(Skeleton.fill))
                     }
                 }
             }

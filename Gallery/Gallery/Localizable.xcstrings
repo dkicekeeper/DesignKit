@@ -562,17 +562,6 @@
         }
       }
     },
-    "common.color" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Color"
-          }
-        }
-      }
-    },
     "common.hide" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -613,17 +602,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select"
-          }
-        }
-      }
-    },
-    "common.startDate" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start Date"
           }
         }
       }

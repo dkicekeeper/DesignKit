@@ -214,7 +214,7 @@ private struct BarChartPage: View {
             name: "BarChart",
             summary: "Bars per period, one or several series side by side or stacked.",
             since: "0.5.0",
-            apps: [.tenra],
+            apps: [.tenra, .platina],
             canvas: .bleed,
             notes: [
                 "Opens on the current period, selected and in the middle of the window; its bars are in full colour, the others step back (8.3.0).",
@@ -278,7 +278,7 @@ private struct CalendarHeatmapPage: View {
             name: "CalendarHeatmap",
             summary: "Days as small squares, a week per column, tinted by their value; tap a day for its amount.",
             since: "8.3.0",
-            apps: [.tenra],
+            apps: [.tenra, .platina],
             canvas: .fill,
             notes: [
                 "Five steps from an empty grey square to the full colour, by the quartiles of the days with a value.",

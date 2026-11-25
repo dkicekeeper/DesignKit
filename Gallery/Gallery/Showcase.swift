@@ -143,6 +143,8 @@ struct ShowcaseCount<Pages: View>: View {
 enum ConsumerApp: String {
     case tenra = "Tenra"
     case dalada = "Dalada"
+    /// The third consumer (8.12.0), a PlayStation trophy tracker; its badges since 8.17.1.
+    case platina = "Platina"
 }
 
 /// How a preview sits on its canvas.
@@ -379,6 +381,7 @@ private struct PreviewCanvas<Content: View>: View {
 
     @State private var scheme: ColorScheme?
     @Environment(\.colorScheme) private var systemScheme
+    @Environment(\.surfaceStyle) private var surface
 
     private var effectiveScheme: ColorScheme { scheme ?? systemScheme }
 
@@ -438,8 +441,11 @@ private struct PreviewCanvas<Content: View>: View {
         }
     }
 
+    /// Grey, so glass shows; the page itself (white, black) under grey cards (8.12.0), which
+    /// would melt into the grey.
     private var canvasFill: Color {
-        effectiveScheme == .dark ? Color(white: 0.11) : Color(white: 0.95)
+        if surface == .fill { return effectiveScheme == .dark ? .black : .white }
+        return effectiveScheme == .dark ? Color(white: 0.11) : Color(white: 0.95)
     }
 }
 

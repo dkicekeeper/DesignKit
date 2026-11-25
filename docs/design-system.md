@@ -9,7 +9,8 @@
 >
 > **How each app uses DesignKit** (its adapters, screen patterns, the effects in use): Tenra's
 > `docs/design-system.md`, Dalada's `CLAUDE.md` («Компоненты интерфейса», a table from what a
-> screen needs to the components).
+> screen needs to the components), Platina's `CLAUDE.md` (its «DesignKit» section) and
+> `docs/PLAN.md` §4.
 >
 > **Availability.** Section 0 lists which documented components ship in DesignKit and which
 > stay in the host app (they depend on app models or services). Anything marked *app-side* is
@@ -39,9 +40,9 @@
 
 | Module | Contents |
 |---|---|
-| `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases, `Palette` 3.7.0), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `chartAppear`, `staggeredEntrance`, `softScrollEdges` 5.4.0, inline field styles), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme`, `DesignKitFonts` (Inter) |
+| `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases, `Palette` 3.7.0), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppLayout` (a large screen's column and card grid, 8.13.0; its side column, 8.15.0), `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `readableWidth` 8.13.0, `chartAppear`, `staggeredEntrance`, `softScrollEdges` 5.4.0, inline field styles), `SurfaceStyle` with `.surfaceStyle(_:)` and the `.surfaceNeutral1` / `.surfaceNeutral2` fills (8.12.0, glass or a grey fill), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme` (`accent`, `surface`), `DesignKitFonts` (Inter) |
 | `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `Icon` (a brand logo is `Icon(source: .brandService(name))`; `BrandLogoView` was removed in 2.0.0), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `RecentSearches` and `SearchMatch` (search suggestions, 3.5.0), `Formatting.relativeTime` / `elapsedTime` / `clockTime` / `dayTitle` (8.9.0), `AccessibilityAnnouncer` and `.voiceOverAnnouncement` (8.9.0), `HapticManager`, `HapticCue` (haptics by meaning, 2.3.0), `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitPhotoLoader` (3.1.0), `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
-| `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons"); since 8.13.0 `MomentOverlay`, `MomentAction` and `MomentPresenter` (a moment of success over the whole app, in a window of its own) |
+| `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons"); since vNext `MomentOverlay`, `MomentAction` and `MomentPresenter` (a moment of success over the whole app, in a window of its own) |
 
 **Names (2.0.0).** A component is named for what it is, without `View` or `App`: `SectionHeader`,
 `EmptyState`, `Avatar`, `Badge`, `Icon`, `DSButton`. The names before 2.0 were deprecated
@@ -69,6 +70,7 @@ DesignKit ships no networking, persistence or FX. A host app wires these once, i
 | Hook | Default | Wire to |
 |---|---|---|
 | `DesignKitTheme.accent` | `.indigo` | Brand accent behind `AppColors.accent`. Also set the asset-catalog `AccentColor` to the same colour (system chrome never reads `AppColors`). |
+| `DesignKitTheme.surface` *(8.12.0)* | `.glass` | How the surfaces draw: Liquid Glass, or `.fill`, an opaque grey (`Background.neutral1`) on the white page with no glass. Reaches `cardStyle()` and all built on it, filter chips, `ProgressRingTile`, an `Icon`'s glass plate, `OnboardingStepIndicator`, `MessageBanner`; `.surfaceStyle(_:)` changes a subtree. See "Surfaces" under Colors. |
 | `DesignKitFonts.registerIfNeeded()` | — | Call once; registers the bundled Inter variable fonts. |
 | `DesignKitLogoLoader.loader` | `nil` → fallback icon | Brand-logo images for `IconSource.brandService` (`Icon`, `heroAccentGlow`). |
 | `DesignKitIconPhotos.save` / `.isPhoto` *(8.5.0)* | `nil` → no Photo tab in `IconPicker` | Keeps a square the person cropped and returns the `IconSource` that shows it (Tenra: `.brandService("photo:<id>")` its logo loader reads from a file); `isPhoto` tells such an icon apart. `@MainActor`. |
@@ -139,7 +141,18 @@ Modifiers:
 | `fill` | `.tertiarySystemFill` | Translucent container on any surface, glass included |
 | `fillOnDark` / `fillOnLight` | white 15% / black 5% | Translucent container on dark / light photos, both themes |
 | `overlayOnImage` | black 30% | Darkens a photo under text |
-| `scrim` *(8.13.0)* | black 10% / 45% | Dims the whole app under a `MomentOverlay`, over the material that blurs it |
+| `scrim` *(vNext)* | black 10% / 45% | Dims the whole app under a `MomentOverlay`, over the material that blurs it |
+
+**Surfaces: glass or a grey fill** *(8.12.0)*. `SurfaceStyle` says how DesignKit draws a surface: `.glass` (Liquid Glass, the default: Tenra) or `.fill`, an opaque `Background.neutral1` (`#F2F2F7` on the white page, `#1C1C1E` on black, `#2C2C2E` in a dark sheet) in the same shape, with no glass: for an app on the white page that wants less glass (Platina since its first build on 8.12.0, Dalada since 1.0.4). An app sets `DesignKitTheme.surface` once in `App.init()`; `.surfaceStyle(_:)` (`EnvironmentValues.surfaceStyle`, whose default is the hook) sets a subtree, a glass card over a photo in an app of grey cards. It reaches `cardStyle()` and everything on it (`FormSection`, `CardList`, the cards, `SectionHeader(style: .card)`), `filterChipStyle()` (the selected chip the accent's pale tint), `ProgressRingTile`'s circle (its colour's pale tint when selected), an `Icon`'s glass plate (`.glassHero`, `.glassService`: the neutral plate instead), `OnboardingStepIndicator` and `MessageBanner` (the grey under its colour's pale tint, opaque over the content). Controls (`DSButton`, `.buttonStyle(.glass)`), the chrome that floats over content (`MessageComposer`, `GlassActionMenu`, the system's bars) and glass drawn as an effect on a coloured hero (`.glassBar`, `HeroMilestoneGauge`, `OrbChart`) stay glass.
+
+On a grey card `neutral1` is the card itself and `neutral2` the card in a dark sheet, so the neutral shapes inside cards follow the surface: `SurfaceStyle.neutral1` / `.neutral2` (colours) and the shape styles `.surfaceNeutral1` / `.surfaceNeutral2` (`SurfaceNeutral`, resolved from the environment) are `neutral1` / `neutral2` on glass and the translucent `tertiarySystemFill` / `secondarySystemFill` under `.fill`, a step darker than whatever lies under them. DesignKit's own use them (an icon tile's default plate, tracks, skeletons, `StepTracker`, `CalendarHeatmap`'s empty days, `FormTextField`, `IconPicker`'s cells, the "+N" of `MonthCalendar` and `AvatarGroup`); an app's own grey shape inside a card does too. `.fill` is for the white page: on `baseAlt` (`systemGroupedBackground`) the cards would melt into it.
+
+The same section and card on both, from the snapshot references (`FoundationsSnapshotTests.surfaceStyles`, so they follow every re-recording):
+
+| | `.glass` (Tenra) | `.fill` (Platina, Dalada) |
+|---|---|---|
+| Light | <img src="../Gallery/SnapshotTests/__Snapshots__/FoundationsSnapshotTests/surfaceStyles.section-glass-light.png" width="360"><br><img src="../Gallery/SnapshotTests/__Snapshots__/FoundationsSnapshotTests/surfaceStyles.card-glass-light.png" width="360"> | <img src="../Gallery/SnapshotTests/__Snapshots__/FoundationsSnapshotTests/surfaceStyles.section-fill-light.png" width="360"><br><img src="../Gallery/SnapshotTests/__Snapshots__/FoundationsSnapshotTests/surfaceStyles.card-fill-light.png" width="360"> |
+| Dark | <img src="../Gallery/SnapshotTests/__Snapshots__/FoundationsSnapshotTests/surfaceStyles.section-glass-dark.png" width="360"><br><img src="../Gallery/SnapshotTests/__Snapshots__/FoundationsSnapshotTests/surfaceStyles.card-glass-dark.png" width="360"> | <img src="../Gallery/SnapshotTests/__Snapshots__/FoundationsSnapshotTests/surfaceStyles.section-fill-dark.png" width="360"><br><img src="../Gallery/SnapshotTests/__Snapshots__/FoundationsSnapshotTests/surfaceStyles.card-fill-dark.png" width="360"> |
 
 **`AppColors.Status`** — banners, badges, notices: `info` (`.blue`), `positive` (`.green`), `negative` (`.red`), `warning` (`.orange`), `neutral` (`.gray`), each with a `…Pale` container (`AppColors.pale`) and *(8.9.0)* a `…Text` colour for its text and icons (`AppColors.readable` of the solid one: `infoText`, `positiveText`, `negativeText`, `warningText`, `neutralText`). `Text.positive`, `.negative` and `.warning` are the `…Text` colours since 8.9.0. The solid colours stay for fills, icons on a fill and charts.
 
@@ -208,6 +221,8 @@ with the text size (`scalesWithText: false` for a symbol in a control of a fixed
 44 pt a **tile**: the symbol on a plate (the style's colour, else `Background.neutral1`, or its
 glass) with room around it, 20 % of the side to 63 pt and 25 % from 64 pt; it keeps its size. A
 logo fills its shape at any size. A style's `backgroundColor` and glass apply to tiles only.
+Under `SurfaceStyle.fill` *(8.12.0)* the neutral plate is the surface's (`surface.neutral1`, a
+step darker than a grey card) and a glass plate is that fill, with no glass.
 
 | Glyph | Value | Use For |
 |-------|-------|---------|
@@ -235,6 +250,22 @@ deprecated in 1.13.0 are gone: `avatar` (40, now `xxl`), the old `xxl` (44, `Til
 ### Container Sizes
 
 There is no `AppSize` enum. Component-local sizes (cursor height/width, voice button diameter, CSV preview heights, etc.) live as numeric literals at use-site or as `private` constants in the component file. This is deliberate — global tokens are for 3+ shared use sites; everything else is local.
+
+### Layout (`AppLayout`) *(8.13.0)*
+
+How wide a screen's content runs on a large screen: an iPad, a Mac window. A phone is narrower
+than all of them, so its screens look as before.
+
+| Token | Value | Use |
+|---|---|---|
+| `AppLayout.readableWidth` | 720 pt | The widest a column of cards, rows and text runs, its margins included (`.readableWidth()`); it grows with the text size |
+| `AppLayout.wideWidth` | 1120 pt | The column of a grid of cards (`.readableWidth(AppLayout.wideWidth)`): three cards side by side, never more |
+| `AppLayout.cardMinWidth` | 320 pt | The narrowest a card gets in a grid of cards: one in a row on a phone, two or three on an iPad |
+| `AppLayout.cardColumns(minimum:spacing:)` | `[GridItem]` | The adaptive columns of a `LazyVGrid` of cards, `AppSpacing.lg` apart |
+| `AppLayout.sideColumnWidth` *(8.15.0)* | 340 pt | The side column beside a screen's main column (`AdaptiveColumns`); it grows with the text size |
+| `AppLayout.mainColumnMinWidth` *(8.15.0)* | 400 pt | The narrowest the main column gets with a side column beside it; with the 24 pt gap the two need 764 pt, more at a larger text size |
+
+The view pattern is in §4, "Large screens: iPad and Mac".
 
 ### Typography (`AppTypography`)
 
@@ -328,10 +359,11 @@ The 1.x tokens, still used by the components that have them:
 
 | Modifier | Effect | When to Use |
 |----------|--------|-------------|
-| `.cardStyle(radius:)` | Liquid Glass (iOS 26+) or `.ultraThinMaterial` card background. Default radius: `AppRadius.xl` (20pt). Since 3.0.0 the glass is drawn behind the content, so the content keeps its exact colours (applied to the content, the glass blended its layers into each other) | **Display cards only.** Account/Loan/Health hero cards, list cards, detail-view cards — anything without interactive `Picker(.menu)` / `Menu` inside |
+| `.cardStyle(radius:)` | Liquid Glass card background, or under `SurfaceStyle.fill` *(8.12.0)* the opaque grey `Background.neutral1` in the same shape. Default radius: `AppRadius.xl` (20pt). Since 3.0.0 the glass is drawn behind the content, so the content keeps its exact colours (applied to the content, the glass blended its layers into each other) | **Display cards only.** Account/Loan/Health hero cards, list cards, detail-view cards — anything without interactive `Picker(.menu)` / `Menu` inside |
 | `.formCardStyle(radius:)` | `.ultraThinMaterial` card background on every iOS. Same shape/padding contract as `cardStyle`. | A Material card for a host that wants one. `FormSection` used it up to 7.x, for fear that iOS 26's `glassEffect` would become the morph source of a menu inside it and collapse a one-row section into the popover; 8.0.0's probe on a device showed menus in glass cards work, and `FormSection` is glass (`cardStyle`) |
-| `.filterChipStyle(isSelected:)` | Glass chip styling with accent tint when selected. Animated selection transition | Filter buttons, `UniversalFilterButton` |
+| `.filterChipStyle(isSelected:)` | Glass chip styling with accent tint when selected; under `SurfaceStyle.fill` *(8.12.0)* a `.surfaceNeutral1` capsule, the accent's pale tint when selected. Animated selection transition | Filter buttons, `UniversalFilterButton` |
 | `.screenPadding()` | `.padding(.horizontal, AppSpacing.lg)` (16pt) | Screen-level horizontal insets |
+| `.readableWidth(_:)` *(8.13.0)* | A centred column no wider than `AppLayout.readableWidth` (720 pt, the margins included), scaled with the text size like the system's readable width; nothing on a phone, which is narrower | The content of every scroll view of an app that runs on an iPad or a Mac, after `.screenPadding()`; `AppLayout.wideWidth` for a grid of cards (§4, "Large screens") |
 | `.cardContentPadding()` | `.padding(AppSpacing.lg)` (16pt) | Internal card content padding — canonical, matches §10 |
 | `.futureTransactionStyle(isFuture:)` | `.opacity(0.55)` when future | Planned/future transaction rows |
 | `.chartAppear(delay:)` | Scale(0.94→1.0) + opacity entrance from bottom | Outermost chart container, scrollable list cards |
@@ -404,7 +436,8 @@ EditSheetContainer(
 
 #### `FormSection`
 **Purpose:** A titled group of rows on a Liquid Glass card: every form, settings list and short
-list of both apps *(8.0.0: one look, as in Tenra's Finances and Insights)*.
+list of both apps *(8.0.0: one look, as in Tenra's Finances and Insights)*. Under
+`SurfaceStyle.fill` *(8.12.0)* the card is the grey fill, as every `cardStyle()` card.
 
 ```swift
 FormSection(header: "Payment", footer: "Charged on the 17th of every month") {
@@ -414,7 +447,8 @@ FormSection(header: "Payment", footer: "Charged on the 17th of every month") {
 }
 ```
 
-- The card is `cardStyle()` (Liquid Glass behind the rows) and pads its rows `lg` at the sides;
+- The card is `cardStyle()` (Liquid Glass behind the rows, or the grey of `SurfaceStyle.fill`,
+  8.12.0) and pads its rows `lg` at the sides;
   the rows pad themselves only vertically (`UniversalRow`'s `.standard`, 12 pt: a row is 48 pt
   with its 24 pt icon, §10; 16 pt and 56 pt in 8.0.0 to 8.5.0). The header stands 12 pt above the
   card, the footer 12 pt under it (8.6.0; the header stood 8 pt above it before).
@@ -462,6 +496,7 @@ ScrollView {
 | `.cards` (default) | a glass card per item, its content padded `lg` on every side, `md` between cards | accounts, deposits, debts, categories |
 | `.section` | every item a row in one glass card, a `RowDivider` under each row's text | subcategories, a short list of options |
 | `.stack` | items that are cards already (`PayoffProgressCard`, `TargetProgressCard`, `RecurringPaymentCard`), spaced `md`; the circle and the handle of the modes beside the card | loans, goals, subscriptions |
+| `.grid` *(8.15.0)* | a glass card per item as `.cards`, side by side in `AppLayout.cardColumns()` (`md` apart) where the width holds two or more: an iPad or a Mac window under `.readableWidth(AppLayout.wideWidth)`; one in a row on a phone | games, trips, accounts on a large screen |
 
 | Mode | What the item shows | A tap |
 |---|---|---|
@@ -482,7 +517,8 @@ ScrollView {
   Done, and "Delete N" (`DSButton(role: .destructive)`) under the list while something is picked;
   reordering shows a checkmark. `onDeleteSelected` runs on "Delete N": the app confirms and
   deletes. The strings are `bulk.*` (docs/localization-keys.md).
-- A `LazyVStack`, not a `List`: the cards stay Liquid Glass like the rest of the app, and a
+- A `LazyVStack`, not a `List`: the cards stay the app's surfaces (Liquid Glass, or the grey of
+  `SurfaceStyle.fill`) like the rest of the app, and a
   200-item list scrolls on the probe's device check. What an item is, what opening it shows and
   what deleting does stay in the app.
 - Skeleton: `CardListSkeleton(layout:count:)`, grey rows of an icon, a title and a value in the
@@ -671,7 +707,8 @@ AmountRow(account.name, leading: .icon(account.iconSource), value: .amount(balan
 - `detail`: a caption line under the value (text, then an amount in `AppColors.planned`); at
   accessibility sizes the amount goes under its text, which drops a trailing "·".
 - `accessory`: `.chevron` (in a `NavigationLink`), `.systemImage(name)` (a secondary mark, a lock).
-- The tap (`Button` + `.plain`, or a `NavigationLink`) and `.swipeActions` stay at the call site.
+- The tap (`Button` + `.plain`, or a `NavigationLink`) and the long press's Edit and Delete
+  (`.contextMenu`, or the rows in a `CardList`) stay at the call site; no swipe actions (8.0.0).
 - Skeleton: `AmountRowSkeleton(style:showsRing:showsDetail:)`.
 - Tenra: `AccountRow`, `CategoryRow` (the over-budget haptic), `CategoryBreakdownRow` and the
   insight lists are adapters. `AmountPercentage` (the amount over its share) stays public.
@@ -737,7 +774,7 @@ Use in: `CategoryEditView` only.
 
 ### Card Components
 
-All display cards share one contract: inner padding `AppSpacing.lg` (16), `.cardStyle()` (default radius `AppRadius.xl` = 20), section title `AppTypography.h3` / `AppColors.textPrimary`, entity-card title `AppTypography.h4`. Money always via `FormattedAmountText`. Conform new cards to this; don't hand-roll the glass shell.
+All display cards share one contract: inner padding `AppSpacing.lg` (16), `.cardStyle()` (default radius `AppRadius.xl` = 20), section title `AppTypography.h3` / `AppColors.textPrimary`, entity-card title `AppTypography.h4`. Money always via `FormattedAmountText`. Conform new cards to this; don't hand-roll the card's surface (`cardStyle()` draws it: Liquid Glass, or the grey of `SurfaceStyle.fill`, 8.12.0).
 
 #### `FinanceCard`
 Shell for home-screen finance-product entry cards (accounts, deposits, loans, subscriptions, categories, subcategories). Owns the `HStack(title + hero/subtitle | icons)` layout, compact empty-state swap, padding and `.cardStyle()`. Each card supplies title, `isEmpty`, empty copy, `subtitle` (count line), a `hero` value view and a `trailing` facepile.
@@ -762,6 +799,10 @@ FinanceCard(
 `.heroBackground(color)` lays the hero's gradient behind a view: mesh light in shades of `color` (`AuroraBackground.palette(around:spread: 12)`) with a fine grain. In dark mode it is a tone deeper (78% of its brightness, so white large text is at least 3:1 on the success, warning and destructive colours) and opaque; in light mode *(4.5.1)* it is a pale tint, the shades at 30% over the page (the deep gradient read as brown there), behind black text. It starts at the screen's top edge, behind the navigation bar and the status bar *(4.5.1; under the bar before, with the mesh's top row carried up behind it)*, reaches 600 pt past the top of the screen (the mesh's top row carried up, so a pull down shows colour), and fades into the page over 96 pt below the view, where the cards that follow rise over it (`.padding(.top, -AppSpacing.xxl)`). `ScoreGaugeCard(style: .hero)` lies on it.
 
 In dark mode `\.heroTone` inside it is `.onColor`, and DesignKit's hero pieces draw in white: `HeroSection` (white title, amount and metric; the subtitle semibold, so it is large text on the colour), `TrendBadge` (white, the pill a translucent white capsule), `HeroHalfGauge`, `HeroBarPair`, `HeroSparkline`, `HeroMilestoneGauge`, `HeroProportionBar` (charts.md). In light mode the tone stays `.onSurface` and they draw as on the page, marks in their colours, except that `HeroSection`'s amount and subtitle are black (grey on the page) and the subtitle semibold (`\.heroOnPale`, internal). A screen puts it on the hero at the top of its scroll view, edge to edge (no `.screenPadding()` on it; pad what is inside), and `.heroScrollEdge()` on the scroll view: iOS 26 fades the content under the navigation bar into the page (the soft scroll edge effect), which cut the colour off under the bar; `.heroScrollEdge()` keeps it off while the hero's colour is under the bar (the hero reports its height) and brings it back once the cards after it scroll under the bar. It also hands the scroll view's top inset (the bars) to the gradient through the environment, so the mesh starts at the screen's top edge; without it the mesh starts at the hero's top. Tenra's insight details and Financial Health use it, the colour by the insight's tone.
+
+`.heroBackground(clearHeight:picture:)` *(8.14.0)* lays a picture there instead, as a film's page in Apple's TV app does: any view that fills its frame (`RemotePhoto`, an `Image` that is `.resizable().scaledToFill()`), cropped to the hero and reaching up to the screen's top edge with `.heroScrollEdge()`. It is sharp down to `clearHeight` below the bars (240 pt by default, `HeroPictureMetrics.clearHeight`): the hero's room for the picture, with nothing over it but a title logo at its foot. From 48 pt above the end of that room a blurred copy (40 pt) and 55% black take over, complete 120 pt below it, so the hero's text and buttons lie on the picture's own colours, darkened. The hero's content is drawn in the dark scheme in both modes (white text, DesignKit's buttons and chips in their dark look, `\.heroTone` `.onColor`), centred over the picture, and the hero ends on the page with an edge. `.heroScrollEdge()` makes the bar's items and the status bar light while the picture is under them; `.heroScrollEdge(isHeroUnderBar:)` also tells the screen, so a hero that shows the name (or the logo) keeps the bar's title empty until it scrolls away. Lay no scrim of your own over it. *(8.15.0)* With `.heroScrollEdge()`, pulled down, the picture keeps to the screen's top and grows with the pull; scrolled up, it moves at half the content's pace (`HeroPictureMetrics.parallax`), still under Reduce Motion and `.designKitMotion(false)`. While a `RemotePhoto` in it loads, a still dark fill stands in (black under the picture, `RemotePhotoLoading.still`), or its `placeholderKey`'s small version blurred: no shimmer behind the hero's text. Platina's game screen lies on the game's art with its title logo, the game's icon as the placeholder.
+
+`.heroBackground(clearHeight:picture:subject:)` *(8.17.0)* stands a cut-out figure in front of the picture, as a game's page on a PlayStation stands its hero before its world: the picture is the backdrop the figure was drawn for, the figure a picture with a transparent background. The figure gets a square as wide as the hero, or as tall as the hero below the bars where that is less (`HeroPictureMetrics.subjectSide`: an iPad, a Mac window), centred, its top at the bars' foot, so on a phone it shows whole, where the same art drawn into one wide cover and cropped to the phone's width showed a shoulder. It is a layer of the picture: sharp in the clear part, blurred and darkened with it under the hero's text. Scrolled up, the backdrop lags behind the content by half and the figure by a quarter (`HeroPictureMetrics.subjectParallax`), so it rises in front of the backdrop (still under Reduce Motion and `.designKitMotion(false)`); pulled down, both grow with the pull. While the figure loads, and if it fails, nothing stands in for it (`RemotePhotoLoading.hidden`): the backdrop shows alone. Do not pass a cover that already shows the figure as the picture: it would stand twice. Platina's game screen stands a game's hero character (`HERO_CHARACTER`) on its hub backdrop (`BACKGROUND_LAYER_ART`) where PlayStation has both, its cover where not.
 - **`PackedCircleIcons`**: circles sized by amount, packed without overlap. Since 2.9.0 they are
   glossy marbles (`style: .glossy`, the default): a white symbol on a marble of its item's `tint`
   (the accent without one); a brand logo fills its circle as the marble's skin. Over both, a
@@ -929,18 +970,20 @@ multilingual queries).
 
 | Preset | Shape | Context |
 |--------|-------|---------|
-| `.categoryIcon(size:)` | Circle, accent tint | Category rows, chips |
-| `.categoryCoin(size:)` | Circle, surface bg | Large category coins |
-| `.bankLogo(size:)` | RoundedSquare, md radius | Account rows |
-| `.bankLogoLarge(size:)` | RoundedSquare, lg radius | Account cards |
-| `.serviceLogo(size:)` | RoundedSquare, md radius | Subscription cards |
-| `.serviceLogoLarge(size:)` | RoundedSquare, lg radius | Subscription detail |
-| `.placeholder(size:)` | Circle, secondary tint | Nil source fallback |
-| `.glassHero(size:)` | Circle + glass | Detail view hero |
-| `.glassService(size:)` | RoundedSquare + glass | Service hero |
-| `.inline(tint:)` | Small circle | Text fields, chips |
-| `.toolbar(tint:)` | Medium circle | Toolbar buttons |
-| `.emptyState()` | XL circle | Empty state illustration |
+| `.glyph(_:tint:)` *(7.0.0)* | A glyph, no plate; `.inherit` takes the colour around it | A symbol in a component, a row, a banner, a badge, a button (`Icon(_:size:tint:)`) |
+| `.categoryIcon(size:backgroundColor:)` | Circle, accent tint, `neutral1` plate as a tile | Category rows, chips (`Icon(source:size:)` for a symbol) |
+| `.categoryCoin(size:)` | Circle, accent tint, `neutral1` plate, 64 pt | Large category coins |
+| `.roundedLogo(size:)` / `.roundedLogoLarge(size:)` | Circle, original colours, 32 / 40 pt | A logo in account rows / cards |
+| `.serviceLogo(size:)` / `.serviceLogoLarge(size:)` | Circle, original colours, 32 / 40 pt | A logo in subscription rows / cards (`Icon(source:size:)` for a brand) |
+| `.placeholder(size:)` | Circle, secondary tint, `neutral1` plate | Nil source fallback |
+| `.glassHero(size:tint:)` | Circle + glass, 80 pt | Detail view hero (`EditableHero`, `HeroSection`) |
+| `.glassService(size:)` | Circle + glass, 40 pt | Service hero |
+| `.inline(tint:)` | 16 pt glyph | Text fields, chips |
+| `.toolbar(tint:)` | 20 pt glyph | Toolbar buttons |
+| `.emptyState()` | 80 pt tile, accent tint | Empty state illustration |
+
+The `neutral1` plates are the surface's under `SurfaceStyle.fill` *(8.12.0)*, and the glass of
+`.glassHero` / `.glassService` is that grey plate there.
 
 ---
 
@@ -1238,7 +1281,7 @@ without taking room; on iPhone the popover stays a popover (`presentationCompact
 VoiceOver: "About <title>" or "More information" (`infoTip.about`, `infoTip.label`). No skeleton:
 it explains, it shows no data.
 
-#### `MomentOverlay` / `MomentPresenter` *(8.13.0)*
+#### `MomentOverlay` / `MomentPresenter` *(vNext)*
 A big moment of success over the whole screen, without a card (the owner's decision for Tenra's
 assistant): a goal reached, a debt settled, a month inside the budgets, an accessory earned. The
 screen behind dims and blurs (`.regularMaterial` under `AppColors.Background.scrim`, edge to edge);
@@ -1378,7 +1421,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `UniversalRow`'s accessories (7.0.0) | `UniversalRowSkeleton.navigationSettings`, `.toggleSettings`, `.actionSettings`, `.menuPicker`, `.datePicker`, `.checkmark(iconStyle:)` (a stepper or picker row is `.menuPicker`, the same shape), `.slider(showsHint:config:)`, `.info(showsIcon:)`, `.colors(swatches:)` |
 | `ItemRow` (3.6.0) | `ItemRowSkeleton(style:showsLeading:showsDetail:metaLines:verticalPadding:)` |
 | `PendingItemCard` (3.6.0) | `PendingItemCardSkeleton(contentLines:)` |
-| `NoticeCard`, `PickerCarousel` (4.14.0); a glass `FormSection` (5.0.0) | `NoticeCardSkeleton(leadingSize:showsAction:)`, `PickerCarouselSkeleton(pictureSize:)`; `FormSection(style: .glass)` of its rows' skeletons (`ItemRowSkeleton`, …; `ListCardSkeleton` until 5.0.0) |
+| `NoticeCard`, `PickerCarousel` (4.14.0); a `FormSection` (5.0.0) | `NoticeCardSkeleton(leadingSize:showsAction:)`, `PickerCarouselSkeleton(pictureSize:)`; a `FormSection` of its rows' skeletons (`ItemRowSkeleton`, …; `FormSection(style: .glass)` in 5.x to 7.x, `ListCardSkeleton` until 5.0.0) |
 | `RatingSummary` (4.1.0) | `RatingSummarySkeleton(maximum:)` |
 | `SearchSuggestionRow` (3.5.0), drawn by `.dsSearchSuggestions` while `isLoading` | `SearchSuggestionRowSkeleton(showsSubtitle:)` |
 | `AmountRow` (2.1.0) | `AmountRowSkeleton(style:showsRing:showsDetail:)` |
@@ -1397,7 +1440,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `ShareCardFrame` (and `ShareCardSheet` while it loads), `LiveSessionBar`, `DownloadRow`, `ArticleBody` (2.8.0) | `…Skeleton` (`PhotoTileSkeleton(size:cornerRadius:)`, `PhotoStripSkeleton(count:size:)`, `PhotoGridSkeleton(count:columns:style:)`, `ShareCardSkeleton(format:)`, `ArticleBodySkeleton(paragraphs:)`) |
 | `TransactionRow`, `OptionCardPicker`, `StreamingText`, `SnapCardPicker` (2.9.0) | `…Skeleton` (`TransactionRowSkeleton(showsDetails:)`, `StreamingTextSkeleton(font:)`, `SnapCardPickerSkeleton { the card's skeleton }`, `OptionCardPickerSkeleton()`, 6.0.0) |
 
-**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`, `CurrencyRow`, 3.6.0); `MetaLine` (3.6.0, a line inside a row that has the skeleton); `LoadMoreFooter` (4.1.0, the loading state itself); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); `AmountEntrySheet` and `VoiceOrbButton` (4.14.0: an input and a control); `ActionRowLabel` (3.1.0, a label); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `CreatureTabLabel`, `CreatureGlyph`, `MessageComposerAccessory`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
+**No skeleton, on purpose:** views that show no data that loads. Inputs and controls (`AmountInput`, `CurrencyAmountInput`, `CurrencyPickerMenu`, `EditableHero`, `AnimatedTitleInput`, `FormTextField`, `MessageComposer`, `CalculatorKeypad`, `CalculatorAmountDisplay`, `AmountDigitDisplay`, `TagInput`, `RatingPicker`, `ReactionButton`, `SegmentedPicker`, `DateButtons`, `UniversalFilterButton`, `ChartZoomControls`, `AmountVisibilityToggle`, `DSButton`, which has its own loading state); containers (`FormSection`, `EditSheetContainer`, `UniversalCarousel`, `OnboardingPager`, `OnboardingPageContainer`: put the skeletons of their content inside); pickers over local data (`IconPicker`, `CurrencyList`, `CurrencyRow`, 3.6.0); `MetaLine` (3.6.0, a line inside a row that has the skeleton); `LoadMoreFooter` (4.1.0, the loading state itself); `PhotoViewer` (full screen over photos already shown; the app's image view shows its own loading); `DateRangePickerSheet`, `PagerArrows`, `ProgressOverlay` and `.cascadeIn` (2.9.0: an input, a container, a status and a motion); `AmountEntrySheet` and `VoiceOrbButton` (4.14.0: an input and a control); `ActionRowLabel` (3.1.0, a label); messages and flows that appear once something is known (`EmptyState`, `EmptyCard`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `PromptSheet`, `NotificationPermissionPrompt`, `ImportProgressSheet`, `OnboardingPage`, `LoopOnboardingHero`, `StepTracker`, `OnboardingStepIndicator`); decoration, effects and layouts (`AuroraBackground`, `EdgeGlow`, `VoiceWave`, `AccentGlow`, `.borderBeam`, `PlusTabLabel`, `CreatureTabLabel`, `CreatureGlyph`, `MessageComposerAccessory`, `DisclosureChevron`, `SelectionIndicator`, `FlowLayout`, `InfoRowLayout`, `CirclePackingLayout`, `AdaptiveColumns` (8.15.0), the modifiers and button styles). A new component that shows data gets its skeleton in the same PR.
 
 #### `SkeletonText` *(1.7.0)*
 A text-line placeholder in a given style: `SkeletonText(AppTypography.h4, width: 140)`, `SkeletonText(AppTypography.bodySmall, lines: 2)` (the last of several lines is 60% wide). The line is as tall as the style's own line, so it grows with Dynamic Type; the bar is 70% of it. Shimmers like `Skeleton`. For a component, use its skeleton (above); `.skeleton(isLoading:)` redacts a real view in place, with the system's placeholder shapes.
@@ -1903,6 +1946,18 @@ scroll. `FlowLayout(spacing:lineSpacing:) { ForEach(tags, id: \.self) { Badge($0
 Inside the module a subview can join the one before it with no spacing (`FlowJoinsPrevious`,
 5.1.1): `StreamingText`'s words of a line written without spaces.
 
+#### `AdaptiveColumns` *(8.15.0)*
+A screen's main column with a side column beside it where the width allows, the narrow layout
+where not: on an iPad a game's trophies with its guide and sessions beside them, on a phone chips
+over one part at a time. `AdaptiveColumns { main } side: { cards } narrow: { phone layout }`;
+without `narrow:` the side stacks under the main column (`AdaptiveColumnsStack`). The columns
+show when `AppLayout.mainColumnMinWidth` (400 pt), the gap (`AppSpacing.xxl`) and
+`AppLayout.sideColumnWidth` (340 pt) fit, both widths scaled with the text size: what decides is
+the width the view gets (`ViewThatFits`), so a panel beside the screen or a narrower Mac window
+switches it too. The main column takes the rest of the width; the side's content is a column of
+cards `AppSpacing.lg` apart. The two layouts are different views, so state belongs in the screen.
+A layout: no skeleton (its content has them).
+
 #### `HeroSymbol` *(0.7.0)*
 Large SF Symbol on a disc of its tint at 12%: the picture of `OnboardingPage` and
 `PromptSheet`. `HeroSymbol(systemImage: "map", size: 96, tint: AppColors.success)`.
@@ -2050,7 +2105,12 @@ comes into focus in its place (`.skeletonReveal`). A photo the app already holds
 (`DesignKitPhotoLoader.cached`) shows at once. `placeholderKey:` shows a smaller version the app
 holds, with the shimmer over it, while this one loads (the thumbnail under the full photo in a
 viewer). No URL or a failed load: `PhotoPlaceholderSymbol`. It fills the frame and does not
-clip: the container (a `PhotoTile`, a grid cell) gives the shape.
+clip: the container (a `PhotoTile`, a grid cell) gives the shape. `.remotePhotoLoading(.still)`
+*(8.15.0)* is for a picture behind text and buttons: a still grey while it loads (or the
+`placeholderKey`'s small version, blurred), no shimmer and no photo symbol;
+`.heroBackground(picture:)` sets it. `.remotePhotoLoading(.hidden)` *(8.17.0)* is for a cut-out
+figure over another picture: nothing while it loads, nor when it fails or has no URL, so the
+picture under it shows alone; `.heroBackground(picture:subject:)` sets it on its figure.
 
 ```swift
 PhotoTile { RemotePhoto(key: photo.thumbnailPath, url: urls[photo.thumbnailPath]) }
@@ -2096,6 +2156,12 @@ is a number (24 pt bold rounded) over its caption (12 pt, 70%). Fixed sizes on p
 card is an image, not a screen. Dalada: the trip, catch and place cards are its own content in
 the frame, with its teal style.
 
+The brand line (8.16.0) can say which app the picture is from: `brandIcon:` puts the app's icon
+(30 pt) before its name, in the home screen's rounded square (22.5 % continuous corners), and
+`ShareCard.Style(…, brandTypeface: .inter)` sets the name in Inter bold instead of rounded heavy
+(`.rounded`, the default). An app icon set cannot be read as an image: the app adds its icon as
+an image set too. Tenra: the year in review's picture, its icon and its name in Inter.
+
 #### `ShareCardSheet`
 `ShareCardSheet(previewTitle:formats:load:message:card:)`: a segmented format picker
 (`share.format`), the picture (drawn with `ImageRenderer` when the data arrives and when the
@@ -2138,8 +2204,9 @@ Something to download for offline use: the name (bodyEmphasis) and a caption lin
 action. `Status`: `.available` and `.paused` (caption; download button), `.downloading(p)` (a
 6 pt bar over the caption; pause button), `.downloaded` (accent check mark before the
 caption; no action), `.failed` (caption in the destructive colour; download button). The app
-writes the caption ("About 80 MB", "40% · 32 MB") and adds the swipe to delete. Vertical
-padding `xxs`. VoiceOver: `download.start` / `download.pause`, or the labels it passes.
+writes the caption ("About 80 MB", "40% · 32 MB") and puts Delete in a long press
+(`.contextMenu`; no swipe actions since 8.0.0). Vertical padding `xxs`, a `List` row's; in a
+`FormSection` card the app adds `AppSpacing.md` above and below (Dalada's offline maps). VoiceOver: `download.start` / `download.pause`, or the labels it passes.
 
 #### `ArticleBody`
 An article's blocks, `AppSpacing.md` apart: `.heading(_, level:)` (title3 semibold or headline,
@@ -2254,7 +2321,7 @@ The screen dims (black 45%) and an `.ultraThinMaterial` panel (`AppRadius.lg`) s
 spinner in the accent, the title (bodyEmphasis) and a message (secondary). Disable the screen
 under it at the call site. Tenra: restoring a backup.
 
-Since 8.13.0 `.progressOverlay(isPresented:title:message:hero:)` (and `ProgressOverlay(title:message:hero:)`)
+Since vNext `.progressOverlay(isPresented:title:message:hero:)` (and `ProgressOverlay(title:message:hero:)`)
 puts a view in the spinner's place, one that shows the progress itself, sized by the host:
 Tenra's mascot in `.working(progress:)` over a backup's restore. Without `hero:` it is as before.
 
@@ -2284,7 +2351,8 @@ AmountEntrySheet(title: goal.name, icon: goal.icon, subtitle: left, currency: go
 ```
 
 #### `NoticeCard`
-A message the app writes to the person, on a glass card (`FormSection(style: .glass)` since 5.0.0,
+A message the app writes to the person, on a card that pads it (its own `cardStyle()` card since
+8.0.0, glass or the grey of `SurfaceStyle.fill`; `FormSection(style: .glass)` in 5.x to 7.x,
 `ListCard` in 4.14.0): the `leading` picture at its own size
 (a mascot, an icon: `NoticeCardMetrics.leadingSize`, 48 pt, since 5.2.0; hide it from VoiceOver
 when it says nothing), the title (`bodyEmphasis`) and the message (`bodySmall`, secondary), the ✕
@@ -2542,7 +2610,7 @@ ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
 Used in: `StaticSubscriptionIconsView`, `LoanFacepileIconsView`.
 
 #### `BlurSlideTransition` (text reveal)
-Canonical transition for animated text appearance: insertion slides up from below + un-blurs + fades in; removal keeps sliding up + blurs + fades out. Lives in `Views/Components/Feedback/BlurSlideTransition.swift`. Use the presets — don't hand-tune parameters at call sites:
+Canonical transition for animated text appearance: insertion slides up from below + un-blurs + fades in; removal keeps sliding up + blurs + fades out. Lives in `Sources/DesignComponents/Effects/BlurSlideTransition.swift`. Use the presets — don't hand-tune parameters at call sites:
 
 | Preset | Params | Use For |
 |--------|--------|---------|
@@ -2562,7 +2630,7 @@ Text(token.text)
 Used in: `OnboardingWelcomeStep`, `AnimatedTranscriptionText`.
 
 #### `AccentGlow` (ambient edge glow)
-Blurred gradient circle rising from a screen edge (`Views/Components/Feedback/AccentGlow.swift`). Static — no animation loop, no hit-testing, hidden from VoiceOver. Tunables in `GlowMetrics` (blur 120, 85% off-screen, hero intensity 0.45).
+Blurred gradient circle rising from a screen edge (`Sources/DesignComponents/Effects/AccentGlow.swift`). Static — no animation loop, no hit-testing, hidden from VoiceOver. Tunables in `GlowMetrics` (blur 120, 85% off-screen, hero intensity 0.45).
 
 | Preset | Edge | Tint | Use For |
 |--------|------|------|---------|
@@ -2650,6 +2718,53 @@ Tenra builds every entity detail screen this way (its `EntityDetailScaffold`).
 `ScrollView` → `VStack(spacing: AppSpacing.lg)`: `BalanceCard`s in a `UniversalCarousel(config:
 .cards)`, a `CashFlowCard`, a grid of `ProgressRingTile`s, `FinanceCard` summaries with
 `PackedCircleIcons`. Tenra's Home and Finances tabs.
+
+### Large screens: iPad and Mac *(8.13.0, 8.15.0)*
+
+On an iPad, or in a Mac window ("Designed for iPad"), a screen gets several times a phone's
+width. The same screen works there without a check for the device: what changes follows the
+width the view gets.
+
+```
+ScrollView
+└── VStack(spacing: AppSpacing.lg) { … }        the phone's screen as it is
+    .screenPadding()
+    .readableWidth()                             a centred column, 720 pt at most
+
+ScrollView                                       cards that stand on their own
+└── LazyVGrid(columns: AppLayout.cardColumns(), spacing: AppSpacing.lg) { cards }
+    .screenPadding()
+    .readableWidth(AppLayout.wideWidth)          two or three in a row, 1120 pt at most
+```
+
+- **The column.** Every scrolling screen keeps its content to `.readableWidth()`: lines of text
+  stay readable and a switch stays near its label. The scroll view itself still fills the screen,
+  so the scroll bar and the scroll edge effect stay at its edges. The column grows with the
+  person's text size.
+- **A grid of cards.** Cards a person opens one by one (games, accounts, trips) go side by side
+  in `AppLayout.cardColumns()`: one in a row on a phone, two or three on an iPad. The things a
+  person keeps stay a `CardList`, with `layout: .grid` *(8.15.0)*: the same taps, menus,
+  selection and dragging, in columns. A form, a
+  settings list and rows in one card (`CardList(layout: .section)`) stay one column.
+- **A main column and a side column** *(8.15.0)*. A detail screen with one thing it is for and
+  summaries around it (a game's trophies with its guide, walkthrough and sessions) puts them side
+  by side in `AdaptiveColumns` under `.readableWidth(AppLayout.wideWidth)`, and keeps the phone's
+  layout for `narrow:` (often a `ChipPicker` over the parts). The width decides, so when a panel
+  opens beside the screen (`.inspector`), or a list beside it in a `NavigationSplitView`, the
+  screen goes back to its narrow layout.
+
+  ```
+  ScrollView
+  └── AdaptiveColumns { main } side: { cards } narrow: { chips + one part }
+      .screenPadding()
+      .readableWidth(AppLayout.wideWidth)      main | 340 pt side, or the phone's layout
+  ```
+- **List and detail.** A list and what it opens side by side is the system's
+  `NavigationSplitView` (on a phone it collapses into a stack); each column's screen keeps its own
+  `.readableWidth()`. A tab bar becomes a sidebar with `TabView { … }.tabViewStyle(.sidebarAdaptable)`.
+- **Sheets** are already a readable width on an iPad (the system's form sheet); nothing to add.
+- What a large screen lacks (Live Activities on a Mac, the camera) stays behind an availability
+  check in the app, never a check for the device.
 
 ### Empty, loading, error
 
@@ -3055,7 +3170,7 @@ with the iOS 27 SDK — Xcode 27; built with Xcode 26 the gate honours Reduce Mo
 
 ## 10. cardStyle Padding Contract
 
-`cardStyle()` = **pure visual only** (shape + material, NO padding). Never rely on it for spacing.
+`cardStyle()` = **pure visual only** (shape + surface: Liquid Glass, or the grey of `SurfaceStyle.fill` since 8.12.0; NO padding). Never rely on it for spacing.
 
 ### Who owns which padding
 
@@ -3063,7 +3178,7 @@ with the iOS 27 SDK — Xcode 27; built with Xcode 26 the gate honours Reduce Mo
 |---|---|---|---|
 | **Card**: has its own surface | Its own: `.padding(AppSpacing.lg)` before `.cardStyle()`, inside the component | — | `TotalsCard`, `LimitProgressCard`, `ComparisonCard`, `CashFlowCard`, `ScoreCard`, `FinanceCard`, `EmptyCard`, `InsightsStatCard`, `SectionHeader(style: .card)` |
 | **Compact surface** | Its own, smaller | — | `MessageBanner` (`md`), `ChartSelectionBanner` (`lg` × `sm`) |
-| **Row**: no surface, lives in a container | Vertical only, from its `RowConfiguration` preset | The container's: a card's `.cardContentPadding()`, `List` / `Form` insets, or `.screenPadding()` | `InfoRow`, `AmountRow` (info style), `NetAmountRow`, `ScheduleRow`, `TransactionRow` (`.info`, 12) |
+| **Row**: no surface, lives in a container | Vertical only, from its `RowConfiguration` preset | The container's: a card's `.cardContentPadding()`, `List` / `Form` insets, or `.screenPadding()` | `AmountRow` (info style), `NetAmountRow`, `ScheduleRow`, `TransactionRow` (`.info`, 12) |
 | **List row**: lives only in a `List` | None: the `List`'s row insets give both | `List` | `AmountRow(style: .list)` |
 | **Row in a `FormSection` or a `CardList`** | Vertical only (`.standard`: 12, 8.6.0; 16 in 8.0.0, 12 × 16 before): the card pads its rows `lg` at the sides | The card's | `UniversalRow` (`config: .standard`, its default since 7.0.0), `FormTextField(style: .row)`, `ItemRow` (12, 8.1.0), `ChecklistRow` (12, 8.6.0; 8 in 8.1.0), a `CardList(layout: .section)` row |
 | **Primitive** | None: the parent places it | — | `Badge`, `TrendBadge`, `FormattedAmountText`, `LinearProgressBar`, charts |

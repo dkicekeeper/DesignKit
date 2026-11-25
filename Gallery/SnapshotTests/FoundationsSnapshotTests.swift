@@ -130,6 +130,99 @@ extension ComponentSnapshots {
             )
         }
 
+        /// `SurfaceStyle` (8.12.0): the same section and card on Liquid Glass and as the grey
+        /// fill on the white page; under `.fill` the greys inside a card (a tile's plate, chips, a
+        /// track, a skeleton) stay a step darker than it. The glass twins look as before 8.12.0.
+        @Test func surfaceStyles() async {
+            let styles: [(SurfaceStyle, String)] = [(.glass, "glass"), (.fill, "fill")]
+            for (surface, name) in styles {
+                await assertComponentSnapshot(
+                    FormSection(header: "Trip") {
+                        UniversalRow("Reminder", icon: "clock", accessory: .toggle(.constant(true)))
+                        ChipPicker("Bite", options: ["None", "Weak", "Good"], selection: .constant("Good"),
+                                   inset: AppSpacing.lg) { $0 }
+                            .padding(.vertical, AppSpacing.sm)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .surfaceStyle(surface),
+                    named: "section-\(name)"
+                )
+                await assertComponentSnapshot(
+                    HStack(spacing: AppSpacing.md) {
+                        Icon(source: .sfSymbol("cart.fill"), size: AppIconSize.Tile.sm)
+                        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                            Text(verbatim: "Groceries").font(AppTypography.h4)
+                            LinearProgressBar(value: 0.6, animatesOnAppear: false)
+                            SkeletonText(AppTypography.bodySmall, width: 120)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .cardContentPadding()
+                    .cardStyle()
+                    .surfaceStyle(surface),
+                    named: "card-\(name)"
+                )
+            }
+        }
+
+        /// `.readableWidth()` and `AppLayout.cardColumns()` (8.13.0), drawn small: the window
+        /// must fit the phone's screen, so a 240 pt column stands for the 720 pt one in a 360 pt
+        /// "screen" (the whole width at a large text size, where the column grows), and 150 pt
+        /// cards two in a row for the 320 pt ones on an iPad. Grey surfaces: glass cards side by
+        /// side reflect each other.
+        @Test func readableWidth() async {
+            await assertComponentSnapshot(
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    FormSection(header: "Trip") {
+                        UniversalRow("Reminder", icon: "clock", accessory: .toggle(.constant(true)))
+                    }
+                    Text(verbatim: "The lake lies at 2,500 m, an hour's drive above the city.")
+                        .font(AppTypography.body)
+                        .foregroundStyle(AppColors.textPrimary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .cardContentPadding()
+                        .cardStyle()
+                }
+                .readableWidth(240)
+                .background(AppColors.accent.opacity(0.08))
+                .surfaceStyle(.fill),
+                named: "column",
+                appearances: [.light, .largeText]
+            )
+            await assertComponentSnapshot(
+                LazyVGrid(columns: AppLayout.cardColumns(minimum: 150), spacing: AppSpacing.lg) {
+                    ForEach(["Big Almaty Lake", "Charyn Canyon", "Kolsai Lakes"], id: \.self) { title in
+                        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                            Icon(source: .sfSymbol("mountain.2.fill"), size: AppIconSize.lg)
+                            Text(verbatim: title).font(AppTypography.h4)
+                                .foregroundStyle(AppColors.textPrimary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .cardContentPadding()
+                        .cardStyle()
+                    }
+                }
+                .surfaceStyle(.fill),
+                named: "cardGrid"
+            )
+        }
+
+        /// `AdaptiveColumns` (8.15.0), drawn small like the column above: a 130 pt side beside a
+        /// main column of at least 150 pt fits in 320 pt, and in 240 pt the side folds under the
+        /// main column. At a large text size both widths grow, so 320 pt folds it too.
+        @Test func adaptiveColumns() async {
+            await assertComponentSnapshot(
+                AdaptiveColumnsSpecimen().frame(width: 320).surfaceStyle(.fill),
+                named: "sideBySide",
+                appearances: [.light, .largeText]
+            )
+            await assertComponentSnapshot(
+                AdaptiveColumnsSpecimen().frame(width: 240).surfaceStyle(.fill),
+                named: "folded",
+                appearances: [.light]
+            )
+        }
+
         /// Dalada's green accent through `DesignKitTheme.accent`: everything tinted follows it.
         @Test func daladaAccent() async {
             let saved = DesignKitTheme.accent
@@ -176,5 +269,30 @@ extension ComponentSnapshots {
                 appearances: [.light, .dark]
             )
         }
+    }
+}
+
+/// A trip's route with its weather and group beside it, at the small widths of the snapshot.
+private struct AdaptiveColumnsSpecimen: View {
+    var body: some View {
+        AdaptiveColumns(sideWidth: 130, mainMinWidth: 150, spacing: AppSpacing.md) {
+            card("Route", symbol: "map.fill", detail: "Almaty, Big Almaty Lake, the observatory")
+        } side: {
+            card("Weather", symbol: "sun.max.fill", detail: "+18°, clear")
+            card("Group", symbol: "person.2.fill", detail: "4 people")
+        }
+    }
+
+    private func card(_ title: String, symbol: String, detail: String) -> some View {
+        VStack(alignment: .leading, spacing: AppSpacing.xs) {
+            Icon(source: .sfSymbol(symbol), size: AppIconSize.lg)
+            Text(verbatim: title).font(AppTypography.h4)
+                .foregroundStyle(AppColors.textPrimary)
+            Text(verbatim: detail).font(AppTypography.bodySmall)
+                .foregroundStyle(AppColors.Text.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardContentPadding()
+        .cardStyle()
     }
 }
