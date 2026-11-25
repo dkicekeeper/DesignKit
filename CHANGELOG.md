@@ -17,6 +17,15 @@ Versions follow semantic versioning; apps pin an exact version. A PR declares it
 note in `.changes/`; at the merge the release bot gives it the next number and writes its section
 here (docs/releasing.md).
 
+## 8.20.2 - 2026-11-25
+
+The release bot pushes a release's tag again when GitHub refuses it at first. Nothing changes in an app.
+[#120](https://github.com/dkicekeeper/DesignKit/pull/120)
+
+### Gallery and tooling
+
+- The release bot pushes a tag GitHub refused right after the release commit ("missing necessary objects") again after 5, 15 and 30 seconds. 8.19.0's run stopped there and a second run had to tag it.
+
 ## 8.20.1 - 2026-11-25
 
 The Gallery and docs/adoption.md follow Tenra's decisions on 8.9.0's components. No API changes.
