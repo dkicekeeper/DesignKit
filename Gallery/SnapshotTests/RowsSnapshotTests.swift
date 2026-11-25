@@ -101,7 +101,7 @@ extension ComponentSnapshots {
 
         @Test func colorPickerRow() async {
             await assertComponentSnapshot(
-                UniversalRow("Color", config: .settings, accessory: .colors(.constant(CategoryColors.pickerPalette[2])))
+                UniversalRow("Color", config: .settings, accessory: .colors(.constant(AppColors.Data.pickerPalette[2])))
                     .frame(maxWidth: .infinity, alignment: .leading),
                 appearances: [.light, .dark, .largeText]
             )

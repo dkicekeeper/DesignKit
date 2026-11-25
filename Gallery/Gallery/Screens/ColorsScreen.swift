@@ -111,7 +111,7 @@ struct ColorsScreen: View {
             ShowcaseSection(title: "Financial", subtitle: "Transaction-type tokens") {
                 tokenList(financial)
             }
-            ShowcaseSection(title: "Category palette", subtitle: "CategoryColors · 30 picker colours, the first 14 also hashed") {
+            ShowcaseSection(title: "Data", subtitle: "AppColors.Data · 30 picker colours, the first 14 also hashed by name") {
                 paletteDemo
             }
             ShowcaseSection(title: "Palette (3.7.0)", subtitle: "AppColors.Palette · deep hues for markers, lines and zones · the same in both themes") {
@@ -293,16 +293,16 @@ struct ColorsScreen: View {
         }
     }
 
-    /// The 30 colours a user picks from (`CategoryColors.pickerPalette`, `UniversalRow(accessory: .colors)`'s
+    /// The 30 colours a user picks from (`AppColors.Data.pickerPalette`, `UniversalRow(accessory: .colors)`'s
     /// default). The first 14, marked "#", are the hash palette too: the colour of a name that
-    /// has none stored (`CategoryColors.color(for:)`: an insight's item, a letter avatar,
+    /// has none stored (`AppColors.Data.color(for:)`: an insight's item, a letter avatar,
     /// a category before the user picks one). Under them, a few names and the colour they hash to.
     private var paletteDemo: some View {
-        let hashed = CategoryColors.paletteColors.count
+        let hashed = AppColors.Data.palette.count
         let names = ["Food", "Travel", "Bills", "Health", "Shopping", "Salary", "Gifts", "Home"]
         return VStack(alignment: .leading, spacing: AppSpacing.lg) {
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: AppSpacing.sm), count: 6), spacing: AppSpacing.sm) {
-                ForEach(Array(CategoryColors.pickerPalette.enumerated()), id: \.offset) { index, hex in
+                ForEach(Array(AppColors.Data.pickerPalette.enumerated()), id: \.offset) { index, hex in
                     VStack(spacing: AppSpacing.xxs) {
                         Circle()
                             .fill(Color(hex: hex))
@@ -322,13 +322,13 @@ struct ColorsScreen: View {
                     }
                 }
             }
-            Text("# = also in the hash palette (\(hashed) of \(CategoryColors.pickerPalette.count)). Its size and order are frozen: a new colour goes to the picker only.")
+            Text("# = also in the hash palette (\(hashed) of \(AppColors.Data.pickerPalette.count)). Its size and order are frozen: a new colour goes to the picker only.")
                 .font(AppTypography.caption)
                 .foregroundStyle(AppColors.Text.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 76), spacing: AppSpacing.sm)], spacing: AppSpacing.sm) {
                 ForEach(names, id: \.self) { name in
-                    let color = CategoryColors.color(for: name)
+                    let color = AppColors.Data.color(for: name)
                     Text(name)
                         .font(AppTypography.caption.weight(.medium))
                         .foregroundStyle(color)

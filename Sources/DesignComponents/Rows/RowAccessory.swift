@@ -157,7 +157,7 @@ public struct RowAccessory {
     /// stored colour outside the palette comes first, so it shows as chosen.
     public static func colors(
         _ selection: Binding<String>,
-        palette: [String] = CategoryColors.pickerPalette
+        palette: [String] = AppColors.Data.pickerPalette
     ) -> RowAccessory {
         RowAccessory(kind: .colors(selection, palette: palette))
     }
