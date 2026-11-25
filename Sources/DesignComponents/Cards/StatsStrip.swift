@@ -24,16 +24,36 @@ import DesignSupport
 /// Two to five items read well on an iPhone; numbers shrink to fit (down to 60%), captions
 /// wrap to two lines; at accessibility text sizes the counters take two columns. A card: pads
 /// itself and draws its own glass. For one figure with a trend, `StatTile`.
+///
+/// A counter that needs explaining (how it is counted, where it comes from) takes `info:`
+/// (8.19.0): an `InfoTip` after its caption, on the caption's first line.
+///
+/// ```swift
+/// .init(value: "1.8%", title: "of players",
+///       info: "The percentage of the game's players who have earned the trophy.",
+///       infoTitle: "Share of players")
+/// ```
 public struct StatsStrip: View {
     /// One counter.
     public struct Item: Identifiable, Sendable {
         public let value: String
         public let title: String
+        /// What the counter means, in an `InfoTip` after its caption (8.19.0): a sentence or two.
+        public let info: String?
+        /// The tip's heading, the counter's name (the caption is often only its unit); `nil`
+        /// shows the text alone, and VoiceOver names the tip "More information".
+        public let infoTitle: String?
         public var id: String { title }
 
-        public init(value: String, title: String) {
+        /// - Parameters:
+        ///   - info: What the counter means and how it is counted, in an `InfoTip` after the
+        ///     caption (8.19.0).
+        ///   - infoTitle: The tip's heading, the counter's full name.
+        public init(value: String, title: String, info: String? = nil, infoTitle: String? = nil) {
             self.value = value
             self.title = title
+            self.info = info
+            self.infoTitle = infoTitle
         }
     }
 
@@ -48,25 +68,52 @@ public struct StatsStrip: View {
     public var body: some View {
         StatsStripLayout(isStacked: dynamicTypeSize.isAccessibilitySize) {
             ForEach(items) { item in
-                VStack(spacing: AppSpacing.xxs) {
-                    Text(verbatim: item.value)
-                        .font(AppTypography.h4)
-                        .foregroundStyle(AppColors.Text.primary)
-                        .monospacedDigit()
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.6)
-                    Text(verbatim: item.title)
-                        .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.Text.secondary)
-                        .multilineTextAlignment(.center)
-                        .lineLimit(2)
-                }
-                .frame(maxWidth: .infinity)
-                .accessibilityElement(children: .combine)
+                counter(item)
             }
         }
         .cardContentPadding()
         .cardStyle()
+    }
+
+    @ViewBuilder
+    private func counter(_ item: Item) -> some View {
+        if let info = item.info {
+            // The counter reads as one element and its tip as another, so the tip's button keeps
+            // its own action under VoiceOver.
+            VStack(spacing: AppSpacing.xxs) {
+                value(item)
+                    .accessibilityHidden(true)
+                caption(item)
+                    .accessibilityLabel(Text(verbatim: "\(item.value), \(item.title)"))
+                    .infoTip(info, title: item.infoTitle)
+            }
+            .frame(maxWidth: .infinity)
+            .accessibilityElement(children: .contain)
+        } else {
+            VStack(spacing: AppSpacing.xxs) {
+                value(item)
+                caption(item)
+            }
+            .frame(maxWidth: .infinity)
+            .accessibilityElement(children: .combine)
+        }
+    }
+
+    private func value(_ item: Item) -> some View {
+        Text(verbatim: item.value)
+            .font(AppTypography.h4)
+            .foregroundStyle(AppColors.Text.primary)
+            .monospacedDigit()
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
+    }
+
+    private func caption(_ item: Item) -> some View {
+        Text(verbatim: item.title)
+            .font(AppTypography.caption)
+            .foregroundStyle(AppColors.Text.secondary)
+            .multilineTextAlignment(.center)
+            .lineLimit(2)
     }
 }
 

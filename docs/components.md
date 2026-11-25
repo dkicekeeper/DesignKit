@@ -242,7 +242,7 @@ init(_ queries: [String] = [])
 
 A list too long to scan: the system search narrows it, one option or several are picked with the row's circle, and a name nothing has offers “Create”.
 
-Since 8.9.0 · Apps: Platina
+Since 8.9.0 · Apps: Dalada, Platina, Tenra
 
 - `SearchablePicker` in `Sources/DesignComponents/Selection/SearchablePicker.swift`; skeleton `SearchablePickerSkeleton`
   A list to pick one option or several from, with the system search and "Create “…”".
@@ -1116,9 +1116,11 @@ Since 1.12.0 · Apps: Dalada, Platina, Tenra
   A card of counters.
 
 ```swift
-init(value: String, title: String)
+init(value: String, title: String, info: String? = nil, infoTitle: String? = nil)
 init(items: [Item])
 ```
+
+- info: (8.19.0) puts an InfoTip after a counter's caption: how the number is counted, where it comes from. infoTitle: is its heading, the counter's full name when the caption is only a unit.
 
 ### StreakCard
 
@@ -1693,13 +1695,16 @@ init(_ text: String, arrowEdge: VerticalEdge = .bottom, arrowAlignment: TooltipA
 
 An ⓘ next to the name of a value; a tap opens a popover that explains it.
 
-Since 8.9.0 · Apps: none yet
+Since 8.9.0 · Apps: Dalada, Platina
 
 - `InfoTip` in `Sources/DesignComponents/Feedback/InfoTip.swift`
   An ⓘ button that explains the value next to it in a popover.
+- `.infoTip` in `Sources/DesignComponents/Feedback/InfoTip.swift`
+  The view with an `InfoTip` after it, on its first line: a label and its explanation.
 
 ```swift
 init(_ message: String, title: String? = nil)
+func infoTip(_ message: String, title: String? = nil) -> some View
 ```
 
 - Text("Health score").infoTip(message, title: "Health score") puts it after the label on its first line; InfoTip(message) stands anywhere.
@@ -1811,9 +1816,41 @@ Since 2.9.0 · Apps: Tenra
 
 ```swift
 func progressOverlay(isPresented: Bool, title: String, message: String? = nil) -> some View
+func progressOverlay<Hero: View>(isPresented: Bool, title: String, message: String? = nil, @ViewBuilder hero: () -> Hero) -> some View
 ```
 
 - For a restore, a migration, an import that must finish first. Disable the screen under it at the call site.
+- hero: (8.18.0) takes the spinner's place: a view that shows the progress itself, such as a ParticleCreature in .working(progress:), sized by the host.
+
+### MomentOverlay · MomentPresenter
+
+A moment of success over the whole screen, without a card: the screen dims and blurs, the hero springs in with a title and a line under it, confetti for a celebration, buttons at the bottom.
+
+Since 8.18.0 · Apps: none yet
+
+- `MomentOverlay` in `Sources/DesignComponents/Feedback/MomentOverlay.swift`
+  A moment of success over the whole screen, without a card: the screen behind dims and blurs, the hero springs in at the centre with a title and a line or two under it, and buttons wait at the bottom.
+- `MomentPresenter` in `Sources/DesignComponents/Feedback/MomentPresenter.swift`
+  Presents a `MomentOverlay` over the whole app, in a window of its own.
+
+```swift
+init(title: String, message: String? = nil, celebrates: Bool = false, primary: MomentAction? = nil, dismissTitle: String, onDismiss: @escaping () -> Void = {}, @ViewBuilder hero: () -> Hero, @ViewBuilder reward: () -> Reward)
+init(title: String, message: String? = nil, celebrates: Bool = false, primary: MomentAction? = nil, dismissTitle: String, onDismiss: @escaping () -> Void = {}, @ViewBuilder hero: () -> Hero)
+```
+
+- MomentPresenter.shared.present { MomentOverlay(…) } shows it over the whole app, sheets, tab bar and navigation included, in a window of its own; it refuses while another moment is up.
+- Every close plays the exit first. The primary button runs primary.action; any other close (the dismiss button, a tap outside the hero and the buttons, a swipe down, VoiceOver's escape) runs onDismiss. In the presenter the window goes before the action, so the action may navigate or open a sheet.
+- celebrates: confetti behind the hero and the success haptic; otherwise a light tap. Under Reduce Motion it comes and goes by opacity only; the haptic stays.
+- The hero is sized by the host and read by VoiceOver with the title. The title and the message are announced, and focus moves into the moment.
+- No skeleton: a moment shows no data that loads. No strings of its own: every text comes from the host.
+- The blur is a material over the app's windows; check it on a device.
+
+- Do: Only good news: a goal reached, a debt settled, a month inside the budgets, a reward earned.
+- Do: One at a time: queue the next moment in the presenter's onDismissed.
+- Do: A title of a few words and a line or two; the hero and the reward say the rest.
+- Don't: A warning, an error or anything the person must act on: that is a StatusBanner, a MessageBanner or an alert.
+- Don't: A moment for every small step: a like or a saved form is a .sparkleBurst or a MessageBanner.
+- Don't: Buttons inside the hero: the action is primary:, what the moment gives is reward:.
 
 ### NoticeCard
 
@@ -2292,7 +2329,7 @@ init(format: ShareCard.Format, brand: String, brandIcon: UIImage? = nil, site: S
 
 A line across a conversation: the day the next messages are from, or something that happened in it.
 
-Since 8.9.0 · Apps: Platina
+Since 8.9.0 · Apps: Platina, Tenra
 
 - `ConversationDivider` in `Sources/DesignComponents/Content/ConversationDivider.swift`; skeleton `ConversationDividerSkeleton`
   A centred caption between two hairlines, in a conversation's list of messages.

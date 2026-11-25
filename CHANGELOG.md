@@ -17,6 +17,72 @@ Versions follow semantic versioning; apps pin an exact version. A PR declares it
 note in `.changes/`; at the merge the release bot gives it the next number and writes its section
 here (docs/releasing.md).
 
+## 8.19.0 - 2026-11-25
+
+A counter of a `StatsStrip` can explain itself: `info:` puts an `InfoTip` after its caption. Platina's trophy screen explains a trophy's share of players this way, and Platina is the first app to use `InfoTip`.
+[#117](https://github.com/dkicekeeper/DesignKit/pull/117)
+
+### Added
+
+- `StatsStrip.Item(value:title:info:infoTitle:)`: `info:` is the text of an `InfoTip` after the counter's caption, on its first line (what the number means, where it comes from); `infoTitle:` is the tip's heading, the counter's full name when the caption is only a unit ("Share of players" over "1.8% of players"). VoiceOver reads the counter, then the tip as a button of its own. Without `info:` a counter looks and reads as before.
+
+### Gallery and tooling
+
+- `StatsStrip`'s page explains its first counter with a switch, and a note on `info:`; a snapshot of a counter with its tip (`statsStripWithInfo`, light, dark and large text).
+- `InfoTip`'s page carries Platina's badge: its profile explains the share of players over its rarest trophies. `gallery_badges.py` counts the `.infoTip` modifier as a use of `InfoTip`.
+- The badges follow the apps' `main` of 2026-11-25: `InfoTip` names Dalada too, `SearchablePicker` Tenra, Dalada and Platina, `ConversationDivider` Tenra and Platina.
+- docs/adoption.md: Platina's `InfoTip` and readable colours in use (a trophy row's metal and earned date in `AppColors.readable` and `Status.positiveText`).
+
+## 8.18.1 - 2026-11-25
+
+The Gallery's badges follow Dalada's adoption of 8.9.0's components (Dalada#80). No API changes.
+[#118](https://github.com/dkicekeeper/DesignKit/pull/118)
+
+### Gallery and tooling
+
+- The Gallery's `SearchablePicker` badge names Dalada too: a packing list's gear, with "Create".
+- The Gallery's `InfoTip` badge names Dalada (a place's pressure over 24 hours) and Platina (a trophy's share of players). `gallery_badges.py` matches the page by `.infoTip`, the modifier an app writes after a label.
+- docs/adoption.md: what Dalada took from the 8.9.0 proposals and what it declined, with the reasons, and Platina's `InfoTip` (Platina#2); proposed: an `info:` on `StreakCard` and `RatingSummary` for an ⓘ after their title.
+
+## 8.18.0 - 2026-11-25
+
+A moment of success over the whole app, without a card: the screen dims and blurs, a hero springs in at the centre with a title and a line under it, confetti for a celebration, the buttons at the bottom. For Tenra's assistant: Ten appears over the app when a goal is reached, a debt is settled or an accessory is earned. And `ProgressOverlay` takes a hero in its spinner's place (Ten at work over a backup's restore).
+[#105](https://github.com/dkicekeeper/DesignKit/pull/105)
+
+### Added
+
+- `MomentOverlay(title:message:celebrates:primary:dismissTitle:onDismiss:hero:reward:)`, and the same without `reward:`: the hero (any view, sized by the host) grows in on the expressive spring, the title, message, reward and buttons rise in after it. `celebrates` plays confetti behind the hero with the success haptic, otherwise a light tap. Every close plays the exit (everything fades, the hero shrinks a little), then runs `primary.action` for the primary button or `onDismiss` for any other close: the dismiss button, a tap outside the hero and the buttons, a swipe down, VoiceOver's escape. Under Reduce Motion and `.designKitMotion(false)` it comes and goes by opacity only. VoiceOver moves into it, hears the title and the message, and reads the hero with the title. No strings of its own, no skeleton.
+- `MomentAction(_:action:)`: a moment's primary button.
+- `MomentPresenter.shared`: `present(onDismissed:_:)` shows a moment over the whole app, sheets, tab bar and navigation included, in a window of its own above the app's windows and below system alerts, with the app's own light or dark choice and its accent; it returns false while another moment is up or with no foreground-active scene. A close removes the window first, then runs the button's action (it may navigate or open a sheet), then `onDismissed`. `dismiss()` removes the moment at once, without its exit or any callback; `isPresenting` tells whether one is up. Unavailable in app extensions.
+- `AppColors.Background.scrim`: dims the app under a moment, over the material that blurs it (black 10% in light mode, 45% in dark mode).
+- `.progressOverlay(isPresented:title:message:hero:)` and `ProgressOverlay(title:message:hero:)`: a view in the spinner's place that shows the progress itself, sized by the host. Without `hero:` the overlay looks as before.
+
+### Migration
+
+Nothing to change in code. A moment over the whole app:
+
+```swift
+MomentPresenter.shared.present(onDismissed: { moments.next() }) {
+    MomentOverlay(
+        title: "Goal reached",
+        message: "A new bike: 250 000 saved.",
+        celebrates: true,
+        primary: MomentAction("See the goal") { router.open(goal) },
+        dismissTitle: "Close"
+    ) {
+        ParticleCreature(mood: .celebrating).frame(width: 220, height: 220)
+    }
+}
+```
+
+The blur of the app's windows under the moment's window is to be checked on a device.
+
+### Gallery and tooling
+
+- Gallery: a MomentOverlay page in Status & Feedback, over a screen of an app, with its title, message, celebration, primary button, reward and the hero's mood, and "Show over everything" through `MomentPresenter.shared`; the ProgressOverlay page has a "With hero" switch; the Colors page lists `Background.scrim`.
+- Snapshot tests: `OverlaySnapshotTests`, the moment with its primary button and reward (light, dark, large text) and with the dismiss button alone (light, dark), and `ProgressOverlay` with a hero (light, dark). References are recorded by CI (`record_snapshots: missing`).
+- docs/components.md and docs/agents.md list the moment.
+
 ## 8.17.4 - 2026-11-25
 
 The Gallery shows whole screens made of DesignKit's components. Nothing changes in an app.
