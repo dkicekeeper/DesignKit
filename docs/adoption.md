@@ -56,13 +56,13 @@ Benchmark round 4 (docs/benchmark.md, against Meta's Astryx) added these. Where 
 
 | Component | Tenra | Dalada | Platina |
 |---|---|---|---|
-| `InfoTip` | proposed: the Financial Health score and its parts, an insight's rolling average or forecast, "spent per day" | proposed: a route's difficulty, a rating, a streak's rule | proposed: a trophy's rarity (the share of players who earned it) |
+| `InfoTip` | proposed: the Financial Health score and its parts, an insight's rolling average or forecast, "spent per day" | proposed: a route's difficulty, a rating, a streak's rule | the share of players who earned a trophy: over its rarest trophies, and by the counter on a trophy's screen (`StatsStrip`'s `info:`, vNext, with its next pin) |
 | `RelativeTime` | uses it | uses it | uses it |
 | `SearchablePicker` | proposed: a transaction's category and subcategory (with "Create"), link payments | proposed: a trip's gear (several, with "Create"), a place's type | uses it |
 | `MessageBubble(markdown:time:status:)` | `MessageBubble` with plain text; proposed: Ten's answers in Markdown, the time under a message | proposed: a thread's messages with time and "Read" | Plati's answers in Markdown |
 | `ConversationDivider` | proposed: the chat's days, "Ten changed the budget" | proposed: a thread's days, "Alex joined" | uses it |
 | `AccessibilityAnnouncer` | proposed: "Saved", "Imported 120 transactions", a sync that finished | uses it | uses it |
-| `AppColors.Status.*Text`, `AppColors.readable` | proposed: its own status texts on tints (a category's badge) | proposed: rule statuses, map legends on a tint | proposed: a trophy's grade on its tint |
+| `AppColors.Status.*Text`, `AppColors.readable` | proposed: its own status texts on tints (a category's badge) | proposed: rule statuses, map legends on a tint | a trophy row's metal and earned date on the grey card (the metals read at 2.1 to 3.6:1 as text) |
 | `scripts/designkit_lint.py` | runs it in CI and after each pin bump | the same | runs it in CI |
 | `scripts/sync_agents_block.py` | its CLAUDE.md, after each pin bump in `designkit.yml` | the same | its CLAUDE.md carries the block; moves its pin by hand |
 
@@ -73,8 +73,9 @@ grey surfaces (`DesignKitTheme.surface = .fill`, 8.12.0) and in a column on the 
 (`.readableWidth()`, 8.13.0); the Gallery's pages carry its badge since 8.17.1. The first app to
 use `SearchablePicker`, `ConversationDivider`, `MessageBubble(markdown:)`, `.readableWidth()` and
 `.heroBackground(clearHeight:picture:)` (its game screen, 8.14.0); its profile puts its sections
-side by side on an iPad (`AppLayout.cardColumns`) and its play days in a `CalendarHeatmap`. Not used
-yet, where it could: `InfoTip` by a trophy's rarity.
+side by side on an iPad (`AppLayout.cardColumns`) and its play days in a `CalendarHeatmap`. The first
+to use `InfoTip` (2026-11-25): what a trophy's share of players is, over its rarest trophies and,
+with `StatsStrip`'s `info:` (vNext), by the counter on a trophy's screen.
 
 ## Ten (ParticleCreature) in Tenra
 

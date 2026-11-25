@@ -152,6 +152,21 @@ extension ComponentSnapshots {
             )
         }
 
+        /// StatsStrip (vNext): a counter with `info:`, its InfoTip after the caption, beside one
+        /// without; the popover is the system's and is not drawn here.
+        @Test func statsStripWithInfo() async {
+            await assertComponentSnapshot(
+                StatsStrip(items: [
+                    .init(value: "Gold", title: "type"),
+                    .init(value: "1.8%", title: "of players",
+                          info: "The percentage of the game's players who have earned the trophy.",
+                          infoTitle: "Share of players"),
+                    .init(value: "Ultra Rare", title: "rarity"),
+                ]),
+                appearances: [.light, .dark, .largeText]
+            )
+        }
+
         @Test func streakCard() async {
             await assertComponentSnapshot(
                 StreakCard(systemImage: "flame.fill", isActive: true, title: "3 weeks in a row",

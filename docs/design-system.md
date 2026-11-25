@@ -1278,7 +1278,7 @@ HStack { Text("Rolling average"); InfoTip("The last 30 days, recomputed nightly.
 The glyph is `AppIconSize.sm` in `Text.secondary` (white on a hero's colour), its target 44 pt
 without taking room; on iPhone the popover stays a popover (`presentationCompactAdaptation`).
 VoiceOver: "About <title>" or "More information" (`infoTip.about`, `infoTip.label`). No skeleton:
-it explains, it shows no data.
+it explains, it shows no data. On a counter of a `StatsStrip`, the item's `info:` *(vNext)*.
 
 #### `MessageBanner`
 Transient animated feedback banner.
@@ -2012,6 +2012,10 @@ A control: no skeleton.
 Counters side by side in a card: the number (h4, tabular, shrinks to 60%) over its caption
 (two lines, centred), equal widths; at accessibility text sizes two columns, so a caption is not
 broken mid-word. `StatsStrip(items: [.init(value: "42", title: "days")])`.
+A counter that needs explaining takes *(vNext)* `info:` (and `infoTitle:`, its full name when the
+caption is only a unit): an `InfoTip` after its caption, on the caption's first line; VoiceOver
+reads the counter, then the tip as a button of its own. One tip per figure, on the screen that
+explains it, not on every row of a list.
 For one figure with a trend, `StatTile`.
 
 #### `StreakCard`
