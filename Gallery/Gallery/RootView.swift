@@ -66,11 +66,6 @@ struct RootView: View {
                 } else {
                     sections
                 }
-                Section {
-                    row(PatternsScreen.title, "rectangle.3.group.fill", .orange) { PatternsScreen() }
-                } footer: {
-                    Text("Whole screens made of the components: settings, a detail, a list, a dashboard, a conversation, an edit sheet, onboarding.")
-                }
             }
             .searchable(text: $query, prompt: "Components")
             .navigationTitle("DesignKit")
@@ -157,6 +152,11 @@ struct RootView: View {
             row(EffectsScreen.title, "sparkles", .purple, pages: EffectsScreen.pages) { EffectsScreen() }
         } header: {
             Text("Structure & Effects")
+        }
+        Section {
+            row(PatternsScreen.title, "rectangle.3.group.fill", .orange) { PatternsScreen() }
+        } footer: {
+            Text("Whole screens made of the components: settings, a detail, a list, a dashboard, a conversation, an edit sheet, onboarding.")
         }
     }
 
