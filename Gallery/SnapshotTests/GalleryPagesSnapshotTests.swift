@@ -26,6 +26,26 @@ extension ComponentSnapshots {
             await assertPageSnapshot(NavigationStack { SelectionScreen() }, page: "PickerCarousel")
         }
 
+        /// A page's canvas in its contexts (vNext): an AvatarGroup in a grey card (rings of the
+        /// card's grey) and on the accent (the hero's white tone).
+        @Test func canvasContexts() async {
+            for (context, name) in [(CanvasContext.card, "card"), (.colour, "colour")] {
+                await assertPageSnapshot(
+                    NavigationStack {
+                        ShowcasePage(title: "Media") {
+                            ComponentPage(name: "AvatarGroup", summary: "Overlapping avatars and \"+N\".") {
+                                AvatarGroup(names: ["Ayan", "Dana", "Marat", "Aru", "Timur"], maxVisible: 3, size: 40)
+                            }
+                        }
+                    }
+                    .environment(\.showcaseCanvasContext, context)
+                    .surfaceStyle(.fill),
+                    page: "AvatarGroup",
+                    named: "context-\(name)"
+                )
+            }
+        }
+
         /// A centred SnapCardPicker on a page of a paging section, as the SnapCardPicker page
         /// shows it with Centered chosen.
         @Test func snapCardPickerCenteredPage() async {

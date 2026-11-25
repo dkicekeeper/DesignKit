@@ -55,9 +55,11 @@ Sources/
 Gallery/               showcase app (xcodegen; the .xcodeproj is not in git): Foundations and
                        17 component sections by what a component does (docs/gallery-structure.md);
                        every public component has a ComponentPage — header, preview canvas
-                       (light/dark), controls for its parameters and states (Loading = its
-                       skeleton), usage notes; Patterns, whole screens made of the components
-                       (8.17.4); an Updates screen reads CHANGELOG.md; ships to TestFlight
+                       (light/dark; on the page, in a card or on colour, vNext), controls for
+                       its parameters and states (Loading = its skeleton), usage notes;
+                       Patterns, whole screens made of the components (8.17.4); the home screen
+                       searches the pages and picks an app's preset (accent and surfaces,
+                       vNext); an Updates screen reads CHANGELOG.md; ships to TestFlight
                        (docs/testflight.md)
 Gallery/SnapshotTests/ snapshot tests hosted in the Gallery app; references in __Snapshots__
 scripts/               snapshot-tests.sh (CI and local runs of the snapshot tests); for the apps
