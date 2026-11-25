@@ -693,8 +693,7 @@ private struct MomentOverlayPage: View {
             name: "MomentOverlay · MomentPresenter",
             summary: "A moment of success over the whole screen, without a card: the screen dims and blurs, the hero springs in with a title and a line under it, confetti for a celebration, buttons at the bottom.",
             since: "8.18.0",
-            // Tenra takes it with its stage-1 commit after this release; the badge follows then.
-            apps: [],
+            apps: [.tenra],
             canvas: .fill,
             notes: [
                 "MomentPresenter.shared.present { MomentOverlay(…) } shows it over the whole app, sheets, tab bar and navigation included, in a window of its own; it refuses while another moment is up.",
