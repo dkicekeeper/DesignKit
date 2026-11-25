@@ -383,7 +383,7 @@ private struct PersonRowPage: View {
             name: "PersonRow",
             summary: "A person in a list: avatar, name, a line under it, a trailing slot. The app passes its photo avatar. The card style is the person at the top of their profile.",
             since: "1.12.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             canvas: .fill,
             notes: ["style: .card (2.8.0): a 64 pt avatar, the name in h4, the @username and a third line (detail), in a card that pads itself."],
             styles: ["list", "card"]
