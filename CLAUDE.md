@@ -56,8 +56,9 @@ Gallery/               showcase app (xcodegen; the .xcodeproj is not in git): Fo
                        17 component sections by what a component does (docs/gallery-structure.md);
                        every public component has a ComponentPage — header, preview canvas
                        (light/dark), controls for its parameters and states (Loading = its
-                       skeleton), usage notes; an Updates screen reads CHANGELOG.md; ships to
-                       TestFlight (docs/testflight.md)
+                       skeleton), usage notes; Patterns, whole screens made of the components
+                       (vNext); an Updates screen reads CHANGELOG.md; ships to TestFlight
+                       (docs/testflight.md)
 Gallery/SnapshotTests/ snapshot tests hosted in the Gallery app; references in __Snapshots__
 scripts/               snapshot-tests.sh (CI and local runs of the snapshot tests); for the apps
                        (8.9.0): designkit_lint.py (their design and section-rows lint, run from
@@ -399,9 +400,9 @@ rather than importing an app type.
   candidates, each when an app asks for it (docs/benchmark.md 13 a data palette, 14 an exit
   motion, 15 spacing that grows with Dynamic Type, 20 `FormSection(isExpanded:)`,
   `FlowLayout(maxRows:)`, a banner over a sheet, a status dot on `Avatar`, 23 the code of a page's
-  configuration in the Gallery, 24 a Patterns section of whole screens), the assistant's list of
-  actions once Tenra shows one, anatomy on the pages of composite cards and rows; Platina's own
-  DesignKit update workflow (its CI job here and the issue template, 28, came in vNext); the
+  configuration in the Gallery), the assistant's list of actions once Tenra shows one, anatomy on
+  the pages of composite cards and rows; Platina's own DesignKit update workflow (its CI job
+  here, the issue template, 28, and the Gallery's Patterns of whole screens, 24, came in vNext); the
   adoption proposals in [docs/adoption.md](docs/adoption.md) for the app sessions.
 - Release numbers given at merge (2026-11, the owner's decision after parallel sessions'
   PRs collided on numbers and on `VERSION`, CHANGELOG.md and docs/components.md): a PR declares
