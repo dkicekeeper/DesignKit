@@ -17,6 +17,16 @@ Versions follow semantic versioning; apps pin an exact version. A PR declares it
 note in `.changes/`; at the merge the release bot gives it the next number and writes its section
 here (docs/releasing.md).
 
+## 8.20.1 - 2026-11-25
+
+The Gallery and docs/adoption.md follow Tenra's decisions on 8.9.0's components. No API changes.
+[#119](https://github.com/dkicekeeper/DesignKit/pull/119)
+
+### Gallery and tooling
+
+- Tenra's badge on the `MomentOverlay` · `MomentPresenter` page: Ten's moments over the app (8.18.0). Its badges on `SearchablePicker` (its subcategory picker) and `ConversationDivider` (the day lines in Ten's chat) came with 8.19.0.
+- docs/adoption.md: Tenra's column of the 8.9.0 table says what it took (`SearchablePicker`, `ConversationDivider`, `AccessibilityAnnouncer`, and `ArticleBody.Block.parse(markdown:)` for Ten's replies) and why it declined the rest (`InfoTip`, `MessageBubble(markdown:)` with time and status for Ten's replies, a "Ten changed the budget" line, `SearchablePicker` for the category and link payments).
+
 ## 8.20.0 - 2026-11-25
 
 Rings and discs that cut a shape out of a card take the card's colour, so grey cards show no white rings.
