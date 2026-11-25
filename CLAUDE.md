@@ -100,7 +100,8 @@ consumers `import DesignTokens` / `DesignSupport` / `DesignComponents` as needed
 since 2026-11-25 (on the Xcode 27 image; its CI lints at the pinned version, and the bump runs
 `sync_agents_block.py`). Swift 6, iOS 26, iPhone and iPad (a Mac runs
 it as "Designed for iPad"; its content keeps to `.readableWidth()`, 8.13.0); accent
-`#3573BA` through `DesignKitTheme.accent`; since 8.12.0 (its #1) grey surfaces
+Plasma (light `#D6006F`, dark `#FF4FA0`; the owner's choice of 2026-11-25, `#3573BA` before) through
+`DesignKitTheme.accent`; since 8.12.0 (its #1) grey surfaces
 (`DesignKitTheme.surface = .fill`). All of its interface is DesignKit's: forms and lists
 (`FormSection`, `UniversalRow`, `CardList`, `ItemRow`, `ChecklistRow`), its assistant Plati
 (`ParticleCreature`, `CreatureTabLabel`, `MessageBubble(markdown:)`, `ConversationDivider`,
