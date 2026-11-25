@@ -802,7 +802,7 @@ struct ChartSelectedDot: View {
         Circle()
             .fill(color)
             .padding(ChartMetrics.selectedRing)
-            .background(Circle().fill(AppColors.Background.base))
+            .background(Circle().fill(.surfaceBackground))
             .frame(width: ChartMetrics.selectedDot, height: ChartMetrics.selectedDot)
             .shadow(color: glows ? color.opacity(0.8) : .clear, radius: glows ? 6 : 0)
     }

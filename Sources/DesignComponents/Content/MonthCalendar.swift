@@ -239,7 +239,7 @@ public struct MonthCalendar<Item: Identifiable, Marker: View, Accessory: View>: 
                     ForEach(items.prefix(maxMarkers)) { item in
                         marker(item)
                             .frame(width: AppIconSize.md, height: AppIconSize.md)
-                            .background(Circle().fill(AppColors.Background.base))
+                            .background(Circle().fill(.surfaceBackground))
                             .clipShape(Circle())
                             .transition(.scale(scale: AppAnimation.facepileHiddenScale).combined(with: .opacity))
                     }

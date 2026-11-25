@@ -68,6 +68,60 @@ public extension EnvironmentValues {
     }
 }
 
+extension EnvironmentValues {
+    /// Set by `cardStyle()` on its content (vNext): the views below lie on a card, so a knockout
+    /// takes the card's colour (`surfaceBackground`).
+    @Entry var isOnCard = false
+}
+
+package extension View {
+    /// The view starts again on a page (vNext): a sheet presented from a row inside a card
+    /// inherits the card's environment, so DesignKit's sheets put this on their root and their
+    /// knockouts take the sheet's colour, not the card's.
+    func startsOnPage() -> some View {
+        environment(\.isOnCard, false)
+    }
+}
+
+public extension EnvironmentValues {
+    /// The opaque colour of the surface a view lies on (vNext): the page's
+    /// (`AppColors.Background.base`), or, inside a `cardStyle()` card under `SurfaceStyle.fill`,
+    /// the card's grey (`AppColors.Background.neutral1`, raised in a dark sheet as the card is).
+    /// On a glass card it stays the page's colour, which the glass lets through.
+    ///
+    /// For a ring or a disc that cuts a shape out of whatever lies under it: the ring between
+    /// avatars, a chart's point, a gauge's tick, a badge over an icon. Read it in a `Canvas` or a
+    /// `TextRenderer`; elsewhere use the shape style `.surfaceBackground`.
+    ///
+    /// A sheet inherits the environment of the view it is presented from: DesignKit's sheets
+    /// (`EditSheetContainer`, `PromptSheet`, `DateRangePickerSheet`, `ShareCardSheet`) start again
+    /// on the page; an app's own sheet presented from inside a card draws its knockouts on the
+    /// sheet's page in the card's grey.
+    var surfaceBackground: Color {
+        isOnCard && surfaceStyle == .fill ? AppColors.Background.neutral1 : AppColors.Background.base
+    }
+}
+
+/// The colour of the surface under a view, as a shape style (vNext): `EnvironmentValues
+/// .surfaceBackground`, the page's colour or a grey card's. For knockouts, so a grey card shows
+/// no white rings.
+///
+/// ```swift
+/// avatar.overlay(Circle().stroke(.surfaceBackground, lineWidth: 2))
+/// ```
+public struct SurfaceBackground: ShapeStyle {
+    public init() {}
+
+    public func resolve(in environment: EnvironmentValues) -> Color {
+        environment.surfaceBackground
+    }
+}
+
+public extension ShapeStyle where Self == SurfaceBackground {
+    /// The colour of the surface under the view: the page's or a grey card's (`SurfaceBackground`).
+    static var surfaceBackground: SurfaceBackground { SurfaceBackground() }
+}
+
 public extension View {
     /// Draws DesignKit's surfaces below as `style` (8.12.0): a glass card over a photo in an app
     /// of grey cards, or one grey screen in an app of glass. The app's own choice is
