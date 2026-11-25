@@ -419,6 +419,7 @@
     "summary": "A list too long to scan: the system search narrows it, one option or several are picked with the row's circle, and a name nothing has offers “Create”.",
     "since": "8.9.0",
     "apps": [
+      "Dalada",
       "Platina"
     ],
     "styles": [],
@@ -2976,7 +2977,10 @@
     "section": "Status & Feedback",
     "summary": "An ⓘ next to the name of a value; a tap opens a popover that explains it.",
     "since": "8.9.0",
-    "apps": [],
+    "apps": [
+      "Dalada",
+      "Platina"
+    ],
     "styles": [],
     "notes": [
       "Text(\"Health score\").infoTip(message, title: \"Health score\") puts it after the label on its first line; InfoTip(message) stands anywhere.",
@@ -2999,6 +3003,15 @@
         "doc": "An ⓘ button that explains the value next to it in a popover.",
         "initialisers": [
           "init(_ message: String, title: String? = nil)"
+        ],
+        "skeleton": null
+      },
+      {
+        "name": ".infoTip",
+        "file": "Sources/DesignComponents/Feedback/InfoTip.swift",
+        "doc": "The view with an `InfoTip` after it, on its first line: a label and its explanation.",
+        "initialisers": [
+          "func infoTip(_ message: String, title: String? = nil) -> some View"
         ],
         "skeleton": null
       }
