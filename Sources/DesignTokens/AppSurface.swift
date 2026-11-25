@@ -74,6 +74,15 @@ extension EnvironmentValues {
     @Entry var isOnCard = false
 }
 
+package extension View {
+    /// The view starts again on a page (vNext): a sheet presented from a row inside a card
+    /// inherits the card's environment, so DesignKit's sheets put this on their root and their
+    /// knockouts take the sheet's colour, not the card's.
+    func startsOnPage() -> some View {
+        environment(\.isOnCard, false)
+    }
+}
+
 public extension EnvironmentValues {
     /// The opaque colour of the surface a view lies on (vNext): the page's
     /// (`AppColors.Background.base`), or, inside a `cardStyle()` card under `SurfaceStyle.fill`,
@@ -83,6 +92,11 @@ public extension EnvironmentValues {
     /// For a ring or a disc that cuts a shape out of whatever lies under it: the ring between
     /// avatars, a chart's point, a gauge's tick, a badge over an icon. Read it in a `Canvas` or a
     /// `TextRenderer`; elsewhere use the shape style `.surfaceBackground`.
+    ///
+    /// A sheet inherits the environment of the view it is presented from: DesignKit's sheets
+    /// (`EditSheetContainer`, `PromptSheet`, `DateRangePickerSheet`, `ShareCardSheet`) start again
+    /// on the page; an app's own sheet presented from inside a card draws its knockouts on the
+    /// sheet's page in the card's grey.
     var surfaceBackground: Color {
         isOnCard && surfaceStyle == .fill ? AppColors.Background.neutral1 : AppColors.Background.base
     }

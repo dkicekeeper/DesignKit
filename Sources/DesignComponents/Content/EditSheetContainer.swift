@@ -68,6 +68,11 @@ public struct EditSheetContainer<Content: View>: View {
     }
 
     public var body: some View {
+        sheetBody.startsOnPage()
+    }
+
+    /// The sheet; `body` starts it again on the page (`.surfaceBackground`, vNext).
+    @ViewBuilder private var sheetBody: some View {
         NavigationStack {
             if wrapInForm {
                 Form {
