@@ -205,7 +205,7 @@ private struct DetailPattern: View {
                 Spacer()
                 FormattedAmountText(amount: 23_400, currency: "KZT", prefix: "-",
                                     fontSize: AppTypography.bodySmall, fontWeight: .semibold,
-                                    color: AppColors.textSecondary)
+                                    color: AppColors.Text.secondary)
             }
             .padding(.top, AppSpacing.md)
 
