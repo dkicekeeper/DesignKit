@@ -102,7 +102,7 @@ public enum IconKind: Hashable, Sendable {
     /// plate. It grows with the text size, as a symbol in a line of text does.
     case glyph
     /// 44 pt and up (`AppIconSize.Tile`): the symbol on a plate (the style's colour, else
-    /// `AppColors.Background.neutral1`, or its glass) with room around it, 20 % of the side up
+    /// `SurfaceStyle.glass.container`, or its glass) with room around it, 20 % of the side up
     /// to 63 pt, 25 % from 64 pt. It keeps its size.
     case tile
 
@@ -221,9 +221,9 @@ public struct IconStyle: Equatable, Hashable {
 
     /// Стандартная иконка категории (круг, accent цвет)
     /// Используется в: CategoryRow, CategoryChip, CategorySelectorView
-    /// - Parameter backgroundColor: опциональный фон контейнера. Для SF Symbols по умолчанию `AppColors.Background.neutral1`,
+    /// - Parameter backgroundColor: опциональный фон контейнера. Для SF Symbols по умолчанию `SurfaceStyle.glass.container`,
     ///   для категорий пробрасывается `category.color.opacity(0.15)`.
-    public static func categoryIcon(size: CGFloat = AppIconSize.lg, backgroundColor: Color? = AppColors.Background.neutral1) -> IconStyle {
+    public static func categoryIcon(size: CGFloat = AppIconSize.lg, backgroundColor: Color? = SurfaceStyle.glass.container) -> IconStyle {
         .circle(
             size: size,
             tint: .accentMonochrome,
@@ -236,7 +236,7 @@ public struct IconStyle: Equatable, Hashable {
         .circle(
             size: size,
             tint: .accentMonochrome,
-            backgroundColor: AppColors.Background.neutral1
+            backgroundColor: SurfaceStyle.glass.container
         )
     }
 
@@ -280,7 +280,7 @@ public struct IconStyle: Equatable, Hashable {
         .circle(
             size: size,
             tint: .secondaryMonochrome,
-            backgroundColor: AppColors.Background.neutral1
+            backgroundColor: SurfaceStyle.glass.container
         )
     }
 

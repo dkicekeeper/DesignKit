@@ -37,7 +37,7 @@ public extension SurfaceStyle {
     var container: Color {
         switch self {
         case .glass: return AppColors.Background.card
-        case .fill: return Color(.tertiarySystemFill)
+        case .fill: return ContainerColors.onFill
         }
     }
 
@@ -46,8 +46,8 @@ public extension SurfaceStyle {
     /// `secondarySystemFill`, which stays a step darker than a grey card in a dark sheet too.
     var containerStrong: Color {
         switch self {
-        case .glass: return Color(.systemGray5)
-        case .fill: return Color(.secondarySystemFill)
+        case .glass: return ContainerColors.strongOnGlass
+        case .fill: return ContainerColors.strongOnFill
         }
     }
 
@@ -58,6 +58,13 @@ public extension SurfaceStyle {
     /// `AppColors.Background.neutral2` as it reads on this surface.
     @available(*, deprecated, renamed: "containerStrong", message: "Use SurfaceStyle.containerStrong.")
     var neutral2: Color { containerStrong }
+}
+
+/// One instance of each container colour, so a preset's plate compares equal to it (`Icon`).
+private enum ContainerColors {
+    nonisolated static let onFill = Color(.tertiarySystemFill)
+    nonisolated static let strongOnGlass = Color(.systemGray5)
+    nonisolated static let strongOnFill = Color(.secondarySystemFill)
 }
 
 // MARK: - Environment

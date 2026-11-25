@@ -56,7 +56,7 @@ public struct CalculatorKeypad: View {
     // MARK: - Keys
 
     private func digit(_ value: String) -> some View {
-        keyButton(background: AppColors.Background.neutral1) {
+        keyButton(background: AppColors.Background.card) {
             model.tapDigit(Character(value))
         } label: {
             Text(value).foregroundStyle(AppColors.Text.primary)
@@ -73,7 +73,7 @@ public struct CalculatorKeypad: View {
     }
 
     private func separatorKey() -> some View {
-        keyButton(background: AppColors.Background.neutral1) {
+        keyButton(background: AppColors.Background.card) {
             model.tapSeparator()
         } label: {
             Text(",").foregroundStyle(AppColors.Text.primary)
@@ -82,7 +82,7 @@ public struct CalculatorKeypad: View {
     }
 
     private func backspaceKey() -> some View {
-        keyShape(background: AppColors.Background.neutral1) {
+        keyShape(background: AppColors.Background.card) {
             Icon("delete.left", size: AppIconSize.lg, tint: .monochrome(AppColors.Text.secondary), scalesWithText: false)
         }
         .scaleEffect(backspacePressed ? 0.96 : 1.0)

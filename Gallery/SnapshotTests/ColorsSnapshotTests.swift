@@ -36,15 +36,16 @@ extension ComponentSnapshots {
             )
             await assertComponentSnapshot(
                 SwatchGrid(items: [
-                    ("base", AppColors.Background.base),
+                    ("page", AppColors.Background.page),
+                    ("card", AppColors.Background.card),
+                    ("container", SurfaceStyle.glass.container),
+                    ("container .fill", SurfaceStyle.fill.container),
+                    ("containerStrong", SurfaceStyle.glass.containerStrong),
+                    ("cStrong .fill", SurfaceStyle.fill.containerStrong),
+                    ("sheet", AppColors.Background.sheet),
+                    ("floating", AppColors.Background.floating),
                     ("baseAlt", AppColors.Background.baseAlt),
                     ("baseAltCard", AppColors.Background.baseAltCard),
-                    ("elevation1", AppColors.Background.elevation1),
-                    ("elevation2", AppColors.Background.elevation2),
-                    ("elevation3", AppColors.Background.elevation3),
-                    ("neutral1", AppColors.Background.neutral1),
-                    ("neutral2", AppColors.Background.neutral2),
-                    ("fill", AppColors.Background.fill),
                     ("fillOnDark", AppColors.Background.fillOnDark),
                     ("fillOnLight", AppColors.Background.fillOnLight),
                     ("overlayOnImage", AppColors.Background.overlayOnImage),

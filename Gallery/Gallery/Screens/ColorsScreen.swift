@@ -30,16 +30,17 @@ struct ColorsScreen: View {
     ]
 
     private let background: [Token] = [
-        .init(name: "Background.base", color: AppColors.Background.base, use: "The screen"),
-        .init(name: "Background.baseAlt", color: AppColors.Background.baseAlt, use: "Grouped-list screen"),
-        .init(name: "Background.baseAltCard", color: AppColors.Background.baseAltCard, use: "Cards, list sections on baseAlt"),
-        .init(name: "Background.elevation1", color: AppColors.Background.elevation1, use: "Sheets, cards on base"),
-        .init(name: "Background.elevation2", color: AppColors.Background.elevation2, use: "Cards on elevation 1"),
-        .init(name: "Background.elevation3", color: AppColors.Background.elevation3, use: "Above everything"),
-        .init(name: "Background.neutral1", color: AppColors.Background.neutral1, use: "Fields, grouped blocks"),
-        .init(name: "Background.neutral2", color: AppColors.Background.neutral2, use: "Tracks, sunken controls"),
-        .init(name: "Background.fill", color: AppColors.Background.fill, use: "Translucent, any surface"),
+        .init(name: "Background.page", color: AppColors.Background.page, use: "The screen"),
+        .init(name: "Background.card", color: AppColors.Background.card, use: "Opaque grey surface: a .fill card, a panel"),
+        .init(name: "Background.container", color: SurfaceStyle.glass.container, use: "Field, plate, chip in a card (on glass)"),
+        .init(name: "Background.container", color: SurfaceStyle.fill.container, use: "… in a grey .fill card"),
+        .init(name: "Background.containerStrong", color: SurfaceStyle.glass.containerStrong, use: "Track, skeleton in a card (on glass)"),
+        .init(name: "Background.containerStrong", color: SurfaceStyle.fill.containerStrong, use: "… in a grey .fill card"),
+        .init(name: "Background.sheet", color: AppColors.Background.sheet, use: "Sheets, modal screens"),
+        .init(name: "Background.floating", color: AppColors.Background.floating, use: "Tooltips, popovers"),
         .init(name: "Background.scrim", color: AppColors.Background.scrim, use: "Dims the app under a moment (8.18.0)"),
+        .init(name: "Background.baseAlt", color: AppColors.Background.baseAlt, use: "A system grouped List only"),
+        .init(name: "Background.baseAltCard", color: AppColors.Background.baseAltCard, use: "Its sections"),
     ]
 
     private let status: [Token] = [
@@ -63,9 +64,9 @@ struct ColorsScreen: View {
     ]
 
     private let legacy: [Token] = [
-        .init(name: "bgBase", color: AppColors.bgBase, use: "= Background.base"),
-        .init(name: "bgCard", color: AppColors.bgCard, use: "= Background.neutral1"),
-        .init(name: "bgMuted", color: AppColors.bgMuted, use: "= Background.neutral2"),
+        .init(name: "bgBase", color: AppColors.bgBase, use: "= Background.page"),
+        .init(name: "bgCard", color: AppColors.bgCard, use: "= Background.card"),
+        .init(name: "bgMuted", color: AppColors.bgMuted, use: "= containerStrong on glass"),
         .init(name: "textPrimary", color: AppColors.textPrimary, use: "= Text.primary"),
         .init(name: "textSecondary", color: AppColors.textSecondary, use: "= Text.secondary"),
         .init(name: "textTertiary", color: AppColors.textTertiary, use: "= Text.tertiary"),
@@ -235,10 +236,10 @@ struct ColorsScreen: View {
 
     private var elevationDemo: some View {
         ZStack(alignment: .topLeading) {
-            level("base", AppColors.Background.base, offset: 0)
-            level("elevation1", AppColors.Background.elevation1, offset: 1)
-            level("elevation2", AppColors.Background.elevation2, offset: 2)
-            level("elevation3", AppColors.Background.elevation3, offset: 3)
+            level("page", AppColors.Background.page, offset: 0)
+            level("card", AppColors.Background.card, offset: 1)
+            level("sheet", AppColors.Background.sheet, offset: 2)
+            level("floating", AppColors.Background.floating, offset: 3)
         }
         .frame(height: 200, alignment: .topLeading)
         .frame(maxWidth: .infinity, alignment: .leading)

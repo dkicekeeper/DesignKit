@@ -43,16 +43,16 @@ private struct SurfaceStylePage: View {
             notes: [
                 "It reaches cardStyle() and everything on it (FormSection, CardList, the cards), filter chips, ProgressRingTile, an Icon's glass plate, OnboardingStepIndicator and MessageBanner.",
                 "Buttons (DSButton, .buttonStyle(.glass)), floating chrome (MessageComposer, GlassActionMenu, the system's bars) and glass drawn on a coloured hero stay Liquid Glass.",
-                "Under .fill the greys inside a card (an icon's plate, tracks, chips, skeletons) turn translucent, a step darker than the card: .surfaceNeutral1 and .surfaceNeutral2 for an app's own.",
+                "Under .fill the greys inside a card (an icon's plate, tracks, chips, skeletons) turn translucent, a step darker than the card: AppColors.Background.container and .containerStrong for an app's own.",
             ],
             styles: [".glass", ".fill"],
             dos: [
                 "Choose it once for the app, next to DesignKitTheme.accent.",
-                "Fill an app's own neutral shape inside a card with .surfaceNeutral1 or .surfaceNeutral2.",
+                "Fill an app's own container inside a card with AppColors.Background.container or .containerStrong.",
             ],
             donts: [
                 "Don't use .fill on a grey page (systemGroupedBackground): the cards melt into it.",
-                "Don't put AppColors.Background.neutral1 inside a grey card: it is the card's own colour.",
+                "Don't put AppColors.Background.card inside a grey card: it is the card's own colour.",
             ]
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.lg) {
@@ -87,7 +87,7 @@ private struct SurfaceStylePage: View {
             }
             // The page the surfaces lie on, whatever the Gallery's own canvas.
             .padding(AppSpacing.lg)
-            .background(AppColors.Background.base, in: .rect(cornerRadius: AppRadius.lg))
+            .background(AppColors.Background.page, in: .rect(cornerRadius: AppRadius.lg))
             .surfaceStyle(surface)
         } controls: {
             ChoiceControl("Surface", selection: $surface, options: [("Glass", .glass), ("Fill", .fill)])

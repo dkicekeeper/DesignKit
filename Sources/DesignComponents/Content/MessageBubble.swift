@@ -148,7 +148,7 @@ public struct MessageBubble: View {
                     .padding(.vertical, AppSpacing.sm)
                     .background(
                         // 8.10.0: white text reads on the person's own bubble in both themes.
-                        isOutgoing ? AppColors.accentFill : AppColors.Background.neutral1,
+                        isOutgoing ? AppColors.accentFill : AppColors.Background.card,
                         in: RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous)
                     )
                     .opacity(failure == nil ? 1 : MessageBubbleMetrics.failedOpacity)
@@ -352,7 +352,7 @@ public struct MessageBubbleSkeleton: View {
             }
             .padding(.horizontal, AppSpacing.md)
             .padding(.vertical, AppSpacing.sm)
-            .background(AppColors.Background.neutral1, in: RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
+            .background(AppColors.Background.card, in: RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
             if role == .incoming { Spacer(minLength: MessageBubbleMetrics.farSideMargin) }
         }
         .shimmer()

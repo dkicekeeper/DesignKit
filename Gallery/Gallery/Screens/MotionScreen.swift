@@ -73,7 +73,7 @@ private struct MotionSpringsPage: View {
                         GeometryReader { proxy in
                             ZStack(alignment: .leading) {
                                 Capsule()
-                                    .fill(AppColors.Background.neutral2)
+                                    .fill(AppColors.Background.containerStrong)
                                     .frame(height: 4)
                                 Circle()
                                     .fill(AppColors.accent)

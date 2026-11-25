@@ -122,7 +122,7 @@ public struct AuroraBackground: View {
             }
         }
         .grain(grain)
-        .background(AppColors.Background.base)
+        .background(AppColors.Background.page)
         .onGeometryChange(for: Double.self) { proxy in
             proxy.size.width / max(proxy.size.height, 1)
         } action: { newAspect in

@@ -137,7 +137,7 @@ public struct PickerCarousel<Item: Identifiable, Picture: View>: View {
             }
             .padding(AppSpacing.md)
             .frame(width: PickerCarouselMetrics.cardWidth)
-            .background(RoundedRectangle(cornerRadius: AppRadius.lg).fill(AppColors.Background.elevation1))
+            .background(RoundedRectangle(cornerRadius: AppRadius.lg).fill(AppColors.Background.sheet))
             .selectionOutline(isChosen, cornerRadius: AppRadius.lg)
             .overlay(alignment: .topTrailing) {
                 if !isOpen {
@@ -223,6 +223,6 @@ public struct PickerCarouselSkeleton: View {
         }
         .padding(AppSpacing.md)
         .frame(width: PickerCarouselMetrics.cardWidth)
-        .background(RoundedRectangle(cornerRadius: AppRadius.lg).fill(AppColors.Background.elevation1))
+        .background(RoundedRectangle(cornerRadius: AppRadius.lg).fill(AppColors.Background.sheet))
     }
 }

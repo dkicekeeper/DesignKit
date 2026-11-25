@@ -55,7 +55,7 @@ struct BrandLogoImage: View {
             .font(.system(size: size * 0.6))
             .foregroundStyle(.secondary)
             .frame(width: size, height: size)
-            .background(AppColors.Background.neutral2)
+            .background(AppColors.Background.containerStrong)
             .clipShape(RoundedRectangle(cornerRadius: size * 0.2))
     }
 }

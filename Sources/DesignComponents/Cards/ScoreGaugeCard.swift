@@ -444,7 +444,7 @@ public struct ScoreGaugeCard: View {
         .multilineTextAlignment(.center)
         .padding(.horizontal, AppSpacing.md)
         .padding(.vertical, AppSpacing.xs)
-        .modifier(HeroCapsule(onColor: onColor, fill: capsuleFill(surface.neutral1)))
+        .modifier(HeroCapsule(onColor: onColor, fill: capsuleFill(surface.container)))
     }
 }
 
