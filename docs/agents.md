@@ -21,7 +21,9 @@ script with the bump. Do not edit the block in the app; change it here.
 1. Tokens, never raw values: `AppColors`, `AppTypography`, `AppSpacing`, `AppRadius`,
    `AppIconSize`, `AppLayout`, `AppAnimation` / `AppMotion`. Status text is `AppColors.Status.*Text` (4.5:1);
    a colour of your own as text is `AppColors.readable(color)` on `AppColors.pale(color)`; a grey
-   shape of your own inside a card is `.surfaceNeutral1` / `.surfaceNeutral2`.
+   shape of your own inside a card is `.surfaceNeutral1` / `.surfaceNeutral2`; a ring or a disc
+   that cuts a shape out (round an avatar, a chart's point) is `.surfaceBackground`, never the
+   page's colour.
 2. Every symbol is an `Icon`: a glyph under 44 pt, a tile on its plate from 44 pt. iOS's own bars,
    menus, tabs and segments, and a symbol inside a line of text, stay `Image` / `Label`.
 3. A form or settings list is `FormSection` cards of `UniversalRow(_:icon:accessory:)`; the
