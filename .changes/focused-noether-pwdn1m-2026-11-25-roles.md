@@ -26,7 +26,7 @@ Colours by role: every colour has one name, named for where it goes. The flat na
 - Nothing breaks: the old names keep their values and warn with their replacement until 9.0.0. To move now, run the 9.0.0 rewrites (`scripts/migrations/9.0.0.json`, docs/migration-9.0.md):
 
 ```bash
-python3 <DesignKit>/scripts/migrate.py --from 8.18.0 --to 9.0.0 --source <App> --apply
+python3 <DesignKit>/scripts/migrate.py --from vNext --to 9.0.0 --source <App> --apply
 ```
 
 - Tenra defines its finance colours next to its adapters, under names of its own, and passes them:
