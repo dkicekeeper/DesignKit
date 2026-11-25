@@ -212,19 +212,19 @@ private struct ShimmerModifier: ViewModifier {
         if !shimmers || isInsideShimmer {
             content
         } else {
-            AmbientMotionGate { allowsMotion in
-                if allowsMotion {
-                    TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { context in
-                        content.overlay {
+            // The gate holds the band only (vNext): it stops off screen now, and the shapes under
+            // it keep their identity when it does.
+            content.overlay {
+                AmbientMotionGate { allowsMotion in
+                    if allowsMotion {
+                        TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { context in
                             GeometryReader { proxy in
                                 band(width: proxy.size.width, at: context.date)
                             }
-                            .mask(content)
-                            .allowsHitTesting(false)
                         }
+                        .mask(content)
+                        .allowsHitTesting(false)
                     }
-                } else {
-                    content
                 }
             }
             .environment(\.isInsideShimmer, true)
