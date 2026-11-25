@@ -1218,6 +1218,34 @@ A picker-grid tile: the name (bodyEmphasis, one line) over a 64 pt Liquid Glass 
 
 ### Feedback & Status Components
 
+#### `.dsRefreshable` / `RefreshIndicator` *(vNext)*
+
+Pull to refresh in every app, with the same closure as `.refreshable`, on the `List` or
+`ScrollView` itself: `List { … }.dsRefreshable { await store.reload() }`. The system's
+`.refreshable` does the work (the trigger, holding the content while loading, the haptic,
+VoiceOver, ⌘R on a Mac); its spinner is hidden app-wide (`UIRefreshControl.appearance()
+.tintColor = .clear`, the first time the modifier is used). Over the scroll view
+`RefreshIndicator` draws mercury: black liquid runs out of the Dynamic Island as the person pulls
+(the thread thins and drips into a pool), turns the accent from 18 pt below the island, breaks into
+six beads that circle while the action runs (at least 0.6 s) and flows back into the island when it
+returns (1 s), the island springing as it swallows. No glow in dark mode: the black part melts
+into the page, so the beads seem to appear out of the island.
+
+- **Where it comes from**: the island of an iPhone that has one (its frame estimated from the
+  window's top safe area: there is no API) when the scroll view starts at the screen's top; the
+  top edge, all accent, otherwise (a notch, landscape, an iPad, a Mac, a sheet, under a header).
+- **On a coloured hero** (`\.heroTone == .onColor`) the beads cast a soft shadow (black 30%,
+  4 pt, 2 pt down), not the thread at the island.
+- **Reduce Motion** and `.designKitMotion(false)`: an 18 pt accent ring that fills with the pull
+  and turns while loading.
+- **Under the navigation bar**: a plain overlay, the title and the bar's buttons on top of the
+  thread (the owner's choice).
+- `RefreshIndicator(phase:source:)` draws a fixed `RefreshPhase` (`.idle`, `.pulling(progress:
+  elapsed:)`, `.refreshing(elapsed:)`, `.finishing(elapsed:)`) from `.automatic`, `.island` or
+  `.topEdge`: the Gallery and the snapshots. The shape is `RefreshDropletGeometry`, the timing
+  `RefreshPhaseClock` (both unit tested).
+- The apps' lint warns on `.refreshable` (`system-refreshable`, an error from 9.0.0).
+
 #### `LoadMoreFooter` / `.onReachEnd` *(4.1.0)*
 The end of a list that loads in pages. `LoadMoreFooter(state:rows:onLoad:placeholder:)` goes
 after the rows: in `.more` it asks for the next page (`onLoad`, async) as soon as it scrolls

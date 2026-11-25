@@ -36,7 +36,8 @@ that moves its pin by hand runs the script with the bump. Do not edit the block 
 4. A list of things a person keeps is a `CardList`: a tap opens, a long press shows Edit and
    Delete, the toolbar selects, reorders and adds. No swipe actions.
 5. Every view that shows data has a skeleton (`<Name>Skeleton`); a list that loads pages ends in
-   `LoadMoreFooter`.
+   `LoadMoreFooter`; pull to refresh is `.dsRefreshable { … }` on the list itself, never the
+   system's `.refreshable`.
 6. An outcome that comes and goes is spoken: `MessageBanner` and the failure states of
    DesignKit's components do it; an app's own outcome calls `AccessibilityAnnouncer.announce(_:)`.
 7. Motion through DesignKit (`AppMotion` springs, `.popIn`, `.riseIn`, effects); everything stops
