@@ -31,24 +31,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # CHANGELOG.md is well formed and has a section for VERSION, so a release PR carries its
-  # notes (release.yml publishes them; the Gallery's Updates screen shows them).
+  # CHANGELOG.md is well formed and has a section for VERSION; on a branch, its release note in
+  # .changes/ is well formed and it leaves the release bot's files alone (release.yml numbers,
+  # writes and publishes the release at merge; the Gallery's Updates screen shows it).
   changelog:
     name: Changelog
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # tags and main's history for the release check
       - name: Check CHANGELOG.md
         run: python3 .github/scripts/changelog.py check
-      # The lint the apps run from the DesignKit version they pin (8.9.0).
-      - name: Test the apps' lint and migrations (scripts/designkit_lint.py, scripts/migrate.py)
+      # The lint the apps run from the DesignKit version they pin (8.9.0), and the release bot.
+      - name: Test the apps' lint and migrations, and the release notes (scripts/, .github/scripts/release.py)
         run: |
           python3 scripts/test_designkit_lint.py
           python3 scripts/test_migrate.py
-      # docs/components.md and .json follow the Gallery's pages and the sources (8.9.0).
-      - name: Check the component reference
-        run: python3 .github/scripts/components_reference.py check
+          python3 .github/scripts/test_release.py
+      # docs/components.md and .json follow the Gallery's pages and the sources (8.9.0); the
+      # release bot writes them on main after each merge, so here they only have to build.
+      - name: Build the component reference
+        run: python3 .github/scripts/components_reference.py build
+      # A branch declares its release in .changes/ and leaves VERSION, the CHANGELOG headings and
+      # the component reference to the release bot (docs/releasing.md).
+      - name: Check the release notes
+        if: github.ref != 'refs/heads/main'
+        run: |
+          git fetch --no-tags origin main
+          python3 .github/scripts/release.py check --base origin/main
+          python3 .github/scripts/release.py next | tee -a "$GITHUB_STEP_SUMMARY"
 
   # The Gallery's app badges (`apps:` on each ComponentPage) name the apps whose code uses the
   # component, read from Tenra's, Dalada's and (8.17.1) Platina's sources (5.2.0), so they follow

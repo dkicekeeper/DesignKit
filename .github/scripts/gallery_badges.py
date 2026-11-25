@@ -58,8 +58,9 @@ ALIASES = {
 # Pages of one overload of a modifier (8.14.0): what an app writes for that overload alone, as
 # patterns, in place of the page's names (`.heroBackground` would match both overloads).
 PATTERNS = {
-    ".heroBackground": [r"\.heroBackground\((?!\s*(?:picture|clearHeight):)", r"\.heroScrollEdge\b"],
-    ".heroBackground(picture:)": [r"\.heroBackground\s*(?:\{|\(\s*(?:picture|clearHeight):)"],
+    # With or without the dot: inside an app's own View extension the call has no receiver.
+    ".heroBackground": [r"(?<!\w)\.?heroBackground\((?!\s*(?:picture|clearHeight):)", r"(?<!\w)\.?heroScrollEdge\b"],
+    ".heroBackground(picture:)": [r"(?<!\w)\.?heroBackground\s*(?:\{|\(\s*(?:picture|clearHeight):)"],
 }
 
 COMMENT = re.compile(r"//.*")

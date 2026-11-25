@@ -27,9 +27,15 @@ reference PNGs in light, dark and large text; CI's `Snapshot tests` job fails on
 difference. An intentional change is re-recorded by a manual CI run with `record_snapshots`
 (`missing` / `failed` / `all`): [docs/snapshots.md](docs/snapshots.md).
 
-**TestFlight**: `.github/workflows/testflight.yml` archives the Gallery and uploads it on every
-push to `main` that touches `Sources/`, `Gallery/`, `Package.swift` or `VERSION` (version =
-`VERSION`, build = run number). Setup and troubleshooting: [docs/testflight.md](docs/testflight.md).
+**TestFlight**: `.github/workflows/testflight.yml` archives the Gallery and uploads it (version =
+`VERSION`, build = run number). A release's build is started by the release bot on the release's
+tag; any other push to `main` that touches `Sources/`, `Gallery/` or `Package.swift` builds too,
+except a merge that carries a release note (its version is not set until the bot runs).
+Setup and troubleshooting: [docs/testflight.md](docs/testflight.md).
+
+**Releases are numbered at merge**: a PR adds a note in `.changes/` and writes the token
+`vNext` where its version goes; the release bot (`.github/workflows/release.yml`) gives it the
+next number after the merge ([docs/releasing.md](docs/releasing.md)).
 
 ## Package Layout
 
@@ -59,7 +65,10 @@ scripts/               snapshot-tests.sh (CI and local runs of the snapshot test
 .github/scripts/       changelog.py (CI's Changelog job, release notes), gallery_badges.py (CI's
                        Gallery badges job: each page's `apps:` against Tenra's, Dalada's and
                        Platina's code),
-                       components_reference.py (docs/components.md + .json; CI fails when stale)
+                       components_reference.py (docs/components.md + .json; the release bot
+                       writes them), release.py (release notes, the branch check, the release
+                       bot; docs/releasing.md)
+.changes/              release notes of the PRs not released yet, one file each (docs/releasing.md)
 Shaders/               Metal sources (Ripple, EdgeGlow, Grain, Holographic, Dissolve) + build.sh;
                        CI compiles them into the .metallib files in Sources/DesignComponents/
                        Resources/Shaders (.github/workflows/shaders.yml), so apps need no Metal
@@ -116,7 +125,7 @@ fails here first (manual runs take `dalada_ref` / `tenra_ref` to check an app br
   local package override: drag the local DesignKit folder into the app's project), CI builds
   every consumer, merge → release tag → each app's update workflow bumps it. Tenra's look stays
   the reference: a visual change to a shared component is a design decision, called out under
-  **Changed** in the release's CHANGELOG.md section.
+  `### Changed` in the PR's release note (`.changes/`, which becomes the CHANGELOG.md section).
 - **Before that:** DesignKit was synced FROM Tenra's own copy: three-way merge per file
   (base = the Tenra commit of the previous sync, theirs = Tenra `main`, ours = DesignKit),
   keeping DesignKit's `public` API and parameterization. The log below records those syncs.
@@ -189,34 +198,40 @@ rather than importing an app type.
    "Loading" shows its skeleton (plus Empty / Error / Disabled when it has them); a new screen
    needs `xcodegen generate`. Its `apps:` names the apps whose code uses it: CI's `Gallery
    badges` job compares them with Tenra's, Dalada's and Platina's sources (5.2.0; Platina 8.17.1). Give it `dos:` / `donts:` when
-   there is a way it is misused (8.9.0), then `python3 .github/scripts/components_reference.py write`
-   (CI fails on a stale docs/components.md). Add a snapshot test in `Gallery/SnapshotTests` (the skeleton's in
+   there is a way it is misused (8.9.0); its `since:` is the token `vNext`, which the release bot
+   turns into the number. `python3 .github/scripts/components_reference.py build` shows the
+   page reads; the release bot writes docs/components.md after the merge. Add a snapshot test in `Gallery/SnapshotTests` (the skeleton's in
    `SkeletonsSnapshotTests`; one Liquid Glass card per snapshot; `named:` tells them apart),
    then record it with a manual CI run, `record_snapshots: missing` (docs/snapshots.md).
 5. Add any new `String(localized:)` key to `docs/localization-keys.md` and its English value
    to `Gallery/Gallery/Localizable.xcstrings`.
 6. Update `docs/design-system.md` (§0 inventory + the component's section), and add the
-   component under **Added** in the release's CHANGELOG.md section (with the app view it
-   replaces under **Migration**).
+   component under `### Added` in the PR's note in `.changes/` (with the app view it replaces
+   under `### Migration`).
 7. Push; CI must be green on the package, Gallery, snapshot, Dalada and Tenra jobs.
 
 ## API Stability & Versioning
 
 - Semantic versioning with git tags (`0.2.0`, …). Consumers pin a version (`exact:` or
   `.upToNextMinor(from:)`), never a branch.
-- **Cutting a release:** bump `VERSION` and add its section at the top of
-  [CHANGELOG.md](CHANGELOG.md) in the PR that should ship. On merge,
-  `.github/workflows/release.yml` tags that commit `X.Y.Z` and creates a GitHub Release whose
-  notes are that section (tags are created by Actions — the Claude session's git proxy only
-  pushes branches). TestFlight's Gallery build carries the same version, with the section as
-  "What to Test", and the Gallery's Updates screen shows it.
-- **A CHANGELOG section** is `## X.Y.Z - YYYY-MM-DD`, a line or two on what the release is with
-  its PR link, then the sections that apply, in this order: `### Added` (new API), `### Changed`
-  (what looks or behaves differently in an app after the bump), `### Deprecated` (old → new),
-  `### Removed` (majors only), `### Fixed`, `### Migration` (what an app changes, old → new, a
-  code block where the API changes) and `### Gallery and tooling`. English, no em dashes, one
-  level of `- ` items. CI's `Changelog` job (`.github/scripts/changelog.py check`) fails when
-  the section for `VERSION` is missing or the format is off.
+- **Cutting a release:** the PR that should ship adds a note, `.changes/<branch>-<date>-<word>.md`,
+  with `bump: patch | minor | major` (a major also `version: X.0.0`) and the release's text,
+  and writes the token `vNext` wherever it would name its version. It never edits `VERSION`,
+  the `## X.Y.Z` headings of CHANGELOG.md or docs/components.md(.json). On merge, the release
+  bot (`.github/workflows/release.yml`, `.github/scripts/release.py run`) gives the notes the
+  next number, writes the CHANGELOG section with the PR link, `VERSION` and the component
+  reference, replaces the token, commits `Release X.Y.Z`, tags it and creates the GitHub Release
+  whose notes are that section (tags are created by Actions; the Claude session's git proxy
+  only pushes branches), then starts TestFlight's Gallery build on the tag, with the section as
+  "What to Test"; the Gallery's Updates screen shows it. CI's `Changelog` job checks the branch
+  and says what a merge would release now ([docs/releasing.md](docs/releasing.md)).
+- **A release's text** (the note, then the CHANGELOG section the bot makes of it) is a line or
+  two on what the release is, then the sections that apply, in this order: `### Added` (new
+  API), `### Changed` (what looks or behaves differently in an app after the bump),
+  `### Deprecated` (old → new), `### Removed` (majors only), `### Fixed`, `### Migration` (what
+  an app changes, old → new, a code block where the API changes) and `### Gallery and tooling`.
+  English, no em dashes, one level of `- ` items. CI's `Changelog` job
+  (`.github/scripts/changelog.py check`, `release.py check`) fails when the format is off.
 - **Never remove or rename public API in a minor release.** Deprecate with
   `@available(*, deprecated, message: "… Use X.")` naming the replacement; remove only in the
   next major, once no consumer uses it. Tenra retiring a component is not a reason to delete it
@@ -384,6 +399,11 @@ rather than importing an app type.
   ask for a component), the assistant's list of actions once Tenra shows one, anatomy on the
   pages of composite cards and rows; Platina in CI's build jobs and its own DesignKit update
   workflow; the adoption proposals in [docs/adoption.md](docs/adoption.md) for the app sessions.
+- Release numbers given at merge (2026-11, the owner's decision after parallel sessions'
+  PRs collided on numbers and on `VERSION`, CHANGELOG.md and docs/components.md): a PR declares
+  its release in `.changes/`, the bot numbers, writes and tags it on `main`
+  ([docs/releasing.md](docs/releasing.md)). The PRs open at the switch (#109, #110, #111, #112)
+  went out the old way first; one still open the old way (#105) moves its section into a note.
 
 ## Reference Docs
 
@@ -397,6 +417,7 @@ rather than importing an app type.
 | Package traps (public API, Xcode 26/27, bundles) and SwiftUI layout traps | [docs/gotchas.md](docs/gotchas.md) |
 | Localized strings used by components | [docs/localization-keys.md](docs/localization-keys.md) |
 | Gallery TestFlight pipeline | [docs/testflight.md](docs/testflight.md) |
+| Cutting a release: the note in `.changes/`, the version token, what the release bot does, recovering a failed run | [docs/releasing.md](docs/releasing.md) |
 | Snapshot tests: what is covered, recording references, the pinned Xcode | [docs/snapshots.md](docs/snapshots.md) |
 | What each version added and changed, and how to move an app to it (also the Gallery's Updates screen) | [CHANGELOG.md](CHANGELOG.md) |
 | Moving an app to 2.0 (renames, `DSButton`, icon sizes, visual changes) | [docs/migration-2.0.md](docs/migration-2.0.md) |

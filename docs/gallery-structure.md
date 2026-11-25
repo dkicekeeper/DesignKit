@@ -117,7 +117,8 @@ Gallery — сколько в нём компонентов; оно считае
 4. **Как использовать**: пара строк из `design-system.md`, если есть правило.
 5. **Do and don't** (8.9.0): как надо и как не надо, по строке (`ComponentPage(dos:donts:)`). Эти
    строки, заметки, версия и приложения страницы попадают в docs/components.md и
-   docs/components.json (`.github/scripts/components_reference.py`; CI падает, если они отстали).
+   docs/components.json (`.github/scripts/components_reference.py`; их пишет релизный бот после
+   каждого слияния, PR их не трогает, docs/releasing.md).
 
 Экрана «Skeletons» больше нет: скелетон — состояние «Loading» на странице своего компонента.
 Снапшот-тесты скелетонов остаются как были.

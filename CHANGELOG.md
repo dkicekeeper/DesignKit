@@ -13,8 +13,9 @@ Each release lists what applies to it, in this order:
 - **Migration**: what to change in an app, old → new, with code where the API changes.
 - **Gallery and tooling**: the Gallery app, the tests and CI; nothing changes in an app.
 
-Versions follow semantic versioning; apps pin an exact version. A release PR bumps `VERSION` and
-adds its section here (CLAUDE.md, "API Stability & Versioning").
+Versions follow semantic versioning; apps pin an exact version. A PR declares its release in a
+note in `.changes/`; at the merge the release bot gives it the next number and writes its section
+here (docs/releasing.md).
 
 ## 8.17.1 - 2026-11-24
 

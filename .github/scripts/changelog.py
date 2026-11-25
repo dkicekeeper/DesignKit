@@ -31,15 +31,42 @@ def releases(text):
     return out
 
 
-def section(version):
-    for name, _, body in releases((ROOT / "CHANGELOG.md").read_text()):
+def section_in(text, version):
+    """A version's section in a CHANGELOG text, without its heading, or None."""
+    for name, _, body in releases(text):
         if name == version:
             return "\n".join(body).strip()
     return None
 
 
+def section(version):
+    return section_in((ROOT / "CHANGELOG.md").read_text(), version)
+
+
+def line_problem(line):
+    """What is wrong with a line of release text outside code, or None (release.py checks the
+    notes in .changes/ with it too)."""
+    if "—" in line:
+        return "an em dash; use a colon, a comma or two sentences"
+    if any(0x2700 <= ord(c) <= 0x27BF or ord(c) >= 0x1F000 for c in line):
+        # App Store Connect refuses them in TestFlight's What to Test (✓ and ✕ did, 5.0.0).
+        return "a dingbat or an emoji, which TestFlight's What to Test refuses; use words"
+    return None
+
+
 def check():
-    text = (ROOT / "CHANGELOG.md").read_text()
+    errors = problems((ROOT / "CHANGELOG.md").read_text(), (ROOT / "VERSION").read_text().strip())
+    for error in errors:
+        print(f"::error file=CHANGELOG.md::{error}")
+    if errors:
+        sys.exit(1)
+    print(f"CHANGELOG.md: {len(releases((ROOT / 'CHANGELOG.md').read_text()))} releases, "
+          f"the newest is {(ROOT / 'VERSION').read_text().strip()}")
+
+
+def problems(text, version):
+    """What is wrong with a CHANGELOG text whose VERSION is `version` (release.py checks the text
+    it writes with it before committing)."""
     errors = []
     in_code = False
     for number, line in enumerate(text.splitlines(), 1):
@@ -53,11 +80,8 @@ def check():
             errors.append(f"line {number}: unknown section {line[4:]!r} (one of {', '.join(SECTIONS)})")
         elif line.startswith("#### "):
             errors.append(f"line {number}: no headings below ###")
-        elif "—" in line:
-            errors.append(f"line {number}: an em dash; use a colon, a comma or two sentences")
-        elif any(0x2700 <= ord(c) <= 0x27BF or ord(c) >= 0x1F000 for c in line):
-            # App Store Connect refuses them in TestFlight's What to Test (✓ and ✕ did, 5.0.0).
-            errors.append(f"line {number}: a dingbat or an emoji, which TestFlight's What to Test refuses; use words")
+        elif line_problem(line):
+            errors.append(f"line {number}: {line_problem(line)}")
     if in_code:
         errors.append("a code block is not closed")
 
@@ -72,27 +96,21 @@ def check():
             errors.append(f"{newer} ({newer_date}) is dated before {older} ({older_date})")
     if len(set(keys)) != len(keys):
         errors.append("a version is listed twice")
-    for version, _, body in found:
+    for name, _, body in found:
         order = [line[4:] for line in body if line.startswith("### ")]
         if not order:
-            errors.append(f"{version} has no section")
+            errors.append(f"{name} has no section")
         if order != sorted(order, key=SECTIONS.index):
-            errors.append(f"{version}: sections go {', '.join(SECTIONS)}")
+            errors.append(f"{name}: sections go {', '.join(SECTIONS)}")
 
-    version = (ROOT / "VERSION").read_text().strip()
     if not any(name == version for name, _, _ in found):
         errors.append(
-            f"no section for VERSION {version}: a release PR adds `## {version} - YYYY-MM-DD` "
-            "to CHANGELOG.md"
+            f"no section for VERSION {version}: the release bot writes `## {version} - YYYY-MM-DD` "
+            "from the notes in .changes/ (docs/releasing.md)"
         )
     elif found[0][0] != version:
         errors.append(f"the newest section is {found[0][0]}, VERSION is {version}")
-
-    for error in errors:
-        print(f"::error file=CHANGELOG.md::{error}")
-    if errors:
-        sys.exit(1)
-    print(f"CHANGELOG.md: {len(found)} releases, the newest is {version}")
+    return errors
 
 
 def plain(text):
