@@ -67,6 +67,7 @@ that moves its pin by hand runs the script with the bump. Do not edit the block 
 | The top of a detail screen | `HeroSection`; on colour `.heroBackground(color)`, on a picture `.heroBackground(clearHeight:picture:)` (8.14.0), with `.heroScrollEdge()` on the scroll view |
 | A moment of success | `.celebration`, `.completionMoment` |
 | A screen on an iPad or a Mac | `.readableWidth()`; cards side by side in `CardList(layout: .grid)` (8.15.0) or `LazyVGrid(columns: AppLayout.cardColumns())` under `.readableWidth(AppLayout.wideWidth)`; a main column with summaries beside it in `AdaptiveColumns` (the phone's layout in `narrow:`); list and detail in `NavigationSplitView` |
+| A big moment of success over the whole app (a goal reached, a reward earned) | `MomentOverlay` through `MomentPresenter.shared.present` |
 
 ## Check before pushing
 
