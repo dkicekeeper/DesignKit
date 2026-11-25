@@ -235,7 +235,7 @@ public struct HeroSparkline<Point: ChartPoint>: View {
                     Circle()
                         .strokeBorder(tint, lineWidth: 2)
                         .frame(width: 11, height: 11)
-                        .background(Circle().fill(onColor ? Color.clear : AppColors.Background.base))
+                        .background(Circle().fill(onColor ? AnyShapeStyle(Color.clear) : AnyShapeStyle(.surfaceBackground)))
                 }
             }
 

@@ -113,6 +113,18 @@ extension ComponentSnapshots {
             )
         }
 
+        /// A forecast's ring and the selected point on a grey `.fill` card (8.20.0): their rings
+        /// take the card's grey, not the page's white.
+        @Test func forecastOnGreyCard() async {
+            await assertComponentSnapshot(
+                LineChart(dataPoints: ChartSample.monthsInProgress, series: ChartSample.incomeWithExtras,
+                          valueFormat: .currency("KZT"), todayText: "Today")
+                    .cardContentPadding()
+                    .cardStyle()
+                    .surfaceStyle(.fill)
+            )
+        }
+
         /// 8.3.0: an average and a limit across the plot (bars past it orange), records.
         @Test func referenceLinesAndRecords() async {
             await assertComponentSnapshot(

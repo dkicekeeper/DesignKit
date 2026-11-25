@@ -78,8 +78,8 @@ public struct AvatarGroup: View {
                 avatars[index]
                     .frame(width: size, height: size)
                     .clipShape(Circle())
-                    .background(AppColors.Background.base, in: Circle())
-                    .overlay(Circle().stroke(AppColors.Background.base, lineWidth: ring))
+                    .background(.surfaceBackground, in: Circle())
+                    .overlay(Circle().stroke(.surfaceBackground, lineWidth: ring))
                     .zIndex(Double(avatars.count - index))
             }
             if overflow > 0 {
@@ -89,7 +89,7 @@ public struct AvatarGroup: View {
                     .foregroundStyle(AppColors.Text.secondary)
                     .frame(width: size, height: size)
                     .background(.surfaceNeutral2, in: Circle())
-                    .overlay(Circle().stroke(AppColors.Background.base, lineWidth: ring))
+                    .overlay(Circle().stroke(.surfaceBackground, lineWidth: ring))
             }
         }
         .accessibilityElement(children: .ignore)
@@ -115,7 +115,7 @@ public struct AvatarGroupSkeleton: View {
             ForEach(0..<count, id: \.self) { index in
                 Skeleton.circle(size)
                     // The ring that separates the avatars.
-                    .overlay(Circle().stroke(AppColors.Background.base, lineWidth: 2))
+                    .overlay(Circle().stroke(.surfaceBackground, lineWidth: 2))
                     .zIndex(Double(count - index))
             }
         }
