@@ -485,6 +485,12 @@ struct HeroBackgroundHeightKey: PreferenceKey {
     }
 }
 
+/// Where the scroll view's content is: its offset and the inset above it, in whole points.
+private struct ScrollTop: Equatable {
+    let offset: CGFloat
+    let inset: CGFloat
+}
+
 private struct HeroScrollEdgeModifier: ViewModifier {
     /// Told whether the hero is under the bar (8.14.0, `.heroScrollEdge(isHeroUnderBar:)`).
     var isHeroUnderBar: Binding<Bool>? = nil
@@ -511,15 +517,19 @@ private struct HeroScrollEdgeModifier: ViewModifier {
             .onPreferenceChange(HeroIsDarkKey.self) { isDark in
                 heroIsDark = isDark
             }
-            .onScrollGeometryChange(for: CGFloat.self) { geometry in
-                (geometry.contentOffset.y + geometry.contentInsets.top).rounded()
-            } action: { _, offset in
-                scrolled = offset
-            }
-            .onScrollGeometryChange(for: CGFloat.self) { geometry in
-                geometry.contentInsets.top.rounded()
-            } action: { _, inset in
-                barInset = inset
+            .onScrollGeometryChange(for: ScrollTop.self) { geometry in
+                ScrollTop(offset: geometry.contentOffset.y.rounded(), inset: geometry.contentInsets.top.rounded())
+            } action: { _, top in
+                // The bars' inset. Pulled far enough, a `.refreshable` screen's spinner adds its
+                // height to the inset while the content stays under the finger: that is not the
+                // bars, and taking it dropped a picture hero's figure by the spinner's height
+                // mid-pull (8.17.3). So the inset grows only while the content is not pulled
+                // down, and shrinks at once (the spinner gone, a smaller bar).
+                let pulledDown = barInset > 0 && top.offset + barInset < 0
+                if barInset == 0 || top.inset < barInset || !pulledDown {
+                    barInset = top.inset
+                }
+                scrolled = top.offset + barInset
             }
             .scrollEdgeEffectHidden(colourIsUnderBar, for: .top)
             // Light bar items and status bar over a picture hero, the system's own after it.
