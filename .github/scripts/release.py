@@ -20,6 +20,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -406,9 +407,25 @@ def _publish(root, gh, repo, version, changelog_text):
         os.remove(file.name)
 
 
+# Pauses before pushing a tag again. GitHub can refuse a tag pushed right after the commit it
+# points at ("missing necessary objects", the release of 8.19.0) and take it a moment later.
+TAG_PUSH_PAUSES = (5, 15, 30)
+
+
+def _pause(seconds):
+    time.sleep(seconds)
+
+
 def _tag(root, remote, version, sha):
     _git(root, *BOT, "tag", "-a", version, sha, "-m", f"DesignKit {version}")
-    _git(root, "push", "-q", remote, f"refs/tags/{version}")
+    for pause in TAG_PUSH_PAUSES + (None,):
+        try:
+            _git(root, "push", "-q", remote, f"refs/tags/{version}")
+            return
+        except subprocess.CalledProcessError:
+            if pause is None:
+                raise
+            _pause(pause)
 
 
 def _finish(root, gh, repo, version, dispatch):
