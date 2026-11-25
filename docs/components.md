@@ -242,7 +242,7 @@ init(_ queries: [String] = [])
 
 A list too long to scan: the system search narrows it, one option or several are picked with the row's circle, and a name nothing has offers “Create”.
 
-Since 8.9.0 · Apps: Platina
+Since 8.9.0 · Apps: Dalada, Platina
 
 - `SearchablePicker` in `Sources/DesignComponents/Selection/SearchablePicker.swift`; skeleton `SearchablePickerSkeleton`
   A list to pick one option or several from, with the system search and "Create “…”".
@@ -1693,13 +1693,16 @@ init(_ text: String, arrowEdge: VerticalEdge = .bottom, arrowAlignment: TooltipA
 
 An ⓘ next to the name of a value; a tap opens a popover that explains it.
 
-Since 8.9.0 · Apps: none yet
+Since 8.9.0 · Apps: Dalada, Platina
 
 - `InfoTip` in `Sources/DesignComponents/Feedback/InfoTip.swift`
   An ⓘ button that explains the value next to it in a popover.
+- `.infoTip` in `Sources/DesignComponents/Feedback/InfoTip.swift`
+  The view with an `InfoTip` after it, on its first line: a label and its explanation.
 
 ```swift
 init(_ message: String, title: String? = nil)
+func infoTip(_ message: String, title: String? = nil) -> some View
 ```
 
 - Text("Health score").infoTip(message, title: "Health score") puts it after the label on its first line; InfoTip(message) stands anywhere.

@@ -17,6 +17,17 @@ Versions follow semantic versioning; apps pin an exact version. A PR declares it
 note in `.changes/`; at the merge the release bot gives it the next number and writes its section
 here (docs/releasing.md).
 
+## 8.18.1 - 2026-11-25
+
+The Gallery's badges follow Dalada's adoption of 8.9.0's components (Dalada#80). No API changes.
+[#118](https://github.com/dkicekeeper/DesignKit/pull/118)
+
+### Gallery and tooling
+
+- The Gallery's `SearchablePicker` badge names Dalada too: a packing list's gear, with "Create".
+- The Gallery's `InfoTip` badge names Dalada (a place's pressure over 24 hours) and Platina (a trophy's share of players). `gallery_badges.py` matches the page by `.infoTip`, the modifier an app writes after a label.
+- docs/adoption.md: what Dalada took from the 8.9.0 proposals and what it declined, with the reasons, and Platina's `InfoTip` (Platina#2); proposed: an `info:` on `StreakCard` and `RatingSummary` for an ⓘ after their title.
+
 ## 8.18.0 - 2026-11-25
 
 A moment of success over the whole app, without a card: the screen dims and blurs, a hero springs in at the centre with a title and a line under it, confetti for a celebration, the buttons at the bottom. For Tenra's assistant: Ten appears over the app when a goal is reached, a debt is settled or an accessory is earned. And `ProgressOverlay` takes a hero in its spinner's place (Ten at work over a backup's restore).
