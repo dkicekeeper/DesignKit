@@ -423,7 +423,7 @@ private struct InfoTipPage: View {
             name: "InfoTip",
             summary: "An ⓘ next to the name of a value; a tap opens a popover that explains it.",
             since: "8.9.0",
-            apps: [],
+            apps: [.dalada, .platina],
             notes: [
                 "Text(\"Health score\").infoTip(message, title: \"Health score\") puts it after the label on its first line; InfoTip(message) stands anywhere.",
                 "A sentence or two: what the value means and how it is counted. A value the person tapped is a Tooltip.",
