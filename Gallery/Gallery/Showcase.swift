@@ -120,6 +120,8 @@ extension ContainerValues {
     @Entry var showcaseTitle: String = ""
     /// Set by `ComponentPage`: the page shows one component, which the home screen counts.
     @Entry var showcaseIsComponent: Bool = false
+    /// The component's purpose, which the home screen's search reads (vNext).
+    @Entry var showcaseSummary: String = ""
 }
 
 /// How many components a screen's pages show: the number on the home screen's row, counted
@@ -232,6 +234,7 @@ struct ComponentPage<Preview: View, Controls: View>: View {
         }
         .containerValue(\.showcaseTitle, name)
         .containerValue(\.showcaseIsComponent, true)
+        .containerValue(\.showcaseSummary, summary)
     }
 }
 
