@@ -13,7 +13,7 @@ Colours by role: every colour has one name, named for where it goes. The flat na
 - `AppColors.Text.action` is the accent made readable (`readable(accent)`): links, text buttons, chosen labels and icons in a line in `MessageComposer`, `PickerCarousel`, the "Today" of `LineChart` and `BarChart`, `MessageBubble`'s retry, `CalculatorKeypad`'s operators, `ArticleBody`, `ExpandableText`, `StepTracker`, `ThumbnailCard`, `SearchablePicker`, `OptionCardPicker`, `ReactionButton`, `MonthCalendar`'s today, `PagerArrows` and `DateRangePickerSheet`. Tenra's indigo is a step lighter on a dark card, Dalada's green a step deeper on a light one; Platina's accent reads as it is.
 - `TrendBadge`'s rise, `AmountComparisonBar`, `PayoffProgressCard` and `ScheduleRow`'s "paid" mark default to `Status.positive` (the system green) instead of Tenra's income green; Tenra passes its own. `AmountComparisonBar`'s income amount is its colour made readable.
 - `CurrencyList`'s sections are `cardStyle()` cards on the caller's page (glass, or grey under `SurfaceStyle.fill`), not white cards on the grouped grey.
-- Under `SurfaceStyle.fill`, a logo's plate, `MessageComposer`'s idle buttons, `TypingIndicator`'s bubble and an unearned `AchievementMedal` follow the surface like every other container (a translucent grey on a grey card).
+- Under `SurfaceStyle.fill`, a logo's plate, `MessageComposer`'s idle buttons, `TypingIndicator`'s bubble, an unearned `AchievementMedal` and the placeholder behind a loading photo in `PhotoTile` and `PhotoCarousel` follow the surface like every other container (a translucent grey on a grey card).
 
 ### Deprecated
 - `AppColors.bgBase`, `bgCard`, `bgMuted`, `textPrimary`, `textSecondary`, `textTertiary`, `staticWhite`, `destructive`, `success`, `warning`, `planned` → the groups (`Background.page`, `.card`, `.containerStrong`, `Text.*`, `Text.primaryOnDark`, `Status.*`).
@@ -29,14 +29,14 @@ Colours by role: every colour has one name, named for where it goes. The flat na
 python3 <DesignKit>/scripts/migrate.py --from 8.18.0 --to 9.0.0 --source <App> --apply
 ```
 
-- Tenra defines its finance colours next to its adapters and passes them:
+- Tenra defines its finance colours next to its adapters, under names of its own, and passes them:
 
 ```swift
-extension AppColors {
+extension Color {
     static let income = Color(red: 0.13, green: 0.70, blue: 0.37)
     static let transfer = Color(red: 0.0, green: 0.75, blue: 0.85)
 }
-AmountComparisonBar(expenseAmount: out, incomeAmount: income, currency: "KZT", incomeColor: .income)
+AmountComparisonBar(expenseAmount: spent, incomeAmount: earned, currency: "KZT", incomeColor: .income)
 ```
 
 ### Gallery and tooling

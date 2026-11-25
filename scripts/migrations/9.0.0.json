@@ -1,28 +1,114 @@
 {
   "guide": "docs/migration-9.0.md",
   "rewrite": [
-    {"pattern": "AppColors\\.textPrimary\\b", "replace": "AppColors.Text.primary", "note": "textPrimary → Text.primary"},
-    {"pattern": "AppColors\\.textSecondary\\b", "replace": "AppColors.Text.secondary", "note": "textSecondary → Text.secondary"},
-    {"pattern": "AppColors\\.textTertiary\\b", "replace": "AppColors.Text.tertiary", "note": "textTertiary → Text.tertiary"},
-    {"pattern": "AppColors\\.staticWhite\\b", "replace": "AppColors.Text.primaryOnDark", "note": "staticWhite → Text.primaryOnDark"},
-    {"pattern": "AppColors\\.destructive\\b", "replace": "AppColors.Status.negative", "note": "destructive → Status.negative"},
-    {"pattern": "AppColors\\.success\\b", "replace": "AppColors.Status.positive", "note": "success → Status.positive"},
-    {"pattern": "AppColors\\.warning\\b", "replace": "AppColors.Status.warning", "note": "warning → Status.warning"},
-    {"pattern": "AppColors\\.planned\\b", "replace": "AppColors.Status.info", "note": "planned → Status.info"},
-    {"pattern": "AppColors\\.bgBase\\b", "replace": "AppColors.Background.page", "note": "bgBase → Background.page"},
-    {"pattern": "AppColors\\.Background\\.base\\b", "replace": "AppColors.Background.page", "note": "Background.base → .page"},
-    {"pattern": "AppColors\\.Background\\.elevation1\\b", "replace": "AppColors.Background.sheet", "note": "Background.elevation1 → .sheet"},
-    {"pattern": "AppColors\\.Background\\.elevation3\\b", "replace": "AppColors.Background.floating", "note": "Background.elevation3 → .floating"},
-    {"pattern": "\\.surfaceNeutral1\\b", "replace": "AppColors.Background.container", "note": ".surfaceNeutral1 → AppColors.Background.container"},
-    {"pattern": "\\.surfaceNeutral2\\b", "replace": "AppColors.Background.containerStrong", "note": ".surfaceNeutral2 → AppColors.Background.containerStrong"},
-    {"pattern": "(\\b[sS]urface(?:Style)?(?:\\.glass|\\.fill)?)\\.neutral1\\b", "replace": "\\1.container", "note": "SurfaceStyle.neutral1 → .container"},
-    {"pattern": "(\\b[sS]urface(?:Style)?(?:\\.glass|\\.fill)?)\\.neutral2\\b", "replace": "\\1.containerStrong", "note": "SurfaceStyle.neutral2 → .containerStrong"},
-    {"pattern": "CategoryColors\\.paletteColors\\b", "replace": "AppColors.Data.palette", "note": "CategoryColors.paletteColors → AppColors.Data.palette"},
-    {"pattern": "\\bCategoryColors\\.", "replace": "AppColors.Data.", "note": "CategoryColors → AppColors.Data"},
-    {"pattern": "\\.refreshable(\\s*[({])", "replace": ".dsRefreshable\\1", "note": ".refreshable → .dsRefreshable"}
+    {
+      "pattern": "AppColors\\.textPrimary\\b",
+      "replace": "AppColors.Text.primary",
+      "note": "textPrimary → Text.primary"
+    },
+    {
+      "pattern": "AppColors\\.textSecondary\\b",
+      "replace": "AppColors.Text.secondary",
+      "note": "textSecondary → Text.secondary"
+    },
+    {
+      "pattern": "AppColors\\.textTertiary\\b",
+      "replace": "AppColors.Text.tertiary",
+      "note": "textTertiary → Text.tertiary"
+    },
+    {
+      "pattern": "AppColors\\.staticWhite\\b",
+      "replace": "AppColors.Text.primaryOnDark",
+      "note": "staticWhite → Text.primaryOnDark"
+    },
+    {
+      "pattern": "AppColors\\.destructive\\b",
+      "replace": "AppColors.Status.negative",
+      "note": "destructive → Status.negative"
+    },
+    {
+      "pattern": "AppColors\\.success\\b",
+      "replace": "AppColors.Status.positive",
+      "note": "success → Status.positive"
+    },
+    {
+      "pattern": "AppColors\\.warning\\b",
+      "replace": "AppColors.Status.warning",
+      "note": "warning → Status.warning"
+    },
+    {
+      "pattern": "AppColors\\.planned\\b",
+      "replace": "AppColors.Status.info",
+      "note": "planned → Status.info"
+    },
+    {
+      "pattern": "AppColors\\.bgBase\\b",
+      "replace": "AppColors.Background.page",
+      "note": "bgBase → Background.page"
+    },
+    {
+      "pattern": "AppColors\\.Background\\.base\\b",
+      "replace": "AppColors.Background.page",
+      "note": "Background.base → .page"
+    },
+    {
+      "pattern": "AppColors\\.Background\\.elevation1\\b",
+      "replace": "AppColors.Background.sheet",
+      "note": "Background.elevation1 → .sheet"
+    },
+    {
+      "pattern": "AppColors\\.Background\\.elevation3\\b",
+      "replace": "AppColors.Background.floating",
+      "note": "Background.elevation3 → .floating"
+    },
+    {
+      "pattern": "\\.surfaceNeutral1\\b",
+      "replace": "AppColors.Background.container",
+      "note": ".surfaceNeutral1 → AppColors.Background.container"
+    },
+    {
+      "pattern": "\\.surfaceNeutral2\\b",
+      "replace": "AppColors.Background.containerStrong",
+      "note": ".surfaceNeutral2 → AppColors.Background.containerStrong"
+    },
+    {
+      "pattern": "(\\b[sS]urface(?:Style)?(?:\\.glass|\\.fill)?)\\.neutral1\\b",
+      "replace": "\\1.container",
+      "note": "SurfaceStyle.neutral1 → .container"
+    },
+    {
+      "pattern": "(\\b[sS]urface(?:Style)?(?:\\.glass|\\.fill)?)\\.neutral2\\b",
+      "replace": "\\1.containerStrong",
+      "note": "SurfaceStyle.neutral2 → .containerStrong"
+    },
+    {
+      "pattern": "CategoryColors\\.paletteColors\\b",
+      "replace": "AppColors.Data.palette",
+      "note": "CategoryColors.paletteColors → AppColors.Data.palette"
+    },
+    {
+      "pattern": "\\bCategoryColors\\.",
+      "replace": "AppColors.Data.",
+      "note": "CategoryColors → AppColors.Data"
+    },
+    {
+      "pattern": "\\.refreshable(\\s*[({])",
+      "replace": ".dsRefreshable\\1",
+      "note": ".refreshable → .dsRefreshable"
+    }
   ],
   "todo": [
-    {"pattern": "AppColors\\.(?:income|incomeText|expense|transfer)\\b", "note": "AppColors.income, incomeText, expense and transfer are gone: define the app's own colours (Tenra: DesignKitBridge.swift) and pass them (incomeColor:, progressColor:, doneColor:)"},
-    {"pattern": "AppColors\\.(?:bgCard|bgMuted)\\b|AppColors\\.Background\\.(?:neutral1|neutral2|fill|elevation2)\\b", "note": "An opaque grey surface is AppColors.Background.card; a shape inside a card is AppColors.Background.container / .containerStrong (SurfaceStyle.container where a Color is needed); elevation2 is .sheet or .floating"}
+    {
+      "pattern": "AppColors\\.(?:income|incomeText|expense|transfer)\\b",
+      "note": "AppColors.income, incomeText, expense and transfer are gone: define the app's own colours (Tenra: DesignKitBridge.swift) and pass them (incomeColor:, progressColor:, doneColor:)"
+    },
+    {
+      "pattern": "AppColors\\.(?:bgCard|bgMuted)\\b|AppColors\\.Background\\.(?:neutral1|neutral2|fill|elevation2)\\b",
+      "note": "An opaque grey surface is AppColors.Background.card; a shape inside a card is AppColors.Background.container / .containerStrong (SurfaceStyle.container where a Color is needed); elevation2 is .sheet or .floating"
+    },
+    {
+      "pattern": "\\bSurfaceNeutral\\b",
+      "note": "SurfaceNeutral is gone: AppColors.Background.container / .containerStrong (SurfaceContainer(.standard) / SurfaceContainer(.strong))"
+    }
   ]
 }

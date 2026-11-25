@@ -670,21 +670,21 @@ private struct TransactionRowPage: View {
         case 1:
             TransactionRow(
                 .entry(title: "Salary", account: kaspi),
-                icon: .sfSymbol("banknote.fill"), iconTint: .monochrome(GallerySamples.income),
-                iconBackground: AppColors.pale(GallerySamples.income),
+                icon: .sfSymbol("banknote.fill"), iconTint: .monochrome(GallerySamples.incomeColor),
+                iconBackground: AppColors.pale(GallerySamples.incomeColor),
                 badgeSystemImage: showsBadge ? "arrow.clockwise" : nil,
-                amounts: [.init(450_000, currency: "KZT", prefix: "+", color: GallerySamples.income)],
+                amounts: [.init(450_000, currency: "KZT", prefix: "+", color: GallerySamples.incomeColor)],
                 isPending: isPending,
                 accessibilityLabel: "Salary, 450 000 tenge, Kaspi Gold"
             )
         case 2:
             TransactionRow(
                 .transfer(from: kaspi, to: deposit),
-                icon: .sfSymbol("arrow.left.arrow.right"), iconTint: .monochrome(GallerySamples.transfer),
-                iconBackground: AppColors.pale(GallerySamples.transfer),
+                icon: .sfSymbol("arrow.left.arrow.right"), iconTint: .monochrome(GallerySamples.transferColor),
+                iconBackground: AppColors.pale(GallerySamples.transferColor),
                 amounts: [
                     .init(100_000, currency: "KZT", prefix: "-", color: AppColors.Text.primary),
-                    .init(100_000, currency: "KZT", prefix: "+", color: GallerySamples.income),
+                    .init(100_000, currency: "KZT", prefix: "+", color: GallerySamples.incomeColor),
                 ],
                 isPending: isPending,
                 accessibilityLabel: "Transfer, 100 000 tenge, from Kaspi Gold to Halyk Deposit"

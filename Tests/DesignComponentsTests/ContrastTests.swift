@@ -37,7 +37,7 @@ struct ContrastTests {
             for (mode, traits) in Self.modes {
                 let onPale = AppColors.contrastRatio(status.text, status.pale, in: traits)
                 #expect(onPale >= Self.minimum, "\(status.name) on its pale, \(mode): \(onPale)")
-                let onPage = AppColors.contrastRatio(status.text, AppColors.Background.base, in: traits)
+                let onPage = AppColors.contrastRatio(status.text, AppColors.Background.page, in: traits)
                 #expect(onPage >= Self.minimum, "\(status.name) on the page, \(mode): \(onPage)")
             }
         }
@@ -52,7 +52,7 @@ struct ContrastTests {
         ]
         for (name, color) in tokens {
             for (mode, traits) in Self.modes {
-                let ratio = AppColors.contrastRatio(color, AppColors.Background.base, in: traits)
+                let ratio = AppColors.contrastRatio(color, AppColors.Background.page, in: traits)
                 #expect(ratio >= Self.minimum, "\(name), \(mode): \(ratio)")
             }
         }
@@ -60,7 +60,7 @@ struct ContrastTests {
 
     @Test("Any category colour made readable reads on its own tint")
     func readableCategoryColours() {
-        let colours = CategoryColors.paletteColors + CategoryColors.pickerPalette.map { Color(hex: $0) }
+        let colours = AppColors.Data.palette + AppColors.Data.pickerPalette.map { Color(hex: $0) }
         for (index, colour) in colours.enumerated() {
             for (mode, traits) in Self.modes {
                 let ratio = AppColors.contrastRatio(AppColors.readable(colour), AppColors.pale(colour), in: traits)

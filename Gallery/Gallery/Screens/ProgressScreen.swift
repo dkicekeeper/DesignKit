@@ -108,7 +108,7 @@ private struct ProportionBarPage: View {
             if state == .loading {
                 ProportionBarSkeleton()
             } else {
-                ProportionBar(ratio: ratio, leftColor: GallerySamples.income, rightColor: SurfaceStyle.glass.containerStrong)
+                ProportionBar(ratio: ratio, leftColor: GallerySamples.incomeColor, rightColor: SurfaceStyle.glass.containerStrong)
             }
         } controls: {
             StateControl(state: $state)

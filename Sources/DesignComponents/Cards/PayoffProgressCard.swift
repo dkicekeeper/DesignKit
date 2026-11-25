@@ -168,12 +168,13 @@ public extension PayoffProgressCard where Accessory == EmptyView {
         total: Double,
         currency: String,
         progress: Double,
-        phase: Phase
+        phase: Phase,
+        progressColor: Color = AppColors.Status.positive
     ) {
         self.init(
             iconSource: iconSource, title: title, subtitle: subtitle,
             remaining: remaining, total: total, currency: currency,
-            progress: progress, phase: phase
+            progress: progress, phase: phase, progressColor: progressColor
         ) { EmptyView() }
     }
 }

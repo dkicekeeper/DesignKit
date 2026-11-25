@@ -13,15 +13,15 @@ import DesignComponents
 enum GallerySamples {
     /// Money in and a transfer, as Tenra defines them in its DesignKitBridge (DesignKit has no
     /// finance colours since vNext): what a finance app passes to the money components.
-    static let income = Color(red: 0.13, green: 0.70, blue: 0.37)
-    static let transfer = Color(red: 0.0, green: 0.75, blue: 0.85)
+    static let incomeColor = Color(red: 0.13, green: 0.70, blue: 0.37)
+    static let transferColor = Color(red: 0.0, green: 0.75, blue: 0.85)
 
     /// Spending by category, shares adding up to 100.
     static let slices: [DonutSlice] = [
         DonutSlice(id: "food", amount: 42_000, color: AppColors.accent, label: "Food", percentage: 42),
         DonutSlice(id: "rent", amount: 30_000, color: AppColors.Status.positive, label: "Rent", percentage: 30),
         DonutSlice(id: "fun", amount: 18_000, color: AppColors.Status.warning, label: "Fun", percentage: 18),
-        DonutSlice(id: "misc", amount: 10_000, color: GallerySamples.transfer, label: "Misc", percentage: 10),
+        DonutSlice(id: "misc", amount: 10_000, color: GallerySamples.transferColor, label: "Misc", percentage: 10),
     ]
 
     /// Category tiles: within the limit, over it, no limit.
