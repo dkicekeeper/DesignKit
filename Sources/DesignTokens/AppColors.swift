@@ -101,67 +101,23 @@ public enum AppColors {
 
 // MARK: - Category Color Palette
 
-/// Цвета для категорий транзакций — hash-based assignment из палитры
+/// The colour of a name, by hash, and the colours a person picks. Deprecated (vNext): the same
+/// colours as `AppColors.Data`, which names them for any data, not one app's categories.
+@available(*, deprecated, message: "Use AppColors.Data (color(for:opacity:), paletteIndex(for:), palette, pickerPalette).")
 public struct CategoryColors {
-    /// The hash palette as RGB values. Its size and order are frozen: `paletteIndex` maps a
-    /// name to a slot by `hash % count`, so growing or reordering it would re-colour every
-    /// category and avatar that relies on the name hash. New colours go to `pickerExtraRGB`.
-    private nonisolated static let hashPaletteRGB: [UInt64] = [
-        0x3b82f6, 0x8b5cf6, 0xec4899, 0xf97316, 0xeab308,
-        0x22c55e, 0x14b8a6, 0x06b6d4, 0x6366f1, 0xd946ef,
-        0xf43f5e, 0xa855f7, 0x10b981, 0xf59e0b
-    ]
+    /// The colours a user can pick: `AppColors.Data.pickerPalette`.
+    public nonisolated static var pickerPalette: [String] { AppColors.Data.pickerPalette }
 
-    /// Colours offered in the picker only, never hashed into: deeper and neutral shades
-    /// (sky, petrol, deep teal, forest, lime, olive, ochre, rust, maroon, berry, plum,
-    /// deep violet, lavender, navy, slate, stone). Chosen to stay at least as distinct from
-    /// each other and from the hash palette as the hash palette's own closest pairs, and to
-    /// keep at least 2.7:1 against white and 2.3:1 against a dark card.
-    private nonisolated static let pickerExtraRGB: [UInt64] = [
-        0x0ea5e9, 0x0e7490, 0x0f766e, 0x15803d, 0x65a30d, 0x4d7c0f,
-        0xa16207, 0x9a3412, 0xb91c1c, 0xbe185d, 0xa21caf, 0x6d28d9,
-        0xa78bfa, 0x1d4ed8, 0x64748b, 0x78716c
-    ]
+    /// The 14 hash palette colours: `AppColors.Data.palette`.
+    public nonisolated static var paletteColors: [Color] { AppColors.Data.palette }
 
-    /// Pre-computed color palette (avoids hex parsing on every call)
-    private nonisolated static let palette: [Color] = hashPaletteRGB.map { rgb in
-        Color(
-            red:   Double((rgb & 0xFF0000) >> 16) / 255.0,
-            green: Double((rgb & 0x00FF00) >> 8)  / 255.0,
-            blue:  Double( rgb & 0x0000FF)         / 255.0
-        )
-    }
-
-    /// The colours a user can pick for a category (`UniversalRow(accessory: .colors)`'s default), as the
-    /// lowercase `#rrggbb` strings apps store: the 14 palette colours first, in palette order,
-    /// so every fallback colour can also be chosen explicitly, then 16 deeper and neutral shades.
-    public nonisolated static let pickerPalette: [String] = (hashPaletteRGB + pickerExtraRGB).map { rgb in
-        let digits = String(rgb, radix: 16)
-        return "#" + String(repeating: "0", count: max(0, 6 - digits.count)) + digits
-    }
-
-    /// The 14 palette colours in order: what categories hash into, and what an app's own
-    /// name-coloured visuals (letter avatars) draw from, so both share one palette.
-    public nonisolated static var paletteColors: [Color] { palette }
-
-    /// The colour of a name that has none stored, hashed into the 14 palette colours: a
-    /// category before the user picks one, an insight's item, a letter avatar.
-    /// (DesignKit drops Tenra's custom-category override; the palette is the single source.)
-    /// `hexColor(for:)` before 2.1.0: it returns a colour, not a hex string.
+    /// The colour of a name: `AppColors.Data.color(for:opacity:)`.
     public nonisolated static func color(for name: String, opacity: Double = 1.0) -> Color {
-        palette[paletteIndex(for: name)].opacity(opacity)
+        AppColors.Data.color(for: name, opacity: opacity)
     }
 
-    /// Palette slot for a category name: the same on every launch and every device.
-    ///
-    /// FNV-1a over the UTF-8 bytes. Until 0.7.0 this used `String.hashValue`, which Swift seeds
-    /// per process, so a category's fallback colour changed on every launch.
+    /// The palette slot of a name: `AppColors.Data.paletteIndex(for:)`.
     public nonisolated static func paletteIndex(for category: String) -> Int {
-        var hash: UInt64 = 0xcbf2_9ce4_8422_2325
-        for byte in category.utf8 {
-            hash ^= UInt64(byte)
-            hash = hash &* 0x0000_0100_0000_01b3
-        }
-        return Int(hash % UInt64(palette.count))
+        AppColors.Data.paletteIndex(for: category)
     }
 }
