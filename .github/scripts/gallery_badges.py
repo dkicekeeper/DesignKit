@@ -47,6 +47,8 @@ ALIASES = {
     "AmountRow: a list of limits": ["AmountRow"],
     "MessageComposer": [".messageComposerAccessory", "MessageComposerAccessory"],
     "HeroBackground": [".heroBackground", ".heroScrollEdge"],
+    # The modifier puts it after a label (Dalada's pressure, 8.9.0).
+    "InfoTip": [".infoTip"],
     ".heroBackground": [".heroScrollEdge"],
     "LoadMoreFooter": [".onReachEnd"],
     "ShimmerModifier": [".shimmer"],

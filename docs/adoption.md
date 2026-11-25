@@ -52,20 +52,21 @@ dropped it since), `.textReveal`, `.staggeredEntrance`, `.hapticCue`, `ScrambleT
 ## 8.9.0: proposals for the new components
 
 Benchmark round 4 (docs/benchmark.md, against Meta's Astryx) added these. Where they went by
-2026-11-24 (Tenra's column by 2026-11-25, when its session decided each proposal), and what is
-still a proposal:
+2026-11-25, and what is still a proposal. Dalada decided its part in
+[Dalada#80](https://github.com/dkicekeeper/Dalada/pull/80) and Tenra its part in
+[Tenra#164](https://github.com/dkicekeeper/Tenra/pull/164) (taken, or declined with the reason):
 
 | Component | Tenra | Dalada | Platina |
 |---|---|---|---|
-| `InfoTip` | declined: every figure proposed explains itself on its screen (Financial Health's weighting card and each part's explanation, "How it's calculated" on the forecast and "For today", By day's footnote), and every figure on Analytics is a link to that screen, where an ⓘ would be a button inside a button | proposed: a route's difficulty, a rating, a streak's rule | proposed: a trophy's rarity (the share of players who earned it) |
+| `InfoTip` | declined: every figure proposed explains itself on its screen (Financial Health's weighting card and each part's explanation, "How it's calculated" on the forecast and "For today", By day's footnote), and every figure on Analytics is a link to that screen, where an ⓘ would be a button inside a button | uses it: a place's pressure over 24 hours and when it is steady (`.infoTip`). Declined where proposed: routes have no difficulty, and `StreakCard` and `RatingSummary` take strings only, with no place after a label for an ⓘ (proposed: an `info:` on both cards) | the share of players who earned a trophy: over its rarest trophies, and by the counter on a trophy's screen (`StatsStrip`'s `info:`, 8.19.0, with its next pin) |
 | `RelativeTime` | uses it | uses it | uses it |
-| `SearchablePicker` | the subcategory picker of the transaction forms (several, with "Create"; one to link from a category's subcategories); declined for the category (the form's chip row; a category needs its icon and colour) and link payments (transactions, with their amounts and days) | proposed: a trip's gear (several, with "Create"), a place's type | uses it |
-| `MessageBubble(markdown:time:status:)` | `MessageBubble` with plain text for the person's questions; Ten's replies stay on the page between their cards, their Markdown read by `ArticleBody.Block.parse(markdown:)` (in place of Tenra's copy); time and status declined (nothing is delivered to a person; the day lines say when) | proposed: a thread's messages with time and "Read" | Plati's answers in Markdown |
-| `ConversationDivider` | the chat's days, once a thread is not all from today (every kept message keeps its date); "Ten changed the budget" declined: the draft card says Saved, with Undo | proposed: a thread's days, "Alex joined" | uses it |
+| `SearchablePicker` | the subcategory picker of the transaction forms (several, with "Create"; one to link from a category's subcategories); declined for the category (the form's chip row; a category needs its icon and colour) and link payments (transactions, with their amounts and days) | uses it: gear for a packing list (several, with "Create"). Declined: a place's type, nine fixed types in a menu row | uses it |
+| `MessageBubble(markdown:time:status:)` | `MessageBubble` with plain text for the person's questions; Ten's replies stay on the page between their cards, their Markdown read by `ArticleBody.Block.parse(markdown:)` (in place of Tenra's copy); time and status declined (nothing is delivered to a person; the day lines say when) | declined: a thread is a public discussion of `CommentRow`s (author, avatar, quote, reactions), with no read state and no chat | Plati's answers in Markdown |
+| `ConversationDivider` | the chat's days, once a thread is not all from today (every kept message keeps its date); "Ten changed the budget" declined: the draft card says Saved, with Undo | declined: each `CommentRow` shows its own time, and nobody joins a public thread | uses it |
 | `AccessibilityAnnouncer` | "Saved" when the add form, a transaction's edit or an account's top-up or transfer closes on save; "Import complete, N operations" when a statement's review closes; backups and restores speak through their `MessageBanner` | uses it | uses it |
-| `AppColors.Status.*Text`, `AppColors.readable` | proposed: its own status texts on tints (a category's badge) | proposed: rule statuses, map legends on a tint | proposed: a trophy's grade on its tint |
+| `AppColors.Status.*Text`, `AppColors.readable` | proposed: its own status texts on tints (a category's badge) | uses it: its own status text and marks (errors, a paused trip, off route, "pending", verified). Its rule statuses are `Badge` and `RecommendationBox`, readable already; it has no map legend | a trophy row's metal and earned date on the grey card (the metals read at 2.1 to 3.6:1 as text) |
 | `scripts/designkit_lint.py` | runs it in CI and after each pin bump | the same | runs it in CI |
-| `scripts/sync_agents_block.py` | its CLAUDE.md, after each pin bump in `designkit.yml` | the same | its CLAUDE.md carries the block; moves its pin by hand |
+| `scripts/sync_agents_block.py` | its CLAUDE.md, after each pin bump in `designkit.yml` | the same | its CLAUDE.md, after each pin bump in its `designkit.yml` (since 2026-11-25) |
 
 ## Platina
 
@@ -74,8 +75,9 @@ grey surfaces (`DesignKitTheme.surface = .fill`, 8.12.0) and in a column on the 
 (`.readableWidth()`, 8.13.0); the Gallery's pages carry its badge since 8.17.1. The first app to
 use `SearchablePicker`, `ConversationDivider`, `MessageBubble(markdown:)`, `.readableWidth()` and
 `.heroBackground(clearHeight:picture:)` (its game screen, 8.14.0); its profile puts its sections
-side by side on an iPad (`AppLayout.cardColumns`) and its play days in a `CalendarHeatmap`. Not used
-yet, where it could: `InfoTip` by a trophy's rarity.
+side by side on an iPad (`AppLayout.cardColumns`) and its play days in a `CalendarHeatmap`. Since
+Platina#2 an `InfoTip` explains the share of players who earned a trophy, over its rarest trophies
+and, with `StatsStrip`'s `info:` (8.19.0), by the counter on a trophy's screen.
 
 ## Ten (ParticleCreature) in Tenra
 

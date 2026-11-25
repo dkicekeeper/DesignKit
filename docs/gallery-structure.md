@@ -81,12 +81,25 @@ Gallery — сколько в нём компонентов; оно считае
 | **Cards: Content** | `ThreadCard`, `ReviewCard`, `ThumbnailCard`, `RecommendationBox`, `EmptyCard`, `RatingSummary` (4.1.0) | M3 Containment |
 | **Charts** | `LineChart`, `BarChart`, `ChartSwitcher`, `CalendarHeatmap` (8.3.0), `HeroSparkline`, `Sparkline`, `OrbChart`, `ChartSelectionBanner`, `ChartZoomControls` | HIG Content (Charts) |
 | **Progress & Gauges** | `LinearProgressBar`, `ProgressRing`, `ProportionBar`, `MiniProportionBar`, `HeroProportionBar`, `AmountComparisonBar`, `MiniDonut`, `MiniHalfGauge`, `HeroHalfGauge` (стиль `.bleed` и тон с 4.2.0), `MiniMilestoneGauge`, `HeroMilestoneGauge`, `MiniBarPair`, `HeroBarPair`, `MiniBars` (8.3.0) | HIG Status (gauges, progress) |
-| **Status & Feedback** | `Badge`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `.spotlight` (2.6.0), `TypingIndicator`, `EmptyState`, `StepTracker`, `ImportProgressSheet`, `.progressOverlay` (2.9.0), примитивы скелетонов (`Skeleton`, `SkeletonText`, `SkeletonRow`), `PendingItemCard` (3.6.0), `LoadMoreFooter` (4.1.0), `NoticeCard` (4.14.0), `InfoTip` (8.9.0) | M3 Communication, Atlassian Messaging + Loading |
+| **Status & Feedback** | `Badge`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `.spotlight` (2.6.0), `TypingIndicator`, `EmptyState`, `StepTracker`, `ImportProgressSheet`, `.progressOverlay` (2.9.0), примитивы скелетонов (`Skeleton`, `SkeletonText`, `SkeletonRow`), `PendingItemCard` (3.6.0), `LoadMoreFooter` (4.1.0), `NoticeCard` (4.14.0), `InfoTip` (8.9.0), `MomentOverlay` и `MomentPresenter` (8.18.0) | M3 Communication, Atlassian Messaging + Loading |
 | **Headers & Navigation** | `SectionHeader` (три стиля, `.card` с 2.0.0; с 3.2.0 иконки до и после заголовка в каждом, `.list` стал `.compact`, удалён в 4.0.0; `.compact` удалён в 8.0.0), `HeroSection`, `UniversalCarousel`, `OnboardingStepIndicator`, `PlusTabLabel`, `CreatureTabLabel` (4.8.0), `LiveSessionBar` (2.8.0), `PagerArrows` (2.9.0) | M3 Navigation, HIG Navigation and search |
 | **Media & Identity** | `Icon` (символы, картинки, логотипы брендов), `Avatar`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIcons`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ThumbnailPlaceholder`, `SquareImageCropper` (8.5.0), фото (2.8.0: `PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `PhotoViewer`; 3.1.0: `RemotePhoto`), `ShareCardFrame`, `ParticleCreature` (4.6.0), `CreatureGlyph` (4.8.0) | Atlassian Images and icons |
 | **Content & Layout** | `ExpandableText`, `ActivityTimeline`, `MonthCalendar`, `FlowLayout`, `FormSection`, `CardList` (8.0.0), `EditSheetContainer`, `EditableHero`, `ArticleBody` (2.8.0), `MessageBubble` (4.6.0), `ConversationDivider`, `RelativeTime` (8.9.0), `.readableWidth()` · `AppLayout` (8.13.0), `AdaptiveColumns` (8.15.0); `FormSection`'s glass style took 4.14.0's `ListCard` page (5.0.0), and since 8.0.0 every section is glass (or the grey of `SurfaceStyle.fill`, 8.12.0) | HIG Layout and organization |
 | **Sheets & Flows** | `PromptSheet` (и праймер разрешения), `NotificationPermissionPrompt`, `OnboardingPager`, `OnboardingPage`, `OnboardingPageContainer`, `LoopOnboardingHero`, `ShareCardSheet` (2.8.0), `DateRangePickerSheet` (2.9.0), `AmountEntrySheet` (4.14.0) | HIG Presentation, M3 Containment (sheets) |
 | **Effects** | `.celebration`, `.sparkleBurst`, `.shine`, `.attentionPulse`, `AuroraBackground`, `.interactiveTilt` (2.2.0), `.completionMoment`, `.ripple` / `.rippleOnTap` (2.3.0), `VoiceWave`, `EdgeGlow` (вместо `SiriGlow`, `SiriWave`, удалены в 3.0.0), `.thinkingShimmer` (2.4.0), `.grain` (2.5.0), `.holographic`, `.dissolve` (2.6.0), `.accentGlow`, `.borderBeam` / `.borderGlow`, `.heroBackground` (4.5.0), `.heroBackground(picture:)` (8.14.0) | — (своё: Liquid Glass, Siri) |
+
+Последний раздел главной — **Patterns** (8.17.4, docs/benchmark.md 24): целые экраны из
+компонентов, как их описывает §4 design-system.md, на образцах данных и без модели приложения.
+Настройки (`FormSection` из `UniversalRow`, экран выбора с галочкой), деталь (`HeroSection`,
+две `DSButton`, факты в `FormSection`, день истории из `TransactionRow`), то, что человек хранит
+(`CardList` с панелью, его скелетон, `EmptyState` пустой и с ошибкой — переключатель состояния
+внизу), дашборд (`StatsStrip`, `BalanceCard` в карусели, `CashFlowCard`, `ProgressRingTileGrid`),
+переписка (`MessageBubble`, `ConversationDivider`, `TypingIndicator`, `SuggestionChips`,
+`MessageComposer`), шторка редактирования (`EditSheetContainer` над `FormSection`,
+`InlineStatusText`) и онбординг (`OnboardingPager`). Страниц компонентов в нём нет, поэтому
+справка (docs/components.md) и бейджи его не читают; каждый экран держит `.readableWidth()`.
+Новый паттерн — экран в `PatternsScreen.swift` и строка в его списке, только из публичных
+компонентов DesignKit.
 
 Правило для нового компонента: раздел выбирается по тому, **что компонент делает**
 (действие, ввод, выбор, показ данных, статус, навигация), а если это строка или карточка — по

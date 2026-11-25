@@ -34,6 +34,7 @@ struct FeedbackScreen: View {
         StepTrackerPage()
         ImportProgressSheetPage()
         ProgressOverlayPage()
+        MomentOverlayPage()
         PendingItemCardPage()
         NoticeCardPage()
         LoadMoreFooterPage()
@@ -422,7 +423,7 @@ private struct InfoTipPage: View {
             name: "InfoTip",
             summary: "An ⓘ next to the name of a value; a tap opens a popover that explains it.",
             since: "8.9.0",
-            apps: [],
+            apps: [.dalada, .platina],
             notes: [
                 "Text(\"Health score\").infoTip(message, title: \"Health score\") puts it after the label on its first line; InfoTip(message) stands anywhere.",
                 "A sentence or two: what the value means and how it is counted. A value the person tapped is a Tooltip.",
@@ -630,6 +631,8 @@ private struct SkeletonPrimitivesPage: View {
 private struct ProgressOverlayPage: View {
     @State private var isPresented = false
     @State private var showsMessage = true
+    @State private var withHero = false
+    @State private var progress = 0.6
 
     var body: some View {
         ComponentPage(
@@ -637,27 +640,187 @@ private struct ProgressOverlayPage: View {
             summary: "The screen waits for something it cannot do without: it dims, and a material panel shows a spinner, what is happening and what it means.",
             since: "2.9.0",
             apps: [.tenra],
-            canvas: .tall(minHeight: 260),
-            notes: ["For a restore, a migration, an import that must finish first. Disable the screen under it at the call site."]
+            canvas: .tall(minHeight: 340),
+            notes: [
+                "For a restore, a migration, an import that must finish first. Disable the screen under it at the call site.",
+                "hero: (8.18.0) takes the spinner's place: a view that shows the progress itself, such as a ParticleCreature in .working(progress:), sized by the host.",
+            ]
         ) {
-            VStack(spacing: AppSpacing.md) {
+            let screen = VStack(spacing: AppSpacing.md) {
                 Text("Settings")
                     .font(AppTypography.h3)
                 Button(isPresented ? "Finish" : "Restore a backup") { isPresented.toggle() }
                     .dsButton(.secondary)
                     .zIndex(3)
             }
-            .frame(maxWidth: .infinity, minHeight: 220)
-            .progressOverlay(
-                isPresented: isPresented,
-                title: "Restoring the backup",
-                message: showsMessage ? "Your data will be back in a moment." : nil
-            )
+            .frame(maxWidth: .infinity, minHeight: 300)
+            let message = showsMessage ? "Your data will be back in a moment." : nil
+            Group {
+                if withHero {
+                    screen.progressOverlay(isPresented: isPresented, title: "Restoring the backup", message: message) {
+                        ParticleCreature(mood: .working(progress: progress))
+                            .frame(width: 120, height: 120)
+                    }
+                } else {
+                    screen.progressOverlay(isPresented: isPresented, title: "Restoring the backup", message: message)
+                }
+            }
             .animation(AppAnimation.gentleSpring, value: isPresented)
         } controls: {
             ToggleControl("Shown", isOn: $isPresented)
             ToggleControl("Message", isOn: $showsMessage)
+            ToggleControl("With hero", isOn: $withHero)
+            if withHero {
+                SliderControl("Progress", value: $progress, in: 0...1)
+            }
         }
+    }
+}
+
+private struct MomentOverlayPage: View {
+    @State private var title = "Goal reached"
+    @State private var showsMessage = true
+    @State private var celebrates = true
+    @State private var hasPrimary = true
+    @State private var hasReward = false
+    @State private var mood: ParticleCreature.Mood = .celebrating
+    @State private var isShown = true
+    @State private var replays = 0
+    @State private var log = ""
+
+    var body: some View {
+        ComponentPage(
+            name: "MomentOverlay · MomentPresenter",
+            summary: "A moment of success over the whole screen, without a card: the screen dims and blurs, the hero springs in with a title and a line under it, confetti for a celebration, buttons at the bottom.",
+            since: "8.18.0",
+            // Tenra takes it with its stage-1 commit after this release; the badge follows then.
+            apps: [.tenra],
+            canvas: .fill,
+            notes: [
+                "MomentPresenter.shared.present { MomentOverlay(…) } shows it over the whole app, sheets, tab bar and navigation included, in a window of its own; it refuses while another moment is up.",
+                "Every close plays the exit first. The primary button runs primary.action; any other close (the dismiss button, a tap outside the hero and the buttons, a swipe down, VoiceOver's escape) runs onDismiss. In the presenter the window goes before the action, so the action may navigate or open a sheet.",
+                "celebrates: confetti behind the hero and the success haptic; otherwise a light tap. Under Reduce Motion it comes and goes by opacity only; the haptic stays.",
+                "The hero is sized by the host and read by VoiceOver with the title. The title and the message are announced, and focus moves into the moment.",
+                "No skeleton: a moment shows no data that loads. No strings of its own: every text comes from the host.",
+                "The blur is a material over the app's windows; check it on a device.",
+            ],
+            dos: [
+                "Only good news: a goal reached, a debt settled, a month inside the budgets, a reward earned.",
+                "One at a time: queue the next moment in the presenter's onDismissed.",
+                "A title of a few words and a line or two; the hero and the reward say the rest.",
+            ],
+            donts: [
+                "A warning, an error or anything the person must act on: that is a StatusBanner, a MessageBanner or an alert.",
+                "A moment for every small step: a like or a saved form is a .sparkleBurst or a MessageBanner.",
+                "Buttons inside the hero: the action is primary:, what the moment gives is reward:.",
+            ]
+        ) {
+            ZStack {
+                backdrop
+                if isShown {
+                    moment { outcome in
+                        log = outcome
+                        isShown = false
+                    }
+                    .id(replays)
+                } else {
+                    DSButton("Show the moment", appearance: .secondary) {
+                        replays += 1
+                        isShown = true
+                    }
+                }
+            }
+            .frame(height: 560)
+            .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+            if !log.isEmpty {
+                Text(log)
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.Text.tertiary)
+            }
+        } controls: {
+            TextControl("Title", text: $title)
+            ToggleControl("Message", isOn: $showsMessage)
+            ToggleControl("Celebrates", isOn: $celebrates)
+            ToggleControl("Primary button", isOn: $hasPrimary)
+            ToggleControl("Reward", isOn: $hasReward)
+            ChoiceControl("Hero mood", selection: $mood, options: [
+                ("Celebrating", .celebrating), ("Proud", .proud), ("Love", .love), ("Happy", .happy),
+            ])
+            ActionControl("Replay", systemImage: "arrow.counterclockwise") {
+                replays += 1
+                isShown = true
+            }
+            ActionControl("Show over everything", systemImage: "rectangle.stack") {
+                let shown = MomentPresenter.shared.present(onDismissed: { log += ", then onDismissed" }) {
+                    moment { outcome in log = outcome }
+                }
+                if !shown { log = "Not shown: another moment is up" }
+            }
+        }
+    }
+
+    /// The moment in the page's controls; `closed` hears which way it closed.
+    @ViewBuilder
+    private func moment(closed: @escaping (String) -> Void) -> some View {
+        let primary = hasPrimary ? MomentAction("See the goal") { closed("primary.action") } : nil
+        let message = showsMessage ? "A new bike: 250 000 saved, two months early." : nil
+        if hasReward {
+            MomentOverlay(
+                title: title,
+                message: message,
+                celebrates: celebrates,
+                primary: primary,
+                dismissTitle: "Close",
+                onDismiss: { closed("onDismiss") }
+            ) {
+                hero
+            } reward: {
+                HStack(spacing: AppSpacing.md) {
+                    Icon(source: .sfSymbol("crown.fill"), size: AppIconSize.Tile.sm)
+                    VStack(alignment: .leading, spacing: AppSpacing.xxs) {
+                        Text("A crown")
+                            .font(AppTypography.bodyEmphasis)
+                        Text("Earned for the goal")
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppColors.Text.secondary)
+                    }
+                }
+                .padding(AppSpacing.md)
+                .cardStyle(radius: AppRadius.lg)
+            }
+        } else {
+            MomentOverlay(
+                title: title,
+                message: message,
+                celebrates: celebrates,
+                primary: primary,
+                dismissTitle: "Close",
+                onDismiss: { closed("onDismiss") }
+            ) {
+                hero
+            }
+        }
+    }
+
+    private var hero: some View {
+        ParticleCreature(mood: mood)
+            .frame(width: 200, height: 200)
+    }
+
+    /// A screen of the app under the moment.
+    private var backdrop: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
+            Text("Goals")
+                .font(AppTypography.h1)
+            ForEach(["New bike", "Holiday", "Laptop"], id: \.self) { name in
+                ItemRow(name, meta: [MetaLine([.text("250 000 ₸"), .text("Due in May")])],
+                        leading: .symbol("target"), verticalPadding: 0)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(AppSpacing.lg)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background(AppColors.Background.base)
     }
 }
 
