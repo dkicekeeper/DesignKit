@@ -2,12 +2,14 @@ name: CI
 
 # Сборка пакета, Gallery и приложений-потребителей на macOS. Код DesignKit часто пишется в
 # облачном контейнере на Linux, где SwiftUI не собрать: ошибки компиляции видны здесь.
+#
+# The macOS jobs run only when the change can affect what they build: the `What to build` job
+# decides (.github/scripts/ci_changes.py). A change of docs, release notes or tooling runs the
+# Linux jobs alone, and the pull_request run of a claude/** branch leaves the build to the push
+# run of the same commit. The account runs a few macOS jobs at a time, shared with the apps.
 on:
   push:
     branches: [main, "claude/**"]
-    paths-ignore:
-      - "**.md"
-      - "docs/**"
   pull_request:
   workflow_dispatch:
     inputs:
@@ -31,6 +33,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Whether this run needs the macOS jobs below (ci_changes.py): not for a change of docs, release
+  # notes or tooling, not in the pull_request run of a claude/** branch (its push run builds the
+  # same commit); a manual run always does. A skipped job shows as skipped, not failed.
+  changes:
+    name: What to build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      build: ${{ steps.decide.outputs.build }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # main and the pushed commits, to list what changed
+          filter: blob:none
+      - name: Decide
+        id: decide
+        run: python3 .github/scripts/ci_changes.py github
+
   # CHANGELOG.md is well formed and has a section for VERSION; on a branch, its release note in
   # .changes/ is well formed and it leaves the release bot's files alone (release.yml numbers,
   # writes and publishes the release at merge; the Gallery's Updates screen shows it).
@@ -50,6 +70,7 @@ jobs:
           python3 scripts/test_designkit_lint.py
           python3 scripts/test_migrate.py
           python3 .github/scripts/test_release.py
+          python3 .github/scripts/test_ci_changes.py
       # docs/components.md and .json follow the Gallery's pages and the sources (8.9.0); the
       # release bot writes them on main after each merge, so here they only have to build.
       - name: Build the component reference
@@ -94,6 +115,8 @@ jobs:
 
   package:
     name: Package + Gallery
+    needs: changes
+    if: needs.changes.outputs.build == 'true'
     runs-on: macos-26
     timeout-minutes: 45
     steps:
@@ -157,6 +180,8 @@ jobs:
 
   xcode27:
     name: Package on Xcode 27
+    needs: changes
+    if: needs.changes.outputs.build == 'true'
     runs-on: macos-26
     timeout-minutes: 30
     steps:
@@ -193,6 +218,8 @@ jobs:
 
   snapshots:
     name: Snapshot tests
+    needs: changes
+    if: needs.changes.outputs.build == 'true'
     runs-on: macos-26
     # A recording run of every test took 48 minutes in October 2026 (7.0.0).
     timeout-minutes: 75
@@ -273,6 +300,8 @@ jobs:
 
   dalada:
     name: Dalada against this DesignKit
+    needs: changes
+    if: needs.changes.outputs.build == 'true'
     runs-on: macos-26
     timeout-minutes: 60
     steps:
@@ -320,6 +349,8 @@ jobs:
   # of DesignKit: a change that would break it fails here, as for Dalada and Tenra.
   platina:
     name: Platina against this DesignKit
+    needs: changes
+    if: needs.changes.outputs.build == 'true'
     runs-on: xcode-27
     timeout-minutes: 60
     steps:
@@ -371,6 +402,8 @@ jobs:
 
   tenra:
     name: Tenra against this DesignKit
+    needs: changes
+    if: needs.changes.outputs.build == 'true'
     runs-on: macos-26
     timeout-minutes: 60
     steps:
