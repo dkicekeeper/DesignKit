@@ -106,6 +106,14 @@ class VersionTests(unittest.TestCase):
         self.assertEqual(list(c.sections), ["Added", "Fixed", "Gallery and tooling"])
         self.assertEqual(c.sections["Gallery and tooling"], ["- A snapshot.", "- A snapshot."])
 
+    def test_combine_keeps_paragraphs_apart(self):
+        prose = lambda text: release.parse_fragment(  # noqa: E731
+            f"---\nbump: patch\n---\nIntro.\n\n### Migration\n\n{text}\n")
+        c = release.combine([prose("Nothing to change."), prose("Rename the call."), prose("- An item.")])
+        self.assertEqual(c.sections["Migration"], ["Nothing to change.", "", "Rename the call.", "", "- An item."])
+        items = release.combine([prose("- One."), prose("- Two.")])
+        self.assertEqual(items.sections["Migration"], ["- One.", "- Two."])
+
     def test_section_and_insert(self):
         head = "# Changelog\n\nPreamble.\n\n## 8.14.0 - 2026-11-24\n\nOld.\n"
         self.assertEqual(release.release_date("2026-11-23", head), "2026-11-24")
@@ -385,13 +393,38 @@ class BotTests(unittest.TestCase):
         self.assertEqual(len(git(self.remote, "log", "--format=%s", "main").splitlines()), 4)
 
     def test_run_two_notes_make_one_release(self):
-        self.merge_pr(121, {".changes/b.md": FIX})
+        self.merge_pr(121, {".changes/b.md": FIX.replace("- A snapshot.", "- The fix's snapshot.")})
         self.merge_pr(122, {".changes/a.md": NOTE})
         self.assertEqual(self.run_bot(), "8.15.0")
         changelog_text = self.remote_file("CHANGELOG.md")
         self.assertIn("A fix.\n\nA share card names its app.\n[#121](https://github.com/o/r/pull/121), [#122](https://github.com/o/r/pull/122)\n", changelog_text)
         self.assertEqual(self.remote_tags(), ["8.14.0", "8.15.0"])
         self.assertEqual(git(self.remote, "ls-tree", "--name-only", "main", ".changes/").strip(), "")
+        self.assertLess(changelog_text.index("- The fix's snapshot."), changelog_text.index("- A snapshot."))
+
+    def test_run_leftover_and_note_in_one_run(self):
+        section = "## 8.15.0 - 2026-11-25\n\nLeft over.\n\n### Fixed\n\n- X.\n\n"
+        release_sha = commit(self.dev, {"VERSION": "8.15.0\n",
+                                        "CHANGELOG.md": CHANGELOG.replace("## 8.14.0", section + "## 8.14.0")}, "Release 8.15.0")
+        git(self.dev, "push", "-q", "origin", "main")
+        self.merge_pr(130, {".changes/a.md": NOTE})
+        self.assertEqual(self.run_bot(), "8.16.0")
+        self.assertEqual(git(self.remote, "rev-parse", "8.15.0^{commit}").strip(), release_sha)
+        self.assertEqual(self.remote_tags(), ["8.14.0", "8.15.0", "8.16.0"])
+        self.assertEqual(self.gh.released(), ["8.15.0", "8.16.0"])
+
+    def test_run_refuses_a_token_the_reference_brings_back(self):
+        self.merge_pr(120, {".changes/a.md": NOTE})
+        before = git(self.remote, "rev-parse", "main")
+        with self.assertRaises(release.ReleaseError):
+            self.run_bot(regen=lambda root: write(root, "docs/components.md", "Since vNext.\n"))
+        self.assertEqual(git(self.remote, "rev-parse", "main"), before)
+
+    def test_run_leaves_untracked_files_alone(self):
+        self.merge_pr(120, {".changes/a.md": NOTE})
+        write(self.bot, "stray.log", "left by a tool\n")
+        self.assertEqual(self.run_bot(), "8.15.0")
+        self.assertNotIn("stray.log", git(self.remote, "ls-tree", "--name-only", "main").split())
 
     def test_run_refuses_major_mismatch(self):
         self.merge_pr(120, {".changes/a.md": NOTE.replace("bump: minor", "bump: major\nversion: 10.0.0")})
