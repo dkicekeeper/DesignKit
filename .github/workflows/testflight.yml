@@ -56,7 +56,9 @@ jobs:
             echo "ready=false" >> "$GITHUB_OUTPUT"
           elif [ -z "$missing" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
-          elif [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+          elif [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ "$GITHUB_ACTOR" != "github-actions[bot]" ]; then
+            # A person asked for this build: say why there is none. The release bot's own
+            # dispatch skips like a push, so a missing key never turns a release red.
             echo "::error::Missing secrets:$missing (docs/testflight.md)"
             exit 1
           else

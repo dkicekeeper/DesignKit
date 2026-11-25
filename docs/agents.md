@@ -4,8 +4,8 @@ The short version of DesignKit's rules for a session working in Tenra, Dalada or
 round 4: Astryx's `init`, which writes such a block into an app's AGENTS.md). Each app's
 **DesignKit update** workflow puts this file into the app's CLAUDE.md between the
 `designkit:agents` markers when it moves the pin (`scripts/sync_agents_block.py`), so it always
-matches the version the app builds with; an app that moves its pin by hand (Platina) runs the
-script with the bump. Do not edit the block in the app; change it here.
+matches the version the app builds with (Tenra, Dalada and, since 2026-11-25, Platina); an app
+that moves its pin by hand runs the script with the bump. Do not edit the block in the app; change it here.
 
 ## Look a component up
 
@@ -13,8 +13,8 @@ script with the bump. Do not edit the block in the app; change it here.
   for, its initialisers, rules, do and don't, its skeleton. `docs/components.json` is the same as
   data. The full rules: `docs/design-system.md`.
 - The Gallery app (TestFlight) shows every component with its parameters and states.
-- A missing component goes to DesignKit by PR (CLAUDE.md, "Porting a component"); the app keeps a
-  thin adapter over its model.
+- A missing component goes to DesignKit by PR (CLAUDE.md, "Porting a component"), or by an issue
+  from the "Component request" template; the app keeps a thin adapter over its model.
 
 ## The rules
 

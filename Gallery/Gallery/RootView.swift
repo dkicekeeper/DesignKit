@@ -92,6 +92,11 @@ struct RootView: View {
                 } header: {
                     Text("Structure & Effects")
                 }
+                Section {
+                    row(PatternsScreen.title, "rectangle.3.group.fill", .orange) { PatternsScreen() }
+                } footer: {
+                    Text("Whole screens made of the components: settings, a detail, a list, a dashboard, a conversation, an edit sheet, onboarding.")
+                }
             }
             .navigationTitle("DesignKit")
             .toolbar {
