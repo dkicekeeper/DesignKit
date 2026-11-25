@@ -141,6 +141,43 @@ extension ComponentSnapshots {
             )
         }
 
+        /// Knockouts on a grey `.fill` card (8.20.0): the rings between avatars and round the
+        /// calendar's markers take the card's grey, not the page's white.
+        @Test func knockoutsOnGreyCard() async {
+            await assertComponentSnapshot(
+                AvatarGroup(names: ["Ayan", "Dana", "Marat", "Aru", "Timur", "Saule"], maxVisible: 4, size: 40)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .cardContentPadding()
+                    .cardStyle()
+                    .surfaceStyle(.fill),
+                named: "avatarGroup"
+            )
+
+            var calendar = Calendar(identifier: .gregorian)
+            calendar.firstWeekday = 2
+            calendar.locale = Locale(identifier: "en_US")
+            let today = calendar.date(from: DateComponents(year: 2026, month: 6, day: 17))!
+            let range = CalendarRange(today: today, calendar: calendar)
+            let byDay = range.itemsByDay(CalendarSample.items) { item, _ in
+                [calendar.date(from: DateComponents(year: 2026, month: 6, day: item.day))!]
+            }
+            await assertComponentSnapshot(
+                MonthCalendar(range: range, itemsByDay: byDay, itemName: { $0.name }) { item in
+                    Image(systemName: item.symbol)
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(AppColors.staticWhite)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(item.color)
+                } accessory: { period in
+                    Badge(period.kind == .week ? "Week" : "Month")
+                }
+                .cardContentPadding()
+                .cardStyle()
+                .surfaceStyle(.fill),
+                named: "monthCalendar"
+            )
+        }
+
         @Test func textAndFlow() async {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {

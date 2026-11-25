@@ -68,6 +68,11 @@ public struct ShareCardSheet<Model, Card: View>: View {
     }
 
     public var body: some View {
+        sheetBody.startsOnPage()
+    }
+
+    /// The sheet; `body` starts it again on the page (`.surfaceBackground`, 8.20.0).
+    @ViewBuilder private var sheetBody: some View {
         NavigationStack {
             VStack(spacing: AppSpacing.lg) {
                 if formats.count > 1 {

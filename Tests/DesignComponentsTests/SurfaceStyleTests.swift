@@ -8,7 +8,7 @@
 
 import SwiftUI
 import Testing
-import DesignTokens
+@testable import DesignTokens
 import DesignSupport
 
 @Suite("Surface style")
@@ -35,6 +35,32 @@ struct SurfaceStyleTests {
         #expect(SurfaceStyle.fill.neutral1 == AppColors.Background.fill)
         #expect(SurfaceStyle.fill.neutral1 != AppColors.Background.neutral1)
         #expect(SurfaceStyle.fill.neutral2 != AppColors.Background.neutral2)
+    }
+
+    /// A ring or disc that cuts a shape out (`.surfaceBackground`) is the colour of what lies
+    /// under it: the page, or the grey of a `.fill` card, never white on grey.
+    @Test("A knockout is the page's colour off a card")
+    func surfaceBackgroundDefaultsToPage() {
+        var values = EnvironmentValues()
+        values.surfaceStyle = .fill
+        #expect(values.surfaceBackground == AppColors.Background.base)
+    }
+
+    @Test("On a grey card a knockout is the card's grey")
+    func surfaceBackgroundFollowsCard() {
+        var values = EnvironmentValues()
+        values.surfaceStyle = .fill
+        values.isOnCard = true
+        #expect(values.surfaceBackground == AppColors.Background.neutral1)
+    }
+
+    @Test("On a glass card a knockout stays the page's colour")
+    func surfaceBackgroundOnGlassCard() {
+        var values = EnvironmentValues()
+        values.surfaceStyle = .glass
+        values.isOnCard = true
+        #expect(values.surfaceBackground == AppColors.Background.base)
+        #expect(SurfaceBackground().resolve(in: values) == AppColors.Background.base)
     }
 
     /// `Icon` maps a preset's plate to the surface's grey by comparing it with the token.

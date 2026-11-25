@@ -298,6 +298,8 @@ struct CreatureSpeechWords: View {
     let anchor: UnitPoint
     let mouth: CGSize
     let textDirection: LayoutDirection
+    /// The halo round the letters is the surface they float over (8.20.0).
+    @Environment(\.surfaceBackground) var surfaceBackground
 
     var body: some View {
         let schedule = CreatureSpeechTiming.schedule(speech.text)
@@ -334,6 +336,7 @@ struct CreatureSpeechWords: View {
                 anchor: anchor,
                 mouth: mouth,
                 sparkle: color,
+                halo: surfaceBackground,
                 glow: glows ? color.opacity(0.55) : nil,
                 trail: speech.isThought(emotion),
                 dots: speech.symbol.map { CreatureSymbolDots.shared.dots(for: $0) }
@@ -358,6 +361,8 @@ struct CreatureSpeechRenderer: TextRenderer {
     let anchor: UnitPoint
     let mouth: CGSize
     let sparkle: Color
+    /// The halo round each letter: the colour of the surface under the words (8.20.0).
+    var halo: Color = AppColors.Background.base
     /// A glow of the words' colour round them, in the dark.
     var glow: Color?
     /// Three dots of light from the head to the words: a thought (4.11.0).
@@ -396,8 +401,8 @@ struct CreatureSpeechRenderer: TextRenderer {
         if let glow {
             context.addFilter(.shadow(color: glow, radius: CreatureSpeechMetrics.glowRadius))
         }
-        context.addFilter(.shadow(color: AppColors.Background.base, radius: CreatureSpeechMetrics.haloRadius))
-        context.addFilter(.shadow(color: AppColors.Background.base, radius: CreatureSpeechMetrics.haloRadius))
+        context.addFilter(.shadow(color: halo, radius: CreatureSpeechMetrics.haloRadius))
+        context.addFilter(.shadow(color: halo, radius: CreatureSpeechMetrics.haloRadius))
 
         var index = 0
         for line in layout {

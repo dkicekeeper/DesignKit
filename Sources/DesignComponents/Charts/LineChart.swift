@@ -430,7 +430,7 @@ struct ChartForecastRing: View {
     var body: some View {
         Circle()
             .strokeBorder(color, lineWidth: 2)
-            .background(Circle().fill(AppColors.Background.base))
+            .background(Circle().fill(.surfaceBackground))
             .frame(width: 11, height: 11)
     }
 }

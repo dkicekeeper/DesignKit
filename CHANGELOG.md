@@ -17,6 +17,33 @@ Versions follow semantic versioning; apps pin an exact version. A PR declares it
 note in `.changes/`; at the merge the release bot gives it the next number and writes its section
 here (docs/releasing.md).
 
+## 8.20.1 - 2026-11-25
+
+The Gallery and docs/adoption.md follow Tenra's decisions on 8.9.0's components. No API changes.
+[#119](https://github.com/dkicekeeper/DesignKit/pull/119)
+
+### Gallery and tooling
+
+- Tenra's badge on the `MomentOverlay` · `MomentPresenter` page: Ten's moments over the app (8.18.0). Its badges on `SearchablePicker` (its subcategory picker) and `ConversationDivider` (the day lines in Ten's chat) came with 8.19.0.
+- docs/adoption.md: Tenra's column of the 8.9.0 table says what it took (`SearchablePicker`, `ConversationDivider`, `AccessibilityAnnouncer`, and `ArticleBody.Block.parse(markdown:)` for Ten's replies) and why it declined the rest (`InfoTip`, `MessageBubble(markdown:)` with time and status for Ten's replies, a "Ten changed the budget" line, `SearchablePicker` for the category and link payments).
+
+## 8.20.0 - 2026-11-25
+
+Rings and discs that cut a shape out of a card take the card's colour, so grey cards show no white rings.
+[#121](https://github.com/dkicekeeper/DesignKit/pull/121)
+
+### Added
+
+- `.surfaceBackground` (`SurfaceBackground`) and `EnvironmentValues.surfaceBackground`: the colour of the surface under a view, the page's or, inside a `cardStyle()` card under `SurfaceStyle.fill`, the card's grey. For a ring or a disc that cuts a shape out of whatever lies under it.
+
+### Fixed
+
+- `AvatarGroup`, `MonthCalendar`'s markers, `LineChart`'s forecast ring and selected point, `HeroSparkline`'s forecast point, the ticks of `HeroHalfGauge` and `MiniHalfGauge`, `TransactionRow`'s badge and the halo of `ParticleCreature`'s words drew their ring in the page's colour: white rings on a grey `.fill` card (Dalada, Platina). They follow the surface now; glass cards look as before. DesignKit's sheets (`EditSheetContainer`, `PromptSheet`, `DateRangePickerSheet`, `ShareCardSheet`) start again on the page, so a sheet presented from a row in a card does not take the card's grey.
+
+### Gallery and tooling
+
+- Snapshots of `AvatarGroup` and `MonthCalendar` (`DisplaySnapshotTests.knockoutsOnGreyCard`) and of a `LineChart` with a forecast (`ChartsSnapshotTests.forecastOnGreyCard`) on a grey card.
+
 ## 8.19.0 - 2026-11-25
 
 A counter of a `StatsStrip` can explain itself: `info:` puts an `InfoTip` after its caption. Platina's trophy screen explains a trophy's share of players this way, and Platina is the first app to use `InfoTip`.

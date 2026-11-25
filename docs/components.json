@@ -3223,7 +3223,9 @@
     "section": "Status & Feedback",
     "summary": "A moment of success over the whole screen, without a card: the screen dims and blurs, the hero springs in with a title and a line under it, confetti for a celebration, buttons at the bottom.",
     "since": "8.18.0",
-    "apps": [],
+    "apps": [
+      "Tenra"
+    ],
     "styles": [],
     "notes": [
       "MomentPresenter.shared.present { MomentOverlay(…) } shows it over the whole app, sheets, tab bar and navigation included, in a window of its own; it refuses while another moment is up.",
