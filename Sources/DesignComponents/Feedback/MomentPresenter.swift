@@ -2,7 +2,7 @@
 //  MomentPresenter.swift
 //  DesignKit
 //
-//  Shows a `MomentOverlay` over the whole app (vNext): in a window of its own above the app's
+//  Shows a `MomentOverlay` over the whole app (8.18.0): in a window of its own above the app's
 //  windows, so over its sheets (they live in the app's main window), the tab bar and navigation,
 //  and below system alerts. The window exists only while a moment is up; afterwards it is torn
 //  down, so touches reach the app whenever no moment is shown.

@@ -2,7 +2,7 @@
 //  OverlaySnapshotTests.swift
 //  DesignKit Gallery snapshot tests
 //
-//  What covers a whole screen (vNext): `MomentOverlay` over a screen of an app, with and without
+//  What covers a whole screen (8.18.0): `MomentOverlay` over a screen of an app, with and without
 //  its primary button and reward, and `ProgressOverlay` with a hero in its spinner's place. Each
 //  hero is a still `HeroSymbol` (the creature moves on a clock); the confetti draws nothing with
 //  motion off, so a celebration looks like a quiet moment here.
