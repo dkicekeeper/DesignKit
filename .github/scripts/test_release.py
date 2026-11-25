@@ -9,6 +9,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -520,6 +521,28 @@ class BotTests(unittest.TestCase):
         status, out = self.run_cli()
         self.assertEqual(status, 1)
         self.assertIn("HTTP 403", out)
+
+    def test_run_retries_a_rejected_tag_push(self):
+        # GitHub can refuse a tag right after the commit it points at ("missing necessary
+        # objects"), the release of 8.19.0: the bot pushes it again after a pause.
+        self.merge_pr(120, {".changes/a.md": NOTE})
+        real_git, pauses, refused = release._git, [], []
+
+        def flaky_git(root, *args):
+            if args[:2] == ("push", "-q") and args[-1].startswith("refs/tags/") and not refused:
+                refused.append(args[-1])
+                raise subprocess.CalledProcessError(1, ["git", *args], stderr="! [remote rejected] (missing necessary objects)")
+            return real_git(root, *args)
+
+        release._git, release._pause = flaky_git, pauses.append
+        try:
+            self.assertEqual(self.run_bot(), "8.15.0")
+        finally:
+            release._git, release._pause = real_git, time.sleep
+        self.assertEqual(refused, ["refs/tags/8.15.0"])
+        self.assertEqual(pauses, [release.TAG_PUSH_PAUSES[0]])
+        self.assertEqual(self.remote_tags(), ["8.14.0", "8.15.0"])
+        self.assertEqual(self.gh.released(), ["8.15.0"])
 
     def test_run_retries_after_rejected_push(self):
         self.merge_pr(120, {".changes/a.md": NOTE})

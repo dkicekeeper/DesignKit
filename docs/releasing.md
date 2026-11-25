@@ -67,8 +67,9 @@ one run at a time. Starting from the newest `main`, it:
    (`changelog.py`'s rules, no bare token left) before it commits;
 5. commits `Release X.Y.Z` as `github-actions[bot]` and pushes it; if `main` moved on meanwhile,
    it starts again from the new `main` (the new note joins this release);
-6. tags the commit, publishes the GitHub Release with the section and the compare link, and
-   starts the TestFlight build on the tag.
+6. tags the commit (a tag GitHub refuses right after the commit, "missing necessary objects", is
+   pushed again after 5, 15 and 30 seconds), publishes the GitHub Release with the section and the
+   compare link, and starts the TestFlight build on the tag.
 
 Notes that meet in one run (quick merges) make one release: the highest bump, their intros and
 items in merge order, all their PR links. Their code is in one commit already.
