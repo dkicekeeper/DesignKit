@@ -75,6 +75,8 @@ struct ComponentLink: Hashable, Identifiable, Sendable {
     /// The page's title ("Rating · RatingPicker").
     let page: String
     let screen: GalleryScreen
+    /// What the component is for (vNext): the search reads it.
+    var summary: String = ""
 
     var id: String { page }
 }
@@ -82,20 +84,25 @@ struct ComponentLink: Hashable, Identifiable, Sendable {
 /// Component names → their pages.
 struct ComponentIndex: Equatable, Sendable {
     private var links: [String: ComponentLink] = [:]
+    /// Every page once, in the order the screens list them (vNext): the search's order.
+    private var ordered: [ComponentLink] = []
 
     var isEmpty: Bool { links.isEmpty }
 
     /// Files a page under each name its title gives: "Rating · RatingPicker" under both,
     /// "Mini/HeroBarPair" under `MiniBarPair` and `HeroBarPair`, ".cascadeIn(index:)" under
     /// `.cascadeIn`.
-    mutating func register(page: String, on screen: GalleryScreen) {
+    mutating func register(page: String, summary: String = "", on screen: GalleryScreen) {
+        if !ordered.contains(where: { $0.page == page }) {
+            ordered.append(ComponentLink(page: page, screen: screen, summary: summary))
+        }
         for part in page.components(separatedBy: " · ") {
             let name = Self.bareName(part)
             let names = name.hasPrefix("Mini/Hero")
                 ? ["Mini" + name.dropFirst(9), "Hero" + name.dropFirst(9)]
                 : [name]
             for name in names where links[name] == nil && !name.contains(" ") {
-                links[name] = ComponentLink(page: page, screen: screen)
+                links[name] = ComponentLink(page: page, screen: screen, summary: summary)
             }
         }
     }
@@ -115,6 +122,39 @@ struct ComponentIndex: Equatable, Sendable {
     func links(for release: Changelog.Release) -> [ComponentLink] {
         var seen = Set<ComponentLink>()
         return release.codeSpans.compactMap(link(for:)).filter { seen.insert($0).inserted }
+    }
+
+    /// The pages a search finds (vNext): a name equal to the text first, then names that start
+    /// with it, then names that contain it, then summaries that contain it; each page once, in
+    /// the screens' order within a rank. Case and diacritics do not count; a skeleton, a 1.x
+    /// name with `View` and a `.ds` modifier find their component, as in `link(for:)`.
+    func search(_ text: String) -> [ComponentLink] {
+        let query = Self.fold(text.trimmingCharacters(in: .whitespacesAndNewlines))
+        guard !query.isEmpty else { return [] }
+        var variants = [query]
+        if query.hasSuffix("skeleton") { variants.append(String(query.dropLast(8))) }
+        if query.hasSuffix("view") { variants.append(String(query.dropLast(4))) }
+        if query.hasPrefix(".ds") { variants.append(String(query.dropFirst(3))) }
+        variants = variants.filter { !$0.isEmpty }
+
+        var found: [(rank: Int, order: Int, link: ComponentLink)] = []
+        for (order, link) in ordered.enumerated() {
+            let names = link.page.components(separatedBy: " · ").map { Self.fold(Self.bareName($0)) }
+            var rank: Int?
+            for variant in variants {
+                for name in names {
+                    let match = name == variant ? 0 : name.hasPrefix(variant) ? 1 : name.contains(variant) ? 2 : nil
+                    if let match { rank = min(rank ?? match, match) }
+                }
+            }
+            if rank == nil, Self.fold(link.summary).contains(query) { rank = 3 }
+            if let rank { found.append((rank, order, link)) }
+        }
+        return found.sorted { ($0.rank, $0.order) < ($1.rank, $1.order) }.map(\.link)
+    }
+
+    private static func fold(_ text: String) -> String {
+        text.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: nil)
     }
 
     /// A name without its arguments: `RatingSummary(average:…)` → `RatingSummary`.
@@ -141,7 +181,8 @@ struct ComponentIndexReader: View {
                 Group(subviews: screen.pages) { subviews in
                     Color.clear.onAppear {
                         for subview in subviews where subview.containerValues.showcaseIsComponent {
-                            index.register(page: subview.containerValues.showcaseTitle, on: screen)
+                            index.register(page: subview.containerValues.showcaseTitle,
+                                           summary: subview.containerValues.showcaseSummary, on: screen)
                         }
                     }
                 }
@@ -151,5 +192,37 @@ struct ComponentIndexReader: View {
         .opacity(0)
         .allowsHitTesting(false)
         .accessibilityHidden(true)
+    }
+}
+
+/// The foundation screens of the home screen (vNext), which the search finds by title.
+enum GalleryFoundation: String, CaseIterable, Identifiable, Sendable {
+    case colors = "Colors"
+    case typography = "Typography"
+    case spacing = "Spacing & Radius"
+    case iconSizes = "Icon Sizes"
+    case surfaces = "Surfaces"
+    case motion = "Motion"
+
+    var id: String { rawValue }
+
+    /// The foundations whose title contains `text`, case and diacritics aside.
+    static func matching(_ text: String) -> [GalleryFoundation] {
+        let query = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return [] }
+        return allCases.filter {
+            $0.rawValue.range(of: query, options: [.caseInsensitive, .diacriticInsensitive]) != nil
+        }
+    }
+
+    @ViewBuilder var destination: some View {
+        switch self {
+        case .colors: ColorsScreen()
+        case .typography: TypographyScreen()
+        case .spacing: SpacingScreen()
+        case .iconSizes: IconSizesScreen()
+        case .surfaces: SurfacesScreen()
+        case .motion: MotionScreen()
+        }
     }
 }
