@@ -17,6 +17,15 @@ Versions follow semantic versioning; apps pin an exact version. A PR declares it
 note in `.changes/`; at the merge the release bot gives it the next number and writes its section
 here (docs/releasing.md).
 
+## 8.17.3 - 2026-11-25
+
+A picture hero's figure no longer jumps when a screen is pulled to refresh. Found by the owner on Platina's game screen.
+[#115](https://github.com/dkicekeeper/DesignKit/pull/115)
+
+### Fixed
+
+- `.heroScrollEdge()`: pulled far enough, a `.refreshable` screen's spinner adds its height to the scroll view's top inset while the content stays under the finger. The hero read it as taller bars, so the figure of `.heroBackground(picture:subject:)` dropped by the spinner's height mid-pull while the picture behind it did not. The bars' inset now grows only while the content is not pulled down, and the scroll is counted from it, so the figure and the picture stretch together through the refresh.
+
 ## 8.17.2 - 2026-11-25
 
 Release numbers are given at merge: a PR declares its release in a note in `.changes/` and writes `vNext` where its version goes, and a bot on `main` numbers, writes and tags it. Parallel PRs no longer collide on numbers or conflict over `VERSION`, CHANGELOG.md and docs/components.md. This release is the bot's first.
