@@ -17,6 +17,134 @@ Versions follow semantic versioning; apps pin an exact version. A PR declares it
 note in `.changes/`; at the merge the release bot gives it the next number and writes its section
 here (docs/releasing.md).
 
+## 8.17.1 - 2026-11-24
+
+The Gallery and the docs brought up to date with the three apps: Platina's badges on the pages it uses, usage notes that still gave advice from before 8.0.0, and the plans in one place. No API changes.
+[#111](https://github.com/dkicekeeper/DesignKit/pull/111)
+
+### Fixed
+
+- Doc comments that still gave advice from before 8.0.0: `cardStyle()` is the card for forms too (a menu inside opens from its row) and `formCardStyle()` is a Material card for a host that wants one; `DownloadRow` and `AmountRow` put Delete in a long press (`.contextMenu`, or the rows in a `CardList`), not in swipe actions.
+
+### Migration
+
+Nothing to change. The agents block (docs/agents.md, which an app's CLAUDE.md takes with the bump) gains a row for the top of a detail screen: `HeroSection` on colour (`.heroBackground(color)`) or on a picture (`.heroBackground(clearHeight:picture:)`), with `.heroScrollEdge()`.
+
+### Gallery and tooling
+
+- Platina is a consumer the Gallery knows: its badge on the 67 pages whose components its code uses (`ConsumerApp.platina`), and its accent (#3573BA) in the toolbar's theme menu.
+- Tenra's badge on `ShareCardFrame`, `ShareCardSheet` and `StatsStrip`, which its year in review uses.
+- CI's Gallery badges job checks Platina's code out with Tenra's and Dalada's (`platina_ref` for a manual run); `gallery_badges.py` takes `--platina`. When an app declares a type of a page's name (Platina's PSN model `Avatar`), only a file that imports one of DesignKit's modules counts. `SurfaceStyle` is matched by `DesignKitTheme.surface` and `SquareImageCropper` by `DesignKitIconPhotos.save`, the hooks that bring them in.
+- Gallery texts: `SectionHeader` lists its three styles (`.compact` went in 8.0.0); `DownloadRow` deletes with a long press and pads itself in a card; `.cardStyle()` and `.formCardStyle()` agree that menus open from a glass card; `FormSection`, `CardList` and `.filterChipStyle()` name the grey fill of 8.12.0; `AmountVisibilityToggle` no longer says Tenra uses it; `ItemRow` names where the three apps use it.
+- docs/components.md and .json carry Platina among the apps. docs/adoption.md is checked against the three apps' code (Tenra hints with `.spotlight` and no longer uses `TypingIndicator`; Dalada dropped `.dissolve` and `PlusTabLabel`; where 8.9.0's components went; a section for Platina). CLAUDE.md's consumers follow, and its Known Gaps lists what is next: benchmark round 4's P3 candidates, the assistant's list of actions, Platina in CI's build jobs and its own update workflow.
+- docs/design-system.md, docs/gallery-structure.md, docs/benchmark.md and docs/testflight.md: the swipe advice, `FormSection(style: .glass)` and the two-app wording that were left from earlier versions; TestFlight's What to Test is the version's notes on a release build.
+
+## 8.17.0 - 2026-11-24
+
+A picture hero in two layers: a cut-out figure standing in front of its backdrop, as a game's page on a PlayStation stands its hero before its world. On a phone the figure shows whole under the bars, where the same art drawn into one wide cover and cropped to the phone's width showed a shoulder; scrolled, the figure rises in front of the backdrop. For Platina's game screen (the owner's review of its mockup with three games).
+[#112](https://github.com/dkicekeeper/DesignKit/pull/112)
+
+### Added
+
+- `.heroBackground(clearHeight:picture:subject:)`: `subject` is a cut-out figure (a picture with a transparent background) in front of `picture`, the backdrop it was drawn for. It gets a square as wide as the hero, or as tall as the hero below the bars where that is less (an iPad, a Mac window), centred, its top at the bars' foot; it is sharp in the clear part and blurred and darkened with the backdrop under the hero's text. Scrolled up, the backdrop lags behind the content by half and the figure by a quarter, so the figure rises in front of it (still under Reduce Motion and `.designKitMotion(false)`); pulled down, both grow with the pull.
+- `RemotePhotoLoading.hidden`: nothing while the photo loads, nor when it fails or has no URL, for a cut-out figure over another picture, which then shows alone. `.heroBackground(picture:subject:)` sets it on its figure.
+
+### Migration
+
+Nothing to change: `.heroBackground(clearHeight:picture:)` looks as before. A screen with a figure and its backdrop passes both:
+
+```swift
+GameHero(game)
+    .heroBackground(clearHeight: 256) {
+        RemotePhoto(key: "backdrop-\(game.id)", url: game.backdropURL)
+    } subject: {
+        RemotePhoto(key: "character-\(game.id)", url: game.characterURL)
+    }
+```
+
+An app that switches over `RemotePhotoLoading` adds the `.hidden` case.
+
+### Gallery and tooling
+
+- Gallery: Effects › `.heroBackground(picture:)` has a "Figure" switch: the sample's backdrop with a hiker in front of it, on the page and in "Open as a screen". Media › `RemotePhoto`'s "While loading" has "Hidden".
+- A snapshot of a hero with a figure in front of its backdrop (`heroOnPictureWithSubject`).
+
+## 8.16.0 - 2026-11-24
+
+A shared picture says which app it is from: the app's icon before its name in the brand line, and the name in Inter. For Tenra's year in review, whose picture goes to Stories and chats.
+[#110](https://github.com/dkicekeeper/DesignKit/pull/110)
+
+### Added
+
+- `ShareCardFrame(format:brand:brandIcon:site:photo:style:content:)`: `brandIcon` is the app's icon, drawn 30 pt before the name in the home screen's rounded square (continuous corners, 22.5 % of its side). Without it the brand line is as before.
+- `ShareCard.BrandTypeface` (`.rounded`, `.inter`) and `ShareCard.Style(top:bottom:accent:brandTypeface:)`: `.inter` sets the name in Inter bold; `.rounded` (the default) keeps the rounded heavy name.
+
+### Migration
+
+Nothing to change in code: a card without the new arguments looks as before. An app that wants its icon on the picture adds the icon as an image set (an app icon set cannot be read as an image) and passes it:
+
+```swift
+ShareCardFrame(
+    format: .story,
+    brand: "Tenra",
+    brandIcon: UIImage(named: "LaunchIcon"),
+    style: ShareCard.Style(top: …, bottom: …, accent: …, brandTypeface: .inter)
+) { … }
+```
+
+### Gallery and tooling
+
+- Gallery: Media › `ShareCardFrame` has "App icon" and "Name" (Rounded, Inter) controls, with a stand-in icon.
+- A snapshot of a post with the icon and the name in Inter (`shareCardFrameBrandIcon`, `brandIcon`).
+
+## 8.15.0 - 2026-11-24
+
+A main column with a side column beside it on a large screen, and a `CardList` in a grid: on an iPad a game's trophies with its guide, walkthrough and sessions beside them, the games a person goes for side by side; on a phone the screen as it is. For Platina's game screen on the iPad, the Mac and an unfolded iPhone Duo (the owner's review of its mockup). And the picture hero after the owner's look at it on a device: it stretches when pulled down, lags behind the content when scrolled, and waits for its picture without a shimmer.
+[#109](https://github.com/dkicekeeper/DesignKit/pull/109)
+
+### Added
+
+- `AdaptiveColumns(sideWidth:mainMinWidth:spacing:main:side:narrow:)`: the main column and a side column of cards side by side where both fit, the screen's own narrow layout (`narrow:`, often a `ChipPicker` over one part at a time) where not. What decides is the width the view gets, never the device, so a panel opening beside the screen or a narrower Mac window switches it too. Without `narrow:`, the side stacks under the main column (`AdaptiveColumnsStack`). A layout: no skeleton.
+- `CardListLayout.grid`: a `CardList`'s cards side by side in `AppLayout.cardColumns()` where the width holds two or more (an iPad or a Mac window under `.readableWidth(AppLayout.wideWidth)`), one in a row on a phone, with the same taps, menus, selection and dragging as `.cards`; `CardListSkeleton(layout: .grid)` too.
+- `RemotePhotoLoading` and `.remotePhotoLoading(_:)`: how the `RemotePhoto`s inside look while they load. `.skeleton` is the shimmer as before; `.still` is a still grey, or the `placeholderKey`'s small version blurred, with no shimmer and no photo symbol, for a picture behind text and buttons.
+- `AppLayout.sideColumnWidth` (340 pt) and `AppLayout.mainColumnMinWidth` (400 pt): the side column's width and the narrowest the main column gets beside it. With the 24 pt gap the two need 764 pt; both grow with the person's text size, so a larger text size keeps the narrow layout longer.
+
+### Changed
+
+- `.heroBackground(clearHeight:picture:)` with `.heroScrollEdge()`: pulled down, the picture keeps to the screen's top and grows with the pull; scrolled up, it moves at half the content's pace, behind it (still under Reduce Motion and `.designKitMotion(false)`). While a `RemotePhoto` in it loads, a still dark fill (or its `placeholderKey`'s small version, blurred) stands in, with black under the picture, instead of two shimmering skeletons, one of them blurred. The picture at rest looks as before.
+
+### Migration
+
+Nothing changes until an app uses it. A detail screen with summaries:
+
+```swift
+ScrollView {
+    AdaptiveColumns {
+        trophies
+    } side: {
+        guideSummary
+        walkthroughCard
+        sessionsCard
+    } narrow: {
+        ChipPicker(options: sections, selection: $section) { $0.title }
+        selectedSection
+    }
+    .screenPadding()
+    .readableWidth(AppLayout.wideWidth)
+}
+```
+
+Keep the picked chip and any filter in the screen: the two layouts are different views, so state inside them starts over when the width switches them.
+
+The games or trips a person keeps, side by side on a large screen: `CardList(items, layout: .grid)` under `.readableWidth(AppLayout.wideWidth)`. An app that switches over `CardListLayout` adds a `.grid` case.
+
+### Gallery and tooling
+
+- Content & Layout: an `AdaptiveColumns` page, a trip's route with its weather and group, on a phone, an iPad mini, an iPad and a Mac window drawn small, with chips or the side under the main column as the narrow layout.
+- Snapshot test `Foundations.adaptiveColumns`: the columns side by side and folded, drawn small, and folded at a large text size.
+- CardList: a Grid layout on its page; snapshot test `CardList.grid`, four cards two in a row at an iPad's width, drawn at half size.
+- RemotePhoto: a "While loading" choice (Skeleton, Still) on its page; `.heroBackground(picture:)`'s page notes the stretch and the parallax ("Open as a screen" shows them).
+
 ## 8.14.0 - 2026-11-24
 
 A hero on a picture, as a film's page in Apple's TV app: a game's art or a trip's photo edge to edge from the screen's top, sharp where nothing is over it, flowing into its own colours, blurred and darkened, under the hero's text and buttons in white. For Platina's game screen: the game's art with its title logo, the progress and the session button over it.

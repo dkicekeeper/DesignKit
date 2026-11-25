@@ -82,7 +82,7 @@ private struct IconPage: View {
         ComponentPage(
             name: "Icon",
             summary: "Every icon: an SF Symbol or a brand logo (loaded by the app's DesignKitLogoLoader), in a shape, a size, a tint, on glass or not.",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             notes: [
                 "A brand logo is Icon(source: .brandService(\"netflix.com\")); BrandLogoView, its view of its own, was removed in 2.0.0.",
                 "Sizes: AppIconSize (glyphs, xs 12 to xxl 40) and AppIconSize.Tile (icons with a backing, sm 44 to xxxl 80).",
@@ -212,7 +212,7 @@ private struct ParticleCreaturePage: View {
             name: "ParticleCreature",
             summary: "A character made of light: a swarm of particles in the shape of a sphere, a rim of light round it and a soft core of its colours inside, with a glowing robot face. Its moods are shapes: a gyroscope while thinking, a ring and waves of light while it answers, light filling it while it works, a coin; and faces: ^ ^, > <, hearts, slanted lids, a wink, a tear.",
             since: "4.6.0",
-            apps: [.tenra],
+            apps: [.tenra, .platina],
             canvas: .tall(minHeight: 340),
             notes: [
                 "Hero from about 160 pt (the sphere takes 70% of the square, the rest is room for the burst, the ring, the waves and the extras); compact from 24 pt for an avatar or a tab icon.",
@@ -390,7 +390,7 @@ private struct HeroSymbolPage: View {
             name: "HeroSymbol",
             summary: "A large SF Symbol on a disc of its tint: the picture of an onboarding page or a permission primer.",
             since: "0.7.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             notes: [
                 "The symbol draws itself on as it appears (2.2.0) and is drawn in an SF Symbols 7 gradient of its tint, for depth (2.3.0).",
                 "In an OnboardingPager the symbol lags behind its page as you swipe (2.3.0).",
@@ -508,7 +508,7 @@ private struct AchievementMedalPage: View {
             name: "AchievementMedal",
             summary: "A round medal: in its colour once earned, grey until then.",
             since: "1.12.0",
-            apps: [.dalada]
+            apps: [.dalada, .platina]
         ) {
             if state == .loading {
                 AchievementMedalSkeleton(size: size)
@@ -559,7 +559,7 @@ private struct AchievementProgressRowPage: View {
             name: "AchievementProgressRow",
             summary: "The achievement closest to being earned: “Up next:”, its title, the progress and a bar.",
             since: "1.12.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             canvas: .fill
         ) {
             if state == .loading {
@@ -604,7 +604,7 @@ private struct SquareImageCropperPage: View {
             name: "SquareImageCropper",
             summary: "Crops a picture to a square for an icon of the person's own: a finger moves it, two fingers zoom it, the page outside the square is veiled.",
             since: "8.5.0",
-            apps: [],
+            apps: [.tenra],
             notes: [
                 "IconPicker's Photo tab opens it after the photo library when the app sets DesignKitIconPhotos.save, which keeps the square and returns its icon.",
                 "The picture fills the square to start and never gets smaller than it; up to six times bigger.",
@@ -657,7 +657,7 @@ private struct PhotoTilePage: View {
             name: "PhotoTile",
             summary: "A photo cropped to a square on the muted background, with rounded corners: the tile of photo rows and grids, a picked photo's preview.",
             since: "2.8.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             notes: [
                 "The app passes the image view (its loader, its cache); PhotoTile(image:) takes a UIImage and shows the photo symbol without one.",
                 "size: nil fills the width and stays square (a grid cell).",
@@ -682,18 +682,21 @@ private struct RemotePhotoPage: View {
     @State private var attempt = 0
     @State private var hasURL = true
     @State private var state: SpecimenState = .content
+    @State private var loading: RemotePhotoLoading = .skeleton
 
     var body: some View {
         ComponentPage(
             name: "RemotePhoto",
             summary: "A photo the app loads by key and URL: a skeleton while it loads, then the photo, coming into focus in its place.",
             since: "3.1.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             notes: [
                 "The app loads it: DesignKitPhotoLoader.loader (its cache, its signed links) and .cached (a photo it already holds shows at once, with no skeleton). Without a loader it downloads the URL itself.",
                 "Fills the frame it is given and does not clip: put it in a PhotoTile, a grid cell, a card.",
                 "placeholderKey: a smaller version shown, with the shimmer over it, while this one loads (the thumbnail under the full photo).",
                 "No URL, or a failed load: the photo symbol.",
+                ".remotePhotoLoading(.still) (8.15.0): a still grey, or the small version blurred, with no shimmer and no symbol, for a picture behind text and buttons. .heroBackground(picture:) sets it.",
+                ".remotePhotoLoading(.hidden) (8.17.0): nothing while it loads, nor when it fails, for a cut-out figure over another picture. .heroBackground(picture:subject:) sets it on its figure.",
             ]
         ) {
             HStack(spacing: AppSpacing.md) {
@@ -710,10 +713,12 @@ private struct RemotePhotoPage: View {
                     }
                 }
             }
+            .remotePhotoLoading(loading)
             // A new attempt is a new photo: its task loads it again.
             .id(attempt)
         } controls: {
             StateControl(state: $state)
+            ChoiceControl("While loading", selection: $loading, options: [("Skeleton", RemotePhotoLoading.skeleton), ("Still", .still), ("Hidden", .hidden)])
             ToggleControl("URL", isOn: $hasURL)
             ActionControl("Load again", systemImage: "arrow.clockwise") { attempt += 1 }
         }
@@ -824,7 +829,7 @@ private struct PhotoViewerPage: View {
             name: "PhotoViewer",
             summary: "Photos full screen: swiped sideways, pinch or double-tap to zoom, drag the zoomed photo. An optional caption with \"2 / 5\" and a menu in the top bar.",
             since: "2.8.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             notes: [
                 "Present it with .fullScreenCover; it closes itself. Pass the photo fitted (.scaledToFit()): the viewer zooms it.",
                 "At 1× a drag turns the page; zoomed in, it moves the photo. VoiceOver zooms with its own gesture.",
@@ -876,19 +881,34 @@ private struct GalleryReportMenu: View {
 private struct ShareCardFramePage: View {
     @State private var format: ShareCard.Format = .story
     @State private var hasPhoto = false
+    @State private var hasIcon = false
+    @State private var typeface: ShareCard.BrandTypeface = .rounded
 
     var body: some View {
         ComponentPage(
             name: "ShareCardFrame",
             summary: "A picture to share in Stories or a chat: a photo under a dark gradient (or a gradient alone), the content from the top, the brand and the site at the bottom.",
             since: "2.8.0",
-            apps: [.dalada],
+            apps: [.tenra, .dalada, .platina],
             notes: [
                 "An image, not a screen: fixed point sizes (360 wide, rendered at 3× to 1080 px), the same colours in light and dark.",
                 "ShareCardSheet renders it, lets the person pick Stories or post, and shares it.",
+                "8.16.0: brandIcon puts the app's icon before its name, in the home screen's rounded square, and ShareCard.Style(brandTypeface: .inter) sets the name in Inter, so a shared picture says which app it is from.",
             ]
         ) {
-            ShareCardFrame(format: format, brand: "Dalada", site: "dalada.kz", photo: hasPhoto ? GallerySharePhoto.image : nil) {
+            ShareCardFrame(
+                format: format,
+                brand: "Dalada",
+                brandIcon: hasIcon ? GalleryAppIcon.image : nil,
+                site: "dalada.kz",
+                photo: hasPhoto ? GallerySharePhoto.image : nil,
+                style: ShareCard.Style(
+                    top: ShareCard.Style.standard.top,
+                    bottom: ShareCard.Style.standard.bottom,
+                    accent: ShareCard.Style.standard.accent,
+                    brandTypeface: typeface
+                )
+            ) {
                 GalleryShareCardContent(format: format)
             }
             .scaleEffect(0.6)
@@ -896,6 +916,8 @@ private struct ShareCardFramePage: View {
         } controls: {
             ChoiceControl("Format", selection: $format, options: ShareCard.Format.allCases.map { ($0.title, $0) })
             ToggleControl("Photo", isOn: $hasPhoto)
+            ToggleControl("App icon", isOn: $hasIcon)
+            ChoiceControl("Name", selection: $typeface, options: [("Rounded", .rounded), ("Inter", .inter)])
         }
     }
 }
@@ -923,6 +945,29 @@ struct GalleryShareCardContent: View {
             ShareCardStat(value: "320 m", title: "Elevation")
         }
     }
+}
+
+/// A stand-in app icon for the brand line: a symbol on the accent's gradient, square (the frame
+/// rounds it).
+@MainActor
+enum GalleryAppIcon {
+    static let image: UIImage? = {
+        let renderer = ImageRenderer(content:
+            LinearGradient(
+                colors: [AppColors.accent, AppColors.Palette.violet.color],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .overlay {
+                Image(systemName: "paintpalette.fill")
+                    .font(.system(size: 30, weight: .semibold))
+                    .foregroundStyle(.white)
+            }
+            .frame(width: 60, height: 60)
+        )
+        renderer.scale = 3
+        return renderer.uiImage
+    }()
 }
 
 /// A photo for the share card specimens, drawn once from a `GalleryPhoto`.

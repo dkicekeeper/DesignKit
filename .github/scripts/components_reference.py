@@ -102,8 +102,8 @@ def pages():
                 "section": section,
                 "summary": string_of(head, "summary") or "",
                 "since": string_of(head, "since"),
-                "apps": sorted({"Tenra" if a == "tenra" else "Dalada"
-                                for a in re.findall(r"\.(tenra|dalada)", apps.group(1))}) if apps else [],
+                "apps": sorted({a.capitalize()
+                                for a in re.findall(r"\.(tenra|dalada|platina)\b", apps.group(1))}) if apps else [],
                 "styles": strings_of(head, "styles"),
                 "notes": strings_of(head, "notes"),
                 "dos": strings_of(head, "dos"),

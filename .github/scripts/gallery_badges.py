@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""The Gallery's app badges against the apps' own code (5.2.0).
+"""The Gallery's app badges against the apps' own code (5.2.0; Platina since 8.17.1).
 
-Each ComponentPage names the apps that use its component (`apps: [.tenra, .dalada]`). This reads
+Each ComponentPage names the apps that use its component (`apps: [.tenra, .dalada, .platina]`). This reads
 every page of Gallery/Gallery/Screens, looks for the component's names in each app's Swift
 sources, and fails when a badge names an app that does not use the component or misses one that
 does, so the badges follow the apps instead of what they used once.
 
-    python3 .github/scripts/gallery_badges.py check --tenra ../Tenra --dalada ../Dalada
-    python3 .github/scripts/gallery_badges.py fix   --tenra ../Tenra --dalada ../Dalada
+    python3 .github/scripts/gallery_badges.py check --tenra ../Tenra --dalada ../Dalada --platina ../Platina
+    python3 .github/scripts/gallery_badges.py fix   --tenra ../Tenra --dalada ../Dalada --platina ../Platina
 
 A component's names are the page's name split at " · ", "/" and "," ("Rating · RatingPicker" is
 Rating and RatingPicker; ".popIn · .riseIn" two modifiers), without what follows "(" or ":".
@@ -15,7 +15,10 @@ A name the apps reach by another one (a modifier over a view, a helper) is in AL
 one overload of a modifier is matched by PATTERNS instead. A use is a
 whole word outside comments and string literals, in a file that does not declare a type of that name itself (an app's
 own view of the same name is not DesignKit's), or the name after its module
-(`DesignComponents.StreakCard`, as an app's adapter of the same name calls it).
+(`DesignComponents.StreakCard`, as an app's adapter of the same name calls it). When the app
+declares a type of that name anywhere, a use counts only in a file that imports one of
+DesignKit's modules (8.17.1: Platina's PSN model `Avatar`, used in a file of its own networking
+package, is not DesignKit's `Avatar`).
 """
 
 import argparse
@@ -24,7 +27,7 @@ import re
 import sys
 
 SCREENS = "Gallery/Gallery/Screens"
-APPS = ("tenra", "dalada")
+APPS = ("tenra", "dalada", "platina")
 
 # The code names of a page whose name is not one ("Springs" is AppAnimation's named animations).
 REPLACES = {
@@ -47,6 +50,9 @@ ALIASES = {
     ".heroBackground": [".heroScrollEdge"],
     "LoadMoreFooter": [".onReachEnd"],
     "ShimmerModifier": [".shimmer"],
+    "SurfaceStyle": ["DesignKitTheme.surface"],
+    # IconPicker's Photo tab opens it once the app sets the hook (8.5.0).
+    "SquareImageCropper": ["DesignKitIconPhotos.save"],
 }
 
 # Pages of one overload of a modifier (8.14.0): what an app writes for that overload alone, as
@@ -60,6 +66,7 @@ COMMENT = re.compile(r"//.*")
 # String literals, multi-line ones first: a place called "Springs" is not the Springs page.
 STRING = re.compile(r'"""[\s\S]*?"""|"(?:[^"\\\n]|\\.)*"')
 DECLARATION = r"\b(?:struct|class|enum|protocol|actor|typealias)\s+{name}\b"
+IMPORTS_DESIGNKIT = re.compile(r"^\s*(?:@_exported\s+)?import\s+(?:DesignKit|DesignComponents|DesignTokens|DesignSupport)\b", re.M)
 
 
 def pages(root):
@@ -77,7 +84,7 @@ def pages(root):
             head_end = text.find(") {", match.end())
             head = text[match.end():head_end]
             apps_match = re.search(r"apps: \[([^\]]*)\]", head)
-            apps = set(re.findall(r"\.(tenra|dalada)", apps_match.group(1))) if apps_match else set()
+            apps = set(re.findall(r"\.(tenra|dalada|platina)\b", apps_match.group(1))) if apps_match else set()
             span = (match.end() + apps_match.start(), match.end() + apps_match.end()) if apps_match else None
             # A new badge goes after `since:`, or after `summary:` on a page without one.
             anchor = re.search(r'since: "[^"]*"', head) or re.search(r'summary: "(?:[^"\\]|\\.)*"', head)
@@ -99,6 +106,12 @@ def tokens(name):
     return result + ALIASES.get(name, [])
 
 
+class Source(str):
+    """A Swift file of an app without comments and strings; `imports_designkit` when it imports
+    one of DesignKit's modules."""
+    imports_designkit = False
+
+
 def load_sources(root):
     """Each Swift file of an app, without comments, skipping build products."""
     sources = []
@@ -107,7 +120,9 @@ def load_sources(root):
         for file in files:
             if file.endswith(".swift"):
                 text = open(os.path.join(directory, file), encoding="utf-8", errors="replace").read()
-                sources.append(COMMENT.sub("", STRING.sub('""', text)))
+                source = Source(COMMENT.sub("", STRING.sub('""', text)))
+                source.imports_designkit = bool(IMPORTS_DESIGNKIT.search(text))
+                sources.append(source)
     return sources
 
 
@@ -120,8 +135,12 @@ def uses(sources, token):
     # An app's adapter of the same name calls DesignKit's by its module.
     qualified = re.compile(r"\b(?:DesignComponents|DesignSupport|DesignTokens)\." + re.escape(token) + r"\b")
     declaration = re.compile(DECLARATION.format(name=re.escape(word)))
+    # The app has a type of that name: only a file that imports DesignKit can mean DesignKit's.
+    declared_in_app = any(declaration.search(text) for text in sources)
     return any(
-        qualified.search(text) or (pattern.search(text) and not declaration.search(text))
+        qualified.search(text)
+        or (pattern.search(text) and not declaration.search(text)
+            and (not declared_in_app or getattr(text, "imports_designkit", True)))
         for text in sources
     )
 
@@ -183,10 +202,11 @@ def main():
     parser.add_argument("command", choices=["check", "fix"])
     parser.add_argument("--tenra", required=True, help="a checkout of Tenra")
     parser.add_argument("--dalada", required=True, help="a checkout of Dalada")
+    parser.add_argument("--platina", required=True, help="a checkout of Platina")
     parser.add_argument("--root", default=".", help="DesignKit's checkout")
     args = parser.parse_args()
 
-    report = audit(args.root, {"tenra": args.tenra, "dalada": args.dalada})
+    report = audit(args.root, {"tenra": args.tenra, "dalada": args.dalada, "platina": args.platina})
     if args.command == "fix":
         fix(report)
         print(f"{len(report)} badges rewritten")

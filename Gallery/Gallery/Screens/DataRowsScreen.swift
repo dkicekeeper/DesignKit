@@ -250,9 +250,9 @@ private struct ItemRowPage: View {
     var body: some View {
         ComponentPage(
             name: "ItemRow",
-            summary: "A row for an item of the app's own: a symbol, the title with a badge, a description, lines of facts joined by \"·\" and an accessory. Dalada's trips, places, articles and gear; Tenra's backups and subcategories.",
+            summary: "A row for an item of the app's own: a symbol, the title with a badge, a description, lines of facts joined by \"·\" and an accessory. Dalada's trips, places, articles, checklists and gear; Tenra's backups, subcategories and what its assistant remembers; Platina's play sessions and walkthroughs.",
             since: "3.6.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: [
                 "standard: title in bodyEmphasis, facts in caption. large: title in body, facts in bodySmall, more air.",
@@ -333,7 +333,7 @@ private struct MetaLinePage: View {
             name: "MetaLine",
             summary: "Short facts on one line: text, text with a symbol, a symbol alone, joined by \"·\" or set side by side. It takes the font around it; ItemRow sets it.",
             since: "3.6.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: [
                 "dot: facts of one kind (a date, a distance). space: labels with symbols (\"Friends\", \"Pending\").",
@@ -476,7 +476,7 @@ private struct ChecklistRowPage: View {
             name: "ChecklistRow",
             summary: "An item to tick off; struck through once done, an optional mark on the right.",
             since: "1.12.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             canvas: .fill,
             notes: [
                 "A row of a glass section (8.1.0): it pads itself 12 pt above and below (verticalPadding), and the divider under it starts at its title, after the circle. verticalPadding: 0 in a stack that spaces its rows or a List.",
@@ -516,7 +516,7 @@ private struct ChecklistSummaryRowPage: View {
             name: "ChecklistSummaryRow",
             summary: "A checklist in a list: its title (a seal once complete), the day, the bar and “12 of 20”.",
             since: "1.12.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             canvas: .fill
         ) {
             InCard {
@@ -546,7 +546,7 @@ private struct ThumbnailRowPage: View {
             name: "ThumbnailRow",
             summary: "Something with a picture in a list: a 64 pt picture, the title with a seal and a bookmark, details.",
             since: "1.12.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             canvas: .fill
         ) {
             InCard {
@@ -603,7 +603,10 @@ private struct DownloadRowPage: View {
             since: "2.8.0",
             apps: [.dalada],
             canvas: .fill,
-            notes: ["The app formats the caption (sizes, percent) and adds .swipeActions to delete."]
+            notes: [
+                "The app formats the caption (sizes, percent) and puts Delete in a long press (.contextMenu): no swipe actions since 8.0.0.",
+                "Its own padding is a List row's (AppSpacing.xxs): in a FormSection card give it .padding(.vertical, AppSpacing.md), as Dalada's offline maps do.",
+            ]
         ) {
             InCard {
                 if state == .loading {

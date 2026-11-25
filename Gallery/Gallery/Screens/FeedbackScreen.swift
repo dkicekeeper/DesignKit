@@ -172,7 +172,7 @@ private struct BadgePage: View {
             name: "Badge",
             summary: "A short label in a capsule: tinted (pale background, coloured text) or filled.",
             since: "0.4.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             styles: ["tinted", "filled"],
             dos: [
                 "Name a status or a tag in a word or two: “Paid”, “Overdue”.",
@@ -267,7 +267,7 @@ private struct StatusBannerPage: View {
             name: "StatusBanner",
             summary: "A status message in a pale box of its colour, or inline; an optional action.",
             since: "1.7.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             styles: ["standard", "compact"],
             dos: [
@@ -302,7 +302,7 @@ private struct MessageBannerPage: View {
         ComponentPage(
             name: "MessageBanner",
             summary: "A floating banner on glass after something happened: saved, failed, a warning; with an action.",
-            apps: [.tenra],
+            apps: [.tenra, .platina],
             canvas: .fill,
             dos: [
                 "Confirm an action briefly (“Saved”), with Undo or Retry when there is one.",
@@ -476,7 +476,7 @@ private struct TypingIndicatorPage: View {
             name: "TypingIndicator",
             summary: "Three dots rising in a wave in a bubble: a reply is on its way, an assistant is thinking.",
             since: "2.2.0",
-            apps: [],
+            apps: [.platina],
             canvas: .tall(minHeight: 120),
             notes: [
                 "Insert it with .transition(.popIn) under the last message.",
@@ -510,7 +510,7 @@ private struct EmptyStatePage: View {
         ComponentPage(
             name: "EmptyState",
             summary: "Nothing to show yet, or a failure: an icon, a title, a line of explanation and an action.",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .tall(minHeight: 280),
             notes: [
                 "The icon draws itself on (2.2.0) in an SF Symbols 7 gradient (2.3.0); the error icon wiggles once.",
@@ -674,7 +674,7 @@ private struct NoticeCardPage: View {
             name: "NoticeCard",
             summary: "A message the app writes to the person: a picture, a title and a line or two, a hide button and an action under the text, in line with it.",
             since: "4.14.0",
-            apps: [.tenra],
+            apps: [.tenra, .platina],
             canvas: .fill,
             notes: [
                 "What the message is, when it shows and what the action does stay in the app.",

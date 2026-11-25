@@ -109,7 +109,7 @@ DesignKit — дизайн-система поверх SwiftUI, а не заме
 | Типографика | 10–15 стилей, Dynamic Type | `AppTypography`: 10 стилей (h1–h4, body, bodySmall, caption…), Inter, Dynamic Type |
 | Отступы | 4/8-pt сетка | `AppSpacing`, 4-pt сетка |
 | Скругления | 4–6 ступеней | `AppRadius` |
-| Раскладка | Ширина колонки для чтения, адаптивная сетка (HIG Layout: readable content guide, size classes; M3 window size classes) | `AppLayout` и `.readableWidth()` (8.13.0): колонка до 720 pt на iPad и Mac, сетка карточек `cardColumns()`; список и деталь — системный `NavigationSplitView` |
+| Раскладка | Ширина колонки для чтения, адаптивная сетка (HIG Layout: readable content guide, size classes; M3 window size classes) | `AppLayout` и `.readableWidth()` (8.13.0): колонка до 720 pt на iPad и Mac, сетка карточек `cardColumns()`; основная колонка и боковая — `AdaptiveColumns` (8.15.0); список и деталь — системный `NavigationSplitView` |
 | Анимация | Токены длительности и кривых (M3 motion, Fluent motion) | `AppAnimation`, уважение Reduce Motion, `AmbientMotionGate` |
 | Глубина | Тени / elevation | Liquid Glass (`glassEffect`) вместо теней |
 
@@ -501,7 +501,7 @@ JSON: `component Button` печатает API, правила и темизац�
 кода. Системное на iOS: диалог, поповер, шторка, меню, дата и время, слайдер, спиннер.
 Свайп-действия строк (Astryx добавил их в 0.7, DesignKit убрал в 8.0.0 решением владельца:
 долгое нажатие и панель инструментов). Темы пакетами и генератор тем: у DesignKit одна
-внешность на два приложения, тема — акцент (`DesignKitTheme.accent`), и Gallery уже
-переключает Tenra и Dalada.
+внешность на три приложения, тема — акцент (`DesignKitTheme.accent`) и поверхности
+(`DesignKitTheme.surface`, 8.12.0), и Gallery уже переключает Tenra, Dalada и Platina.
 
 **Порядок.** Задуман как 8.9.0, 8.10.0 и 8.11.0; одна ветка выходит одним тегом, поэтому всё вошло в 8.9.0. Остальное (P3: 13, 14, 15, 20, 23, 24, 28) — по запросу приложений.

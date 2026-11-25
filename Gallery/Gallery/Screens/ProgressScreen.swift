@@ -43,7 +43,7 @@ private struct LinearProgressBarPage: View {
         ComponentPage(
             name: "LinearProgressBar",
             summary: "A bar of progress; over 100% it turns red. A projection shows where the period will end.",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill
         ) {
             if state == .loading {
@@ -72,7 +72,7 @@ private struct ProgressRingPage: View {
         ComponentPage(
             name: "ProgressRing",
             summary: "A ring of progress around something (a category coin); red once over.",
-            apps: [.tenra],
+            apps: [.tenra, .platina],
             notes: [
                 "celebratesCompletion (2.3.0): a goal ring, green at any fill (2.3.1). Reaching 100 % draws a checkmark in, the ring glows once and the success haptic plays. Off for budgets.",
             ]

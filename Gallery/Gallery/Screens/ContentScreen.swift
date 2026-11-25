@@ -3,8 +3,8 @@
 //  DesignKit Gallery
 //
 //  Content and layout: folded text, timeline, month calendar, flow layout, form sections, the
-//  edit sheet and its hero, message bubbles, times that stay current, the readable column and
-//  card grid of a large screen.
+//  edit sheet and its hero, message bubbles, times that stay current, the readable column, card
+//  grid and side column of a large screen.
 //
 
 import SwiftUI
@@ -26,6 +26,7 @@ struct ContentScreen: View {
         MonthCalendarPage()
         FlowLayoutPage()
         ReadableWidthPage()
+        AdaptiveColumnsPage()
         FormSectionPage()
         CardListPage()
         EditSheetContainerPage()
@@ -47,7 +48,7 @@ private struct ConversationDividerPage: View {
             name: "ConversationDivider",
             summary: "A line across a conversation: the day the next messages are from, or something that happened in it.",
             since: "8.9.0",
-            apps: [],
+            apps: [.platina],
             canvas: .fill,
             notes: [
                 "ConversationDivider(date:) reads “Today”, “Yesterday”, then the day (Formatting.dayTitle, the DesignKitDateFormat.day hook); VoiceOver hears it as a heading.",
@@ -106,7 +107,7 @@ private struct RelativeTimePage: View {
             name: "RelativeTime",
             summary: "When something happened, or how long it has run, kept current on screen: “5 min. ago”, “Yesterday, 14:20”, “1 hr, 2 min”, “1:02:34”.",
             since: "8.9.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             notes: [
                 "Style it as text (.font, .foregroundStyle). .relative redraws every 30 seconds, .elapsed and .clock every second; .clock keeps its digits one width.",
                 "Under a minute “Just now”, under an hour minutes, the same day hours, the next day over “Yesterday, 14:20”, then the day (with the year in another year). The day follows DesignKitDateFormat.day.",
@@ -156,7 +157,7 @@ private struct ExpandableTextPage: View {
             name: "ExpandableText",
             summary: "Text folded to a few lines with “More” when it does not fit.",
             since: "0.6.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             canvas: .fill
         ) {
             if state == .loading {
@@ -184,7 +185,7 @@ private struct ActivityTimelinePage: View {
             name: "ActivityTimeline",
             summary: "Events on a vertical line with a dot or a symbol for each.",
             since: "0.7.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             canvas: .fill
         ) {
             if state == .loading {
@@ -267,7 +268,7 @@ private struct FlowLayoutPage: View {
             name: "FlowLayout",
             summary: "A layout that wraps its views to new lines like words: tags, badges, chips.",
             since: "0.7.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             canvas: .fill,
             notes: ["alignment (2.9.0): each row leading, centred or trailing."]
         ) {
@@ -304,12 +305,12 @@ private struct ReadableWidthPage: View {
             name: ".readableWidth() · AppLayout",
             summary: "A screen's content on an iPad or in a Mac window: a centred column of cards and text no wider than 720 pt, or a grid of cards side by side no wider than 1120 pt. On a phone nothing changes.",
             since: "8.13.0",
-            apps: [],
+            apps: [.platina],
             canvas: .fill,
             notes: [
                 "Put it on the scroll view's content after .screenPadding(): the column's 720 pt include the margins, and the scroll bar stays at the screen's edge.",
                 "The column grows with the person's text size, as the system's readable width does.",
-                "A grid of cards: LazyVGrid(columns: AppLayout.cardColumns(), spacing: AppSpacing.lg) under .readableWidth(AppLayout.wideWidth). A phone holds one card in a row, an iPad two or three.",
+                "A grid of cards: LazyVGrid(columns: AppLayout.cardColumns(), spacing: AppSpacing.lg) under .readableWidth(AppLayout.wideWidth), or CardList(layout: .grid) for the things a person keeps (8.15.0). A phone holds one card in a row, an iPad two or three.",
                 "A list and what it opens side by side is the system's NavigationSplitView; each column's screen keeps its own .readableWidth() (docs/design-system.md, Large screens).",
             ],
             dos: [
@@ -371,6 +372,116 @@ private struct ReadableWidthPage: View {
     }
 }
 
+private struct AdaptiveColumnsPage: View {
+    private enum TripPart: String, CaseIterable, Hashable {
+        case route, weather, group
+
+        var title: String {
+            switch self {
+            case .route: "Route"
+            case .weather: "Weather"
+            case .group: "Group"
+            }
+        }
+    }
+
+    @State private var screen: CGFloat = 1194
+    @State private var chips = true
+    @State private var part: TripPart? = .route
+
+    var body: some View {
+        ComponentPage(
+            name: "AdaptiveColumns",
+            summary: "A screen's main column with a side column beside it when the width allows: on an iPad a trip's route with its weather and group beside it. Narrower, as on a phone, the screen's own narrow layout: chips that switch between the parts, or the side under the main column.",
+            since: "8.15.0",
+            apps: [.platina],
+            canvas: .fill,
+            notes: [
+                "What decides is the width the view gets: the main column's minimum (AppLayout.mainColumnMinWidth, 400 pt), the gap (24 pt) and the side (AppLayout.sideColumnWidth, 340 pt), 764 pt in all, more at a larger text size.",
+                "Put it on a scroll view's content after .screenPadding(), under .readableWidth(AppLayout.wideWidth): an iPad gets the columns, a phone and an iPad mini in portrait the narrow layout, and a Mac window switches as it is resized.",
+                "narrow: is the phone's screen as it is, often a ChipPicker over one part at a time; without it the side stacks under the main column.",
+                "The two layouts are different views: keep state (the picked chip, a filter) in the screen, not inside the columns.",
+            ],
+            dos: [
+                "Put what the screen is for in the main column, and summaries, what comes next and the latest items in the side.",
+                "Show in the side the cards the phone shows, so the person finds the same things.",
+            ],
+            donts: [
+                "Put a form in two columns: a form is one column.",
+                "Check for an iPad to choose the layout: a panel or a split window narrows the screen too.",
+            ]
+        ) {
+            LayoutScreenPreview(width: screen) {
+                specimen
+                    .screenPadding()
+                    .readableWidth(AppLayout.wideWidth)
+            }
+        } controls: {
+            ChoiceControl("Screen", selection: $screen, options: [("iPhone", 402), ("iPad mini", 744), ("iPad", 1194), ("Mac", 1512)])
+            ChoiceControl("Narrow layout", selection: $chips, options: [("Chips", true), ("Side under main", false)])
+        }
+    }
+
+    @ViewBuilder private var specimen: some View {
+        if chips {
+            AdaptiveColumns {
+                route
+            } side: {
+                weather
+                group
+            } narrow: {
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    ChipPicker(options: TripPart.allCases, selection: $part) { $0.title }
+                    switch part ?? .route {
+                    case .route: route
+                    case .weather: weather
+                    case .group: group
+                    }
+                }
+            }
+        } else {
+            AdaptiveColumns {
+                route
+            } side: {
+                weather
+                group
+            }
+        }
+    }
+
+    private var route: some View {
+        FormSection(header: "Route") {
+            UniversalRow("Almaty", icon: "mappin", accessory: .info("08:00"))
+            UniversalRow("Big Almaty Lake", icon: "drop", accessory: .info("09:30"))
+            UniversalRow("The observatory", icon: "sparkles", accessory: .info("12:00"))
+            UniversalRow("Back in the city", icon: "house", accessory: .info("17:00"))
+        }
+    }
+
+    private var weather: some View {
+        sideCard("Weather", symbol: "sun.max.fill", detail: "+18°, clear; wind 4 m/s at the lake")
+    }
+
+    private var group: some View {
+        sideCard("Group", symbol: "person.2.fill", detail: "4 people; Aigerim drives")
+    }
+
+    private func sideCard(_ title: String, symbol: String, detail: String) -> some View {
+        HStack(spacing: AppSpacing.md) {
+            Icon(source: .sfSymbol(symbol), size: AppIconSize.Tile.sm)
+            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                Text(title).font(AppTypography.h4)
+                    .foregroundStyle(AppColors.textPrimary)
+                Text(detail).font(AppTypography.bodySmall)
+                    .foregroundStyle(AppColors.Text.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardContentPadding()
+        .cardStyle()
+    }
+}
+
 /// A screen `width` points wide drawn smaller to fit the page, so a phone shows how an iPad or a
 /// Mac window lays the content out.
 private struct LayoutScreenPreview<Content: View>: View {
@@ -410,8 +521,8 @@ private struct FormSectionPage: View {
     var body: some View {
         ComponentPage(
             name: "FormSection",
-            summary: "A titled group of rows on a Liquid Glass card (8.0.0: one look for forms, settings and short lists). It pads its rows at the sides and draws the divider between them, under each row's text.",
-            apps: [.tenra, .dalada],
+            summary: "A titled group of rows on a Liquid Glass card, or the grey of SurfaceStyle.fill (8.12.0); one look for forms, settings and short lists since 8.0.0. It pads its rows at the sides and draws the divider between them, under each row's text.",
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: [
                 "Rows pad themselves only vertically (UniversalRow .standard, 12 pt: a 48 pt row); the card pads them 16 pt at the sides, and the header stands 12 pt above it (docs/design-system.md §10).",
@@ -498,10 +609,11 @@ private struct CardListPage: View {
             name: "CardList",
             summary: "The things a person keeps (accounts, deposits, loans, categories, trips) with one set of actions: open, select several and delete, change the order by dragging. A card per item, or every item a row in one card.",
             since: "8.0.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: [
-                "cards: a glass card per item, padded 16 pt; section: every item a row in one glass card, a divider under each row's text; stack: items that are cards already (a PayoffProgressCard), the circle and the handle beside them.",
+                "cards: a card per item (glass, or the grey fill), padded 16 pt; section: every item a row in one card, a divider under each row's text; stack: items that are cards already (a PayoffProgressCard), the circle and the handle beside them.",
+                "grid (8.15.0): the cards side by side in AppLayout.cardColumns() where the width holds two or more, on an iPad or in a Mac window under .readableWidth(AppLayout.wideWidth); one in a row on a phone, as here.",
                 "cardListToolbar(mode:selection:allIDs:onAdd:onDeleteSelected:) is the same toolbar on every list: select, change the order, add; Done; Delete N under the list.",
                 "Reordering: a long press lifts a card, moving it over another puts it there (a tick on each step). VoiceOver: move up, move down.",
             ]
@@ -548,7 +660,7 @@ private struct CardListPage: View {
             .frame(height: 560)
         } controls: {
             StateControl(state: $state)
-            ChoiceControl("Layout", selection: $layout, options: [("Cards", .cards), ("Section", .section), ("Stack", .stack)])
+            ChoiceControl("Layout", selection: $layout, options: [("Cards", .cards), ("Section", .section), ("Stack", .stack), ("Grid", .grid)])
             ChoiceControl("Mode", selection: $mode, options: [("Browsing", .browsing), ("Selecting", .selecting), ("Reordering", .reordering)])
             ChoiceControl("Items", selection: $count, options: [("5", 5), ("12", 12), ("200", 200)])
         }
@@ -586,7 +698,7 @@ private struct EditSheetContainerPage: View {
         ComponentPage(
             name: "EditSheetContainer",
             summary: "The shell of an edit sheet: navigation bar with Cancel and Save, a form inside.",
-            apps: [.tenra, .dalada]
+            apps: [.tenra, .dalada, .platina]
         ) {
             DSButton("Open the sheet", appearance: .secondary, fullWidth: true) { isPresented = true }
             .sheet(isPresented: $isPresented) {
@@ -688,7 +800,7 @@ private struct ArticleBodyPage: View {
             name: "ArticleBody",
             summary: "The text of an article: headings, paragraphs, bulleted and numbered lists, notes in a card; bold, italic and links inside a line.",
             since: "2.8.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: ["The app parses its article format into blocks; inline Markdown inside a block is DesignKit's."]
         ) {
@@ -741,7 +853,7 @@ private struct MessageBubblePage: View {
             name: "MessageBubble",
             summary: "One message in a conversation: the person's own on the right in the accent, the other side's on the left in grey. A message not sent says why, with Retry.",
             since: "4.6.0",
-            apps: [.tenra],
+            apps: [.tenra, .platina],
             canvas: .fill,
             notes: [
                 "The bubble grows to about 80% of the width; the text is selectable.",

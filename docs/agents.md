@@ -4,7 +4,8 @@ The short version of DesignKit's rules for a session working in Tenra, Dalada or
 round 4: Astryx's `init`, which writes such a block into an app's AGENTS.md). Each app's
 **DesignKit update** workflow puts this file into the app's CLAUDE.md between the
 `designkit:agents` markers when it moves the pin (`scripts/sync_agents_block.py`), so it always
-matches the version the app builds with. Do not edit the block in the app; change it here.
+matches the version the app builds with; an app that moves its pin by hand (Platina) runs the
+script with the bump. Do not edit the block in the app; change it here.
 
 ## Look a component up
 
@@ -35,7 +36,9 @@ matches the version the app builds with. Do not edit the block in the app; chang
 7. Motion through DesignKit (`AppMotion` springs, `.popIn`, `.riseIn`, effects); everything stops
    under Reduce Motion and `.designKitMotion(false)`.
 8. On an iPad or a Mac a scrolling screen keeps to a column: `.readableWidth()` after
-   `.screenPadding()` (8.13.0). No checks for the device or the screen size.
+   `.screenPadding()` (8.13.0); a detail screen puts its summaries beside the main column in
+   `AdaptiveColumns`, the phone's layout in `narrow:` (8.15.0). No checks for the device or the
+   screen size: the width the view gets decides.
 
 ## What a screen needs → the component
 
@@ -61,8 +64,9 @@ matches the version the app builds with. Do not edit the block in the app; chang
 | People | `Avatar`, `AvatarGroup`, `PersonRow`, `CommentRow` |
 | Photos | `RemotePhoto`, `PhotoTile`, `PhotoGrid`, `PhotoCarousel`, `PhotoViewer` |
 | Edit sheet | `EditSheetContainer`, `EditableHero`, `AmountEntrySheet` |
+| The top of a detail screen | `HeroSection`; on colour `.heroBackground(color)`, on a picture `.heroBackground(clearHeight:picture:)` (8.14.0), with `.heroScrollEdge()` on the scroll view |
 | A moment of success | `.celebration`, `.completionMoment` |
-| A screen on an iPad or a Mac | `.readableWidth()`; cards side by side in `LazyVGrid(columns: AppLayout.cardColumns())` under `.readableWidth(AppLayout.wideWidth)`; list and detail in `NavigationSplitView` |
+| A screen on an iPad or a Mac | `.readableWidth()`; cards side by side in `CardList(layout: .grid)` (8.15.0) or `LazyVGrid(columns: AppLayout.cardColumns())` under `.readableWidth(AppLayout.wideWidth)`; a main column with summaries beside it in `AdaptiveColumns` (the phone's layout in `narrow:`); list and detail in `NavigationSplitView` |
 
 ## Check before pushing
 

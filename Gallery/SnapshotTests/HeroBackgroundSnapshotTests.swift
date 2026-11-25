@@ -7,7 +7,8 @@
 //  deep gradient in dark mode and as on the page, in black, on the pale one in light mode
 //  (4.5.1), each clipped to its own box (the gradient runs up and down past a hero on a
 //  screen), and `ScoreGaugeCard(amount:)` as a hero, as on a screen, a long amount shrunk to
-//  stay inside the arc (4.5.1); a hero on a photo (8.14.0, `.heroBackground(picture:)`).
+//  stay inside the arc (4.5.1); a hero on a photo (8.14.0, `.heroBackground(picture:)`), and on a
+//  backdrop with a figure in front of it (8.17.0, `.heroBackground(picture:subject:)`).
 //
 
 import SwiftUI
@@ -51,6 +52,32 @@ extension ComponentSnapshots {
                 .padding(AppSpacing.lg)
                 .heroBackground(clearHeight: AppSpacing.xxxl * 3) {
                     RemotePhoto(key: "gallery-photo-3", url: URL(string: "https://gallery.invalid/photo/3.jpg"))
+                }
+                .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
+            )
+        }
+
+        /// A hero on a backdrop with a cut-out figure in front of it (8.17.0,
+        /// `.heroBackground(picture:subject:)`): the figure as wide as the hero, sharp at the top,
+        /// blurred and darkened with the backdrop under the text.
+        @Test func heroOnPictureWithSubject() async {
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.md) {
+                    Text(verbatim: "Camp at night")
+                        .font(AppTypography.h1)
+                        .foregroundStyle(AppColors.Text.primary)
+                        .frame(maxWidth: .infinity, minHeight: AppSpacing.xxxl * 4, alignment: .bottom)
+                    Text(verbatim: "Hike \u{00B7} 2 days")
+                        .font(AppTypography.bodySmall)
+                        .foregroundStyle(AppColors.Text.secondary)
+                    DSButton("Start trip", systemImage: "play.fill", fullWidth: true) {}
+                    LinearProgressBar(value: 0.68, animatesOnAppear: false)
+                }
+                .padding(AppSpacing.lg)
+                .heroBackground(clearHeight: AppSpacing.xxxl * 3) {
+                    RemotePhoto(key: "gallery-backdrop-3", url: URL(string: "https://gallery.invalid/photo/3.jpg"))
+                } subject: {
+                    RemotePhoto(key: "gallery-figure", url: URL(string: "https://gallery.invalid/figure.png"))
                 }
                 .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
             )

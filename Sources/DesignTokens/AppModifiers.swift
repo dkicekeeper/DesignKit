@@ -34,11 +34,11 @@ public extension View {
     /// Padding НЕ добавляется — ответственность за отступы лежит на содержимом
     /// (строки используют собственный padding; произвольный контент добавляет .padding перед вызовом).
     ///
-    /// **Use this for display cards** (AccountCard, LoanCard, HealthScoreCard, hero
-    /// sections, etc.). For interactive form sections that contain `Picker(.menu)` /
-    /// `Menu` triggers, use `formCardStyle()` instead — `glassEffect` is the morph
-    /// source for iOS 26 menus, and a single-row section collapses the whole row into
-    /// the popover at tap.
+    /// **Use this for every card** (AccountCard, LoanCard, HealthScoreCard, hero sections) and,
+    /// since 8.0.0, for form sections too: `FormSection` and `CardList` are built on it, and a
+    /// `Picker(.menu)` / `Menu` inside opens from its row (a device probe showed it; the fear that
+    /// glass would become the menu's morph source and collapse a one-row section into the popover
+    /// came from an early iOS 26 build, docs/gotchas.md).
     ///
     /// 3.0.0: the glass is drawn behind the content, not applied to it. Applied to the content,
     /// Liquid Glass blended each layer into the layers under it (darker in light mode, lighter
@@ -61,16 +61,11 @@ public extension View {
         )
     }
 
-    /// Card chrome for form-like containers that host interactive controls
-    /// (`Picker(.menu)`, `Menu`, etc.). Uses `.ultraThinMaterial` on every iOS
-    /// version instead of `.glassEffect` because iOS 26's Liquid Glass surface
-    /// becomes the morph-source for any native menu trigger inside it — in a
-    /// single-row `FormSection` the glass-rect ≈ row bounds and the entire row
-    /// collapses into the popover at tap.
-    ///
-    /// **Use this for `FormSection`, `BudgetSettingsSection`, and any other
-    /// container that wraps rows users tap to open menus.** Use `cardStyle()`
-    /// (above) for non-interactive display cards.
+    /// A Material card (`.ultraThinMaterial` on every iOS), for a host that wants one; the same
+    /// shape and padding contract as `cardStyle()`. `FormSection` used it up to 7.x, for fear
+    /// that iOS 26's Liquid Glass would become the morph source of a menu inside it and collapse
+    /// a one-row section into the popover; since 8.0.0 `FormSection` is glass (`cardStyle()`),
+    /// and menus open from their row there. It does not follow `SurfaceStyle`.
     func formCardStyle(radius: CGFloat = AppRadius.xl) -> some View {
         self
             .background(

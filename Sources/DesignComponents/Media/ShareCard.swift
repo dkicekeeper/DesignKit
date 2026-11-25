@@ -11,6 +11,9 @@
 //  The card is an image, not a screen: its sizes are fixed points (360 wide, rendered at 3× to
 //  1080 px), so the type does not follow Dynamic Type and the colours do not follow the theme.
 //
+//  8.16.0 (Tenra's year in review, the founder: a shared picture should say which app it is):
+//  the app's icon before its name in the brand line, and the name in Inter as well as rounded.
+//
 
 import SwiftUI
 import UIKit
@@ -49,6 +52,14 @@ public enum ShareCard {
         public static let scale: CGFloat = 3
     }
 
+    /// How the brand line sets the app's name (8.16.0).
+    public enum BrandTypeface: Hashable, Sendable {
+        /// Rounded and heavy (the look before 8.16.0, Dalada's).
+        case rounded
+        /// Inter, DesignKit's typeface, bold (Tenra's).
+        case inter
+    }
+
     /// The colours of a share card. They stay the same in light and dark mode: the picture leaves
     /// the app.
     public struct Style: Sendable {
@@ -57,11 +68,14 @@ public enum ShareCard {
         public let bottom: Color
         /// The kicker over the title ("Fishing"), a track, an icon.
         public let accent: Color
+        /// The brand's name: rounded by default, Inter for an app set in it (8.16.0).
+        public let brandTypeface: BrandTypeface
 
-        public init(top: Color, bottom: Color, accent: Color) {
+        public init(top: Color, bottom: Color, accent: Color, brandTypeface: BrandTypeface = .rounded) {
             self.top = top
             self.bottom = bottom
             self.accent = accent
+            self.brandTypeface = brandTypeface
         }
 
         /// Graphite with the accent.
@@ -82,6 +96,11 @@ enum ShareCardMetrics {
     static let siteSize: CGFloat = 11
     static let statValueSize: CGFloat = 24
     static let statTitleSize: CGFloat = 12
+    /// The app's icon before its name (8.16.0): a little taller than the name, with the
+    /// home screen's corner (22.5 % of its side, continuous).
+    static let brandIconSize: CGFloat = 30
+    static let brandIconCorner: CGFloat = 0.225
+    static let brandIconGap: CGFloat = 10
 }
 
 /// A share card's frame: the photo or gradient, the content from the top, and the brand line.
@@ -94,9 +113,19 @@ enum ShareCardMetrics {
 /// ```
 ///
 /// The content is white; lay it out with fixed point sizes, as the card is an image.
+///
+/// With the app's icon (8.16.0), the brand line shows which app the picture is from:
+///
+/// ```swift
+/// ShareCardFrame(
+///     format: .story, brand: "Tenra", brandIcon: UIImage(named: "AppIconImage"),
+///     style: ShareCard.Style(top: …, bottom: …, accent: …, brandTypeface: .inter)
+/// ) { … }
+/// ```
 public struct ShareCardFrame<Content: View>: View {
     let format: ShareCard.Format
     let brand: String
+    let brandIcon: UIImage?
     let site: String?
     let photo: UIImage?
     let style: ShareCard.Style
@@ -104,11 +133,14 @@ public struct ShareCardFrame<Content: View>: View {
 
     /// - Parameters:
     ///   - brand: The name at the bottom left ("Dalada").
+    ///   - brandIcon: The app's icon before the name, in the home screen's rounded square
+    ///     (8.16.0). An app icon set cannot be read as an image: add the icon as an image set.
     ///   - site: At the bottom right, small ("dalada.kz").
     ///   - photo: Fills the card under a dark gradient; without it, the style's gradient.
     public init(
         format: ShareCard.Format,
         brand: String,
+        brandIcon: UIImage? = nil,
         site: String? = nil,
         photo: UIImage? = nil,
         style: ShareCard.Style = .standard,
@@ -116,6 +148,7 @@ public struct ShareCardFrame<Content: View>: View {
     ) {
         self.format = format
         self.brand = brand
+        self.brandIcon = brandIcon
         self.site = site
         self.photo = photo
         self.style = style
@@ -158,16 +191,38 @@ public struct ShareCardFrame<Content: View>: View {
     }
 
     private var brandLine: some View {
-        HStack(alignment: .firstTextBaseline) {
-            Text(verbatim: brand)
-                .font(.system(size: ShareCardMetrics.brandSize, weight: .heavy, design: .rounded))
-            Spacer(minLength: AppSpacing.sm)
-            if let site {
-                Text(verbatim: site)
-                    .font(.system(size: ShareCardMetrics.siteSize, weight: .medium))
-                    .opacity(0.7)
-                    .lineLimit(1)
+        HStack(spacing: ShareCardMetrics.brandIconGap) {
+            if let brandIcon {
+                Image(uiImage: brandIcon)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: ShareCardMetrics.brandIconSize, height: ShareCardMetrics.brandIconSize)
+                    .clipShape(RoundedRectangle(
+                        cornerRadius: ShareCardMetrics.brandIconSize * ShareCardMetrics.brandIconCorner,
+                        style: .continuous
+                    ))
+                    .accessibilityHidden(true)
             }
+            HStack(alignment: .firstTextBaseline) {
+                Text(verbatim: brand)
+                    .font(brandFont)
+                Spacer(minLength: AppSpacing.sm)
+                if let site {
+                    Text(verbatim: site)
+                        .font(.system(size: ShareCardMetrics.siteSize, weight: .medium))
+                        .opacity(0.7)
+                        .lineLimit(1)
+                }
+            }
+        }
+    }
+
+    private var brandFont: Font {
+        switch style.brandTypeface {
+        case .rounded:
+            .system(size: ShareCardMetrics.brandSize, weight: .heavy, design: .rounded)
+        case .inter:
+            .custom(AppInterFont.family, fixedSize: ShareCardMetrics.brandSize).weight(.bold)
         }
     }
 }

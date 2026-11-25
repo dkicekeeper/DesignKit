@@ -29,6 +29,15 @@ public enum AppLayout {
     /// in a row, an iPad two or three.
     public static let cardMinWidth: CGFloat = 320
 
+    /// 340 pt: the side column beside a screen's main column (`AdaptiveColumns`, 8.15.0), where
+    /// cards made for a phone keep their look: a summary, what comes next, the latest items.
+    public static let sideColumnWidth: CGFloat = 340
+
+    /// 400 pt: the narrowest a screen's main column gets with a side column beside it
+    /// (`AdaptiveColumns`, 8.15.0), about a phone's width. Narrower, the side column folds away:
+    /// the two columns need 764 pt at the default text size, more at a larger one.
+    public static let mainColumnMinWidth: CGFloat = 400
+
     /// The columns of a grid of cards: as many side by side as fit at `minimum` each, one on a
     /// phone. `LazyVGrid(columns: AppLayout.cardColumns(), spacing: AppSpacing.lg) { … }`.
     ///

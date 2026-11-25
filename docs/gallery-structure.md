@@ -84,7 +84,7 @@ Gallery — сколько в нём компонентов; оно считае
 | **Status & Feedback** | `Badge`, `TrendBadge`, `StatusIndicatorBadge`, `StatusBanner`, `MessageBanner`, `InlineStatusText`, `Tooltip`, `.spotlight` (2.6.0), `TypingIndicator`, `EmptyState`, `StepTracker`, `ImportProgressSheet`, `.progressOverlay` (2.9.0), примитивы скелетонов (`Skeleton`, `SkeletonText`, `SkeletonRow`), `PendingItemCard` (3.6.0), `LoadMoreFooter` (4.1.0), `NoticeCard` (4.14.0), `InfoTip` (8.9.0) | M3 Communication, Atlassian Messaging + Loading |
 | **Headers & Navigation** | `SectionHeader` (три стиля, `.card` с 2.0.0; с 3.2.0 иконки до и после заголовка в каждом, `.list` стал `.compact`, удалён в 4.0.0; `.compact` удалён в 8.0.0), `HeroSection`, `UniversalCarousel`, `OnboardingStepIndicator`, `PlusTabLabel`, `CreatureTabLabel` (4.8.0), `LiveSessionBar` (2.8.0), `PagerArrows` (2.9.0) | M3 Navigation, HIG Navigation and search |
 | **Media & Identity** | `Icon` (символы, картинки, логотипы брендов), `Avatar`, `AvatarGroup`, `HeroSymbol`, `PackedCircleIcons`, `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`, `ThumbnailPlaceholder`, `SquareImageCropper` (8.5.0), фото (2.8.0: `PhotoTile`, `PhotoStrip`, `PhotoGrid`, `PhotoCarousel`, `PhotoViewer`; 3.1.0: `RemotePhoto`), `ShareCardFrame`, `ParticleCreature` (4.6.0), `CreatureGlyph` (4.8.0) | Atlassian Images and icons |
-| **Content & Layout** | `ExpandableText`, `ActivityTimeline`, `MonthCalendar`, `FlowLayout`, `FormSection`, `CardList` (8.0.0), `EditSheetContainer`, `EditableHero`, `ArticleBody` (2.8.0), `MessageBubble` (4.6.0), `ConversationDivider`, `RelativeTime` (8.9.0), `.readableWidth()` · `AppLayout` (8.13.0); `FormSection`'s glass style took 4.14.0's `ListCard` page (5.0.0), and since 8.0.0 every section is glass (or the grey of `SurfaceStyle.fill`, 8.12.0) | HIG Layout and organization |
+| **Content & Layout** | `ExpandableText`, `ActivityTimeline`, `MonthCalendar`, `FlowLayout`, `FormSection`, `CardList` (8.0.0), `EditSheetContainer`, `EditableHero`, `ArticleBody` (2.8.0), `MessageBubble` (4.6.0), `ConversationDivider`, `RelativeTime` (8.9.0), `.readableWidth()` · `AppLayout` (8.13.0), `AdaptiveColumns` (8.15.0); `FormSection`'s glass style took 4.14.0's `ListCard` page (5.0.0), and since 8.0.0 every section is glass (or the grey of `SurfaceStyle.fill`, 8.12.0) | HIG Layout and organization |
 | **Sheets & Flows** | `PromptSheet` (и праймер разрешения), `NotificationPermissionPrompt`, `OnboardingPager`, `OnboardingPage`, `OnboardingPageContainer`, `LoopOnboardingHero`, `ShareCardSheet` (2.8.0), `DateRangePickerSheet` (2.9.0), `AmountEntrySheet` (4.14.0) | HIG Presentation, M3 Containment (sheets) |
 | **Effects** | `.celebration`, `.sparkleBurst`, `.shine`, `.attentionPulse`, `AuroraBackground`, `.interactiveTilt` (2.2.0), `.completionMoment`, `.ripple` / `.rippleOnTap` (2.3.0), `VoiceWave`, `EdgeGlow` (вместо `SiriGlow`, `SiriWave`, удалены в 3.0.0), `.thinkingShimmer` (2.4.0), `.grain` (2.5.0), `.holographic`, `.dissolve` (2.6.0), `.accentGlow`, `.borderBeam` / `.borderGlow`, `.heroBackground` (4.5.0), `.heroBackground(picture:)` (8.14.0) | — (своё: Liquid Glass, Siri) |
 
@@ -97,17 +97,19 @@ Gallery — сколько в нём компонентов; оно считае
 Сверху вниз, каждый блок отделён:
 
 1. **Шапка**: название, одна фраза о назначении, стили (значения параметра `style:`,
-   `ComponentPage(styles:)`: «4 styles: default · compact · large · card»; только у
+   `ComponentPage(styles:)`: «3 styles: default · large · card»; только у
    компонентов с таким параметром), с какой версии (бейдж ведёт на заметки версии в Updates),
-   кто использует (Tenra, Dalada: `apps:`). Отделена от примера линией и отступом. Бейджи
+   кто использует (Tenra, Dalada, Platina: `apps:`). Отделена от примера линией и отступом. Бейджи
    приложений сверяет с их кодом задание CI «Gallery badges» (5.2.0,
    `.github/scripts/gallery_badges.py`): приложение стоит на странице, если его Swift-код
    называет компонент (вне комментариев и строк); имя, под которым приложение берёт компонент
-   (`.dsSearchSuggestions` у `SearchSuggestions`), — в `ALIASES` скрипта. `gallery_badges.py fix
-   --tenra … --dalada …` переписывает бейджи сам.
+   (`.dsSearchSuggestions` у `SearchSuggestions`, хук `DesignKitTheme.surface` у `SurfaceStyle`),
+   — в `ALIASES` скрипта. Если у приложения есть свой тип с тем же именем (модель `Avatar` в
+   Platina), засчитывается только файл, который импортирует модуль DesignKit. Platina читается с
+   8.17.1. `gallery_badges.py fix --tenra … --dalada … --platina …` переписывает бейджи сам.
 2. **Пример** на холсте (серая подложка с рамкой, на ней видно стекло; при поверхностях
    Fill — страница приложения, белая или чёрная): компонент в текущих параметрах. Акцент
-   (Tenra / Dalada) и поверхности (Glass / Fill, 8.12.0) переключаются в меню на главной и
+   (Tenra / Dalada / Platina) и поверхности (Glass / Fill, 8.12.0) переключаются в меню на главной и
    перерисовывают все страницы.
 3. **Параметры**: переключатели, сегменты, ползунки — то, что принимает компонент.
    Первая строка — **состояние**: обычное, загрузка (скелетон компонента), пусто, ошибка,

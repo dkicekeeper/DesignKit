@@ -5,7 +5,7 @@
 //  Something to download for offline use (2.8.0): its name, a line that says how big it is or
 //  how far along it got, and the action that fits: download, pause, resume. A bar fills while it
 //  downloads; a check mark says it is here. Ported from Dalada's OfflineRegionRow (offline map
-//  regions); the download itself, the sizes and the swipe to delete stay in the app.
+//  regions); the download itself, the sizes and the delete (a long press, 8.0.0) stay in the app.
 //
 
 import SwiftUI
@@ -17,10 +17,12 @@ import DesignSupport
 /// ```swift
 /// DownloadRow("Almaty region", status: .downloading(0.4), caption: "40% · 32 MB",
 ///             onDownload: { maps.download(region) }, onPause: { maps.pause(region) })
-///     .swipeActions { Button("Delete", role: .destructive) { maps.remove(region) } }
+///     .padding(.vertical, AppSpacing.md)   // a row of a FormSection card
+///     .contextMenu { Button("Delete", systemImage: "trash", role: .destructive) { maps.remove(region) } }
 /// ```
 ///
-/// Padding: vertical only, `AppSpacing.xxs` (a `List` row).
+/// Padding: vertical only, `AppSpacing.xxs` (a `List` row); a `FormSection` card's row adds
+/// `AppSpacing.md` above and below. No swipe actions (8.0.0): Delete is a long press.
 public struct DownloadRow: View {
     /// Where the download is.
     public enum Status: Equatable, Sendable {
