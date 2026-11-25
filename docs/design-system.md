@@ -2591,7 +2591,9 @@ Used in: `OnboardingWelcomeStep` (bottom), Account/Category/Subscription/Deposit
 ## 4. View Patterns
 
 How the apps put the components together. Each app's own guide names its screens (Tenra's
-`docs/design-system.md` §4, Dalada's `CLAUDE.md`).
+`docs/design-system.md` §4, Dalada's `CLAUDE.md`). The Gallery's **Patterns** (8.17.4) builds
+these screens from the components with sample data: settings, a detail, the things a person
+keeps with loading, empty and error, a dashboard, a conversation, an edit sheet and onboarding.
 
 ### Edit sheet: cards, with or without a hero
 
@@ -2635,10 +2637,11 @@ and a date (a goal, a debt) is `AmountEntrySheet` (4.14.0), this layout ready-ma
 ScrollView
 └── VStack(spacing: AppSpacing.lg)
     ├── HeroSection(…).screenPadding().scrollHero()
-    ├── HStack { DSButton(…); DSButton(…, appearance: .secondary) }
-    ├── VStack { UniversalRow(…, config: .info, accessory: .info(…)) … }.padding(AppSpacing.lg).cardStyle()
+    ├── GlassEffectContainer { HStack { DSButton(…, iconPlacement: .top); DSButton(…) } }
+    ├── FormSection { UniversalRow(…, config: .info, accessory: .info(…)) … }
     ├── the screen's own cards
-    └── history: day sections, SectionHeader(day) over TransactionRow rows
+    └── history: a card per day, SectionHeader(day) and its total over TransactionRow rows,
+        a RowDivider under each row's text
 .heroAccentGlow(icon:tint:)        a glow tinted from the hero icon
 .toolbar { Menu { edit, delete, … } }
 ```
