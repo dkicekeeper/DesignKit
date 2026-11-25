@@ -17,6 +17,22 @@ Versions follow semantic versioning; apps pin an exact version. A PR declares it
 note in `.changes/`; at the merge the release bot gives it the next number and writes its section
 here (docs/releasing.md).
 
+## 8.19.0 - 2026-11-25
+
+A counter of a `StatsStrip` can explain itself: `info:` puts an `InfoTip` after its caption. Platina's trophy screen explains a trophy's share of players this way, and Platina is the first app to use `InfoTip`.
+[#117](https://github.com/dkicekeeper/DesignKit/pull/117)
+
+### Added
+
+- `StatsStrip.Item(value:title:info:infoTitle:)`: `info:` is the text of an `InfoTip` after the counter's caption, on its first line (what the number means, where it comes from); `infoTitle:` is the tip's heading, the counter's full name when the caption is only a unit ("Share of players" over "1.8% of players"). VoiceOver reads the counter, then the tip as a button of its own. Without `info:` a counter looks and reads as before.
+
+### Gallery and tooling
+
+- `StatsStrip`'s page explains its first counter with a switch, and a note on `info:`; a snapshot of a counter with its tip (`statsStripWithInfo`, light, dark and large text).
+- `InfoTip`'s page carries Platina's badge: its profile explains the share of players over its rarest trophies. `gallery_badges.py` counts the `.infoTip` modifier as a use of `InfoTip`.
+- The badges follow the apps' `main` of 2026-11-25: `InfoTip` names Dalada too, `SearchablePicker` Tenra, Dalada and Platina, `ConversationDivider` Tenra and Platina.
+- docs/adoption.md: Platina's `InfoTip` and readable colours in use (a trophy row's metal and earned date in `AppColors.readable` and `Status.positiveText`).
+
 ## 8.18.1 - 2026-11-25
 
 The Gallery's badges follow Dalada's adoption of 8.9.0's components (Dalada#80). No API changes.

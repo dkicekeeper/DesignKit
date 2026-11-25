@@ -467,11 +467,19 @@ private struct StatTilePage: View {
 private struct StatsStripPage: View {
     @State private var count = 4
     @State private var state: SpecimenState = .content
+    @State private var explainsFirst = false
 
-    private let all: [StatsStrip.Item] = [
-        .init(value: "42", title: "days outdoors"), .init(value: "17", title: "trips"),
-        .init(value: "384", title: "km"), .init(value: "9", title: "catches"), .init(value: "5", title: "places"),
-    ]
+    private var all: [StatsStrip.Item] {
+        [
+            .init(
+                value: "42", title: "days outdoors",
+                info: explainsFirst ? "Days with a trip or a walk of at least an hour, since your first trip." : nil,
+                infoTitle: "Days outdoors"
+            ),
+            .init(value: "17", title: "trips"),
+            .init(value: "384", title: "km"), .init(value: "9", title: "catches"), .init(value: "5", title: "places"),
+        ]
+    }
 
     var body: some View {
         ComponentPage(
@@ -479,7 +487,10 @@ private struct StatsStripPage: View {
             summary: "Counters side by side in a card; two columns at accessibility text sizes.",
             since: "1.12.0",
             apps: [.tenra, .dalada, .platina],
-            canvas: .fill
+            canvas: .fill,
+            notes: [
+                "info: (8.19.0) puts an InfoTip after a counter's caption: how the number is counted, where it comes from. infoTitle: is its heading, the counter's full name when the caption is only a unit.",
+            ]
         ) {
             if state == .loading {
                 StatsStripSkeleton(count: count)
@@ -489,6 +500,7 @@ private struct StatsStripPage: View {
         } controls: {
             StateControl(state: $state)
             StepperControl("Counters", value: $count, in: 2...5)
+            ToggleControl("Explain the first (info:)", isOn: $explainsFirst)
         }
     }
 }

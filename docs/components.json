@@ -420,7 +420,8 @@
     "since": "8.9.0",
     "apps": [
       "Dalada",
-      "Platina"
+      "Platina",
+      "Tenra"
     ],
     "styles": [],
     "notes": [
@@ -1948,7 +1949,9 @@
       "Tenra"
     ],
     "styles": [],
-    "notes": [],
+    "notes": [
+      "info: (8.19.0) puts an InfoTip after a counter's caption: how the number is counted, where it comes from. infoTitle: is its heading, the counter's full name when the caption is only a unit."
+    ],
     "dos": [],
     "donts": [],
     "code": [
@@ -1957,7 +1960,7 @@
         "file": "Sources/DesignComponents/Cards/StatsStrip.swift",
         "doc": "A card of counters.",
         "initialisers": [
-          "init(value: String, title: String)",
+          "init(value: String, title: String, info: String? = nil, infoTitle: String? = nil)",
           "init(items: [Item])"
         ],
         "skeleton": "StatsStripSkeleton"
@@ -4090,7 +4093,8 @@
     "summary": "A line across a conversation: the day the next messages are from, or something that happened in it.",
     "since": "8.9.0",
     "apps": [
-      "Platina"
+      "Platina",
+      "Tenra"
     ],
     "styles": [],
     "notes": [

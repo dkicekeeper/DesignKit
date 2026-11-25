@@ -242,7 +242,7 @@ init(_ queries: [String] = [])
 
 A list too long to scan: the system search narrows it, one option or several are picked with the row's circle, and a name nothing has offers “Create”.
 
-Since 8.9.0 · Apps: Dalada, Platina
+Since 8.9.0 · Apps: Dalada, Platina, Tenra
 
 - `SearchablePicker` in `Sources/DesignComponents/Selection/SearchablePicker.swift`; skeleton `SearchablePickerSkeleton`
   A list to pick one option or several from, with the system search and "Create “…”".
@@ -1116,9 +1116,11 @@ Since 1.12.0 · Apps: Dalada, Platina, Tenra
   A card of counters.
 
 ```swift
-init(value: String, title: String)
+init(value: String, title: String, info: String? = nil, infoTitle: String? = nil)
 init(items: [Item])
 ```
+
+- info: (8.19.0) puts an InfoTip after a counter's caption: how the number is counted, where it comes from. infoTitle: is its heading, the counter's full name when the caption is only a unit.
 
 ### StreakCard
 
@@ -2327,7 +2329,7 @@ init(format: ShareCard.Format, brand: String, brandIcon: UIImage? = nil, site: S
 
 A line across a conversation: the day the next messages are from, or something that happened in it.
 
-Since 8.9.0 · Apps: Platina
+Since 8.9.0 · Apps: Platina, Tenra
 
 - `ConversationDivider` in `Sources/DesignComponents/Content/ConversationDivider.swift`; skeleton `ConversationDividerSkeleton`
   A centred caption between two hairlines, in a conversation's list of messages.
