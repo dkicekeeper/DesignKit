@@ -68,7 +68,7 @@ public struct PagerArrows<Content: View>: View {
             Icon(systemImage, size: AppIconSize.md)
         }
         .buttonStyle(.plain)
-        .foregroundStyle(enabled ? AppColors.accent : AppColors.Text.tertiary)
+        .foregroundStyle(enabled ? AppColors.Text.action : AppColors.Text.tertiary)
         .disabled(!enabled)
         .accessibilityLabel(Text(verbatim: label))
     }

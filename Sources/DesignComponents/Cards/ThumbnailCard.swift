@@ -149,7 +149,7 @@ public struct ThumbnailRow<Picture: View, Details: View>: View {
                     }
                     if isSaved {
                         Icon("bookmark.fill", size: AppIconSize.xs)
-                            .foregroundStyle(AppColors.accent)
+                            .foregroundStyle(AppColors.Text.action)
                             .accessibilityElement(children: .ignore)
                             .accessibilityLabel(Text(verbatim: savedLabel ?? ThumbnailText.saved))
                     }
@@ -194,7 +194,7 @@ private struct VerifiedSeal: View {
 
     var body: some View {
         Icon("checkmark.seal.fill", size: AppIconSize.xs)
-            .foregroundStyle(AppColors.accent)
+            .foregroundStyle(AppColors.Text.action)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text(verbatim: label ?? ThumbnailText.verified))
     }

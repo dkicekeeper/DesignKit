@@ -269,7 +269,7 @@ public struct MessageComposer<Leading: View>: View {
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
                 Text(verbatim: quote.title)
                     .font(AppTypography.caption.weight(.semibold))
-                    .foregroundStyle(AppColors.accent)
+                    .foregroundStyle(AppColors.Text.action)
                     .lineLimit(1)
                 Text(verbatim: quote.text)
                     .font(AppTypography.caption)

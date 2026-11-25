@@ -181,7 +181,7 @@ public struct MessageBubble: View {
                     if let onRetry {
                         Button(String(localized: "common.retry", defaultValue: "Retry"), action: onRetry)
                             .font(AppTypography.caption.weight(.semibold))
-                            .foregroundStyle(AppColors.accent)
+                            .foregroundStyle(AppColors.Text.action)
                     }
                 }
                 .transition(.riseIn)

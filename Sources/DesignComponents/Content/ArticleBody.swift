@@ -183,7 +183,7 @@ struct ArticleBlockView: View {
                     HStack(alignment: .firstTextBaseline, spacing: AppSpacing.sm) {
                         Text(verbatim: "\(index + 1).")
                             .monospacedDigit()
-                            .foregroundStyle(AppColors.accent)
+                            .foregroundStyle(AppColors.Text.action)
                         inline(item)
                     }
                 }

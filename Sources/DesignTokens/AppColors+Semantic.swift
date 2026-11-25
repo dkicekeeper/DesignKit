@@ -25,8 +25,12 @@ public extension AppColors {
         public nonisolated static let secondary = Color.secondary
         /// Hints, placeholders, disclaimers, disabled labels.
         public nonisolated static let tertiary = Color.gray
-        /// Interactive text and icons: links, text buttons. The app's accent.
-        public nonisolated static var action: Color { DesignKitTheme.accent }
+        /// Interactive text and icons: links, text buttons, a chosen label, an icon in a line. The
+        /// app's accent made readable (`AppColors.readable`, vNext): at least 4.5:1 on the page and
+        /// on a card in both themes, so a step deeper or lighter only where the raw accent would
+        /// not read (Tenra's indigo on a dark card, Dalada's green on a light one). Tints, fills,
+        /// outlines and tracks keep `AppColors.accent`.
+        public nonisolated static var action: Color { AppColors.readable(DesignKitTheme.accent) }
         /// A positive value or label: a rise, money in, "done". Since 8.9.0 the green of
         /// `Status.positive` deep enough to read (`AppColors.readable`): 4.5:1 on the page and on
         /// its pale container.

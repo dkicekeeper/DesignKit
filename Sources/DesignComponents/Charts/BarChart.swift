@@ -188,7 +188,7 @@ public struct BarChart<Point: ChartPoint>: View {
                     .annotation(position: .top, alignment: .center, spacing: 2) {
                         Text(todayText)
                             .font(AppTypography.caption2)
-                            .foregroundStyle(AppColors.accent)
+                            .foregroundStyle(AppColors.Text.action)
                     }
                     .accessibilityHidden(true)
             }

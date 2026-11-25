@@ -67,7 +67,7 @@ public struct CalculatorKeypad: View {
         keyButton(background: AppColors.pale(AppColors.accent)) {
             model.tapOperator(op)
         } label: {
-            Text(glyph).foregroundStyle(AppColors.accent)
+            Text(glyph).foregroundStyle(AppColors.Text.action)
         }
         .accessibilityLabel(accessibilityLabel(for: op))
     }

@@ -168,7 +168,7 @@ private struct DateRangeSummary: View {
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
                 Text(verbatim: title)
                     .font(AppTypography.caption)
-                    .foregroundStyle(isEditing ? AppColors.accent : AppColors.Text.secondary)
+                    .foregroundStyle(isEditing ? AppColors.Text.action : AppColors.Text.secondary)
                 Text(verbatim: DesignKitDateFormat.day?(date, true)
                     ?? date.formatted(.dateTime.day().month(.abbreviated).year().locale(locale)))
                     .font(AppTypography.bodyEmphasis)
@@ -332,7 +332,7 @@ struct DateRangeCalendar: View {
             Text(verbatim: "\(calendar.component(.day, from: day))")
                 .font(isEndpoint || isToday ? AppTypography.bodyEmphasis : AppTypography.body)
                 .monospacedDigit()
-                .foregroundStyle(isEndpoint ? AppColors.Text.onAccent : (isToday ? AppColors.accent : AppColors.Text.primary))
+                .foregroundStyle(isEndpoint ? AppColors.Text.onAccent : (isToday ? AppColors.Text.action : AppColors.Text.primary))
                 .frame(width: DateRangeCalendarMetrics.circle, height: DateRangeCalendarMetrics.circle)
                 .background {
                     if isEndpoint {

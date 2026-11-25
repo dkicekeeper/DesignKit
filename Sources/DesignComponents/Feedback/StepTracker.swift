@@ -86,7 +86,7 @@ public struct StepTracker: View {
                 Circle().strokeBorder(AppColors.accent, lineWidth: 2)
                 Text(verbatim: "\(index + 1)")
                     .font(AppTypography.caption.weight(.semibold))
-                    .foregroundStyle(AppColors.accent)
+                    .foregroundStyle(AppColors.Text.action)
             } else {
                 Circle().fill(AppColors.Background.containerStrong)
                 Text(verbatim: "\(index + 1)")
