@@ -359,7 +359,7 @@ rather than importing an app type.
 - Benchmark round 4 (2026-11, against Meta's Astryx, the owner approved the whole plan): 8.9.0.
   Status text reads at WCAG AA (`AppColors.readable`, `Status.*Text`, `ContrastTests`); 8.10.0
   (the owner's decision on the rest): white text sits on `AppColors.accentFill` (Tenra's indigo
-  deeper in dark mode, Dalada's green deeper) and income text is `AppColors.incomeText`,
+  deeper in dark mode, Dalada's green deeper) and income text is `readable(income)`,
   outcomes are spoken (`AccessibilityAnnouncer`), `InfoTip`, `RelativeTime`, `SearchablePicker`,
   Markdown replies with time and status, `ConversationDivider`; for the apps, one lint
   (`scripts/designkit_lint.py`), migrations for a major (`scripts/migrate.py`), the agent block
@@ -367,7 +367,8 @@ rather than importing an app type.
   and the block is their sessions' step (docs/adoption.md).
 - Surfaces without glass (8.12.0, the owner's request for Platina): `DesignKitTheme.surface = .fill`
   draws cards, sections, chips, tiles and icon plates as an opaque grey on the white page, and the
-  neutral shapes inside them as translucent fills (`.surfaceNeutral1` / `.surfaceNeutral2`).
+  neutral shapes inside them as translucent fills (`AppColors.Background.container` /
+  `.containerStrong`, vNext; `.surfaceNeutral1` / `.surfaceNeutral2` before).
   Buttons and floating chrome stay glass. Platina (its #1) and Dalada (its #77, 1.0.4) use
   `.fill`; Tenra keeps the default `.glass`.
 - Large screens (8.13.0, for Platina on the iPad and the Mac): `.readableWidth()` keeps a screen's
@@ -434,6 +435,7 @@ rather than importing an app type.
 | Moving an app to 6.0 (`OptionCardPicker`'s `style:` and `OptionCard` removed) | [docs/migration-6.0.md](docs/migration-6.0.md) |
 | Moving an app to 7.0 (the twelve rows → `UniversalRow(accessory:)`, the icon rule) | [docs/migration-7.0.md](docs/migration-7.0.md) |
 | Moving an app to 8.0 (glass sections and their dividers, `CardList`, `.compact` and `style:` removed) | [docs/migration-8.0.md](docs/migration-8.0.md) |
+| Moving an app to 9.0 (the colour names deprecated in vNext: roles, `AppColors.Data`, finance colours in the app) | [docs/migration-9.0.md](docs/migration-9.0.md) |
 | What exists vs Apple HIG / Material / Fluent / Carbon / Polaris / Atlassian / Astryx, next candidates | [docs/benchmark.md](docs/benchmark.md) |
 | Components no app uses yet and where they could go (for the app sessions) | [docs/adoption.md](docs/adoption.md) |
 | Where a component goes (Gallery sections, source folders), how its Gallery page is built | [docs/gallery-structure.md](docs/gallery-structure.md) |

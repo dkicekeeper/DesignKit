@@ -40,7 +40,7 @@
 
 | Module | Contents |
 |---|---|
-| `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, `pale(_:)`, flat 1.x aliases, `Palette` 3.7.0), `CategoryColors`, `AppSpacing`, `AppRadius`, `AppIconSize`, `AppLayout` (a large screen's column and card grid, 8.13.0; its side column, 8.15.0), `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `readableWidth` 8.13.0, `chartAppear`, `staggeredEntrance`, `softScrollEdges` 5.4.0, inline field styles), `SurfaceStyle` with `.surfaceStyle(_:)` and the `.surfaceNeutral1` / `.surfaceNeutral2` fills (8.12.0, glass or a grey fill), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme` (`accent`, `surface`), `DesignKitFonts` (Inter) |
+| `DesignTokens` | `AppColors` (grouped `Text` / `Background` / `Status` / `Border` since 1.6.0, roles since vNext, `pale(_:)`, `readable(_:)`, `Data` and `Palette` 3.7.0; the flat 1.x names and `CategoryColors` deprecated in vNext), `AppSpacing`, `AppRadius`, `AppIconSize`, `AppLayout` (a large screen's column and card grid, 8.13.0; its side column, 8.15.0), `AppTypography`, `AppAnimation` (+ `AppMotion`: springs by purpose, `MotionBudget`, `designKitMotion`, 2.2.0), `AppModifiers` (`cardStyle`, `formCardStyle`, `filterChipStyle`, paddings, `readableWidth` 8.13.0, `chartAppear`, `staggeredEntrance`, `softScrollEdges` 5.4.0, inline field styles), `SurfaceStyle` with `.surfaceStyle(_:)` (8.12.0, glass or a grey fill), `Background.container` / `.containerStrong` and `.surfaceBackground` (vNext), `DSButtonStyle` (`.dsButton`, 2.0.0; `.bounce`), `AmbientMotionGate`, `DesignKitTheme` (`accent`, `surface`), `DesignKitFonts` (Inter) |
 | `DesignSupport` | `IconSource`, `IconStyle`/`IconTint`, `Icon` (a brand logo is `Icon(source: .brandService(name))`; `BrandLogoView` was removed in 2.0.0), `Formatting`, `AmountFormatter`, `AmountDisplayConfiguration`, `AmountInputFormatting`, `ExpressionEvaluator`, `CurrencyInfo`, `RecentSearches` and `SearchMatch` (search suggestions, 3.5.0), `Formatting.relativeTime` / `elapsedTime` / `clockTime` / `dayTitle` (8.9.0), `AccessibilityAnnouncer` and `.voiceOverAnnouncement` (8.9.0), `HapticManager`, `HapticCue` (haptics by meaning, 2.3.0), `DominantColorExtractor`, host hooks (`DesignKitLogoLoader`, `DesignKitPhotoLoader` (3.1.0), `DesignKitCurrencyConverter`), `amountsHidden` (1.7.0), `matchedTransitionSourceIfPresent`, `swipeActionsContainerIfAvailable` |
 | `DesignComponents` | everything in §3 not marked *app-side*, plus the chart family in §0.2, and a skeleton for every component that shows data (`<Name>Skeleton`, 1.10.0; §3 "Component skeletons") |
 
@@ -70,7 +70,7 @@ DesignKit ships no networking, persistence or FX. A host app wires these once, i
 | Hook | Default | Wire to |
 |---|---|---|
 | `DesignKitTheme.accent` | `.indigo` | Brand accent behind `AppColors.accent`. Also set the asset-catalog `AccentColor` to the same colour (system chrome never reads `AppColors`). |
-| `DesignKitTheme.surface` *(8.12.0)* | `.glass` | How the surfaces draw: Liquid Glass, or `.fill`, an opaque grey (`Background.neutral1`) on the white page with no glass. Reaches `cardStyle()` and all built on it, filter chips, `ProgressRingTile`, an `Icon`'s glass plate, `OnboardingStepIndicator`, `MessageBanner`; `.surfaceStyle(_:)` changes a subtree. See "Surfaces" under Colors. |
+| `DesignKitTheme.surface` *(8.12.0)* | `.glass` | How the surfaces draw: Liquid Glass, or `.fill`, an opaque grey (`Background.card`) on the white page with no glass. Reaches `cardStyle()` and all built on it, filter chips, `ProgressRingTile`, an `Icon`'s glass plate, `OnboardingStepIndicator`, `MessageBanner`; `.surfaceStyle(_:)` changes a subtree. See "Surfaces" under Colors. |
 | `DesignKitFonts.registerIfNeeded()` | — | Call once; registers the bundled Inter variable fonts. |
 | `DesignKitLogoLoader.loader` | `nil` → fallback icon | Brand-logo images for `IconSource.brandService` (`Icon`, `heroAccentGlow`). |
 | `DesignKitIconPhotos.save` / `.isPhoto` *(8.5.0)* | `nil` → no Photo tab in `IconPicker` | Keeps a square the person cropped and returns the `IconSource` that shows it (Tenra: `.brandService("photo:<id>")` its logo loader reads from a file); `isPhoto` tells such an icon apart. `@MainActor`. |
@@ -115,36 +115,60 @@ Modifiers:
 - **`Pale`**: a tinted container behind status text, badges and icons. `AppColors.pale(_:)` makes one from any colour (a category colour too): 12% in light, 24% in dark. Since 1.8.0 every tinted container in DesignKit uses it, so they are equally strong everywhere: `Badge` (tinted), `TrendBadge` (pill), `RecommendationBox`, `HeroSymbol`, `Avatar` (initials), the round icons of `LimitProgressCard` and `AmountRow`'s tinted icon, `ActivityTimeline` markers, the `ScoreGaugeCard` grade and `TargetProgressCard` badge, `MonthCalendar`'s today, `TagInput` chips and the calculator's operator keys. Progress tracks and chart fills are not containers and keep their own opacity.
 - **Opaque** (`Border.opaque`): no transparency, for outlines that overlap.
 - **Readable** *(8.9.0)*: `AppColors.readable(_:)` makes a colour text or an icon that reads at 4.5:1 (WCAG AA for body text) on its own `pale(_:)` container and on the page: the same hue a step deeper in light mode, a step lighter in dark mode, unchanged when it already reads (the indigo accent in light mode). The system orange and green read at 2:1 on their tints in light mode, red 3:1, blue 3.4:1; made readable they are a deep amber, a forest green, a brick red. `readableFill(_:)` deepens a fill under white text (`Badge(.filled)`); `contrastRatio(_:_:in:)` measures a pair. Fills, tracks and chart marks keep the solid colours. `ContrastTests` pins the tokens, every category colour and the accents.
-- **Accent fill, income text** *(8.10.0)*: `AppColors.accentFill` is the accent under white text or a white symbol (a primary `DSButton`, the person's own `MessageBubble`, `MessageComposer`'s send and voice buttons, `DateRangePickerSheet`'s ends, `StepTracker`'s done steps, a picked `IconPicker` icon, `ThumbnailCard`'s mark, `GlassActionMenu`'s closed button): `readableFill(accent)`, 4.5:1 for white in both themes. Tenra's indigo is a step deeper in dark mode only (iOS 26's dark indigo read at 3.5:1), Dalada's green a step deeper in both (4.25:1 and 2.7:1). Tints, outlines, tracks and selection circles keep `accent`. `AppColors.incomeText` is money in as text (`readable(income)`; the bright `income` reads at 2.75:1 on white), which `PayoffProgressCard` and `ScheduleRow` take for their "paid" marks; fills, bars and chart marks keep `income`. A destructive primary button fills with `readableFill(Status.negative)`, a secondary or flat one writes in `Status.negativeText`.
+- **Accent fill, income text** *(8.10.0)*: `AppColors.accentFill` is the accent under white text or a white symbol (a primary `DSButton`, the person's own `MessageBubble`, `MessageComposer`'s send and voice buttons, `DateRangePickerSheet`'s ends, `StepTracker`'s done steps, a picked `IconPicker` icon, `ThumbnailCard`'s mark, `GlassActionMenu`'s closed button): `readableFill(accent)`, 4.5:1 for white in both themes. Tenra's indigo is a step deeper in dark mode only (iOS 26's dark indigo read at 3.5:1), Dalada's green a step deeper in both (4.25:1 and 2.7:1). Tints, outlines, tracks and selection circles keep `accent`. Money in as text is `readable(income)` (the bright income green reads at 2.75:1 on white); since vNext the income colour is the app's own and `PayoffProgressCard` and `ScheduleRow` make their "paid" marks readable from it (`progressColor:`, `doneColor:`). A destructive primary button fills with `readableFill(Status.negative)`, a secondary or flat one writes in `Status.negativeText`.
+
+**Which colour where** *(vNext)*: every colour has one name, named for where it goes. Only the accent is flat (`accent`, `accentFill`); everything else is in a group.
+
+| Where | Token |
+|---|---|
+| The screen | `Background.page` |
+| A card, a form section | `cardStyle()`: glass, or `Background.card` under `SurfaceStyle.fill` |
+| An opaque grey surface on the page: a banner's base, a message bubble, an app's panel over a map | `Background.card` |
+| A field, an icon's plate, an inactive chip inside a card | `Background.container` |
+| A track, a skeleton, a sunken control inside a card | `Background.containerStrong` |
+| A ring or a disc cut out of what lies under it (round an avatar, a chart's point) | `.surfaceBackground` |
+| A sheet, a modal screen | `Background.sheet` |
+| A tooltip, a popover | `Background.floating` |
+| Over a photo or a coloured hero | `Background.fillOnDark`, `.overlayOnImage`, `Text.*OnDark` |
+| Main, secondary, placeholder text | `Text.primary`, `.secondary`, `.tertiary` |
+| A link, a text button, a chosen label, an icon in a line | `Text.action` (the accent made readable) |
+| Tints, outlines, tracks, selection | `accent` |
+| Under white text or a white symbol | `accentFill` with `Text.onAccent` |
+| A status | `Status.x` fill, `Status.xText` text, `Status.xPale` container |
+| A thing with a name (a category, a game, a place type) | `AppColors.Data.color(for:)` |
+| A chart's series | `AppColors.Data.series` |
+| A marker, a route, a zone on a map | `AppColors.Palette` |
 
 **`AppColors.Text`** — text and icons
 
 | Token | Value | Use |
 |---|---|---|
-| `primary` / `secondary` / `tertiary` | `.primary` / `.secondary` / `.gray` | Main text; subtitles and metadata; hints, disclaimers, disabled labels |
-| `action` | `DesignKitTheme.accent` | Links, text buttons |
-| `positive` / `negative` / `warning` | `.green` / `.red` / `.orange` | A rise or "done"; a fall or an error; a warning |
+| `primary` / `secondary` / `tertiary` | `.primary` / `.secondary` / `.gray` | Main text; subtitles, metadata, hints and disclaimers; placeholders and disabled labels (`tertiary` reads under 3:1 on a grey card) |
+| `action` | `readable(accent)` *(vNext)* | Links, text buttons, chosen labels, icons in a line: the accent, a step deeper or lighter only where it would read under 4.5:1 on the page or a card (Tenra's indigo on a dark card, Dalada's green on a light one) |
+| `positive` / `negative` / `warning` | the `Status.*Text` colours | A rise or "done"; a fall or an error; a warning |
 | `onAccent` | `.white` | On an accent fill (filled button, badge) |
 | `primaryOnDark` / `secondaryOnDark` / `tertiaryOnDark` | white; iOS dark-mode label grey at 60% / 30% | On dark photos and headers, both themes |
 | `primaryOnLight` / `secondaryOnLight` / `tertiaryOnLight` | black; iOS light-mode label grey at 60% / 30% | On light photos and pale fills, both themes |
 
-**`AppColors.Background`** — screens, surfaces, containers
+**`AppColors.Background`** — screens, surfaces, containers *(roles since vNext)*
 
 | Token | Value (light / dark) | Use |
 |---|---|---|
-| `base` | `.systemBackground` | The screen |
-| `baseAlt` | `.systemGroupedBackground` | A grouped-list screen |
-| `baseAltCard` *(7.1.0)* | `.secondarySystemGroupedBackground` | A card or a list's section on `baseAlt`, as a grouped `List`'s rows: white in light, a step lighter in dark (and in a sheet, where iOS raises both) |
-| `elevation1` / `elevation2` / `elevation3` | white / `#1C1C1E`, `#2C2C2E`, `#3A3A3C` | Sheets and cards on base; cards on elevation 1; above everything. In light a shadow tells the levels apart, in dark the colour (iOS's own elevated backgrounds) |
-| `neutral1` | `.secondarySystemBackground` | Opaque, minimal contrast: fields, grouped blocks, inactive chips |
-| `neutral2` | `.systemGray5` | Opaque, more contrast: progress tracks, sunken controls, secondary buttons |
-| `fill` | `.tertiarySystemFill` | Translucent container on any surface, glass included |
+| `page` | `.systemBackground` | The screen (`base` before vNext) |
+| `card` | `.secondarySystemBackground`: `#F2F2F7` / `#1C1C1E`, `#2C2C2E` in a dark sheet | An opaque grey surface: the card of `SurfaceStyle.fill`, a banner's base, a panel (`neutral1` and `bgCard` before) |
+| `container` | a shape style: `card`'s grey on glass, `tertiarySystemFill` under `.fill` | A field, an icon's plate, an inactive chip inside a card, always a step darker than what it lies on (`neutral1`, `AppColors.Background.container` before); `SurfaceStyle.container` where an API takes a `Color` |
+| `containerStrong` | a shape style: `systemGray5` on glass, `secondarySystemFill` under `.fill` | A track, a skeleton, a sunken control (`neutral2`, `AppColors.Background.containerStrong`, `bgMuted` before); `SurfaceStyle.containerStrong` as a `Color` |
+| `sheet` | white / `#1C1C1E` | Sheets, modal screens (`elevation1` before) |
+| `floating` | white / `#3A3A3C` | Tooltips, popovers (`elevation3` before) |
+| `baseAlt` / `baseAltCard` | `.systemGroupedBackground` / `.secondarySystemGroupedBackground` | Only under the system's grouped `List`: white sections on grey in light, the mirror of `page` + `card`. In dark the two pairs are the same colours |
 | `fillOnDark` / `fillOnLight` | white 15% / black 5% | Translucent container on dark / light photos, both themes |
 | `overlayOnImage` | black 30% | Darkens a photo under text |
 
-**Surfaces: glass or a grey fill** *(8.12.0)*. `SurfaceStyle` says how DesignKit draws a surface: `.glass` (Liquid Glass, the default: Tenra) or `.fill`, an opaque `Background.neutral1` (`#F2F2F7` on the white page, `#1C1C1E` on black, `#2C2C2E` in a dark sheet) in the same shape, with no glass: for an app on the white page that wants less glass (Platina since its first build on 8.12.0, Dalada since 1.0.4). An app sets `DesignKitTheme.surface` once in `App.init()`; `.surfaceStyle(_:)` (`EnvironmentValues.surfaceStyle`, whose default is the hook) sets a subtree, a glass card over a photo in an app of grey cards. It reaches `cardStyle()` and everything on it (`FormSection`, `CardList`, the cards, `SectionHeader(style: .card)`), `filterChipStyle()` (the selected chip the accent's pale tint), `ProgressRingTile`'s circle (its colour's pale tint when selected), an `Icon`'s glass plate (`.glassHero`, `.glassService`: the neutral plate instead), `OnboardingStepIndicator` and `MessageBanner` (the grey under its colour's pale tint, opaque over the content). Controls (`DSButton`, `.buttonStyle(.glass)`), the chrome that floats over content (`MessageComposer`, `GlassActionMenu`, the system's bars) and glass drawn as an effect on a coloured hero (`.glassBar`, `HeroMilestoneGauge`, `OrbChart`) stay glass.
+Grey cards on the white page (`page` + `card`, `SurfaceStyle.fill`) and white sections on the grey page (`baseAlt` + `baseAltCard`, the system's grouped `List`) are mirror images in light mode and the same colours in dark; DesignKit draws the first, `CurrencyList` included since vNext.
 
-On a grey card `neutral1` is the card itself and `neutral2` the card in a dark sheet, so the neutral shapes inside cards follow the surface: `SurfaceStyle.neutral1` / `.neutral2` (colours) and the shape styles `.surfaceNeutral1` / `.surfaceNeutral2` (`SurfaceNeutral`, resolved from the environment) are `neutral1` / `neutral2` on glass and the translucent `tertiarySystemFill` / `secondarySystemFill` under `.fill`, a step darker than whatever lies under them. DesignKit's own use them (an icon tile's default plate, tracks, skeletons, `StepTracker`, `CalendarHeatmap`'s empty days, `FormTextField`, `IconPicker`'s cells, the "+N" of `MonthCalendar` and `AvatarGroup`); an app's own grey shape inside a card does too. `.fill` is for the white page: on `baseAlt` (`systemGroupedBackground`) the cards would melt into it. A ring or a disc that cuts a shape out of what lies under it (the ring between `AvatarGroup`'s avatars, a chart's point, a gauge's tick, a badge over an icon) is `.surfaceBackground` *(vNext)*: the page's colour, or the card's grey inside a `.fill` card (`cardStyle()` tells its content it lies on a card; `EnvironmentValues.surfaceBackground` is the same colour for a `Canvas`), so a grey card shows no white rings.
+**Surfaces: glass or a grey fill** *(8.12.0)*. `SurfaceStyle` says how DesignKit draws a surface: `.glass` (Liquid Glass, the default: Tenra) or `.fill`, an opaque `Background.card` (`#F2F2F7` on the white page, `#1C1C1E` on black, `#2C2C2E` in a dark sheet) in the same shape, with no glass: for an app on the white page that wants less glass (Platina since its first build on 8.12.0, Dalada since 1.0.4). An app sets `DesignKitTheme.surface` once in `App.init()`; `.surfaceStyle(_:)` (`EnvironmentValues.surfaceStyle`, whose default is the hook) sets a subtree, a glass card over a photo in an app of grey cards. It reaches `cardStyle()` and everything on it (`FormSection`, `CardList`, the cards, `SectionHeader(style: .card)`), `filterChipStyle()` (the selected chip the accent's pale tint), `ProgressRingTile`'s circle (its colour's pale tint when selected), an `Icon`'s glass plate (`.glassHero`, `.glassService`: the neutral plate instead), `OnboardingStepIndicator` and `MessageBanner` (the grey under its colour's pale tint, opaque over the content). Controls (`DSButton`, `.buttonStyle(.glass)`), the chrome that floats over content (`MessageComposer`, `GlassActionMenu`, the system's bars) and glass drawn as an effect on a coloured hero (`.glassBar`, `HeroMilestoneGauge`, `OrbChart`) stay glass.
+
+On a grey card `card` is the card itself, so the shapes inside cards follow the surface: `AppColors.Background.container` / `.containerStrong` (`SurfaceContainer`, resolved from the environment; `SurfaceStyle.container` / `.containerStrong` as colours) are the opaque greys on glass and the translucent `tertiarySystemFill` / `secondarySystemFill` under `.fill`, a step darker than whatever lies under them. DesignKit's own use them (an icon tile's default plate, tracks, skeletons, `StepTracker`, `CalendarHeatmap`'s empty days, `FormTextField`, `IconPicker`'s cells, the "+N" of `MonthCalendar` and `AvatarGroup`; since vNext also a logo's plate, the composer's idle buttons, the typing bubble and an unearned medal); an app's own container inside a card does too. `.fill` is for the white page: on `baseAlt` (`systemGroupedBackground`) the cards would melt into it. (It becomes `SurfaceStyle.solid` in 9.0.0, so "fill" means one thing.) A ring or a disc that cuts a shape out of what lies under it (the ring between `AvatarGroup`'s avatars, a chart's point, a gauge's tick, a badge over an icon) is `.surfaceBackground` *(vNext)*: the page's colour, or the card's grey inside a `.fill` card (`cardStyle()` tells its content it lies on a card; `EnvironmentValues.surfaceBackground` is the same colour for a `Canvas`), so a grey card shows no white rings.
 
 The same section and card on both, from the snapshot references (`FoundationsSnapshotTests.surfaceStyles`, so they follow every re-recording):
 
@@ -157,21 +181,17 @@ The same section and card on both, from the snapshot references (`FoundationsSna
 
 **`AppColors.Border`** — `normal` (`.separator`), `opaque` (`.opaqueSeparator`), `selected` (accent), `darkModeOnly` (clear in light, white 10% in dark: a hairline around logos, avatars and images that would melt into black), `onDark` (white 10%), `onLight` (black 5%).
 
-**Flat names (1.x)** stay as aliases of the groups, with the same values: `bgBase` = `Background.base`, `bgCard` = `Background.neutral1`, `bgMuted` = `Background.neutral2`, `textPrimary` / `textSecondary` / `textTertiary` = `Text.*`, `destructive` = `Status.negative`, `success` = `Status.positive`, `warning` = `Status.warning`, `staticWhite` = `Text.primaryOnDark`, `planned` = `Status.info`. New code uses the groups. Since 1.15.0 every component reads `Background.*` and `Text.*`; `accent`, `destructive`, `success`, `warning` and `staticWhite` stay as they are, they name a role rather than a level.
+**Deprecated names** *(vNext, removed in 9.0.0; [migration-9.0.md](migration-9.0.md), `scripts/migrations/9.0.0.json`)*: the flat names of 1.x (`bgBase`, `bgCard`, `bgMuted`, `textPrimary`, `textSecondary`, `textTertiary`, `staticWhite`, `destructive`, `success`, `warning`, `planned`), the levels (`Background.base`, `elevation1` to `elevation3`, `neutral1`, `neutral2`, `fill`, `SurfaceStyle.neutral1` / `.neutral2`, `AppColors.Background.container` / `AppColors.Background.containerStrong`) and `CategoryColors`. They keep their values and compile with a warning naming the replacement.
 
-| Token | Value | Use For |
-|-------|-------|---------|
-| `accent` | `DesignKitTheme.accent` (default `.indigo`) | Interactive elements, primary CTA tint. Per-app brand value — set `DesignKitTheme.accent` in `App.init()`. The host app's asset-catalog `AccentColor` must be the SAME colour — it drives system chrome (active tab tint, default buttons, search cursor). Keep the two in sync: an empty AccentColor silently falls back to system blue (Tenra shipped that until 2026-08-26). Tenra: system indigo (light 0x5856D6 / dark 0x5E5CE6). |
-| `income` | RGB(0.13, 0.70, 0.37) | Income amounts (deliberately distinct from `success`) |
-| `expense` | `.primary` | Expense amounts — deliberately NOT red (see comment in AppColors.swift) |
-| `transfer` | Cyan-teal | Internal transfer amounts |
-| `planned` | `.blue` (= `Status.info`) | Future/planned transactions |
+**Accent.** `AppColors.accent` is `DesignKitTheme.accent` (default `.indigo`): tints, outlines, tracks, selection. A per-app brand value, set in `App.init()`. The host app's asset-catalog `AccentColor` must be the SAME colour: it drives system chrome (active tab tint, default buttons, search cursor), and an empty AccentColor silently falls back to system blue (Tenra shipped that until 2026-08-26). Tenra: system indigo (light 0x5856D6 / dark 0x5E5CE6); Dalada: light 0x2E8B57 / dark 0x3CB371; Platina: Plasma, light 0xD6006F / dark 0xFF4FA0 (vNext). As text it is `Text.action`; under white text `accentFill`.
 
-For archived/inactive UI use `Color(.systemGray)` directly — there is no dedicated token.
+**Finance colours are the app's** *(vNext)*. `income`, `incomeText`, `expense` and `transfer` were Tenra's and are deprecated: Tenra defines them in its `DesignKitBridge.swift` and passes them to the components (`AmountComparisonBar(incomeColor:)`, `PayoffProgressCard(progressColor:)`, `ScheduleRow(doneColor:)`, `TrendBadge(color:)`, `TransactionRow`'s amounts). Without them the components use `Status.positive`. Expense amounts stay `Text.primary`, deliberately not red: most transactions are expenses, and red would make the whole app shout.
 
-**Category colors:** `CategoryColors.color(for:opacity:)` (`hexColor(for:)` before 2.1.0: it returns a colour, not a hex) — the 14-colour palette hashed by name; `CategoryColors.paletteColors` (1.10.0) is the palette itself, for an app's own name-coloured visuals (Tenra's letter avatars). DesignKit has no custom-category override; Tenra keeps its `customCategories:` / store-backed overloads app-side. The slot is `CategoryColors.paletteIndex(for:)`, an FNV-1a hash of the name: the same on every launch and device (since 0.7.0; before that it used `String.hashValue`, which Swift seeds per process, so the colour changed between launches). `CategoryColors.pickerPalette` (1.11.0) is what a user can pick (the default of `UniversalRow(accessory: .colors)`): the 14 hash colours first, then 16 deeper and neutral shades (30 `#rrggbb` strings). The hash palette itself stays at 14: `paletteIndex` is `hash % count`, so growing it would re-colour every category and avatar that relies on the name; new colours go to the picker only.
+For archived or inactive UI use `AppColors.Status.neutral`.
 
-**Palette (`AppColors.Palette`, 3.7.0):** deep hues for what an app draws over a map, a photo or a chart: a marker circle with a white symbol, a route or track line, a zone fill. Thirteen cases (`blue`, `indigo`, `violet`, `purple`, `pink`, `red`, `orange`, `ochre`, `green`, `emerald`, `teal`, `cyan`, `slate`), each with `.color` (SwiftUI), `.uiColor` (UIKit, MapKit, MapLibre, Core Graphics) and `.rgb`. Fixed values, the same in light and dark, so a marker image drawn once at style load looks right in both themes (a system colour such as `.systemTeal` resolves to whichever theme was on). White on each is at least 3:1, the WCAG minimum for a symbol; all but `orange` (3.6) reach 4.5. The hues are the `CategoryColors` family, one tone deeper where the category colour would not carry a white symbol. Which thing gets which hue stays in the app: Dalada's place types and map layers (its `MapColors`). Not for text, status or chrome: those are `AppColors.Text`, `.Status` and the accent; a map zone that means "banned" or "soon" uses `Status.negative` / `.warning`.
+**Data colours (`AppColors.Data`, vNext; `CategoryColors` before).** `AppColors.Data.color(for:opacity:)` is the colour of anything with a name that has none stored (a category, a game, a place type, a letter avatar): the 14-colour palette hashed by name. `paletteIndex(for:)` is an FNV-1a hash of the UTF-8 bytes, the same on every launch and device (since 0.7.0; before that it used `String.hashValue`, which Swift seeds per process). `AppColors.Data.palette` is the 14 colours; `pickerPalette` is what a person can pick (the default of `UniversalRow(accessory: .colors)`): the 14 hash colours first, then 16 deeper and neutral shades (30 `#rrggbb` strings). The hash palette stays at 14 in its order: growing it would re-colour every name. `AppColors.Data.series` *(vNext)* is eight colours for a chart's series, in an order where neighbours are at least 45° apart on the colour wheel (blue, orange, teal, pink, violet, yellow, green, rose). Every hue of the hash, picker and map palettes is defined once (`PaletteTable`, named after the Tailwind shades they are).
+
+**Palette (`AppColors.Palette`, 3.7.0):** deep hues for what an app draws over a map, a photo or a chart: a marker circle with a white symbol, a route or track line, a zone fill. Thirteen cases (`blue`, `indigo`, `violet`, `purple`, `pink`, `red`, `orange`, `ochre`, `green`, `emerald`, `teal`, `cyan`, `slate`), each with `.color` (SwiftUI), `.uiColor` (UIKit, MapKit, MapLibre, Core Graphics) and `.rgb`. Fixed values, the same in light and dark, so a marker image drawn once at style load looks right in both themes (a system colour such as `.systemTeal` resolves to whichever theme was on). White on each is at least 3:1, the WCAG minimum for a symbol; all but `orange` (3.6) reach 4.5. The hues are `AppColors.Data`'s family, one tone deeper where the category colour would not carry a white symbol. Which thing gets which hue stays in the app: Dalada's place types and map layers (its `MapColors`). Not for text, status or chrome: those are `AppColors.Text`, `.Status` and the accent; a map zone that means "banned" or "soon" uses `Status.negative` / `.warning`.
 
 ```swift
 markerFill = AppColors.Palette.teal.uiColor        // MapLibre, Core Graphics
@@ -217,10 +237,10 @@ below it the backing leaves the symbol no room for `Icon`'s padding, so 40 pt is
 **The rule (7.0.0, the owner's):** every icon is an `Icon`, and its size says what it is
 (`IconKind`). Under 44 pt a **glyph**: the symbol at its size, edge to edge, no plate, growing
 with the text size (`scalesWithText: false` for a symbol in a control of a fixed size). From
-44 pt a **tile**: the symbol on a plate (the style's colour, else `Background.neutral1`, or its
+44 pt a **tile**: the symbol on a plate (the style's colour, else `SurfaceStyle.glass.container`, or its
 glass) with room around it, 20 % of the side to 63 pt and 25 % from 64 pt; it keeps its size. A
 logo fills its shape at any size. A style's `backgroundColor` and glass apply to tiles only.
-Under `SurfaceStyle.fill` *(8.12.0)* the neutral plate is the surface's (`surface.neutral1`, a
+Under `SurfaceStyle.fill` *(8.12.0)* the neutral plate is the surface's (`surface.container`, a
 step darker than a grey card) and a glass plate is that fill, with no glass.
 
 | Glyph | Value | Use For |
@@ -358,9 +378,9 @@ The 1.x tokens, still used by the components that have them:
 
 | Modifier | Effect | When to Use |
 |----------|--------|-------------|
-| `.cardStyle(radius:)` | Liquid Glass card background, or under `SurfaceStyle.fill` *(8.12.0)* the opaque grey `Background.neutral1` in the same shape. Default radius: `AppRadius.xl` (20pt). Since 3.0.0 the glass is drawn behind the content, so the content keeps its exact colours (applied to the content, the glass blended its layers into each other) | **Display cards only.** Account/Loan/Health hero cards, list cards, detail-view cards — anything without interactive `Picker(.menu)` / `Menu` inside |
+| `.cardStyle(radius:)` | Liquid Glass card background, or under `SurfaceStyle.fill` *(8.12.0)* the opaque grey `Background.card` in the same shape. Default radius: `AppRadius.xl` (20pt). Since 3.0.0 the glass is drawn behind the content, so the content keeps its exact colours (applied to the content, the glass blended its layers into each other) | **Display cards only.** Account/Loan/Health hero cards, list cards, detail-view cards — anything without interactive `Picker(.menu)` / `Menu` inside |
 | `.formCardStyle(radius:)` | `.ultraThinMaterial` card background on every iOS. Same shape/padding contract as `cardStyle`. | A Material card for a host that wants one. `FormSection` used it up to 7.x, for fear that iOS 26's `glassEffect` would become the morph source of a menu inside it and collapse a one-row section into the popover; 8.0.0's probe on a device showed menus in glass cards work, and `FormSection` is glass (`cardStyle`) |
-| `.filterChipStyle(isSelected:)` | Glass chip styling with accent tint when selected; under `SurfaceStyle.fill` *(8.12.0)* a `.surfaceNeutral1` capsule, the accent's pale tint when selected. Animated selection transition | Filter buttons, `UniversalFilterButton` |
+| `.filterChipStyle(isSelected:)` | Glass chip styling with accent tint when selected; under `SurfaceStyle.fill` *(8.12.0)* a `Background.container` capsule, the accent's pale tint when selected. Animated selection transition | Filter buttons, `UniversalFilterButton` |
 | `.screenPadding()` | `.padding(.horizontal, AppSpacing.lg)` (16pt) | Screen-level horizontal insets |
 | `.readableWidth(_:)` *(8.13.0)* | A centred column no wider than `AppLayout.readableWidth` (720 pt, the margins included), scaled with the text size like the system's readable width; nothing on a phone, which is narrower | The content of every scroll view of an app that runs on an iPad or a Mac, after `.screenPadding()`; `AppLayout.wideWidth` for a grid of cards (§4, "Large screens") |
 | `.cardContentPadding()` | `.padding(AppSpacing.lg)` (16pt) | Internal card content padding — canonical, matches §10 |
@@ -535,7 +555,7 @@ EditableHero(icon: $icon, title: $name, titlePlaceholder: "Account name",
 **Purpose:** Read-only icon + title (+ optional amount / subtitle / progress) hero for entity-**detail** screens and simple icon+title contexts (`InsightDetailView`, `InsightDeepDiveView`, `TransactionAddModal`). For edit flows with bindings use `EditableHero` instead.
 
 - ⚠️ **`icon: nil` renders a placeholder container** (intentional). To omit the icon block entirely (e.g. the icon lives elsewhere, like a `OrbChart` centre), pass **`showsIcon: false`** — not `icon: nil`.
-- **`primaryAmount` / `primaryCurrency`** — built-in amount slot (h3). Prefer it over a sibling `FormattedAmountText`. **`primaryAmountColor`** overrides its colour (default `AppColors.textSecondary`).
+- **`primaryAmount` / `primaryCurrency`** — built-in amount slot (h3). Prefer it over a sibling `FormattedAmountText`. **`primaryAmountColor`** overrides its colour (default `AppColors.Text.secondary`).
 
 ---
 
@@ -609,7 +629,7 @@ UniversalRow(
 }
 ```
 
-**Rule:** do NOT manually apply `.font(AppTypography.body).foregroundStyle(AppColors.textPrimary)` to the title `Text` — use the `title:` initializer instead. Keeps form styling consistent.
+**Rule:** do NOT manually apply `.font(AppTypography.body).foregroundStyle(AppColors.Text.primary)` to the title `Text` — use the `title:` initializer instead. Keeps form styling consistent.
 
 **Configurations:**
 
@@ -655,7 +675,7 @@ Every row in `Views/Components/Rows/` follows these token rules. New rows MUST c
 | **Inner VStack (title ↔ subtitle)** | `AppSpacing.xs` (4) | Never `xxs` |
 | **Title — management lists** | `AppTypography.h4` (20 semibold) | AmountRow `.list` (larger touch lists) |
 | **Title — detail / breakdown rows** | `AppTypography.body` (18) or `bodyEmphasis` (18 semibold) | Insights detail rows. Use the `bodyEmphasis` **token** — never `body` + `.fontWeight(.semibold)` |
-| **Subtitle / secondary line** | `AppTypography.bodySmall` (16) / `AppColors.textSecondary` | One token for all secondary subtitles |
+| **Subtitle / secondary line** | `AppTypography.bodySmall` (16) / `AppColors.Text.secondary` | One token for all secondary subtitles |
 | **Trailing amount** | `FormattedAmountText` (default body/semibold) | Never hand-format money |
 | **Horizontal inset** | per-row `.screenPadding()` | Rows declare `hPad 0` (UniversalRow `.info`) and own their inset at the call site, so the full width — incl. padding — is tappable inside `NavigationLink`. Lists do NOT wrap the whole `VStack` (would double-pad self-padding `SectionHeader(.large)`) |
 | **Navigation chevron (outside `List`)** | `DisclosureChevron` | `chevron.forward` (RTL-aware) + tertiary. Never hand-roll `chevron.right` |
@@ -666,7 +686,7 @@ Every row in `Views/Components/Rows/` follows these token rules. New rows MUST c
 A label with a net amount (destructive when negative) and "+inflow −outflow" under it, or one amount (`singleValue`, `singleColor`) with no second line. Vertical padding of the `.info` preset (12; 8 from 1.4.0 to 8.5.0); in a card, a `RowDivider` between rows (§10). Tenra: `PeriodBreakdownRow` (period lists of the insights) is an adapter.
 
 #### `ScheduleRow` *(1.1.0)*
-A schedule entry: a checked circle when `isDone` (the row is dimmed with `futureTransactionStyle` when not), title + date subtitle, the amount and an optional detail line under it (`detailColor`, `AppColors.expense` by default). Vertical padding of the `.info` preset (12; 8 from 1.4.0 to 8.5.0, none before). Tenra: `AmortizationScheduleRow` (payment number, date format, interest) is an adapter.
+A schedule entry: a checked circle when `isDone` (the row is dimmed with `futureTransactionStyle` when not), title + date subtitle, the amount and an optional detail line under it (`detailColor`, `AppColors.Text.primary` by default). Vertical padding of the `.info` preset (12; 8 from 1.4.0 to 8.5.0, none before). Tenra: `AmortizationScheduleRow` (payment number, date format, interest) is an adapter.
 
 #### `AmountRow` *(2.1.0)*
 A row about money: an icon, a name, and an amount, a share or a limit. It merges four rows that
@@ -703,7 +723,7 @@ AmountRow(account.name, leading: .icon(account.iconSource), value: .amount(balan
 - **A limit row keeps the ring's room** (`Tile.lg`, 52 pt) around its icon whether a limit is set or
   not (2.1.0): a list of categories with and without a budget lines up. Before, a row without a
   ring had its icon and name 8 pt to the left and was 8 pt shorter.
-- `detail`: a caption line under the value (text, then an amount in `AppColors.planned`); at
+- `detail`: a caption line under the value (text, then an amount in `AppColors.Status.info`); at
   accessibility sizes the amount goes under its text, which drops a trailing "·".
 - `accessory`: `.chevron` (in a `NavigationLink`), `.systemImage(name)` (a secondary mark, a lock).
 - The tap (`Button` + `.plain`, or a `NavigationLink`) and the long press's Edit and Delete
@@ -773,7 +793,7 @@ Use in: `CategoryEditView` only.
 
 ### Card Components
 
-All display cards share one contract: inner padding `AppSpacing.lg` (16), `.cardStyle()` (default radius `AppRadius.xl` = 20), section title `AppTypography.h3` / `AppColors.textPrimary`, entity-card title `AppTypography.h4`. Money always via `FormattedAmountText`. Conform new cards to this; don't hand-roll the card's surface (`cardStyle()` draws it: Liquid Glass, or the grey of `SurfaceStyle.fill`, 8.12.0).
+All display cards share one contract: inner padding `AppSpacing.lg` (16), `.cardStyle()` (default radius `AppRadius.xl` = 20), section title `AppTypography.h3` / `AppColors.Text.primary`, entity-card title `AppTypography.h4`. Money always via `FormattedAmountText`. Conform new cards to this; don't hand-roll the card's surface (`cardStyle()` draws it: Liquid Glass, or the grey of `SurfaceStyle.fill`, 8.12.0).
 
 #### `FinanceCard`
 Shell for home-screen finance-product entry cards (accounts, deposits, loans, subscriptions, categories, subcategories). Owns the `HStack(title + hero/subtitle | icons)` layout, compact empty-state swap, padding and `.cardStyle()`. Each card supplies title, `isEmpty`, empty copy, `subtitle` (count line), a `hero` value view and a `trailing` facepile.
@@ -970,18 +990,18 @@ multilingual queries).
 | Preset | Shape | Context |
 |--------|-------|---------|
 | `.glyph(_:tint:)` *(7.0.0)* | A glyph, no plate; `.inherit` takes the colour around it | A symbol in a component, a row, a banner, a badge, a button (`Icon(_:size:tint:)`) |
-| `.categoryIcon(size:backgroundColor:)` | Circle, accent tint, `neutral1` plate as a tile | Category rows, chips (`Icon(source:size:)` for a symbol) |
-| `.categoryCoin(size:)` | Circle, accent tint, `neutral1` plate, 64 pt | Large category coins |
+| `.categoryIcon(size:backgroundColor:)` | Circle, accent tint, `container` plate as a tile | Category rows, chips (`Icon(source:size:)` for a symbol) |
+| `.categoryCoin(size:)` | Circle, accent tint, `container` plate, 64 pt | Large category coins |
 | `.roundedLogo(size:)` / `.roundedLogoLarge(size:)` | Circle, original colours, 32 / 40 pt | A logo in account rows / cards |
 | `.serviceLogo(size:)` / `.serviceLogoLarge(size:)` | Circle, original colours, 32 / 40 pt | A logo in subscription rows / cards (`Icon(source:size:)` for a brand) |
-| `.placeholder(size:)` | Circle, secondary tint, `neutral1` plate | Nil source fallback |
+| `.placeholder(size:)` | Circle, secondary tint, `container` plate | Nil source fallback |
 | `.glassHero(size:tint:)` | Circle + glass, 80 pt | Detail view hero (`EditableHero`, `HeroSection`) |
 | `.glassService(size:)` | Circle + glass, 40 pt | Service hero |
 | `.inline(tint:)` | 16 pt glyph | Text fields, chips |
 | `.toolbar(tint:)` | 20 pt glyph | Toolbar buttons |
 | `.emptyState()` | 80 pt tile, accent tint | Empty state illustration |
 
-The `neutral1` plates are the surface's under `SurfaceStyle.fill` *(8.12.0)*, and the glass of
+The `container` plates are the surface's under `SurfaceStyle.fill` *(8.12.0)*, and the glass of
 `.glassHero` / `.glassService` is that grey plate there.
 
 ---
@@ -1182,7 +1202,7 @@ HStack(spacing: AppSpacing.md) {
 #### `SelectionIndicator(isSelected:tint:)`
 Check circle for multi-select and checklist rows, and since 5.2.0 the trailing mark of every
 choice list (`UniversalRow(accessory: .checkmark)`, `CurrencyRow`): a filled check on the picked one, an empty circle on
-the others. The row carries the label and the `.isSelected` trait. `tint` (0.4.0, default accent) colours the filled check: `AppColors.success`
+the others. The row carries the label and the `.isSelected` trait. `tint` (0.4.0, default accent) colours the filled check: `AppColors.Status.positive`
 for a done checklist item, `textTertiary` for one that is already owned and disabled.
 
 #### `SelectableBalanceCard` *(1.5.0)*
@@ -1467,8 +1487,8 @@ Cases: `.active` (green checkmark), `.paused` (orange pause), `.archived` (gray 
 Capsule with short text and an optional SF Symbol: a status, a tag or a counter.
 
 ```swift
-Badge("Seasonal ban", color: AppColors.destructive)                       // .tinted: text on a 12 % tint
-Badge("3", systemImage: "person.badge.plus", color: AppColors.destructive, style: .filled)
+Badge("Seasonal ban", color: AppColors.Status.negative)                       // .tinted: text on a 12 % tint
+Badge("3", systemImage: "person.badge.plus", color: AppColors.Status.negative, style: .filled)
 ```
 
 Use `.tinted` for statuses and tags, `.filled` only for counters that need attention. Icon-only
@@ -1480,11 +1500,11 @@ Direction arrow + signed percent ("↗ +12.4%"), from Tenra's insights.
 
 ```swift
 TrendBadge(direction: .up, changePercent: 12.4)                                 // .pill
-TrendBadge(direction: .up, changePercent: 8, style: .inline, color: AppColors.destructive) // up is bad
+TrendBadge(direction: .up, changePercent: 8, style: .inline, color: AppColors.Status.negative) // up is bad
 TrendBadge(direction: .down, changePercent: -3.2, style: .changeIndicator)      // icon over value
 ```
 
-Default colours: up = `AppColors.income`, down = `destructive`, flat = `textSecondary`; pass
+Default colours: up = `Status.positive` (vNext; Tenra's income green before), down = `Status.negative`, flat = `Text.secondary`; pass
 `color:` where the direction's meaning flips (expenses). Tenra's `InsightTrendBadge` is an
 adapter over it (`InsightTrend` → direction + percent).
 
@@ -1552,7 +1572,7 @@ FormattedAmountText(
     prefix: "-",
     fontSize: AppTypography.h2,
     fontWeight: .semibold,
-    color: AppColors.expense
+    color: AppColors.Text.primary
 )
 ```
 
@@ -1643,7 +1663,7 @@ The budget bar's plain form for any progress (downloads, checklists, a followed 
 so progress looks the same in every app. Both inits expose the percentage to VoiceOver.
 
 ```swift
-LinearProgressBar(value: checklist.progress, color: AppColors.success, height: 6)
+LinearProgressBar(value: checklist.progress, color: AppColors.Status.positive, height: 6)
 LinearProgressBar(value: download.fraction, animatesOnAppear: false)
 ```
 
@@ -1727,7 +1747,7 @@ Events top to bottom on a continuous line: check-ins of a trip, history of a rec
 
 ```swift
 ActivityTimeline(checkins) { checkin in
-    TimelineMarker(systemImage: "mappin", color: AppColors.success)   // or .dot
+    TimelineMarker(systemImage: "mappin", color: AppColors.Status.positive)   // or .dot
 } content: { checkin in
     VStack(alignment: .leading) { Text(checkin.title); Text(checkin.time).font(AppTypography.caption) }
 }
@@ -1904,7 +1924,7 @@ A layout: no skeleton (its content has them).
 
 #### `HeroSymbol` *(0.7.0)*
 Large SF Symbol on a disc of its tint at 12%: the picture of `OnboardingPage` and
-`PromptSheet`. `HeroSymbol(systemImage: "map", size: 96, tint: AppColors.success)`.
+`PromptSheet`. `HeroSymbol(systemImage: "map", size: 96, tint: AppColors.Status.positive)`.
 Decorative (hidden from VoiceOver).
 
 #### `Rating` / `RatingPicker` *(0.4.0)*
@@ -1916,7 +1936,7 @@ Rating(rating: summary.average, size: 12)
 RatingPicker(rating: $draft.rating)
 ```
 
-Default colour `AppColors.warning`, maximum 5. VoiceOver keys: `rating.value`, `rating.pick`
+Default colour `AppColors.Status.warning`, maximum 5. VoiceOver keys: `rating.value`, `rating.pick`
 ([localization-keys.md](localization-keys.md)).
 
 ---
@@ -1991,7 +2011,7 @@ A control: no skeleton.
 
 #### `AchievementMedal`, `AchievementTile`, `AchievementProgressRow`
 - **Medal:** an SF Symbol in white on a disc of the achievement's colour once earned; a
-  tertiary symbol on `bgMuted` until then. Decorative for VoiceOver.
+  tertiary symbol on `Background.containerStrong` until then. Decorative for VoiceOver.
 - **Tile:** the medal, the title under it (caption, two lines, centred) and, while not earned,
   the progress text ("7 of 10", caption2, tertiary). For grids.
 - **Progress row:** a 32 pt medal, "Up next:" (secondary), the title, the progress text on the
@@ -2036,7 +2056,7 @@ recorder, the download manager) and passes views and strings in. Gallery: Media,
 Navigation, Rows, Content; snapshots: `MediaSnapshotTests` (skeletons in `SkeletonsSnapshotTests`).
 
 #### `PhotoTile`
-A photo cropped to a square on `AppColors.bgMuted` (what shows while it loads), corners
+A photo cropped to a square on `AppColors.Background.containerStrong` (what shows while it loads), corners
 `AppRadius.md`. `PhotoTile(size:cornerRadius:) { image }` takes the app's image view filling the
 tile; `PhotoTile(image: UIImage?)` takes a loaded image, or shows `PhotoPlaceholderSymbol`
 (the photo symbol, tertiary). `size: nil` fills the width and stays square (a grid cell); the
@@ -2079,7 +2099,7 @@ gives each photo's VoiceOver name.
 
 #### `PhotoCarousel`
 A post's photos one at a time in a rounded 4:3 frame (`PhotoCarouselMetrics.aspectRatio`), paged
-with dots when there are several; `onOpen` opens the photo. A `TabView(.page)` on `bgMuted`.
+with dots when there are several; `onOpen` opens the photo. A `TabView(.page)` on `Background.containerStrong`.
 
 #### `PhotoViewer`
 Photos full screen: black, dark scheme, paged, ✕ to close (`common.close`). Zoom *(new in the
@@ -2241,7 +2261,7 @@ Tenra: `AnimatedTranscriptionText` (recognised entities by confidence → highli
 One calendar of DesignKit's own (5.2.0; the system's two graphical calendars before, which
 showed neither the period nor which end was picked). On top the period ("Sep 12 – Oct 3, 2026",
 h3) and its length ("22 days", the system's words for the locale), over a field for each end
-(neutral1, `md` corners), the one the next tap sets outlined (`.selectionOutline`). Under it the
+(`Background.container`, `md` corners), the one the next tap sets outlined (`.selectionOutline`). Under it the
 month (h4, arrows to turn it; VoiceOver `pager.previous` / `pager.next`), the weekdays from the
 calendar's first one, and the days: the ends in 40 pt filled accent circles with white numbers,
 the days between on a pale accent band, today in the accent. A tap sets From (a one-day period),
@@ -2486,7 +2506,7 @@ creature waits inside the screen the tab opens. Decoration and a label: no skele
 
 #### `MessageBubble`
 `MessageBubble(text, role: .outgoing)`: the person's message on the trailing side in the accent,
-white text; `.incoming` on the leading side in `Background.neutral1`. `AppRadius.xl`, body text,
+white text; `.incoming` on the leading side in `Background.card`. `AppRadius.xl`, body text,
 selectable, at most the width minus 56 pt on the far side. `failure:` fades the bubble and says
 why under it in red; `onRetry:` adds Retry (`common.retry`). *(5.2.0)* A failure shakes the bubble
 once, its line rises in under it and the error haptic plays. `.transition(.messageBubble(role))`

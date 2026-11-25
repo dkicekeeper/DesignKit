@@ -75,6 +75,28 @@ class MigrateTests(unittest.TestCase):
         self.assertNotIn("DesignKit 7.0", self.text())
         self.assertIn("DesignKit 8.0", self.text())
 
+    def test_9_moves_the_colour_names_to_their_roles(self):
+        code = """Text("a").foregroundStyle(AppColors.textSecondary)
+Circle().fill(AppColors.success)
+Capsule().fill(.surfaceNeutral2)
+view.background(AppColors.Background.base)
+let c = CategoryColors.color(for: name)
+Text(amount).foregroundStyle(AppColors.income)
+list.refreshable { await load() }
+"""
+        with open(self.path, "w") as f:
+            f.write(code)
+        status, _ = run(self.dir.name, "--from", "8.18.0", "--to", "9.0.0", "--apply")
+        self.assertEqual(status, 0)
+        text = self.text()
+        self.assertIn("foregroundStyle(AppColors.Text.secondary)", text)
+        self.assertIn("fill(AppColors.Status.positive)", text)
+        self.assertIn("fill(AppColors.Background.containerStrong)", text)
+        self.assertIn("background(AppColors.Background.page)", text)
+        self.assertIn("AppColors.Data.color(for: name)", text)
+        self.assertIn("list.dsRefreshable { await load() }", text)
+        self.assertIn("// TODO(DesignKit 9.0): AppColors.income", text)
+
     def test_every_rules_file_is_valid(self):
         for name in os.listdir(os.path.join(HERE, "migrations")):
             with open(os.path.join(HERE, "migrations", name)) as f:
