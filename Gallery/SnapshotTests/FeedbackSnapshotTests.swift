@@ -18,6 +18,9 @@ extension ComponentSnapshots {
         /// `.dsRefreshable`'s mercury in fixed phases (vNext): a half and an almost full pull, the
         /// beads circling, the same from the top edge (no island), on a coloured hero (a shadow
         /// under the beads) and under `.designKitMotion(false)` (the ring of Reduce Motion).
+        ///
+        /// The renderer turns DesignKit's motion off for every snapshot, and the indicator draws
+        /// its ring then; a fixed phase is a still picture, so the mercury cases turn it back on.
         @Test func refreshIndicator() async {
             let cases: [(String, RefreshPhase, RefreshIndicator.Source)] = [
                 ("pulling-half", .pulling(progress: 0.5, elapsed: 0.6), .island),
@@ -27,7 +30,9 @@ extension ComponentSnapshots {
             ]
             for (name, phase, source) in cases {
                 await assertComponentSnapshot(
-                    RefreshIndicator(phase: phase, source: source).frame(height: 140),
+                    RefreshIndicator(phase: phase, source: source)
+                        .frame(height: 140)
+                        .designKitMotion(true),
                     named: name
                 )
             }
@@ -35,7 +40,8 @@ extension ComponentSnapshots {
                 RefreshIndicator(phase: .refreshing(elapsed: 0.4), source: .island)
                     .frame(height: 140)
                     .background(AppColors.accent)
-                    .environment(\.heroTone, .onColor),
+                    .environment(\.heroTone, .onColor)
+                    .designKitMotion(true),
                 named: "on-colour"
             )
             await assertComponentSnapshot(
