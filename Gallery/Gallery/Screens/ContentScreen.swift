@@ -48,7 +48,7 @@ private struct ConversationDividerPage: View {
             name: "ConversationDivider",
             summary: "A line across a conversation: the day the next messages are from, or something that happened in it.",
             since: "8.9.0",
-            apps: [.tenra, .platina],
+            apps: [.platina],
             canvas: .fill,
             notes: [
                 "ConversationDivider(date:) reads “Today”, “Yesterday”, then the day (Formatting.dayTitle, the DesignKitDateFormat.day hook); VoiceOver hears it as a heading.",
