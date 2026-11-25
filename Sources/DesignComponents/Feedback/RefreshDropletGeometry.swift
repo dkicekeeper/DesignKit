@@ -42,6 +42,8 @@ enum RefreshMetrics {
     static let shadowOpacity = 0.3
     static let shadowRadius: CGFloat = 4
     static let shadowY: CGFloat = 2
+    /// How much of the scroll view's top the indicator covers (from the screen's top).
+    static let overlayHeight: CGFloat = 240
     /// Reduce Motion's ring.
     static let reduceMotionRing: CGFloat = 18
     /// The blur that melts the circles into one liquid.
