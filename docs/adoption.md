@@ -57,13 +57,13 @@ Benchmark round 4 (docs/benchmark.md, against Meta's Astryx) added these. Where 
 
 | Component | Tenra | Dalada | Platina |
 |---|---|---|---|
-| `InfoTip` | proposed: the Financial Health score and its parts, an insight's rolling average or forecast, "spent per day" | uses it: a place's pressure over 24 hours and when it is steady (`.infoTip`). Declined where proposed: routes have no difficulty, and `StreakCard` and `RatingSummary` take strings only, with no place after a label for an ⓘ (proposed: an `info:` on both cards) | uses it: the share of players who earned a trophy, once in the profile's rarest trophies (Platina#2) |
+| `InfoTip` | proposed: the Financial Health score and its parts, an insight's rolling average or forecast, "spent per day" | uses it: a place's pressure over 24 hours and when it is steady (`.infoTip`). Declined where proposed: routes have no difficulty, and `StreakCard` and `RatingSummary` take strings only, with no place after a label for an ⓘ (proposed: an `info:` on both cards) | the share of players who earned a trophy: over its rarest trophies, and by the counter on a trophy's screen (`StatsStrip`'s `info:`, vNext, with its next pin) |
 | `RelativeTime` | uses it | uses it | uses it |
 | `SearchablePicker` | proposed: a transaction's category and subcategory (with "Create"), link payments | uses it: gear for a packing list (several, with "Create"). Declined: a place's type, nine fixed types in a menu row | uses it |
 | `MessageBubble(markdown:time:status:)` | `MessageBubble` with plain text; proposed: Ten's answers in Markdown, the time under a message | declined: a thread is a public discussion of `CommentRow`s (author, avatar, quote, reactions), with no read state and no chat | Plati's answers in Markdown |
 | `ConversationDivider` | proposed: the chat's days, "Ten changed the budget" | declined: each `CommentRow` shows its own time, and nobody joins a public thread | uses it |
 | `AccessibilityAnnouncer` | proposed: "Saved", "Imported 120 transactions", a sync that finished | uses it | uses it |
-| `AppColors.Status.*Text`, `AppColors.readable` | proposed: its own status texts on tints (a category's badge) | uses it: its own status text and marks (errors, a paused trip, off route, "pending", verified). Its rule statuses are `Badge` and `RecommendationBox`, readable already; it has no map legend | proposed: a trophy's grade on its tint |
+| `AppColors.Status.*Text`, `AppColors.readable` | proposed: its own status texts on tints (a category's badge) | uses it: its own status text and marks (errors, a paused trip, off route, "pending", verified). Its rule statuses are `Badge` and `RecommendationBox`, readable already; it has no map legend | a trophy row's metal and earned date on the grey card (the metals read at 2.1 to 3.6:1 as text) |
 | `scripts/designkit_lint.py` | runs it in CI and after each pin bump | the same | runs it in CI |
 | `scripts/sync_agents_block.py` | its CLAUDE.md, after each pin bump in `designkit.yml` | the same | its CLAUDE.md, after each pin bump in its `designkit.yml` (since 2026-11-25) |
 
@@ -75,7 +75,8 @@ grey surfaces (`DesignKitTheme.surface = .fill`, 8.12.0) and in a column on the 
 use `SearchablePicker`, `ConversationDivider`, `MessageBubble(markdown:)`, `.readableWidth()` and
 `.heroBackground(clearHeight:picture:)` (its game screen, 8.14.0); its profile puts its sections
 side by side on an iPad (`AppLayout.cardColumns`) and its play days in a `CalendarHeatmap`. Since
-Platina#2 an `InfoTip` explains the share of players who earned a trophy.
+Platina#2 an `InfoTip` explains the share of players who earned a trophy, over its rarest trophies
+and, with `StatsStrip`'s `info:` (vNext), by the counter on a trophy's screen.
 
 ## Ten (ParticleCreature) in Tenra
 
