@@ -52,16 +52,17 @@ dropped it since), `.textReveal`, `.staggeredEntrance`, `.hapticCue`, `ScrambleT
 ## 8.9.0: proposals for the new components
 
 Benchmark round 4 (docs/benchmark.md, against Meta's Astryx) added these. Where they went by
-2026-11-24, and what is still a proposal:
+2026-11-24 (Tenra's column by 2026-11-25, when its session decided each proposal), and what is
+still a proposal:
 
 | Component | Tenra | Dalada | Platina |
 |---|---|---|---|
-| `InfoTip` | proposed: the Financial Health score and its parts, an insight's rolling average or forecast, "spent per day" | proposed: a route's difficulty, a rating, a streak's rule | proposed: a trophy's rarity (the share of players who earned it) |
+| `InfoTip` | declined: every figure proposed explains itself on its screen (Financial Health's weighting card and each part's explanation, "How it's calculated" on the forecast and "For today", By day's footnote), and every figure on Analytics is a link to that screen, where an ⓘ would be a button inside a button | proposed: a route's difficulty, a rating, a streak's rule | proposed: a trophy's rarity (the share of players who earned it) |
 | `RelativeTime` | uses it | uses it | uses it |
-| `SearchablePicker` | proposed: a transaction's category and subcategory (with "Create"), link payments | proposed: a trip's gear (several, with "Create"), a place's type | uses it |
-| `MessageBubble(markdown:time:status:)` | `MessageBubble` with plain text; proposed: Ten's answers in Markdown, the time under a message | proposed: a thread's messages with time and "Read" | Plati's answers in Markdown |
-| `ConversationDivider` | proposed: the chat's days, "Ten changed the budget" | proposed: a thread's days, "Alex joined" | uses it |
-| `AccessibilityAnnouncer` | proposed: "Saved", "Imported 120 transactions", a sync that finished | uses it | uses it |
+| `SearchablePicker` | the subcategory picker of the transaction forms (several, with "Create"; one to link from a category's subcategories); declined for the category (the form's chip row; a category needs its icon and colour) and link payments (transactions, with their amounts and days) | proposed: a trip's gear (several, with "Create"), a place's type | uses it |
+| `MessageBubble(markdown:time:status:)` | `MessageBubble` with plain text for the person's questions; Ten's replies stay on the page between their cards, their Markdown read by `ArticleBody.Block.parse(markdown:)` (in place of Tenra's copy); time and status declined (nothing is delivered to a person; the day lines say when) | proposed: a thread's messages with time and "Read" | Plati's answers in Markdown |
+| `ConversationDivider` | the chat's days, once a thread is not all from today (every kept message keeps its date); "Ten changed the budget" declined: the draft card says Saved, with Undo | proposed: a thread's days, "Alex joined" | uses it |
+| `AccessibilityAnnouncer` | "Saved" when the add form, a transaction's edit or an account's top-up or transfer closes on save; "Import complete, N operations" when a statement's review closes; backups and restores speak through their `MessageBanner` | uses it | uses it |
 | `AppColors.Status.*Text`, `AppColors.readable` | proposed: its own status texts on tints (a category's badge) | proposed: rule statuses, map legends on a tint | proposed: a trophy's grade on its tint |
 | `scripts/designkit_lint.py` | runs it in CI and after each pin bump | the same | runs it in CI |
 | `scripts/sync_agents_block.py` | its CLAUDE.md, after each pin bump in `designkit.yml` | the same | its CLAUDE.md carries the block; moves its pin by hand |
