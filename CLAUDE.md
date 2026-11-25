@@ -96,8 +96,9 @@ consumers `import DesignTokens` / `DesignSupport` / `DesignComponents` as needed
 | Tenra | `Tenra.xcodeproj` package reference, exact version | Reference look. `Tenra/Utils/DesignKitBridge.swift` re-exports the three modules, wires the host hooks and keeps the Tenra-model adapters (custom category colours, logo registry, breakdown → `DonutSlice`, the stat-card sparkline). Since 2.9.0 its transaction rows (`TransactionRow` under `TransactionCardView`), account and category card pickers (`SnapCardPicker`), live transcript (`StreamingText`), custom period sheet (`DateRangePickerSheet`), background options (`OptionCardPicker`), voice cards (`.cascadeIn`), period pagers (`PagerArrows`) and backup overlay (`.progressOverlay`) are DesignKit's too, as thin adapters over its models. Its Finances cards use `PackedCircleIcons(style: .shelf)` (4.5.0; whole 48 pt tiles in a 160 pt row since 4.15.0, 36 pt in a pocket from 4.5.1, the rest in "+N"; 4.4.0's shelf replaced 3.3.0's `.fan`). Since 3.5.0 search suggestions (`.dsSearchSuggestions`: History with its categories and subcategories, link payments, subcategory search). Since 4.6.0 the pieces of its AI assistant: `ParticleCreature` (the mascot), `MessageBubble`, `SuggestionChips`; since 4.8.0 its tab (`CreatureTabLabel` over `CreatureGlyph`) and its field's attach menu and microphone (`MessageComposer(leading:onVoice:)`). Since 4.10.0 Ten speaks in words of light and gestures (`speech:`, `.creatureGesture`), since 4.11.0 it lives on its own and thinks pictures (`.creatureAmbience`, `CreatureSpeech(symbol:label:)`), since 4.12.0 it wears accessories (`accessory:`: holidays, a crown, its wardrobe), since 4.13.0 it stands in its empty lists (`EmptyState(…) { artwork }`, a line and a point at the button). Since 4.14.0 the last generic views it drew itself: `AmountEntrySheet` (money towards a goal or a debt), `ListCard` (its assistant's cards; `FormSection(style: .glass)` since 5.0.0), `NoticeCard` ("Ten writes"), `VoiceOrbButton` (the voice stop orb), `PickerCarousel` (Ten's wardrobe) and `NavigationPickerRow(style: .list)` (Settings' voice language; since 7.0.0 every form and settings row of it is a `UniversalRow`). Since 5.3.0 (its #79, docs/adoption.md) every mood, emotion and gesture of Ten (`.working(progress:)` while a statement is read, gesture haptics on reactions, `.creatureFollowsTilt()` on Home, `ParticleCreature.image` on notifications), `MessageBubbleTransition` in the chat (its step in words under `.thinkingShimmer` while Ten thinks, in place of 5.3.0's `TypingIndicator`), `OptionCardPicker` for Home's background (a carousel of previews only since 6.0.0), and `StatusBanner`, `HeroSymbol`, `StepTracker`, `.spotlight` (its first-launch hints), `LiveAmountText`, `SpentBudgetText`, `.sparkleBurst`. Since 8.2.0 its assets are `HoldingCard`s (`AssetCard`, its #105). Its guide: `docs/design-system.md` (the bridge, every adapter and the component under it, screen patterns, amount rules) |
 
 **Platina** (2026-11, a PlayStation trophy tracker, in development) is the third consumer:
-`ios/project.yml` (XcodeGen), `exactVersion: "X.Y.Z"`, moved by hand (no DesignKit update
-workflow yet; its CI lints at the pinned version, and the bump runs `sync_agents_block.py`). Swift 6, iOS 26, iPhone and iPad (a Mac runs
+`ios/project.yml` (XcodeGen), `exactVersion: "X.Y.Z"`, moved by its own DesignKit update workflow
+since 2026-11-25 (on the Xcode 27 image; its CI lints at the pinned version, and the bump runs
+`sync_agents_block.py`). Swift 6, iOS 26, iPhone and iPad (a Mac runs
 it as "Designed for iPad"; its content keeps to `.readableWidth()`, 8.13.0); accent
 `#3573BA` through `DesignKitTheme.accent`; since 8.12.0 (its #1) grey surfaces
 (`DesignKitTheme.surface = .fill`). All of its interface is DesignKit's: forms and lists
@@ -117,8 +118,8 @@ since 8.17.1 (CI's `Gallery badges` job checks it out with Tenra and Dalada).
 
 A consumer sees a DesignKit change when its pin moves. Each app's **DesignKit update** workflow
 (`.github/workflows/designkit.yml` in the app) checks for a newer release tag daily, bumps the
-pin, builds and tests, and commits the bump to the app's `main` when green (Platina has no such
-workflow yet). CI's `dalada`, `tenra` and `platina` jobs build the three apps against the current
+pin, builds and tests, and commits the bump to the app's `main` when green (Platina's since
+2026-11-25). CI's `dalada`, `tenra` and `platina` jobs build the three apps against the current
 checkout, so a change that would break one fails here first (manual runs take `dalada_ref` /
 `tenra_ref` / `platina_ref` to check an app branch).
 
@@ -401,9 +402,10 @@ rather than importing an app type.
   motion, 15 spacing that grows with Dynamic Type, 20 `FormSection(isExpanded:)`,
   `FlowLayout(maxRows:)`, a banner over a sheet, a status dot on `Avatar`, 23 the code of a page's
   configuration in the Gallery), the assistant's list of actions once Tenra shows one, anatomy on
-  the pages of composite cards and rows; Platina's own DesignKit update workflow (its CI job
-  here, the issue template, 28, and the Gallery's Patterns of whole screens, 24, came in vNext); the
-  adoption proposals in [docs/adoption.md](docs/adoption.md) for the app sessions.
+  the pages of composite cards and rows (Platina's CI job here, the issue template, 28, and the
+  Gallery's Patterns of whole screens, 24, came in vNext, and Platina's own DesignKit update
+  workflow on 2026-11-25); the adoption proposals in [docs/adoption.md](docs/adoption.md) for the
+  app sessions.
 - Release numbers given at merge (2026-11, the owner's decision after parallel sessions'
   PRs collided on numbers and on `VERSION`, CHANGELOG.md and docs/components.md): a PR declares
   its release in `.changes/`, the bot numbers, writes and tags it on `main`
