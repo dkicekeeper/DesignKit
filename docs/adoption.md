@@ -64,7 +64,7 @@ Benchmark round 4 (docs/benchmark.md, against Meta's Astryx) added these. Where 
 | `AccessibilityAnnouncer` | proposed: "Saved", "Imported 120 transactions", a sync that finished | uses it | uses it |
 | `AppColors.Status.*Text`, `AppColors.readable` | proposed: its own status texts on tints (a category's badge) | proposed: rule statuses, map legends on a tint | proposed: a trophy's grade on its tint |
 | `scripts/designkit_lint.py` | runs it in CI and after each pin bump | the same | runs it in CI |
-| `scripts/sync_agents_block.py` | its CLAUDE.md, after each pin bump in `designkit.yml` | the same | its CLAUDE.md carries the block; moves its pin by hand |
+| `scripts/sync_agents_block.py` | its CLAUDE.md, after each pin bump in `designkit.yml` | the same | its CLAUDE.md, after each pin bump in its `designkit.yml` (since 2026-11-25) |
 
 ## Platina
 

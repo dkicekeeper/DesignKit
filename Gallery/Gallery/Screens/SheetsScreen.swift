@@ -217,11 +217,16 @@ private struct LoopOnboardingHeroPage: View {
 
 // MARK: - Sample onboarding
 
-private struct SampleOnboarding: View {
+/// Also the Onboarding pattern (PatternsScreen).
+struct SampleOnboarding: View {
     enum Page: Hashable, CaseIterable { case welcome, places, location, done }
 
     let onFinish: () -> Void
     @State private var page: Page = .welcome
+
+    init(onFinish: @escaping () -> Void) {
+        self.onFinish = onFinish
+    }
 
     var body: some View {
         OnboardingPager(
