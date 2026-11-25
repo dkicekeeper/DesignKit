@@ -41,6 +41,31 @@ enum GalleryScreen: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
+    /// The screen's title: the section a search result names (vNext).
+    var title: String {
+        switch self {
+        case .surfaces: SurfacesScreen.title
+        case .motion: MotionScreen.title
+        case .actions: ActionsScreen.title
+        case .textInput: TextInputScreen.title
+        case .selection: SelectionScreen.title
+        case .amounts: AmountsScreen.title
+        case .settingsRows: SettingsRowsScreen.title
+        case .dataRows: DataRowsScreen.title
+        case .moneyCards: MoneyCardsScreen.title
+        case .progressCards: ProgressCardsScreen.title
+        case .contentCards: ContentCardsScreen.title
+        case .charts: ChartsScreen.title
+        case .progress: ProgressScreen.title
+        case .feedback: FeedbackScreen.title
+        case .navigation: NavigationScreen.title
+        case .media: MediaScreen.title
+        case .content: ContentScreen.title
+        case .sheets: SheetsScreen.title
+        case .effects: EffectsScreen.title
+        }
+    }
+
     /// The screen, opened on the page titled `page`.
     func destination(page: String) -> some View {
         Group {
