@@ -268,6 +268,29 @@ extension ComponentSnapshots {
             )
         }
 
+        /// vNext: what it is busy with, in its still frames: searching (the beam on the globe's
+        /// front), calculating (the bands mixed), connecting (the network with a pulse on its way),
+        /// writing (the pen on the front, its line behind it); then the four in the avatar.
+        @Test func particleCreatureBusy() async {
+            let moods: [ParticleCreature.Mood] = [.searching, .calculating, .connecting, .writing]
+            await assertComponentSnapshot(
+                VStack(spacing: AppSpacing.md) {
+                    // Four 80 pt squares fit the 360 pt snapshot.
+                    HStack(spacing: AppSpacing.md) {
+                        ForEach(moods.indices, id: \.self) { index in
+                            ParticleCreature(mood: moods[index]).frame(width: 80, height: 80)
+                        }
+                    }
+                    HStack(spacing: AppSpacing.lg) {
+                        ForEach(moods.indices, id: \.self) { index in
+                            ParticleCreature(mood: moods[index], style: .compact).frame(width: 40, height: 40)
+                        }
+                    }
+                },
+                appearances: [.light, .dark]
+            )
+        }
+
         /// 5.3.0: working at a fifth, three fifths and all of the work done (the sphere filling
         /// with light), and the still picture `ParticleCreature.image(…)` gives, answering.
         @Test func particleCreatureWorkAndImage() async {
