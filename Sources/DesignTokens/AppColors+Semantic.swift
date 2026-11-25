@@ -54,34 +54,70 @@ public extension AppColors {
 
     // MARK: - Background
 
-    /// Screens, surfaces and containers.
+    /// Screens, surfaces and containers, named by role (vNext).
     ///
-    /// Levels: `base` (the screen) → `elevation1` (sheets, cards on base) → `elevation2` (cards
-    /// on elevation 1) → `elevation3` (above everything). In light they are all white and a
-    /// shadow tells them apart; in dark each level is a step lighter.
+    /// | Where | Token |
+    /// |---|---|
+    /// | The screen | `page` |
+    /// | An opaque grey surface: a card under `SurfaceStyle.fill`, a panel over a map | `card` |
+    /// | A field, an icon's plate, an inactive chip inside a card | `container` |
+    /// | A track, a skeleton, a sunken control inside a card | `containerStrong` |
+    /// | A sheet, a modal screen | `sheet` |
+    /// | A tooltip, a popover | `floating` |
+    /// | A ring that cuts a shape out of whatever lies under it | `.surfaceBackground` |
+    ///
+    /// A glass card is `cardStyle()`, not a colour. `baseAlt` / `baseAltCard` are only for the
+    /// system's grouped `List`.
     enum Background {
-        /// The screen.
-        public nonisolated static let base = Color(.systemBackground)
-        /// An alternative screen background (grouped lists): grey in light, black in dark.
+        /// The screen: white in light, black in dark, raised in a sheet (vNext; `base` before).
+        public nonisolated static let page = Color(.systemBackground)
+        /// An opaque grey surface on the page (vNext): the card of `SurfaceStyle.fill`, a
+        /// banner's base over content, an app's panel over a map or a photo. `#F2F2F7` in
+        /// light, `#1C1C1E` in dark, `#2C2C2E` in a dark sheet.
+        public nonisolated static let card = Color(.secondarySystemBackground)
+        /// Sheets and modal screens (vNext; `elevation1` before).
+        public nonisolated static let sheet = AppColors.dynamic(light: .white, dark: UIColor(white: 28 / 255, alpha: 1))
+        /// Above everything: a tooltip, a popover, a floating panel (vNext; `elevation3` before).
+        public nonisolated static let floating = AppColors.dynamic(light: .white, dark: UIColor(white: 58 / 255, alpha: 1))
+        /// A container inside a card (vNext): a field, an icon's plate, an inactive chip. A shape
+        /// style that follows the surface: opaque grey on glass, translucent on a grey card, so it
+        /// always reads a step darker than what it lies on. Where an API takes a `Color`, use
+        /// `SurfaceStyle.container` of the surface it lies on.
+        public nonisolated static var container: SurfaceContainer { SurfaceContainer(.standard) }
+        /// A stronger container inside a card (vNext): a progress track, a skeleton, a sunken
+        /// control. Follows the surface as `container` does.
+        public nonisolated static var containerStrong: SurfaceContainer { SurfaceContainer(.strong) }
+
+        /// An alternative screen background (grouped lists): grey in light, black in dark. Only
+        /// under the system's grouped `List`.
         public nonisolated static let baseAlt = Color(.systemGroupedBackground)
         /// A card or a list's section on `baseAlt` (7.1.0), as the rows of a grouped `List`:
         /// white in light, a step lighter than `baseAlt` in dark, in a sheet too (iOS raises
         /// both there; the fixed `elevation1` would be the sheet's own colour).
         public nonisolated static let baseAltCard = Color(.secondarySystemGroupedBackground)
+
+        /// The screen.
+        @available(*, deprecated, renamed: "page", message: "Use AppColors.Background.page.")
+        public nonisolated static let base = Color(.systemBackground)
         /// Sheets, modal screens, cards on `base`.
+        @available(*, deprecated, renamed: "sheet", message: "Use AppColors.Background.sheet.")
         public nonisolated static let elevation1 = AppColors.dynamic(light: .white, dark: UIColor(white: 28 / 255, alpha: 1))
         /// Cards on `elevation1`.
+        @available(*, deprecated, message: "Use AppColors.Background.sheet or AppColors.Background.floating.")
         public nonisolated static let elevation2 = AppColors.dynamic(light: .white, dark: UIColor(white: 44 / 255, alpha: 1))
         /// Elements above everything else (popovers, floating panels).
+        @available(*, deprecated, renamed: "floating", message: "Use AppColors.Background.floating.")
         public nonisolated static let elevation3 = AppColors.dynamic(light: .white, dark: UIColor(white: 58 / 255, alpha: 1))
-
         /// An opaque container with minimal contrast on `base`: fields, grouped blocks,
         /// inactive chips.
+        @available(*, deprecated, message: "Use AppColors.Background.card for an opaque grey surface, AppColors.Background.container inside a card.")
         public nonisolated static let neutral1 = Color(.secondarySystemBackground)
         /// An opaque container with more contrast: progress tracks, sunken controls, secondary
         /// buttons.
+        @available(*, deprecated, message: "Use AppColors.Background.containerStrong (SurfaceStyle.containerStrong where a Color is needed).")
         public nonisolated static let neutral2 = Color(.systemGray5)
         /// A translucent container that works on any surface, glass included.
+        @available(*, deprecated, message: "Use AppColors.Background.container.")
         public nonisolated static let fill = Color(.tertiarySystemFill)
         /// A translucent container on dark photos and headers. The same in both themes.
         public nonisolated static let fillOnDark = Color.white.opacity(0.15)
@@ -226,7 +262,7 @@ public extension AppColors {
 enum ColorContrast {
     /// Body text and icons: WCAG AA.
     nonisolated static let textMinimum: Double = 4.5
-    /// The card a dark-mode badge sits on (`Background.elevation1`).
+    /// The card a dark-mode badge sits on (`Background.sheet`).
     nonisolated static var darkCard: UIColor { UIColor(white: 28 / 255, alpha: 1) }
 
     nonisolated static func components(_ color: UIColor) -> (r: CGFloat, g: CGFloat, b: CGFloat, a: CGFloat) {

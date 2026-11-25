@@ -46,7 +46,7 @@ public extension View {
     /// colour. Behind it, the content keeps its exact colours; the card itself looks the same.
     ///
     /// 8.12.0: under `SurfaceStyle.fill` (`DesignKitTheme.surface`, `.surfaceStyle(_:)`) the card
-    /// is the opaque grey `AppColors.Background.neutral1` instead of glass, in the same shape.
+    /// is the opaque grey `AppColors.Background.card` instead of glass, in the same shape.
     ///
     /// vNext: the content knows it lies on a card, so a knockout in it (`.surfaceBackground`) is
     /// the card's grey under `.fill`, not the page's white.
@@ -94,7 +94,7 @@ private struct CardSurface: ViewModifier {
                 case .glass:
                     Color.clear.glassEffect(.regular, in: .rect(cornerRadius: radius))
                 case .fill:
-                    Color.clear.background(AppColors.Background.neutral1, in: .rect(cornerRadius: radius))
+                    Color.clear.background(AppColors.Background.card, in: .rect(cornerRadius: radius))
                 }
             }
     }
@@ -116,7 +116,7 @@ private struct FilterChipSurface: ViewModifier {
             )
         case .fill:
             content.background(
-                isSelected ? AnyShapeStyle(AppColors.pale(AppColors.accent)) : AnyShapeStyle(.surfaceNeutral1),
+                isSelected ? AnyShapeStyle(AppColors.pale(AppColors.accent)) : AnyShapeStyle(AppColors.Background.container),
                 in: Capsule()
             )
         }

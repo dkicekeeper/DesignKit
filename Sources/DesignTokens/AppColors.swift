@@ -21,13 +21,13 @@ public enum AppColors {
     // bgMuted  — "утопленный" слой внутри карточек (треки прогресс-баров, фон чипов).
 
     /// Фон самого экрана.
-    public static let bgBase = Background.base
+    public static let bgBase = Background.page
 
     /// Приподнятая поверхность — карточки, elevated containers.
-    public static let bgCard = Background.neutral1
+    public static let bgCard = Background.card
 
     /// "Утопленный" фон — chips, прогресс-бар треки, secondary buttons.
-    public static let bgMuted = Background.neutral2
+    public static let bgMuted = SurfaceStyle.glass.containerStrong
 
     // MARK: Text Colors
 
