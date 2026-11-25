@@ -384,7 +384,7 @@ private struct WeightBreakdownCardPage: View {
     private let all: [WeightBreakdownCard.Segment] = [
         .init(title: "Savings", systemImage: "banknote.fill", color: AppColors.Status.positive, weight: 40),
         .init(title: "Regular payments", systemImage: "repeat.circle", color: AppColors.accent, weight: 27),
-        .init(title: "Safety cushion", systemImage: "shield.lefthalf.filled", color: GallerySamples.income, weight: 20),
+        .init(title: "Safety cushion", systemImage: "shield.lefthalf.filled", color: GallerySamples.incomeColor, weight: 20),
         .init(title: "Cash flow", systemImage: "chart.line.uptrend.xyaxis", color: AppColors.Status.negative, weight: 13),
     ]
 

@@ -80,6 +80,7 @@ class MigrateTests(unittest.TestCase):
 Circle().fill(AppColors.success)
 Capsule().fill(.surfaceNeutral2)
 view.background(AppColors.Background.base)
+let style: SurfaceNeutral = SurfaceNeutral(.neutral1)
 let c = CategoryColors.color(for: name)
 Text(amount).foregroundStyle(AppColors.income)
 list.refreshable { await load() }
@@ -96,6 +97,7 @@ list.refreshable { await load() }
         self.assertIn("AppColors.Data.color(for: name)", text)
         self.assertIn("list.dsRefreshable { await load() }", text)
         self.assertIn("// TODO(DesignKit 9.0): AppColors.income", text)
+        self.assertIn("// TODO(DesignKit 9.0): SurfaceNeutral is gone", text)
 
     def test_every_rules_file_is_valid(self):
         for name in os.listdir(os.path.join(HERE, "migrations")):

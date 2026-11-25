@@ -25,7 +25,8 @@ public struct TrendBadge: View {
     public enum Direction: Hashable, Sendable {
         case up, down, flat
 
-        /// Default semantic colour: up = income green, down = destructive, flat = secondary.
+        /// Default semantic colour: up = `Status.positive` (vNext; Tenra passes its income green),
+        /// down = `Status.negative`, flat = `Text.secondary`.
         public var color: Color {
             switch self {
             case .up: return AppColors.Status.positive

@@ -32,17 +32,18 @@ accent stays flat.
 ## Finance colours
 
 `AppColors.income`, `incomeText`, `expense` and `transfer` were Tenra's. An app with money in it
-defines its own, next to its other adapters, and passes them to the components:
+defines its own, next to its other adapters, under names of its own (an `AppColors.income` of the
+app's would be ambiguous with DesignKit's until 9.0.0), and passes them to the components:
 
 ```swift
 // Tenra, DesignKitBridge.swift
-extension AppColors {
+extension Color {
     static let income = Color(red: 0.13, green: 0.70, blue: 0.37)
-    static let incomeText = AppColors.readable(income)
+    static let incomeText = AppColors.readable(.income)
     static let transfer = Color(red: 0.0, green: 0.75, blue: 0.85)
 }
 
-AmountComparisonBar(expenseAmount: out, incomeAmount: in, currency: "KZT", incomeColor: .income)
+AmountComparisonBar(expenseAmount: spent, incomeAmount: earned, currency: "KZT", incomeColor: .income)
 PayoffProgressCard(…, progressColor: .income) { … }
 ScheduleRow(…, doneColor: .income, isDone: true)
 TrendBadge(direction: .up, changePercent: 8, color: .income)

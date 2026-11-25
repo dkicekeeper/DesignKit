@@ -125,7 +125,7 @@ private struct PayoffProgressCardPage: View {
                         : .inProgress(nextDate: "12 Nov 2026", remainingCaption: "18 left")
                 ) {
                     Badge(progress >= 1 ? "Paid off" : "Credit",
-                              color: progress >= 1 ? GallerySamples.income : AppColors.Text.primary)
+                              color: progress >= 1 ? GallerySamples.incomeColor : AppColors.Text.primary)
                 }
             }
         } controls: {
@@ -414,7 +414,7 @@ private struct InsightsStatCardPage: View {
                     InsightsStatCardSkeleton()
                 } else {
                     InsightsStatCard(title: "Income", amount: 640_000, currency: "KZT",
-                                     color: GallerySamples.income, previous: showsChange ? 580_000 : nil, upIsGood: true)
+                                     color: GallerySamples.incomeColor, previous: showsChange ? 580_000 : nil, upIsGood: true)
                     InsightsStatCard(title: "Expenses", amount: 921_300, currency: "KZT",
                                      color: AppColors.Text.primary, previous: showsChange ? 870_000 : nil, upIsGood: false) {
                         if showsFooter {
