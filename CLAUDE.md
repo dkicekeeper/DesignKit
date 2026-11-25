@@ -401,7 +401,10 @@ rather than importing an app type.
   their geometry is pure Foundation in `ParticleCreatureBusy.swift`, unit-tested. `.thinking`'s
   rings got comets, the avatar fewer, larger dots when small, the dark rim's glow a gradient
   instead of a per-frame blur, and `AmbientMotionGate` stops every ambient loop scrolled out of
-  sight. The apps' step-to-mood mapping is proposed in docs/adoption.md.
+  sight. The apps' step-to-mood mapping is proposed in docs/adoption.md. And on a white page
+  (the owner's request in the same PR) Ten is inked to a luminance cap (`CreatureInkStrength`,
+  stronger under Increase Contrast), with an outline all round, a faint disc for a body and
+  larger dots.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.

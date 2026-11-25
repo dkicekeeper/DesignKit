@@ -160,3 +160,42 @@ struct ParticleCreatureBusyTests {
         for tip in tips { #expect(hypot(tip.x - tips[0].x, tip.y - tips[0].y) < 1e-9) }
     }
 }
+
+/// The creature's ink on a light page (vNext): a light colour is taken down to the ink's
+/// luminance, keeping its hue; a dark one is left as it is.
+struct CreatureInkTests {
+
+    private static func contrastOnWhite(_ rgb: SIMD3<Double>) -> Double {
+        1.05 / (CreatureInkStrength.luminance(rgb) + 0.05)
+    }
+
+    @Test("A cyan or a yellow is taken down to 4.6:1 on white, 7:1 under Increase Contrast", arguments: [
+        SIMD3<Double>(64, 214, 255), SIMD3<Double>(255, 236, 160), SIMD3<Double>(60, 220, 255), SIMD3<Double>(90, 236, 180),
+    ])
+    func lightColours(rgb: SIMD3<Double>) {
+        let standard = CreatureInkStrength.capped(rgb, luminance: CreatureInkStrength.standard.luminance)
+        let increased = CreatureInkStrength.capped(rgb, luminance: CreatureInkStrength.increased.luminance)
+        #expect(Self.contrastOnWhite(standard) >= 4.5)
+        #expect(Self.contrastOnWhite(increased) >= 6.9)
+        // The hue stays: the channels keep their proportions.
+        let ratio = standard / rgb
+        #expect(abs(ratio.x - ratio.y) < 1e-9 && abs(ratio.y - ratio.z) < 1e-9)
+    }
+
+    @Test("A colour already deep enough is left as it is")
+    func darkColours() {
+        let violet = SIMD3<Double>(72, 63, 148)
+        #expect(CreatureInkStrength.capped(violet, luminance: CreatureInkStrength.standard.luminance) == violet)
+    }
+
+    @Test("Increase Contrast inks more strongly in every way")
+    func increasedIsStronger() {
+        let standard = CreatureInkStrength.standard
+        let increased = CreatureInkStrength.increased
+        #expect(increased.luminance < standard.luminance)
+        #expect(increased.nearAlpha > standard.nearAlpha)
+        #expect(increased.rimFloor > standard.rimFloor)
+        #expect(increased.body > standard.body)
+        #expect(increased.dotScale > standard.dotScale)
+    }
+}

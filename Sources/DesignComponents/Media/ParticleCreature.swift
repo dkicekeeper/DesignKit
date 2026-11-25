@@ -142,6 +142,7 @@ public struct ParticleCreature: View {
     @Environment(\.designKitMotion) private var designKitMotion
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     @Environment(\.layoutDirection) private var layoutDirection
     @Environment(\.creatureGestureRequest) private var gestureRequest
     @Environment(\.creatureGestureFrame) private var gestureFrame
@@ -413,6 +414,7 @@ public struct ParticleCreature: View {
         let style = style
         let level = level
         let onLight = colorScheme == .light
+        let ink: CreatureInkStrength = colorSchemeContrast == .increased ? .increased : .standard
         let still = time == nil ? gestureFrame : nil
         let isRTL = layoutDirection == .rightToLeft
         let ambience = moves ? ambience : .still
@@ -421,7 +423,8 @@ public struct ParticleCreature: View {
         return Canvas { context, size in
             engine.tilt = tilt
             engine.render(in: &context, size: size, mood: mood, style: style, level: level, time: time,
-                          onLight: onLight, still: still, isRTL: isRTL, ambience: ambience, accessory: accessory)
+                          onLight: onLight, ink: ink, still: still, isRTL: isRTL, ambience: ambience,
+                          accessory: accessory)
         }
     }
 
@@ -508,6 +511,9 @@ final class ParticleCreatureEngine {
     private var busyFlare: Double = 0
     private var linksShown: Double = 0
     private var fromPose: CreaturePose = .idle
+    /// How strongly it is inked on a light page this frame (vNext): stronger under Increase
+    /// Contrast.
+    private var ink = CreatureInkStrength.standard
 
     private var fromParts: [CGPoint] = []
     private var fromDepth: [Double] = []
@@ -597,6 +603,7 @@ final class ParticleCreatureEngine {
         level: Double?,
         time: Double?,
         onLight: Bool = false,
+        ink: CreatureInkStrength = .standard,
         still: CreatureGestureFrame? = nil,
         isRTL: Bool = false,
         ambience: CreatureAmbience = .still,
@@ -604,6 +611,7 @@ final class ParticleCreatureEngine {
     ) {
         let geo = Geometry(size: size, style: style)
         guard geo.radius > 1 else { return }
+        self.ink = ink
         let animated = time != nil
         if let time, origin == nil { origin = time }
         let t = time.map { $0 - (origin ?? $0) } ?? 0
@@ -1551,8 +1559,9 @@ final class ParticleCreatureEngine {
             if !onLight { glow.blendMode = .plusLighter }
             let pulse = 0.8 + 0.2 * sin(t * 2)
             let alpha = (onLight ? CreatureGlow.haze : CreatureGlow.halo) * pulse
+            // On a light page a closer, stronger haze (vNext): the faint wide one was lost on white.
             let reach = hero
-                ? min(shellRadius * CreatureGlow.reach, min(geo.width, geo.height) / 2)
+                ? min(shellRadius * (onLight ? CreatureInk.hazeReach : CreatureGlow.reach), min(geo.width, geo.height) / 2)
                 : shellRadius
             glow.fill(
                 Path(ellipseIn: CGRect(x: cx - reach, y: cy - reach, width: reach * 2, height: reach * 2)),
@@ -1587,7 +1596,8 @@ final class ParticleCreatureEngine {
         let levels = 6
         var dots = [[Path]](repeating: [Path](repeating: Path(), count: levels), count: 4)
         var halos = [Path](repeating: Path(), count: 4)
-        let sizeFactor = hero ? 1.0 : 1.3
+        // Ink has no halo to enlarge it, so on a light page the dots are larger (vNext).
+        let sizeFactor = (hero ? 1.0 : 1.3) * (onLight ? ink.dotScale : 1)
         for n in parts.indices {
             let z = depth[n]
             let level = min(levels - 1, max(0, Int(z * Double(levels))))
@@ -1601,13 +1611,13 @@ final class ParticleCreatureEngine {
                 halos[tone].addEllipse(in: CGRect(x: p.x - halo, y: p.y - halo, width: halo * 2, height: halo * 2))
             }
         }
+        let inkTones = (0..<4).map { inked(palette[$0]) }
         func fillDots(_ range: Range<Int>) {
             for tone in 0..<4 {
-                let ink = deepen(palette[tone], CreatureInk.depth)
                 for level in range where !dots[tone][level].isEmpty {
                     let zl = (Double(level) + 0.5) / Double(levels)
                     let shade = onLight
-                        ? color(ink, (CreatureInk.nearAlpha + CreatureInk.depthAlpha * zl) * dim)
+                        ? color(inkTones[tone], (ink.nearAlpha + ink.depthAlpha * zl) * dim)
                         : color(whiten(palette[tone], 0.15 * zl), (0.16 + 0.6 * zl) * dim)
                     swarm.fill(dots[tone][level], with: .color(shade))
                 }
@@ -1632,7 +1642,7 @@ final class ParticleCreatureEngine {
                 }
             }
         }
-        let linkTone = onLight ? deepen(palette[1], CreatureInk.depth) : whiten(palette[1], 0.2)
+        let linkTone = onLight ? inked(palette[1]) : whiten(palette[1], 0.2)
         let linkWidth = hero ? max(0.8, 1.1 * geo.unit) : max(0.5, 0.8 * geo.dot)
         func strokeLinks(_ paths: [Path], far: Bool) {
             for bucket in 0..<3 where !paths[bucket].isEmpty {
@@ -1643,6 +1653,11 @@ final class ParticleCreatureEngine {
             }
         }
 
+        // The body (vNext): on a light page the sphere is a faint disc of its colour inside its
+        // rim, an object on white rather than a cloud of dots.
+        if onLight && shell > 0.02 {
+            swarm.fill(globe, with: .color(color(deepen(palette[0], CreatureCore.depth), ink.body * shell)))
+        }
         strokeLinks(farLinks, far: true)
         fillDots(0..<levels / 2)
         drawCore(in: body, center: center, radius: r0, hero: hero, globe: globe, t: t,
@@ -1682,9 +1697,11 @@ final class ParticleCreatureEngine {
         // The sphere's outline in light (4.7.0): a thin rim, brightest on the side the light
         // falls on, which drifts round slowly; with a glow in the dark, in ink on a light page.
         if shell > 0.02 {
-            let rimTone = onLight ? deepen(palette[0], CreatureInk.depth) : whiten(palette[1], 0.35)
-            let peak = onLight ? CreatureGlow.inkRimPeak : CreatureGlow.rimPeak
-            let floor = onLight ? CreatureGlow.inkRimFloor : CreatureGlow.rimFloor
+            // On a light page the outline holds all round (vNext): the far side of the light
+            // kept 0.1 of it before, and the sphere had no edge on white.
+            let rimTone = onLight ? inked(palette[0]) : whiten(palette[1], 0.35)
+            let peak = onLight ? ink.rimPeak : CreatureGlow.rimPeak
+            let floor = onLight ? ink.rimFloor : CreatureGlow.rimFloor
             let crest = onLight ? rimTone : whiten(rimTone, 0.55)
             let light = GraphicsContext.Shading.conicGradient(
                 Gradient(stops: [
@@ -1698,7 +1715,7 @@ final class ParticleCreatureEngine {
                 center: center,
                 angle: .radians(CreatureGlow.lightAngle + t * CreatureGlow.drift)
             )
-            let lineWidth = hero ? max(1, 1.5 * geo.scale) : max(0.7, r0 / 22)
+            let lineWidth = (hero ? max(1, 1.5 * geo.scale) : max(0.7, r0 / 22)) * (onLight ? ink.rimWidth : 1)
             var rim = body
             rim.opacity = shell
             if !onLight {
@@ -1966,20 +1983,28 @@ final class ParticleCreatureEngine {
     private func deepen(_ rgb: RGB, _ amount: Double) -> RGB {
         rgb * (1 - amount)
     }
+
+    /// A colour in ink on a light page (vNext): deepened, then taken down further while it is
+    /// still lighter than the ink's luminance allows (a cyan, a yellow), so every tone of every
+    /// mood reads on white.
+    private func inked(_ rgb: RGB) -> RGB {
+        CreatureInkStrength.capped(deepen(rgb, CreatureInk.depth), luminance: ink.luminance)
+    }
 }
 
 /// Light mode (4.6.1): the creature on a light page. Light added to white is lost, so it is
 /// drawn with normal blending in deeper colours.
 enum CreatureInk {
-    /// How far a particle's colour is taken towards black.
-    static let depth: Double = 0.3
-    /// A particle's opacity, the far ones fainter: `nearAlpha + depthAlpha × depth`.
-    static let nearAlpha: Double = 0.4
-    static let depthAlpha: Double = 0.55
+    /// How far a particle's colour is taken towards black (0.3 until vNext; then capped by the
+    /// ink's luminance, `CreatureInkStrength`).
+    static let depth: Double = 0.42
     /// The links' strongest opacity (0.11 in the dark, where they add light).
     static let links: Double = 0.22
-    /// The shadow under the sphere, where the dark draws a light on the ground.
-    static let shadow: Double = 0.18
+    /// The shadow under the sphere, where the dark draws a light on the ground (0.18 until vNext).
+    static let shadow: Double = 0.24
+    /// How far the hero's haze reaches on a light page, in sphere radii (vNext; 1.9 before, as in
+    /// the dark, where it was too wide and faint to see).
+    static let hazeReach: Double = 1.45
     /// The face: its colours this much deeper, its glow this much fainter, so cyan eyes read on
     /// white.
     static let faceDepth: Double = 0.45
@@ -1991,21 +2016,74 @@ enum CreatureInk {
     static let question: SIMD3<Double> = [112, 92, 226]
 }
 
+/// How strongly the creature is inked on a light page (vNext, the owner's request: Ten read faintly
+/// on white). Every colour is deepened, then taken down while its luminance is above
+/// `luminance`: in the standard ink a particle at full strength is at least 4.6:1 on white and
+/// one of middle depth at least 3.2:1 (2.1 to 3.1 before, under the 3:1 a graphic needs). Its
+/// outline holds all round, the sphere is a faint disc of its colour, the dots are larger.
+/// Under Increase Contrast, stronger: 7:1 and 5.1:1.
+struct CreatureInkStrength: Equatable {
+    /// The highest relative luminance of an ink colour.
+    let luminance: Double
+    /// A particle's opacity, the far ones fainter: `nearAlpha + depthAlpha × depth` (0.4 + 0.55
+    /// before).
+    let nearAlpha: Double
+    let depthAlpha: Double
+    /// The dots' size against the dark's.
+    let dotScale: Double
+    /// The rim's opacity where the light falls and elsewhere (0.6 and 0.1 before), and its width
+    /// against the dark's.
+    let rimPeak: Double
+    let rimFloor: Double
+    let rimWidth: Double
+    /// The body: the sphere's fill of its colour inside the rim.
+    let body: Double
+
+    static let standard = CreatureInkStrength(
+        luminance: 0.18, nearAlpha: 0.55, depthAlpha: 0.45, dotScale: 1.2,
+        rimPeak: 0.75, rimFloor: 0.32, rimWidth: 1.3, body: 0.07
+    )
+    static let increased = CreatureInkStrength(
+        luminance: 0.1, nearAlpha: 0.7, depthAlpha: 0.3, dotScale: 1.3,
+        rimPeak: 0.9, rimFloor: 0.5, rimWidth: 1.5, body: 0.1
+    )
+
+    /// The relative luminance of a colour, 0…255 a channel (WCAG).
+    static func luminance(_ rgb: SIMD3<Double>) -> Double {
+        func linear(_ value: Double) -> Double {
+            let v = value / 255
+            return v <= 0.039_28 ? v / 12.92 : pow((v + 0.055) / 1.055, 2.4)
+        }
+        return 0.2126 * linear(rgb.x) + 0.7152 * linear(rgb.y) + 0.0722 * linear(rgb.z)
+    }
+
+    /// `rgb` taken down, keeping its hue, until its luminance is at most `luminance`.
+    static func capped(_ rgb: SIMD3<Double>, luminance cap: Double) -> SIMD3<Double> {
+        var colour = rgb
+        for _ in 0..<4 {
+            let current = luminance(colour)
+            guard current > cap, current > 0 else { break }
+            colour *= pow(cap / current, 1 / 2.2)
+        }
+        return colour
+    }
+}
+
 /// What holds the swarm together since the glass went (4.7.0): a glow round it and a rim of
 /// light along its outline, as in the owner's references of a sphere made of light.
 enum CreatureGlow {
     /// The glow's opacity at the centre: light in the dark, a haze on a light page.
     static let halo: Double = 0.2
-    static let haze: Double = 0.08
+    static let haze: Double = 0.13
     /// How far the hero's glow reaches, in sphere radii (the square's edge at most).
     static let reach: Double = 1.9
     /// The light on the ground under the sphere in the dark.
     static let ground: Double = 0.2
-    /// The rim's opacity where the light falls and on the far side; in the dark and in ink.
+    /// The rim's opacity where the light falls and on the far side in the dark (in ink since
+    /// vNext: `CreatureInkStrength`), and the outlines of an accessory and a hand in ink.
     static let rimPeak: Double = 0.85
     static let rimFloor: Double = 0.12
     static let inkRimPeak: Double = 0.6
-    static let inkRimFloor: Double = 0.1
     /// Where the light falls on the rim (radians, from the right, clockwise: the lower right)
     /// and how fast it drifts round (radians a second).
     static let lightAngle: Double = 0.2

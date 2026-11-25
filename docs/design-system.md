@@ -2489,6 +2489,18 @@ and a tear 45% deeper with a fainter glow, the z's, hearts, sparkles and "?" in 
 the glow a faint haze (0.08) and a soft shadow under the sphere. On a dark surface in light
 mode, set `.environment(\.colorScheme, .dark)` on it.
 
+*(vNext, the owner's request: Ten read faintly on white)* The ink is measured
+(`CreatureInkStrength`): every colour is deepened (0.42, 0.3 before) and then taken down,
+keeping its hue, while its luminance is above 0.18, so a cyan or a yellow reads like a violet. A
+particle at full strength is at least 4.6:1 on white and one of middle depth at least 3.2:1 in
+every mood (2.1 to 3.1 before, under the 3:1 a graphic needs), its opacity 0.55 to 1 (0.4 to
+0.95). The rim's outline holds all round (0.32 on the far side of the light, 0.1 before; 0.75
+where it falls, a third wider), the sphere is a faint disc of its colour inside it (0.07), the
+dots are a fifth larger (ink has no halo to enlarge them), the haze is closer and stronger (0.13
+out to 1.45 radii, 0.08 out to 1.9 before) and the shadow deeper (0.24). Under Increase
+Contrast (`colorSchemeContrast == .increased`) the cap is 0.1 (7:1 at full strength, 5.1:1 at
+middle depth), the outline 0.5 to 0.9, the disc 0.1. The dark is unchanged.
+
 *(4.9.1, the owner's idea)* The core: without the glass the swarm had no body on a white page,
 so a soft ball of the mood's colours fills it (`CreatureCore`), from its first colour to its
 third: it reaches 1.12 of the particle sphere's radius, just inside the rim at 1.2, its colour
