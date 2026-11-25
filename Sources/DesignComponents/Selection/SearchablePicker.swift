@@ -122,7 +122,7 @@ public struct SearchablePicker<Value: Hashable>: View {
                             UniversalRow(
                                 String(localized: "picker.create", defaultValue: "Create “\(name)”"),
                                 icon: "plus.circle.fill",
-                                titleColor: AppColors.accent,
+                                titleColor: AppColors.Text.action,
                                 accessory: .action { create(name) }
                             )
                         }

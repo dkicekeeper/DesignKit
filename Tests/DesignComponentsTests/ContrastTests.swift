@@ -116,10 +116,42 @@ struct ContrastTests {
         #expect(abs(a.r - b.r) < 0.01 && abs(a.g - b.g) < 0.01 && abs(a.b - b.b) < 0.01)
     }
 
+    /// Platina's Plasma: light #D6006F, dark #FF4FA0 (vNext).
+    private static let platinaPlasma = Color(UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(red: 0xFF / 255, green: 0x4F / 255, blue: 0xA0 / 255, alpha: 1)
+            : UIColor(red: 0xD6 / 255, green: 0x00 / 255, blue: 0x6F / 255, alpha: 1)
+    })
+
+    /// vNext: a link or a text button in the accent is `Text.action`, the accent made readable,
+    /// so it reads on the page and on a grey card in both themes (Tenra's indigo on a dark card
+    /// read 3.4:1 raw, Dalada's green on a light card 3.8:1).
+    @Test("Accent text reads on the page and on a card: Tenra, Dalada, Platina, both themes")
+    func actionTextReads() {
+        let accents: [(String, Color)] = [
+            ("Tenra's indigo", .indigo), ("Dalada's green", Self.daladaGreen), ("Platina's plasma", Self.platinaPlasma),
+        ]
+        let surfaces: [(String, Color)] = [("page", AppColors.Background.page), ("card", AppColors.Background.card)]
+        for (name, accent) in accents {
+            for (surface, background) in surfaces {
+                for (mode, traits) in Self.modes {
+                    let ratio = AppColors.contrastRatio(AppColors.readable(accent), background, in: traits)
+                    #expect(ratio >= Self.minimum, "\(name) as text on the \(surface), \(mode): \(ratio)")
+                }
+            }
+        }
+        // `Text.action` is that readable accent, of whichever accent the app set.
+        for (_, traits) in Self.modes {
+            let action = UIColor(AppColors.Text.action).resolvedColor(with: traits)
+            let readable = UIColor(AppColors.readable(DesignKitTheme.accent)).resolvedColor(with: traits)
+            #expect(action == readable)
+        }
+    }
+
     @Test("Income as text reads on the page in both themes (8.10.0)")
     func incomeText() {
         for (mode, traits) in Self.modes {
-            let ratio = AppColors.contrastRatio(AppColors.incomeText, AppColors.Background.base, in: traits)
+            let ratio = AppColors.contrastRatio(AppColors.incomeText, AppColors.Background.page, in: traits)
             #expect(ratio >= Self.minimum, "income text, \(mode): \(ratio)")
         }
     }

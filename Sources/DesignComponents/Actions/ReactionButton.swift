@@ -80,7 +80,7 @@ public struct ReactionButton: View {
                             .symbolEffect(.bounce, value: isSelected)
                             .sparkleBurst(trigger: additions, tint: AppColors.accent)
                     }
-                    .foregroundStyle(isSelected ? AppColors.accent : AppColors.Text.secondary)
+                    .foregroundStyle(isSelected ? AppColors.Text.action : AppColors.Text.secondary)
                     .frame(minWidth: 44, minHeight: 44, alignment: .leading)
                     .contentShape(Rectangle())
                 }

@@ -62,7 +62,7 @@ public struct ExpandableText: View {
                          ? String(localized: "text.less", defaultValue: "Less")
                          : String(localized: "text.more", defaultValue: "More"))
                         .font(AppTypography.bodySmall.weight(.semibold))
-                        .foregroundStyle(AppColors.accent)
+                        .foregroundStyle(AppColors.Text.action)
                 }
                 .buttonStyle(.plain)
             }
