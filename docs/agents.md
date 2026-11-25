@@ -19,11 +19,15 @@ that moves its pin by hand runs the script with the bump. Do not edit the block 
 ## The rules
 
 1. Tokens, never raw values: `AppColors`, `AppTypography`, `AppSpacing`, `AppRadius`,
-   `AppIconSize`, `AppLayout`, `AppAnimation` / `AppMotion`. Status text is `AppColors.Status.*Text` (4.5:1);
-   a colour of your own as text is `AppColors.readable(color)` on `AppColors.pale(color)`; a grey
-   shape of your own inside a card is `.surfaceNeutral1` / `.surfaceNeutral2`; a ring or a disc
-   that cuts a shape out (round an avatar, a chart's point) is `.surfaceBackground`, never the
-   page's colour.
+   `AppIconSize`, `AppLayout`, `AppAnimation` / `AppMotion`. Colours by role, one name each
+   (docs/design-system.md, "Which colour where"): `AppColors.Text.*`, `.Background.*`,
+   `.Status.*`, `.Border.*`, `.Data`, and the flat `accent` / `accentFill` only; the 1.x flat
+   names (`textSecondary`, `success`, `bgCard`, …) and `CategoryColors` are deprecated. Text in
+   the accent is `AppColors.Text.action`; status text `AppColors.Status.*Text` (4.5:1); a colour
+   of your own as text is `AppColors.readable(color)` on `AppColors.pale(color)`; a shape inside
+   a card is `AppColors.Background.container` / `.containerStrong`; a ring or a disc that cuts a
+   shape out (round an avatar, a chart's point) is `.surfaceBackground`, never the page's colour.
+   Money colours (income, a transfer) are the app's own, passed to the components.
 2. Every symbol is an `Icon`: a glyph under 44 pt, a tile on its plate from 44 pt. iOS's own bars,
    menus, tabs and segments, and a symbol inside a line of text, stay `Image` / `Label`.
 3. A form or settings list is `FormSection` cards of `UniversalRow(_:icon:accessory:)`; the
