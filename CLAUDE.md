@@ -21,7 +21,11 @@ Code is often written in a Linux container where SwiftUI cannot compile. **CI is
 there**: `.github/workflows/ci.yml` builds the package, the Gallery, and **Dalada, Tenra and
 Platina against this checkout** on macOS (Platina on GitHub's Xcode 27 image) for every push to
 `main` and `claude/**`, and runs the unit and
-snapshot tests. Push, then read the job logs.
+snapshot tests. Push, then read the job logs. The macOS jobs run only when the change can affect
+what they build (CI's `What to build` job, `.github/scripts/ci_changes.py`): a change of docs,
+release notes or tooling runs the Linux jobs alone, and a PR's own run of a `claude/**` branch
+leaves the build to the branch's push run. The account runs a few macOS jobs at a time, shared
+with the apps' CI.
 
 **Snapshot tests** (`Gallery/SnapshotTests`, hosted in the Gallery app) compare components with
 reference PNGs in light, dark and large text; CI's `Snapshot tests` job fails on a visual
@@ -64,7 +68,8 @@ scripts/               snapshot-tests.sh (CI and local runs of the snapshot test
                        (8.9.0): designkit_lint.py (their design and section-rows lint, run from
                        the pinned version), migrate.py + migrations/ (rewrites and TODOs for a
                        major), sync_agents_block.py (docs/agents.md into an app's CLAUDE.md)
-.github/scripts/       changelog.py (CI's Changelog job, release notes), gallery_badges.py (CI's
+.github/scripts/       ci_changes.py (CI's What to build job: whether a run needs the macOS
+                       jobs), changelog.py (CI's Changelog job, release notes), gallery_badges.py (CI's
                        Gallery badges job: each page's `apps:` against Tenra's, Dalada's and
                        Platina's code),
                        components_reference.py (docs/components.md + .json; the release bot
