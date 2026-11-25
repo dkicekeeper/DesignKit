@@ -49,7 +49,7 @@ public struct TypingIndicator: View {
         }
         .padding(.horizontal, AppSpacing.md)
         .padding(.vertical, AppSpacing.md)
-        .background(AppColors.Background.neutral2, in: Capsule())
+        .background(AppColors.Background.containerStrong, in: Capsule())
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(verbatim: label ?? String(localized: "typing.indicator", defaultValue: "Typing")))
     }

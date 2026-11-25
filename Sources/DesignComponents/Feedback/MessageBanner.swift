@@ -163,7 +163,7 @@ private struct BannerSurface: ViewModifier {
         case .fill:
             content
                 .background(AppColors.pale(tint), in: .rect(cornerRadius: AppRadius.xl))
-                .background(AppColors.Background.neutral1, in: .rect(cornerRadius: AppRadius.xl))
+                .background(AppColors.Background.card, in: .rect(cornerRadius: AppRadius.xl))
         }
     }
 }

@@ -36,7 +36,7 @@ import DesignTokens
 ///     style: .circle(
 ///         size: AppIconSize.xl,
 ///         tint: .monochrome(.red),
-///         backgroundColor: AppColors.Background.neutral1
+///         backgroundColor: SurfaceStyle.glass.container
 ///     )
 /// )
 /// ```
@@ -134,25 +134,26 @@ public struct Icon: View {
     /// glass, the glass and the colour if any), nothing for a glyph. A logo keeps its style's.
     ///
     /// 8.12.0: under `SurfaceStyle.fill` a glass plate is the neutral fill instead (the style's
-    /// colour if it has one), and the neutral greys become the surface's (`surface.neutral1`,
-    /// `.neutral2`), so a plate still reads on a grey card, whose own colour is `neutral1`.
+    /// colour if it has one), and the containers become the surface's (`surface.container`,
+    /// `.containerStrong`), so a plate still reads on a grey card, whose own colour is `card`.
     private var plateColor: Color? {
         guard isTile || isLogo else { return nil }
         let color: Color?
         if style.hasGlassEffect {
-            color = surface == .glass ? style.backgroundColor : (style.backgroundColor ?? AppColors.Background.neutral1)
+            color = surface == .glass ? style.backgroundColor : (style.backgroundColor ?? SurfaceStyle.glass.container)
         } else {
-            color = isLogo ? style.backgroundColor : (style.backgroundColor ?? AppColors.Background.neutral1)
+            color = isLogo ? style.backgroundColor : (style.backgroundColor ?? SurfaceStyle.glass.container)
         }
         return color.map(onSurface)
     }
 
-    /// `neutral1` and `neutral2` (the presets' plates: `.categoryIcon`, `.placeholder`, an
-    /// unearned medal) as the surface draws them; any other colour as it is.
+    /// The containers (the presets' plates: `.categoryIcon`, `.placeholder`, an unearned medal,
+    /// given as `SurfaceStyle.glass.container` / `.containerStrong`) as the surface draws them;
+    /// any other colour as it is.
     private func onSurface(_ color: Color) -> Color {
         guard surface == .fill else { return color }
-        if color == AppColors.Background.neutral1 { return surface.neutral1 }
-        if color == AppColors.Background.neutral2 { return surface.neutral2 }
+        if color == SurfaceStyle.glass.container { return surface.container }
+        if color == SurfaceStyle.glass.containerStrong { return surface.containerStrong }
         return color
     }
 

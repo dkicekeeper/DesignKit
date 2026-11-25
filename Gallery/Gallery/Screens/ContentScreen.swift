@@ -496,7 +496,7 @@ private struct LayoutScreenPreview<Content: View>: View {
             VStack(spacing: 0) { content }
                 .padding(.vertical, AppSpacing.lg)
                 .frame(width: width, height: height, alignment: .top)
-                .background(AppColors.Background.base)
+                .background(AppColors.Background.page)
                 .scaleEffect(scale, anchor: .topLeading)
         }
         .aspectRatio(width / height, contentMode: .fit)

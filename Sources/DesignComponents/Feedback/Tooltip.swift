@@ -12,7 +12,7 @@ import SwiftUI
 import DesignTokens
 import DesignSupport
 
-/// An opaque bubble on the top level surface (`AppColors.Background.elevation3`) with a soft
+/// An opaque bubble on the top level surface (`AppColors.Background.floating`) with a soft
 /// shadow and a tail.
 ///
 /// ```swift
@@ -88,7 +88,7 @@ public struct Tooltip<Content: View>: View {
             // A tail by a corner needs the room between it and the corner on both sides.
             .frame(minWidth: arrowAlignment == .center ? nil : TooltipMetrics.tailInset * 2 + TooltipMetrics.tailWidth)
             .background(
-                AppColors.Background.elevation3,
+                AppColors.Background.floating,
                 in: RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
             )
             if arrowEdge == .bottom {
@@ -112,7 +112,7 @@ public struct Tooltip<Content: View>: View {
     /// The triangle turns on its own, so its place along the edge stays on the side it is set.
     private func tail(pointsUp: Bool) -> some View {
         TooltipTail()
-            .fill(AppColors.Background.elevation3)
+            .fill(AppColors.Background.floating)
             // Its base reaches into the bubble so no seam shows between them.
             .frame(width: TooltipMetrics.tailWidth, height: TooltipMetrics.tailHeight + TooltipMetrics.tailOverlap)
             .rotationEffect(.degrees(pointsUp ? 180 : 0))

@@ -257,13 +257,13 @@ public struct FormTextField: View {
 
     private var backgroundForState: Color {
         if isDisabled {
-            return surface.neutral1.opacity(0.3)
+            return surface.container.opacity(0.3)
         } else if errorMessage != nil {
             return AppColors.destructive.opacity(0.05)
         } else if isFieldFocused {
             return AppColors.accent.opacity(0.04)
         } else {
-            return surface.neutral1.opacity(0.5)
+            return surface.container.opacity(0.5)
         }
     }
 

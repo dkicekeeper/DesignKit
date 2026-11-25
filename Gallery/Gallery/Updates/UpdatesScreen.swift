@@ -251,7 +251,7 @@ private struct CodeBlock: View {
         }
         .scrollIndicators(.hidden)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColors.Background.neutral1, in: RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+        .background(AppColors.Background.card, in: RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
     }
 }
 

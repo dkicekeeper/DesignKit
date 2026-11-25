@@ -17,7 +17,7 @@ public extension View {
     /// **Use when:** the chip triggers filtering, navigation, or any tap action
     /// (filter buttons, action menu triggers, segmented-style selectors in toolbars).
     ///
-    /// Under `SurfaceStyle.fill` (8.12.0) the chip is a grey capsule (`.surfaceNeutral1`), the
+    /// Under `SurfaceStyle.fill` (8.12.0) the chip is a grey capsule (`AppColors.Background.container`), the
     /// selected one the accent's pale tint.
     func filterChipStyle(isSelected: Bool = false) -> some View {
         self

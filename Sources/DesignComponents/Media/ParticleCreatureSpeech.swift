@@ -362,7 +362,7 @@ struct CreatureSpeechRenderer: TextRenderer {
     let mouth: CGSize
     let sparkle: Color
     /// The halo round each letter: the colour of the surface under the words (vNext).
-    var halo: Color = AppColors.Background.base
+    var halo: Color = AppColors.Background.page
     /// A glow of the words' colour round them, in the dark.
     var glow: Color?
     /// Three dots of light from the head to the words: a thought (4.11.0).

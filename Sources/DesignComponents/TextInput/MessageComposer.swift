@@ -179,7 +179,7 @@ public struct MessageComposer<Leading: View>: View {
             .padding(.vertical, MessageComposerMetrics.inset)
             // Typing over a busy thread: the surface fills in behind the text (4.9.0).
             .background(
-                AppColors.Background.elevation1.opacity(focusBinding.wrappedValue ? MessageComposerMetrics.focusedFill : 0),
+                AppColors.Background.sheet.opacity(focusBinding.wrappedValue ? MessageComposerMetrics.focusedFill : 0),
                 in: .rect(cornerRadius: MessageComposerMetrics.cornerRadius)
             )
             .glassEffect(.regular.interactive(), in: .rect(cornerRadius: MessageComposerMetrics.cornerRadius))
@@ -224,7 +224,7 @@ public struct MessageComposer<Leading: View>: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(isEnabled ? AppColors.accentFill : AppColors.Background.neutral2)
+                    .fill(isEnabled ? AnyShapeStyle(AppColors.accentFill) : AnyShapeStyle(AppColors.Background.containerStrong))
                 Icon("mic.fill", size: AppIconSize.sm, scalesWithText: false)
                     .fontWeight(.bold)
                     .foregroundStyle(isEnabled ? AppColors.staticWhite : AppColors.Text.tertiary)
@@ -242,7 +242,7 @@ public struct MessageComposer<Leading: View>: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(isSendEnabled || isSending ? AppColors.accentFill : AppColors.Background.neutral2)
+                    .fill(isSendEnabled || isSending ? AnyShapeStyle(AppColors.accentFill) : AnyShapeStyle(AppColors.Background.containerStrong))
                 if isSending {
                     ProgressView()
                         .controlSize(.small)

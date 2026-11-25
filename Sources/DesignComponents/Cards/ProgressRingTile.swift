@@ -100,7 +100,7 @@ public struct ProgressRingTile: View {
 }
 
 /// The circle under the symbol: interactive glass, tinted with the colour at 30% when selected;
-/// under `SurfaceStyle.fill` (8.12.0) a grey circle (`.surfaceNeutral1`), the colour's pale tint
+/// under `SurfaceStyle.fill` (8.12.0) a grey circle (`AppColors.Background.container`), the colour's pale tint
 /// when selected.
 private struct TileCircleSurface: ViewModifier {
     let color: Color
@@ -118,7 +118,7 @@ private struct TileCircleSurface: ViewModifier {
             )
         case .fill:
             content.background(
-                isSelected ? AnyShapeStyle(AppColors.pale(color)) : AnyShapeStyle(.surfaceNeutral1),
+                isSelected ? AnyShapeStyle(AppColors.pale(color)) : AnyShapeStyle(AppColors.Background.container),
                 in: Circle()
             )
         }

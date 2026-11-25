@@ -50,8 +50,8 @@ public struct Skeleton: View {
     }
 
     /// The grey of every skeleton shape: `neutral2`, translucent on a grey card under
-    /// `SurfaceStyle.fill` (8.12.0, `.surfaceNeutral2`).
-    static let fill = SurfaceNeutral(.neutral2)
+    /// `SurfaceStyle.fill` (8.12.0, `AppColors.Background.containerStrong`).
+    static let fill = SurfaceContainer(.strong)
 
     /// A circle: an avatar, a round icon, a dot.
     public static func circle(_ diameter: CGFloat) -> Skeleton {
