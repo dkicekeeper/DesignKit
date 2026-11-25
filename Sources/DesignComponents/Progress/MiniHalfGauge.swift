@@ -46,7 +46,7 @@ public struct MiniHalfGauge: View {
     /// How far the norm tick overshoots the stroke on each side.
     static let tickOvershoot: CGFloat = 8
 
-    /// The tick's dot cuts the arc in the colour of what lies under it (vNext).
+    /// The tick's dot cuts the arc in the colour of what lies under it (8.20.0).
     @Environment(\.surfaceBackground) private var surfaceBackground
 
     public init(

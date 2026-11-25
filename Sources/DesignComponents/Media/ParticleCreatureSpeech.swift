@@ -298,7 +298,7 @@ struct CreatureSpeechWords: View {
     let anchor: UnitPoint
     let mouth: CGSize
     let textDirection: LayoutDirection
-    /// The halo round the letters is the surface they float over (vNext).
+    /// The halo round the letters is the surface they float over (8.20.0).
     @Environment(\.surfaceBackground) var surfaceBackground
 
     var body: some View {
@@ -361,7 +361,7 @@ struct CreatureSpeechRenderer: TextRenderer {
     let anchor: UnitPoint
     let mouth: CGSize
     let sparkle: Color
-    /// The halo round each letter: the colour of the surface under the words (vNext).
+    /// The halo round each letter: the colour of the surface under the words (8.20.0).
     var halo: Color = AppColors.Background.base
     /// A glow of the words' colour round them, in the dark.
     var glow: Color?

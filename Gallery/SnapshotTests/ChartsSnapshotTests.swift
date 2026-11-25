@@ -113,7 +113,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// A forecast's ring and the selected point on a grey `.fill` card (vNext): their rings
+        /// A forecast's ring and the selected point on a grey `.fill` card (8.20.0): their rings
         /// take the card's grey, not the page's white.
         @Test func forecastOnGreyCard() async {
             await assertComponentSnapshot(

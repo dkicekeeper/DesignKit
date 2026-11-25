@@ -69,13 +69,13 @@ public extension EnvironmentValues {
 }
 
 extension EnvironmentValues {
-    /// Set by `cardStyle()` on its content (vNext): the views below lie on a card, so a knockout
+    /// Set by `cardStyle()` on its content (8.20.0): the views below lie on a card, so a knockout
     /// takes the card's colour (`surfaceBackground`).
     @Entry var isOnCard = false
 }
 
 package extension View {
-    /// The view starts again on a page (vNext): a sheet presented from a row inside a card
+    /// The view starts again on a page (8.20.0): a sheet presented from a row inside a card
     /// inherits the card's environment, so DesignKit's sheets put this on their root and their
     /// knockouts take the sheet's colour, not the card's.
     func startsOnPage() -> some View {
@@ -84,7 +84,7 @@ package extension View {
 }
 
 public extension EnvironmentValues {
-    /// The opaque colour of the surface a view lies on (vNext): the page's
+    /// The opaque colour of the surface a view lies on (8.20.0): the page's
     /// (`AppColors.Background.base`), or, inside a `cardStyle()` card under `SurfaceStyle.fill`,
     /// the card's grey (`AppColors.Background.neutral1`, raised in a dark sheet as the card is).
     /// On a glass card it stays the page's colour, which the glass lets through.
@@ -102,7 +102,7 @@ public extension EnvironmentValues {
     }
 }
 
-/// The colour of the surface under a view, as a shape style (vNext): `EnvironmentValues
+/// The colour of the surface under a view, as a shape style (8.20.0): `EnvironmentValues
 /// .surfaceBackground`, the page's colour or a grey card's. For knockouts, so a grey card shows
 /// no white rings.
 ///

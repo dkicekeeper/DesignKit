@@ -79,7 +79,7 @@ public struct PromptSheet: View {
         sheetBody.startsOnPage()
     }
 
-    /// The sheet; `body` starts it again on the page (`.surfaceBackground`, vNext).
+    /// The sheet; `body` starts it again on the page (`.surfaceBackground`, 8.20.0).
     @ViewBuilder private var sheetBody: some View {
         content
             .modifier(PromptSheetDetent(detent: detent))

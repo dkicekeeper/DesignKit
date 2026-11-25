@@ -141,7 +141,7 @@ extension ComponentSnapshots {
             )
         }
 
-        /// Knockouts on a grey `.fill` card (vNext): the rings between avatars and round the
+        /// Knockouts on a grey `.fill` card (8.20.0): the rings between avatars and round the
         /// calendar's markers take the card's grey, not the page's white.
         @Test func knockoutsOnGreyCard() async {
             await assertComponentSnapshot(

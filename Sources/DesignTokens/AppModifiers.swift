@@ -48,7 +48,7 @@ public extension View {
     /// 8.12.0: under `SurfaceStyle.fill` (`DesignKitTheme.surface`, `.surfaceStyle(_:)`) the card
     /// is the opaque grey `AppColors.Background.neutral1` instead of glass, in the same shape.
     ///
-    /// vNext: the content knows it lies on a card, so a knockout in it (`.surfaceBackground`) is
+    /// 8.20.0: the content knows it lies on a card, so a knockout in it (`.surfaceBackground`) is
     /// the card's grey under `.fill`, not the page's white.
     func cardStyle(radius: CGFloat = AppRadius.xl) -> some View {
         modifier(CardSurface(radius: radius))
@@ -85,7 +85,7 @@ private struct CardSurface: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            // The content lies on the card: its knockouts take the card's colour (vNext).
+            // The content lies on the card: its knockouts take the card's colour (8.20.0).
             .environment(\.isOnCard, true)
             .contentShape(Rectangle())
             .clipShape(.rect(cornerRadius: radius))
