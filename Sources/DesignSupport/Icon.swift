@@ -82,7 +82,7 @@ public struct Icon: View {
     /// it), no plate.
     ///
     /// ```swift
-    /// Icon("checkmark.circle.fill", size: AppIconSize.sm, tint: .monochrome(AppColors.success))
+    /// Icon("checkmark.circle.fill", size: AppIconSize.sm, tint: .monochrome(AppColors.Status.positive))
     /// ```
     ///
     /// - Parameter scalesWithText: Whether it grows with the text size (the default); off for a

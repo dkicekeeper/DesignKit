@@ -42,12 +42,12 @@ private struct TrendExtras {
     var followsScroll = false
 
     var expenses: ChartSeries<ChartValuePoint> {
-        .keyed("expenses", name: "Expenses", coloring: .solid(AppColors.destructive), better: .lower,
+        .keyed("expenses", name: "Expenses", coloring: .solid(AppColors.Status.negative), better: .lower,
                projectedKey: forecast ? "expensesForecast" : nil, comparisonKey: lastYear ? "expensesLastYear" : nil)
     }
 
     var income: ChartSeries<ChartValuePoint> {
-        .keyed("income", name: "Income", coloring: .solid(AppColors.success), better: .higher,
+        .keyed("income", name: "Income", coloring: .solid(AppColors.Status.positive), better: .higher,
                projectedKey: forecast ? "incomeForecast" : nil, comparisonKey: lastYear ? "incomeLastYear" : nil)
     }
 
@@ -59,7 +59,7 @@ private struct TrendExtras {
     func referenceLines(limit value: Double) -> [ChartReferenceLine] {
         var lines: [ChartReferenceLine] = []
         if average { lines.append(.average(label: "Average")) }
-        if limit { lines.append(.value(value, label: "Limit", aboveColor: AppColors.warning)) }
+        if limit { lines.append(.value(value, label: "Limit", aboveColor: AppColors.Status.warning)) }
         return lines
     }
 
@@ -294,7 +294,7 @@ private struct CalendarHeatmapPage: View {
                 CalendarHeatmap(
                     values: GallerySamples.spendingByDay(),
                     weeks: Int(weeks),
-                    color: tint == .spending ? AppColors.destructive : AppColors.accent,
+                    color: tint == .spending ? AppColors.Status.negative : AppColors.accent,
                     valueFormat: .currency("KZT")
                 )
             }
@@ -360,7 +360,7 @@ private struct SparklinePage: View {
             if state == .loading {
                 SparklineSkeleton(height: height)
             } else if projects {
-                Sparkline(values: [12, 18, 15, 22, 27], coloring: .solid(AppColors.warning),
+                Sparkline(values: [12, 18, 15, 22, 27], coloring: .solid(AppColors.Status.warning),
                           height: height, projectedValue: 34)
             } else {
                 Sparkline(dataPoints: GallerySamples.months,
@@ -422,8 +422,8 @@ private struct ChartSelectionBannerPage: View {
                 ChartSelectionBannerSkeleton(values: twoValues ? 2 : 1)
             } else if twoValues {
                 ChartSelectionBanner(title: "January 2026", note: inProgress ? "so far" : nil, entries: [
-                    .init(value: 480_000, color: AppColors.success, label: "Income"),
-                    .init(value: 275_000, color: AppColors.destructive, label: "Expenses"),
+                    .init(value: 480_000, color: AppColors.Status.positive, label: "Income"),
+                    .init(value: 275_000, color: AppColors.Status.negative, label: "Expenses"),
                 ], format: .currency("KZT"))
             } else {
                 ChartSelectionBanner(title: "Week 12", note: inProgress ? "so far" : nil, entries: [
@@ -450,7 +450,7 @@ private struct ChartZoomControlsPage: View {
                 ChartZoomControls(zoomScale: $zoom, range: 1...4)
                 Text("zoom \(zoom, specifier: "%.1f")×")
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
         }
     }

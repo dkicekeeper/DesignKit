@@ -48,7 +48,7 @@ public struct PhotoCarousel<Item: Identifiable, Photo: View>: View where Item.ID
         }
         .tabViewStyle(.page(indexDisplayMode: items.count > 1 ? .automatic : .never))
         .aspectRatio(aspectRatio, contentMode: .fit)
-        .background(AppColors.bgMuted)
+        .background(AppColors.Background.containerStrong)
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.md))
     }
 

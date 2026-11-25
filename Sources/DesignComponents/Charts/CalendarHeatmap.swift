@@ -20,7 +20,7 @@ import DesignSupport
 /// A calendar of days tinted by their values.
 ///
 /// ```swift
-/// CalendarHeatmap(values: spendingByDay, color: AppColors.destructive, valueFormat: .currency("KZT"))
+/// CalendarHeatmap(values: spendingByDay, color: AppColors.Status.negative, valueFormat: .currency("KZT"))
 /// ```
 ///
 /// - The steps are the quartiles of the days that have a value, so one big day does not wash

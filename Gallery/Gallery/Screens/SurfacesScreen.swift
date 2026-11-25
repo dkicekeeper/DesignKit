@@ -113,9 +113,9 @@ private struct CardStylePage: View {
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 Text("Total balance").font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                 Text("₸ 1 284 500").font(AppTypography.h2)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
             }
             .padding(padded ? AppSpacing.lg : 0)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -141,10 +141,10 @@ private struct FormCardStylePage: View {
                         Text(label).font(AppTypography.body)
                         Spacer()
                         Text("Choose").font(AppTypography.body)
-                            .foregroundStyle(AppColors.textSecondary)
+                            .foregroundStyle(AppColors.Text.secondary)
                         Image(systemName: "chevron.up.chevron.down")
                             .font(AppTypography.caption)
-                            .foregroundStyle(AppColors.textTertiary)
+                            .foregroundStyle(AppColors.Text.tertiary)
                     }
                     .padding(AppSpacing.lg)
                     if label != "Account" { Divider().padding(.leading, AppSpacing.lg) }

@@ -368,13 +368,13 @@ public struct LineChart<Point: ChartPoint>: View {
         if let high = cache.maxIndex[s] {
             PointMark(x: .value("Period", cache.labels[high]), y: .value("Value", cache.values[s][high]))
                 .symbolSize(70)
-                .foregroundStyle(lowerIsBetter ? AppColors.destructive : AppColors.success)
+                .foregroundStyle(lowerIsBetter ? AppColors.Status.negative : AppColors.Status.positive)
                 .accessibilityHidden(true)
         }
         if let low = cache.minIndex[s] {
             PointMark(x: .value("Period", cache.labels[low]), y: .value("Value", cache.values[s][low]))
                 .symbolSize(70)
-                .foregroundStyle(lowerIsBetter ? AppColors.success : AppColors.destructive)
+                .foregroundStyle(lowerIsBetter ? AppColors.Status.positive : AppColors.Status.negative)
                 .accessibilityHidden(true)
         }
     }

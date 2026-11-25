@@ -45,7 +45,7 @@ public struct ChecklistRow: View {
     public init(
         _ title: String,
         isChecked: Bool,
-        tint: Color = AppColors.success,
+        tint: Color = AppColors.Status.positive,
         accessorySystemImage: String? = nil,
         accessoryLabel: String? = nil,
         verticalPadding: CGFloat = AppSpacing.md,
@@ -141,7 +141,7 @@ public struct ChecklistSummaryRow: View {
                     .foregroundStyle(AppColors.Text.primary)
                 Spacer(minLength: 0)
                 if isComplete {
-                    Icon("checkmark.seal.fill", size: AppIconSize.md, tint: .monochrome(AppColors.success))
+                    Icon("checkmark.seal.fill", size: AppIconSize.md, tint: .monochrome(AppColors.Status.positive))
                         // 2.2.0: the seal draws itself on when the list is complete.
                         .drawOnAppear()
                         .accessibilityElement(children: .ignore)
@@ -161,7 +161,7 @@ public struct ChecklistSummaryRow: View {
             } else {
                 LinearProgressBar(
                     value: progress,
-                    color: isComplete ? AppColors.success : AppColors.accent,
+                    color: isComplete ? AppColors.Status.positive : AppColors.accent,
                     height: ChecklistMetrics.barHeight,
                     animatesOnAppear: false
                 )

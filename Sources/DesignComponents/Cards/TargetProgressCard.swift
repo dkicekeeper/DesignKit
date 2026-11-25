@@ -18,7 +18,7 @@ import DesignSupport
 /// ```swift
 /// TargetProgressCard(
 ///     systemImage: "banknote.fill",
-///     color: AppColors.success,
+///     color: AppColors.Status.positive,
 ///     title: "Savings rate",
 ///     badge: "Weight 30%",
 ///     summary: "Score 50 of 100",
@@ -88,9 +88,9 @@ public struct TargetProgressCard: View {
     private var barColor: Color {
         if let progressColor { return progressColor }
         switch progress {
-        case ..<0.33: return AppColors.destructive
-        case ..<0.66: return AppColors.warning
-        default:      return AppColors.success
+        case ..<0.33: return AppColors.Status.negative
+        case ..<0.66: return AppColors.Status.warning
+        default:      return AppColors.Status.positive
         }
     }
 

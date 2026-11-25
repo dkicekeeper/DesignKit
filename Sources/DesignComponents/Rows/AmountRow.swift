@@ -38,7 +38,7 @@ import DesignSupport
 ///
 /// // A part of a breakdown (BreakdownRow)
 /// AmountRow("Food", subtitle: "Groceries, Cafés", subtitleLineLimit: 1,
-///           leading: .tinted(.sfSymbol("fork.knife"), AppColors.warning),
+///           leading: .tinted(.sfSymbol("fork.knife"), AppColors.Status.warning),
 ///           value: .share(85_000, percentage: 42), currency: "KZT", accessory: .chevron)
 ///
 /// // An insight's item (InsightEntityRow)
@@ -104,8 +104,8 @@ public struct AmountRow: View {
         ///     ("Posting: 30 Oct  ·  "); at accessibility text sizes, where the amount goes on
         ///     the next line, trailing spaces and "·" are dropped.
         ///   - amount: Follows the text on the same line, in the row's currency.
-        ///   - amountColor: `AppColors.planned` by default.
-        public init(_ text: String, amount: Double? = nil, amountColor: Color = AppColors.planned) {
+        ///   - amountColor: `AppColors.Status.info` by default.
+        public init(_ text: String, amount: Double? = nil, amountColor: Color = AppColors.Status.info) {
             self.text = text
             self.amount = amount
             self.amountColor = amountColor
@@ -313,7 +313,7 @@ public struct AmountRow: View {
 
     @ViewBuilder
     private func limitLine(_ progress: LimitProgress) -> some View {
-        let amountColor = progress.isOverLimit ? AppColors.destructive : AppColors.Text.secondary
+        let amountColor = progress.isOverLimit ? AppColors.Status.negative : AppColors.Text.secondary
         if dynamicTypeSize.isAccessibilitySize {
             // Accessibility text sizes: on one line both amounts were cut to "185… / 250…".
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
@@ -467,7 +467,7 @@ public struct AmountRow: View {
         case .limit(let progress, let placeholder):
             if let progress {
                 infoAmount(progress.spent,
-                           color: progress.isOverLimit ? AppColors.destructive : AppColors.Text.primary,
+                           color: progress.isOverLimit ? AppColors.Status.negative : AppColors.Text.primary,
                            caption: "\(Int(progress.percentage))%",
                            alignment: alignment)
             } else if let placeholder {

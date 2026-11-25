@@ -28,7 +28,7 @@ public struct Rating: View {
         rating: Double,
         maximum: Int = 5,
         size: CGFloat = 14,
-        color: Color = AppColors.warning
+        color: Color = AppColors.Status.warning
     ) {
         self.rating = rating
         self.maximum = max(1, maximum)
@@ -78,7 +78,7 @@ public struct RatingPicker: View {
         rating: Binding<Int>,
         maximum: Int = 5,
         size: CGFloat = 32,
-        color: Color = AppColors.warning
+        color: Color = AppColors.Status.warning
     ) {
         self._rating = rating
         self.maximum = max(1, maximum)

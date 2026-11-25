@@ -59,7 +59,7 @@ public struct LiveSessionBar: View {
                 // and `.designKitMotion(false)` stop it, as they stop the other loops.
                 AmbientMotionGate { allowsAmbientMotion in
                     Icon(isPaused ? "pause.circle.fill" : "record.circle", size: AppIconSize.md)
-                        .foregroundStyle(isPaused ? AppColors.warning : AppColors.destructive)
+                        .foregroundStyle(isPaused ? AppColors.Status.warning : AppColors.Status.negative)
                         .symbolEffect(.pulse, isActive: !isPaused && allowsAmbientMotion && designKitMotion)
                 }
                 TimelineView(.periodic(from: .now, by: 1)) { context in

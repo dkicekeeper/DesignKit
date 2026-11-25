@@ -124,7 +124,7 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 MetricCard(title: "Top category", subtitle: "Food took 42% of spending",
                            value: .amount(185_000, currency: "KZT"),
-                           trend: .init(direction: .up, changePercent: 12.4, color: AppColors.destructive)) {
+                           trend: .init(direction: .up, changePercent: 12.4, color: AppColors.Status.negative)) {
                     MiniDonut(slices: BalancesSample.slices)
                 },
                 named: "miniChart",
@@ -139,7 +139,7 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 MetricCard(title: "Spending", subtitle: "Less than last month",
                            value: .amount(280_000, currency: "KZT"),
-                           trend: .init(direction: .down, changePercent: -12.5, color: AppColors.success),
+                           trend: .init(direction: .down, changePercent: -12.5, color: AppColors.Status.positive),
                            chartPlacement: .bottom) {
                     HeroBarPair(previous: 320_000, current: 280_000, color: AppColors.accent,
                                 currency: "KZT", animatesOnAppear: false)
@@ -196,8 +196,8 @@ extension ComponentSnapshots {
 private enum BalancesSample {
     static let slices: [DonutSlice] = [
         DonutSlice(id: "food", amount: 42_000, color: AppColors.accent, label: "Food", percentage: 42),
-        DonutSlice(id: "rent", amount: 30_000, color: AppColors.success, label: "Rent", percentage: 30),
-        DonutSlice(id: "fun", amount: 18_000, color: AppColors.warning, label: "Fun", percentage: 18),
-        DonutSlice(id: "misc", amount: 10_000, color: AppColors.transfer, label: "Misc", percentage: 10),
+        DonutSlice(id: "rent", amount: 30_000, color: AppColors.Status.positive, label: "Rent", percentage: 30),
+        DonutSlice(id: "fun", amount: 18_000, color: AppColors.Status.warning, label: "Fun", percentage: 18),
+        DonutSlice(id: "misc", amount: 10_000, color: SampleColors.transfer, label: "Misc", percentage: 10),
     ]
 }

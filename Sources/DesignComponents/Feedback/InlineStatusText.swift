@@ -26,10 +26,10 @@ public struct InlineStatusText: View {
 
         var color: Color {
             switch self {
-            case .error:   return AppColors.destructive
-            case .warning: return AppColors.warning
+            case .error:   return AppColors.Status.negative
+            case .warning: return AppColors.Status.warning
             case .info:    return AppColors.accent
-            case .success: return AppColors.success
+            case .success: return AppColors.Status.positive
             }
         }
     }

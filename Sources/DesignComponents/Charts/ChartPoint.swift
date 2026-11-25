@@ -138,8 +138,8 @@ public enum ChartBaseline: Hashable, Sendable {
 /// How a series reads its value from a point and how it is drawn.
 ///
 /// Colouring and baseline reproduce Tenra's insight series:
-/// - spending: `.solid(AppColors.destructive)`, `.zero`
-/// - income: `.solid(AppColors.success)`, `.zero`
+/// - spending: `.solid(AppColors.Status.negative)`, `.zero`
+/// - income: `.solid(AppColors.Status.positive)`, `.zero`
 /// - cash flow: `.signed(positive: success, negative: destructive)`, `.signed` — the line
 ///   turns from green to red where it crosses zero, with a dashed zero rule
 /// - balance: `.solid(AppColors.accent)`, `.signed`, line width 2.5
@@ -371,7 +371,7 @@ public enum ChartValueFormat {
 ///
 /// ```swift
 /// BarChart(dataPoints: months, series: spending,
-///          referenceLines: [.average(), .value(500_000, label: "Limit", aboveColor: AppColors.warning)])
+///          referenceLines: [.average(), .value(500_000, label: "Limit", aboveColor: AppColors.Status.warning)])
 /// ```
 public struct ChartReferenceLine: Identifiable {
     enum Value {
@@ -408,7 +408,7 @@ public struct ChartReferenceLine: Identifiable {
     public static func value(
         _ value: Double,
         label: String,
-        color: Color = AppColors.warning,
+        color: Color = AppColors.Status.warning,
         aboveColor: Color? = nil
     ) -> ChartReferenceLine {
         ChartReferenceLine(id: "value-\(label)-\(value)", value: .fixed(value), label: label,

@@ -61,7 +61,7 @@ private struct AmountRowPage: View {
     private var rowLeading: AmountRow.Leading {
         switch leading {
         case 0: .icon(.sfSymbol("banknote.fill"))
-        case 1: .tinted(.sfSymbol("fork.knife"), AppColors.warning)
+        case 1: .tinted(.sfSymbol("fork.knife"), AppColors.Status.warning)
         default: .none
         }
     }
@@ -195,7 +195,7 @@ private struct NetAmountRowPage: View {
                     NetAmountRowSkeleton(showsFlows: !single)
                 } else if single {
                     NetAmountRow(label: "March 2026", inflow: 0, outflow: 0, net: 0, currency: "KZT",
-                                 singleValue: 410_000, singleColor: AppColors.success)
+                                 singleValue: 410_000, singleColor: AppColors.Status.positive)
                 } else {
                     NetAmountRow(label: "May 2026", inflow: 530_000, outflow: 530_000 - net, net: net, currency: "KZT")
                 }
@@ -282,7 +282,7 @@ private struct ItemRowPage: View {
                         case 1: DisclosureChevron()
                         case 2:
                             Image(systemName: "wrench.and.screwdriver")
-                                .foregroundStyle(AppColors.warning)
+                                .foregroundStyle(AppColors.Status.warning)
                         default: EmptyView()
                         }
                     }
@@ -350,7 +350,7 @@ private struct MetaLinePage: View {
                 )
                 MetaLine(
                     [.label("Friends", systemImage: "person.2"),
-                     .label("Pending", systemImage: "hourglass", tint: tinted ? AppColors.warning : nil)],
+                     .label("Pending", systemImage: "hourglass", tint: tinted ? AppColors.Status.warning : nil)],
                     separator: separator == 0 ? .dot : .space,
                     tint: lineTint
                 )
@@ -442,7 +442,7 @@ private struct CommentRowPage: View {
                         text: AttributedString("Thin near the north shore, fine in the bay."),
                         quote: showsQuote ? MessageQuote(title: "Aida", text: "Was anyone on the lake this weekend?") : nil
                     ) {
-                        Image(systemName: "ellipsis").foregroundStyle(AppColors.textTertiary)
+                        Image(systemName: "ellipsis").foregroundStyle(AppColors.Text.tertiary)
                     } actions: {
                         ReactionButton(systemImage: "hand.thumbsup", selectedSystemImage: "hand.thumbsup.fill",
                                        count: 12, isSelected: true, accessibilityLabel: "12") {}
@@ -670,21 +670,21 @@ private struct TransactionRowPage: View {
         case 1:
             TransactionRow(
                 .entry(title: "Salary", account: kaspi),
-                icon: .sfSymbol("banknote.fill"), iconTint: .monochrome(AppColors.income),
-                iconBackground: AppColors.pale(AppColors.income),
+                icon: .sfSymbol("banknote.fill"), iconTint: .monochrome(GallerySamples.income),
+                iconBackground: AppColors.pale(GallerySamples.income),
                 badgeSystemImage: showsBadge ? "arrow.clockwise" : nil,
-                amounts: [.init(450_000, currency: "KZT", prefix: "+", color: AppColors.income)],
+                amounts: [.init(450_000, currency: "KZT", prefix: "+", color: GallerySamples.income)],
                 isPending: isPending,
                 accessibilityLabel: "Salary, 450 000 tenge, Kaspi Gold"
             )
         case 2:
             TransactionRow(
                 .transfer(from: kaspi, to: deposit),
-                icon: .sfSymbol("arrow.left.arrow.right"), iconTint: .monochrome(AppColors.transfer),
-                iconBackground: AppColors.pale(AppColors.transfer),
+                icon: .sfSymbol("arrow.left.arrow.right"), iconTint: .monochrome(GallerySamples.transfer),
+                iconBackground: AppColors.pale(GallerySamples.transfer),
                 amounts: [
                     .init(100_000, currency: "KZT", prefix: "-", color: AppColors.Text.primary),
-                    .init(100_000, currency: "KZT", prefix: "+", color: AppColors.income),
+                    .init(100_000, currency: "KZT", prefix: "+", color: GallerySamples.income),
                 ],
                 isPending: isPending,
                 accessibilityLabel: "Transfer, 100 000 tenge, from Kaspi Gold to Halyk Deposit"

@@ -1,49 +1,26 @@
 //
 //  AppColors.swift
-//  Tenra
+//  DesignKit
 //
-//  Semantic color tokens + category palette. Single source of truth for all colors.
+//  The brand accent, and the flat names of 1.x. Every other colour lives in a group by role
+//  (AppColors+Semantic.swift: Text, Background, Status, Border), the data colours in
+//  AppColors+Data.swift and the deep hues in AppColors+Palette.swift.
 //
 
 import SwiftUI
 
 // MARK: - Semantic Colors
 
-/// Semantic colours. Since 1.6.0 the canonical tokens are grouped (`AppColors.Text`,
-/// `.Background`, `.Status`, `.Border`: AppColors+Semantic.swift); the flat names below are
-/// aliases of them and keep working.
+/// DesignKit's colours. The accent is flat (`accent`, `accentFill`); everything else is grouped by
+/// role (`AppColors.Text`, `.Background`, `.Status`, `.Border`, `.Data`, `.Palette`). The flat
+/// names of 1.x below are deprecated (vNext) and go in 9.0.0; a finance colour (money in, money
+/// out, a transfer) is the app's own (Tenra's `DesignKitBridge.swift`).
 public enum AppColors {
-    // MARK: Backgrounds
-    //
-    // Три уровня иерархии — base → card → muted.
-    // bgBase   — фон самого экрана.
-    // bgCard   — приподнятая поверхность (карточки, fallback под cardStyle на iOS<26).
-    // bgMuted  — "утопленный" слой внутри карточек (треки прогресс-баров, фон чипов).
+    // MARK: Accent
 
-    /// Фон самого экрана.
-    public static let bgBase = Background.page
-
-    /// Приподнятая поверхность — карточки, elevated containers.
-    public static let bgCard = Background.card
-
-    /// "Утопленный" фон — chips, прогресс-бар треки, secondary buttons.
-    public static let bgMuted = SurfaceStyle.glass.containerStrong
-
-    // MARK: Text Colors
-
-    /// Primary text (используй системный .primary для auto light/dark)
-    public static let textPrimary = Text.primary
-
-    /// Secondary text — системный адаптивный цвет (.secondary).
-    public static let textSecondary = Text.secondary
-
-    /// Tertiary text (используй системный .gray для мета-информации)
-    public nonisolated static let textTertiary = Text.tertiary
-
-    // MARK: Interactive Colors
-
-    /// Accent color (для выделений, selections).
-    /// Configured per app via `DesignKitTheme.accent` (default: indigo).
+    /// The brand accent: tints, outlines, tracks, selection. Configured per app via
+    /// `DesignKitTheme.accent` (default: indigo). As text use `AppColors.Text.action`, its
+    /// readable form.
     public nonisolated static var accent: Color { DesignKitTheme.accent }
 
     /// The accent as a fill under white text or a white symbol (8.10.0): a primary button, the
@@ -52,51 +29,69 @@ public enum AppColors {
     /// Dalada's green a step deeper in both. Tints, outlines and tracks keep `accent`.
     public nonisolated static var accentFill: Color { readableFill(DesignKitTheme.accent) }
 
-    /// Destructive actions
+    // MARK: Deprecated flat names (1.x)
+
+    /// The screen.
+    @available(*, deprecated, message: "Use AppColors.Background.page.")
+    public static let bgBase = Background.page
+
+    /// An opaque grey surface.
+    @available(*, deprecated, message: "Use AppColors.Background.card for an opaque grey surface, AppColors.Background.container inside a card.")
+    public static let bgCard = Background.card
+
+    /// A sunken grey: tracks, chips.
+    @available(*, deprecated, message: "Use AppColors.Background.containerStrong (SurfaceStyle.containerStrong where a Color is needed).")
+    public static let bgMuted = SurfaceStyle.glass.containerStrong
+
+    /// Main text.
+    @available(*, deprecated, message: "Use AppColors.Text.primary.")
+    public static let textPrimary = Text.primary
+
+    /// Secondary text.
+    @available(*, deprecated, message: "Use AppColors.Text.secondary.")
+    public static let textSecondary = Text.secondary
+
+    /// Hints, placeholders.
+    @available(*, deprecated, message: "Use AppColors.Text.tertiary.")
+    public nonisolated static let textTertiary = Text.tertiary
+
+    /// Destructive actions, errors.
+    @available(*, deprecated, message: "Use AppColors.Status.negative (Status.negativeText for text).")
     public nonisolated static let destructive = Status.negative
 
-    /// Success/positive — используй для UI-состояний (кнопки, индикаторы).
-    /// Для финансового дохода используй `income`.
+    /// Success, a positive state.
+    @available(*, deprecated, message: "Use AppColors.Status.positive (Status.positiveText for text).")
     public nonisolated static let success = Status.positive
 
-    /// Warning
+    /// A warning.
+    @available(*, deprecated, message: "Use AppColors.Status.warning (Status.warningText for text).")
     public nonisolated static let warning = Status.warning
 
-    // MARK: Static Colors
-
-    /// Белый цвет без адаптации к теме — для текста поверх тёмных/цветных фонов.
-    /// Не используй для обычного текста: предпочитай `textPrimary`.
+    /// White in both themes, on dark photos and colours.
+    @available(*, deprecated, message: "Use AppColors.Text.primaryOnDark.")
     public static let staticWhite = Text.primaryOnDark
 
-    // MARK: Transaction Type Colors (semantic)
-
-    /// Income transactions — финансово-специфичный зелёный.
-    /// Не зависит от `success`: если дизайн меняет success, income не изменится.
-    /// `nonisolated` so the nonisolated `InsightsService` can read it without a
-    /// MainActor hop (`Color` is `Sendable`).
-    public nonisolated static let income = Color(red: 0.13, green: 0.70, blue: 0.37)
-
-    /// Income as text (8.10.0): an amount of money in, a "paid" mark. `readable(income)`: 4.5:1 on
-    /// the page and on its tint (the bright `income` reads at 2.75:1 on white). Fills, bars, icons
-    /// on a plate and chart marks keep `income`.
-    public nonisolated static let incomeText = readable(income)
-
-    /// Expense transactions.
-    /// Сознательно НЕ красный (как могло бы подсказать "destructive"-чтение расхода):
-    /// если бы расходы рендерились красным, всё приложение визуально кричало бы
-    /// тревогой — большинство транзакций это расходы. Чёрный (`.primary`) даёт
-    /// нейтральный baseline, а контраст создаётся через `income` (зелёный)
-    /// и `transfer` (cyan). Резолвится в тот же цвет, что и `textPrimary`,
-    /// но семантически это отдельный токен — менять расход на другой цвет
-    /// (если когда-нибудь понадобится) можно будет в одной точке.
-    public nonisolated static let expense = Color.primary
-
-    /// Transfer / internal transactions (distinct cyan-teal, not accent blue)
-    public static let transfer = Color(red: 0.0, green: 0.75, blue: 0.85)
-
-    /// Planned / future / scheduled transactions
+    /// Planned, scheduled things.
+    @available(*, deprecated, message: "Use AppColors.Status.info.")
     public static let planned = Status.info
 
+    // MARK: Deprecated finance colours (the app's own since vNext)
+
+    /// Money in: a green of its own, RGB(0.13, 0.70, 0.37).
+    @available(*, deprecated, message: "A finance colour is the app's own: define it in the app (Tenra: DesignKitBridge.swift) or use AppColors.Status.positive.")
+    public nonisolated static let income = Color(red: 0.13, green: 0.70, blue: 0.37)
+
+    /// Money in as text: `readable(income)`.
+    @available(*, deprecated, message: "Use AppColors.readable(<the app's income colour>) or AppColors.Text.positive.")
+    public nonisolated static let incomeText = readable(Color(red: 0.13, green: 0.70, blue: 0.37))
+
+    /// Money out: the primary text colour.
+    @available(*, deprecated, message: "Use AppColors.Text.primary, or the app's own expense colour.")
+    public nonisolated static let expense = Color.primary
+
+    /// An internal transfer: cyan-teal.
+    @available(*, deprecated, message: "A finance colour is the app's own: define it in the app (Tenra: DesignKitBridge.swift).")
+    public static let transfer = Color(red: 0.0, green: 0.75, blue: 0.85)
 }
 
 // MARK: - Category Color Palette

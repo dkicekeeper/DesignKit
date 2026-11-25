@@ -30,7 +30,7 @@ struct SpacingScreen: View {
                                 .frame(width: value, height: 16)
                             Text("\(Int(value))pt")
                                 .font(AppTypography.caption2)
-                                .foregroundStyle(AppColors.textSecondary)
+                                .foregroundStyle(AppColors.Text.secondary)
                         }
                     }
                 }

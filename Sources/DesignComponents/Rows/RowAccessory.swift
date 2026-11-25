@@ -270,7 +270,7 @@ struct RowControlView: View {
 
     private var titleColor: Color {
         if !isEnabled { return AppColors.Text.tertiary }
-        return row.titleColor ?? (row.role == .destructive ? AppColors.destructive : AppColors.Text.primary)
+        return row.titleColor ?? (row.role == .destructive ? AppColors.Status.negative : AppColors.Text.primary)
     }
 
     /// The leading icon, grey while the row is disabled.

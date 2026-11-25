@@ -69,7 +69,7 @@ public struct RatingSummary: View {
                             .font(AppTypography.caption)
                             .foregroundStyle(AppColors.Text.secondary)
                             .frame(width: AppIconSize.xs)
-                        LinearProgressBar(value: share(of: star), color: AppColors.warning, height: 6,
+                        LinearProgressBar(value: share(of: star), color: AppColors.Status.warning, height: 6,
                                           animatesOnAppear: animatesOnAppear)
                     }
                     .accessibilityElement(children: .ignore)

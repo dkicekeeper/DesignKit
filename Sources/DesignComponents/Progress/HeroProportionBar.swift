@@ -42,7 +42,7 @@ public struct HeroProportionBar: View {
     private func segmentColor(_ segment: DonutSlice, index: Int) -> Color {
         guard onColor else { return segment.color }
         let steps: [Double] = [1, 0.72, 0.52, 0.38, 0.28]
-        return AppColors.staticWhite.opacity(steps[min(index, steps.count - 1)])
+        return AppColors.Text.primaryOnDark.opacity(steps[min(index, steps.count - 1)])
     }
 
     private var immediate: Bool { AppAnimation.isReduceMotionEnabled }

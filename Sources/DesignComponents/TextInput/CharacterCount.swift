@@ -30,7 +30,7 @@ struct CharacterCount: View {
         Text(verbatim: "\(count)/\(limit)")
             .font(AppTypography.caption)
             .monospacedDigit()
-            .foregroundStyle(Self.isOver(count: count, limit: limit) ? AppColors.destructive : AppColors.Text.secondary)
+            .foregroundStyle(Self.isOver(count: count, limit: limit) ? AppColors.Status.negative : AppColors.Text.secondary)
             .contentTransition(.numericText())
             .accessibilityLabel(Text(String(localized: "textInput.characterCount",
                                             defaultValue: "\(count) of \(limit) characters")))

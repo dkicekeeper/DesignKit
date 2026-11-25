@@ -131,7 +131,7 @@ struct ShowcaseCount<Pages: View>: View {
         Group(subviews: pages) { subviews in
             Text("\(subviews.filter { $0.containerValues.showcaseIsComponent }.count)")
                 .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
                 .monospacedDigit()
         }
     }
@@ -206,7 +206,7 @@ struct ComponentPage<Preview: View, Controls: View>: View {
                             Label {
                                 Text(note)
                                     .font(AppTypography.bodySmall)
-                                    .foregroundStyle(AppColors.textPrimary)
+                                    .foregroundStyle(AppColors.Text.primary)
                             } icon: {
                                 Image(systemName: "info.circle")
                                     .foregroundStyle(AppColors.accent)
@@ -277,7 +277,7 @@ private struct GuidanceList: View {
                     Label {
                         Text(line)
                             .font(AppTypography.bodySmall)
-                            .foregroundStyle(AppColors.textPrimary)
+                            .foregroundStyle(AppColors.Text.primary)
                             .fixedSize(horizontal: false, vertical: true)
                     } icon: {
                         Image(systemName: isDo ? "checkmark.circle.fill" : "xmark.circle.fill")
@@ -302,17 +302,17 @@ private struct ComponentHeader: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text(name)
                 .font(AppTypography.h2)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
                 .textSelection(.enabled)
             Text(summary)
                 .font(AppTypography.body)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             if !styles.isEmpty {
                 Label {
                     Text(verbatim: "\(styles.count) styles: \(styles.joined(separator: " · "))")
                         .font(AppTypography.bodySmall)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 } icon: {
                     Image(systemName: "square.stack.3d.up")
@@ -363,7 +363,7 @@ private struct PanelSection<Content: View>: View {
             HStack {
                 Text(title.uppercased())
                     .font(AppTypography.caption2.weight(.semibold))
-                    .foregroundStyle(AppColors.textTertiary)
+                    .foregroundStyle(AppColors.Text.tertiary)
                     .tracking(0.6)
                 Spacer(minLength: 0)
                 if let trailing { trailing }
@@ -532,7 +532,7 @@ struct ChoiceControl<Value: Hashable>: View {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 Text(title)
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                 Picker(title, selection: $selection) {
                     ForEach(options.indices, id: \.self) { index in
                         Text(options[index].0).tag(options[index].1)
@@ -544,7 +544,7 @@ struct ChoiceControl<Value: Hashable>: View {
             HStack {
                 Text(title)
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                 Spacer(minLength: AppSpacing.sm)
                 Picker(title, selection: $selection) {
                     ForEach(options.indices, id: \.self) { index in
@@ -585,11 +585,11 @@ struct SliderControl: View {
             HStack {
                 Text(title)
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                 Spacer()
                 Text(format(value))
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .monospacedDigit()
             }
             if let step {
@@ -620,11 +620,11 @@ struct StepperControl: View {
             HStack {
                 Text(title)
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                 Spacer()
                 Text("\(value)")
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .monospacedDigit()
             }
         }
@@ -645,11 +645,11 @@ struct TextControl: View {
         HStack {
             Text(title)
                 .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
             TextField(title, text: $text)
                 .font(AppTypography.bodySmall)
                 .multilineTextAlignment(.trailing)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
         }
     }
 }
@@ -689,11 +689,11 @@ struct ShowcaseSection<Content: View>: View {
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(title)
                     .font(AppTypography.h3)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                 if let subtitle {
                     Text(subtitle)
                         .font(AppTypography.bodySmall)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                 }
                 Divider().padding(.top, AppSpacing.xs)
             }
@@ -711,11 +711,11 @@ struct TokenLabel: View {
         HStack(spacing: AppSpacing.xs) {
             Text(name)
                 .font(AppTypography.caption.weight(.medium))
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
             if let value {
                 Text(value)
                     .font(AppTypography.caption2)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
         }
     }

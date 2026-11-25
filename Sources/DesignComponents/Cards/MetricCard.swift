@@ -52,7 +52,7 @@ public enum MetricCardChartPlacement: Hashable, Sendable {
 /// ```swift
 /// MetricCard(title: "Top category", subtitle: "Food took 38% of spending",
 ///            value: .amount(185_000, currency: "KZT"),
-///            trend: .init(direction: .up, changePercent: 12.4, color: AppColors.destructive)) {
+///            trend: .init(direction: .up, changePercent: 12.4, color: AppColors.Status.negative)) {
 ///     MiniDonut(slices: slices)
 /// }
 ///

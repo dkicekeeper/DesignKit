@@ -262,7 +262,7 @@ struct SampleOnboarding: View {
                 }
             }
         }
-        .background(AppColors.bgCard.ignoresSafeArea())
+        .background(AppColors.Background.card.ignoresSafeArea())
     }
 
     private func next() {

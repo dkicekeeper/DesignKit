@@ -93,7 +93,7 @@ public struct PhotoStrip<Item: Identifiable, Photo: View>: View {
             } label: {
                 Icon("xmark.circle.fill", size: PhotoStripMetrics.removeGlyph, scalesWithText: false)
                     .symbolRenderingMode(.palette)
-                    .foregroundStyle(AppColors.staticWhite, Color.black.opacity(0.55))
+                    .foregroundStyle(AppColors.Text.primaryOnDark, Color.black.opacity(0.55))
             }
             .buttonStyle(.borderless)
             .padding(AppSpacing.xxs)

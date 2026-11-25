@@ -7,7 +7,7 @@
 //  on a filled badge and on the accents. 4.5:1 is AA for body text and icons.
 //
 //  8.10.0: white text sits on `AppColors.accentFill` (the accent made readable as a fill) and
-//  income text is `AppColors.incomeText`, so the accents and income pass too; the apps' raw
+//  income text is `readable(income)` (`AppColors.incomeText` before vNext), so the accents and income pass too; the apps' raw
 //  accents and the bright `income` stay for tints, fills and charts.
 //
 
@@ -148,10 +148,13 @@ struct ContrastTests {
         }
     }
 
+    /// Tenra's income green (its DesignKitBridge; DesignKit's `income` before vNext).
+    private static let tenraIncome = Color(red: 0.13, green: 0.70, blue: 0.37)
+
     @Test("Income as text reads on the page in both themes (8.10.0)")
     func incomeText() {
         for (mode, traits) in Self.modes {
-            let ratio = AppColors.contrastRatio(AppColors.incomeText, AppColors.Background.page, in: traits)
+            let ratio = AppColors.contrastRatio(AppColors.readable(Self.tenraIncome), AppColors.Background.page, in: traits)
             #expect(ratio >= Self.minimum, "income text, \(mode): \(ratio)")
         }
     }

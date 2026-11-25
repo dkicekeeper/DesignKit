@@ -27,13 +27,13 @@ import DesignSupport
 ///     amounts: [.init(18_500, currency: "KZT", prefix: "-", color: AppColors.Text.primary)],
 ///     accessibilityLabel: "Groceries, 18 500 tenge, Kaspi Gold"
 /// )
-/// // A transfer: from → to, both legs
+/// // A transfer: from → to, both legs (transferColor, incomeColor: the app's own colours)
 /// TransactionRow(
 ///     .transfer(from: .init(name: "Kaspi Gold", icon: …), to: .init(name: "Deposit", icon: …)),
-///     icon: .sfSymbol("arrow.left.arrow.right"), iconTint: .monochrome(AppColors.transfer),
-///     iconBackground: AppColors.pale(AppColors.transfer),
+///     icon: .sfSymbol("arrow.left.arrow.right"), iconTint: .monochrome(transferColor),
+///     iconBackground: AppColors.pale(transferColor),
 ///     amounts: [.init(100_000, currency: "KZT", prefix: "-", color: .primary),
-///               .init(100_000, currency: "KZT", prefix: "+", color: AppColors.income)],
+///               .init(100_000, currency: "KZT", prefix: "+", color: incomeColor)],
 ///     accessibilityLabel: "Transfer, 100 000 tenge, from Kaspi Gold to Deposit"
 /// )
 /// ```

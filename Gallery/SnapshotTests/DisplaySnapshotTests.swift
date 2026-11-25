@@ -21,8 +21,8 @@ extension ComponentSnapshots {
                 VStack(alignment: .leading, spacing: AppSpacing.md) {
                     HStack(spacing: AppSpacing.sm) {
                         Badge("New")
-                        Badge("Ban", systemImage: "nosign", color: AppColors.destructive)
-                        Badge("Filled", color: AppColors.success, style: .filled)
+                        Badge("Ban", systemImage: "nosign", color: AppColors.Status.negative)
+                        Badge("Filled", color: AppColors.Status.positive, style: .filled)
                     }
                     HStack(spacing: AppSpacing.md) {
                         TrendBadge(direction: .up, changePercent: 12.5)
@@ -45,11 +45,11 @@ extension ComponentSnapshots {
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {
                     HStack(spacing: AppSpacing.md) {
                         StatTile(title: "Distance", value: "12.4 km", systemImage: "figure.hiking")
-                        StatTile(title: "Catches", value: "7", valueColor: AppColors.success)
+                        StatTile(title: "Catches", value: "7", valueColor: AppColors.Status.positive)
                     }
                     HStack(spacing: AppSpacing.md) {
                         Avatar(name: "Ayan Seitkali")
-                        Avatar(name: "Dana", size: 56, tint: AppColors.success)
+                        Avatar(name: "Dana", size: 56, tint: AppColors.Status.positive)
                         Avatar(name: nil)
                         AvatarGroup(names: ["Ayan", "Dana", "Marat", "Aru", "Timur", "Saule"], size: 32)
                     }
@@ -110,7 +110,7 @@ extension ComponentSnapshots {
                             .font(AppTypography.bodyEmphasis)
                         Text(verbatim: event.detail)
                             .font(AppTypography.caption)
-                            .foregroundStyle(AppColors.textSecondary)
+                            .foregroundStyle(AppColors.Text.secondary)
                     }
                 },
                 appearances: [.light, .dark, .largeText]
@@ -132,7 +132,7 @@ extension ComponentSnapshots {
                 MonthCalendar(range: range, itemsByDay: byDay, itemName: { $0.name }) { item in
                     Image(systemName: item.symbol)
                         .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(AppColors.staticWhite)
+                        .foregroundStyle(AppColors.Text.primaryOnDark)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(item.color)
                 } accessory: { period in
@@ -165,7 +165,7 @@ extension ComponentSnapshots {
                 MonthCalendar(range: range, itemsByDay: byDay, itemName: { $0.name }) { item in
                     Image(systemName: item.symbol)
                         .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(AppColors.staticWhite)
+                        .foregroundStyle(AppColors.Text.primaryOnDark)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(item.color)
                 } accessory: { period in
@@ -192,7 +192,7 @@ extension ComponentSnapshots {
                     }
                     HStack(spacing: AppSpacing.lg) {
                         HeroSymbol(systemImage: "bell.badge", size: 72)
-                        HeroSymbol(systemImage: "location", size: 72, tint: AppColors.success)
+                        HeroSymbol(systemImage: "location", size: 72, tint: AppColors.Status.positive)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),

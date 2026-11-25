@@ -28,7 +28,7 @@ extension ComponentSnapshots {
                             primaryCurrency: "KZT", subtitle: "September against August") {
                     TrendBadge(direction: .up, changePercent: 12.4)
                 }
-                .onHeroColor(AppColors.warning)
+                .onHeroColor(AppColors.Status.warning)
             )
         }
 
@@ -86,9 +86,9 @@ extension ComponentSnapshots {
         /// The hero charts on colour, one per snapshot.
         @Test func heroChartsOnColor() async {
             await assertComponentSnapshot(
-                HeroBarPair(previous: 252_000, current: 284_000, color: AppColors.warning, currency: "KZT",
+                HeroBarPair(previous: 252_000, current: 284_000, color: AppColors.Status.warning, currency: "KZT",
                             animatesOnAppear: false)
-                    .onHeroColor(AppColors.warning),
+                    .onHeroColor(AppColors.Status.warning),
                 named: "barPair"
             )
             await assertComponentSnapshot(
@@ -105,7 +105,7 @@ extension ComponentSnapshots {
             )
             await assertComponentSnapshot(
                 HeroProportionBar(segments: HeroSamples.slices, currency: "KZT")
-                    .onHeroColor(AppColors.success),
+                    .onHeroColor(AppColors.Status.positive),
                 named: "proportion"
             )
         }
@@ -114,7 +114,7 @@ extension ComponentSnapshots {
         @Test func scoreGaugeHeroAmount() async {
             await assertComponentSnapshot(
                 ScoreGaugeCard(amount: 84_900, currency: "KZT", maxValue: 84_900 * 1.15, norm: 6_100,
-                               grade: "13.9× the usual", color: AppColors.destructive,
+                               grade: "13.9× the usual", color: AppColors.Status.negative,
                                subtitle: "Furniture, 3 Oct", style: .hero)
             )
         }
@@ -124,7 +124,7 @@ extension ComponentSnapshots {
         @Test func scoreGaugeHeroLongAmount() async {
             await assertComponentSnapshot(
                 ScoreGaugeCard(amount: 1_200_000, currency: "KZT", maxValue: 1_200_000 * 1.15, norm: 30_700,
-                               grade: "39.1× the usual", color: AppColors.warning,
+                               grade: "39.1× the usual", color: AppColors.Status.warning,
                                subtitle: "Furniture, 29 Sep", style: .hero)
             )
         }
@@ -152,8 +152,8 @@ private enum HeroSamples {
     static let series = ChartSeries<ChartValuePoint>.keyed("km", name: "Distance", coloring: .solid(AppColors.accent))
 
     static let slices: [DonutSlice] = [
-        DonutSlice(id: "salary", amount: 620_000, color: AppColors.success, label: "Salary", percentage: 75),
+        DonutSlice(id: "salary", amount: 620_000, color: AppColors.Status.positive, label: "Salary", percentage: 75),
         DonutSlice(id: "freelance", amount: 180_000, color: AppColors.accent, label: "Freelance", percentage: 22),
-        DonutSlice(id: "cashback", amount: 24_000, color: AppColors.warning, label: "Cashback", percentage: 3),
+        DonutSlice(id: "cashback", amount: 24_000, color: AppColors.Status.warning, label: "Cashback", percentage: 3),
     ]
 }

@@ -320,7 +320,7 @@ private struct SpringsPage: View {
                         GeometryReader { proxy in
                             ZStack(alignment: .leading) {
                                 Capsule()
-                                    .fill(AppColors.bgMuted)
+                                    .fill(AppColors.Background.containerStrong)
                                     .frame(height: 4)
                                 Circle()
                                     .fill(AppColors.accent)
@@ -386,7 +386,7 @@ private struct StaggeredEntrancePage: View {
                         .fill(AppColors.Data.color(for: "icon\(index)"))
                         .frame(width: AppIconSize.xxl, height: AppIconSize.xxl)
                         .overlay(Image(systemName: "person.fill").foregroundStyle(.white))
-                        .overlay(Circle().strokeBorder(AppColors.bgBase, lineWidth: 2))
+                        .overlay(Circle().strokeBorder(AppColors.Background.page, lineWidth: 2))
                         .staggeredEntrance(delay: Double(index) * AppAnimation.facepileStagger)
                         .id("\(replay)-\(index)")
                 }
@@ -501,7 +501,7 @@ private struct StreamingTextPage: View {
         let string = text as NSString
         return sample.amounts.compactMap { amount in
             let range = string.range(of: amount)
-            return range.location == NSNotFound ? nil : .init(range: range, color: AppColors.success)
+            return range.location == NSNotFound ? nil : .init(range: range, color: AppColors.Status.positive)
         }
     }
 

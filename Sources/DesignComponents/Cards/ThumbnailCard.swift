@@ -68,7 +68,7 @@ public struct ThumbnailCard<Picture: View, Details: View>: View {
                     .clipShape(RoundedRectangle(cornerRadius: AppRadius.md))
                 if isSaved {
                     Icon("bookmark.fill", size: AppIconSize.xs)
-                        .foregroundStyle(AppColors.staticWhite)
+                        .foregroundStyle(AppColors.Text.primaryOnDark)
                         .padding(AppSpacing.xs)
                         .background(AppColors.accentFill, in: Circle())
                         .padding(AppSpacing.xs)

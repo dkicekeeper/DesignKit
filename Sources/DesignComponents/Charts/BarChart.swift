@@ -39,7 +39,7 @@ public enum BarChartLayout: Hashable, Sendable {
 /// BarChart(dataPoints: months, series: [income, spending])                 // grouped bars
 /// BarChart(dataPoints: months, series: categories, layout: .stacked)       // stacks
 /// BarChart(dataPoints: months, series: spending,
-///          referenceLines: [.value(500_000, label: "Limit", aboveColor: AppColors.warning)])
+///          referenceLines: [.value(500_000, label: "Limit", aboveColor: AppColors.Status.warning)])
 /// ```
 ///
 /// A long press and a drag pick a stretch of periods: the banner sums it up.
@@ -328,11 +328,11 @@ public struct BarChart<Point: ChartPoint>: View {
         let isGrouped = seriesList.count > 1
         if let high = cache.maxIndex[s] {
             extremeDot(label: cache.labels[high], value: cache.values[s][high], seriesID: series.id, isGrouped: isGrouped,
-                       color: lowerIsBetter ? AppColors.destructive : AppColors.success)
+                       color: lowerIsBetter ? AppColors.Status.negative : AppColors.Status.positive)
         }
         if let low = cache.minIndex[s] {
             extremeDot(label: cache.labels[low], value: cache.values[s][low], seriesID: series.id, isGrouped: isGrouped,
-                       color: lowerIsBetter ? AppColors.success : AppColors.destructive)
+                       color: lowerIsBetter ? AppColors.Status.positive : AppColors.Status.negative)
         }
     }
 

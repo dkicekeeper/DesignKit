@@ -21,10 +21,10 @@ extension ComponentSnapshots {
         @Test func totalsCard() async {
             await assertComponentSnapshot(
                 TotalsCard([
-                    .init(title: "Income", amount: 530_000, previous: 480_000, color: AppColors.success),
-                    .init(title: "Expenses", amount: 320_000, previous: 350_000, color: AppColors.destructive,
+                    .init(title: "Income", amount: 530_000, previous: 480_000, color: AppColors.Status.positive),
+                    .init(title: "Expenses", amount: 320_000, previous: 350_000, color: AppColors.Status.negative,
                           increaseIsGood: false),
-                    .init(title: "Net", amount: -60_000, previous: 130_000, color: AppColors.destructive),
+                    .init(title: "Net", amount: -60_000, previous: 130_000, color: AppColors.Status.negative),
                 ], currency: "KZT", title: "May 2026"),
                 appearances: [.light, .dark, .largeText]
             )
@@ -51,10 +51,10 @@ extension ComponentSnapshots {
                     message: "Each part counts by how much it matters for the whole.",
                     caption: "Based on the last 3 months",
                     segments: [
-                        .init(title: "Savings", systemImage: "banknote.fill", color: AppColors.success, weight: 40),
+                        .init(title: "Savings", systemImage: "banknote.fill", color: AppColors.Status.positive, weight: 40),
                         .init(title: "Regular payments", systemImage: "repeat.circle", color: AppColors.accent, weight: 26.7),
-                        .init(title: "Safety cushion", systemImage: "shield.lefthalf.filled", color: AppColors.income, weight: 20),
-                        .init(title: "Cash flow", systemImage: "chart.line.uptrend.xyaxis", color: AppColors.destructive,
+                        .init(title: "Safety cushion", systemImage: "shield.lefthalf.filled", color: SampleColors.income, weight: 20),
+                        .init(title: "Cash flow", systemImage: "chart.line.uptrend.xyaxis", color: AppColors.Status.negative,
                               weight: 13.3),
                     ],
                     footnote: "No budgets set, so their weight is shared among the other parts."
@@ -66,7 +66,7 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 CalculationCard(
                     systemImage: "banknote.fill",
-                    color: AppColors.success,
+                    color: AppColors.Status.positive,
                     title: "How it's calculated",
                     heroLabel: "Savings rate",
                     heroValue: "18.4%",
@@ -89,7 +89,7 @@ extension ComponentSnapshots {
                     NetAmountRow(label: "April 2026", inflow: 280_000, outflow: 340_000, net: -60_000, currency: "KZT")
                     RowDivider()
                     NetAmountRow(label: "March 2026", inflow: 0, outflow: 0, net: 0, currency: "KZT",
-                                 singleValue: 410_000, singleColor: AppColors.success)
+                                 singleValue: 410_000, singleColor: AppColors.Status.positive)
                 }
                 .cardContentPadding()
                 .cardStyle(),
@@ -173,7 +173,7 @@ extension ComponentSnapshots {
                     remaining: 1_200_000, total: 3_000_000, currency: "KZT", progress: 0.6,
                     phase: .inProgress(nextDate: "12 Nov 2026", remainingCaption: "18 left")
                 ) {
-                    Badge("Credit", color: AppColors.expense)
+                    Badge("Credit", color: AppColors.Text.primary)
                 },
                 named: "inProgress"
             )
@@ -192,7 +192,7 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 VStack(spacing: 0) {
                     AmountRow("Food", subtitle: "Groceries, Cafés, Delivery", subtitleLineLimit: 1,
-                              leading: .tinted(.sfSymbol("fork.knife"), AppColors.warning),
+                              leading: .tinted(.sfSymbol("fork.knife"), AppColors.Status.warning),
                               value: .share(85_000, percentage: 42), currency: "KZT", accessory: .chevron)
                     AmountRow("Transport", subtitleLineLimit: 1,
                               leading: .tinted(.sfSymbol("car.fill"), AppColors.accent),

@@ -62,27 +62,10 @@ struct ColorsScreen: View {
         .init(name: "Border.darkModeOnly", color: AppColors.Border.darkModeOnly, use: "Shows in dark only"),
     ]
 
-    private let legacy: [Token] = [
-        .init(name: "bgBase", color: AppColors.bgBase, use: "= Background.page"),
-        .init(name: "bgCard", color: AppColors.bgCard, use: "= Background.card"),
-        .init(name: "bgMuted", color: AppColors.bgMuted, use: "= containerStrong on glass"),
-        .init(name: "textPrimary", color: AppColors.textPrimary, use: "= Text.primary"),
-        .init(name: "textSecondary", color: AppColors.textSecondary, use: "= Text.secondary"),
-        .init(name: "textTertiary", color: AppColors.textTertiary, use: "= Text.tertiary"),
-        .init(name: "accent", color: AppColors.accent, use: "DesignKitTheme.accent"),
+    private let accentTokens: [Token] = [
+        .init(name: "accent", color: AppColors.accent, use: "Tints, outlines, tracks (DesignKitTheme.accent)"),
         .init(name: "accentFill", color: AppColors.accentFill, use: "Under white text, 4.5:1 (8.10.0)"),
-        .init(name: "destructive", color: AppColors.destructive, use: "= Status.negative"),
-        .init(name: "success", color: AppColors.success, use: "= Status.positive"),
-        .init(name: "warning", color: AppColors.warning, use: "= Status.warning"),
-        .init(name: "staticWhite", color: AppColors.staticWhite, use: "= Text.primaryOnDark"),
-    ]
-
-    private let financial: [Token] = [
-        .init(name: "income", color: AppColors.income, use: "Money in: fills, bars, icons"),
-        .init(name: "incomeText", color: AppColors.incomeText, use: "Money in as text, 4.5:1 (8.10.0)"),
-        .init(name: "expense", color: AppColors.expense, use: "Money out (not red)"),
-        .init(name: "transfer", color: AppColors.transfer, use: "Between own accounts"),
-        .init(name: "planned", color: AppColors.planned, use: "= Status.info"),
+        .init(name: "Text.action", color: AppColors.Text.action, use: "As text and icons, 4.5:1 (vNext)"),
     ]
 
     var body: some View {
@@ -105,11 +88,8 @@ struct ColorsScreen: View {
                 tokenList(border)
                 darkModeOnlyDemo
             }
-            ShowcaseSection(title: "Flat names (1.x)", subtitle: "Aliases of the groups · keep working") {
-                tokenList(legacy)
-            }
-            ShowcaseSection(title: "Financial", subtitle: "Transaction-type tokens") {
-                tokenList(financial)
+            ShowcaseSection(title: "Accent", subtitle: "The app's brand: DesignKitTheme.accent · the only flat names") {
+                tokenList(accentTokens)
             }
             ShowcaseSection(title: "Data", subtitle: "AppColors.Data · 30 picker colours, the first 14 also hashed by name") {
                 paletteDemo

@@ -117,7 +117,7 @@ struct RootView: View {
             .safeAreaInset(edge: .bottom) {
                 Text(versionLine)
                     .font(AppTypography.caption2)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .padding(.bottom, AppSpacing.xs)
             }
             .background { ComponentIndexReader(index: $componentIndex) }
@@ -196,7 +196,7 @@ struct RootView: View {
                 } else if let trailing {
                     Text(verbatim: trailing)
                         .font(AppTypography.bodySmall)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                         .monospacedDigit()
                 }
             }

@@ -47,7 +47,7 @@ public struct PhotoTile<Photo: View>: View {
     public var body: some View {
         square
             .overlay { photo }
-            .background(AppColors.bgMuted)
+            .background(AppColors.Background.containerStrong)
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }
 

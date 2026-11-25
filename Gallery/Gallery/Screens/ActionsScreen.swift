@@ -186,7 +186,7 @@ private struct BounceStylePage: View {
                 Text("Taps").font(AppTypography.bodySmall)
                 Spacer()
                 Text("\(taps)").font(AppTypography.bodySmall).monospacedDigit()
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
         }
     }
@@ -237,7 +237,7 @@ private struct AmountVisibilityTogglePage: View {
         ) {
             HStack(spacing: AppSpacing.md) {
                 FormattedAmountText(amount: 1_284_500, currency: "KZT", fontSize: AppTypography.h2,
-                                    fontWeight: .bold, color: AppColors.textPrimary)
+                                    fontWeight: .bold, color: AppColors.Text.primary)
                 AmountVisibilityToggle(isHidden: $isHidden)
             }
             .amountsHidden(isHidden)
