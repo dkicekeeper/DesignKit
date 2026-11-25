@@ -86,7 +86,6 @@ struct RootView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showsCustom) { customSheet }
             .safeAreaInset(edge: .bottom) {
                 Text(versionLine)
                     .font(AppTypography.caption2)
@@ -101,6 +100,9 @@ struct RootView: View {
         // Tokens are static reads: a new identity re-renders every screen with the new accent
         // and surfaces.
         .id("\(theme.rawValue)-\(surface)-\(customAccent.description)")
+        // Outside the identity above: a new accent rebuilds the screens, not the sheet that
+        // picks it (or the colour picker it presented).
+        .sheet(isPresented: $showsCustom) { customSheet }
     }
 
     /// The home screen's sections, when nothing is searched.
@@ -181,6 +183,9 @@ struct RootView: View {
                         VStack(alignment: .leading, spacing: AppSpacing.xxs) {
                             Text(verbatim: link.page)
                                 .font(AppTypography.bodyEmphasis)
+                            Text(verbatim: link.screen.title)
+                                .font(AppTypography.caption.weight(.semibold))
+                                .foregroundStyle(AppColors.Text.secondary)
                             Text(verbatim: link.summary)
                                 .font(AppTypography.caption)
                                 .foregroundStyle(AppColors.Text.secondary)
@@ -229,6 +234,8 @@ struct RootView: View {
         Binding(
             get: { surface },
             set: { newSurface in
+                // The custom preset: its accent with these surfaces.
+                DesignKitTheme.accent = customAccent
                 DesignKitTheme.surface = newSurface
                 theme = .custom
                 surface = newSurface
