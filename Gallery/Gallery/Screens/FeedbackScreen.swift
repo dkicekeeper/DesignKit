@@ -890,7 +890,7 @@ private struct MomentOverlayPage: View {
         }
         .padding(AppSpacing.lg)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(AppColors.Background.base)
+        .background(AppColors.Background.page)
     }
 }
 

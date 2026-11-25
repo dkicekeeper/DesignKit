@@ -50,7 +50,7 @@ extension ComponentSnapshots {
                 }
             }
             .padding(AppSpacing.md)
-            .background(AppColors.Background.fill, in: RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+            .background(SurfaceStyle.fill.container, in: RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
         }
 
         @Test func momentOverlay() async {
