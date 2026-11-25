@@ -11,4 +11,5 @@ A counter of a `StatsStrip` can explain itself: `info:` puts an `InfoTip` after 
 
 - `StatsStrip`'s page explains its first counter with a switch, and a note on `info:`; a snapshot of a counter with its tip (`statsStripWithInfo`, light, dark and large text).
 - `InfoTip`'s page carries Platina's badge: its profile explains the share of players over its rarest trophies. `gallery_badges.py` counts the `.infoTip` modifier as a use of `InfoTip`.
+- The badges follow the apps' `main` of 2026-11-25: `InfoTip` names Dalada too, `SearchablePicker` Tenra, Dalada and Platina, `ConversationDivider` Tenra and Platina.
 - docs/adoption.md: Platina's `InfoTip` and readable colours in use (a trophy row's metal and earned date in `AppColors.readable` and `Status.positiveText`).

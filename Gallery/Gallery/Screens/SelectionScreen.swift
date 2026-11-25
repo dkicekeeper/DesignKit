@@ -54,7 +54,7 @@ private struct SearchablePickerPage: View {
             name: "SearchablePicker",
             summary: "A list too long to scan: the system search narrows it, one option or several are picked with the row's circle, and a name nothing has offers “Create”.",
             since: "8.9.0",
-            apps: [.platina],
+            apps: [.tenra, .dalada, .platina],
             notes: [
                 "A screen's content: put it in a NavigationStack (a pushed screen, or a sheet with its own stack), where the search field lives.",
                 "selection: Binding<Value?> picks one (dismissesOnSelection: true closes the screen on a pick); Binding<Set<Value>> picks several.",
