@@ -57,7 +57,7 @@ Benchmark round 4 (docs/benchmark.md, against Meta's Astryx) added these. Where 
 
 | Component | Tenra | Dalada | Platina |
 |---|---|---|---|
-| `InfoTip` | proposed: the Financial Health score and its parts, an insight's rolling average or forecast, "spent per day" | uses it: a place's pressure over 24 hours and when it is steady (`.infoTip`). Declined where proposed: routes have no difficulty, and `StreakCard` and `RatingSummary` take strings only, with no place after a label for an ⓘ (proposed: an `info:` on both cards) | proposed: a trophy's rarity (the share of players who earned it) |
+| `InfoTip` | proposed: the Financial Health score and its parts, an insight's rolling average or forecast, "spent per day" | uses it: a place's pressure over 24 hours and when it is steady (`.infoTip`). Declined where proposed: routes have no difficulty, and `StreakCard` and `RatingSummary` take strings only, with no place after a label for an ⓘ (proposed: an `info:` on both cards) | uses it: the share of players who earned a trophy, once in the profile's rarest trophies (Platina#2) |
 | `RelativeTime` | uses it | uses it | uses it |
 | `SearchablePicker` | proposed: a transaction's category and subcategory (with "Create"), link payments | uses it: gear for a packing list (several, with "Create"). Declined: a place's type, nine fixed types in a menu row | uses it |
 | `MessageBubble(markdown:time:status:)` | `MessageBubble` with plain text; proposed: Ten's answers in Markdown, the time under a message | declined: a thread is a public discussion of `CommentRow`s (author, avatar, quote, reactions), with no read state and no chat | Plati's answers in Markdown |
@@ -74,8 +74,8 @@ grey surfaces (`DesignKitTheme.surface = .fill`, 8.12.0) and in a column on the 
 (`.readableWidth()`, 8.13.0); the Gallery's pages carry its badge since 8.17.1. The first app to
 use `SearchablePicker`, `ConversationDivider`, `MessageBubble(markdown:)`, `.readableWidth()` and
 `.heroBackground(clearHeight:picture:)` (its game screen, 8.14.0); its profile puts its sections
-side by side on an iPad (`AppLayout.cardColumns`) and its play days in a `CalendarHeatmap`. Not used
-yet, where it could: `InfoTip` by a trophy's rarity.
+side by side on an iPad (`AppLayout.cardColumns`) and its play days in a `CalendarHeatmap`. Since
+Platina#2 an `InfoTip` explains the share of players who earned a trophy.
 
 ## Ten (ParticleCreature) in Tenra
 
