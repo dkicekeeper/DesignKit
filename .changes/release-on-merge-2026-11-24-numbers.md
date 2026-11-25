@@ -14,3 +14,4 @@ Release numbers are given at merge: a PR declares its release in a note in `.cha
 - TestFlight skips the merge push that carries a note and takes a release build's What to Test from the tag on it.
 - docs/components.md and .json are the bot's: CI checks that they build (`components_reference.py build`), a PR leaves them alone.
 - docs/releasing.md, and CLAUDE.md, CHANGELOG.md's preamble, docs/testflight.md and docs/gallery-structure.md on the new way.
+- `gallery_badges.py` finds a hero modifier called without a receiver, inside an app's own `View` extension (Platina's game screen), so the picture hero's page keeps its Platina badge.
