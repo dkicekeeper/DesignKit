@@ -39,6 +39,7 @@ struct ColorsScreen: View {
         .init(name: "Background.neutral1", color: AppColors.Background.neutral1, use: "Fields, grouped blocks"),
         .init(name: "Background.neutral2", color: AppColors.Background.neutral2, use: "Tracks, sunken controls"),
         .init(name: "Background.fill", color: AppColors.Background.fill, use: "Translucent, any surface"),
+        .init(name: "Background.scrim", color: AppColors.Background.scrim, use: "Dims the app under a moment (vNext)"),
     ]
 
     private let status: [Token] = [
