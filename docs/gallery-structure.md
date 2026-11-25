@@ -88,7 +88,7 @@ Gallery — сколько в нём компонентов; оно считае
 | **Sheets & Flows** | `PromptSheet` (и праймер разрешения), `NotificationPermissionPrompt`, `OnboardingPager`, `OnboardingPage`, `OnboardingPageContainer`, `LoopOnboardingHero`, `ShareCardSheet` (2.8.0), `DateRangePickerSheet` (2.9.0), `AmountEntrySheet` (4.14.0) | HIG Presentation, M3 Containment (sheets) |
 | **Effects** | `.celebration`, `.sparkleBurst`, `.shine`, `.attentionPulse`, `AuroraBackground`, `.interactiveTilt` (2.2.0), `.completionMoment`, `.ripple` / `.rippleOnTap` (2.3.0), `VoiceWave`, `EdgeGlow` (вместо `SiriGlow`, `SiriWave`, удалены в 3.0.0), `.thinkingShimmer` (2.4.0), `.grain` (2.5.0), `.holographic`, `.dissolve` (2.6.0), `.accentGlow`, `.borderBeam` / `.borderGlow`, `.heroBackground` (4.5.0), `.heroBackground(picture:)` (8.14.0) | — (своё: Liquid Glass, Siri) |
 
-Последний раздел главной — **Patterns** (vNext, docs/benchmark.md 24): целые экраны из
+Последний раздел главной — **Patterns** (8.17.4, docs/benchmark.md 24): целые экраны из
 компонентов, как их описывает §4 design-system.md, на образцах данных и без модели приложения.
 Настройки (`FormSection` из `UniversalRow`, экран выбора с галочкой), деталь (`HeroSection`,
 две `DSButton`, факты в `FormSection`, день истории из `TransactionRow`), то, что человек хранит

@@ -17,6 +17,25 @@ Versions follow semantic versioning; apps pin an exact version. A PR declares it
 note in `.changes/`; at the merge the release bot gives it the next number and writes its section
 here (docs/releasing.md).
 
+## 8.17.4 - 2026-11-25
+
+The Gallery shows whole screens made of DesignKit's components. Nothing changes in an app.
+
+Tooling after the first release given at merge: the bot's own fixes, Platina built in CI, and a
+form to ask for a component. Nothing changes in an app.
+[#116](https://github.com/dkicekeeper/DesignKit/pull/116)
+
+### Gallery and tooling
+
+- Patterns, the last section of the Gallery's home: settings, a detail screen, the things a person keeps (a `CardList` with its toolbar, its skeleton, empty and error), a dashboard, a conversation with an assistant, an edit sheet and onboarding, each a whole screen of public components on sample data, in the column a large screen gets (docs/benchmark.md 24).
+- docs/design-system.md §4 points to them, and its detail screen is drawn as Tenra builds it: the actions in one `GlassEffectContainer`, the facts in a `FormSection`, a card per day of history.
+- Notes released together keep their paragraphs apart in the CHANGELOG section: an intro or a block that follows another note's text starts after a blank line, and items of one section still run on.
+- The release bot commits only the files it changed (`git add -u`), never a file a step left untracked in the checkout.
+- TestFlight's build started by the release bot skips quietly when the signing secrets are missing, as a push does; a person's manual run still fails with the list of what to add.
+- CI's `platina` job builds Platina against this checkout on GitHub's Xcode 27 image, as its own CI does: its XcodeGen spec is pointed at the local package, and a manual run takes `platina_ref` to check a Platina branch.
+- CLAUDE.md, docs/agents.md and docs/adoption.md say that Platina moves its pin with its own DesignKit update workflow, as Tenra and Dalada do.
+- An issue template, "Component request" (`.github/ISSUE_TEMPLATE/component-request.yml`): the app, the screen, what the person should see and do, what the app draws today, the components that come close, a screenshot (docs/benchmark.md 28).
+
 ## 8.17.3 - 2026-11-25
 
 A picture hero's figure no longer jumps when a screen is pulled to refresh. Found by the owner on Platina's game screen.

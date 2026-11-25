@@ -57,7 +57,7 @@ Gallery/               showcase app (xcodegen; the .xcodeproj is not in git): Fo
                        every public component has a ComponentPage — header, preview canvas
                        (light/dark), controls for its parameters and states (Loading = its
                        skeleton), usage notes; Patterns, whole screens made of the components
-                       (vNext); an Updates screen reads CHANGELOG.md; ships to TestFlight
+                       (8.17.4); an Updates screen reads CHANGELOG.md; ships to TestFlight
                        (docs/testflight.md)
 Gallery/SnapshotTests/ snapshot tests hosted in the Gallery app; references in __Snapshots__
 scripts/               snapshot-tests.sh (CI and local runs of the snapshot tests); for the apps
@@ -110,7 +110,7 @@ it as "Designed for iPad"; its content keeps to `.readableWidth()`, 8.13.0); acc
 `ExpandableText`), picking (`SearchablePicker`), its game screen
 (`.heroBackground(clearHeight:picture:)`, 8.14.0), sharing (`ShareCardSheet`). Its guide:
 `CLAUDE.md` («DesignKit») and `docs/PLAN.md` §4. CI's `platina` job builds it against this checkout
-on GitHub's Xcode 27 image, as its own CI does (since vNext), and the Gallery's badges read its code
+on GitHub's Xcode 27 image, as its own CI does (since 8.17.4), and the Gallery's badges read its code
 since 8.17.1 (CI's `Gallery badges` job checks it out with Tenra and Dalada).
 
 **Dalada since 8.12.0** (its #77, version 1.0.4) draws its surfaces as a grey fill too
@@ -403,7 +403,7 @@ rather than importing an app type.
   `FlowLayout(maxRows:)`, a banner over a sheet, a status dot on `Avatar`, 23 the code of a page's
   configuration in the Gallery), the assistant's list of actions once Tenra shows one, anatomy on
   the pages of composite cards and rows (Platina's CI job here, the issue template, 28, and the
-  Gallery's Patterns of whole screens, 24, came in vNext, and Platina's own DesignKit update
+  Gallery's Patterns of whole screens, 24, came in 8.17.4, and Platina's own DesignKit update
   workflow on 2026-11-25); the adoption proposals in [docs/adoption.md](docs/adoption.md) for the
   app sessions.
 - Release numbers given at merge (2026-11, the owner's decision after parallel sessions'

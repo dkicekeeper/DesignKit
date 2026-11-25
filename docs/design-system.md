@@ -2591,7 +2591,7 @@ Used in: `OnboardingWelcomeStep` (bottom), Account/Category/Subscription/Deposit
 ## 4. View Patterns
 
 How the apps put the components together. Each app's own guide names its screens (Tenra's
-`docs/design-system.md` §4, Dalada's `CLAUDE.md`). The Gallery's **Patterns** (vNext) builds
+`docs/design-system.md` §4, Dalada's `CLAUDE.md`). The Gallery's **Patterns** (8.17.4) builds
 these screens from the components with sample data: settings, a detail, the things a person
 keeps with loading, empty and error, a dashboard, a conversation, an edit sheet and onboarding.
 
