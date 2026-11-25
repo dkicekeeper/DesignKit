@@ -54,7 +54,7 @@ private struct SearchablePickerPage: View {
             name: "SearchablePicker",
             summary: "A list too long to scan: the system search narrows it, one option or several are picked with the row's circle, and a name nothing has offers “Create”.",
             since: "8.9.0",
-            apps: [],
+            apps: [.platina],
             notes: [
                 "A screen's content: put it in a NavigationStack (a pushed screen, or a sheet with its own stack), where the search field lives.",
                 "selection: Binding<Value?> picks one (dismissesOnSelection: true closes the screen on a pick); Binding<Set<Value>> picks several.",
@@ -128,7 +128,7 @@ private struct SegmentedPickerPage: View {
         ComponentPage(
             name: "SegmentedPicker",
             summary: "Two to four exclusive modes on Liquid Glass.",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: [
                 "A selection haptic as the segment moves (2.3.0, HapticCue.select).",
@@ -161,7 +161,7 @@ private struct ChipPickerPage: View {
             name: "ChipPicker",
             summary: "Chips to pick one option, or several (a filter); with icons, a title and an \"All\" chip.",
             since: "0.4.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: [
                 "allTitle (2.8.0): an \"All\" chip in front, selected while nothing is picked; a tap clears the selection.",

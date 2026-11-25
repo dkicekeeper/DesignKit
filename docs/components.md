@@ -12,7 +12,7 @@ rules are in [design-system.md](design-system.md); this is the index to grep (`#
 
 The button of the design system: a title with an icon before, after or above it (or the icon alone), appearance × role × size, a loading state, full width or its own.
 
-Since 2.0.0 · Apps: Dalada, Tenra
+Since 2.0.0 · Apps: Dalada, Platina, Tenra
 
 - `DSButton` in `Sources/DesignComponents/Actions/DSButton.swift`
   A button of the design system.
@@ -65,7 +65,7 @@ init(systemImage: String, selectedSystemImage: String, count: Int, isSelected: B
 
 ### AmountVisibilityToggle
 
-The eye that hides every amount below it (.amountsHidden). Tenra puts it in the Home toolbar.
+The eye that hides every amount below it (.amountsHidden), for the toolbar of a screen of amounts.
 
 Since 1.7.0 · Apps: none yet
 
@@ -80,7 +80,7 @@ init(isHidden: Binding<Bool>, size: CGFloat = AppIconSize.md, color: Color = App
 
 A filter chip on Liquid Glass: a tap or a menu, with an optional icon and chevron.
 
-Apps: Tenra
+Apps: Platina, Tenra
 
 - `UniversalFilterButton` in `Sources/DesignComponents/Actions/UniversalFilterButton.swift`
   Universal filter button/menu component with consistent styling Supports two modes: simple button tap or menu with custom content
@@ -130,7 +130,7 @@ init(systemImage: String = "plus", items: [Item], direction: Direction = .up, ti
 
 Ready-made things to say: chips under an answer or on an empty chat, each one a prompt sent with a tap. Nothing stays selected.
 
-Since 4.6.0 · Apps: Tenra
+Since 4.6.0 · Apps: Platina, Tenra
 
 - `SuggestionChips` in `Sources/DesignComponents/Actions/SuggestionChips.swift`; skeleton `SuggestionChipsSkeleton`
   Tappable prompts in chips.
@@ -148,7 +148,7 @@ init(_ suggestions: [String], systemImage: String? = nil, layout: Layout = .scro
 
 A form field with focus, error, help and disabled states; inline styles sit in a row's trailing slot, row styles fill a FormSection row (3.0.0).
 
-Apps: Dalada, Tenra · Styles: `.standard`, `.multiline`, `.inline`, `.inlineMultiline`, `.row`, `.rowMultiline`
+Apps: Dalada, Platina, Tenra · Styles: `.standard`, `.multiline`, `.inline`, `.inlineMultiline`, `.row`, `.rowMultiline`
 
 - `FormTextField` in `Sources/DesignComponents/TextInput/FormTextField.swift`
   Enhanced text field for forms with error/help states and multiple styles. Supports single-line, multi-line, and `inline` variants.
@@ -177,7 +177,7 @@ init(text: Binding<String>, placeholder: String, font: Font = AppTypography.h2, 
 
 The field at the bottom of a conversation: glass that grows to five lines, the send button inside, the quoted message, the send error; an attach slot and a microphone for an assistant.
 
-Since 1.12.0 · Apps: Dalada, Tenra
+Since 1.12.0 · Apps: Dalada, Platina, Tenra
 
 - `MessageComposer` in `Sources/DesignComponents/TextInput/MessageComposer.swift`
   A message field with a send button.
@@ -242,7 +242,7 @@ init(_ queries: [String] = [])
 
 A list too long to scan: the system search narrows it, one option or several are picked with the row's circle, and a name nothing has offers “Create”.
 
-Since 8.9.0 · Apps: none yet
+Since 8.9.0 · Apps: Platina
 
 - `SearchablePicker` in `Sources/DesignComponents/Selection/SearchablePicker.swift`; skeleton `SearchablePickerSkeleton`
   A list to pick one option or several from, with the system search and "Create “…”".
@@ -266,7 +266,7 @@ init(_ options: [Option], selection: Binding<Set<Value>>, prompt: String? = nil,
 
 Two to four exclusive modes on Liquid Glass.
 
-Apps: Dalada, Tenra
+Apps: Dalada, Platina, Tenra
 
 - `SegmentedPicker` in `Sources/DesignComponents/Selection/SegmentedPicker.swift`
 
@@ -280,7 +280,7 @@ init(title: String, selection: Binding<T>, options: [(label: String, value: T)])
 
 Chips to pick one option, or several (a filter); with icons, a title and an "All" chip.
 
-Since 0.4.0 · Apps: Dalada, Tenra
+Since 0.4.0 · Apps: Dalada, Platina, Tenra
 
 - `ChipPicker` in `Sources/DesignComponents/Selection/ChipPicker.swift`; skeleton `ChipPickerSkeleton`
   Horizontally scrolling chips.
@@ -597,7 +597,7 @@ init(amount: Double, currency: String, prefix: String = "", fontSize: Font = App
 
 The one row of a form card or a settings list (7.0.0): an icon, the title, what the row carries (accessory: a switch, a menu, a list, a date, a stepper, a slider, a check, a screen, an action, a value) and a hint.
 
-Apps: Dalada, Tenra
+Apps: Dalada, Platina, Tenra
 
 - `UniversalRow` in `Sources/DesignComponents/Rows/UniversalRow.swift`; skeleton `UniversalRowSkeleton`
   Universal row component for consistent UI patterns across the app Integrates with Icon for leading icons and supports flexible content
@@ -623,7 +623,7 @@ init(_ title: String, leadingIcon: IconConfig?, value: String? = nil, hint: Stri
 
 The chevron at the end of a row that opens a screen; tertiary, sized to the text.
 
-Apps: Dalada, Tenra
+Apps: Dalada, Platina, Tenra
 
 - `DisclosureChevron` in `Sources/DesignComponents/Rows/DisclosureChevron.swift`
   The system disclosure chevron used to signal "tap to navigate forward".
@@ -701,9 +701,9 @@ init(title: String, subtitle: String, amount: Double, currency: String, detail: 
 
 ### ItemRow
 
-A row for an item of the app's own: a symbol, the title with a badge, a description, lines of facts joined by "·" and an accessory. Dalada's trips, places, articles and gear; Tenra's backups and subcategories.
+A row for an item of the app's own: a symbol, the title with a badge, a description, lines of facts joined by "·" and an accessory. Dalada's trips, places, articles, checklists and gear; Tenra's backups, subcategories and what its assistant remembers; Platina's play sessions and walkthroughs.
 
-Since 3.6.0 · Apps: Dalada, Tenra · Styles: `.standard`, `.large`
+Since 3.6.0 · Apps: Dalada, Platina, Tenra · Styles: `.standard`, `.large`
 
 - `ItemRow` in `Sources/DesignComponents/Rows/ItemRow.swift`; skeleton `ItemRowSkeleton`
   A row for an item of the app's own (a trip, a place, an article, a backup): a symbol, the title with an optional badge, a description, lines of facts (`MetaLine`) and an accessory.
@@ -722,7 +722,7 @@ init(_ title: String, badge: String? = nil, detail: String? = nil, meta: [MetaLi
 
 Short facts on one line: text, text with a symbol, a symbol alone, joined by "·" or set side by side. It takes the font around it; ItemRow sets it.
 
-Since 3.6.0 · Apps: Dalada, Tenra
+Since 3.6.0 · Apps: Dalada, Platina, Tenra
 
 - `MetaLine` in `Sources/DesignComponents/Rows/ItemRow.swift`
   Short facts on one line: "12 Oct · 14.2 km · 3 h", or labels with symbols side by side. It takes the font around it (`ItemRow` sets it; elsewhere, `.font(AppTypography.caption)`) and draws in `tint`, an item's own tint over it. A long fact wraps; `.lineLimit(1)` on the line keeps each to one line. At accessibility text sizes the facts go one under another, without dots (a symbol alone stays after its fact).
@@ -769,7 +769,7 @@ init(author: String, date: Date, text: AttributedString, quote: MessageQuote? = 
 
 An item to tick off; struck through once done, an optional mark on the right.
 
-Since 1.12.0 · Apps: Dalada
+Since 1.12.0 · Apps: Dalada, Platina
 
 - `ChecklistRow` in `Sources/DesignComponents/Rows/ChecklistRow.swift`; skeleton `ChecklistRowSkeleton`
   A checklist item; a tap toggles it.
@@ -784,7 +784,7 @@ init(_ title: String, isChecked: Bool, tint: Color = AppColors.success, accessor
 
 A checklist in a list: its title (a seal once complete), the day, the bar and “12 of 20”.
 
-Since 1.12.0 · Apps: Dalada
+Since 1.12.0 · Apps: Dalada, Platina
 
 - `ChecklistSummaryRow` in `Sources/DesignComponents/Rows/ChecklistRow.swift`; skeleton `ChecklistSummaryRowSkeleton`
   A checklist in a list: title (with a seal once complete), a line under it (the day it is for), and the progress bar with "12 of 20"; an empty checklist says so instead.
@@ -797,7 +797,7 @@ init(title: String, subtitle: String? = nil, subtitleSystemImage: String = "cale
 
 Something with a picture in a list: a 64 pt picture, the title with a seal and a bookmark, details.
 
-Since 1.12.0 · Apps: Dalada
+Since 1.12.0 · Apps: Dalada, Platina
 
 - `ThumbnailRow` in `Sources/DesignComponents/Cards/ThumbnailCard.swift`; skeleton `ThumbnailRowSkeleton`
   The same thing as a list row: a 64 pt picture on the left, the title (two lines) with the seal and the bookmark, the details under it.
@@ -819,7 +819,8 @@ Since 2.8.0 · Apps: Dalada
 init(_ title: String, status: Status, caption: String, onDownload: @escaping () -> Void, onPause: @escaping () -> Void = {}, downloadLabel: String = String(localized: "download.start", defaultValue: "Download"), pauseLabel: String = String(localized: "download.pause", defaultValue: "Pause"))
 ```
 
-- The app formats the caption (sizes, percent) and adds .swipeActions to delete.
+- The app formats the caption (sizes, percent) and puts Delete in a long press (.contextMenu): no swipe actions since 8.0.0.
+- Its own padding is a List row's (AppSpacing.xxs): in a FormSection card give it .padding(.vertical, AppSpacing.md), as Dalada's offline maps do.
 
 ### TransactionRow
 
@@ -1109,7 +1110,7 @@ init(title: String, value: String, systemImage: String? = nil, valueColor: Color
 
 Counters side by side in a card; two columns at accessibility text sizes.
 
-Since 1.12.0 · Apps: Dalada
+Since 1.12.0 · Apps: Dalada, Platina, Tenra
 
 - `StatsStrip` in `Sources/DesignComponents/Cards/StatsStrip.swift`; skeleton `StatsStripSkeleton`
   A card of counters.
@@ -1123,7 +1124,7 @@ init(items: [Item])
 
 A streak: a flame while it runs (grey once it stopped), what to do next, the best result.
 
-Since 1.12.0 · Apps: Dalada
+Since 1.12.0 · Apps: Dalada, Platina
 
 - `StreakCard` in `Sources/DesignComponents/Cards/StreakCard.swift`; skeleton `StreakCardSkeleton`
   A streak card.
@@ -1222,7 +1223,7 @@ init(title: String, isVerified: Bool = false, isSaved: Bool = false, verifiedLab
 
 A piece of advice in a pale box of its colour, with an icon.
 
-Apps: Dalada
+Apps: Dalada, Platina
 
 - `RecommendationBox` in `Sources/DesignComponents/Cards/RecommendationBox.swift`; skeleton `RecommendationBoxSkeleton`
   A tinted recommendation callout: an icon and a line of advice on a soft `color`-tinted background. Used at the bottom of insight / health cards.
@@ -1287,7 +1288,7 @@ init(dataPoints: [Point], series: ChartSeries<Point>, valueFormat: ChartValueFor
 
 Bars per period, one or several series side by side or stacked.
 
-Since 0.5.0 · Apps: Tenra · Styles: `.grouped`, `.stacked`
+Since 0.5.0 · Apps: Platina, Tenra · Styles: `.grouped`, `.stacked`
 
 - `BarChart` in `Sources/DesignComponents/Charts/BarChart.swift`; skeleton `BarChartSkeleton`
   Scrollable bar chart that opens on the current period, with tap selection, a banner and a "Today" marker.
@@ -1305,7 +1306,7 @@ init(dataPoints: [Point], series: ChartSeries<Point>, valueFormat: ChartValueFor
 
 Days as small squares, a week per column, tinted by their value; tap a day for its amount.
 
-Since 8.3.0 · Apps: Tenra
+Since 8.3.0 · Apps: Platina, Tenra
 
 - `CalendarHeatmap` in `Sources/DesignComponents/Charts/CalendarHeatmap.swift`; skeleton `CalendarHeatmapSkeleton`
   A calendar of days tinted by their values.
@@ -1396,7 +1397,7 @@ init(zoomScale: Binding<CGFloat>, range: ClosedRange<CGFloat>, step: CGFloat = 1
 
 A bar of progress; over 100% it turns red. A projection shows where the period will end.
 
-Apps: Dalada, Tenra
+Apps: Dalada, Platina, Tenra
 
 - `LinearProgressBar` in `Sources/DesignComponents/Progress/LinearProgressBar.swift`; skeleton `LinearProgressBarSkeleton`
   Horizontal progress bar for budget utilisation.
@@ -1410,7 +1411,7 @@ init(value: Double, color: Color = AppColors.accent, height: CGFloat = 8, animat
 
 A ring of progress around something (a category coin); red once over.
 
-Apps: Tenra
+Apps: Platina, Tenra
 
 - `ProgressRing` in `Sources/DesignComponents/Progress/ProgressRing.swift`; skeleton `ProgressRingSkeleton`
   Circular arc representing how much of a budget period has been consumed.
@@ -1575,7 +1576,7 @@ init(title: String, systemImage: String? = nil, date: Date?, state: State, disca
 
 A short label in a capsule: tinted (pale background, coloured text) or filled.
 
-Since 0.4.0 · Apps: Dalada, Tenra · Styles: `.tinted`, `.filled`
+Since 0.4.0 · Apps: Dalada, Platina, Tenra · Styles: `.tinted`, `.filled`
 
 - `Badge` in `Sources/DesignComponents/Feedback/Badge.swift`; skeleton `BadgeSkeleton`
   Capsule badge: short text with an optional SF Symbol.
@@ -1621,7 +1622,7 @@ init(status: EntityStatus, size: CGFloat = AppIconSize.md)
 
 A status message in a pale box of its colour, or inline; an optional action.
 
-Since 1.7.0 · Apps: Dalada, Tenra · Styles: `.standard`, `.compact`
+Since 1.7.0 · Apps: Dalada, Platina, Tenra · Styles: `.standard`, `.compact`
 
 - `StatusBanner` in `Sources/DesignComponents/Feedback/StatusBanner.swift`; skeleton `StatusBannerSkeleton`
   "ⓘ Your statement for September is ready ›" on a pale blue box.
@@ -1637,7 +1638,7 @@ init(_ text: String, status: Status = .info, style: Style = .standard, systemIma
 
 A floating banner on glass after something happened: saved, failed, a warning; with an action.
 
-Apps: Tenra
+Apps: Platina, Tenra
 
 - `MessageBanner` in `Sources/DesignComponents/Feedback/MessageBanner.swift`
   Universal message banner component supporting multiple message types Consolidates ErrorMessageView and SuccessMessageView patterns
@@ -1715,7 +1716,7 @@ init(_ message: String, title: String? = nil)
 
 Three dots rising in a wave in a bubble: a reply is on its way, an assistant is thinking.
 
-Since 2.2.0 · Apps: none yet
+Since 2.2.0 · Apps: Platina
 
 - `TypingIndicator` in `Sources/DesignComponents/Feedback/TypingIndicator.swift`
   Three dots in a wave, in a bubble.
@@ -1731,7 +1732,7 @@ init(tint: Color = AppColors.Text.secondary, accessibilityLabel: String? = nil)
 
 Nothing to show yet, or a failure: an icon, a title, a line of explanation and an action.
 
-Apps: Dalada, Tenra · Styles: `.standard`, `.compact`, `.error`
+Apps: Dalada, Platina, Tenra · Styles: `.standard`, `.compact`, `.error`
 
 - `EmptyState` in `Sources/DesignComponents/Feedback/EmptyState.swift`
   Единый компонент для отображения empty states И error states.
@@ -1818,7 +1819,7 @@ func progressOverlay(isPresented: Bool, title: String, message: String? = nil) -
 
 A message the app writes to the person: a picture, a title and a line or two, a hide button and an action under the text, in line with it.
 
-Since 4.14.0 · Apps: Tenra
+Since 4.14.0 · Apps: Platina, Tenra
 
 - `NoticeCard` in `Sources/DesignComponents/Feedback/NoticeCard.swift`; skeleton `NoticeCardSkeleton`
   "🫧 A payment is due tomorrow / Internet, 12 000 ₸ ……… ✕" and "✨ Go through it" under it.
@@ -1855,9 +1856,9 @@ func spotlight<ID: Hashable>(_ current: Binding<ID?>, message: ((ID) -> String)?
 
 ### SectionHeader
 
-The title over a section in four styles: default, compact (a List or Form section, or a screen's with the screen padding), large (a screen's sections) and card (a day in a transaction list), with symbols around the title and an optional action at the end of the line.
+The title over a section in three styles: default (a form, a card, a List section, a screen's with the screen padding), large (a screen's own sections) and card (a day in a transaction list), with symbols around the title and an optional action at the end of the line.
 
-Apps: Dalada, Tenra · Styles: `.default`, `.compact`, `.large`, `.card`
+Apps: Dalada, Platina, Tenra · Styles: `.default`, `.large`, `.card`
 
 - `SectionHeader` in `Sources/DesignComponents/Navigation/SectionHeader.swift`; skeleton `SectionHeaderSkeleton`
   The title over a section:
@@ -1867,11 +1868,11 @@ init(_ title: String, systemImage: String? = nil, trailingSystemImage: String? =
 init(_ title: String, systemImage: String? = nil, trailingSystemImage: String? = nil, tint: Color? = nil, style: Style = .default, @ViewBuilder trailing: () -> Trailing)
 ```
 
-- Both symbols show in every style (3.2.0), in the title's font: the one before the title in the accent (the label's grey in compact), the one right after it in the tertiary grey. Tint colours both.
+- Both symbols show in every style (3.2.0), in the title's font: the one before the title in the accent, the one right after it in the tertiary grey. Tint colours both.
 - The symbol after the title says what the header does: chevron.forward for one that leads somewhere (wrap it in a NavigationLink), info.circle for one that explains.
 - The action (1.15.0) is any view: a NavigationLink “All”, a button, a spinner, a day's total. It takes bodySmall and sits inside the style's padding.
-- 3.2.0: compact has no padding of its own, as list had; list, its old name, is removed in 4.0.0. On a screen, add .screenPadding().
-- 2.0.0: SectionHeaderView before; SettingsSectionHeaderView is the compact style in a List, DateSectionHeaderView the card style with the day's total as the action.
+- 8.0.0: one look for a section's title, bold and in sentence case, in a List's header too. compact, the small grey uppercase label, is removed (docs/migration-8.0.md); default has no padding of its own, so on a screen add .screenPadding().
+- 2.0.0: SectionHeaderView before; DateSectionHeaderView is the card style with the day's total as the action.
 
 ### HeroSection
 
@@ -1931,7 +1932,7 @@ init(isExpanded: Bool)
 
 An assistant's tab: ParticleCreature's still glyph (twelve dots and two eyes) over a title, tinted by the bar.
 
-Since 4.8.0 · Apps: Tenra
+Since 4.8.0 · Apps: Platina, Tenra
 
 - `CreatureTabLabel` in `Sources/DesignComponents/Navigation/CreatureTabLabel.swift`
   A tab bar item showing ParticleCreature's still glyph and a title.
@@ -1947,7 +1948,7 @@ init(title: String)
 
 Something going on above the tabs: a pulsing recording dot (a pause sign when paused), the running time, a detail; a tap opens it.
 
-Since 2.8.0 · Apps: Dalada
+Since 2.8.0 · Apps: Dalada, Platina
 
 - `LiveSessionBar` in `Sources/DesignComponents/Navigation/LiveSessionBar.swift`; skeleton `LiveSessionBarSkeleton`
   A session in progress: its state, its running time, a detail; a tap opens it.
@@ -1979,7 +1980,7 @@ init(index: Binding<Int>, count: Int, showsArrows: Bool = true, previousLabel: S
 
 Every icon: an SF Symbol or a brand logo (loaded by the app's DesignKitLogoLoader), in a shape, a size, a tint, on glass or not.
 
-Apps: Dalada, Tenra
+Apps: Dalada, Platina, Tenra
 
 - `Icon` in `Sources/DesignSupport/Icon.swift`; skeleton `IconSkeleton`
   Универсальный компонент для отображения иконок и логотипов Полностью интегрирован с Design System (AppTheme.swift)
@@ -2010,7 +2011,7 @@ init(name: String?, image: Image? = nil, size: CGFloat = AppIconSize.xxl, tint: 
 
 A character made of light: a swarm of particles in the shape of a sphere, a rim of light round it and a soft core of its colours inside, with a glowing robot face. Its moods are shapes: a gyroscope while thinking, a ring and waves of light while it answers, light filling it while it works, a coin; and faces: ^ ^, > <, hearts, slanted lids, a wink, a tear.
 
-Since 4.6.0 · Apps: Tenra · Styles: `.hero`, `.compact`
+Since 4.6.0 · Apps: Platina, Tenra · Styles: `.hero`, `.compact`
 
 - `ParticleCreature` in `Sources/DesignComponents/Media/ParticleCreature.swift`; skeleton `ParticleCreatureSkeleton`
   A creature made of a swarm of light in the shape of a sphere, with a glowing face and moods.
@@ -2074,7 +2075,7 @@ init(_ people: [Person], maxVisible: Int = 4, size: CGFloat = 32, accessibilityL
 
 A large SF Symbol on a disc of its tint: the picture of an onboarding page or a permission primer.
 
-Since 0.7.0 · Apps: Dalada, Tenra
+Since 0.7.0 · Apps: Dalada, Platina, Tenra
 
 - `HeroSymbol` in `Sources/DesignComponents/Media/HeroSymbol.swift`; skeleton `HeroSymbolSkeleton`
   A symbol centred in a circle of its tint at 12% opacity.
@@ -2107,7 +2108,7 @@ init(items: [PackedCircleItem], maxVisible: Int = 5, containerWidth: CGFloat = 1
 
 A round medal: in its colour once earned, grey until then.
 
-Since 1.12.0 · Apps: Dalada
+Since 1.12.0 · Apps: Dalada, Platina
 
 - `AchievementMedal` in `Sources/DesignComponents/Media/AchievementMedal.swift`; skeleton `AchievementMedalSkeleton`
   A round achievement medal.
@@ -2133,7 +2134,7 @@ init(title: String, systemImage: String, color: Color, isEarned: Bool, medalSize
 
 The achievement closest to being earned: “Up next:”, its title, the progress and a bar.
 
-Since 1.12.0 · Apps: Dalada
+Since 1.12.0 · Apps: Dalada, Platina
 
 - `AchievementProgressRow` in `Sources/DesignComponents/Media/AchievementMedal.swift`; skeleton `AchievementProgressRowSkeleton`
   The achievement closest to being earned: a small grey medal, "Up next:" and its title, the progress text on the right and a bar under them.
@@ -2159,7 +2160,7 @@ init(systemImage: String, tint: Color = AppColors.accent)
 
 Crops a picture to a square for an icon of the person's own: a finger moves it, two fingers zoom it, the page outside the square is veiled.
 
-Since 8.5.0 · Apps: none yet
+Since 8.5.0 · Apps: Tenra
 
 - `SquareImageCropper` in `Sources/DesignComponents/Media/SquareImageCropper.swift`
   A square crop of a picture.
@@ -2176,7 +2177,7 @@ init(image: UIImage, outputSize: CGFloat = 512, onCrop: @escaping (UIImage) -> V
 
 A photo cropped to a square on the muted background, with rounded corners: the tile of photo rows and grids, a picked photo's preview.
 
-Since 2.8.0 · Apps: Dalada
+Since 2.8.0 · Apps: Dalada, Platina
 
 - `PhotoTile` in `Sources/DesignComponents/Media/PhotoTile.swift`; skeleton `PhotoTileSkeleton`
   A photo cropped to a square, on the muted background, with rounded corners.
@@ -2193,7 +2194,7 @@ init(image: UIImage?, size: CGFloat? = PhotoTileMetrics.size, cornerRadius: CGFl
 
 A photo the app loads by key and URL: a skeleton while it loads, then the photo, coming into focus in its place.
 
-Since 3.1.0 · Apps: Dalada
+Since 3.1.0 · Apps: Dalada, Platina
 
 - `RemotePhoto` in `Sources/DesignComponents/Media/RemotePhoto.swift`; skeleton `RemotePhotoSkeleton`
   A photo by key and URL: a skeleton while it loads, then the photo, revealed from a light blur.
@@ -2254,7 +2255,7 @@ init(_ items: [Item], aspectRatio: CGFloat = PhotoCarouselMetrics.aspectRatio, o
 
 Photos full screen: swiped sideways, pinch or double-tap to zoom, drag the zoomed photo. An optional caption with "2 / 5" and a menu in the top bar.
 
-Since 2.8.0 · Apps: Dalada
+Since 2.8.0 · Apps: Dalada, Platina
 
 - `PhotoViewer` in `Sources/DesignComponents/Media/PhotoViewer.swift`
   Full-screen paged photos with zoom.
@@ -2272,7 +2273,7 @@ init(_ items: [Item], selection: Item.ID, closeTitle: String = String(localized:
 
 A picture to share in Stories or a chat: a photo under a dark gradient (or a gradient alone), the content from the top, the brand and the site at the bottom.
 
-Since 2.8.0 · Apps: Dalada
+Since 2.8.0 · Apps: Dalada, Platina, Tenra
 
 - `ShareCardFrame` in `Sources/DesignComponents/Media/ShareCard.swift`
   A share card's frame: the photo or gradient, the content from the top, and the brand line.
@@ -2291,7 +2292,7 @@ init(format: ShareCard.Format, brand: String, brandIcon: UIImage? = nil, site: S
 
 A line across a conversation: the day the next messages are from, or something that happened in it.
 
-Since 8.9.0 · Apps: none yet
+Since 8.9.0 · Apps: Platina
 
 - `ConversationDivider` in `Sources/DesignComponents/Content/ConversationDivider.swift`; skeleton `ConversationDividerSkeleton`
   A centred caption between two hairlines, in a conversation's list of messages.
@@ -2312,7 +2313,7 @@ init(date: Date)
 
 When something happened, or how long it has run, kept current on screen: “5 min. ago”, “Yesterday, 14:20”, “1 hr, 2 min”, “1:02:34”.
 
-Since 8.9.0 · Apps: Dalada, Tenra
+Since 8.9.0 · Apps: Dalada, Platina, Tenra
 
 - `RelativeTime` in `Sources/DesignComponents/Content/RelativeTime.swift`
   When something happened, or how long it has run, kept current.
@@ -2335,7 +2336,7 @@ init(_ date: Date, style: Style = .relative)
 
 Text folded to a few lines with “More” when it does not fit.
 
-Since 0.6.0 · Apps: Dalada
+Since 0.6.0 · Apps: Dalada, Platina
 
 - `ExpandableText` in `Sources/DesignComponents/Content/ExpandableText.swift`; skeleton `ExpandableTextSkeleton`
   Text clamped to `lineLimit` lines with a More / Less button when it overflows.
@@ -2348,7 +2349,7 @@ init(_ text: String, lineLimit: Int = 3, font: Font = AppTypography.body, color:
 
 Events on a vertical line with a dot or a symbol for each.
 
-Since 0.7.0 · Apps: Dalada
+Since 0.7.0 · Apps: Dalada, Platina
 
 - `ActivityTimeline` in `Sources/DesignComponents/Content/ActivityTimeline.swift`; skeleton `ActivityTimelineSkeleton`
   Events top to bottom, each with a marker on a continuous line.
@@ -2375,7 +2376,7 @@ init(range: CalendarRange, itemsByDay: [Date: [Item]], maxMarkers: Int = 3, item
 
 A layout that wraps its views to new lines like words: tags, badges, chips.
 
-Since 0.7.0 · Apps: Dalada
+Since 0.7.0 · Apps: Dalada, Platina
 
 - `FlowLayout` in `Sources/DesignComponents/Content/FlowLayout.swift`
   Rows of subviews at their ideal size, wrapping at the proposed width.
@@ -2390,7 +2391,7 @@ init(spacing: CGFloat = AppSpacing.sm, lineSpacing: CGFloat = AppSpacing.sm, ali
 
 A screen's content on an iPad or in a Mac window: a centred column of cards and text no wider than 720 pt, or a grid of cards side by side no wider than 1120 pt. On a phone nothing changes.
 
-Since 8.13.0 · Apps: none yet
+Since 8.13.0 · Apps: Platina
 
 - `.readableWidth` in `Sources/DesignTokens/AppLayout.swift`
   Keeps a screen's content in a centred column no wider than `width` (8.13.0): on an iPad or in a Mac window the cards and text stay readable instead of running across the screen; on a phone, narrower than the column, nothing changes. Put it on the scroll view's content, after `.screenPadding()`; the column grows with the person's text size.
@@ -2415,7 +2416,7 @@ func readableWidth(_ width: CGFloat = AppLayout.readableWidth) -> some View
 
 A screen's main column with a side column beside it when the width allows: on an iPad a trip's route with its weather and group beside it. Narrower, as on a phone, the screen's own narrow layout: chips that switch between the parts, or the side under the main column.
 
-Since 8.15.0 · Apps: none yet
+Since 8.15.0 · Apps: Platina
 
 - `AdaptiveColumns` in `Sources/DesignComponents/Content/AdaptiveColumns.swift`
   A main column and a side column side by side when they fit, the narrow layout when not (8.15.0).
@@ -2437,9 +2438,9 @@ init(sideWidth: CGFloat = AppLayout.sideColumnWidth, mainMinWidth: CGFloat = App
 
 ### FormSection
 
-A titled group of rows on a Liquid Glass card (8.0.0: one look for forms, settings and short lists). It pads its rows at the sides and draws the divider between them, under each row's text.
+A titled group of rows on a Liquid Glass card, or the grey of SurfaceStyle.fill (8.12.0); one look for forms, settings and short lists since 8.0.0. It pads its rows at the sides and draws the divider between them, under each row's text.
 
-Apps: Dalada, Tenra
+Apps: Dalada, Platina, Tenra
 
 - `FormSection` in `Sources/DesignComponents/Content/FormSection.swift`
   A titled group of rows on a Liquid Glass card (8.0.0: one look for forms, settings and short lists).
@@ -2460,7 +2461,7 @@ init(header: String? = nil, footer: String? = nil, @ViewBuilder content: () -> C
 
 The things a person keeps (accounts, deposits, loans, categories, trips) with one set of actions: open, select several and delete, change the order by dragging. A card per item, or every item a row in one card.
 
-Since 8.0.0 · Apps: Dalada, Tenra
+Since 8.0.0 · Apps: Dalada, Platina, Tenra
 
 - `CardList` in `Sources/DesignComponents/Content/CardList.swift`; skeleton `CardListSkeleton`
   A list of items on Liquid Glass (8.0.0): a card per item (`.cards`), every item a row in one card with a divider under each row's text (`.section`), items that are cards already (`.stack`), or cards side by side on a large screen (`.grid`, 8.15.0). In `.selecting` a tap picks an item; in `.reordering` an item is dragged to its place (VoiceOver: move up, move down), and `onMove` gets the move as `List`'s `onMove` does.
@@ -2469,7 +2470,7 @@ Since 8.0.0 · Apps: Dalada, Tenra
 init(_ data: Data, layout: CardListLayout = .cards, mode: CardListMode = .browsing, selection: Binding<Set<Data.Element.ID>> = .constant([]), onMove: ((IndexSet, Int) -> Void)? = nil, onOpen: ((Data.Element) -> Void)? = nil, @ViewBuilder card: @escaping (Data.Element) -> Card)
 ```
 
-- cards: a glass card per item, padded 16 pt; section: every item a row in one glass card, a divider under each row's text; stack: items that are cards already (a PayoffProgressCard), the circle and the handle beside them.
+- cards: a card per item (glass, or the grey fill), padded 16 pt; section: every item a row in one card, a divider under each row's text; stack: items that are cards already (a PayoffProgressCard), the circle and the handle beside them.
 - grid (8.15.0): the cards side by side in AppLayout.cardColumns() where the width holds two or more, on an iPad or in a Mac window under .readableWidth(AppLayout.wideWidth); one in a row on a phone, as here.
 - cardListToolbar(mode:selection:allIDs:onAdd:onDeleteSelected:) is the same toolbar on every list: select, change the order, add; Done; Delete N under the list.
 - Reordering: a long press lifts a card, moving it over another puts it there (a tick on each step). VoiceOver: move up, move down.
@@ -2478,7 +2479,7 @@ init(_ data: Data, layout: CardListLayout = .cards, mode: CardListMode = .browsi
 
 The shell of an edit sheet: navigation bar with Cancel and Save, a form inside.
 
-Apps: Dalada, Tenra
+Apps: Dalada, Platina, Tenra
 
 - `EditSheetContainer` in `Sources/DesignComponents/Content/EditSheetContainer.swift`
   A reusable container that wraps Form content inside a NavigationView with the standard modal edit-sheet chrome: title, cancel (xmark) and save (checkmark) toolbar buttons.
@@ -2505,7 +2506,7 @@ init(icon: Binding<IconSource?>, title: Binding<String>, titlePlaceholder: Strin
 
 The text of an article: headings, paragraphs, bulleted and numbered lists, notes in a card; bold, italic and links inside a line.
 
-Since 2.8.0 · Apps: Dalada, Tenra
+Since 2.8.0 · Apps: Dalada, Platina, Tenra
 
 - `ArticleBody` in `Sources/DesignComponents/Content/ArticleBody.swift`; skeleton `ArticleBodySkeleton`
   An article's blocks, one under another.
@@ -2520,7 +2521,7 @@ init(_ blocks: [Block], spacing: CGFloat = AppSpacing.md)
 
 One message in a conversation: the person's own on the right in the accent, the other side's on the left in grey. A message not sent says why, with Retry.
 
-Since 4.6.0 · Apps: Tenra
+Since 4.6.0 · Apps: Platina, Tenra
 
 - `MessageBubble` in `Sources/DesignComponents/Content/MessageBubble.swift`; skeleton `MessageBubbleSkeleton`
   A chat message in a bubble.
@@ -2578,7 +2579,7 @@ init(onAllow: @escaping () async -> Void, onSkip: @escaping () -> Void)
 
 Onboarding pages with dots, Skip where allowed and each page's own buttons.
 
-Since 0.7.0 · Apps: Dalada
+Since 0.7.0 · Apps: Dalada, Platina
 
 - `OnboardingPager` in `Sources/DesignComponents/Sheets/OnboardingPager.swift`
   Paged onboarding. The app owns `selection` and moves it from the buttons.
@@ -2593,7 +2594,7 @@ init(pages: [Page], selection: Binding<Page>, skipTitle: String = String(localiz
 
 One onboarding page: a hero symbol, a title, a message and an accessory.
 
-Since 0.7.0 · Apps: Dalada
+Since 0.7.0 · Apps: Dalada, Platina
 
 - `OnboardingPage` in `Sources/DesignComponents/Sheets/OnboardingPager.swift`
   One onboarding page: `HeroSymbol`, title, text and optional content under them.
@@ -2632,7 +2633,7 @@ init(symbol: String, config: LoopOnBoardingConfig = LoopOnBoardingConfig())
 
 Turns something into a picture to share: pick Stories or post, see the picture, send it with the system share sheet.
 
-Since 2.8.0 · Apps: Dalada
+Since 2.8.0 · Apps: Dalada, Platina, Tenra
 
 - `ShareCardSheet` in `Sources/DesignComponents/Sheets/ShareCardSheet.swift`
   Picks a format, previews the picture and shares it.
@@ -2683,7 +2684,7 @@ init(title: String, icon: IconSource, subtitle: String? = nil, currency: String,
 
 Confetti bursts from a view with the success haptic: a goal reached, a debt paid off, an achievement, a trip finished.
 
-Since 2.2.0 · Apps: Dalada, Tenra
+Since 2.2.0 · Apps: Dalada, Platina, Tenra
 
 - `.celebration` in `Sources/DesignComponents/Effects/ParticleBurst.swift`
   Confetti bursts from the view's centre each time `trigger` changes, with the success haptic. For moments that matter: a goal reached, a debt paid off, an achievement.
@@ -2761,7 +2762,7 @@ init(_ spots: [Spot], intensity: Double = 1, motion: Motion = .still, grain: Dou
 
 Press and drag on the medal: it tilts towards the finger in 3D with a glare, and springs back on release.
 
-Since 2.2.0 · Apps: Dalada
+Since 2.2.0 · Apps: Dalada, Platina
 
 - `.interactiveTilt` in `Sources/DesignComponents/Effects/InteractiveTilt.swift`
   The view tilts towards the finger (up to `maxAngle`) with a glare clipped to `shape`, and springs back on release.
@@ -2810,7 +2811,7 @@ init(level: Double? = nil, colors: [Color]? = nil, cornerRadius: CGFloat = EdgeG
 
 A band of aurora colour runs through the words while the app works on what was asked: “Listening…”, “Analysing…”, an insight on its way.
 
-Since 2.4.0 · Apps: Tenra
+Since 2.4.0 · Apps: Platina, Tenra
 
 - `.thinkingShimmer` in `Sources/DesignComponents/Effects/ThinkingShimmer.swift`
   Runs a band of aurora colour through this text while `isActive`.
@@ -2877,7 +2878,7 @@ func borderGlow(isActive: Bool = true, colors: [Color] = [AppColors.accent, .pur
 
 The top of a detail screen on a picture, as a film's page in Apple's TV app: a game's cover, a trip's photo, edge to edge from the screen's top. Sharp where nothing is over it, it flows into its own colours, blurred and darkened, under the hero's text and buttons, drawn in white in both modes; the hero ends on the page with an edge.
 
-Since 8.14.0 · Apps: none yet
+Since 8.14.0 · Apps: Platina
 
 - `.heroBackground` in `Sources/DesignComponents/Effects/HeroBackground.swift`
   Lays a picture behind the hero, as a film's page in Apple's TV app does (8.14.0): a game's cover, a trip's photo, edge to edge from the screen's top edge. It is sharp down to `clearHeight` below the bars, the room the hero leaves it (a logo may stand at its foot), then flows into its own colours, blurred and darkened, under the hero's text and buttons, which are drawn in white (the dark scheme) in light and dark mode alike; the hero ends on the page with an edge. Put it on the hero at the top of a scroll view, edge to edge (pad what is inside), and `.heroScrollEdge()` on the scroll view: the picture then reaches the screen's top, and the bar's buttons and the status bar are light while it is under them.
@@ -2906,7 +2907,7 @@ func heroBackground<Picture: View, Subject: View>(clearHeight: CGFloat = HeroPic
 
 When something is done, a soft glow of its shape flares and fades behind it and the success haptic plays. Only the change plays it: a view that appears complete stays quiet.
 
-Since 2.3.0 · Apps: Dalada
+Since 2.3.0 · Apps: Dalada, Platina
 
 - `.completionMoment` in `Sources/DesignComponents/Effects/CompletionMoment.swift`
   When `isComplete` turns true: a glow of `shape` flares and fades behind the view, and the success haptic plays.
@@ -2943,7 +2944,7 @@ func rippleOnTap() -> some View
 
 A holographic foil: rainbow bands slide across the surface as your finger moves over it, with a sheen where the light falls. Drag over the medal and the card.
 
-Since 2.6.0 · Apps: Dalada, Tenra
+Since 2.6.0 · Apps: Dalada, Platina, Tenra
 
 - `.holographic` in `Sources/DesignComponents/Effects/Holographic.swift`
   A holographic foil whose colours follow the finger.
@@ -2968,7 +2969,7 @@ Since 2.6.0 · Apps: none yet
 
 The top of a detail screen on colour: a gradient of the colour from the screen's top edge, behind the navigation bar and the hero, fading into the page. In dark mode a tone deeper with the hero pieces in white; in light mode a pale tint with them in black.
 
-Since 4.5.0 · Apps: Tenra
+Since 4.5.0 · Apps: Platina, Tenra
 
 - `.heroBackground` in `Sources/DesignComponents/Effects/HeroBackground.swift`
   Lays the hero's gradient of `color` behind this view, from the screen's top edge and fading out below it (4.5.0): deep with DesignKit's hero pieces in white in dark mode, a pale tint with the pieces as on the page in light mode (4.5.1). Put it on the hero at the top of a scroll view, edge to edge (no `.screenPadding()` on it; pad what is inside), and `.heroScrollEdge()` on the scroll view. The hero takes the full width (5.2.0), its content centred in it.

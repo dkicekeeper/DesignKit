@@ -191,7 +191,7 @@ private struct MotionTransitionsPage: View {
             name: ".popIn · .riseIn",
             summary: "Transitions that know Reduce Motion: they move a little and fade, and under Reduce Motion they only fade.",
             since: "2.2.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .tall(minHeight: 160),
             notes: [
                 ".popIn: grows from 92 % — a chip, a badge, a toast, a tooltip, TypingIndicator.",
@@ -306,7 +306,7 @@ private struct SpringsPage: View {
         ComponentPage(
             name: "Springs",
             summary: "The named animations: tap Play to run every ball with its own curve and compare them.",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: [
                 "Never a hard-coded spring: pick a token. AppAnimation.adaptiveSpring and fastAnimation respect Reduce Motion.",
@@ -611,7 +611,7 @@ private struct SkeletonRevealPage: View {
             name: "SkeletonReveal",
             summary: "Loading ends softly: the skeleton fades out while the content comes into focus from a light blur in the same place, instead of a jump.",
             since: "2.3.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: [
                 "SkeletonReveal(isLoading:) { content } skeleton: { <Name>Skeleton() }. Give both the same size; a component and its skeleton already have it.",

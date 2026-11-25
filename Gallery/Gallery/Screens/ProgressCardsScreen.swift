@@ -478,7 +478,7 @@ private struct StatsStripPage: View {
             name: "StatsStrip",
             summary: "Counters side by side in a card; two columns at accessibility text sizes.",
             since: "1.12.0",
-            apps: [.dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill
         ) {
             if state == .loading {
@@ -502,7 +502,7 @@ private struct StreakCardPage: View {
             name: "StreakCard",
             summary: "A streak: a flame while it runs (grey once it stopped), what to do next, the best result.",
             since: "1.12.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             canvas: .fill
         ) {
             if state == .loading {

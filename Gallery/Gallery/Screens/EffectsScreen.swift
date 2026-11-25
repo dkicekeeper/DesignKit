@@ -52,7 +52,7 @@ private struct CelebrationPage: View {
             name: ".celebration",
             summary: "Confetti bursts from a view with the success haptic: a goal reached, a debt paid off, an achievement, a trip finished.",
             since: "2.2.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             canvas: .tall(minHeight: 260),
             notes: [
                 "Rare by design: a burst on every tap stops meaning anything.",
@@ -220,7 +220,7 @@ private struct InteractiveTiltPage: View {
             name: ".interactiveTilt",
             summary: "Press and drag on the medal: it tilts towards the finger in 3D with a glare, and springs back on release.",
             since: "2.2.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             canvas: .tall(minHeight: 240),
             notes: ["For an object shown on its own (a medal, a card's detail); in a scrolling list it would fight the scroll."]
         ) {
@@ -339,7 +339,7 @@ private struct ThinkingShimmerPage: View {
             name: ".thinkingShimmer",
             summary: "A band of aurora colour runs through the words while the app works on what was asked: “Listening…”, “Analysing…”, an insight on its way.",
             since: "2.4.0",
-            apps: [.tenra],
+            apps: [.tenra, .platina],
             notes: [
                 "A skeleton's shimmer says content is coming; this one says the app is working on your request.",
                 "One gradient masked by the text, 30 fps while active. Under Reduce Motion the text is drawn in the still aurora gradient.",
@@ -468,7 +468,7 @@ private struct HeroPicturePage: View {
             name: ".heroBackground(picture:)",
             summary: "The top of a detail screen on a picture, as a film's page in Apple's TV app: a game's cover, a trip's photo, edge to edge from the screen's top. Sharp where nothing is over it, it flows into its own colours, blurred and darkened, under the hero's text and buttons, drawn in white in both modes; the hero ends on the page with an edge.",
             since: "8.14.0",
-            apps: [],
+            apps: [.platina],
             canvas: .bleed,
             notes: [
                 "clearHeight (240 pt) is the room the hero leaves the picture below the bars: sharp, nothing over it but a title logo at its foot. From 48 pt above its end the picture blurs (40 pt) and darkens (55% black), through 120 pt below it.",
@@ -597,7 +597,7 @@ private struct CompletionMomentPage: View {
             name: ".completionMoment",
             summary: "When something is done, a soft glow of its shape flares and fades behind it and the success haptic plays. Only the change plays it: a view that appears complete stays quiet.",
             since: "2.3.0",
-            apps: [.dalada],
+            apps: [.dalada, .platina],
             notes: [
                 "Built in: ProgressRing(celebratesCompletion: true) also draws a checkmark in; ChecklistSummaryRow's bar and TargetProgressCard's bar glow when they reach the end.",
                 "On your own view: .completionMoment(isComplete: goal.progress >= 1, in: RoundedRectangle(cornerRadius: AppRadius.xl)).",
@@ -679,7 +679,7 @@ private struct HolographicPage: View {
             name: ".holographic",
             summary: "A holographic foil: rainbow bands slide across the surface as your finger moves over it, with a sheen where the light falls. Drag over the medal and the card.",
             since: "2.6.0",
-            apps: [.tenra, .dalada],
+            apps: [.tenra, .dalada, .platina],
             notes: [
                 "Pairs with .interactiveTilt(in:), which tilts the same surface towards the finger.",
                 "One Metal colour effect, redrawn only while the finger moves or the light settles back.",
@@ -777,7 +777,7 @@ private struct HeroBackgroundPage: View {
             name: ".heroBackground",
             summary: "The top of a detail screen on colour: a gradient of the colour from the screen's top edge, behind the navigation bar and the hero, fading into the page. In dark mode a tone deeper with the hero pieces in white; in light mode a pale tint with them in black.",
             since: "4.5.0",
-            apps: [.tenra],
+            apps: [.tenra, .platina],
             canvas: .bleed,
             notes: [
                 "Dark mode: sets \\.heroTone to .onColor, so HeroSection, TrendBadge, HeroHalfGauge, HeroBarPair, HeroSparkline, HeroMilestoneGauge and HeroProportionBar draw in white. Light mode (4.5.1): a pale tint, the tone stays .onSurface and the pieces draw as on the page, the text in black. ScoreGaugeCard(style: .hero) lies on it.",

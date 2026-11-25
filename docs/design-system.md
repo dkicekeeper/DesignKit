@@ -446,7 +446,8 @@ FormSection(header: "Payment", footer: "Charged on the 17th of every month") {
 }
 ```
 
-- The card is `cardStyle()` (Liquid Glass behind the rows) and pads its rows `lg` at the sides;
+- The card is `cardStyle()` (Liquid Glass behind the rows, or the grey of `SurfaceStyle.fill`,
+  8.12.0) and pads its rows `lg` at the sides;
   the rows pad themselves only vertically (`UniversalRow`'s `.standard`, 12 pt: a row is 48 pt
   with its 24 pt icon, §10; 16 pt and 56 pt in 8.0.0 to 8.5.0). The header stands 12 pt above the
   card, the footer 12 pt under it (8.6.0; the header stood 8 pt above it before).
@@ -705,7 +706,8 @@ AmountRow(account.name, leading: .icon(account.iconSource), value: .amount(balan
 - `detail`: a caption line under the value (text, then an amount in `AppColors.planned`); at
   accessibility sizes the amount goes under its text, which drops a trailing "·".
 - `accessory`: `.chevron` (in a `NavigationLink`), `.systemImage(name)` (a secondary mark, a lock).
-- The tap (`Button` + `.plain`, or a `NavigationLink`) and `.swipeActions` stay at the call site.
+- The tap (`Button` + `.plain`, or a `NavigationLink`) and the long press's Edit and Delete
+  (`.contextMenu`, or the rows in a `CardList`) stay at the call site; no swipe actions (8.0.0).
 - Skeleton: `AmountRowSkeleton(style:showsRing:showsDetail:)`.
 - Tenra: `AccountRow`, `CategoryRow` (the over-budget haptic), `CategoryBreakdownRow` and the
   insight lists are adapters. `AmountPercentage` (the amount over its share) stays public.
@@ -1363,7 +1365,7 @@ SkeletonReveal(isLoading: balance == nil) {
 | `UniversalRow`'s accessories (7.0.0) | `UniversalRowSkeleton.navigationSettings`, `.toggleSettings`, `.actionSettings`, `.menuPicker`, `.datePicker`, `.checkmark(iconStyle:)` (a stepper or picker row is `.menuPicker`, the same shape), `.slider(showsHint:config:)`, `.info(showsIcon:)`, `.colors(swatches:)` |
 | `ItemRow` (3.6.0) | `ItemRowSkeleton(style:showsLeading:showsDetail:metaLines:verticalPadding:)` |
 | `PendingItemCard` (3.6.0) | `PendingItemCardSkeleton(contentLines:)` |
-| `NoticeCard`, `PickerCarousel` (4.14.0); a glass `FormSection` (5.0.0) | `NoticeCardSkeleton(leadingSize:showsAction:)`, `PickerCarouselSkeleton(pictureSize:)`; `FormSection(style: .glass)` of its rows' skeletons (`ItemRowSkeleton`, …; `ListCardSkeleton` until 5.0.0) |
+| `NoticeCard`, `PickerCarousel` (4.14.0); a `FormSection` (5.0.0) | `NoticeCardSkeleton(leadingSize:showsAction:)`, `PickerCarouselSkeleton(pictureSize:)`; a `FormSection` of its rows' skeletons (`ItemRowSkeleton`, …; `FormSection(style: .glass)` in 5.x to 7.x, `ListCardSkeleton` until 5.0.0) |
 | `RatingSummary` (4.1.0) | `RatingSummarySkeleton(maximum:)` |
 | `SearchSuggestionRow` (3.5.0), drawn by `.dsSearchSuggestions` while `isLoading` | `SearchSuggestionRowSkeleton(showsSubtitle:)` |
 | `AmountRow` (2.1.0) | `AmountRowSkeleton(style:showsRing:showsDetail:)` |
@@ -2146,8 +2148,9 @@ Something to download for offline use: the name (bodyEmphasis) and a caption lin
 action. `Status`: `.available` and `.paused` (caption; download button), `.downloading(p)` (a
 6 pt bar over the caption; pause button), `.downloaded` (accent check mark before the
 caption; no action), `.failed` (caption in the destructive colour; download button). The app
-writes the caption ("About 80 MB", "40% · 32 MB") and adds the swipe to delete. Vertical
-padding `xxs`. VoiceOver: `download.start` / `download.pause`, or the labels it passes.
+writes the caption ("About 80 MB", "40% · 32 MB") and puts Delete in a long press
+(`.contextMenu`; no swipe actions since 8.0.0). Vertical padding `xxs`, a `List` row's; in a
+`FormSection` card the app adds `AppSpacing.md` above and below (Dalada's offline maps). VoiceOver: `download.start` / `download.pause`, or the labels it passes.
 
 #### `ArticleBody`
 An article's blocks, `AppSpacing.md` apart: `.heading(_, level:)` (title3 semibold or headline,
@@ -2288,7 +2291,8 @@ AmountEntrySheet(title: goal.name, icon: goal.icon, subtitle: left, currency: go
 ```
 
 #### `NoticeCard`
-A message the app writes to the person, on a glass card (`FormSection(style: .glass)` since 5.0.0,
+A message the app writes to the person, on a card that pads it (its own `cardStyle()` card since
+8.0.0, glass or the grey of `SurfaceStyle.fill`; `FormSection(style: .glass)` in 5.x to 7.x,
 `ListCard` in 4.14.0): the `leading` picture at its own size
 (a mascot, an icon: `NoticeCardMetrics.leadingSize`, 48 pt, since 5.2.0; hide it from VoiceOver
 when it says nothing), the title (`bodyEmphasis`) and the message (`bodySmall`, secondary), the ✕
