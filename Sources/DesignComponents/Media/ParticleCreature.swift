@@ -80,19 +80,19 @@ public struct ParticleCreature: View {
         /// A long piece of work (5.3.0): the sphere fills with light from the bottom up as
         /// `progress` (0…1) grows, the eyes on the rising light. For an import, a sync.
         case working(progress: Double)
-        /// Looking something up (vNext): a beam of light sweeps round the sphere like a radar's,
+        /// Looking something up (8.22.0): a beam of light sweeps round the sphere like a radar's,
         /// the particles it reaches swell and light up, then fade behind it; the eyes follow the
         /// beam. For a search, a lookup.
         case searching
-        /// Working something out (vNext): the sphere's bands turn a quarter at a time, three turns
+        /// Working something out (8.22.0): the sphere's bands turn a quarter at a time, three turns
         /// and three back, then a click of light when it comes out right; the eyes on the band
         /// that turns. For sums, a forecast, a check.
         case calculating
-        /// Reaching another service (vNext): nodes on the sphere linked by lines of light, pulses
+        /// Reaching another service (8.22.0): nodes on the sphere linked by lines of light, pulses
         /// hopping from node to node; the eyes follow a pulse. For a sync, a tool, a change being
         /// made.
         case connecting
-        /// Writing (vNext): a ribbon of light runs round the sphere behind a pen point, its line
+        /// Writing (8.22.0): a ribbon of light runs round the sphere behind a pen point, its line
         /// staying where it was written and fading behind; the eyes on the pen. For a reply on
         /// its way.
         case writing
@@ -498,7 +498,7 @@ final class ParticleCreatureEngine {
     private var workTarget: Double = 0
     private var workShown: Double = 0
     private var workClock: Double = 0
-    /// The busy moods (vNext, ParticleCreatureBusy.swift): this frame's shape, where the eyes go,
+    /// The busy moods (8.22.0, ParticleCreatureBusy.swift): this frame's shape, where the eyes go,
     /// the click of a sum, and the network's links (shown while connecting, fading as it leaves).
     private var search = CreatureSearch(t: 0)
     private var sums = CreatureSums(t: 0)
@@ -511,7 +511,7 @@ final class ParticleCreatureEngine {
     private var busyFlare: Double = 0
     private var linksShown: Double = 0
     private var fromPose: CreaturePose = .idle
-    /// How strongly it is inked on a light page this frame (vNext): stronger under Increase
+    /// How strongly it is inked on a light page this frame (8.22.0): stronger under Increase
     /// Contrast.
     private var ink = CreatureInkStrength.standard
 
@@ -680,7 +680,7 @@ final class ParticleCreatureEngine {
 
         prepareBusy(t: animated ? t : Self.stillMoment(pose), mt: mt, animated: animated, style: style)
 
-        // Last frame's buffers, written over (vNext): no new arrays each frame. One still shared
+        // Last frame's buffers, written over (8.22.0): no new arrays each frame. One still shared
         // with the start of a change is copied once, on its first write.
         var parts = lastParts
         var depth = lastDepth
@@ -954,7 +954,7 @@ final class ParticleCreatureEngine {
     private func build(style: ParticleCreature.Style, radius: Double) {
         let count: Int = switch style {
         case .hero: min(max(Int(radius * 3.4), 150), 400)
-        // Fewer, larger particles in a small avatar (vNext), so it reads: 48 at 24 pt, 90 from
+        // Fewer, larger particles in a small avatar (8.22.0), so it reads: 48 at 24 pt, 90 from
         // about 45 pt.
         case .compact: min(90, max(48, Int(radius * 6)))
         }
@@ -1004,7 +1004,7 @@ final class ParticleCreatureEngine {
 
     // MARK: Busy
 
-    /// The moment a still frame shows of a busy mood (vNext): the beam on the front, the bands
+    /// The moment a still frame shows of a busy mood (8.22.0): the beam on the front, the bands
     /// mixed, a pulse on its way, the pen on the front with its line behind it.
     private static func stillMoment(_ pose: CreaturePose) -> Double {
         switch pose {
@@ -1016,7 +1016,7 @@ final class ParticleCreatureEngine {
         }
     }
 
-    /// Sets up this frame's busy shape (vNext) and where its eyes go.
+    /// Sets up this frame's busy shape (8.22.0) and where its eyes go.
     private func prepareBusy(t: Double, mt: Double, animated: Bool, style: ParticleCreature.Style) {
         busyFlare = 0
         switch pose {
@@ -1056,7 +1056,7 @@ final class ParticleCreatureEngine {
         (CGPoint(x: geo.cx + spot.x * geo.radius, y: cy + spot.y * geo.radius), spot.depth)
     }
 
-    /// A particle of a thinking comet (vNext): its ring, where its comet starts round the ring
+    /// A particle of a thinking comet (8.22.0): its ring, where its comet starts round the ring
     /// and its place in the comet, 0 the head. A few comets a ring, a stride of the swarm each.
     private func thinkingComet(_ index: Int) -> (ring: Int, offset: Double, place: Int)? {
         let stride = max(CreatureThought.minStride, particles.count / CreatureThought.groups)
@@ -1177,7 +1177,7 @@ final class ParticleCreatureEngine {
         let cx = geo.cx
         switch pose {
         case .thinking:
-            // Comets (vNext): a few particles of each ring run along it head first, bright, and
+            // Comets (8.22.0): a few particles of each ring run along it head first, bright, and
             // the rest of the ring is a faint track that barely moves, so the spin reads, in ink
             // on a white page too (the whole ring turned as one before).
             let comet = thinkingComet(p.index)
@@ -1313,7 +1313,7 @@ final class ParticleCreatureEngine {
         switch pose {
         case .listening:
             let voice = level.map { 0.2 + 0.8 * $0 } ?? (0.45 + 0.55 * abs(sin(t * 2.7) * sin(t * 1.3 + 1)))
-            // Two waves at their own pace (vNext), one rising and one falling, so the ripple never
+            // Two waves at their own pace (8.22.0), one rising and one falling, so the ripple never
             // quite repeats; on their crests the particles come nearer, larger and brighter.
             let wave = 0.65 * sin(p.uy * 10 - t * 8) + 0.35 * sin(p.uy * 6.5 + t * 5.3)
             r = r0 * (1 + 0.16 * voice * wave)
@@ -1424,7 +1424,7 @@ final class ParticleCreatureEngine {
             lx = 0.12 * sin(t * 0.8)
             ly = 0.55 - 0.9 * workShown
         case .searching, .calculating, .connecting, .writing:
-            // On the work (vNext): the beam, the turning band, a pulse, the pen.
+            // On the work (8.22.0): the beam, the turning band, a pulse, the pen.
             lx = busyGaze.x
             ly = busyGaze.y
         case .asleep, .dizzy, .answering, .glyph:
@@ -1459,7 +1459,7 @@ final class ParticleCreatureEngine {
             face.right.height *= 1 + 0.1 * voice
         }
         if pose == .calculating, busyFlare > 0.01 {
-            // The sum came out right (vNext): a smile in the eyes with the click.
+            // The sum came out right (8.22.0): a smile in the eyes with the click.
             face.left.cheek = max(face.left.cheek, CreatureSums.smile * busyFlare)
             face.right.cheek = max(face.right.cheek, CreatureSums.smile * busyFlare)
         }
@@ -1559,7 +1559,7 @@ final class ParticleCreatureEngine {
             if !onLight { glow.blendMode = .plusLighter }
             let pulse = 0.8 + 0.2 * sin(t * 2)
             let alpha = (onLight ? CreatureGlow.haze : CreatureGlow.halo) * pulse
-            // On a light page a closer, stronger haze (vNext): the faint wide one was lost on white.
+            // On a light page a closer, stronger haze (8.22.0): the faint wide one was lost on white.
             let reach = hero
                 ? min(shellRadius * (onLight ? CreatureInk.hazeReach : CreatureGlow.reach), min(geo.width, geo.height) / 2)
                 : shellRadius
@@ -1596,7 +1596,7 @@ final class ParticleCreatureEngine {
         let levels = 6
         var dots = [[Path]](repeating: [Path](repeating: Path(), count: levels), count: 4)
         var halos = [Path](repeating: Path(), count: 4)
-        // Ink has no halo to enlarge it, so on a light page the hero's dots are larger (vNext);
+        // Ink has no halo to enlarge it, so on a light page the hero's dots are larger (8.22.0);
         // the avatar's are large enough already, and lighter, so its face leads.
         let sizeFactor = hero ? (onLight ? ink.dotScale : 1) : 1.3
         let inkAlpha = hero ? 1 : CreatureInk.compactAlpha
@@ -1625,7 +1625,7 @@ final class ParticleCreatureEngine {
                 }
             }
         }
-        // The network's links while connecting (vNext): lines of light between the nodes, the
+        // The network's links while connecting (8.22.0): lines of light between the nodes, the
         // far ones behind the core, the near ones over it, each under its nodes.
         var farLinks = [Path](repeating: Path(), count: 3)
         var nearLinks = [Path](repeating: Path(), count: 3)
@@ -1655,7 +1655,7 @@ final class ParticleCreatureEngine {
             }
         }
 
-        // The body (vNext): on a light page the sphere is a faint disc of its colour inside its
+        // The body (8.22.0): on a light page the sphere is a faint disc of its colour inside its
         // rim, an object on white rather than a cloud of dots.
         if onLight && shell > 0.02 {
             swarm.fill(globe, with: .color(color(deepen(palette[0], CreatureCore.depth), ink.body * shell)))
@@ -1699,7 +1699,7 @@ final class ParticleCreatureEngine {
         // The sphere's outline in light (4.7.0): a thin rim, brightest on the side the light
         // falls on, which drifts round slowly; with a glow in the dark, in ink on a light page.
         if shell > 0.02 {
-            // On a light page the outline holds all round (vNext): the far side of the light
+            // On a light page the outline holds all round (8.22.0): the far side of the light
             // kept 0.1 of it before, and the sphere had no edge on white.
             let rimTone = onLight ? inked(palette[0]) : whiten(palette[1], 0.35)
             let peak = onLight ? ink.rimPeak : CreatureGlow.rimPeak
@@ -1722,7 +1722,7 @@ final class ParticleCreatureEngine {
             rim.opacity = shell
             if !onLight {
                 rim.blendMode = .plusLighter
-                // Its glow (vNext without a blur each frame): a soft band whose fall-off is a
+                // Its glow (8.22.0 without a blur each frame): a soft band whose fall-off is a
                 // radial gradient, lit by angle as the rim is, in one plain layer.
                 let reach = lineWidth * CreatureGlow.haloReach
                 let outer = shellRadius + reach
@@ -1831,7 +1831,7 @@ final class ParticleCreatureEngine {
     ) {
         let breath = sin(t * CreatureCore.breathRate)
         let since = t - pokeAt
-        // A tap's flare, or a sum's click (vNext).
+        // A tap's flare, or a sum's click (8.22.0).
         let flare = max(since >= 0 && since < 1.2 ? exp(-since / 0.25) : 0, busyFlare)
         let alpha = min(1, (onLight ? CreatureCore.ink : CreatureCore.light) * (hero ? 1 : CreatureCore.compact)
             * strength * (1 + CreatureCore.breath * breath + CreatureCore.flare * flare))
@@ -1905,7 +1905,7 @@ final class ParticleCreatureEngine {
                 let wave = Path(ellipseIn: CGRect(x: cx - radius, y: cy - radius, width: radius * 2, height: radius * 2))
                 extras.opacity = CreatureAnswer.waveAlpha * pow(1 - progress, 1.6) * min(1, progress * 6)
                 if !onLight {
-                    // Its glow (vNext): a radial gradient, no blurred layer each frame.
+                    // Its glow (8.22.0): a radial gradient, no blurred layer each frame.
                     let reach = width * CreatureAnswer.haloReach
                     let outer = radius + reach
                     extras.fill(
@@ -1927,7 +1927,7 @@ final class ParticleCreatureEngine {
         }
     }
 
-    /// A soft ring of light as a radial gradient (vNext, in place of a blurred stroke drawn each
+    /// A soft ring of light as a radial gradient (8.22.0, in place of a blurred stroke drawn each
     /// frame): the light of a line at `radius` softened out to `reach` either side, the fall-off
     /// of a three-unit line under a blur of two and a half (`CreatureGlow.haloProfile`).
     static func softRing(radius: Double, reach: Double, color rgb: RGB, alpha: Double) -> Gradient {
@@ -1986,7 +1986,7 @@ final class ParticleCreatureEngine {
         rgb * (1 - amount)
     }
 
-    /// A colour in ink on a light page (vNext): deepened, then taken down further while it is
+    /// A colour in ink on a light page (8.22.0): deepened, then taken down further while it is
     /// still lighter than the ink's luminance allows (a cyan, a yellow), so every tone of every
     /// mood reads on white.
     private func inked(_ rgb: RGB) -> RGB {
@@ -1997,17 +1997,17 @@ final class ParticleCreatureEngine {
 /// Light mode (4.6.1): the creature on a light page. Light added to white is lost, so it is
 /// drawn with normal blending in deeper colours.
 enum CreatureInk {
-    /// How far a particle's colour is taken towards black (0.3 until vNext; then capped by the
+    /// How far a particle's colour is taken towards black (0.3 until 8.22.0; then capped by the
     /// ink's luminance, `CreatureInkStrength`).
     static let depth: Double = 0.42
     /// The links' strongest opacity (0.11 in the dark, where they add light).
     static let links: Double = 0.22
-    /// The shadow under the sphere, where the dark draws a light on the ground (0.18 until vNext).
+    /// The shadow under the sphere, where the dark draws a light on the ground (0.18 until 8.22.0).
     static let shadow: Double = 0.24
-    /// How far the hero's haze reaches on a light page, in sphere radii (vNext; 1.9 before, as in
+    /// How far the hero's haze reaches on a light page, in sphere radii (8.22.0; 1.9 before, as in
     /// the dark, where it was too wide and faint to see).
     static let hazeReach: Double = 1.45
-    /// The avatar's dots (vNext): they shrink with the sphere to this power of its scale, so a
+    /// The avatar's dots (8.22.0): they shrink with the sphere to this power of its scale, so a
     /// small one keeps its dots (at 40 pt a fifth larger than before, at 24 pt a third), and on a
     /// light page they keep this much of the ink's opacity, so its face stays the clearest thing
     /// in it (the same ink at full strength crowded the eyes of a 40 pt avatar).
@@ -2024,7 +2024,7 @@ enum CreatureInk {
     static let question: SIMD3<Double> = [112, 92, 226]
 }
 
-/// How strongly the creature is inked on a light page (vNext, the owner's request: Ten read faintly
+/// How strongly the creature is inked on a light page (8.22.0, the owner's request: Ten read faintly
 /// on white). Every colour is deepened, then taken down while its luminance is above
 /// `luminance`: in the standard ink a particle at full strength is at least 4.6:1 on white and
 /// one of middle depth at least 3.2:1 (2.1 to 3.1 before, under the 3:1 a graphic needs). Its
@@ -2088,7 +2088,7 @@ enum CreatureGlow {
     /// The light on the ground under the sphere in the dark.
     static let ground: Double = 0.2
     /// The rim's opacity where the light falls and on the far side in the dark (in ink since
-    /// vNext: `CreatureInkStrength`), and the outlines of an accessory and a hand in ink.
+    /// 8.22.0: `CreatureInkStrength`), and the outlines of an accessory and a hand in ink.
     static let rimPeak: Double = 0.85
     static let rimFloor: Double = 0.12
     static let inkRimPeak: Double = 0.6
@@ -2096,7 +2096,7 @@ enum CreatureGlow {
     /// and how fast it drifts round (radians a second).
     static let lightAngle: Double = 0.2
     static let drift: Double = 0.25
-    /// The rim's glow (vNext, drawn without a blur): how far it reaches either side of the rim, in
+    /// The rim's glow (8.22.0, drawn without a blur): how far it reaches either side of the rim, in
     /// rim widths, and its fall-off there, as (share of the reach, strength) from the rim out:
     /// a three-width line under a blur of two and a half, as it was drawn before.
     static let haloReach: Double = 7
@@ -2147,7 +2147,7 @@ enum CreatureAnswer {
     static let waveReach: Double = 0.42
     static let waveWidth: Double = 1.4
     static let waveAlpha: Double = 0.6
-    /// How far a wave's glow reaches either side of it, in its widths (vNext, drawn without a
+    /// How far a wave's glow reaches either side of it, in its widths (8.22.0, drawn without a
     /// blur: a line two and a half widths wide under a blur of two, as before).
     static let haloReach: Double = 6
     /// Phrases of this length (seconds) with a pause at their end; the syllables' rate.
@@ -2181,7 +2181,7 @@ enum CreatureWork {
     static let coreFloor: Double = 0.75
 }
 
-/// Thinking's rings (vNext): comets running along a faint track.
+/// Thinking's rings (8.22.0): comets running along a faint track.
 enum CreatureThought {
     /// About this many comets in all, a stride of the swarm each (at least this long), each of
     /// this many particles, the head first, this far apart (radians) round the ring.
@@ -2198,12 +2198,12 @@ enum CreatureThought {
     static let track = 0.7
 }
 
-/// Listening (vNext): how much nearer a particle on a wave's crest is drawn at full voice.
+/// Listening (8.22.0): how much nearer a particle on a wave's crest is drawn at full voice.
 enum CreatureListen {
     static let crest = 0.25
 }
 
-/// Connecting (vNext): the links' strongest opacity in the dark (added light) and in ink, and how
+/// Connecting (8.22.0): the links' strongest opacity in the dark (added light) and in ink, and how
 /// much of it the far ones keep.
 enum CreatureNetworkInk {
     static let light = 0.5
@@ -2222,7 +2222,7 @@ private struct Geometry {
     let restY: Double
     /// Particle and eye sizes.
     let unit: Double
-    /// Particle sizes (vNext): the unit in the hero; in the avatar they shrink more slowly than
+    /// Particle sizes (8.22.0): the unit in the hero; in the avatar they shrink more slowly than
     /// the sphere, so a small one still shows its dots.
     let dot: Double
 
@@ -2306,7 +2306,7 @@ private enum CreaturePalette {
     static let determined: [RGB] = [[110, 90, 255], [80, 70, 220], [150, 120, 255], [60, 90, 230]]
     static let confused: [RGB] = [[150, 130, 255], [90, 200, 230], [200, 150, 255], [120, 170, 240]]
     static let sleepy: [RGB] = [[140, 130, 210], [110, 140, 210], [170, 160, 225], [100, 115, 190]]
-    // The busy moods (vNext): cyan for a search, mint for sums, teal for a connection, pink at
+    // The busy moods (8.22.0): cyan for a search, mint for sums, teal for a connection, pink at
     // the pen for writing, each on the creature's own violet.
     static let searching: [RGB] = [[90, 140, 255], [60, 220, 255], [130, 110, 255], [160, 235, 255]]
     static let calculating: [RGB] = [[124, 108, 255], [80, 225, 190], [176, 130, 255], [120, 200, 255]]

@@ -2,7 +2,7 @@
 //  ParticleCreatureBusyTests.swift
 //  DesignComponentsTests
 //
-//  Pins the busy moods' geometry (vNext, ParticleCreatureBusy.swift): the globe of rows holds
+//  Pins the busy moods' geometry (8.22.0, ParticleCreatureBusy.swift): the globe of rows holds
 //  every particle on the sphere, a round of sums comes out right, the pulses travel without
 //  jumps, the ribbon and every spot stay in the creature's square.
 //
@@ -161,7 +161,7 @@ struct ParticleCreatureBusyTests {
     }
 }
 
-/// The creature's ink on a light page (vNext): a light colour is taken down to the ink's
+/// The creature's ink on a light page (8.22.0): a light colour is taken down to the ink's
 /// luminance, keeping its hue; a dark one is left as it is.
 struct CreatureInkTests {
 

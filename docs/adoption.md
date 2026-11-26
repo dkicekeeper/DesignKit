@@ -111,7 +111,7 @@ empty answer; `.surprised` also at a spending spike or a large expense), `.glyph
 card's currency sign, `.determined` after three tools, `.sleepy` late at night, `.perk` at a new
 "Ten writes" card.
 
-vNext, proposed: the busy moods for the steps Tenra already writes under `.thinkingShimmer`
+8.22.0, proposed: the busy moods for the steps Tenra already writes under `.thinkingShimmer`
 while Ten thinks, the step's mood beside its words: `.searching` while it looks through the
 transactions (a search, a category's history), `.calculating` for sums, a forecast, a budget's
 check, `.connecting` while a tool changes the person's data (and Platina's Plati while it syncs

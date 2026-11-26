@@ -52,7 +52,7 @@ struct ThinkingShimmerModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         if isActive {
-            // The gate holds the light only (vNext): it stops off screen now, and the text under
+            // The gate holds the light only (8.22.0): it stops off screen now, and the text under
             // it keeps its identity when it does.
             content.overlay {
                 AmbientMotionGate { allowsAmbientMotion in

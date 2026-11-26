@@ -404,7 +404,7 @@ rather than importing an app type.
   character) in front of its backdrop, as wide as the screen just under the bars on a phone, with
   a parallax of its own; `RemotePhotoLoading.hidden` keeps a figure that is loading or failed
   out of sight.
-- What the creature is busy with (vNext, the owner's request from a reference of dotted
+- What the creature is busy with (8.22.0, the owner's request from a reference of dotted
   "thinking" orbs, drawn afresh on Ten's engine, nothing copied): `ParticleCreature.Mood`
   `.searching` (a beam over a globe of rows), `.calculating` (bands turning and turning back),
   `.connecting` (a network with pulses), `.writing` (a ribbon behind a pen), the eyes on the work;

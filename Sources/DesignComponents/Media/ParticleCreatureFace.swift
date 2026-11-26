@@ -89,16 +89,16 @@ struct CreatureFace: Equatable {
             // On the work (5.3.0): calm, lids a little lowered and level (slanted, they read cross).
             return pair(CreatureEye(width: 0.27, height: 0.28, roundness: 0.6, lid: 0.2))
         case .searching:
-            // Looking (vNext): wide, round eyes after the beam.
+            // Looking (8.22.0): wide, round eyes after the beam.
             return pair(CreatureEye(width: 0.27, height: 0.31, roundness: 0.7, lid: 0.06))
         case .calculating:
-            // Counting (vNext): level lids a little lowered, on the band that turns.
+            // Counting (8.22.0): level lids a little lowered, on the band that turns.
             return pair(CreatureEye(width: 0.26, height: 0.27, roundness: 0.55, lid: 0.24))
         case .connecting:
-            // Watching a pulse go (vNext): open and round.
+            // Watching a pulse go (8.22.0): open and round.
             return pair(CreatureEye(width: 0.25, height: 0.29, roundness: 0.75, lid: 0.04))
         case .writing:
-            // On the pen (vNext): lids lowered, looking down at the line.
+            // On the pen (8.22.0): lids lowered, looking down at the line.
             return pair(CreatureEye(y: 0.02, width: 0.27, height: 0.26, roundness: 0.6, lid: 0.3, lidAngle: 0.05))
         case .glyph:
             return pair(CreatureEye(form: .arc, x: 0.2, width: 0.16, height: 0.12))

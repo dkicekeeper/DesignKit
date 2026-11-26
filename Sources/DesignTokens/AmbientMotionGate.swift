@@ -9,7 +9,7 @@
 //  - `systemPrefersReducedResourceUsage` (iOS 27) — the system telling apps to back
 //    off, e.g. under thermal or power pressure. Continuously redrawing decoration is
 //    exactly the work worth dropping first: it carries no information.
-//  - Off screen (vNext) — scrolled well out of sight: a creature at the top of a long
+//  - Off screen (8.22.0) — scrolled well out of sight: a creature at the top of a long
 //    screen, a background preview in a carousel, a skeleton far down a list. A view
 //    more than half a scroll view's size outside its visible part stops; it starts again
 //    before it comes back into sight, so its still frame is never seen.
@@ -27,7 +27,7 @@ public struct AmbientMotionGate<Content: View>: View {
     @ViewBuilder var content: (_ allowsAmbientMotion: Bool) -> Content
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    /// Whether the view is near the visible part of the scroll views round it (vNext). True
+    /// Whether the view is near the visible part of the scroll views round it (8.22.0). True
     /// until it is measured, and outside a scroll view.
     @State private var isNearScreen = true
 
@@ -58,7 +58,7 @@ public struct AmbientMotionGate<Content: View>: View {
     }
 }
 
-/// Where a view is against the scroll views round it (vNext).
+/// Where a view is against the scroll views round it (8.22.0).
 enum AmbientViewport {
     /// How far outside a scroll view's visible part a view still moves, as a share of that
     /// part's size: it starts again before it shows, and a card peeking past the edge of a

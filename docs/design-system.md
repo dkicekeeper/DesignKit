@@ -2465,7 +2465,7 @@ sparkles), `.wink` (a tongue, a tilt), `.confused` (one lid lower, a tilt, "?"),
 (lids slanted down to the middle), `.worried` (lids slanted up, amber), `.sad` (a frown, a tear),
 `.sleepy` (half-closed lids, a yawn), `.asleep` (closed, dim, z's).
 
-*(vNext, from a reference of dotted "thinking" orbs, drawn afresh on Ten's engine)* What it is
+*(8.22.0, from a reference of dotted "thinking" orbs, drawn afresh on Ten's engine)* What it is
 busy with: four moods for the steps of an assistant's work, so the person sees what it is doing,
 each with the eyes on the work (ParticleCreatureBusy.swift). `.searching`: the swarm stands as a
 globe of rows along its parallels (`CreatureGlobe`) and a beam sweeps round it like a radar's
@@ -2488,7 +2488,7 @@ little brighter than at rest. A still frame (Reduce Motion, `.image`) shows a mo
 it: the beam on the front, the bands mixed, a pulse on its way, the pen with its line. Their
 geometry is computed once a frame and costs 13 to 37 µs for 400 particles.
 
-*(vNext)* `.thinking`'s rings carry comets: four particles each, the head nearest, a few a ring
+*(8.22.0)* `.thinking`'s rings carry comets: four particles each, the head nearest, a few a ring
 running at 1.6 times the ring's spin, over a faint track (0.7 of its depth) that crawls at 0.15
 (`CreatureThought`); the whole ring turned as one before, which did not read on a white page,
 where the sweep of light is not drawn. `.listening` without a level rides two waves at their
@@ -2525,7 +2525,7 @@ a `UIImage` for a widget, a notification's attachment or a share image (in a wid
 swarm itself, held together by a glow of its colour round it (`CreatureGlow`: 0.2 at the centre,
 out to 1.9 sphere radii, the square's edge at most) and a thin rim of light along its outline,
 brightest where the light falls (the lower right, drifting round once in about 25 s) with a
-glow of its own (since vNext a radial gradient lit by the rim's light in one layer, the fall-off
+glow of its own (since 8.22.0 a radial gradient lit by the rim's light in one layer, the fall-off
 of the blurred line it was, `CreatureGlow.haloProfile`: no blur drawn every frame; the answer's
 waves glow the same way). The shadow (or the light) on the ground is an ellipse of a round
 gradient, soft all round (it had a hard top and bottom). `.compact` has the same glow, inside
@@ -2539,7 +2539,7 @@ and a tear 45% deeper with a fainter glow, the z's, hearts, sparkles and "?" in 
 the glow a faint haze (0.08) and a soft shadow under the sphere. On a dark surface in light
 mode, set `.environment(\.colorScheme, .dark)` on it.
 
-*(vNext, the owner's request: Ten read faintly on white)* The ink is measured
+*(8.22.0, the owner's request: Ten read faintly on white)* The ink is measured
 (`CreatureInkStrength`): every colour is deepened (0.42, 0.3 before) and then taken down,
 keeping its hue, while its luminance is above 0.18, so a cyan or a yellow reads like a violet. A
 particle at full strength is at least 4.6:1 on white and one of middle depth at least 3.2:1 in
@@ -3261,7 +3261,7 @@ beam's display-rate sweep — is *ambient*: decorative, information-free, and pa
 cost every frame it is on screen. Those views go through
 [`AmbientMotionGate`](../Sources/DesignTokens/AmbientMotionGate.swift), which suspends them under
 Reduce Motion **and**, on iOS 27, while `systemPrefersReducedResourceUsage` is true (the system
-asking apps to back off under thermal or power pressure), **and** *(vNext)* while the view is
+asking apps to back off under thermal or power pressure), **and** *(8.22.0)* while the view is
 scrolled well out of sight: more than half a scroll view's size outside its visible part, down
 or across (`AmbientViewport`, from `onGeometryChange` over `bounds(of: .scrollView(axis:))`). It
 starts again before it comes back, so its still frame is never seen, and a card peeking past the

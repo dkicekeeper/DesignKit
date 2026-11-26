@@ -212,7 +212,7 @@ private struct ShimmerModifier: ViewModifier {
         if !shimmers || isInsideShimmer {
             content
         } else {
-            // The gate holds the band only (vNext): it stops off screen now, and the shapes under
+            // The gate holds the band only (8.22.0): it stops off screen now, and the shapes under
             // it keep their identity when it does.
             content.overlay {
                 AmbientMotionGate { allowsMotion in

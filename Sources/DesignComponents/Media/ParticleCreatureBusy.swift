@@ -2,7 +2,7 @@
 //  ParticleCreatureBusy.swift
 //  DesignKit
 //
-//  What the creature is busy with (vNext): four shapes of the swarm for the steps of an
+//  What the creature is busy with (8.22.0): four shapes of the swarm for the steps of an
 //  assistant's work, so the person sees what it is doing and not only that it is busy, each with
 //  the eyes on the work.
 //
@@ -118,7 +118,7 @@ enum CreatureBusyMath {
 
 // MARK: - Globe
 
-/// The swarm laid out as a globe (vNext): rows of particles along its parallels, as many in a row
+/// The swarm laid out as a globe (8.22.0): rows of particles along its parallels, as many in a row
 /// as its length allows, so a beam lights a column of them and a turned band breaks its rows.
 /// Searching and calculating stand on it.
 enum CreatureGlobe {
@@ -178,7 +178,7 @@ enum CreatureGlobe {
 
 // MARK: - Searching
 
-/// Searching (vNext): a beam sweeps round the globe; what it reaches swells and lights up, then
+/// Searching (8.22.0): a beam sweeps round the globe; what it reaches swells and lights up, then
 /// fades behind it. A size and light ripple, not a shine, so it reads in ink on a white page too.
 struct CreatureSearch {
     /// The globe's own slow turn (radians a second) and its tip (radians).
@@ -235,7 +235,7 @@ struct CreatureSearch {
 
 // MARK: - Calculating
 
-/// Calculating (vNext): rounds of three quarter turns of the sphere's bands, then the same turns
+/// Calculating (8.22.0): rounds of three quarter turns of the sphere's bands, then the same turns
 /// undone in reverse, so every round comes out right with a click of light.
 struct CreatureSums {
     struct Move: Equatable {
@@ -351,7 +351,7 @@ struct CreatureSums {
 
 // MARK: - Connecting
 
-/// Connecting (vNext): nodes on the sphere linked by lines of light, pulses hopping along the
+/// Connecting (8.22.0): nodes on the sphere linked by lines of light, pulses hopping along the
 /// links. Every `stride`th particle is a node, the one halfway to the next a pulse (the first
 /// few), the rest a faint sphere.
 final class CreatureNetwork {
@@ -544,7 +544,7 @@ final class CreatureNetwork {
 
 // MARK: - Writing
 
-/// Writing (vNext): a ribbon of lanes runs round the sphere behind a pen point. Its line is set
+/// Writing (8.22.0): a ribbon of lanes runs round the sphere behind a pen point. Its line is set
 /// by where it is round the sphere, not by the time, so what is written stays in place while the
 /// pen moves on: the line appears at the pen and fades behind it. Two particles in three are the
 /// ribbon, the rest a faint sphere.
