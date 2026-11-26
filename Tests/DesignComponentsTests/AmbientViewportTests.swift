@@ -2,7 +2,7 @@
 //  AmbientViewportTests.swift
 //  DesignKit
 //
-//  8.22.0: an ambient loop stops while scrolled well out of sight. vNext: a view with no size
+//  8.22.0: an ambient loop stops while scrolled well out of sight. 8.22.2: a view with no size
 //  gives no answer, so content that draws nothing while stopped cannot start and stop it again
 //  in the same layout pass (Platina's screens hung on a skeleton's shimmer).
 //

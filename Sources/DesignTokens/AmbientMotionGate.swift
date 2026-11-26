@@ -40,7 +40,7 @@ public struct AmbientMotionGate<Content: View>: View {
             .onGeometryChange(for: Bool?.self) { proxy in
                 AmbientViewport.isNear(proxy)
             } action: { near in
-                // No size, no answer (vNext): content that draws nothing while stopped would
+                // No size, no answer (8.22.2): content that draws nothing while stopped would
                 // otherwise read as near, start, measure far, stop, and never settle.
                 if let near { isNearScreen = near }
             }
@@ -70,7 +70,7 @@ enum AmbientViewport {
     /// Whether any of the view is within `margin` of the visible part of every scroll view round
     /// it, down and across: a card scrolled off a carousel that is itself off the page is out.
     /// Outside a scroll view it is near. Without a size there is no answer (nil): the gate keeps
-    /// what it had (vNext). A view that drew nothing while stopped read as near here, started,
+    /// what it had (8.22.2). A view that drew nothing while stopped read as near here, started,
     /// read as far, stopped again, and so on in one layout pass: a skeleton's shimmer scrolled out
     /// of sight hung the layout of a screen pushed onto a navigation stack (Platina, 8.22.0).
     static func isNear(_ proxy: GeometryProxy) -> Bool? {
