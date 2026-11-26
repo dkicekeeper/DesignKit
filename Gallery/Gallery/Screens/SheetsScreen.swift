@@ -275,6 +275,8 @@ struct SampleOnboarding: View {
 private struct ShareCardSheetPage: View {
     @State private var isPresented = false
     @State private var fails = false
+    /// The formats the sheet offers; the cases set it (one format hides the picker).
+    @State private var formats: [ShareCard.Format] = ShareCard.Format.allCases
 
     var body: some View {
         ComponentPage(
@@ -285,11 +287,13 @@ private struct ShareCardSheetPage: View {
             notes: [
                 "The data loads when the sheet opens (the card's skeleton meanwhile); the picture is drawn on the phone with ImageRenderer, 1080 px wide.",
                 "load returning nil shows the error state.",
-            ]
+            ],
+            code: sheetCode,
+            cases: sheetCases
         ) {
             PresentButton(title: "Share a picture") { isPresented = true }
                 .sheet(isPresented: $isPresented) {
-                    ShareCardSheet(previewTitle: "Gallery") { () async -> String? in
+                    ShareCardSheet(previewTitle: "Gallery", formats: formats) { () async -> String? in
                         try? await Task.sleep(for: .seconds(1))
                         return fails ? nil : "Kapchagay weekend"
                     } message: { (title: String) in
@@ -303,6 +307,48 @@ private struct ShareCardSheetPage: View {
         } controls: {
             ToggleControl("Loading fails", isOn: $fails)
         }
+    }
+
+    /// The button and its sheet as the controls set them; the data, the link and the card's
+    /// content are the app's.
+    private var sheetCode: String {
+        let allFormats = "ShareCard.Format.allCases"
+        let formatsCode = formats == ShareCard.Format.allCases
+            ? allFormats
+            : SwiftCode.array(formats.map { "." + $0.rawValue })
+        let frameCall = SwiftCode.call("ShareCardFrame", [
+            .labeled("format", "format"),
+            .text("brand", "Gallery"),
+            .text("site", "example.com"),
+        ], trailing: "TripCardContent(trip: trip, format: format)")
+        let call = SwiftCode.call("ShareCardSheet", [
+            .text("previewTitle", "Gallery"),
+            .option("formats", formatsCode, default: allFormats),
+        ])
+        let message = "\"\\(trip.title) https://example.com\""
+        var sheetCall = call + " {\n" + SwiftCode.indent("try? await loadTrip()")
+        sheetCall += "\n} message: { trip in\n" + SwiftCode.indent(message)
+        sheetCall += "\n} card: { trip, format in\n" + SwiftCode.indent(frameCall) + "\n}"
+        let button = "Button(" + SwiftCode.string("Share a picture") + ") { isPresented = true }"
+        return SwiftCode.modifier(button, "sheet", [.labeled("isPresented", "$isPresented")], trailing: sheetCall)
+    }
+
+    /// The formats an app offers, and a load that fails.
+    private var sheetCases: [SpecimenCase] {
+        [
+            SpecimenCase("Stories and post") {
+                formats = ShareCard.Format.allCases; fails = false
+            },
+            SpecimenCase("Stories only") {
+                formats = [.story]; fails = false
+            },
+            SpecimenCase("Post only") {
+                formats = [.post]; fails = false
+            },
+            SpecimenCase("Loading fails") {
+                formats = ShareCard.Format.allCases; fails = true
+            },
+        ]
     }
 }
 

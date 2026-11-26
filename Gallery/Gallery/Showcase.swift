@@ -4,13 +4,16 @@
 //
 //  The pieces every Gallery screen is built from (docs/gallery-structure.md):
 //  - `ShowcasePage`: a screen whose sections are pages, with chips on top and a swipe;
-//  - `ComponentPage`: one component — header, preview on a canvas, controls, notes;
+//  - `ComponentPage`: one component — header, preview on a canvas and its bar, cases, controls,
+//    code, parameters, notes;
 //  - controls: state, toggles, choices, sliders, steppers, text;
 //  - `ShowcaseSection` and `TokenLabel` for the foundation screens.
 //
 
 import SwiftUI
+import UIKit
 import DesignTokens
+import DesignSupport
 import DesignComponents
 
 // MARK: - Paged screen
@@ -46,6 +49,8 @@ struct ShowcasePage<Content: View>: View {
                         },
                         selection: $selection
                     )
+                    // The selected chip's tint is the accent (vNext: the app switches on a page).
+                    .galleryRefreshes()
                 }
                 .onAppear {
                     guard !openedInitialPage, let initialPage else { return }
@@ -74,6 +79,8 @@ struct ShowcasePage<Content: View>: View {
             }
             .padding(AppSpacing.lg)
             .frame(maxWidth: .infinity, alignment: .leading)
+            // A wide Mac window or an iPad in landscape: the page keeps to a column (vNext).
+            .readableWidth(AppLayout.wideWidth)
         }
         .scrollDismissesKeyboard(.interactively)
     }
@@ -192,13 +199,20 @@ enum CanvasContext: String, CaseIterable, Identifiable {
 /// 1. **Header** — the name, what it is for, its styles (the values of its `style:`
 ///    parameter), since which version, which apps use it; a rule under it keeps it apart from
 ///    the component.
-/// 2. **Preview** — the component on a canvas, in the current controls; the canvas can be
-///    switched to light or dark.
-/// 3. **Controls** — its state (default, loading = its skeleton, empty, error, disabled) and
+/// 2. **Preview** — the component on a canvas, in the current controls. The canvas switches to
+///    light or dark and lies on the page, a card or a colour (8.21.0); its bar (vNext) switches
+///    the app (Tenra, Dalada, Platina), the text size and the direction, and on a wide screen the
+///    width.
+/// 3. **Cases** (vNext) — ready data from life, one tap each.
+/// 4. **Controls** — its state (default, loading = its skeleton, empty, error, disabled) and
 ///    its parameters.
-/// 4. **Notes** — a rule or two from docs/design-system.md.
-/// 5. **Do / Don't** (8.9.0) — how to use it and how not to, side by side; docs/components.md
+/// 5. **Code** (vNext) — the call as the controls set it, to copy.
+/// 6. **Parameters** (vNext) — its initialisers from docs/components.json.
+/// 7. **Notes** — a rule or two from docs/design-system.md.
+/// 8. **Do / Don't** (8.9.0) — how to use it and how not to, side by side; docs/components.md
 ///    carries them too (`.github/scripts/components_reference.py`).
+///
+/// On a wide screen (an iPad, a Mac window) the cases and controls stand beside the canvas.
 struct ComponentPage<Preview: View, Controls: View>: View {
     let name: String
     let summary: String
@@ -213,52 +227,19 @@ struct ComponentPage<Preview: View, Controls: View>: View {
     var dos: [String] = []
     /// What not to do with it, a line each (8.9.0).
     var donts: [String] = []
+    /// The Swift that draws the preview as the controls set it (vNext), built by the page from
+    /// its state with `SwiftCode`; nil hides the panel.
+    var code: String? = nil
+    /// Ready data from life, one tap each (vNext): a long name, zero, a huge amount, no photo.
+    var cases: [SpecimenCase] = []
     @ViewBuilder var preview: Preview
     @ViewBuilder var controls: Controls
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.xl) {
-            ComponentHeader(name: name, summary: summary, styles: styles, since: since, apps: apps)
-            PreviewCanvas(style: canvas) { preview }
-            if Controls.self != EmptyView.self {
-                PanelSection("Controls") {
-                    ControlStack { controls }
-                }
-            }
-            if !notes.isEmpty {
-                PanelSection("Usage") {
-                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                        ForEach(notes, id: \.self) { note in
-                            Label {
-                                Text(note)
-                                    .font(AppTypography.bodySmall)
-                                    .foregroundStyle(AppColors.Text.primary)
-                            } icon: {
-                                Image(systemName: "info.circle")
-                                    .foregroundStyle(AppColors.accent)
-                            }
-                        }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(AppSpacing.lg)
-                    .formCardStyle(radius: AppRadius.lg)
-                }
-            }
-            if !dos.isEmpty || !donts.isEmpty {
-                PanelSection("Do and don't") {
-                    VStack(alignment: .leading, spacing: AppSpacing.md) {
-                        GuidanceList(lines: dos, isDo: true)
-                        GuidanceList(lines: donts, isDo: false)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(AppSpacing.lg)
-                    .formCardStyle(radius: AppRadius.lg)
-                }
-            }
-        }
-        .containerValue(\.showcaseTitle, name)
-        .containerValue(\.showcaseIsComponent, true)
-        .containerValue(\.showcaseSummary, summary)
+        ComponentPageBody(page: self)
+            .containerValue(\.showcaseTitle, name)
+            .containerValue(\.showcaseIsComponent, true)
+            .containerValue(\.showcaseSummary, summary)
     }
 }
 
@@ -273,6 +254,7 @@ extension ComponentPage where Controls == EmptyView {
         styles: [String] = [],
         dos: [String] = [],
         donts: [String] = [],
+        code: String? = nil,
         @ViewBuilder preview: () -> Preview
     ) {
         self.name = name
@@ -284,8 +266,139 @@ extension ComponentPage where Controls == EmptyView {
         self.styles = styles
         self.dos = dos
         self.donts = donts
+        self.code = code
         self.preview = preview()
         self.controls = EmptyView()
+    }
+}
+
+/// A component page as it draws. The canvas's light or dark and its context, and the page's
+/// width, live here, above the part that draws again when the preset changes
+/// (`.galleryRefreshes()`), so switching the app keeps them.
+private struct ComponentPageBody<Preview: View, Controls: View>: View {
+    let page: ComponentPage<Preview, Controls>
+
+    @State private var scheme: ColorScheme?
+    @State private var context: CanvasContext?
+    @State private var width: CGFloat = 0
+
+    /// Wide enough for the cases and controls beside the canvas: the canvas at least
+    /// `AppLayout.mainColumnMinWidth`, the gap, the controls `AppLayout.sideColumnWidth`.
+    private static var wideWidth: CGFloat {
+        AppLayout.mainColumnMinWidth + AppSpacing.xxl + AppLayout.sideColumnWidth
+    }
+
+    private var hasSide: Bool { Controls.self != EmptyView.self || !page.cases.isEmpty }
+
+    var body: some View {
+        Group {
+            if hasSide && width >= Self.wideWidth {
+                VStack(alignment: .leading, spacing: AppSpacing.xl) {
+                    header
+                    HStack(alignment: .top, spacing: AppSpacing.xxl) {
+                        VStack(alignment: .leading, spacing: AppSpacing.xl) {
+                            canvas
+                            code
+                            parameters
+                            usage
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        VStack(alignment: .leading, spacing: AppSpacing.xl) {
+                            cases
+                            controls
+                        }
+                        .frame(width: AppLayout.sideColumnWidth, alignment: .leading)
+                    }
+                }
+            } else {
+                VStack(alignment: .leading, spacing: AppSpacing.xl) {
+                    header
+                    canvas
+                    cases
+                    controls
+                    code
+                    parameters
+                    usage
+                }
+            }
+        }
+        .galleryRefreshes()
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { newWidth in
+            width = newWidth
+        }
+    }
+
+    private var header: some View {
+        ComponentHeader(name: page.name, summary: page.summary, styles: page.styles,
+                        since: page.since, apps: page.apps)
+    }
+
+    private var canvas: some View {
+        PreviewCanvas(style: page.canvas, scheme: $scheme, context: $context) { page.preview }
+    }
+
+    @ViewBuilder private var cases: some View {
+        if !page.cases.isEmpty {
+            PanelSection("Cases") {
+                CaseChips(cases: page.cases)
+            }
+        }
+    }
+
+    @ViewBuilder private var controls: some View {
+        if Controls.self != EmptyView.self {
+            PanelSection("Controls") {
+                ControlStack { page.controls }
+            }
+        }
+    }
+
+    @ViewBuilder private var code: some View {
+        if let code = page.code {
+            CodePanel(code: code)
+        }
+    }
+
+    @ViewBuilder private var parameters: some View {
+        let declarations = ComponentReference.bundled?.declarations(forPage: page.name) ?? []
+        if !declarations.isEmpty {
+            ParametersPanel(declarations: declarations)
+        }
+    }
+
+    @ViewBuilder private var usage: some View {
+        if !page.notes.isEmpty {
+            PanelSection("Usage") {
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    ForEach(page.notes, id: \.self) { note in
+                        Label {
+                            Text(note)
+                                .font(AppTypography.bodySmall)
+                                .foregroundStyle(AppColors.Text.primary)
+                        } icon: {
+                            Image(systemName: "info.circle")
+                                .foregroundStyle(AppColors.accent)
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(AppSpacing.lg)
+                .formCardStyle(radius: AppRadius.lg)
+            }
+        }
+        if !page.dos.isEmpty || !page.donts.isEmpty {
+            PanelSection("Do and don't") {
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    GuidanceList(lines: page.dos, isDo: true)
+                    GuidanceList(lines: page.donts, isDo: false)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(AppSpacing.lg)
+                .formCardStyle(radius: AppRadius.lg)
+            }
+        }
     }
 }
 
@@ -401,24 +514,39 @@ private struct PanelSection<Content: View>: View {
 }
 
 /// The light (or dark) surface a preview sits on, with a thin border, so the component never
-/// blends into the page around it. A switch on top renders it in light or dark.
+/// blends into the page around it. A switch on top renders it in light or dark; the bar under it
+/// sets the app, the text size, the direction and the width (vNext).
 private struct PreviewCanvas<Content: View>: View {
     let style: CanvasStyle
+    @Binding var scheme: ColorScheme?
+    @Binding var context: CanvasContext?
     @ViewBuilder var content: Content
 
-    @State private var scheme: ColorScheme?
-    @State private var context: CanvasContext?
+    /// The canvas's own width: a choice of widths shows only where it is wider than a phone.
+    @State private var available: CGFloat = 0
     @Environment(\.colorScheme) private var systemScheme
     @Environment(\.surfaceStyle) private var surface
     @Environment(\.showcaseCanvasContext) private var initialContext
 
+    /// Wider than this, the bar offers the phone's width and a screen's column.
+    private static var widthChoiceMinimum: CGFloat { 500 }
+
     private var effectiveScheme: ColorScheme { scheme ?? systemScheme }
     private var effectiveContext: CanvasContext { context ?? initialContext }
+    private var offersWidths: Bool { available > Self.widthChoiceMinimum }
 
     var body: some View {
         PanelSection("Preview", trailing: AnyView(HStack(spacing: AppSpacing.sm) { contextMenu; schemeSwitch })) {
-            canvas
-                .environment(\.colorScheme, effectiveScheme)
+            VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                canvas
+                    .environment(\.colorScheme, effectiveScheme)
+                    .onGeometryChange(for: CGFloat.self) { proxy in
+                        proxy.size.width
+                    } action: { newWidth in
+                        available = newWidth
+                    }
+                CanvasBar(offersWidths: offersWidths)
+            }
         }
     }
 
@@ -439,7 +567,7 @@ private struct PreviewCanvas<Content: View>: View {
 
     /// The component in its context: as it is, in a card of the current surfaces, or on the
     /// accent with the hero's white tone.
-    @ViewBuilder private var placed: some View {
+    @ViewBuilder private var contextual: some View {
         switch effectiveContext {
         case .screen:
             content
@@ -455,6 +583,16 @@ private struct PreviewCanvas<Content: View>: View {
                 .background(AppColors.accent, in: RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
                 .environment(\.heroTone, .onColor)
         }
+    }
+
+    /// The component in its context, at the bar's text size, direction and width. Nothing chosen,
+    /// it follows the device, as the page does.
+    private var placed: some View {
+        let settings = GallerySettings.shared
+        return contextual
+            .modifier(CanvasTextSize(size: settings.textSize))
+            .modifier(CanvasDirection(isRightToLeft: settings.isRightToLeft))
+            .frame(maxWidth: offersWidths ? settings.canvasWidth.maxWidth : nil)
     }
 
     private var schemeSwitch: some View {
@@ -514,6 +652,274 @@ private struct PreviewCanvas<Content: View>: View {
     }
 }
 
+/// The canvas's text size when one is chosen; otherwise the device's.
+private struct CanvasTextSize: ViewModifier {
+    let size: DynamicTypeSize?
+
+    func body(content: Content) -> some View {
+        if let size {
+            content.dynamicTypeSize(size)
+        } else {
+            content
+        }
+    }
+}
+
+/// Right to left when chosen; otherwise the direction around it.
+private struct CanvasDirection: ViewModifier {
+    let isRightToLeft: Bool
+
+    func body(content: Content) -> some View {
+        if isRightToLeft {
+            content.environment(\.layoutDirection, .rightToLeft)
+        } else {
+            content
+        }
+    }
+}
+
+/// The bar under a canvas (vNext): the app whose accent and surfaces the Gallery shows (the
+/// home screen's preset, one tap), the text size, the direction and, on a wide screen, the
+/// width. The size, direction and width hold for every page until they are changed back.
+private struct CanvasBar: View {
+    let offersWidths: Bool
+
+    var body: some View {
+        let settings = GallerySettings.shared
+        HStack(spacing: AppSpacing.sm) {
+            Picker("App", selection: Binding(get: { settings.theme }, set: { settings.select($0) })) {
+                ForEach(themes(settings)) { theme in
+                    Text(theme.rawValue).tag(theme)
+                }
+            }
+            .pickerStyle(.segmented)
+            .fixedSize()
+            Spacer(minLength: 0)
+            Menu {
+                Picker("Text size", selection: Binding(get: { settings.textSize }, set: { settings.textSize = $0 })) {
+                    Text("Device").tag(DynamicTypeSize?.none)
+                    ForEach(DynamicTypeSize.allCases, id: \.self) { size in
+                        Text(size.galleryLabel).tag(DynamicTypeSize?.some(size))
+                    }
+                }
+            } label: {
+                BarChip(systemImage: "textformat.size", text: settings.textSize?.galleryLabel)
+            }
+            .accessibilityLabel("Text size")
+            .accessibilityValue(settings.textSize?.galleryLabel ?? "Device")
+            Button {
+                settings.isRightToLeft.toggle()
+            } label: {
+                BarChip(systemImage: "arrow.left.arrow.right", text: settings.isRightToLeft ? "RTL" : nil)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Right to left")
+            .accessibilityValue(settings.isRightToLeft ? "On" : "Off")
+            if offersWidths {
+                Menu {
+                    Picker("Width", selection: Binding(get: { settings.canvasWidth }, set: { settings.canvasWidth = $0 })) {
+                        ForEach(CanvasWidth.allCases) { width in
+                            Label(width.rawValue, systemImage: width.systemImage).tag(width)
+                        }
+                    }
+                } label: {
+                    BarChip(systemImage: settings.canvasWidth.systemImage,
+                            text: settings.canvasWidth == .full ? nil : settings.canvasWidth.rawValue)
+                }
+                .accessibilityLabel("Width")
+                .accessibilityValue(settings.canvasWidth.rawValue)
+            }
+        }
+        .controlSize(.small)
+    }
+
+    /// The three apps, and the custom preset while it is the one shown.
+    private func themes(_ settings: GallerySettings) -> [GalleryTheme] {
+        settings.theme == .custom ? GalleryTheme.apps + [.custom] : GalleryTheme.apps
+    }
+}
+
+/// A button of the canvas's bar: its symbol, and what it is set to when that is not the default.
+private struct BarChip: View {
+    let systemImage: String
+    let text: String?
+
+    var body: some View {
+        HStack(spacing: AppSpacing.xxs) {
+            Image(systemName: systemImage)
+            if let text {
+                Text(verbatim: text)
+                    .lineLimit(1)
+            }
+        }
+        .font(AppTypography.caption.weight(.semibold))
+        .foregroundStyle(AppColors.Text.action)
+        .padding(.horizontal, AppSpacing.sm)
+        .frame(minWidth: 32, minHeight: 28)
+        .background(text == nil ? Color.clear : AppColors.pale(AppColors.accent), in: Capsule())
+        .contentShape(Capsule())
+    }
+}
+
+/// The page's cases (vNext): a chip each, which sets the page's data in one tap.
+private struct CaseChips: View {
+    let cases: [SpecimenCase]
+
+    var body: some View {
+        FlowLayout(spacing: AppSpacing.sm) {
+            ForEach(cases) { specimen in
+                Button {
+                    withAnimation(AppAnimation.contentSpring) { specimen.apply() }
+                } label: {
+                    Text(specimen.title)
+                        .lineLimit(1)
+                        .filterChipStyle()
+                }
+                .buttonStyle(.plain)
+                .accessibilityHint("Sets the component's data")
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+/// The call as the controls set it (vNext), with a button that copies it.
+private struct CodePanel: View {
+    let code: String
+
+    @State private var copied = false
+
+    var body: some View {
+        PanelSection("Code", trailing: AnyView(copyButton)) {
+            CodeBlock(code: code)
+        }
+    }
+
+    private var copyButton: some View {
+        Button {
+            UIPasteboard.general.string = code
+            AccessibilityAnnouncer.announce("Copied")
+            copied = true
+            Task {
+                try? await Task.sleep(for: .seconds(1.5))
+                copied = false
+            }
+        } label: {
+            Label(copied ? "Copied" : "Copy", systemImage: copied ? "checkmark" : "doc.on.doc")
+                .font(AppTypography.caption.weight(.semibold))
+                .foregroundStyle(AppColors.Text.action)
+                .contentTransition(.symbolEffect(.replace))
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+/// The component's initialisers (vNext), from docs/components.json: a parameter a line, its
+/// label, type and default. Folded until opened, so the page stays short.
+private struct ParametersPanel: View {
+    let declarations: [ComponentReference.Declaration]
+
+    @State private var isExpanded = false
+
+    private var signatureCount: Int { declarations.map(\.initialisers.count).reduce(0, +) }
+
+    var body: some View {
+        PanelSection("Parameters") {
+            VStack(alignment: .leading, spacing: 0) {
+                Button {
+                    withAnimation(AppAnimation.contentSpring) { isExpanded.toggle() }
+                } label: {
+                    HStack {
+                        Text(verbatim: signatureCount == 1 ? "1 initialiser" : "\(signatureCount) initialisers")
+                            .font(AppTypography.bodySmall)
+                            .foregroundStyle(AppColors.Text.primary)
+                        Spacer(minLength: AppSpacing.sm)
+                        Image(systemName: "chevron.down")
+                            .font(AppTypography.caption.weight(.semibold))
+                            .foregroundStyle(AppColors.Text.secondary)
+                            .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                    }
+                    .padding(AppSpacing.lg)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityValue(isExpanded ? "Expanded" : "Collapsed")
+                if isExpanded {
+                    Divider().padding(.leading, AppSpacing.lg)
+                    VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                        ForEach(declarations, id: \.name) { declaration in
+                            DeclarationView(declaration: declaration)
+                        }
+                    }
+                    .padding(AppSpacing.lg)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .formCardStyle(radius: AppRadius.lg)
+        }
+    }
+}
+
+/// One type of the reference: its name, what it is, each initialiser's parameters, its skeleton.
+private struct DeclarationView: View {
+    let declaration: ComponentReference.Declaration
+
+    private static let mono = Font.system(.footnote, design: .monospaced)
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            Text(verbatim: declaration.name)
+                .font(AppTypography.bodySmall.weight(.semibold))
+                .foregroundStyle(AppColors.Text.primary)
+            if let doc = declaration.doc, !doc.isEmpty {
+                Text(verbatim: doc)
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppColors.Text.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            ForEach(declaration.initialisers, id: \.self) { signature in
+                let parameters = ComponentReference.parameters(of: signature)
+                VStack(alignment: .leading, spacing: AppSpacing.xxs) {
+                    if parameters.isEmpty {
+                        Text(verbatim: signature)
+                            .font(Self.mono)
+                            .foregroundStyle(AppColors.Text.secondary)
+                    }
+                    ForEach(parameters.indices, id: \.self) { index in
+                        line(parameters[index])
+                    }
+                }
+                .padding(AppSpacing.md)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(AppColors.Background.container, in: RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+                .textSelection(.enabled)
+            }
+            if let skeleton = declaration.skeleton {
+                Label {
+                    Text(verbatim: "Loading: \(skeleton)")
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppColors.Text.secondary)
+                } icon: {
+                    Image(systemName: "rectangle.dashed")
+                        .foregroundStyle(AppColors.Text.secondary)
+                }
+            }
+        }
+    }
+
+    /// `label name: Type = default`, the label in bold and the default in grey.
+    private func line(_ parameter: ComponentReference.Parameter) -> some View {
+        let names = [parameter.label, parameter.name].compactMap { $0 }.joined(separator: " ")
+        let label = Text(verbatim: names).bold().foregroundStyle(AppColors.Text.primary)
+        let type = Text(verbatim: ": \(parameter.type)").foregroundStyle(AppColors.Text.secondary)
+        let value = Text(verbatim: parameter.defaultValue.map { " = \($0)" } ?? "")
+            .foregroundStyle(AppColors.Text.tertiary)
+        return Text("\(label)\(type)\(value)")
+            .font(Self.mono)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
 // MARK: - Controls
 
 /// The rows of a controls panel, divided by hairlines, on a form card.
@@ -546,6 +952,20 @@ enum SpecimenState: String, CaseIterable, Identifiable {
     case disabled = "Disabled"
 
     var id: String { rawValue }
+}
+
+/// Ready data for a component page (vNext), one tap each: "Long name", "Zero", "No photo". `apply`
+/// sets the page's own state, which the preview, the controls and the code all read.
+struct SpecimenCase: Identifiable {
+    let title: String
+    let apply: () -> Void
+
+    var id: String { title }
+
+    init(_ title: String, apply: @escaping () -> Void) {
+        self.title = title
+        self.apply = apply
+    }
 }
 
 /// The first control of most pages: which state the component is in. "Loading" shows the
@@ -764,6 +1184,8 @@ struct ShowcaseSection<Content: View>: View {
             }
             content
         }
+        // A foundation's swatches read the accent (vNext: the app switches with a page open).
+        .galleryRefreshes()
         .containerValue(\.showcaseTitle, title)
     }
 }

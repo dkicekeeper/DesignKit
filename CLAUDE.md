@@ -63,7 +63,10 @@ Gallery/               showcase app (xcodegen; the .xcodeproj is not in git): Fo
                        its parameters and states (Loading = its skeleton), usage notes;
                        Patterns, whole screens made of the components (8.17.4); the home screen
                        searches the pages and picks an app's preset (accent and surfaces,
-                       8.21.0); an Updates screen reads CHANGELOG.md; ships to TestFlight
+                       8.21.0); the canvas switches the app, text size, direction and width, and
+                       a page shows its parameters (docs/components.json) and, on the 40 most
+                       used, the code of its configuration and cases (vNext); iPhone, iPad and
+                       Mac; an Updates screen reads CHANGELOG.md; ships to TestFlight
                        (docs/testflight.md)
 Gallery/SnapshotTests/ snapshot tests hosted in the Gallery app; references in __Snapshots__
 scripts/               snapshot-tests.sh (CI and local runs of the snapshot tests); for the apps
@@ -71,7 +74,8 @@ scripts/               snapshot-tests.sh (CI and local runs of the snapshot test
                        the pinned version), migrate.py + migrations/ (rewrites and TODOs for a
                        major), sync_agents_block.py (docs/agents.md into an app's CLAUDE.md)
 .github/scripts/       ci_changes.py (CI's What to build job: whether a run needs the macOS
-                       jobs), changelog.py (CI's Changelog job, release notes), gallery_badges.py (CI's
+                       jobs), changelog.py (CI's Changelog job, release notes),
+                       gallery_coverage.py (the pages without code and cases, vNext), gallery_badges.py (CI's
                        Gallery badges job: each page's `apps:` against Tenra's, Dalada's and
                        Platina's code),
                        components_reference.py (docs/components.md + .json; the release bot
@@ -215,7 +219,9 @@ rather than importing an app type.
    badges` job compares them with Tenra's, Dalada's and Platina's sources (5.2.0; Platina 8.17.1). Give it `dos:` / `donts:` when
    there is a way it is misused (8.9.0); its `since:` is the token `vNext`, which the release bot
    turns into the number. `python3 .github/scripts/components_reference.py build` shows the
-   page reads; the release bot writes docs/components.md after the merge. Add a snapshot test in `Gallery/SnapshotTests` (the skeleton's in
+   page reads; the release bot writes docs/components.md after the merge. A page of a component
+   the apps use gives `code:` (its call as the controls set it, built with `SwiftCode` in a
+   property of the page) and `cases:` (ready data from life), vNext. Add a snapshot test in `Gallery/SnapshotTests` (the skeleton's in
    `SkeletonsSnapshotTests`; one Liquid Glass card per snapshot; `named:` tells them apart),
    then record it with a manual CI run, `record_snapshots: missing` (docs/snapshots.md).
 5. Add any new `String(localized:)` key to `docs/localization-keys.md` and its English value

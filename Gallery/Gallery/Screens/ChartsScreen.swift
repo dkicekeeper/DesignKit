@@ -221,7 +221,9 @@ private struct BarChartPage: View {
                 "The bars rise from zero as the chart appears; a period that is not over fades towards the top, under a pale bar up to its forecast; a pale wider bar shows a year ago.",
                 "layout: .stacked puts the series on top of each other; the banner leads with the total.",
             ],
-            styles: ["grouped", "stacked"]
+            styles: ["grouped", "stacked"],
+            code: code,
+            cases: cases
         ) {
             if state == .loading {
                 BarChartSkeleton(bars: min(Int(count), 12), series: data == .distance ? 1 : 2)
@@ -263,6 +265,102 @@ private struct BarChartPage: View {
             SliderControl("Months", value: $count, in: 4...120, step: 1)
             TrendExtrasControls(extras: $extras)
         }
+    }
+
+    /// The series and the chart as the controls set them, the defaults left out; `months` is
+    /// the app's `[ChartValuePoint]` and `categories` its series of a part each.
+    private var code: String {
+        var lines: [String] = []
+        if extras.average {
+            lines.append(".average()")
+        }
+        if extras.limit {
+            let limit = SwiftCode.number(data == .distance ? 55 : 560_000)
+            lines.append(".value(" + limit + ", label: \"Limit\", aboveColor: AppColors.Status.warning)")
+        }
+        let referenceLines: SwiftCode.Argument? = lines.isEmpty
+            ? nil : .labeled("referenceLines", SwiftCode.array(lines))
+        let marksExtremes: SwiftCode.Argument? = .flag("marksExtremes", extras.records)
+        let followsScroll: SwiftCode.Argument? = .flag("followsScroll", extras.followsScroll)
+        switch data {
+        case .distance:
+            let series = seriesCode("distance", id: "km", name: "Distance", color: "AppColors.accent",
+                                    better: ".higher")
+            let kilometres = ".custom({ \"\\($0.formatted(.number.precision(.fractionLength(0)))) km\" })"
+            let chart = SwiftCode.call("BarChart", [
+                .labeled("dataPoints", "months"),
+                .labeled("series", "distance"),
+                .labeled("valueFormat", kilometres),
+                referenceLines,
+                marksExtremes,
+                followsScroll,
+            ])
+            return series + "\n" + chart
+        case .incomeAndSpending:
+            let income = seriesCode("income", id: "income", name: "Income", color: "AppColors.Status.positive",
+                                    better: ".higher")
+            let expenses = seriesCode("expenses", id: "expenses", name: "Expenses",
+                                      color: "AppColors.Status.negative", better: ".lower")
+            let chart = SwiftCode.call("BarChart", [
+                .labeled("dataPoints", "months"),
+                .labeled("series", "[income, expenses]"),
+                .labeled("valueFormat", ".currency(\"KZT\")"),
+                referenceLines,
+                marksExtremes,
+                followsScroll,
+            ])
+            return income + "\n" + expenses + "\n" + chart
+        case .categories:
+            return SwiftCode.call("BarChart", [
+                .labeled("dataPoints", "months"),
+                .labeled("series", "categories"),
+                .labeled("valueFormat", ".currency(\"KZT\")"),
+                .labeled("layout", ".stacked"),
+                referenceLines,
+                followsScroll,
+            ])
+        }
+    }
+
+    /// `let name = ChartSeries<ChartValuePoint>.keyed(…)`, with the forecast and a year ago as switched on.
+    private func seriesCode(_ variable: String, id: String, name: String, color: String, better: String) -> String {
+        let forecast: SwiftCode.Argument? = extras.forecast ? .text("projectedKey", id + "Forecast") : nil
+        let lastYear: SwiftCode.Argument? = extras.lastYear ? .text("comparisonKey", id + "LastYear") : nil
+        let keyed = SwiftCode.call("ChartSeries<ChartValuePoint>.keyed", [
+            .positional(SwiftCode.string(id)),
+            .text("name", name),
+            .labeled("coloring", ".solid(\(color))"),
+            .labeled("better", better),
+            forecast,
+            lastYear,
+        ])
+        return "let \(variable) = \(keyed)"
+    }
+
+    /// Histories from a new account to ten years.
+    private var cases: [SpecimenCase] {
+        [
+            SpecimenCase("Two years") {
+                data = .distance; count = 24; inProgress = true
+                extras = TrendExtras(lastYear: true, limit: true); state = .content
+            },
+            SpecimenCase("New account") {
+                data = .distance; count = 4; inProgress = true
+                extras = TrendExtras(forecast: false); state = .content
+            },
+            SpecimenCase("Ten years") {
+                data = .incomeAndSpending; count = 120; inProgress = true
+                extras = TrendExtras(average: true, records: true); state = .content
+            },
+            SpecimenCase("Month closed") {
+                data = .incomeAndSpending; count = 12; inProgress = false
+                extras = TrendExtras(forecast: false, lastYear: true, limit: true); state = .content
+            },
+            SpecimenCase("By category") {
+                data = .categories; count = 12; inProgress = true
+                extras = TrendExtras(limit: true); state = .content
+            },
+        ]
     }
 }
 

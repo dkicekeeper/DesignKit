@@ -75,6 +75,9 @@ jobs:
       # release bot writes them on main after each merge, so here they only have to build.
       - name: Build the component reference
         run: python3 .github/scripts/components_reference.py build
+      # vNext: which pages show their code and cases yet, in the run's summary; it never fails.
+      - name: Gallery pages with code and cases
+        run: python3 .github/scripts/gallery_coverage.py
       # A branch declares its release in .changes/ and leaves VERSION, the CHANGELOG headings and
       # the component reference to the release bot (docs/releasing.md).
       - name: Check the release notes

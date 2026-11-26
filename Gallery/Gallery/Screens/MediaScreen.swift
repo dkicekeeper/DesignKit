@@ -86,7 +86,9 @@ private struct IconPage: View {
             notes: [
                 "A brand logo is Icon(source: .brandService(\"netflix.com\")); BrandLogoView, its view of its own, was removed in 2.0.0.",
                 "Sizes: AppIconSize (glyphs, xs 12 to xxl 40) and AppIconSize.Tile (icons with a backing, sm 44 to xxxl 80).",
-            ]
+            ],
+            code: iconCode,
+            cases: iconCases
         ) {
             if state == .loading {
                 IconSkeleton(style: style)
@@ -101,6 +103,88 @@ private struct IconPage: View {
             ToggleControl("Glass", isOn: $glass)
             SliderControl("Size", value: $size, in: 24...80, step: 4) { "\(Int($0)) pt" }
         }
+    }
+
+    /// The icon (or its skeleton) as the controls set it, the defaults left out.
+    private var iconCode: String {
+        if state == .loading {
+            return SwiftCode.call("IconSkeleton", [.labeled("style", styleCode)])
+        }
+        return SwiftCode.call("Icon", [
+            .labeled("source", sourceCode),
+            .labeled("style", styleCode),
+        ])
+    }
+
+    /// The source as Swift writes it.
+    private var sourceCode: String {
+        switch source {
+        case 1: return ".brandService(" + SwiftCode.string("netflix.com") + ")"
+        case 2: return "nil"
+        default: return ".sfSymbol(" + SwiftCode.string("fork.knife") + ")"
+        }
+    }
+
+    /// The style's preset call: its shape, size, tint, plate and glass.
+    private var styleCode: String {
+        let preset: String
+        switch shape {
+        case 1: preset = ".roundedSquare"
+        case 2: preset = ".square"
+        default: preset = ".circle"
+        }
+        return SwiftCode.call(preset, [
+            .labeled("size", sizeCode),
+            .option("tint", tintCode, default: ".original"),
+            source == 0 && !glass ? .labeled("backgroundColor", "AppColors.pale(AppColors.accent)") : nil,
+            .flag("hasGlassEffect", glass),
+        ])
+    }
+
+    /// The size as its token where it has one.
+    private var sizeCode: String {
+        switch Int(size.rounded()) {
+        case 24: return "AppIconSize.lg"
+        case 32: return "AppIconSize.xl"
+        case 40: return "AppIconSize.xxl"
+        case 44: return "AppIconSize.Tile.sm"
+        case 48: return "AppIconSize.Tile.md"
+        case 52: return "AppIconSize.Tile.lg"
+        case 64: return "AppIconSize.Tile.xl"
+        case 72: return "AppIconSize.Tile.xxl"
+        case 80: return "AppIconSize.Tile.xxxl"
+        default: return SwiftCode.number(size)
+        }
+    }
+
+    /// The tint as Swift writes it.
+    private var tintCode: String {
+        switch tint {
+        case 1: return ".monochrome(AppColors.accent)"
+        case 2: return ".hierarchical(AppColors.Status.positive)"
+        default: return ".original"
+        }
+    }
+
+    /// Icons as the apps draw them.
+    private var iconCases: [SpecimenCase] {
+        [
+            SpecimenCase("Category") {
+                source = 0; shape = 0; tint = 1; glass = false; size = 44; state = .content
+            },
+            SpecimenCase("Brand logo") {
+                source = 1; shape = 0; tint = 0; glass = false; size = 44; state = .content
+            },
+            SpecimenCase("No logo") {
+                source = 2; shape = 0; tint = 0; glass = false; size = 44; state = .content
+            },
+            SpecimenCase("App tile") {
+                source = 0; shape = 1; tint = 1; glass = false; size = 64; state = .content
+            },
+            SpecimenCase("Hero on glass") {
+                source = 0; shape = 0; tint = 1; glass = true; size = 80; state = .content
+            },
+        ]
     }
 }
 
@@ -394,6 +478,8 @@ private struct HeroSymbolPage: View {
     @State private var size = 140.0
     @State private var tint = 0
     @State private var state: SpecimenState = .content
+    /// The symbol on the disc; the cases set it.
+    @State private var symbol = "map"
 
     var body: some View {
         ComponentPage(
@@ -404,12 +490,14 @@ private struct HeroSymbolPage: View {
             notes: [
                 "The symbol draws itself on as it appears (2.2.0) and is drawn in an SF Symbols 7 gradient of its tint, for depth (2.3.0).",
                 "In an OnboardingPager the symbol lags behind its page as you swipe (2.3.0).",
-            ]
+            ],
+            code: heroCode,
+            cases: heroCases
         ) {
             if state == .loading {
                 HeroSymbolSkeleton(size: size)
             } else {
-                HeroSymbol(systemImage: "map", size: size,
+                HeroSymbol(systemImage: symbol, size: size,
                            tint: [AppColors.accent, AppColors.Status.positive, AppColors.Status.warning][tint])
             }
         } controls: {
@@ -417,6 +505,45 @@ private struct HeroSymbolPage: View {
             SliderControl("Size", value: $size, in: 80...200, step: 10) { "\(Int($0)) pt" }
             ChoiceControl("Tint", selection: $tint, options: [("Accent", 0), ("Success", 1), ("Warning", 2)])
         }
+    }
+
+    /// The hero (or its skeleton) as the controls set it, the defaults left out.
+    private var heroCode: String {
+        if state == .loading {
+            return SwiftCode.call("HeroSymbolSkeleton", [.number("size", size, default: 140)])
+        }
+        return SwiftCode.call("HeroSymbol", [
+            .text("systemImage", symbol),
+            .number("size", size, default: 140),
+            .option("tint", tintCode, default: "AppColors.accent"),
+        ])
+    }
+
+    /// The tint as Swift writes it; the accent is the default.
+    private var tintCode: String {
+        switch tint {
+        case 1: return "AppColors.Status.positive"
+        case 2: return "AppColors.Status.warning"
+        default: return "AppColors.accent"
+        }
+    }
+
+    /// Heroes of onboarding pages and permission primers.
+    private var heroCases: [SpecimenCase] {
+        [
+            SpecimenCase("Notifications") {
+                symbol = "bell.badge"; size = 140; tint = 0; state = .content
+            },
+            SpecimenCase("Location") {
+                symbol = "location.fill"; size = 120; tint = 0; state = .content
+            },
+            SpecimenCase("Offline maps") {
+                symbol = "map"; size = 140; tint = 1; state = .content
+            },
+            SpecimenCase("Sync paused") {
+                symbol = "icloud.slash"; size = 100; tint = 2; state = .content
+            },
+        ]
     }
 }
 
@@ -904,7 +1031,9 @@ private struct ShareCardFramePage: View {
                 "An image, not a screen: fixed point sizes (360 wide, rendered at 3× to 1080 px), the same colours in light and dark.",
                 "ShareCardSheet renders it, lets the person pick Stories or post, and shares it.",
                 "8.16.0: brandIcon puts the app's icon before its name, in the home screen's rounded square, and ShareCard.Style(brandTypeface: .inter) sets the name in Inter, so a shared picture says which app it is from.",
-            ]
+            ],
+            code: frameCode,
+            cases: frameCases
         ) {
             ShareCardFrame(
                 format: format,
@@ -929,6 +1058,59 @@ private struct ShareCardFramePage: View {
             ToggleControl("App icon", isOn: $hasIcon)
             ChoiceControl("Name", selection: $typeface, options: [("Rounded", .rounded), ("Inter", .inter)])
         }
+    }
+
+    /// The frame as the controls set it, the defaults left out; the content is the app's.
+    private var frameCode: String {
+        let formatCode = "." + format.rawValue
+        let iconCode = "UIImage(named: " + SwiftCode.string("AppIconImage") + ")"
+        let arguments: [SwiftCode.Argument?] = [
+            .labeled("format", formatCode),
+            .text("brand", "Dalada"),
+            hasIcon ? .labeled("brandIcon", iconCode) : nil,
+            .text("site", "dalada.kz"),
+            hasPhoto ? .labeled("photo", "photo") : nil,
+            typeface == .inter ? .labeled("style", interStyleCode) : nil,
+        ]
+        return SwiftCode.call("ShareCardFrame", arguments, trailing: frameContentCode)
+    }
+
+    /// The standard colours with the name in Inter, as the preview sets them.
+    private var interStyleCode: String {
+        SwiftCode.call("ShareCard.Style", [
+            .labeled("top", "ShareCard.Style.standard.top"),
+            .labeled("bottom", "ShareCard.Style.standard.bottom"),
+            .labeled("accent", "ShareCard.Style.standard.accent"),
+            .labeled("brandTypeface", ".inter"),
+        ])
+    }
+
+    /// A short version of the sample content: the title and a stat, in fixed point sizes.
+    private var frameContentCode: String {
+        let titleSize = format == .story ? 32 : 28
+        let titleText = "Text(" + SwiftCode.string("Kapchagay weekend") + ")"
+        let titleFont = ".system(size: " + String(titleSize) + ", weight: .bold)"
+        let titleLine = SwiftCode.modifier(titleText, "font", [.positional(titleFont)])
+        let stat = SwiftCode.call("ShareCardStat", [.text("value", "12.4 km"), .text("title", "Distance")])
+        return [titleLine, "Spacer(minLength: 0)", stat].joined(separator: "\n")
+    }
+
+    /// Share pictures as the apps make them.
+    private var frameCases: [SpecimenCase] {
+        [
+            SpecimenCase("With photo") {
+                format = .story; hasPhoto = true; hasIcon = true; typeface = .rounded
+            },
+            SpecimenCase("No photo") {
+                format = .story; hasPhoto = false; hasIcon = false; typeface = .rounded
+            },
+            SpecimenCase("Post") {
+                format = .post; hasPhoto = true; hasIcon = false; typeface = .rounded
+            },
+            SpecimenCase("Inter name") {
+                format = .post; hasPhoto = false; hasIcon = true; typeface = .inter
+            },
+        ]
     }
 }
 

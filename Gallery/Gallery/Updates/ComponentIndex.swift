@@ -66,8 +66,8 @@ enum GalleryScreen: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    /// The screen, opened on the page titled `page`.
-    func destination(page: String) -> some View {
+    /// The screen, opened on the page titled `page` (on its first page without one).
+    func destination(page: String? = nil) -> some View {
         Group {
             switch self {
             case .surfaces: SurfacesScreen()

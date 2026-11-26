@@ -44,7 +44,9 @@ private struct LinearProgressBarPage: View {
             name: "LinearProgressBar",
             summary: "A bar of progress; over 100% it turns red. A projection shows where the period will end.",
             apps: [.tenra, .dalada, .platina],
-            canvas: .fill
+            canvas: .fill,
+            code: code,
+            cases: cases
         ) {
             if state == .loading {
                 LinearProgressBarSkeleton(height: height)
@@ -58,6 +60,40 @@ private struct LinearProgressBarPage: View {
             SliderControl("Height", value: $height, in: 4...16, step: 1)
             ToggleControl("Projection", isOn: $projected)
         }
+    }
+
+    /// The bar as the controls set it, the defaults left out; percentages rounded as the slider shows them.
+    private var code: String {
+        let projection: SwiftCode.Argument? = projected
+            ? .number("projectedPercentage", (min(value * 130, 150) * 10).rounded() / 10) : nil
+        return SwiftCode.call("LinearProgressBar", [
+            .number("percentage", (value * 100).rounded()),
+            .labeled("isOverBudget", value > 1 ? "true" : "false"),
+            .labeled("color", "AppColors.accent"),
+            .number("height", height, default: 8),
+            projection,
+        ])
+    }
+
+    /// A budget from untouched to over its limit.
+    private var cases: [SpecimenCase] {
+        [
+            SpecimenCase("Zero") {
+                value = 0; height = 8; projected = false; state = .content
+            },
+            SpecimenCase("Complete") {
+                value = 1; height = 8; projected = false; state = .content
+            },
+            SpecimenCase("Over the limit") {
+                value = 1.35; height = 8; projected = false; state = .content
+            },
+            SpecimenCase("Heading over") {
+                value = 0.85; height = 8; projected = true; state = .content
+            },
+            SpecimenCase("Thin track") {
+                value = 0.4; height = 4; projected = false; state = .content
+            },
+        ]
     }
 }
 
@@ -75,7 +111,9 @@ private struct ProgressRingPage: View {
             apps: [.tenra, .platina],
             notes: [
                 "celebratesCompletion (2.3.0): a goal ring, green at any fill (2.3.1). Reaching 100 % draws a checkmark in, the ring glows once and the success haptic plays. Off for budgets.",
-            ]
+            ],
+            code: code,
+            cases: cases
         ) {
             if state == .loading {
                 ProgressRingSkeleton(size: AppIconSize.Tile.xxl, lineWidth: lineWidth)
@@ -91,6 +129,39 @@ private struct ProgressRingPage: View {
             ToggleControl("Track", isOn: $showsTrack)
             ToggleControl("Celebrates completion (goal)", isOn: $celebrates)
         }
+    }
+
+    /// The ring as the controls set it, the defaults left out.
+    private var code: String {
+        SwiftCode.call("ProgressRing", [
+            .number("progress", (progress * 100).rounded() / 100),
+            .labeled("size", "AppIconSize.Tile.xxl"),
+            .number("lineWidth", lineWidth, default: 3),
+            .flag("isOverBudget", !celebrates && progress > 1),
+            .flag("showsTrack", showsTrack),
+            .flag("celebratesCompletion", celebrates),
+        ])
+    }
+
+    /// Budgets and goals around a category coin.
+    private var cases: [SpecimenCase] {
+        [
+            SpecimenCase("Not started") {
+                progress = 0; lineWidth = 5; showsTrack = true; celebrates = false; state = .content
+            },
+            SpecimenCase("Almost spent") {
+                progress = 0.92; lineWidth = 5; showsTrack = true; celebrates = false; state = .content
+            },
+            SpecimenCase("Over budget") {
+                progress = 1.32; lineWidth = 5; showsTrack = true; celebrates = false; state = .content
+            },
+            SpecimenCase("Goal reached") {
+                progress = 1; lineWidth = 5; showsTrack = true; celebrates = true; state = .content
+            },
+            SpecimenCase("Category coin") {
+                progress = 0.64; lineWidth = 3; showsTrack = false; celebrates = false; state = .content
+            },
+        ]
     }
 }
 

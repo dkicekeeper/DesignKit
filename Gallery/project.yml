@@ -24,6 +24,10 @@ targets:
       # The repository's changelog, read by the Updates screen (Gallery/Updates/Changelog.swift).
       - path: ../CHANGELOG.md
         buildPhase: resources
+      # The component reference the release bot writes; a page's Parameters panel reads it
+      # (Gallery/ComponentReference.swift).
+      - path: ../docs/components.json
+        buildPhase: resources
     dependencies:
       - package: DesignKit
         product: DesignKit
@@ -43,17 +47,18 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: DesignKit Gallery
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.developer-tools
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
-        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
-        # Portrait only → full screen is required, otherwise App Store Connect rejects the
-        # upload (error 90474: without it the app must support every orientation for iPad
-        # multitasking). Same setting as Dalada.
-        INFOPLIST_KEY_UIRequiresFullScreen: YES
+        # A phone in portrait; an iPad (and a Mac, which runs the iPad app) in every orientation,
+        # which iPad multitasking requires (App Store Connect error 90474 otherwise), so a Mac
+        # window and Split View can be any width and the pages show their wide layout.
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
         # The voice effects' pages (VoiceWave, EdgeGlow) can follow the microphone's level; nothing
         # is recorded or kept.
         INFOPLIST_KEY_NSMicrophoneUsageDescription: "Lets the voice effects follow your voice. Nothing is recorded or kept."
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        TARGETED_DEVICE_FAMILY: "1"
+        # iPhone and iPad (vNext); a Mac runs it as an app for iPad.
+        TARGETED_DEVICE_FAMILY: "1,2"
         SWIFT_VERSION: "5.0"
         # Gallery/Localizable.xcstrings holds only the English values of DesignKit's keys
         # (docs/localization-keys.md). Without this, building in Xcode would add every Gallery
@@ -89,7 +94,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dakacom.DesignKitGallery.SnapshotTests
         GENERATE_INFOPLIST_FILE: YES
-        TARGETED_DEVICE_FAMILY: "1"
+        TARGETED_DEVICE_FAMILY: "1,2"
         SWIFT_VERSION: "5.0"
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/DesignKitGallery.app/DesignKitGallery"
         BUNDLE_LOADER: "$(TEST_HOST)"

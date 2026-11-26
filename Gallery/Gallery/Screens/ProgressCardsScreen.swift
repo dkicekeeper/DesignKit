@@ -468,16 +468,19 @@ private struct StatsStripPage: View {
     @State private var count = 4
     @State private var state: SpecimenState = .content
     @State private var explainsFirst = false
+    /// The five counters' values, which the cases change.
+    @State private var values = ["42", "17", "384", "9", "5"]
 
     private var all: [StatsStrip.Item] {
         [
             .init(
-                value: "42", title: "days outdoors",
+                value: values[0], title: "days outdoors",
                 info: explainsFirst ? "Days with a trip or a walk of at least an hour, since your first trip." : nil,
                 infoTitle: "Days outdoors"
             ),
-            .init(value: "17", title: "trips"),
-            .init(value: "384", title: "km"), .init(value: "9", title: "catches"), .init(value: "5", title: "places"),
+            .init(value: values[1], title: "trips"),
+            .init(value: values[2], title: "km"), .init(value: values[3], title: "catches"),
+            .init(value: values[4], title: "places"),
         ]
     }
 
@@ -490,7 +493,9 @@ private struct StatsStripPage: View {
             canvas: .fill,
             notes: [
                 "info: (8.19.0) puts an InfoTip after a counter's caption: how the number is counted, where it comes from. infoTitle: is its heading, the counter's full name when the caption is only a unit.",
-            ]
+            ],
+            code: code,
+            cases: cases
         ) {
             if state == .loading {
                 StatsStripSkeleton(count: count)
@@ -503,11 +508,43 @@ private struct StatsStripPage: View {
             ToggleControl("Explain the first (info:)", isOn: $explainsFirst)
         }
     }
+
+    /// The strip as the controls set it, the defaults left out.
+    private var code: String {
+        let items = all.prefix(count).map { item -> String in
+            let info: SwiftCode.Argument? = item.info.map { SwiftCode.Argument.text("info", $0) }
+            let infoTitle: SwiftCode.Argument? = item.info == nil
+                ? nil : item.infoTitle.map { SwiftCode.Argument.text("infoTitle", $0) }
+            return SwiftCode.call(".init", [.text("value", item.value), .text("title", item.title), info, infoTitle])
+        }
+        return SwiftCode.call("StatsStrip", [.labeled("items", SwiftCode.array(items))])
+    }
+
+    /// A profile's counters, from the first day to years of trips.
+    private var cases: [SpecimenCase] {
+        [
+            SpecimenCase("New account") {
+                values = ["0", "0", "0", "0", "0"]; count = 4; explainsFirst = false; state = .content
+            },
+            SpecimenCase("Season") {
+                values = ["42", "17", "384", "9", "5"]; count = 4; explainsFirst = false; state = .content
+            },
+            SpecimenCase("Huge numbers") {
+                values = ["1,284", "312", "12,480", "2,045", "96"]; count = 5; explainsFirst = false; state = .content
+            },
+            SpecimenCase("Explained") {
+                values = ["42", "17", "384", "9", "5"]; count = 3; explainsFirst = true; state = .content
+            },
+        ]
+    }
 }
 
 private struct StreakCardPage: View {
     @State private var isActive = true
     @State private var state: SpecimenState = .content
+    /// The running streak and the best one, which the cases change.
+    @State private var weeks = 3
+    @State private var best = 5
 
     var body: some View {
         ComponentPage(
@@ -515,20 +552,57 @@ private struct StreakCardPage: View {
             summary: "A streak: a flame while it runs (grey once it stopped), what to do next, the best result.",
             since: "1.12.0",
             apps: [.dalada, .platina],
-            canvas: .fill
+            canvas: .fill,
+            code: code,
+            cases: cases
         ) {
             if state == .loading {
                 StreakCardSkeleton()
             } else {
                 StreakCard(systemImage: "flame.fill", isActive: isActive,
-                           title: isActive ? "3 weeks in a row" : "No streak",
+                           title: isActive ? "\(weeks) weeks in a row" : "No streak",
                            subtitle: isActive ? "Head out by Sunday to keep it" : "One trip this week starts it",
-                           value: "5", valueCaption: "best")
+                           value: "\(best)", valueCaption: "best")
             }
         } controls: {
             StateControl(state: $state)
             ToggleControl("Running", isOn: $isActive)
         }
+    }
+
+    /// The card as the controls set it.
+    private var code: String {
+        let title = isActive ? "\(weeks) weeks in a row" : "No streak"
+        let subtitle = isActive ? "Head out by Sunday to keep it" : "One trip this week starts it"
+        return SwiftCode.call("StreakCard", [
+            .text("systemImage", "flame.fill"),
+            .labeled("isActive", isActive ? "true" : "false"),
+            .text("title", title),
+            .text("subtitle", subtitle),
+            .text("value", String(best)),
+            .text("valueCaption", "best"),
+        ])
+    }
+
+    /// Streaks from none to years.
+    private var cases: [SpecimenCase] {
+        [
+            SpecimenCase("Running") {
+                isActive = true; weeks = 3; best = 5; state = .content
+            },
+            SpecimenCase("New record") {
+                isActive = true; weeks = 12; best = 12; state = .content
+            },
+            SpecimenCase("Three years") {
+                isActive = true; weeks = 156; best = 156; state = .content
+            },
+            SpecimenCase("Stopped") {
+                isActive = false; weeks = 0; best = 8; state = .content
+            },
+            SpecimenCase("Never started") {
+                isActive = false; weeks = 0; best = 0; state = .content
+            },
+        ]
     }
 }
 

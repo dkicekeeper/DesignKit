@@ -52,7 +52,9 @@ private struct SectionHeaderPage: View {
                 "8.0.0: one look for a section's title, bold and in sentence case, in a List's header too. compact, the small grey uppercase label, is removed (docs/migration-8.0.md); default has no padding of its own, so on a screen add .screenPadding().",
                 "2.0.0: SectionHeaderView before; DateSectionHeaderView is the card style with the day's total as the action.",
             ],
-            styles: ["default", "large", "card"]
+            styles: ["default", "large", "card"],
+            code: headerCode,
+            cases: headerCases
         ) {
             if state == .loading {
                 SectionHeaderSkeleton(style: style, showsTrailing: trailing != 0, showsIcon: showsIcon)
@@ -103,6 +105,79 @@ private struct SectionHeaderPage: View {
         case .card: "Yesterday"
         default: "Recent trips"
         }
+    }
+
+    /// The symbol before the title, as the preview picks it for the action.
+    private var leadingSymbol: String {
+        switch trailing {
+        case 2: "icloud.and.arrow.up"
+        case 3: "calendar"
+        default: "map"
+        }
+    }
+
+    /// The action at the end of the line, as the call writes it; nil without one.
+    private var actionCode: String? {
+        switch trailing {
+        case 1:
+            return SwiftCode.call("NavigationLink", [.text("All")], trailing: "TripsView()")
+        case 2:
+            return "ProgressView()"
+        case 3:
+            return SwiftCode.call("FormattedAmountText", [
+                .labeled("amount", "45_000"),
+                .text("currency", "KZT"),
+                .text("prefix", "-"),
+                .labeled("fontSize", "AppTypography.bodySmall"),
+                .labeled("color", "AppColors.Text.tertiary"),
+            ])
+        default:
+            return nil
+        }
+    }
+
+    /// The call as the controls set it, the defaults left out.
+    private var headerCode: String {
+        if state == .loading {
+            return SwiftCode.call("SectionHeaderSkeleton", [
+                .option("style", ".\(style)", default: ".default"),
+                .flag("showsTrailing", trailing != 0),
+                .flag("showsIcon", showsIcon),
+            ])
+        }
+        return SwiftCode.call("SectionHeader", [
+            .text(title),
+            showsIcon ? .text("systemImage", leadingSymbol) : nil,
+            trailingSymbol.isEmpty ? nil : .text("trailingSystemImage", trailingSymbol),
+            tinted ? .labeled("tint", "AppColors.Status.positive") : nil,
+            .option("style", ".\(style)", default: ".default"),
+        ], trailing: actionCode)
+    }
+
+    /// Headers as the apps' screens use them.
+    private var headerCases: [SpecimenCase] {
+        [
+            SpecimenCase("Recent trips") {
+                style = .default; showsIcon = true; trailingSymbol = ""; tinted = false; trailing = 1
+                state = .content
+            },
+            SpecimenCase("Day total") {
+                style = .card; showsIcon = false; trailingSymbol = ""; tinted = false; trailing = 3
+                state = .content
+            },
+            SpecimenCase("Syncing") {
+                style = .large; showsIcon = true; trailingSymbol = ""; tinted = false; trailing = 2
+                state = .content
+            },
+            SpecimenCase("With info") {
+                style = .default; showsIcon = false; trailingSymbol = "info.circle"; tinted = false; trailing = 0
+                state = .content
+            },
+            SpecimenCase("Leads on") {
+                style = .large; showsIcon = true; trailingSymbol = "chevron.forward"; tinted = true; trailing = 0
+                state = .content
+            },
+        ]
     }
 }
 

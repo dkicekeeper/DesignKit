@@ -57,7 +57,8 @@ private struct CelebrationPage: View {
             notes: [
                 "Rare by design: a burst on every tap stops meaning anything.",
                 "1.4 s, one Canvas, paths computed from the time; nothing runs before or after. Under Reduce Motion only the haptic.",
-            ]
+            ],
+            code: celebrationCode
         ) {
             VStack(spacing: AppSpacing.md) {
                 HeroSymbol(systemImage: "flag.checkered", size: 96, tint: AppColors.Status.positive)
@@ -73,6 +74,21 @@ private struct CelebrationPage: View {
             }
             ActionControl("Reset", systemImage: "arrow.counterclockwise") { progress = 0.8 }
         }
+    }
+
+    /// The goal's hero with confetti when the goal is reached; the goal is the app's.
+    private var celebrationCode: String {
+        let hero = SwiftCode.call("HeroSymbol", [
+            .text("systemImage", "flag.checkered"),
+            .labeled("size", "96"),
+            .labeled("tint", "AppColors.Status.positive"),
+        ])
+        let bar = SwiftCode.call("LinearProgressBar", [
+            .labeled("value", "goal.progress"),
+            .labeled("color", "AppColors.Status.positive"),
+        ])
+        let stack = "VStack(spacing: AppSpacing.md)" + SwiftCode.closure(hero + "\n" + bar)
+        return SwiftCode.modifier(stack, "celebration", [.labeled("trigger", "goal.isReached")])
     }
 }
 
@@ -683,7 +699,9 @@ private struct HolographicPage: View {
             notes: [
                 "Pairs with .interactiveTilt(in:), which tilts the same surface towards the finger.",
                 "One Metal colour effect, redrawn only while the finger moves or the light settles back.",
-            ]
+            ],
+            code: holographicCode,
+            cases: holographicCases
         ) {
             HStack(spacing: AppSpacing.xl) {
                 medal
@@ -714,6 +732,37 @@ private struct HolographicPage: View {
         .background(LinearGradient(colors: [Color(white: 0.85), Color(white: 0.65)], startPoint: .topLeading, endPoint: .bottomTrailing), in: .rect(cornerRadius: AppRadius.lg))
         .holographic(strength: strength)
         if tilts { foil.interactiveTilt(in: RoundedRectangle(cornerRadius: AppRadius.lg)) } else { foil }
+    }
+
+    /// The medal's foil as the controls set it, the default strength left out.
+    private var holographicCode: String {
+        let medalCall = SwiftCode.call("AchievementMedal", [
+            .text("systemImage", "mountain.2.fill"),
+            .labeled("color", "achievement.color"),
+            .labeled("isEarned", "true"),
+            .labeled("size", "120"),
+        ])
+        // The slider's steps, so the default reads as the default.
+        let stepped = (strength * 20).rounded() / 20
+        let foil = SwiftCode.modifier(medalCall, "holographic", [
+            .number("strength", stepped, default: HolographicMetrics.strength),
+        ])
+        return tilts ? SwiftCode.modifier(foil, "interactiveTilt", [.labeled("in", "Circle()")]) : foil
+    }
+
+    /// Foils as the apps use them.
+    private var holographicCases: [SpecimenCase] {
+        [
+            SpecimenCase("Earned medal") {
+                strength = HolographicMetrics.strength; tilts = true
+            },
+            SpecimenCase("Subtle foil") {
+                strength = 0.2; tilts = false
+            },
+            SpecimenCase("Full foil") {
+                strength = 1; tilts = true
+            },
+        ]
     }
 }
 
