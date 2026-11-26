@@ -10,7 +10,7 @@
 > **How each app uses DesignKit** (its adapters, screen patterns, the effects in use): Tenra's
 > `docs/design-system.md`, Dalada's `CLAUDE.md` («Компоненты интерфейса», a table from what a
 > screen needs to the components), Platina's `CLAUDE.md` (its «DesignKit» section) and
-> `docs/PLAN.md` §4.
+> `docs/domains/design.md`.
 >
 > **Availability.** Section 0 lists which documented components ship in DesignKit and which
 > stay in the host app (they depend on app models or services). Anything marked *app-side* is

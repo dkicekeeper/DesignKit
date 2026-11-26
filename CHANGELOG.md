@@ -17,6 +17,15 @@ Versions follow semantic versioning; apps pin an exact version. A PR declares it
 note in `.changes/`; at the merge the release bot gives it the next number and writes its section
 here (docs/releasing.md).
 
+## 8.22.1 - 2026-11-26
+
+The Gallery's `.dsRefreshable · RefreshIndicator` page names Dalada and Platina, whose lists pull to refresh with it. Nothing changes in an app.
+[#128](https://github.com/dkicekeeper/DesignKit/pull/128)
+
+### Gallery and tooling
+
+- The `.dsRefreshable · RefreshIndicator` page carries Dalada's and Platina's badges: both apps replaced `.refreshable` with it. CI's Gallery badges job failed on `main` until the badges followed the apps' code.
+
 ## 8.22.0 - 2026-11-26
 
 The creature shows what it is busy with: four new moods for the steps of an assistant's work, each a shape of the swarm with the eyes on the work. It reads clearly on a white page, its thinking rings carry comets, its listening rides two waves, its avatar reads when small, and it and every other ambient loop stop while scrolled out of sight.
