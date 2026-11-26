@@ -237,7 +237,7 @@ private struct ReleaseSectionView: View {
 }
 
 /// Swift (or a shell line) as it is: monospaced, scrolling sideways, selectable. A component
-/// page's code panel shows its call in it too (vNext).
+/// page's code panel shows its call in it too (8.22.3).
 struct CodeBlock: View {
     let code: String
 

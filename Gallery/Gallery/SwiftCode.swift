@@ -2,7 +2,7 @@
 //  SwiftCode.swift
 //  DesignKit Gallery
 //
-//  The code a component page shows (vNext): the call that draws its preview as the controls set
+//  The code a component page shows (8.22.3): the call that draws its preview as the controls set
 //  it, the arguments at their defaults left out, as a person would write it.
 //
 //  A page builds it in a computed property of its own and passes it as

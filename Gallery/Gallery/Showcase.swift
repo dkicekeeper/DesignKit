@@ -49,7 +49,7 @@ struct ShowcasePage<Content: View>: View {
                         },
                         selection: $selection
                     )
-                    // The selected chip's tint is the accent (vNext: the app switches on a page).
+                    // The selected chip's tint is the accent (8.22.3: the app switches on a page).
                     .galleryRefreshes()
                 }
                 .onAppear {
@@ -79,7 +79,7 @@ struct ShowcasePage<Content: View>: View {
             }
             .padding(AppSpacing.lg)
             .frame(maxWidth: .infinity, alignment: .leading)
-            // A wide Mac window or an iPad in landscape: the page keeps to a column (vNext).
+            // A wide Mac window or an iPad in landscape: the page keeps to a column (8.22.3).
             .readableWidth(AppLayout.wideWidth)
         }
         .scrollDismissesKeyboard(.interactively)
@@ -200,14 +200,14 @@ enum CanvasContext: String, CaseIterable, Identifiable {
 ///    parameter), since which version, which apps use it; a rule under it keeps it apart from
 ///    the component.
 /// 2. **Preview** — the component on a canvas, in the current controls. The canvas switches to
-///    light or dark and lies on the page, a card or a colour (8.21.0); its bar (vNext) switches
+///    light or dark and lies on the page, a card or a colour (8.21.0); its bar (8.22.3) switches
 ///    the app (Tenra, Dalada, Platina), the text size and the direction, and on a wide screen the
 ///    width.
-/// 3. **Cases** (vNext) — ready data from life, one tap each.
+/// 3. **Cases** (8.22.3) — ready data from life, one tap each.
 /// 4. **Controls** — its state (default, loading = its skeleton, empty, error, disabled) and
 ///    its parameters.
-/// 5. **Code** (vNext) — the call as the controls set it, to copy.
-/// 6. **Parameters** (vNext) — its initialisers from docs/components.json.
+/// 5. **Code** (8.22.3) — the call as the controls set it, to copy.
+/// 6. **Parameters** (8.22.3) — its initialisers from docs/components.json.
 /// 7. **Notes** — a rule or two from docs/design-system.md.
 /// 8. **Do / Don't** (8.9.0) — how to use it and how not to, side by side; docs/components.md
 ///    carries them too (`.github/scripts/components_reference.py`).
@@ -227,10 +227,10 @@ struct ComponentPage<Preview: View, Controls: View>: View {
     var dos: [String] = []
     /// What not to do with it, a line each (8.9.0).
     var donts: [String] = []
-    /// The Swift that draws the preview as the controls set it (vNext), built by the page from
+    /// The Swift that draws the preview as the controls set it (8.22.3), built by the page from
     /// its state with `SwiftCode`; nil hides the panel.
     var code: String? = nil
-    /// Ready data from life, one tap each (vNext): a long name, zero, a huge amount, no photo.
+    /// Ready data from life, one tap each (8.22.3): a long name, zero, a huge amount, no photo.
     var cases: [SpecimenCase] = []
     @ViewBuilder var preview: Preview
     @ViewBuilder var controls: Controls
@@ -515,7 +515,7 @@ private struct PanelSection<Content: View>: View {
 
 /// The light (or dark) surface a preview sits on, with a thin border, so the component never
 /// blends into the page around it. A switch on top renders it in light or dark; the bar under it
-/// sets the app, the text size, the direction and the width (vNext).
+/// sets the app, the text size, the direction and the width (8.22.3).
 private struct PreviewCanvas<Content: View>: View {
     let style: CanvasStyle
     @Binding var scheme: ColorScheme?
@@ -678,7 +678,7 @@ private struct CanvasDirection: ViewModifier {
     }
 }
 
-/// The bar under a canvas (vNext): the app whose accent and surfaces the Gallery shows (the
+/// The bar under a canvas (8.22.3): the app whose accent and surfaces the Gallery shows (the
 /// home screen's preset, one tap), the text size, the direction and, on a wide screen, the
 /// width. The size, direction and width hold for every page until they are changed back.
 private struct CanvasBar: View {
@@ -761,7 +761,7 @@ private struct BarChip: View {
     }
 }
 
-/// The page's cases (vNext): a chip each, which sets the page's data in one tap.
+/// The page's cases (8.22.3): a chip each, which sets the page's data in one tap.
 private struct CaseChips: View {
     let cases: [SpecimenCase]
 
@@ -783,7 +783,7 @@ private struct CaseChips: View {
     }
 }
 
-/// The call as the controls set it (vNext), with a button that copies it.
+/// The call as the controls set it (8.22.3), with a button that copies it.
 private struct CodePanel: View {
     let code: String
 
@@ -814,7 +814,7 @@ private struct CodePanel: View {
     }
 }
 
-/// The component's initialisers (vNext), from docs/components.json: a parameter a line, its
+/// The component's initialisers (8.22.3), from docs/components.json: a parameter a line, its
 /// label, type and default. Folded until opened, so the page stays short.
 private struct ParametersPanel: View {
     let declarations: [ComponentReference.Declaration]
@@ -954,7 +954,7 @@ enum SpecimenState: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
-/// Ready data for a component page (vNext), one tap each: "Long name", "Zero", "No photo". `apply`
+/// Ready data for a component page (8.22.3), one tap each: "Long name", "Zero", "No photo". `apply`
 /// sets the page's own state, which the preview, the controls and the code all read.
 struct SpecimenCase: Identifiable {
     let title: String
@@ -1184,7 +1184,7 @@ struct ShowcaseSection<Content: View>: View {
             }
             content
         }
-        // A foundation's swatches read the accent (vNext: the app switches with a page open).
+        // A foundation's swatches read the accent (8.22.3: the app switches with a page open).
         .galleryRefreshes()
         .containerValue(\.showcaseTitle, title)
     }

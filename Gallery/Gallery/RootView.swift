@@ -6,7 +6,7 @@
 import SwiftUI
 import DesignTokens
 
-/// A screen the home screen opens (vNext): on a phone it is pushed, on an iPad or a Mac it fills
+/// A screen the home screen opens (8.22.3): on a phone it is pushed, on an iPad or a Mac it fills
 /// the detail column beside the sidebar.
 enum GalleryDestination: Hashable {
     case updates
@@ -41,14 +41,14 @@ struct RootView: View {
     @State private var query = ""
     /// Which page shows which component, for the links in the release notes.
     @State private var componentIndex = ComponentIndex()
-    /// The screen open beside the sidebar, or pushed on a phone (vNext).
+    /// The screen open beside the sidebar, or pushed on a phone (8.22.3).
     @State private var selection: GalleryDestination?
 
     private var settings: GallerySettings { .shared }
 
     var body: some View {
         // The accent is a static read: reading the key draws the home screen and its tint again
-        // when the preset changes, without closing the screen that is open (vNext).
+        // when the preset changes, without closing the screen that is open (8.22.3).
         let _ = settings.renderKey
         NavigationSplitView {
             List(selection: $selection) {
@@ -99,7 +99,7 @@ struct RootView: View {
         }
         .softScrollEdges()
         .environment(\.componentIndex, componentIndex)
-        // The surfaces go down the environment, so every card follows the preset (vNext; the
+        // The surfaces go down the environment, so every card follows the preset (8.22.3; the
         // static `DesignKitTheme.surface` stays the default for what reads no environment).
         .surfaceStyle(settings.surface)
         .tint(AppColors.accent)

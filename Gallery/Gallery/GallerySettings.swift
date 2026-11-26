@@ -2,7 +2,7 @@
 //  GallerySettings.swift
 //  DesignKit Gallery
 //
-//  What the Gallery shows its components with (vNext): the app's preset (accent and surfaces),
+//  What the Gallery shows its components with (8.22.3): the app's preset (accent and surfaces),
 //  and the canvas's text size, direction and width. One object for the session, so the home
 //  screen's menu and every canvas's app switch set the same preset, and a whole section can be
 //  read in AX3 or right to left by paging through it.
@@ -54,7 +54,7 @@ enum GalleryTheme: String, CaseIterable, Identifiable {
     }
 }
 
-/// How wide the canvas draws its component on a wide screen (vNext): as on a phone, in a
+/// How wide the canvas draws its component on a wide screen (8.22.3): as on a phone, in a
 /// screen's readable column, or across the whole page.
 enum CanvasWidth: String, CaseIterable, Identifiable {
     case phone = "Phone"
@@ -119,11 +119,11 @@ final class GallerySettings {
     /// (`.galleryRefreshes()`) and draw again; the page around them stays open.
     private(set) var renderKey = 0
 
-    /// The canvas's text size (vNext); nil follows the device's, as the page around it does.
+    /// The canvas's text size (8.22.3); nil follows the device's, as the page around it does.
     var textSize: DynamicTypeSize?
-    /// The canvas lays out right to left (vNext), as in Arabic or Hebrew.
+    /// The canvas lays out right to left (8.22.3), as in Arabic or Hebrew.
     var isRightToLeft = false
-    /// How wide the canvas draws on a wide screen (vNext).
+    /// How wide the canvas draws on a wide screen (8.22.3).
     var canvasWidth: CanvasWidth = .full
 
     /// Whether the canvas shows anything but the defaults: its bar says so.
@@ -166,7 +166,7 @@ final class GallerySettings {
 }
 
 extension View {
-    /// Draws the view again when the preset changes (vNext), for a view that keeps no state worth
+    /// Draws the view again when the preset changes (8.22.3), for a view that keeps no state worth
     /// keeping: it takes `GallerySettings.renderKey` as its identity.
     func galleryRefreshes() -> some View {
         modifier(GalleryRefresh())

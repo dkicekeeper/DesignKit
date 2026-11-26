@@ -2,7 +2,7 @@
 //  ComponentReference.swift
 //  DesignKit Gallery
 //
-//  The parameters a component page lists (vNext): its initialisers from docs/components.json,
+//  The parameters a component page lists (8.22.3): its initialisers from docs/components.json,
 //  which the release bot writes after every merge (`.github/scripts/components_reference.py`) and
 //  `Gallery/project.yml` puts in the bundle, as it does CHANGELOG.md. A page that is not in it yet
 //  (a component added since the last release) shows no parameters.

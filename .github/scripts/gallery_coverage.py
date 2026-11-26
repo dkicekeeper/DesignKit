@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Which Gallery pages show their code and cases yet (vNext).
+"""Which Gallery pages show their code and cases yet (8.22.3).
 
 A component page can show the call that draws its preview as the controls set it
 (`ComponentPage(code:)`) and ready data from life (`ComponentPage(cases:)`). The pages of the

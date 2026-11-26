@@ -65,7 +65,7 @@ Gallery/               showcase app (xcodegen; the .xcodeproj is not in git): Fo
                        searches the pages and picks an app's preset (accent and surfaces,
                        8.21.0); the canvas switches the app, text size, direction and width, and
                        a page shows its parameters (docs/components.json) and, on the 40 most
-                       used, the code of its configuration and cases (vNext); iPhone, iPad and
+                       used, the code of its configuration and cases (8.22.3); iPhone, iPad and
                        Mac; an Updates screen reads CHANGELOG.md; ships to TestFlight
                        (docs/testflight.md)
 Gallery/SnapshotTests/ snapshot tests hosted in the Gallery app; references in __Snapshots__
@@ -75,7 +75,7 @@ scripts/               snapshot-tests.sh (CI and local runs of the snapshot test
                        major), sync_agents_block.py (docs/agents.md into an app's CLAUDE.md)
 .github/scripts/       ci_changes.py (CI's What to build job: whether a run needs the macOS
                        jobs), changelog.py (CI's Changelog job, release notes),
-                       gallery_coverage.py (the pages without code and cases, vNext), gallery_badges.py (CI's
+                       gallery_coverage.py (the pages without code and cases, 8.22.3), gallery_badges.py (CI's
                        Gallery badges job: each page's `apps:` against Tenra's, Dalada's and
                        Platina's code),
                        components_reference.py (docs/components.md + .json; the release bot
@@ -221,7 +221,7 @@ rather than importing an app type.
    turns into the number. `python3 .github/scripts/components_reference.py build` shows the
    page reads; the release bot writes docs/components.md after the merge. A page of a component
    the apps use gives `code:` (its call as the controls set it, built with `SwiftCode` in a
-   property of the page) and `cases:` (ready data from life), vNext. Add a snapshot test in `Gallery/SnapshotTests` (the skeleton's in
+   property of the page) and `cases:` (ready data from life), 8.22.3. Add a snapshot test in `Gallery/SnapshotTests` (the skeleton's in
    `SkeletonsSnapshotTests`; one Liquid Glass card per snapshot; `named:` tells them apart),
    then record it with a manual CI run, `record_snapshots: missing` (docs/snapshots.md).
 5. Add any new `String(localized:)` key to `docs/localization-keys.md` and its English value

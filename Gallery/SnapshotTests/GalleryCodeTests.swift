@@ -2,7 +2,7 @@
 //  GalleryCodeTests.swift
 //  DesignKit Gallery snapshot tests
 //
-//  vNext: what a component page shows besides its preview. The code of the current configuration
+//  8.22.3: what a component page shows besides its preview. The code of the current configuration
 //  (`SwiftCode`) and the parameters read from docs/components.json (`ComponentReference`).
 //
 
