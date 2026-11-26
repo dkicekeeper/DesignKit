@@ -460,3 +460,15 @@ rather than importing an app type.
 | Components no app uses yet and where they could go (for the app sessions) | [docs/adoption.md](docs/adoption.md) |
 | Where a component goes (Gallery sections, source folders), how its Gallery page is built | [docs/gallery-structure.md](docs/gallery-structure.md) |
 | How an app uses DesignKit (its adapters, screens, effects in use) | Tenra's `docs/design-system.md`, Dalada's `CLAUDE.md` («Компоненты интерфейса»), Platina's `CLAUDE.md` («DesignKit») and `docs/PLAN.md` §4 |
+
+## Строка состояния для Warehouse
+
+Каждое сообщение, после которого ты останавливаешься, заканчивай отдельной последней строкой:
+
+`Статус: <состояние> — <одна строка>`
+
+- `ждёт владельца` — без владельца дальше нельзя: что именно от него нужно (решение, мерж, проверка на устройстве, секрет).
+- `работаю` — ты остановился, но вернёшься сам: чего ждёшь (CI, событие PR, таймер). Если следишь за PR и чинишь его — `работаю — слежу за PR #N`.
+- `готово` — работа закончена и от владельца ничего не нужно: что сделано.
+
+Строку читает сервис Warehouse и показывает владельцу; без неё сессия попадает в список «без статуса».
