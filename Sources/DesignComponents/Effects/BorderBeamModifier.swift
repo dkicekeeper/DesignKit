@@ -72,6 +72,12 @@ public struct BorderBeamModifier: ViewModifier {
                         }
                         .allowsHitTesting(false)
                         .accessibilityHidden(true)
+                    } else {
+                        // Stopped, the overlay keeps its frame (vNext), so the gate keeps
+                        // measuring it and starts the beam again near the screen.
+                        Color.clear
+                            .allowsHitTesting(false)
+                            .accessibilityHidden(true)
                     }
                 }
             }

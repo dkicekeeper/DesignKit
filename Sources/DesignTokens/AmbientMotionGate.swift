@@ -37,10 +37,12 @@ public struct AmbientMotionGate<Content: View>: View {
 
     public var body: some View {
         gated(!reduceMotion && isNearScreen)
-            .onGeometryChange(for: Bool.self) { proxy in
+            .onGeometryChange(for: Bool?.self) { proxy in
                 AmbientViewport.isNear(proxy)
             } action: { near in
-                isNearScreen = near
+                // No size, no answer (vNext): content that draws nothing while stopped would
+                // otherwise read as near, start, measure far, stop, and never settle.
+                if let near { isNearScreen = near }
             }
     }
 
@@ -67,12 +69,22 @@ enum AmbientViewport {
 
     /// Whether any of the view is within `margin` of the visible part of every scroll view round
     /// it, down and across: a card scrolled off a carousel that is itself off the page is out.
-    /// Outside a scroll view, and before it has a size, it is near.
-    static func isNear(_ proxy: GeometryProxy) -> Bool {
-        let own = CGRect(origin: .zero, size: proxy.size)
-        guard own.width > 0, own.height > 0 else { return true }
-        return isNear(own, proxy.bounds(of: .scrollView(axis: .vertical)))
-            && isNear(own, proxy.bounds(of: .scrollView(axis: .horizontal)))
+    /// Outside a scroll view it is near. Without a size there is no answer (nil): the gate keeps
+    /// what it had (vNext). A view that drew nothing while stopped read as near here, started,
+    /// read as far, stopped again, and so on in one layout pass: a skeleton's shimmer scrolled out
+    /// of sight hung the layout of a screen pushed onto a navigation stack (Platina, 8.22.0).
+    static func isNear(_ proxy: GeometryProxy) -> Bool? {
+        isNear(size: proxy.size,
+               vertical: proxy.bounds(of: .scrollView(axis: .vertical)),
+               horizontal: proxy.bounds(of: .scrollView(axis: .horizontal)))
+    }
+
+    /// `isNear(_:)` on plain values: the view's size and the visible parts of the scroll views
+    /// round it, in its own space (tests).
+    static func isNear(size: CGSize, vertical: CGRect?, horizontal: CGRect?) -> Bool? {
+        let own = CGRect(origin: .zero, size: size)
+        guard own.width > 0, own.height > 0 else { return nil }
+        return isNear(own, vertical) && isNear(own, horizontal)
     }
 
     /// Whether `own` is within `margin` of `visible`, a scroll view's visible part in the view's

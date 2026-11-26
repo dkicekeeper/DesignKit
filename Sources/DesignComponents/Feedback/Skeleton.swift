@@ -224,6 +224,11 @@ private struct ShimmerModifier: ViewModifier {
                         }
                         .mask(content)
                         .allowsHitTesting(false)
+                    } else {
+                        // Stopped, the band keeps its frame (vNext): with nothing here the gate
+                        // had no size, read as near and started again, without end.
+                        Color.clear
+                            .allowsHitTesting(false)
                     }
                 }
             }
