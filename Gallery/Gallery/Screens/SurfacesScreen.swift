@@ -38,7 +38,7 @@ private struct SurfaceStylePage: View {
             name: "SurfaceStyle",
             summary: "How the surfaces draw: Liquid Glass (Tenra) or a grey fill on the white page with no glass (Platina, Dalada). Set DesignKitTheme.surface once in App.init(); .surfaceStyle(_:) changes a subtree. The toolbar's Surfaces menu shows every page either way.",
             since: "8.12.0",
-            apps: [.dalada, .platina],
+            apps: [.tenra, .dalada, .platina],
             canvas: .fill,
             notes: [
                 "It reaches cardStyle() and everything on it (FormSection, CardList, the cards), filter chips, ProgressRingTile, an Icon's glass plate, OnboardingStepIndicator and MessageBanner.",

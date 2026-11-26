@@ -3268,7 +3268,11 @@ starts again before it comes back, so its still frame is never seen, and a card 
 edge of a carousel that does not clip keeps moving.
 
 The gate hands its content a `Bool`; render a **static frame** when it is false (`EdgeGlow`
-freezes at `t = 0`) rather than removing the view, so nothing shifts in layout. Put new
+freezes at `t = 0`) rather than removing the view, so nothing shifts in layout. A loop that has
+nothing to show while stopped keeps its frame with `Color.clear` (the skeleton's shimmer, the
+border beam). The gate reads a view with no size as no answer and keeps what it had (vNext):
+content that drew nothing while stopped read as near, started, read as far and stopped again
+in one layout pass, without end. Put new
 `TimelineView` decoration behind this gate instead of reading `accessibilityReduceMotion`
 directly — the iOS 27 signal then comes for free. (DesignKit compiles the iOS 27 branch only
 with the iOS 27 SDK — Xcode 27; built with Xcode 26 the gate honours Reduce Motion alone.)
