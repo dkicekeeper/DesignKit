@@ -2,7 +2,7 @@
 //  RefreshPhaseClock.swift
 //  DesignKit
 //
-//  vNext: which phase `.dsRefreshable` draws when. Foundation only, so it is tested without a
+//  8.21.0: which phase `.dsRefreshable` draws when. Foundation only, so it is tested without a
 //  screen.
 //
 

@@ -7,7 +7,7 @@
 //  on a filled badge and on the accents. 4.5:1 is AA for body text and icons.
 //
 //  8.10.0: white text sits on `AppColors.accentFill` (the accent made readable as a fill) and
-//  income text is `readable(income)` (`AppColors.incomeText` before vNext), so the accents and income pass too; the apps' raw
+//  income text is `readable(income)` (`AppColors.incomeText` before 8.21.0), so the accents and income pass too; the apps' raw
 //  accents and the bright `income` stay for tints, fills and charts.
 //
 
@@ -116,14 +116,14 @@ struct ContrastTests {
         #expect(abs(a.r - b.r) < 0.01 && abs(a.g - b.g) < 0.01 && abs(a.b - b.b) < 0.01)
     }
 
-    /// Platina's Plasma: light #D6006F, dark #FF4FA0 (vNext).
+    /// Platina's Plasma: light #D6006F, dark #FF4FA0 (8.21.0).
     private static let platinaPlasma = Color(UIColor { traits in
         traits.userInterfaceStyle == .dark
             ? UIColor(red: 0xFF / 255, green: 0x4F / 255, blue: 0xA0 / 255, alpha: 1)
             : UIColor(red: 0xD6 / 255, green: 0x00 / 255, blue: 0x6F / 255, alpha: 1)
     })
 
-    /// vNext: a link or a text button in the accent is `Text.action`, the accent made readable,
+    /// 8.21.0: a link or a text button in the accent is `Text.action`, the accent made readable,
     /// so it reads on the page and on a grey card in both themes (Tenra's indigo on a dark card
     /// read 3.4:1 raw, Dalada's green on a light card 3.8:1).
     @Test("Accent text reads on the page and on a card: Tenra, Dalada, Platina, both themes")
@@ -148,7 +148,7 @@ struct ContrastTests {
         }
     }
 
-    /// Tenra's income green (its DesignKitBridge; DesignKit's `income` before vNext).
+    /// Tenra's income green (its DesignKitBridge; DesignKit's `income` before 8.21.0).
     private static let tenraIncome = Color(red: 0.13, green: 0.70, blue: 0.37)
 
     @Test("Income as text reads on the page in both themes (8.10.0)")

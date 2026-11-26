@@ -90,7 +90,7 @@ DesignKitTheme.accent = Color(UIColor { $0.userInterfaceStyle == .dark
     : UIColor(red: 0xD6 / 255, green: 0, blue: 0x6F / 255, alpha: 1) })
 ```
 
-The Gallery's Platina preset shows it (vNext). Its pull to refresh is `.dsRefreshable` (vNext).
+The Gallery's Platina preset shows it (8.21.0). Its pull to refresh is `.dsRefreshable` (8.21.0).
 
 ## Ten (ParticleCreature) in Tenra
 

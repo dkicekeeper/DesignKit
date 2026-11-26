@@ -29,7 +29,7 @@ public enum SurfaceStyle: Hashable, Sendable {
 }
 
 public extension SurfaceStyle {
-    /// A container inside a card on this surface (vNext): a field, an icon's plate, an inactive
+    /// A container inside a card on this surface (8.21.0): a field, an icon's plate, an inactive
     /// chip. On glass the opaque grey `AppColors.Background.card`; under `.fill`, where that grey
     /// is the card itself, the translucent `tertiarySystemFill`, a step darker than whatever lies
     /// under it (the page, a grey card, a card in a sheet). The colour behind the shape style
@@ -41,7 +41,7 @@ public extension SurfaceStyle {
         }
     }
 
-    /// A stronger container inside a card on this surface (vNext): a progress track, a skeleton,
+    /// A stronger container inside a card on this surface (8.21.0): a progress track, a skeleton,
     /// a sunken control. On glass the opaque `systemGray5`; under `.fill` the translucent
     /// `secondarySystemFill`, which stays a step darker than a grey card in a dark sheet too.
     var containerStrong: Color {
@@ -148,7 +148,7 @@ public extension View {
 
 // MARK: - Containers that follow the surface
 
-/// A container that keeps reading on the surface it lies on (vNext): opaque grey on glass,
+/// A container that keeps reading on the surface it lies on (8.21.0): opaque grey on glass,
 /// translucent on a grey `.fill` card (`SurfaceStyle.container` / `.containerStrong`). Resolved
 /// from the view's `surfaceStyle`, so a `.surfaceStyle(_:)` above it counts. Reached as
 /// `AppColors.Background.container` / `.containerStrong`.
@@ -178,7 +178,7 @@ public struct SurfaceContainer: ShapeStyle {
     }
 }
 
-/// A neutral grey that keeps reading on the surface it lies on (8.12.0). Deprecated (vNext):
+/// A neutral grey that keeps reading on the surface it lies on (8.12.0). Deprecated (8.21.0):
 /// `AppColors.Background.container` / `.containerStrong` (`SurfaceContainer`).
 public struct SurfaceNeutral: ShapeStyle {
     /// Which neutral: `neutral1` (fields, plates, chips) or `neutral2` (tracks, skeletons).

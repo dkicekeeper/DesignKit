@@ -66,7 +66,7 @@ struct ColorsScreen: View {
     private let accentTokens: [Token] = [
         .init(name: "accent", color: AppColors.accent, use: "Tints, outlines, tracks (DesignKitTheme.accent)"),
         .init(name: "accentFill", color: AppColors.accentFill, use: "Under white text, 4.5:1 (8.10.0)"),
-        .init(name: "Text.action", color: AppColors.Text.action, use: "As text and icons, 4.5:1 (vNext)"),
+        .init(name: "Text.action", color: AppColors.Text.action, use: "As text and icons, 4.5:1 (8.21.0)"),
     ]
 
     var body: some View {

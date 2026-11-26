@@ -12,7 +12,7 @@ import DesignComponents
 
 enum GallerySamples {
     /// Money in and a transfer, as Tenra defines them in its DesignKitBridge (DesignKit has no
-    /// finance colours since vNext): what a finance app passes to the money components.
+    /// finance colours since 8.21.0): what a finance app passes to the money components.
     static let incomeColor = Color(red: 0.13, green: 0.70, blue: 0.37)
     static let transferColor = Color(red: 0.0, green: 0.75, blue: 0.85)
 

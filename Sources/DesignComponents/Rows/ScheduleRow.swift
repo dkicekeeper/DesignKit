@@ -32,7 +32,7 @@ public struct ScheduleRow: View {
 
     /// - Parameters:
     ///   - detail: A line under the amount (the interest part of a payment, for example).
-    ///   - doneColor: The checked mark (vNext): `Status.positive` unless the app has its own
+    ///   - doneColor: The checked mark (8.21.0): `Status.positive` unless the app has its own
     ///     (Tenra's income green), made readable.
     ///   - isDone: Checked mark when `true`; dimmed row with an empty circle otherwise.
     public init(

@@ -2,7 +2,7 @@
 //  DataColorsTests.swift
 //  DesignKit
 //
-//  Pins the colours of named things (`AppColors.Data`, `CategoryColors` before vNext): the
+//  Pins the colours of named things (`AppColors.Data`, `CategoryColors` before 8.21.0): the
 //  palette slot must not change between launches (it did while it was based on
 //  `String.hashValue`, which is seeded per process), the hash palette is frozen, and the chart
 //  series keeps neighbours apart.
@@ -25,7 +25,7 @@ struct DataColorsTests {
         #expect(AppColors.Data.paletteIndex(for: "") == 9)
     }
 
-    /// vNext: the new name gives every name the colour it had, or every category re-colours.
+    /// 8.21.0: the new name gives every name the colour it had, or every category re-colours.
     @available(*, deprecated)
     @Test("AppColors.Data gives every name the slot CategoryColors gave it")
     func sameAsCategoryColors() {
@@ -77,7 +77,7 @@ struct DataColorsTests {
         ])
     }
 
-    /// vNext: eight colours for a chart's series, each far from the one before it on the wheel.
+    /// 8.21.0: eight colours for a chart's series, each far from the one before it on the wheel.
     @Test("Chart series: eight distinct colours, neighbours at least 45° apart")
     func seriesNeighboursDiffer() {
         let hues = AppColors.Data.series.map { color -> Double in

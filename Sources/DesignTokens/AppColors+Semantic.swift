@@ -26,7 +26,7 @@ public extension AppColors {
         /// Hints, placeholders, disclaimers, disabled labels.
         public nonisolated static let tertiary = Color.gray
         /// Interactive text and icons: links, text buttons, a chosen label, an icon in a line. The
-        /// app's accent made readable (`AppColors.readable`, vNext): at least 4.5:1 on the page and
+        /// app's accent made readable (`AppColors.readable`, 8.21.0): at least 4.5:1 on the page and
         /// on a card in both themes, so a step deeper or lighter only where the raw accent would
         /// not read (Tenra's indigo on a dark card, Dalada's green on a light one). Tints, fills,
         /// outlines and tracks keep `AppColors.accent`.
@@ -58,7 +58,7 @@ public extension AppColors {
 
     // MARK: - Background
 
-    /// Screens, surfaces and containers, named by role (vNext).
+    /// Screens, surfaces and containers, named by role (8.21.0).
     ///
     /// | Where | Token |
     /// |---|---|
@@ -73,22 +73,22 @@ public extension AppColors {
     /// A glass card is `cardStyle()`, not a colour. `baseAlt` / `baseAltCard` are only for the
     /// system's grouped `List`.
     enum Background {
-        /// The screen: white in light, black in dark, raised in a sheet (vNext; `base` before).
+        /// The screen: white in light, black in dark, raised in a sheet (8.21.0; `base` before).
         public nonisolated static let page = Color(.systemBackground)
-        /// An opaque grey surface on the page (vNext): the card of `SurfaceStyle.fill`, a
+        /// An opaque grey surface on the page (8.21.0): the card of `SurfaceStyle.fill`, a
         /// banner's base over content, an app's panel over a map or a photo. `#F2F2F7` in
         /// light, `#1C1C1E` in dark, `#2C2C2E` in a dark sheet.
         public nonisolated static let card = Color(.secondarySystemBackground)
-        /// Sheets and modal screens (vNext; `elevation1` before).
+        /// Sheets and modal screens (8.21.0; `elevation1` before).
         public nonisolated static let sheet = AppColors.dynamic(light: .white, dark: UIColor(white: 28 / 255, alpha: 1))
-        /// Above everything: a tooltip, a popover, a floating panel (vNext; `elevation3` before).
+        /// Above everything: a tooltip, a popover, a floating panel (8.21.0; `elevation3` before).
         public nonisolated static let floating = AppColors.dynamic(light: .white, dark: UIColor(white: 58 / 255, alpha: 1))
-        /// A container inside a card (vNext): a field, an icon's plate, an inactive chip. A shape
+        /// A container inside a card (8.21.0): a field, an icon's plate, an inactive chip. A shape
         /// style that follows the surface: opaque grey on glass, translucent on a grey card, so it
         /// always reads a step darker than what it lies on. Where an API takes a `Color`, use
         /// `SurfaceStyle.container` of the surface it lies on.
         public nonisolated static var container: SurfaceContainer { SurfaceContainer(.standard) }
-        /// A stronger container inside a card (vNext): a progress track, a skeleton, a sunken
+        /// A stronger container inside a card (8.21.0): a progress track, a skeleton, a sunken
         /// control. Follows the surface as `container` does.
         public nonisolated static var containerStrong: SurfaceContainer { SurfaceContainer(.strong) }
 

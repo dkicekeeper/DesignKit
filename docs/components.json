@@ -527,7 +527,7 @@
         "file": "Sources/DesignComponents/Selection/Rating.swift",
         "doc": "Read-only star rating with half stars: 3.4 → ★★★⯨☆.",
         "initialisers": [
-          "init(rating: Double, maximum: Int = 5, size: CGFloat = 14, color: Color = AppColors.warning)"
+          "init(rating: Double, maximum: Int = 5, size: CGFloat = 14, color: Color = AppColors.Status.warning)"
         ],
         "skeleton": "RatingSkeleton"
       },
@@ -536,7 +536,7 @@
         "file": "Sources/DesignComponents/Selection/Rating.swift",
         "doc": "Tap-to-rate input: whole stars, 1…`maximum`.",
         "initialisers": [
-          "init(rating: Binding<Int>, maximum: Int = 5, size: CGFloat = 32, color: Color = AppColors.warning)"
+          "init(rating: Binding<Int>, maximum: Int = 5, size: CGFloat = 32, color: Color = AppColors.Status.warning)"
         ],
         "skeleton": null
       }
@@ -1129,7 +1129,7 @@
         "file": "Sources/DesignComponents/Rows/AmountRow.swift",
         "doc": "A row with an icon, a name and money.",
         "initialisers": [
-          "init(_ text: String, amount: Double? = nil, amountColor: Color = AppColors.planned)",
+          "init(_ text: String, amount: Double? = nil, amountColor: Color = AppColors.Status.info)",
           "init(_ title: String, subtitle: String? = nil, subtitleLineLimit: Int? = nil, leading: Leading, value: Value, currency: String, style: Style = .info, detail: Detail? = nil, accessory: Accessory = .none, transitionSourceID: String? = nil, transitionNamespace: Namespace.ID? = nil)",
           "init(_ title: String, leading: Leading, value: Value, currency: String, style: Style = .info, detail: Detail? = nil, accessory: Accessory = .none, transitionSourceID: String? = nil, transitionNamespace: Namespace.ID? = nil, @ViewBuilder subtitle: () -> Subtitle)"
         ],
@@ -1155,7 +1155,7 @@
         "file": "Sources/DesignComponents/Rows/AmountRow.swift",
         "doc": "A row with an icon, a name and money.",
         "initialisers": [
-          "init(_ text: String, amount: Double? = nil, amountColor: Color = AppColors.planned)",
+          "init(_ text: String, amount: Double? = nil, amountColor: Color = AppColors.Status.info)",
           "init(_ title: String, subtitle: String? = nil, subtitleLineLimit: Int? = nil, leading: Leading, value: Value, currency: String, style: Style = .info, detail: Detail? = nil, accessory: Accessory = .none, transitionSourceID: String? = nil, transitionNamespace: Namespace.ID? = nil)",
           "init(_ title: String, leading: Leading, value: Value, currency: String, style: Style = .info, detail: Detail? = nil, accessory: Accessory = .none, transitionSourceID: String? = nil, transitionNamespace: Namespace.ID? = nil, @ViewBuilder subtitle: () -> Subtitle)"
         ],
@@ -1166,7 +1166,7 @@
         "file": "Sources/DesignComponents/Rows/AmountRow.swift",
         "doc": "A row with an icon, a name and money.",
         "initialisers": [
-          "init(_ text: String, amount: Double? = nil, amountColor: Color = AppColors.planned)",
+          "init(_ text: String, amount: Double? = nil, amountColor: Color = AppColors.Status.info)",
           "init(_ title: String, subtitle: String? = nil, subtitleLineLimit: Int? = nil, leading: Leading, value: Value, currency: String, style: Style = .info, detail: Detail? = nil, accessory: Accessory = .none, transitionSourceID: String? = nil, transitionNamespace: Namespace.ID? = nil)",
           "init(_ title: String, leading: Leading, value: Value, currency: String, style: Style = .info, detail: Detail? = nil, accessory: Accessory = .none, transitionSourceID: String? = nil, transitionNamespace: Namespace.ID? = nil, @ViewBuilder subtitle: () -> Subtitle)"
         ],
@@ -1216,7 +1216,7 @@
         "file": "Sources/DesignComponents/Rows/ScheduleRow.swift",
         "doc": "A schedule entry: \"✓ #3 · 12 Mar 2026 ……… 45 000 ₸ / int: 3 200 ₸\".",
         "initialisers": [
-          "init(title: String, subtitle: String, amount: Double, currency: String, detail: String? = nil, detailColor: Color = AppColors.expense, isDone: Bool)"
+          "init(title: String, subtitle: String, amount: Double, currency: String, detail: String? = nil, detailColor: Color = AppColors.Text.primary, doneColor: Color = AppColors.Status.positive, isDone: Bool)"
         ],
         "skeleton": "ScheduleRowSkeleton"
       }
@@ -1293,7 +1293,8 @@
     "summary": "A person in a list: avatar, name, a line under it, a trailing slot. The app passes its photo avatar. The card style is the person at the top of their profile.",
     "since": "1.12.0",
     "apps": [
-      "Dalada"
+      "Dalada",
+      "Platina"
     ],
     "styles": [
       "list",
@@ -1363,7 +1364,7 @@
         "file": "Sources/DesignComponents/Rows/ChecklistRow.swift",
         "doc": "A checklist item; a tap toggles it.",
         "initialisers": [
-          "init(_ title: String, isChecked: Bool, tint: Color = AppColors.success, accessorySystemImage: String? = nil, accessoryLabel: String? = nil, verticalPadding: CGFloat = AppSpacing.md, onToggle: @escaping () -> Void)"
+          "init(_ title: String, isChecked: Bool, tint: Color = AppColors.Status.positive, accessorySystemImage: String? = nil, accessoryLabel: String? = nil, verticalPadding: CGFloat = AppSpacing.md, onToggle: @escaping () -> Void)"
         ],
         "skeleton": "ChecklistRowSkeleton"
       }
@@ -1795,8 +1796,8 @@
         "file": "Sources/DesignComponents/Cards/PayoffProgressCard.swift",
         "doc": "\"Car loan / Halyk Bank ……… [Credit]\", \"1 200 000 ₸ ……… 3 000 000 ₸\" over a bar, \"📅 12 Nov 2026 ……… 18 left\".",
         "initialisers": [
-          "init(iconSource: IconSource?, title: String, subtitle: String? = nil, remaining: Double, total: Double, currency: String, progress: Double, phase: Phase, @ViewBuilder accessory: () -> Accessory)",
-          "init(iconSource: IconSource?, title: String, subtitle: String? = nil, remaining: Double, total: Double, currency: String, progress: Double, phase: Phase)"
+          "init(iconSource: IconSource?, title: String, subtitle: String? = nil, remaining: Double, total: Double, currency: String, progress: Double, phase: Phase, progressColor: Color = AppColors.Status.positive, @ViewBuilder accessory: () -> Accessory)",
+          "init(iconSource: IconSource?, title: String, subtitle: String? = nil, remaining: Double, total: Double, currency: String, progress: Double, phase: Phase, progressColor: Color = AppColors.Status.positive)"
         ],
         "skeleton": "PayoffProgressCardSkeleton"
       }
@@ -2530,7 +2531,7 @@
         "file": "Sources/DesignComponents/Progress/AmountComparisonBar.swift",
         "doc": "",
         "initialisers": [
-          "init(expenseAmount: Double, incomeAmount: Double, currency: String, animatesOnAppear: Bool = true)"
+          "init(expenseAmount: Double, incomeAmount: Double, currency: String, animatesOnAppear: Bool = true, incomeColor: Color = AppColors.Status.positive)"
         ],
         "skeleton": "AmountComparisonBarSkeleton"
       }
@@ -2692,6 +2693,47 @@
           "init(values: [Double], highlighted: Int? = nil, color: Color = AppColors.accent, labels: [String]? = nil, height: CGFloat = 60)"
         ],
         "skeleton": "MiniBarsSkeleton"
+      }
+    ]
+  },
+  {
+    "name": ".dsRefreshable · RefreshIndicator",
+    "section": "Status & Feedback",
+    "summary": "Pull to refresh with mercury: black liquid runs out of the Dynamic Island as you pull, turns the accent, breaks into beads that circle while loading and flows back in.",
+    "since": "8.21.0",
+    "apps": [],
+    "styles": [],
+    "notes": [
+      "The same closure as .refreshable, on the List or ScrollView itself. The system's refresh does the work (the trigger, holding the content, the haptic, VoiceOver); its spinner is hidden app-wide.",
+      "Out of the island on an iPhone that has one, with the list at the screen's top; from the top edge otherwise (this list in a page, a sheet, landscape, an iPad, a Mac).",
+      "The beads circle at least 0.6 s, so a fast answer does not blink. Under Reduce Motion an accent ring.",
+      "On a coloured hero the beads cast a soft shadow, so they do not melt into a colour like their own."
+    ],
+    "dos": [
+      "Replace every .refreshable with .dsRefreshable: the apps' lint warns on .refreshable."
+    ],
+    "donts": [
+      "Don't put it on a view around the scroll view: it reads the scroll view's pull.",
+      "Don't add a spinner of your own while it refreshes: the beads are the spinner."
+    ],
+    "code": [
+      {
+        "name": ".dsRefreshable",
+        "file": "Sources/DesignComponents/Feedback/DSRefreshable.swift",
+        "doc": "Pull to refresh with DesignKit's mercury (8.21.0): the same closure as `.refreshable`. Black liquid runs out of the Dynamic Island as the person pulls, turns the accent, breaks into beads that circle while `action` runs (at least 0.6 s) and flows back into the island. Without an island it runs from the top edge; under Reduce Motion an accent ring.",
+        "initialisers": [
+          "func dsRefreshable(action: @escaping @Sendable () async -> Void) -> some View"
+        ],
+        "skeleton": null
+      },
+      {
+        "name": "RefreshIndicator",
+        "file": "Sources/DesignComponents/Feedback/RefreshIndicator.swift",
+        "doc": "The indicator of a pull to refresh, in a phase (8.21.0). `.dsRefreshable` lays it over a scroll view and drives it; use it yourself only to show a phase (the Gallery, a header of your own).",
+        "initialisers": [
+          "init(phase: RefreshPhase, source: Source = .automatic)"
+        ],
+        "skeleton": null
       }
     ]
   },
@@ -2966,7 +3008,7 @@
       {
         "name": "Tooltip",
         "file": "Sources/DesignComponents/Feedback/Tooltip.swift",
-        "doc": "An opaque bubble on the top level surface (`AppColors.Background.elevation3`) with a soft shadow and a tail.",
+        "doc": "An opaque bubble on the top level surface (`AppColors.Background.floating`) with a soft shadow and a tail.",
         "initialisers": [
           "init(arrowEdge: VerticalEdge = .bottom, arrowAlignment: TooltipArrowAlignment = .center, @ViewBuilder content: () -> Content)",
           "init(_ text: String, arrowEdge: VerticalEdge = .bottom, arrowAlignment: TooltipArrowAlignment = .center)"

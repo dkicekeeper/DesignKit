@@ -2,7 +2,7 @@
 //  RefreshIndicator.swift
 //  DesignKit
 //
-//  vNext: the mercury of `.dsRefreshable`, drawn. Black liquid runs out of the Dynamic Island,
+//  8.21.0: the mercury of `.dsRefreshable`, drawn. Black liquid runs out of the Dynamic Island,
 //  turns the accent below it, breaks into six beads that circle while loading and flows back
 //  into the island. Without an island it runs, all accent, from the top edge. The shape is
 //  `RefreshDropletGeometry`; here a blur and an alpha threshold melt its circles into one liquid
@@ -14,7 +14,7 @@ import SwiftUI
 import UIKit
 import DesignTokens
 
-/// The indicator of a pull to refresh, in a phase (vNext). `.dsRefreshable` lays it over a
+/// The indicator of a pull to refresh, in a phase (8.21.0). `.dsRefreshable` lays it over a
 /// scroll view and drives it; use it yourself only to show a phase (the Gallery, a header of
 /// your own).
 ///

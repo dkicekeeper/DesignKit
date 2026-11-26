@@ -43,7 +43,7 @@ struct FeedbackScreen: View {
     }
 }
 
-/// `.dsRefreshable` live on a list, and `RefreshIndicator` in a phase you pick (vNext).
+/// `.dsRefreshable` live on a list, and `RefreshIndicator` in a phase you pick (8.21.0).
 private struct RefreshablePage: View {
     @State private var showsPhase = false
     @State private var phase = 1
@@ -64,7 +64,7 @@ private struct RefreshablePage: View {
         ComponentPage(
             name: ".dsRefreshable · RefreshIndicator",
             summary: "Pull to refresh with mercury: black liquid runs out of the Dynamic Island as you pull, turns the accent, breaks into beads that circle while loading and flows back in.",
-            since: "vNext",
+            since: "8.21.0",
             canvas: .tall(minHeight: 340),
             notes: [
                 "The same closure as .refreshable, on the List or ScrollView itself. The system's refresh does the work (the trigger, holding the content, the haptic, VoiceOver); its spinner is hidden app-wide.",

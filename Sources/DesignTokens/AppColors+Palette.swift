@@ -60,7 +60,7 @@ public extension AppColors {
     }
 }
 
-/// Every hue DesignKit's palettes use, each defined once (vNext): the hash and picker colours of
+/// Every hue DesignKit's palettes use, each defined once (8.21.0): the hash and picker colours of
 /// `AppColors.Data` and the deep `AppColors.Palette` read the same constants. Named after the
 /// Tailwind shades they are.
 enum PaletteTable {

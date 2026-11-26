@@ -17,7 +17,7 @@ public struct AmountComparisonBar: View {
     let currency: String
     /// Sweep-from-zero entrance (see ProportionBar). Disable in lazy lists.
     var animatesOnAppear: Bool = true
-    /// The colour of money in (vNext): `Status.positive` unless the app has its own (Tenra's
+    /// The colour of money in (8.21.0): `Status.positive` unless the app has its own (Tenra's
     /// income green). Its amount is the same colour made readable.
     var incomeColor: Color = AppColors.Status.positive
 

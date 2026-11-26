@@ -15,7 +15,7 @@ extension ComponentSnapshots {
     @MainActor
     @Suite("Feedback")
     struct Feedback {
-        /// `.dsRefreshable`'s mercury in fixed phases (vNext): a half and an almost full pull, the
+        /// `.dsRefreshable`'s mercury in fixed phases (8.21.0): a half and an almost full pull, the
         /// beads circling, the same from the top edge (no island), on a coloured hero (a shadow
         /// under the beads) and under `.designKitMotion(false)` (the ring of Reduce Motion).
         ///

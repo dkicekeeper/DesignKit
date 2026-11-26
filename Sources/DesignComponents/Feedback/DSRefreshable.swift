@@ -2,7 +2,7 @@
 //  DSRefreshable.swift
 //  DesignKit
 //
-//  vNext: pull to refresh with DesignKit's mercury, in every app. The system's `.refreshable`
+//  8.21.0: pull to refresh with DesignKit's mercury, in every app. The system's `.refreshable`
 //  does the work (the trigger, holding the content while loading, the haptic, VoiceOver, ⌘R on
 //  a Mac); its spinner is hidden, and `RefreshIndicator` draws over the scroll view from the
 //  pull (`onScrollGeometryChange`) and the action's progress (`RefreshPhaseClock`).
@@ -13,7 +13,7 @@ import UIKit
 import DesignTokens
 
 public extension View {
-    /// Pull to refresh with DesignKit's mercury (vNext): the same closure as `.refreshable`. Black
+    /// Pull to refresh with DesignKit's mercury (8.21.0): the same closure as `.refreshable`. Black
     /// liquid runs out of the Dynamic Island as the person pulls, turns the accent, breaks into
     /// beads that circle while `action` runs (at least 0.6 s) and flows back into the island.
     /// Without an island it runs from the top edge; under Reduce Motion an accent ring.

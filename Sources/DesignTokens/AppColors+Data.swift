@@ -2,9 +2,9 @@
 //  AppColors+Data.swift
 //  DesignKit
 //
-//  Colours for data (vNext): the colour of anything with a name (Tenra's categories, Platina's
+//  Colours for data (8.21.0): the colour of anything with a name (Tenra's categories, Platina's
 //  games, Dalada's place types, a letter avatar) and the colours of a chart's series. Before
-//  vNext the first was `CategoryColors`, named for one app's categories.
+//  8.21.0 the first was `CategoryColors`, named for one app's categories.
 //
 
 import SwiftUI

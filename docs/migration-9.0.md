@@ -1,6 +1,6 @@
 # Moving to DesignKit 9.0
 
-9.0.0 removes the colour names deprecated in vNext, when no app uses them any more. Until then
+9.0.0 removes the colour names deprecated in 8.21.0, when no app uses them any more. Until then
 they compile with a warning that names the replacement. Run the rewrites first:
 
     python3 <DesignKit>/scripts/migrate.py --from <your version> --to 9.0.0 --source <App>          # what would change

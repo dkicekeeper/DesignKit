@@ -6,7 +6,7 @@
 import SwiftUI
 import DesignTokens
 
-/// The apps that consume DesignKit, as presets of the Gallery (vNext: accent and surfaces
+/// The apps that consume DesignKit, as presets of the Gallery (8.21.0: accent and surfaces
 /// together, as each app sets them), and a custom accent to try one. `DesignKitTheme.accent` and
 /// `.surface` are read at render time, so switching re-renders the tree.
 enum GalleryTheme: String, CaseIterable, Identifiable {
@@ -23,7 +23,7 @@ enum GalleryTheme: String, CaseIterable, Identifiable {
         case .tenra: return .indigo
         // Dalada's AccentColor (light #2E8B57 / dark #3CB371).
         case .dalada: return Self.pair(light: (0x2E, 0x8B, 0x57), dark: (0x3C, 0xB3, 0x71))
-        // Platina's Plasma (vNext; #3573BA before): light #D6006F / dark #FF4FA0.
+        // Platina's Plasma (8.21.0; #3573BA before): light #D6006F / dark #FF4FA0.
         case .platina: return Self.pair(light: (0xD6, 0x00, 0x6F), dark: (0xFF, 0x4F, 0xA0))
         case .custom: return nil
         }
@@ -50,10 +50,10 @@ struct RootView: View {
     @State private var theme: GalleryTheme = .tenra
     /// The surfaces of every page (8.12.0): the preset's, or the custom choice.
     @State private var surface: SurfaceStyle = .glass
-    /// The custom preset (vNext): an accent to try and its surfaces.
+    /// The custom preset (8.21.0): an accent to try and its surfaces.
     @State private var customAccent: Color = .orange
     @State private var showsCustom = false
-    /// What the home screen's search looks for (vNext).
+    /// What the home screen's search looks for (8.21.0).
     @State private var query = ""
     /// Which page shows which component, for the links in the release notes.
     @State private var componentIndex = ComponentIndex()
@@ -160,7 +160,7 @@ struct RootView: View {
         }
     }
 
-    /// What the search finds: foundations by title, then component pages (vNext).
+    /// What the search finds: foundations by title, then component pages (8.21.0).
     @ViewBuilder private var searchResults: some View {
         let foundations = GalleryFoundation.matching(query)
         let pages = componentIndex.search(query)
@@ -197,7 +197,7 @@ struct RootView: View {
         }
     }
 
-    /// The custom preset: an accent from the colour picker and its surfaces (vNext).
+    /// The custom preset: an accent from the colour picker and its surfaces (8.21.0).
     private var customSheet: some View {
         NavigationStack {
             Form {
@@ -248,7 +248,7 @@ struct RootView: View {
         Binding(
             get: { theme },
             set: { newTheme in
-                // A preset sets the app's accent and surfaces together (vNext).
+                // A preset sets the app's accent and surfaces together (8.21.0).
                 let accent = newTheme.accent ?? customAccent
                 let newSurface = newTheme.surface ?? surface
                 DesignKitTheme.accent = accent

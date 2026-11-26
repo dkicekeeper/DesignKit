@@ -2,7 +2,7 @@
 //  RefreshDropletGeometryTests.swift
 //  DesignKit
 //
-//  vNext: the mercury of `.dsRefreshable` is a pure function of its phase and the source it
+//  8.21.0: the mercury of `.dsRefreshable` is a pure function of its phase and the source it
 //  runs out of (the Dynamic Island, or the top edge), so its shape is pinned here.
 //
 

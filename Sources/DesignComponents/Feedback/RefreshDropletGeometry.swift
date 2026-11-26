@@ -2,7 +2,7 @@
 //  RefreshDropletGeometry.swift
 //  DesignKit
 //
-//  vNext: the shape of `.dsRefreshable`'s mercury as a pure function of its phase and the
+//  8.21.0: the shape of `.dsRefreshable`'s mercury as a pure function of its phase and the
 //  source it runs out of (the Dynamic Island, or the top edge). `RefreshIndicator` draws the
 //  circles; a blur and an alpha threshold melt them into one liquid. Foundation only, so it is
 //  tested without a screen.
@@ -13,7 +13,7 @@ import Foundation
 import CoreGraphics
 #endif
 
-/// Where a pull to refresh is (vNext): `RefreshIndicator(phase:)` draws it, `.dsRefreshable`
+/// Where a pull to refresh is (8.21.0): `RefreshIndicator(phase:)` draws it, `.dsRefreshable`
 /// drives it.
 public enum RefreshPhase: Equatable, Sendable {
     /// Nothing pulled, nothing loading: nothing drawn.
@@ -70,7 +70,7 @@ enum RefreshMetrics {
     static let firstDrip: TimeInterval = 0.25
 }
 
-/// The Dynamic Island's frame, estimated (vNext): there is no API for it. An iPhone in
+/// The Dynamic Island's frame, estimated (8.21.0): there is no API for it. An iPhone in
 /// portrait whose top safe area is at least 54 pt has one, 126 × 37 pt, centred, 48 pt above the
 /// safe area's top. Nil without one, and when the scroll view does not start at the screen's top
 /// (a sheet, under a header): the liquid then runs from the top edge.

@@ -2,7 +2,7 @@
 //  RefreshPhaseClockTests.swift
 //  DesignKit
 //
-//  vNext: which phase `.dsRefreshable` draws when: the pull becomes progress, the beads circle
+//  8.21.0: which phase `.dsRefreshable` draws when: the pull becomes progress, the beads circle
 //  at least 0.6 s, a second pull while busy starts nothing, and the flow back lasts 1 s.
 //
 

@@ -48,7 +48,7 @@ public struct PayoffProgressCard<Accessory: View>: View {
     ///   - remaining: Left to pay, shown on the leading edge above the bar.
     ///   - total: The original amount, shown on the trailing edge.
     ///   - progress: 0…1, the share already paid.
-    ///   - progressColor: The bar and the "done" mark (vNext): `Status.positive` unless the app
+    ///   - progressColor: The bar and the "done" mark (8.21.0): `Status.positive` unless the app
     ///     has its own (Tenra's income green); the mark is it made readable.
     ///   - accessory: A view on the trailing edge of the header (a type or status badge).
     public init(

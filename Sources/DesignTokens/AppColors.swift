@@ -13,7 +13,7 @@ import SwiftUI
 
 /// DesignKit's colours. The accent is flat (`accent`, `accentFill`); everything else is grouped by
 /// role (`AppColors.Text`, `.Background`, `.Status`, `.Border`, `.Data`, `.Palette`). The flat
-/// names of 1.x below are deprecated (vNext) and go in 9.0.0; a finance colour (money in, money
+/// names of 1.x below are deprecated (8.21.0) and go in 9.0.0; a finance colour (money in, money
 /// out, a transfer) is the app's own (Tenra's `DesignKitBridge.swift`).
 public enum AppColors {
     // MARK: Accent
@@ -75,7 +75,7 @@ public enum AppColors {
     @available(*, deprecated, message: "Use AppColors.Status.info.")
     public static let planned = Status.info
 
-    // MARK: Deprecated finance colours (the app's own since vNext)
+    // MARK: Deprecated finance colours (the app's own since 8.21.0)
 
     /// Money in: a green of its own, RGB(0.13, 0.70, 0.37).
     @available(*, deprecated, message: "A finance colour is the app's own: define it in the app (Tenra: DesignKitBridge.swift) or use AppColors.Status.positive.")
@@ -96,7 +96,7 @@ public enum AppColors {
 
 // MARK: - Category Color Palette
 
-/// The colour of a name, by hash, and the colours a person picks. Deprecated (vNext): the same
+/// The colour of a name, by hash, and the colours a person picks. Deprecated (8.21.0): the same
 /// colours as `AppColors.Data`, which names them for any data, not one app's categories.
 @available(*, deprecated, message: "Use AppColors.Data (color(for:opacity:), paletteIndex(for:), palette, pickerPalette).")
 public struct CategoryColors {

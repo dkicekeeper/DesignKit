@@ -26,7 +26,7 @@ extension ComponentSnapshots {
             await assertPageSnapshot(NavigationStack { SelectionScreen() }, page: "PickerCarousel")
         }
 
-        /// A page's canvas in its contexts (vNext): an AvatarGroup in a grey card (rings of the
+        /// A page's canvas in its contexts (8.21.0): an AvatarGroup in a grey card (rings of the
         /// card's grey) and on the accent (the hero's white tone).
         @Test func canvasContexts() async {
             for (context, name) in [(CanvasContext.card, "card"), (.colour, "colour")] {

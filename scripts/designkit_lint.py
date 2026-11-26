@@ -107,7 +107,7 @@ TOKEN_RULES = {
     "system-form": re.compile(r'(?:^|[^\w.])Form\s*\{'),
 }
 
-# Warnings (vNext): reported on every run, never counted in the failures or the baseline, so a
+# Warnings (8.21.0): reported on every run, never counted in the failures or the baseline, so a
 # DesignKit update does not stop at them; each becomes an error in a major.
 TOKEN_WARNINGS = {
     # The system's pull to refresh. Use .dsRefreshable, the same closure (DesignKit's mercury);

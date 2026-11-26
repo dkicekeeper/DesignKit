@@ -59,11 +59,11 @@ Sources/
 Gallery/               showcase app (xcodegen; the .xcodeproj is not in git): Foundations and
                        17 component sections by what a component does (docs/gallery-structure.md);
                        every public component has a ComponentPage — header, preview canvas
-                       (light/dark; on the page, in a card or on colour, vNext), controls for
+                       (light/dark; on the page, in a card or on colour, 8.21.0), controls for
                        its parameters and states (Loading = its skeleton), usage notes;
                        Patterns, whole screens made of the components (8.17.4); the home screen
                        searches the pages and picks an app's preset (accent and surfaces,
-                       vNext); an Updates screen reads CHANGELOG.md; ships to TestFlight
+                       8.21.0); an Updates screen reads CHANGELOG.md; ships to TestFlight
                        (docs/testflight.md)
 Gallery/SnapshotTests/ snapshot tests hosted in the Gallery app; references in __Snapshots__
 scripts/               snapshot-tests.sh (CI and local runs of the snapshot tests); for the apps
@@ -376,7 +376,7 @@ rather than importing an app type.
 - Surfaces without glass (8.12.0, the owner's request for Platina): `DesignKitTheme.surface = .fill`
   draws cards, sections, chips, tiles and icon plates as an opaque grey on the white page, and the
   neutral shapes inside them as translucent fills (`AppColors.Background.container` /
-  `.containerStrong`, vNext; `.surfaceNeutral1` / `.surfaceNeutral2` before).
+  `.containerStrong`, 8.21.0; `.surfaceNeutral1` / `.surfaceNeutral2` before).
   Buttons and floating chrome stay glass. Platina (its #1) and Dalada (its #77, 1.0.4) use
   `.fill`; Tenra keeps the default `.glass`.
 - Large screens (8.13.0, for Platina on the iPad and the Mac): `.readableWidth()` keeps a screen's
@@ -443,7 +443,7 @@ rather than importing an app type.
 | Moving an app to 6.0 (`OptionCardPicker`'s `style:` and `OptionCard` removed) | [docs/migration-6.0.md](docs/migration-6.0.md) |
 | Moving an app to 7.0 (the twelve rows → `UniversalRow(accessory:)`, the icon rule) | [docs/migration-7.0.md](docs/migration-7.0.md) |
 | Moving an app to 8.0 (glass sections and their dividers, `CardList`, `.compact` and `style:` removed) | [docs/migration-8.0.md](docs/migration-8.0.md) |
-| Moving an app to 9.0 (the colour names deprecated in vNext: roles, `AppColors.Data`, finance colours in the app) | [docs/migration-9.0.md](docs/migration-9.0.md) |
+| Moving an app to 9.0 (the colour names deprecated in 8.21.0: roles, `AppColors.Data`, finance colours in the app) | [docs/migration-9.0.md](docs/migration-9.0.md) |
 | What exists vs Apple HIG / Material / Fluent / Carbon / Polaris / Atlassian / Astryx, next candidates | [docs/benchmark.md](docs/benchmark.md) |
 | Components no app uses yet and where they could go (for the app sessions) | [docs/adoption.md](docs/adoption.md) |
 | Where a component goes (Gallery sections, source folders), how its Gallery page is built | [docs/gallery-structure.md](docs/gallery-structure.md) |

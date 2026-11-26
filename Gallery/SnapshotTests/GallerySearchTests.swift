@@ -2,7 +2,7 @@
 //  GallerySearchTests.swift
 //  DesignKit Gallery snapshot tests
 //
-//  vNext: the home screen's search over the component pages. The index is the one the release
+//  8.21.0: the home screen's search over the component pages. The index is the one the release
 //  notes link through (`ComponentIndex`), with each page's summary.
 //
 

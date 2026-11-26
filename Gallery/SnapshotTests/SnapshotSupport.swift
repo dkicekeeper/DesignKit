@@ -34,7 +34,7 @@ enum SnapshotAppearance: String, CaseIterable {
 let lightAndDark: [SnapshotAppearance] = [.light, .dark]
 
 /// Money in and a transfer for the money components' snapshots, as Tenra defines them in its
-/// DesignKitBridge (DesignKit has no finance colours since vNext). Same values as before, so
+/// DesignKitBridge (DesignKit has no finance colours since 8.21.0). Same values as before, so
 /// the references do not change.
 enum SampleColors {
     static let income = Color(red: 0.13, green: 0.70, blue: 0.37)

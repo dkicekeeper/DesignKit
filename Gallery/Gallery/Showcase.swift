@@ -116,7 +116,7 @@ private struct ShowcaseChips: View {
 }
 
 extension EnvironmentValues {
-    /// The context a page's canvas opens in (vNext): `.screen`; a snapshot sets another.
+    /// The context a page's canvas opens in (8.21.0): `.screen`; a snapshot sets another.
     @Entry var showcaseCanvasContext: CanvasContext = .screen
 }
 
@@ -125,7 +125,7 @@ extension ContainerValues {
     @Entry var showcaseTitle: String = ""
     /// Set by `ComponentPage`: the page shows one component, which the home screen counts.
     @Entry var showcaseIsComponent: Bool = false
-    /// The component's purpose, which the home screen's search reads (vNext).
+    /// The component's purpose, which the home screen's search reads (8.21.0).
     @Entry var showcaseSummary: String = ""
 }
 
@@ -168,7 +168,7 @@ enum CanvasStyle {
     case tall(minHeight: CGFloat)
 }
 
-/// What a preview lies on (vNext): the page, a card of the app's surfaces, or a hero's colour.
+/// What a preview lies on (8.21.0): the page, a card of the app's surfaces, or a hero's colour.
 /// The same component reads differently on each (a knockout ring on a grey card, white pieces on
 /// colour), so the canvas shows any of them.
 enum CanvasContext: String, CaseIterable, Identifiable {
@@ -422,7 +422,7 @@ private struct PreviewCanvas<Content: View>: View {
         }
     }
 
-    /// Where the preview lies (vNext): the page, a card, a hero's colour.
+    /// Where the preview lies (8.21.0): the page, a card, a hero's colour.
     private var contextMenu: some View {
         Menu {
             Picker("Context", selection: Binding(get: { effectiveContext }, set: { context = $0 })) {

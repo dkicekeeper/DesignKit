@@ -5,7 +5,7 @@
 //  Every currency to pick from: "Popular" on top, then all of them, each a row with the
 //  code, the name and the symbol, the chosen one checked, and a search over codes and names.
 //  A ScrollView of cards rather than a List, so it can sit in a scroll view of its own (Tenra's
-//  onboarding). vNext: its sections are `cardStyle()` cards on the caller's page, like every
+//  onboarding). 8.21.0: its sections are `cardStyle()` cards on the caller's page, like every
 //  section since 8.0.0 (white cards on the grey grouped background from 7.1.0 before).
 //  Ported from Tenra's CurrencyListContent; the screen around it (title, what a pick does)
 //  stays with the caller.
@@ -99,7 +99,7 @@ public struct CurrencyList: View {
                     }
                 }
             }
-            // vNext: a card like every other section (glass, or grey under `SurfaceStyle.fill`).
+            // 8.21.0: a card like every other section (glass, or grey under `SurfaceStyle.fill`).
             .cardStyle()
         }
     }

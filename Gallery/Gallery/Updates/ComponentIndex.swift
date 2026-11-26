@@ -41,7 +41,7 @@ enum GalleryScreen: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    /// The screen's title: the section a search result names (vNext).
+    /// The screen's title: the section a search result names (8.21.0).
     var title: String {
         switch self {
         case .surfaces: SurfacesScreen.title
@@ -100,7 +100,7 @@ struct ComponentLink: Hashable, Identifiable, Sendable {
     /// The page's title ("Rating · RatingPicker").
     let page: String
     let screen: GalleryScreen
-    /// What the component is for (vNext): the search reads it.
+    /// What the component is for (8.21.0): the search reads it.
     var summary: String = ""
 
     var id: String { page }
@@ -109,7 +109,7 @@ struct ComponentLink: Hashable, Identifiable, Sendable {
 /// Component names → their pages.
 struct ComponentIndex: Equatable, Sendable {
     private var links: [String: ComponentLink] = [:]
-    /// Every page once, in the order the screens list them (vNext): the search's order.
+    /// Every page once, in the order the screens list them (8.21.0): the search's order.
     private var ordered: [ComponentLink] = []
 
     var isEmpty: Bool { links.isEmpty }
@@ -149,7 +149,7 @@ struct ComponentIndex: Equatable, Sendable {
         return release.codeSpans.compactMap(link(for:)).filter { seen.insert($0).inserted }
     }
 
-    /// The pages a search finds (vNext): a name equal to the text first, then names that start
+    /// The pages a search finds (8.21.0): a name equal to the text first, then names that start
     /// with it, then names that contain it, then summaries that contain it; each page once, in
     /// the screens' order within a rank. Case and diacritics do not count; a skeleton, a 1.x
     /// name with `View` and a `.ds` modifier find their component, as in `link(for:)`.
@@ -220,7 +220,7 @@ struct ComponentIndexReader: View {
     }
 }
 
-/// The foundation screens of the home screen (vNext), which the search finds by title.
+/// The foundation screens of the home screen (8.21.0), which the search finds by title.
 enum GalleryFoundation: String, CaseIterable, Identifiable, Sendable {
     case colors = "Colors"
     case typography = "Typography"

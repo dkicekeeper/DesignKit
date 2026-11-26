@@ -36,7 +36,7 @@ struct SurfaceStyleTests {
         return [r, g, b, a].map { Int(($0 * 255).rounded()) }
     }
 
-    /// vNext: the roles are today's colours under new names, so nothing an app draws changes.
+    /// 8.21.0: the roles are today's colours under new names, so nothing an app draws changes.
     @Test("The background roles keep today's values", arguments: [UIUserInterfaceStyle.light, .dark])
     func rolesKeepTodaysValues(style: UIUserInterfaceStyle) {
         #expect(Self.rgba(AppColors.Background.page, style) == Self.rgba(Color(.systemBackground), style))
