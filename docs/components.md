@@ -1539,7 +1539,7 @@ init(values: [Double], highlighted: Int? = nil, color: Color = AppColors.accent,
 
 Pull to refresh with mercury: black liquid runs out of the Dynamic Island as you pull, turns the accent, breaks into beads that circle while loading and flows back in.
 
-Since 8.21.0 · Apps: none yet
+Since 8.21.0 · Apps: Dalada, Platina
 
 - `.dsRefreshable` in `Sources/DesignComponents/Feedback/DSRefreshable.swift`
   Pull to refresh with DesignKit's mercury (8.21.0): the same closure as `.refreshable`. Black liquid runs out of the Dynamic Island as the person pulls, turns the accent, breaks into beads that circle while `action` runs (at least 0.6 s) and flows back into the island. Without an island it runs from the top edge; under Reduce Motion an accent ring.
