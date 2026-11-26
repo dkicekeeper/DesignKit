@@ -12,3 +12,4 @@ A fix for 8.22.0's off-screen gate: a skeleton's shimmer or a border beam scroll
 
 - Unit tests for `AmbientViewport` (`AmbientViewportTests`): no size gives no answer, near and far down, across and in nested scroll views.
 - docs/design-system.md: a loop with nothing to show while stopped keeps its frame.
+- `SurfaceStyle`'s Gallery page names Tenra too, whose code uses it.
