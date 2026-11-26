@@ -179,7 +179,8 @@ private struct ParticleCreaturePage: View {
 
     private static let moods: [(String, ParticleCreature.Mood)] = [
         ("Idle", .idle), ("Listening", .listening), ("Thinking", .thinking), ("Answering", .answering),
-        ("Working", .working(progress: 0)), ("Glyph ₸", .glyph("₸")), ("Celebrating", .celebrating), ("Happy", .happy), ("Surprised", .surprised),
+        ("Working", .working(progress: 0)), ("Searching", .searching), ("Calculating", .calculating),
+        ("Connecting", .connecting), ("Writing", .writing), ("Glyph ₸", .glyph("₸")), ("Celebrating", .celebrating), ("Happy", .happy), ("Surprised", .surprised),
         ("Love", .love), ("Proud", .proud), ("Wink", .wink), ("Confused", .confused),
         ("Determined", .determined), ("Worried", .worried), ("Sad", .sad), ("Sleepy", .sleepy), ("Asleep", .asleep),
     ]
@@ -210,7 +211,7 @@ private struct ParticleCreaturePage: View {
     var body: some View {
         ComponentPage(
             name: "ParticleCreature",
-            summary: "A character made of light: a swarm of particles in the shape of a sphere, a rim of light round it and a soft core of its colours inside, with a glowing robot face. Its moods are shapes: a gyroscope while thinking, a ring and waves of light while it answers, light filling it while it works, a coin; and faces: ^ ^, > <, hearts, slanted lids, a wink, a tear.",
+            summary: "A character made of light: a swarm of particles in the shape of a sphere, a rim of light round it and a soft core of its colours inside, with a glowing robot face. Its moods are shapes: a gyroscope while thinking, a beam over a globe while it searches, turning bands while it calculates, a network while it connects, a ribbon while it writes, a ring and waves of light while it answers, light filling it while it works, a coin; and faces: ^ ^, > <, hearts, slanted lids, a wink, a tear.",
             since: "4.6.0",
             apps: [.tenra, .platina],
             canvas: .tall(minHeight: 340),
@@ -218,11 +219,13 @@ private struct ParticleCreaturePage: View {
                 "Hero from about 160 pt (the sphere takes 70% of the square, the rest is room for the burst, the ring, the waves and the extras); compact from 24 pt for an avatar or a tab icon.",
                 "Answering (5.3.0): it talks in phrases, a third of the swarm flows in a tilted ring round the sphere and waves of light leave its rim (a bar chart until 5.2.0). The compact style only talks.",
                 "Working (5.3.0): .working(progress:) fills the sphere with light from the bottom up as the work goes, the eyes on the rising light, the core brighter as it fills. For an import, a sync.",
+                "What it is busy with (vNext), for the steps of an assistant's work, the eyes always on the work: .searching, the swarm a globe of rows with a beam sweeping round it, what it reaches swelling and lighting up; .calculating, the globe's bands turning a quarter at a time and back, a click of light and a smile when the sum comes out; .connecting, nodes linked by lines of light with pulses hopping along them; .writing, a ribbon written round the sphere behind a pen point, the line staying where it was written. Map each step to one in the app; a change of step carries the particles to the new shape.",
+                "Thinking (vNext): a few comets of particles run round each ring of the gyroscope over a faint track, so the spin reads in ink on a white page too. Listening (vNext): two waves at their own pace, the particles on their crests nearer and brighter.",
                 "Tilt (5.3.0): .creatureFollowsTilt() turns the hero's eyes to the side the phone dips to when no finger is on it, back to the middle when it rests in a new way. Hero only, off under Reduce Motion; nothing in the Simulator.",
                 "Haptics (5.3.0): .creatureGesture(_:trigger:haptic: true) plays each gesture's haptic with it (a tap, a confirm for a hop, a warning for a shake or a flinch, a selection), under Reduce Motion too.",
                 "A still picture (5.3.0): ParticleCreature.image(mood:style:accessory:side:colorScheme:) gives a UIImage of the still frame for a widget, a notification or a share image.",
                 "Interactive: the eyes follow the finger, a tap scatters the swarm, three quick taps make it dizzy.",
-                "30 fps, positions from the time; one still frame under Reduce Motion. Decorative: say what it is doing in text.",
+                "30 fps, positions from the time; one still frame under Reduce Motion and while it is scrolled well out of sight (vNext, AmbientMotionGate). Decorative: say what it is doing in text.",
                 "No glass (4.7.0): the swarm is held by a glow of its colour and a thin rim of light along its outline, brightest where the light falls; the shadow on the ground is soft all round.",
                 "The core (4.9.1): a soft ball of the mood's colours that fills the sphere almost to its rim, the far particles behind it and the near ones in front. It breathes with the sphere, burns brighter while thinking, dims asleep and flares at a tap; fainter in the compact style.",
                 "Speech (4.10.0): speech: CreatureSpeech(\"Hi!\") says a line in words of light, no bubble: each letter flies out of the mouth on an arc to its place while the mouth talks, in rounded bold type in the mood's colour (ink on a light page, glowing in the dark) with a soft halo of the page round it. Then the words move with the emotion (from the mood by default): calm rests, joy hops in a wave with sparkles, a thought sways in a slant (the mouth still, the eyes on the words), a whisper glimmers small and pale, worry trembles, dizzy spins, sad sinks. Above or beside it; they go after a few seconds (or stay: duration .untilChanged). Hero only; leave room on their side.",
@@ -231,8 +234,15 @@ private struct ParticleCreaturePage: View {
                 "Accessories (4.12.0): accessory: .partyHat, .crown, .beanie, .taqiya, .headphones (on the head, moving with the sphere), .glasses, .sunglasses, .sleepMask (on the eyes, following the gaze). Drawn in its own light: a soft fill, an outline and dots of light that gather from the sphere when it is put on and scatter when it comes off. The compact style wears hats only.",
                 "A life of its own (4.11.0): .creatureAmbience(CreatureAmbience(dozesAfter: 40)) makes an idle hero look round, stretch, rock or bounce now and then, doze off after a quiet spell (sleepy, then asleep) and daydream of the pictures it is given (daydreams:, about every 30 to 60 s); a touch, a line, a gesture or a new mood wakes it. Off by default.",
                 "Light mode (4.6.1): everything in ink, deeper colours with normal blending (light added to white is lost); the core a ball of colour that gives the swarm a body on white, the glow a faint haze, a soft shadow under it. On a dark surface in light mode, set .environment(\\.colorScheme, .dark) on it.",
+                "On white (vNext): every colour is inked to a luminance cap, so a particle of middle depth is at least 3.2:1 on white in every mood (2.1 to 3.1 before); the outline holds all round, the sphere is a faint disc of its colour, the hero's dots are a fifth larger (the avatar's a little lighter, so its face leads), the haze closer and stronger, the shadow deeper. Under Increase Contrast stronger still (5.1:1, a firmer outline and body).",
             ],
-            styles: ["hero", "compact"]
+            styles: ["hero", "compact"],
+            dos: [
+                "Show what the assistant is doing with the busy mood of its step (.searching, .calculating, .connecting, .writing) and say the step in words beside it.",
+            ],
+            donts: [
+                "Leave it on .thinking for every step, or use a busy mood as the only sign of progress: it is decorative and hidden from VoiceOver.",
+            ]
         ) {
             Group {
                 if state == .loading {

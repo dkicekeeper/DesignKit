@@ -52,19 +52,19 @@ struct ThinkingShimmerModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         if isActive {
-            AmbientMotionGate { allowsAmbientMotion in
-                if allowsAmbientMotion && designKitMotion {
-                    TimelineView(.animation(minimumInterval: ThinkingShimmerMetrics.frameInterval)) { timeline in
-                        content.overlay {
+            // The gate holds the light only (vNext): it stops off screen now, and the text under
+            // it keeps its identity when it does.
+            content.overlay {
+                AmbientMotionGate { allowsAmbientMotion in
+                    if allowsAmbientMotion && designKitMotion {
+                        TimelineView(.animation(minimumInterval: ThinkingShimmerMetrics.frameInterval)) { timeline in
                             GeometryReader { proxy in
                                 band(width: proxy.size.width, at: timeline.date)
                             }
-                            .mask(content)
-                            .allowsHitTesting(false)
                         }
-                    }
-                } else {
-                    content.overlay {
+                        .mask(content)
+                        .allowsHitTesting(false)
+                    } else {
                         LinearGradient(colors: palette, startPoint: .leading, endPoint: .trailing)
                             .mask(content)
                             .allowsHitTesting(false)

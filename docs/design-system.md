@@ -2465,6 +2465,38 @@ sparkles), `.wink` (a tongue, a tilt), `.confused` (one lid lower, a tilt, "?"),
 (lids slanted down to the middle), `.worried` (lids slanted up, amber), `.sad` (a frown, a tear),
 `.sleepy` (half-closed lids, a yawn), `.asleep` (closed, dim, z's).
 
+*(vNext, from a reference of dotted "thinking" orbs, drawn afresh on Ten's engine)* What it is
+busy with: four moods for the steps of an assistant's work, so the person sees what it is doing,
+each with the eyes on the work (ParticleCreatureBusy.swift). `.searching`: the swarm stands as a
+globe of rows along its parallels (`CreatureGlobe`) and a beam sweeps round it like a radar's
+(a turn in about 2.7 s); what it reaches swells out of the globe and comes near (larger,
+brighter), and fades behind it; a ripple of size and light rather than a shine, so it reads in
+ink on a white page; the eyes follow the beam across the front. `.calculating`: on the same
+globe, rounds of three quarter turns of its bands (a third of the sphere each, a new axis each
+time) and the three turned back in reverse, each with a little click; when the round comes out
+right the core flares, the globe swells a touch and the eyes smile; the eyes on the band that
+turns. `.connecting`: about thirty particles (twelve in the avatar) are nodes that wander a
+little on the sphere, linked by lines of light to their neighbours (about five each; the far
+links behind the core and fainter), five pulses (two) hop from node to node along the links and
+light the node they leave and the one they reach; the rest of the swarm is a faint sphere; the
+eyes follow a pulse. `.writing`: two particles in three are a ribbon of four lanes (three) that
+runs round the sphere behind a pen point, the lanes meeting at the pen; its line is set by where
+it is round the sphere, not by the time, so what is written stays in place while the pen moves
+on, bright at the pen and fading behind it; the rest a faint sphere; lids lowered, the eyes on
+the pen. Each has its colours (cyan, mint, teal, pink at the pen on the violet) and a core a
+little brighter than at rest. A still frame (Reduce Motion, `.image`) shows a moment that says
+it: the beam on the front, the bands mixed, a pulse on its way, the pen with its line. Their
+geometry is computed once a frame and costs 13 to 37 µs for 400 particles.
+
+*(vNext)* `.thinking`'s rings carry comets: four particles each, the head nearest, a few a ring
+running at 1.6 times the ring's spin, over a faint track (0.7 of its depth) that crawls at 0.15
+(`CreatureThought`); the whole ring turned as one before, which did not read on a white page,
+where the sweep of light is not drawn. `.listening` without a level rides two waves at their
+own pace (one rising, one falling) and the particles on their crests come nearer
+(`CreatureListen`). The avatar has fewer, larger particles when it is small (48 at 24 pt, 90
+from about 45 pt), their size shrinking more slowly than the sphere's (`Geometry.dot`, the
+sphere's scale to the power 0.85: a fifth larger at 40 pt, a third at 24 pt).
+
 `style: .hero` from about 160 pt: the sphere takes 70% of the square, the rest is room for the
 burst, the ring, the waves and the extras. `.compact` from 24 pt (an avatar, a tab icon): fewer
 particles clipped to the glass; the coin and burst show as happy, an answer only talks. `isInteractive:` (hero): the eyes
@@ -2493,7 +2525,9 @@ a `UIImage` for a widget, a notification's attachment or a share image (in a wid
 swarm itself, held together by a glow of its colour round it (`CreatureGlow`: 0.2 at the centre,
 out to 1.9 sphere radii, the square's edge at most) and a thin rim of light along its outline,
 brightest where the light falls (the lower right, drifting round once in about 25 s) with a
-blurred glow of its own. The shadow (or the light) on the ground is an ellipse of a round
+glow of its own (since vNext a radial gradient lit by the rim's light in one layer, the fall-off
+of the blurred line it was, `CreatureGlow.haloProfile`: no blur drawn every frame; the answer's
+waves glow the same way). The shadow (or the light) on the ground is an ellipse of a round
 gradient, soft all round (it had a hard top and bottom). `.compact` has the same glow, inside
 its sphere, and the same rim.
 
@@ -2504,6 +2538,19 @@ particles 30% deeper and more opaque, without halos, the links and the rim deepe
 and a tear 45% deeper with a fainter glow, the z's, hearts, sparkles and "?" in deeper colours,
 the glow a faint haze (0.08) and a soft shadow under the sphere. On a dark surface in light
 mode, set `.environment(\.colorScheme, .dark)` on it.
+
+*(vNext, the owner's request: Ten read faintly on white)* The ink is measured
+(`CreatureInkStrength`): every colour is deepened (0.42, 0.3 before) and then taken down,
+keeping its hue, while its luminance is above 0.18, so a cyan or a yellow reads like a violet. A
+particle at full strength is at least 4.6:1 on white and one of middle depth at least 3.2:1 in
+every mood (2.1 to 3.1 before, under the 3:1 a graphic needs), its opacity 0.55 to 1 (0.4 to
+0.95). The rim's outline holds all round (0.32 on the far side of the light, 0.1 before; 0.75
+where it falls, a third wider), the sphere is a faint disc of its colour inside it (0.07), the
+hero's dots are a fifth larger (ink has no halo to enlarge them; the avatar's keep 0.8 of
+the ink's opacity, so its face leads), the haze is closer and stronger (0.13
+out to 1.45 radii, 0.08 out to 1.9 before) and the shadow deeper (0.24). Under Increase
+Contrast (`colorSchemeContrast == .increased`) the cap is 0.1 (7:1 at full strength, 5.1:1 at
+middle depth), the outline 0.5 to 0.9, the disc 0.1. The dark is unchanged.
 
 *(4.9.1, the owner's idea)* The core: without the glass the swarm had no body on a white page,
 so a soft ball of the mood's colours fills it (`CreatureCore`), from its first colour to its
@@ -3214,7 +3261,11 @@ beam's display-rate sweep — is *ambient*: decorative, information-free, and pa
 cost every frame it is on screen. Those views go through
 [`AmbientMotionGate`](../Sources/DesignTokens/AmbientMotionGate.swift), which suspends them under
 Reduce Motion **and**, on iOS 27, while `systemPrefersReducedResourceUsage` is true (the system
-asking apps to back off under thermal or power pressure).
+asking apps to back off under thermal or power pressure), **and** *(vNext)* while the view is
+scrolled well out of sight: more than half a scroll view's size outside its visible part, down
+or across (`AmbientViewport`, from `onGeometryChange` over `bounds(of: .scrollView(axis:))`). It
+starts again before it comes back, so its still frame is never seen, and a card peeking past the
+edge of a carousel that does not clip keeps moving.
 
 The gate hands its content a `Bool`; render a **static frame** when it is false (`EdgeGlow`
 freezes at `t = 0`) rather than removing the view, so nothing shifts in layout. Put new

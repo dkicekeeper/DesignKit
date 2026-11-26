@@ -404,6 +404,17 @@ rather than importing an app type.
   character) in front of its backdrop, as wide as the screen just under the bars on a phone, with
   a parallax of its own; `RemotePhotoLoading.hidden` keeps a figure that is loading or failed
   out of sight.
+- What the creature is busy with (vNext, the owner's request from a reference of dotted
+  "thinking" orbs, drawn afresh on Ten's engine, nothing copied): `ParticleCreature.Mood`
+  `.searching` (a beam over a globe of rows), `.calculating` (bands turning and turning back),
+  `.connecting` (a network with pulses), `.writing` (a ribbon behind a pen), the eyes on the work;
+  their geometry is pure Foundation in `ParticleCreatureBusy.swift`, unit-tested. `.thinking`'s
+  rings got comets, the avatar fewer, larger dots when small, the dark rim's glow a gradient
+  instead of a per-frame blur, and `AmbientMotionGate` stops every ambient loop scrolled out of
+  sight. The apps' step-to-mood mapping is proposed in docs/adoption.md. And on a white page
+  (the owner's request in the same PR) Ten is inked to a luminance cap (`CreatureInkStrength`,
+  stronger under Increase Contrast), with an outline all round, a faint disc for a body and
+  larger dots.
 - Search with suggestions (the last benchmark candidate) is 3.5.0's `.dsSearchSuggestions`: the
   lines live in the system's suggestion list under `.searchable`, so Tenra's "system search
   only" rule holds. New candidates go in [docs/benchmark.md](docs/benchmark.md) first.

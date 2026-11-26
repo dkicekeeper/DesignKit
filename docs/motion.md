@@ -107,7 +107,7 @@ Insert with a spring: `withAnimation(AppAnimation.bouncy) { isShown = true }`.
 
 | Effect | What | Cost | Use |
 |---|---|---|---|
-| `ParticleCreature(mood:style:level:isInteractive:speech:)` | a swarm of light in the shape of a sphere (a glow and a rim of light round it since 4.7.0, a glass sphere before; a soft core of its colours inside that breathes with it since 4.9.1) with a glowing robot face; since 4.10.0 it says lines in words of light (each letter flies out of its mouth to its place, then moves with the emotion: joy hops, a thought sways, worry trembles); since 4.11.0 it thinks pictures in dots of light that gather from its head, and with `.creatureAmbience` it looks round, stretches, rocks, bounces and dozes off while idle; since 4.12.0 it wears accessories of light whose dots gather from the sphere when put on and scatter when taken off and plays gestures on a trigger (`.creatureGesture`: nod, shake, hop, shrug, flinch, perk, a hand of particles that waves or points; with their haptic since 5.3.0); since 5.3.0 its eyes can follow the phone's tilt (`.creatureFollowsTilt()`); each mood is a shape of the swarm (gyroscope rings while thinking, a flowing ring and waves of light while it answers and light filling it while it works since 5.3.0, a coin, a burst) and of the face (lids, arcs, chevrons, hearts, a mouth, a tear), which morphs between moods; a change of mood carries every particle to the new shape in about 0.7 s, staggered, with a small overshoot | one Canvas, 30 fps (60 under a finger), positions from the time, particles bucketed into a few dozen fills | an assistant: its avatar, its state while it listens, thinks and answers |
+| `ParticleCreature(mood:style:level:isInteractive:speech:)` | a swarm of light in the shape of a sphere (a glow and a rim of light round it since 4.7.0, a glass sphere before; a soft core of its colours inside that breathes with it since 4.9.1) with a glowing robot face; since 4.10.0 it says lines in words of light (each letter flies out of its mouth to its place, then moves with the emotion: joy hops, a thought sways, worry trembles); since 4.11.0 it thinks pictures in dots of light that gather from its head, and with `.creatureAmbience` it looks round, stretches, rocks, bounces and dozes off while idle; since 4.12.0 it wears accessories of light whose dots gather from the sphere when put on and scatter when taken off and plays gestures on a trigger (`.creatureGesture`: nod, shake, hop, shrug, flinch, perk, a hand of particles that waves or points; with their haptic since 5.3.0); since 5.3.0 its eyes can follow the phone's tilt (`.creatureFollowsTilt()`); each mood is a shape of the swarm (gyroscope rings while thinking, with comets on a faint track since vNext, a flowing ring and waves of light while it answers and light filling it while it works since 5.3.0, a coin, a burst; since vNext what it is busy with: a beam sweeping a globe of rows while it searches, bands turning and turning back while it calculates, a network with pulses while it connects, a ribbon written behind a pen while it writes, the eyes on the work) and of the face (lids, arcs, chevrons, hearts, a mouth, a tear), which morphs between moods; a change of mood carries every particle to the new shape in about 0.7 s, staggered, with a small overshoot | one Canvas, 30 fps (60 under a finger), positions from the time, particles bucketed into a few dozen fills | an assistant: its avatar, its state while it listens, thinks and answers |
 
 **2.9.0: text that arrives, cards that cascade, marbles**
 
@@ -202,8 +202,9 @@ on; the system's own switch turns them off.
   finger).
 - **Ambient loops** (`AuroraBackground`, `TypingIndicator`, `ParticleCreature`, `.symbolPulse`, `LiveSessionBar`'s
   recording dot, `PackedCircleIcons`' swaying marbles, the light across its fan and its turning
-  orbit, the 1.x beams and glows) run inside `AmbientMotionGate`: off under Reduce Motion and, on iOS 27, while the system
-  prefers reduced resource usage. They draw one still frame instead, with the same layout.
+  orbit, the 1.x beams and glows) run inside `AmbientMotionGate`: off under Reduce Motion, on iOS 27 while the system
+  prefers reduced resource usage, and (vNext) while scrolled more than half a scroll view's size out of sight. They draw
+  one still frame instead, with the same layout.
 - **`.designKitMotion(false)`** stills all of DesignKit's motion below it: snapshot tests set it,
   an app can offer it as "reduce effects".
 - **Snapshots** therefore show every component in its final, still state.
@@ -216,6 +217,8 @@ on; the system's own switch turns them off.
 - Loops at 30 fps unless they track a finger; never a display-rate timer for decoration.
 - No animated blur radius on large areas; a blur is for small, short-lived layers (a glyph, a
   4 pt rise, one card coming into focus for 0.45 s). Never a whole screen, never in a loop.
+  A glow round a circle drawn every frame is a radial gradient, not a blurred stroke
+  (`ParticleCreature`'s rim and its answer's waves since vNext).
 - A Metal shader runs only while its effect plays (`layerEffect(isEnabled:)`), and ships
   compiled (§6, "Ripple and its shaders").
 - Scroll-driven effects read geometry in `visualEffect`, never into `@State` per frame.
