@@ -114,7 +114,8 @@ Plasma (light `#D6006F`, dark `#FF4FA0`; the owner's choice of 2026-11-25, `#357
 (`ParticleCreature`, `CreatureTabLabel`, `MessageBubble(markdown:)`, `ConversationDivider`,
 `MessageComposer`, `TypingIndicator`, `SuggestionChips`), progress and trophies (`ProgressRing`,
 `LinearProgressBar`, `StreakCard`, `CalendarHeatmap`, `BarChart`, `AchievementMedal`,
-`.holographic`), sessions (`LiveSessionBar`, `RelativeTime`), guides (`ArticleBody`,
+`.holographic`), sessions (`LiveSessionBar`, `RelativeTime`), friends (`PersonRow`, `.card` on a
+friend's screen), guides (`ArticleBody`,
 `ExpandableText`), picking (`SearchablePicker`), its game screen
 (`.heroBackground(clearHeight:picture:)`, 8.14.0), sharing (`ShareCardSheet`). Its guide:
 `CLAUDE.md` («DesignKit») and `docs/PLAN.md` §4. CI's `platina` job builds it against this checkout
