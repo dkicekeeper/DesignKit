@@ -2,7 +2,7 @@
 
 Several sessions open release PRs at once. A PR therefore never names its own version: it
 declares its release in a note, and after the merge a bot on `main` gives it the next number.
-The design and the reasons: [superpowers/specs/2026-11-24-release-on-merge-design.md](superpowers/specs/2026-11-24-release-on-merge-design.md).
+The design and the reasons: [archive/plans/2026-11-24-release-on-merge-design.md](archive/plans/2026-11-24-release-on-merge-design.md).
 
 ## In a PR
 
@@ -36,7 +36,8 @@ The design and the reasons: [superpowers/specs/2026-11-24-release-on-merge-desig
    feature in docs/design-system.md, a doc comment, a deprecation message. The bot replaces
    every bare vNext with the number. `vNext` in backticks is the word itself and stays, so a doc
    can name the token. The bot does not touch `.changes/`, `.github/workflows/` (its token may
-   not push them), `.github/scripts/release.py`, its tests, this file and `docs/superpowers/`.
+   not push them), `.github/scripts/release.py`, its tests, this file, `docs/plans/`, `docs/backlog/` and
+   `docs/archive/`.
 
 3. **A major names its number.** Its file names carry it (`docs/migration-9.0.md`,
    `scripts/migrations/9.0.0.json`) and so does the short form (`TODO(DesignKit 9.0)`), which the

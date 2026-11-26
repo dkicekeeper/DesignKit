@@ -35,9 +35,11 @@ VERSION_TEXT = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
 # as docs about the mechanism write it), not part of a longer word.
 BARE_TOKEN = re.compile(r"(?<![`\w])vNext(?![`\w])")
 # What the bot never rewrites: the notes (it deletes them), workflows (GITHUB_TOKEN may not push
-# them), itself, its tests, and the documents that describe the token.
+# them), itself, its tests, and the documents that describe the token or name a release still to
+# come: plans, tasks and the archive (the project standard's folders).
 SKIPPED = (".changes/", ".github/workflows/", ".github/scripts/release.py",
-           ".github/scripts/test_release.py", "docs/releasing.md", "docs/superpowers/")
+           ".github/scripts/test_release.py", "docs/releasing.md", "docs/plans/", "docs/backlog/",
+           "docs/archive/")
 
 
 class FragmentError(ValueError):

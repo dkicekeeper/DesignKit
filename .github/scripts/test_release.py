@@ -142,7 +142,8 @@ class TokenTests(unittest.TestCase):
 
     def test_skip_list(self):
         for path in (".changes/a.md", ".github/workflows/ci.yml", ".github/scripts/release.py",
-                     ".github/scripts/test_release.py", "docs/releasing.md", "docs/superpowers/plans/p.md"):
+                     ".github/scripts/test_release.py", "docs/releasing.md", "docs/plans/2026-11-24-p.md",
+                     "docs/archive/plans/2026-11-24-p.md", "docs/backlog/2026-11-26-t.md"):
             self.assertTrue(release.is_skipped(path), path)
         for path in ("CLAUDE.md", "Gallery/Gallery/Screens/MediaScreen.swift", "docs/design-system.md",
                      ".github/scripts/changelog.py"):
