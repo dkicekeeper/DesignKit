@@ -2445,7 +2445,8 @@ running at 1.6 times the ring's spin, over a faint track (0.7 of its depth) that
 where the sweep of light is not drawn. `.listening` without a level rides two waves at their
 own pace (one rising, one falling) and the particles on their crests come nearer
 (`CreatureListen`). The avatar has fewer, larger particles when it is small (48 at 24 pt, 90
-from about 45 pt), their size shrinking more slowly than the sphere's (`Geometry.dot`).
+from about 45 pt), their size shrinking more slowly than the sphere's (`Geometry.dot`, the
+sphere's scale to the power 0.85: a fifth larger at 40 pt, a third at 24 pt).
 
 `style: .hero` from about 160 pt: the sphere takes 70% of the square, the rest is room for the
 burst, the ring, the waves and the extras. `.compact` from 24 pt (an avatar, a tab icon): fewer
@@ -2496,7 +2497,8 @@ particle at full strength is at least 4.6:1 on white and one of middle depth at 
 every mood (2.1 to 3.1 before, under the 3:1 a graphic needs), its opacity 0.55 to 1 (0.4 to
 0.95). The rim's outline holds all round (0.32 on the far side of the light, 0.1 before; 0.75
 where it falls, a third wider), the sphere is a faint disc of its colour inside it (0.07), the
-dots are a fifth larger (ink has no halo to enlarge them), the haze is closer and stronger (0.13
+hero's dots are a fifth larger (ink has no halo to enlarge them; the avatar's keep 0.8 of
+the ink's opacity, so its face leads), the haze is closer and stronger (0.13
 out to 1.45 radii, 0.08 out to 1.9 before) and the shadow deeper (0.24). Under Increase
 Contrast (`colorSchemeContrast == .increased`) the cap is 0.1 (7:1 at full strength, 5.1:1 at
 middle depth), the outline 0.5 to 0.9, the disc 0.1. The dark is unchanged.

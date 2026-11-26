@@ -1596,8 +1596,10 @@ final class ParticleCreatureEngine {
         let levels = 6
         var dots = [[Path]](repeating: [Path](repeating: Path(), count: levels), count: 4)
         var halos = [Path](repeating: Path(), count: 4)
-        // Ink has no halo to enlarge it, so on a light page the dots are larger (vNext).
-        let sizeFactor = (hero ? 1.0 : 1.3) * (onLight ? ink.dotScale : 1)
+        // Ink has no halo to enlarge it, so on a light page the hero's dots are larger (vNext);
+        // the avatar's are large enough already, and lighter, so its face leads.
+        let sizeFactor = hero ? (onLight ? ink.dotScale : 1) : 1.3
+        let inkAlpha = hero ? 1 : CreatureInk.compactAlpha
         for n in parts.indices {
             let z = depth[n]
             let level = min(levels - 1, max(0, Int(z * Double(levels))))
@@ -1617,7 +1619,7 @@ final class ParticleCreatureEngine {
                 for level in range where !dots[tone][level].isEmpty {
                     let zl = (Double(level) + 0.5) / Double(levels)
                     let shade = onLight
-                        ? color(inkTones[tone], (ink.nearAlpha + ink.depthAlpha * zl) * dim)
+                        ? color(inkTones[tone], (ink.nearAlpha + ink.depthAlpha * zl) * inkAlpha * dim)
                         : color(whiten(palette[tone], 0.15 * zl), (0.16 + 0.6 * zl) * dim)
                     swarm.fill(dots[tone][level], with: .color(shade))
                 }
@@ -2005,6 +2007,12 @@ enum CreatureInk {
     /// How far the hero's haze reaches on a light page, in sphere radii (vNext; 1.9 before, as in
     /// the dark, where it was too wide and faint to see).
     static let hazeReach: Double = 1.45
+    /// The avatar's dots (vNext): they shrink with the sphere to this power of its scale, so a
+    /// small one keeps its dots (at 40 pt a fifth larger than before, at 24 pt a third), and on a
+    /// light page they keep this much of the ink's opacity, so its face stays the clearest thing
+    /// in it (the same ink at full strength crowded the eyes of a 40 pt avatar).
+    static let compactDotPower: Double = 0.85
+    static let compactAlpha: Double = 0.8
     /// The face: its colours this much deeper, its glow this much fainter, so cyan eyes read on
     /// white.
     static let faceDepth: Double = 0.45
@@ -2233,7 +2241,7 @@ private struct Geometry {
             radius = side * 0.337
             restY = height / 2
             unit = radius / 40
-            dot = pow(unit, 0.7)
+            dot = pow(unit, CreatureInk.compactDotPower)
         }
     }
 
