@@ -17,6 +17,15 @@ Versions follow semantic versioning; apps pin an exact version. A PR declares it
 note in `.changes/`; at the merge the release bot gives it the next number and writes its section
 here (docs/releasing.md).
 
+## 8.21.1 - 2026-11-26
+
+The Gallery's `PersonRow` page names Platina, which shows its friends with it. Nothing changes in an app.
+[#125](https://github.com/dkicekeeper/DesignKit/pull/125)
+
+### Gallery and tooling
+
+- `PersonRow`'s page carries Platina's badge: its friends list and a friend's screen (`style: .card`) use it. CI's Gallery badges job failed on `main` until the badge followed Platina's code.
+
 ## 8.21.0 - 2026-11-26
 
 The Gallery finds a component by typing, previews each app as it is set up, and shows a component in a card or on colour.
