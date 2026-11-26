@@ -120,7 +120,9 @@ buttons that belongs together stays one snapshot.
 ## CI
 
 The `Snapshot tests` job in `.github/workflows/ci.yml` runs `scripts/snapshot-tests.sh` on
-every push and PR. On a failure it uploads the images that differ as the `failing-snapshots`
+every push and PR that can change what it renders (CI's `What to build` job,
+`.github/scripts/ci_changes.py`: not for docs, release notes or tooling, and a PR of a
+`claude/**` branch leaves it to the branch's push run) and on every manual run. On a failure it uploads the images that differ as the `failing-snapshots`
 artifact. Open them next to the references in the PR's diff. The job log has the same in
 text: the library's message for each failing image (which reference, how much it differs)
 under "Snapshot differences", and each failing image base64-encoded between
