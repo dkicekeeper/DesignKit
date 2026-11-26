@@ -55,7 +55,9 @@ private struct FormTextFieldPage: View {
                 "Inline styles show no error or help text: put validation at the form level (InlineStatusText).",
                 "limit: (4.1.0) counts characters under the field from 80% of it, red over it; the field doesn't cut the text.",
             ],
-            styles: ["standard", "multiline", "inline", "inlineMultiline", "row", "rowMultiline"]
+            styles: ["standard", "multiline", "inline", "inlineMultiline", "row", "rowMultiline"],
+            code: fieldCode,
+            cases: fieldCases
         ) {
             if style >= 3 {
                 // Row styles fill a row of a FormSection on their own: the card is their chrome.
@@ -95,6 +97,61 @@ private struct FormTextFieldPage: View {
             ToggleControl("Disabled", isOn: $disabled)
             TextControl("Text", text: $text)
         }
+    }
+
+    /// The field as the controls set it, the defaults left out; in its row or card when it needs one.
+    private var fieldCode: String {
+        let inline = style == 2
+        let field = SwiftCode.call("FormTextField", [
+            .labeled("text", "$name"),
+            .text("placeholder", "Place name"),
+            .option("style", fieldStyleCode, default: ".standard"),
+            !inline && showsError ? .text("errorMessage", "The name is too short") : nil,
+            !inline && showsHelp ? .text("helpText", "Shown on the map") : nil,
+            !inline && limited ? .labeled("limit", "20") : nil,
+            .flag("isDisabled", disabled),
+        ])
+        if inline {
+            return SwiftCode.call("UniversalRow", [.text("title", "Name")], trailing: field)
+        }
+        if style >= 3 {
+            return SwiftCode.call("FormSection", [.text("header", "Place")], trailing: field)
+        }
+        return field
+    }
+
+    /// The style picked, as Swift writes it.
+    private var fieldStyleCode: String {
+        switch style {
+        case 1: return ".multiline(min: 2, max: 5)"
+        case 2: return ".inline"
+        case 3: return ".row"
+        case 4: return ".rowMultiline(min: 2, max: 5)"
+        default: return ".standard"
+        }
+    }
+
+    /// Fields as the apps' forms fill them.
+    private var fieldCases: [SpecimenCase] {
+        [
+            SpecimenCase("Place name") {
+                text = "Big Almaty Lake"; style = 0; showsError = false; showsHelp = true; limited = false; disabled = false
+            },
+            SpecimenCase("Empty") {
+                text = ""; style = 0; showsError = false; showsHelp = true; limited = false; disabled = false
+            },
+            SpecimenCase("Too short") {
+                text = "Ab"; style = 0; showsError = true; showsHelp = false; limited = false; disabled = false
+            },
+            SpecimenCase("Over the limit") {
+                text = "Upper Kolsai Lake, past the ranger post"; style = 3; showsError = false; showsHelp = false
+                limited = true; disabled = false
+            },
+            SpecimenCase("Long note") {
+                text = "Park by the bridge, then walk an hour upstream. The best spot is past the second bend, under the big willow."
+                style = 4; showsError = false; showsHelp = true; limited = false; disabled = false
+            },
+        ]
     }
 }
 
@@ -138,7 +195,9 @@ private struct MessageComposerPage: View {
                 "Signed out: .disabled(true) with a placeholder that says why.",
                 "limit: (4.1.0) shows the count over the field from 80% of it; over it the count is red and sending is off.",
                 "leading: (4.8.0) puts an attach button or menu inside the glass, with MessageComposerAccessory as its label. onVoice: puts a microphone in the send button's place while the text is blank.",
-            ]
+            ],
+            code: composerCode,
+            cases: composerCases
         ) {
             Group {
                 if attach {
@@ -198,6 +257,72 @@ private struct MessageComposerPage: View {
             text = ""
             isSending = false
         }
+    }
+
+    /// The composer as the controls set it, the defaults left out.
+    private var composerCode: String {
+        let placeholder = attach ? "Ask about your money…" : disabled ? "Sign in to comment" : "Add a comment…"
+        let quote = SwiftCode.call("MessageQuote", [
+            .text("title", "Replying to Aida"),
+            .text("text", "Was anyone on the lake this weekend?"),
+        ])
+        let leading = "{\n" + SwiftCode.indent(attachMenuCode) + "\n}"
+        let composer = SwiftCode.call("MessageComposer", [
+            .labeled("text", "$text"),
+            .text("placeholder", placeholder),
+            showsQuote ? .labeled("quote", quote) : nil,
+            .flag("isSending", isSending),
+            showsError ? .text("errorMessage", "No connection. Try again.") : nil,
+            limited ? .labeled("limit", "40") : nil,
+            attach ? .labeled("leading", leading) : nil,
+            voice ? .labeled("onVoice", "{ startDictation() }") : nil,
+            showsQuote ? .labeled("onCancelQuote", "{ cancelReply() }") : nil,
+        ], trailing: "send()")
+        return disabled ? SwiftCode.modifier(composer, "disabled", [.positional("true")]) : composer
+    }
+
+    /// The attach menu in the leading slot.
+    private var attachMenuCode: String {
+        let items = [
+            SwiftCode.call("Button", [.positional(SwiftCode.string("Receipt")), .text("systemImage", "camera")],
+                           trailing: "attachReceipt()"),
+            SwiftCode.call("Button", [.positional(SwiftCode.string("Statement")), .text("systemImage", "doc")],
+                           trailing: "attachStatement()"),
+        ].joined(separator: "\n")
+        let label = SwiftCode.call("MessageComposerAccessory", [.text("systemImage", "paperclip")])
+        let menu = "Menu {\n" + SwiftCode.indent(items) + "\n} label: {\n" + SwiftCode.indent(label) + "\n}"
+        return SwiftCode.modifier(menu, "accessibilityLabel", [.positional(SwiftCode.string("Attach"))])
+    }
+
+    /// Conversations as the apps hold them.
+    private var composerCases: [SpecimenCase] {
+        [
+            SpecimenCase("Reply") {
+                text = "Yes, we were there on Saturday. The ice is thin near the dam."
+                showsQuote = true; showsError = false; isSending = false; disabled = false; limited = false
+                attach = false; voice = false
+            },
+            SpecimenCase("Over the limit") {
+                text = "Bring the big tent, two stoves and the spare headlamps for everyone"
+                showsQuote = false; showsError = false; isSending = false; disabled = false; limited = true
+                attach = false; voice = false
+            },
+            SpecimenCase("Offline") {
+                text = "See you at the lake at six"
+                showsQuote = false; showsError = true; isSending = false; disabled = false; limited = false
+                attach = false; voice = false
+            },
+            SpecimenCase("Signed out") {
+                text = ""
+                showsQuote = false; showsError = false; isSending = false; disabled = true; limited = false
+                attach = false; voice = false
+            },
+            SpecimenCase("Assistant") {
+                text = ""
+                showsQuote = false; showsError = false; isSending = false; disabled = false; limited = false
+                attach = true; voice = true
+            },
+        ]
     }
 }
 

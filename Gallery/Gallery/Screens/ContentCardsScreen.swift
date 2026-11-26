@@ -191,18 +191,22 @@ private struct ThumbnailCardPage: View {
 private struct RecommendationBoxPage: View {
     @State private var tone = 0
     @State private var state: SpecimenState = .content
+    /// The advice, which the cases change.
+    @State private var text = "You spent 18% less on dining this month. Keep the same pace to reach your goal."
 
     var body: some View {
         ComponentPage(
             name: "RecommendationBox",
             summary: "A piece of advice in a pale box of its colour, with an icon.",
             apps: [.dalada, .platina],
-            canvas: .fill
+            canvas: .fill,
+            code: code,
+            cases: cases
         ) {
             if state == .loading {
                 RecommendationBoxSkeleton(lines: 2)
             } else {
-                RecommendationBox(text: "You spent 18% less on dining this month. Keep the same pace to reach your goal.",
+                RecommendationBox(text: text,
                                   color: [AppColors.Status.positive, AppColors.Status.warning, AppColors.accent][tone],
                                   icon: ["lightbulb.fill", "exclamationmark.triangle.fill", "sparkles"][tone])
             }
@@ -210,6 +214,38 @@ private struct RecommendationBoxPage: View {
             StateControl(state: $state)
             ChoiceControl("Tone", selection: $tone, options: [("Good", 0), ("Warning", 1), ("Tip", 2)])
         }
+    }
+
+    /// The box as the controls set it, the default icon left out.
+    private var code: String {
+        let colors = ["AppColors.Status.positive", "AppColors.Status.warning", "AppColors.accent"]
+        let icons = ["lightbulb.fill", "exclamationmark.triangle.fill", "sparkles"]
+        return SwiftCode.call("RecommendationBox", [
+            .text("text", text),
+            .labeled("color", colors[tone]),
+            .option("icon", SwiftCode.string(icons[tone]), default: SwiftCode.string("lightbulb.fill")),
+        ])
+    }
+
+    /// Advice from the apps, from a line to a paragraph.
+    private var cases: [SpecimenCase] {
+        [
+            SpecimenCase("Saved more") {
+                tone = 0; text = "You spent 18% less on dining this month. Keep the same pace to reach your goal."
+                state = .content
+            },
+            SpecimenCase("Over budget") {
+                tone = 1; text = "Dining is 40% over its limit with 9 days left in the month."; state = .content
+            },
+            SpecimenCase("Long advice") {
+                tone = 2
+                text = "Start with the story trophies: chapters 3 and 7 hold collectibles you cannot go back for, so pick them up on the first run. Leave the online trophies for the end, but finish them before the servers shut down."
+                state = .content
+            },
+            SpecimenCase("Short tip") {
+                tone = 2; text = "Rain after 3 pm."; state = .content
+            },
+        ]
     }
 }
 

@@ -68,7 +68,9 @@ private struct SearchablePickerPage: View {
             donts: [
                 "Use it for a few options: a menu row or ChipPicker shows them at once.",
                 "Put it outside a NavigationStack: the search field lives in the navigation bar.",
-            ]
+            ],
+            code: pickerCode,
+            cases: pickerCases
         ) {
             if state == .loading {
                 SearchablePickerSkeleton(rows: 4)
@@ -118,6 +120,52 @@ private struct SearchablePickerPage: View {
         }
         return single ?? "No category"
     }
+
+    /// The picker as the controls set it, the defaults left out.
+    private var pickerCode: String {
+        if state == .loading {
+            return SwiftCode.call("SearchablePickerSkeleton", [.number("rows", 4, default: 6)])
+        }
+        if multiple {
+            return SwiftCode.call("SearchablePicker", [
+                .positional("gear.map { SearchablePickerOption($0.name, value: $0.id) }"),
+                .labeled("selection", "$packed"),
+                creates ? .labeled("onCreate", "{ name in addGear(named: name) }") : nil,
+            ])
+        }
+        return SwiftCode.call("SearchablePicker", [
+            .positional("categories.map { SearchablePickerOption($0.name, value: $0.id, subtitle: $0.note, systemImage: $0.symbol) }"),
+            .labeled("selection", "$category"),
+            .flag("dismissesOnSelection", true),
+            creates ? .labeled("onCreate", "{ name in addCategory(named: name) }") : nil,
+        ])
+    }
+
+    /// Picks as the apps hold them.
+    private var pickerCases: [SpecimenCase] {
+        [
+            SpecimenCase("One category") {
+                state = .content; multiple = false; creates = true; isPresented = false; single = "Groceries"
+            },
+            SpecimenCase("Nothing picked") {
+                state = .content; multiple = false; creates = false; isPresented = false; single = nil
+            },
+            SpecimenCase("Long name") {
+                let name = "Children's clubs and summer camps"
+                if !categories.contains(where: { $0.0 == name }) {
+                    categories.append((name, "graduationcap.fill", "Sports, music, school trips"))
+                }
+                state = .content; multiple = false; creates = true; isPresented = false; single = name
+            },
+            SpecimenCase("Hike gear") {
+                state = .content; multiple = true; creates = true; isPresented = false
+                several = ["Tent", "Sleeping bag", "Headlamp", "Stove", "Water filter", "Trekking poles", "Rain jacket"]
+            },
+            SpecimenCase("Nothing packed") {
+                state = .content; multiple = true; creates = false; isPresented = false; several = []
+            },
+        ]
+    }
 }
 
 private struct SegmentedPickerPage: View {
@@ -132,7 +180,9 @@ private struct SegmentedPickerPage: View {
             canvas: .fill,
             notes: [
                 "A selection haptic as the segment moves (2.3.0, HapticCue.select).",
-            ]
+            ],
+            code: segmentsCode,
+            cases: segmentsCases
         ) {
             SegmentedPicker(
                 title: "Type",
@@ -143,6 +193,27 @@ private struct SegmentedPickerPage: View {
         } controls: {
             StepperControl("Options", value: $count, in: 2...4)
         }
+    }
+
+    /// The picker as the controls set it: its options over the app's own type.
+    private var segmentsCode: String {
+        let options = [("Expense", ".expense"), ("Income", ".income"), ("Transfer", ".transfer"), ("Debt", ".debt")]
+            .prefix(count)
+            .map { "(\(SwiftCode.string($0.0)), \($0.1))" }
+        return SwiftCode.call("SegmentedPicker", [
+            .text("title", "Type"),
+            .labeled("selection", "$type"),
+            .labeled("options", SwiftCode.array(Array(options))),
+        ])
+    }
+
+    /// Switches as the apps show them.
+    private var segmentsCases: [SpecimenCase] {
+        [
+            SpecimenCase("Two modes") { count = 2; selection = 1 },
+            SpecimenCase("Expense") { count = 3; selection = 0 },
+            SpecimenCase("Four modes") { count = 4; selection = 3 },
+        ]
     }
 }
 
@@ -166,7 +237,9 @@ private struct ChipPickerPage: View {
             notes: [
                 "allTitle (2.8.0): an \"All\" chip in front, selected while nothing is picked; a tap clears the selection.",
                 "inset (3.1.0): in a FormSection card pass the card's padding, AppSpacing.lg. The caption and the first chip start there; the chips still scroll to the card's edge.",
-            ]
+            ],
+            code: chipsCode,
+            cases: chipsCases
         ) {
             if state == .loading {
                 ChipPickerSkeleton(count: 4, showsTitle: showsTitle)
@@ -207,6 +280,55 @@ private struct ChipPickerPage: View {
     private var placeIcon: ((String) -> String?)? {
         guard showsIcons else { return nil }
         return { _ in "mappin" }
+    }
+
+    /// The chips as the controls set them, the defaults left out; in a card with its padding.
+    private var chipsCode: String {
+        if state == .loading {
+            return SwiftCode.call("ChipPickerSkeleton", [.flag("showsTitle", showsTitle, default: true)])
+        }
+        let options = multiple ? ["Lake", "River", "Camp", "Forest"] : ["Sunny", "Cloudy", "Rain", "Snow"]
+        let caption = multiple ? "Place" : "Weather"
+        let selection = multiple ? "$places" : "$weather"
+        let allTitle = multiple ? "All" : "Any"
+        let icon = multiple ? #"{ _ in "mappin" }"# : "{ weatherSymbols[$0] }"
+        let chips = SwiftCode.call("ChipPicker", [
+            showsTitle ? .positional(SwiftCode.string(caption)) : nil,
+            .labeled("options", SwiftCode.array(options.map { SwiftCode.string($0) })),
+            .labeled("selection", selection),
+            showsAll ? .text("allTitle", allTitle) : nil,
+            showsIcons ? .labeled("systemImage", icon) : nil,
+            inCard ? .labeled("inset", "AppSpacing.lg") : nil,
+        ], trailing: "$0")
+        guard inCard else { return chips }
+        let padded = SwiftCode.modifier(chips, "padding", [.positional(".vertical"), .positional("AppSpacing.sm")])
+        return SwiftCode.call("FormSection", [], trailing: padded)
+    }
+
+    /// Chips as the apps fill them.
+    private var chipsCases: [SpecimenCase] {
+        [
+            SpecimenCase("Rain") {
+                state = .content; multiple = false; single = "Rain"; showsIcons = true; showsTitle = true
+                showsAll = false; inCard = false
+            },
+            SpecimenCase("Nothing picked") {
+                state = .content; multiple = false; single = nil; showsIcons = true; showsTitle = true
+                showsAll = true; inCard = false
+            },
+            SpecimenCase("Filter") {
+                state = .content; multiple = true; several = ["Lake", "River", "Forest"]; showsIcons = true
+                showsTitle = false; showsAll = true; inCard = false
+            },
+            SpecimenCase("In a form") {
+                state = .content; multiple = false; single = "Sunny"; showsIcons = true; showsTitle = true
+                showsAll = false; inCard = true
+            },
+            SpecimenCase("Text only") {
+                state = .content; multiple = true; several = []; showsIcons = false; showsTitle = true
+                showsAll = false; inCard = false
+            },
+        ]
     }
 }
 

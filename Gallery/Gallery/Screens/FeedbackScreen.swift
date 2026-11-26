@@ -140,7 +140,9 @@ private struct LoadMoreFooterPage: View {
                 "The app maps its flags to LoadMoreState and keeps one request in flight; the footer may ask again while it stays on screen.",
                 ".onReachEnd(of:in:threshold:) asks a few rows before the end (a feed of tall cards).",
                 "Strings: loadMore.failed, common.retry.",
-            ]
+            ],
+            code: footerCode,
+            cases: footerCases
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.md) {
                 ForEach(0..<2, id: \.self) { index in
@@ -164,6 +166,48 @@ private struct LoadMoreFooterPage: View {
             ToggleControl("Card placeholder", isOn: $cardPlaceholder)
             ChoiceControl("Rows", selection: $rows, options: [("1", 1), ("2", 2), ("3", 3)])
         }
+    }
+
+    /// The state as the call writes it.
+    private var stateCode: String {
+        switch state {
+        case 0: return ".more"
+        case 2:
+            let message = showsMessage ? SwiftCode.string("No connection") : "nil"
+            return ".failed(message: \(message))"
+        case 3: return ".end"
+        default: return ".loading"
+        }
+    }
+
+    /// The call as the controls set it, the defaults left out.
+    private var footerCode: String {
+        SwiftCode.call("LoadMoreFooter", [
+            .labeled("state", stateCode),
+            .number("rows", Double(rows), default: 2),
+            .labeled("onLoad", "{ await loadMore() }"),
+        ], trailing: cardPlaceholder ? "ReviewCardSkeleton()" : nil)
+    }
+
+    /// The ends of the apps' paged lists.
+    private var footerCases: [SpecimenCase] {
+        [
+            SpecimenCase("Rows loading") {
+                state = 1; rows = 3; cardPlaceholder = false; showsMessage = false; loads = 0
+            },
+            SpecimenCase("Review cards") {
+                state = 1; rows = 1; cardPlaceholder = true; showsMessage = false; loads = 0
+            },
+            SpecimenCase("Offline") {
+                state = 2; rows = 2; cardPlaceholder = false; showsMessage = true; loads = 0
+            },
+            SpecimenCase("No reason") {
+                state = 2; rows = 2; cardPlaceholder = false; showsMessage = false; loads = 0
+            },
+            SpecimenCase("End of list") {
+                state = 3; rows = 2; cardPlaceholder = false; showsMessage = false; loads = 0
+            },
+        ]
     }
 }
 
@@ -253,7 +297,9 @@ private struct BadgePage: View {
             donts: [
                 "Make it a button.",
                 "Colour its text yourself: the tint is made readable for you.",
-            ]
+            ],
+            code: badgeCode,
+            cases: badgeCases
         ) {
             if state == .loading {
                 BadgeSkeleton(width: 96)
@@ -268,6 +314,51 @@ private struct BadgePage: View {
             ToggleControl("Icon", isOn: $showsIcon)
             TextControl("Text", text: $text)
         }
+    }
+
+    /// The colour as the call writes it.
+    private var colorCode: String {
+        switch tone {
+        case 1: "AppColors.Status.positive"
+        case 2: "AppColors.Status.warning"
+        case 3: "AppColors.Status.negative"
+        default: "AppColors.accent"
+        }
+    }
+
+    /// The call as the controls set it, the defaults left out.
+    private var badgeCode: String {
+        if state == .loading {
+            return SwiftCode.call("BadgeSkeleton", [.number("width", 96, default: 64)])
+        }
+        return SwiftCode.call("Badge", [
+            .text(text),
+            showsIcon ? .text("systemImage", "flame.fill") : nil,
+            .option("color", colorCode, default: "AppColors.accent"),
+            .option("style", filled ? ".filled" : ".tinted", default: ".tinted"),
+        ])
+    }
+
+    /// Badges as the apps write them.
+    private var badgeCases: [SpecimenCase] {
+        [
+            SpecimenCase("Paid") {
+                text = "Paid"; tone = 1; filled = false; showsIcon = false; state = .content
+            },
+            SpecimenCase("Overdue") {
+                text = "Overdue"; tone = 3; filled = false; showsIcon = false; state = .content
+            },
+            SpecimenCase("Count") {
+                text = "12"; tone = 3; filled = true; showsIcon = false; state = .content
+            },
+            SpecimenCase("Long tag") {
+                text = "Free camping with a fire pit and drinking water"; tone = 0; filled = false
+                showsIcon = true; state = .content
+            },
+            SpecimenCase("Popular") {
+                text = "Popular this week"; tone = 2; filled = false; showsIcon = true; state = .content
+            },
+        ]
     }
 }
 
@@ -333,6 +424,8 @@ private struct StatusBannerPage: View {
     @State private var compact = false
     @State private var hasAction = false
     @State private var state: SpecimenState = .content
+    /// The banner's text, which the cases change.
+    @State private var message = "Offline. Changes will be sent when you are back online."
 
     var body: some View {
         ComponentPage(
@@ -347,12 +440,14 @@ private struct StatusBannerPage: View {
             ],
             donts: [
                 "Use it for the outcome of an action that comes and goes: that is MessageBanner.",
-            ]
+            ],
+            code: bannerCode,
+            cases: bannerCases
         ) {
             if state == .loading {
                 StatusBannerSkeleton(style: compact ? .compact : .standard)
             } else {
-                StatusBanner("Offline. Changes will be sent when you are back online.", status: status,
+                StatusBanner(message, status: status,
                              style: compact ? .compact : .standard, action: hasAction ? {} : nil)
             }
         } controls: {
@@ -364,11 +459,52 @@ private struct StatusBannerPage: View {
             ToggleControl("Action", isOn: $hasAction)
         }
     }
+
+    /// The call as the controls set it, the defaults left out.
+    private var bannerCode: String {
+        let style: SwiftCode.Argument? = .option("style", compact ? ".compact" : ".standard", default: ".standard")
+        if state == .loading {
+            return SwiftCode.call("StatusBannerSkeleton", [style])
+        }
+        return SwiftCode.call("StatusBanner", [
+            .text(message),
+            .option("status", ".\(status)", default: ".info"),
+            style,
+        ], trailing: hasAction ? "openDetails()" : nil)
+    }
+
+    /// States the apps keep on screen.
+    private var bannerCases: [SpecimenCase] {
+        [
+            SpecimenCase("Offline") {
+                message = "Offline. Changes will be sent when you are back online."
+                status = .warning; compact = false; hasAction = false; state = .content
+            },
+            SpecimenCase("Statement ready") {
+                message = "Your March statement is ready to import."
+                status = .positive; compact = false; hasAction = true; state = .content
+            },
+            SpecimenCase("Card expiring") {
+                message = "The Visa card ending 4821 expires next month."
+                status = .warning; compact = true; hasAction = true; state = .content
+            },
+            SpecimenCase("Rates failed") {
+                message = "Couldn't refresh exchange rates. Amounts use yesterday's rates."
+                status = .negative; compact = false; hasAction = true; state = .content
+            },
+            SpecimenCase("Long message") {
+                message = "Sync is paused while Low Power Mode is on. Your trips, photos and comments stay on this iPhone and will be sent once it is off or the phone is charging."
+                status = .neutral; compact = false; hasAction = false; state = .content
+            },
+        ]
+    }
 }
 
 private struct MessageBannerPage: View {
     @State private var type: MessageBanner.MessageType = .success
     @State private var hasAction = false
+    /// The text of the banner without an action, which the cases change.
+    @State private var message = "Transaction saved."
 
     var body: some View {
         ComponentPage(
@@ -382,12 +518,14 @@ private struct MessageBannerPage: View {
             donts: [
                 "Keep it for a state that lasts: that is StatusBanner.",
                 "Announce it to VoiceOver yourself: it does on appear.",
-            ]
+            ],
+            code: messageBannerCode,
+            cases: messageBannerCases
         ) {
             if hasAction {
                 MessageBanner(message: "Couldn't sync the last changes.", type: type, actionTitle: "Retry") {}
             } else {
-                MessageBanner(message: "Transaction saved.", type: type)
+                MessageBanner(message: message, type: type)
             }
         } controls: {
             ChoiceControl("Type", selection: $type, options: [
@@ -395,6 +533,37 @@ private struct MessageBannerPage: View {
             ])
             ToggleControl("Action", isOn: $hasAction)
         }
+    }
+
+    /// The call as the controls set it.
+    private var messageBannerCode: String {
+        if hasAction {
+            return SwiftCode.call("MessageBanner", [
+                .text("message", "Couldn't sync the last changes."),
+                .labeled("type", ".\(type)"),
+                .text("actionTitle", "Retry"),
+            ], trailing: "retry()")
+        }
+        return SwiftCode.call("MessageBanner", [.text("message", message), .labeled("type", ".\(type)")])
+    }
+
+    /// Outcomes as the apps report them.
+    private var messageBannerCases: [SpecimenCase] {
+        [
+            SpecimenCase("Saved") {
+                message = "Transaction saved."; type = .success; hasAction = false
+            },
+            SpecimenCase("Sync failed") {
+                type = .error; hasAction = true
+            },
+            SpecimenCase("Rates updated") {
+                message = "Exchange rates updated."; type = .info; hasAction = false
+            },
+            SpecimenCase("Long message") {
+                message = "3 operations in the statement had no exchange rate for their day. They were saved at today's rate. Check them in History."
+                type = .warning; hasAction = false
+            },
+        ]
     }
 }
 
@@ -508,7 +677,9 @@ private struct InfoTipPage: View {
             donts: [
                 "Hide something the person needs to act: say it on the screen.",
                 "Use it for a value the person tapped (that is a Tooltip) or for errors.",
-            ]
+            ],
+            code: infoTipCode,
+            cases: infoTipCases
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 if asModifier {
@@ -536,6 +707,42 @@ private struct InfoTipPage: View {
             ToggleControl("Title", isOn: $hasTitle)
             TextControl("Text", text: $message)
         }
+    }
+
+    /// The label and its ⓘ as the controls set them.
+    private var infoTipCode: String {
+        let arguments: [SwiftCode.Argument?] = [
+            .text(message),
+            hasTitle ? .text("title", "Health score") : nil,
+        ]
+        let label = SwiftCode.call("Text", [.text("Health score")])
+        if asModifier {
+            return SwiftCode.modifier(label, "infoTip", arguments)
+        }
+        return SwiftCode.call("HStack", [.labeled("spacing", "AppSpacing.xs")],
+                              trailing: label + "\n" + SwiftCode.call("InfoTip", arguments))
+    }
+
+    /// Explanations as the apps write them.
+    private var infoTipCases: [SpecimenCase] {
+        [
+            SpecimenCase("Health score") {
+                message = "Your savings rate, debts and spending against your limits, from 0 to 100. Recomputed every night."
+                hasTitle = true; asModifier = true
+            },
+            SpecimenCase("One line") {
+                message = "From 0 to 100. Higher is better."
+                hasTitle = true; asModifier = true
+            },
+            SpecimenCase("Long text") {
+                message = "Your savings rate, your debts against your income and your spending against the limits you set, each from 0 to 100, weighed together. Recomputed every night from the last 90 days, so one big purchase moves it only a little."
+                hasTitle = true; asModifier = true
+            },
+            SpecimenCase("No title") {
+                message = "Your savings rate, debts and spending against your limits, from 0 to 100. Recomputed every night."
+                hasTitle = false; asModifier = false
+            },
+        ]
     }
 }
 
@@ -595,7 +802,9 @@ private struct EmptyStatePage: View {
             ],
             donts: [
                 "Show it while the list is loading: that is the skeleton.",
-            ]
+            ],
+            code: emptyStateCode,
+            cases: emptyStateCases
         ) {
             if mascot {
                 EmptyState(
@@ -626,6 +835,56 @@ private struct EmptyStatePage: View {
             ToggleControl("Action", isOn: $hasAction)
             ToggleControl("Mascot artwork", isOn: $mascot)
         }
+    }
+
+    /// The call as the controls set it, the defaults left out.
+    private var emptyStateCode: String {
+        if mascot {
+            let speech = SwiftCode.call("CreatureSpeech", [.text("Shall we save for something?")])
+            let creature = SwiftCode.call("ParticleCreature", [.labeled("mood", ".happy"), .labeled("speech", speech)])
+            let artwork = SwiftCode.modifier(creature, "frame", [.labeled("width", "140"), .labeled("height", "140")])
+            return SwiftCode.call("EmptyState", [
+                .text("title", "No goals yet"),
+                hasDescription ? .text("description", "Save towards something and see how close it is.") : nil,
+                hasAction ? .text("actionTitle", "New goal") : nil,
+                hasAction ? .labeled("action", "{ addGoal() }") : nil,
+            ], trailing: artwork)
+        }
+        let isError = style == .error
+        let icon = isError ? "wifi.slash" : "tray"
+        let title = isError ? "Couldn't load" : "No transactions yet"
+        let description = isError ? "Check the connection and try again." : "Add the first one with +."
+        let actionTitle = isError ? "Retry" : "Add"
+        let action = isError ? "{ retry() }" : "{ add() }"
+        return SwiftCode.call("EmptyState", [
+            .text("icon", icon),
+            .text("title", title),
+            hasDescription ? .text("description", description) : nil,
+            hasAction ? .text("actionTitle", actionTitle) : nil,
+            hasAction ? .labeled("action", action) : nil,
+            .option("style", ".\(style)", default: ".standard"),
+        ])
+    }
+
+    /// Empty lists and failures as the apps show them.
+    private var emptyStateCases: [SpecimenCase] {
+        [
+            SpecimenCase("First run") {
+                style = .standard; hasDescription = true; hasAction = true; mascot = false
+            },
+            SpecimenCase("Load failed") {
+                style = .error; hasDescription = true; hasAction = true; mascot = false
+            },
+            SpecimenCase("No button") {
+                style = .standard; hasDescription = true; hasAction = false; mascot = false
+            },
+            SpecimenCase("Title only") {
+                style = .compact; hasDescription = false; hasAction = false; mascot = false
+            },
+            SpecimenCase("Mascot") {
+                style = .standard; hasDescription = true; hasAction = true; mascot = true
+            },
+        ]
     }
 }
 
@@ -916,7 +1175,9 @@ private struct NoticeCardPage: View {
                 "5.2.0: the action moved into the text's column, so it starts where the text does.",
                 "8.11.0: a second action in the neutral colour after the first (secondaryActionTitle, secondaryAction), for what the person can do about the message without opening anything; under the first when the two do not fit in a line.",
                 "Strings: common.hide (the hide button's VoiceOver name, unless hideLabel is given).",
-            ]
+            ],
+            code: noticeCode,
+            cases: noticeCases
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 if state == .loading {
@@ -953,6 +1214,59 @@ private struct NoticeCardPage: View {
             ToggleControl("Second action", isOn: $hasSecondAction)
             ToggleControl("Hide button", isOn: $canHide)
         }
+    }
+
+    /// The mascot before the text, as the call writes it.
+    private var leadingCode: String {
+        let creature = SwiftCode.call("ParticleCreature", [.labeled("mood", ".worried"), .labeled("style", ".compact")])
+        let framed = SwiftCode.modifier(creature, "frame", [
+            .labeled("width", "NoticeCardMetrics.leadingSize"),
+            .labeled("height", "NoticeCardMetrics.leadingSize"),
+        ])
+        return SwiftCode.modifier(framed, "accessibilityHidden", [.positional("true")])
+    }
+
+    /// The call as the controls set it, the defaults left out.
+    private var noticeCode: String {
+        if state == .loading {
+            return SwiftCode.call("NoticeCardSkeleton", [
+                showsLeading ? nil : .labeled("leadingSize", "nil"),
+                .flag("showsAction", hasAction, default: true),
+            ])
+        }
+        return SwiftCode.call("NoticeCard", [
+            .text("title", "A payment is due tomorrow"),
+            .text("message", "Internet, 12 000 ₸. There is enough on the card."),
+            hasAction ? .text("actionTitle", "Go through it") : nil,
+            hasAction ? .text("actionSystemImage", "sparkles") : nil,
+            hasAction ? .labeled("action", "{ goThrough() }") : nil,
+            hasSecondAction ? .text("secondaryActionTitle", "Pause") : nil,
+            hasSecondAction ? .text("secondaryActionSystemImage", "pause") : nil,
+            hasSecondAction ? .labeled("secondaryAction", "{ pause() }") : nil,
+            canHide ? .labeled("onHide", "{ hide() }") : nil,
+        ], trailing: showsLeading ? leadingCode : nil)
+    }
+
+    /// Messages as the apps write them.
+    private var noticeCases: [SpecimenCase] {
+        [
+            SpecimenCase("Payment due") {
+                showsLeading = true; hasAction = true; hasSecondAction = false; canHide = true
+                state = .content; log = ""
+            },
+            SpecimenCase("Two actions") {
+                showsLeading = true; hasAction = true; hasSecondAction = true; canHide = true
+                state = .content; log = ""
+            },
+            SpecimenCase("No picture") {
+                showsLeading = false; hasAction = true; hasSecondAction = false; canHide = true
+                state = .content; log = ""
+            },
+            SpecimenCase("Message only") {
+                showsLeading = true; hasAction = false; hasSecondAction = false; canHide = false
+                state = .content; log = ""
+            },
+        ]
     }
 }
 

@@ -104,7 +104,9 @@ private struct UniversalRowPage: View {
             ],
             donts: [
                 "Build a row from an HStack: it loses the padding, the icon size and the divider inset.",
-            ]
+            ],
+            code: rowCode,
+            cases: rowCases
         ) {
             InRowHost(host: host) {
                 if state == .loading {
@@ -224,6 +226,88 @@ private struct UniversalRowPage: View {
         case .action, .slider, .colors: .empty
         }
     }
+
+    /// The row as the controls set it (or its skeleton), the defaults left out.
+    private var rowCode: String {
+        let config = host == .card ? ".standard" : ".settings"
+        if state == .loading {
+            switch kind {
+            case .slider:
+                return SwiftCode.call("UniversalRowSkeleton.slider", [
+                    .flag("showsHint", showsHint),
+                    .option("config", config, default: ".standard"),
+                ])
+            case .info, .amount:
+                return SwiftCode.call("UniversalRowSkeleton.info", [.flag("showsIcon", showsIcon)])
+            case .colors:
+                return SwiftCode.call("UniversalRowSkeleton.colors")
+            default:
+                return SwiftCode.call("UniversalRowSkeleton", [
+                    .option("config", config, default: ".standard"),
+                    .labeled("iconStyle", showsIcon ? ".circle(size: AppIconSize.lg)" : "nil"),
+                    .option("trailing", ".\(skeletonTrailing)", default: ".empty"),
+                ])
+            }
+        }
+        let shownValue = showsValue ? value : nil
+        let role = destructive ? ".destructive" : ".standard"
+        let row = SwiftCode.call("UniversalRow", [
+            .positional(SwiftCode.string(title)),
+            showsIcon ? .text("icon", symbol) : nil,
+            shownValue.map { SwiftCode.Argument.text("value", $0) },
+            showsHint ? .text("hint", "Shown under the title") : nil,
+            .option("role", role, default: ".standard"),
+            .option("config", config, default: ".standard"),
+            .option("accessory", accessoryCode, default: ".none"),
+        ])
+        return state == .disabled ? SwiftCode.modifier(row, "disabled", [.positional("true")]) : row
+    }
+
+    /// The accessory picked, as Swift writes it.
+    private var accessoryCode: String {
+        switch kind {
+        case .none: ".none"
+        case .info: #".info("12 October")"#
+        case .amount: #".amount(85_000, currency: "KZT")"#
+        case .toggle: ".toggle($quietHours)"
+        case .navigation: ".navigation { LanguageScreen() }"
+        case .action: destructive ? ".action { deleteAllData() }" : ".action { exportData() }"
+        case .checkmark: ".checkmark(isSelected: \(picked)) { pick() }"
+        case .menu: ".menu($period, options: periods)"
+        case .picker: ".picker($species, options: fish)"
+        case .date: ".date($startDate)"
+        case .stepper: #".stepper($count, in: 0...99) { "\($0) pcs" }"#
+        case .slider: #".slider($level, in: 0.05...1, valueText: "\(Int((level * 100).rounded()))%")"#
+        case .colors: ".colors($colorHex)"
+        case .textField: #".textField($bank, placeholder: "Bank name")"#
+        }
+    }
+
+    /// Rows as the apps' settings and forms fill them.
+    private var rowCases: [SpecimenCase] {
+        [
+            SpecimenCase("Quiet hours") {
+                kind = .toggle; host = .card; showsIcon = true; showsHint = true; showsValue = false
+                destructive = false; state = .content; isOn = true
+            },
+            SpecimenCase("Delete all data") {
+                kind = .action; host = .card; showsIcon = true; showsHint = false; showsValue = false
+                destructive = true; state = .content
+            },
+            SpecimenCase("None caught") {
+                kind = .stepper; host = .card; showsIcon = true; showsHint = false; showsValue = false
+                destructive = false; state = .content; count = 0
+            },
+            SpecimenCase("No bank yet") {
+                kind = .textField; host = .card; showsIcon = false; showsHint = true; showsValue = false
+                destructive = false; state = .content; bank = ""
+            },
+            SpecimenCase("Language") {
+                kind = .navigation; host = .list; showsIcon = true; showsHint = false; showsValue = true
+                destructive = false; state = .content
+            },
+        ]
+    }
 }
 
 private struct DisclosureChevronPage: View {
@@ -231,10 +315,16 @@ private struct DisclosureChevronPage: View {
         ComponentPage(
             name: "DisclosureChevron",
             summary: "The chevron at the end of a row that opens a screen; tertiary, sized to the text.",
-            apps: [.tenra, .dalada, .platina]
+            apps: [.tenra, .dalada, .platina],
+            code: chevronCode
         ) {
             DisclosureChevron()
         }
+    }
+
+    /// The chevron takes no arguments.
+    private var chevronCode: String {
+        SwiftCode.call("DisclosureChevron")
     }
 }
 

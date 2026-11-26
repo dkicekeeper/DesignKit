@@ -54,7 +54,9 @@ private struct DSButtonPage: View {
                 "Icon on top draws a tile (the actions under a detail screen's hero; EntityActionButton before 2.0). Give it the width: a row of them in an HStack.",
                 "A delete-selected bar: DSButton(\"Delete (3)\", role: .destructive, shape: .capsule, fullWidth: true) (BulkDeleteButton before 2.0).",
                 "A press plays a light haptic, a warning one for a destructive button.",
-            ]
+            ],
+            code: code,
+            cases: cases
         ) {
             Group {
                 if placement == .top {
@@ -120,6 +122,48 @@ private struct DSButtonPage: View {
         case .only: "xmark"
         default: role == .destructive ? "trash" : "checkmark"
         }
+    }
+
+    /// The call as the controls set it, the defaults left out.
+    private var code: String {
+        SwiftCode.call("DSButton", [
+            .text(title),
+            showsIcon || placement == .only ? .text("systemImage", symbol) : nil,
+            .option("iconPlacement", ".\(placement)", default: ".leading"),
+            .option("appearance", ".\(appearance)", default: ".primary"),
+            .option("role", ".\(role)", default: ".normal"),
+            .option("size", ".\(size)", default: ".large"),
+            .option("shape", ".\(shape)", default: ".automatic"),
+            .flag("fullWidth", fullWidth),
+            .flag("isLoading", loading),
+            .flag("isDisabled", disabled),
+        ], trailing: "save()")
+    }
+
+    /// Buttons as the apps draw them.
+    private var cases: [SpecimenCase] {
+        [
+            SpecimenCase("Save") {
+                title = "Save"; showsIcon = true; placement = .leading; appearance = .primary
+                role = .normal; size = .large; shape = .automatic; fullWidth = true; loading = false; disabled = false
+            },
+            SpecimenCase("Long title") {
+                title = "Continue without signing in to your account"; showsIcon = false; placement = .leading
+                appearance = .secondary; role = .normal; size = .large; fullWidth = true; loading = false; disabled = false
+            },
+            SpecimenCase("Delete selected") {
+                title = "Delete (3)"; showsIcon = true; placement = .leading; appearance = .primary
+                role = .destructive; size = .large; shape = .capsule; fullWidth = true; loading = false; disabled = false
+            },
+            SpecimenCase("Saving") {
+                title = "Save"; showsIcon = false; appearance = .primary; role = .normal; fullWidth = true
+                loading = true; disabled = false
+            },
+            SpecimenCase("Close") {
+                title = "Close"; placement = .only; appearance = .secondary; role = .neutral; size = .medium
+                shape = .automatic; fullWidth = false; loading = false; disabled = false
+            },
+        ]
     }
 }
 

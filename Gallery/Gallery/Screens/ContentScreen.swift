@@ -60,7 +60,9 @@ private struct ConversationDividerPage: View {
             ],
             donts: [
                 "Use it as a section header outside a conversation (that is SectionHeader).",
-            ]
+            ],
+            code: dividerCode,
+            cases: dividerCases
         ) {
             if state == .loading {
                 ConversationDividerSkeleton()
@@ -88,6 +90,38 @@ private struct ConversationDividerPage: View {
         case 3: ConversationDivider(event, systemImage: "pencil")
         default: ConversationDivider(date: .now)
         }
+    }
+
+    /// The call as the controls set it: a message's day, or the event.
+    private var dividerCode: String {
+        if state == .loading {
+            return SwiftCode.call("ConversationDividerSkeleton")
+        }
+        if kind == 3 {
+            return SwiftCode.call("ConversationDivider", [
+                .positional(SwiftCode.string(event)),
+                .text("systemImage", "pencil"),
+            ])
+        }
+        return SwiftCode.call("ConversationDivider", [.labeled("date", "message.sentAt")])
+    }
+
+    /// Days and events as a chat shows them.
+    private var dividerCases: [SpecimenCase] {
+        [
+            SpecimenCase("Today") { kind = 0; state = .content },
+            SpecimenCase("Last year") { kind = 2; state = .content },
+            SpecimenCase("Budget change") {
+                kind = 3; event = "Ten changed the October budget"; state = .content
+            },
+            SpecimenCase("Long event") {
+                kind = 3; event = "Aigerim renamed the trip to Weekend at Big Almaty Lake and added 12 photos"
+                state = .content
+            },
+            SpecimenCase("Long file name") {
+                kind = 3; event = "Ten imported kaspi_gold_statement_2026-10-01_2026-10-31.pdf"; state = .content
+            },
+        ]
     }
 }
 
@@ -121,7 +155,9 @@ private struct RelativeTimePage: View {
             donts: [
                 "Format the date by hand next to it: older dates follow DesignKitDateFormat.day.",
                 "Use it for a date the person picks or plans (that is a date row).",
-            ]
+            ],
+            code: timeCode,
+            cases: timeCases
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(label)
@@ -146,11 +182,44 @@ private struct RelativeTimePage: View {
         case .clock: "Session"
         }
     }
+
+    /// The call as the controls set it, styled as the preview is.
+    private var timeCode: String {
+        let date: String
+        switch style {
+        case .relative: date = "comment.createdAt"
+        case .elapsed: date = "trip.startedAt"
+        case .clock: date = "session.startedAt"
+        }
+        let call = SwiftCode.call("RelativeTime", [
+            .positional(date),
+            .option("style", ".\(style)", default: ".relative"),
+        ])
+        let font = style == .clock ? "AppTypography.numbers(AppTypography.h2)" : "AppTypography.body"
+        let styled = SwiftCode.modifier(call, "font", [.positional(font)])
+        return SwiftCode.modifier(styled, "foregroundStyle", [.positional("AppColors.Text.primary")])
+    }
+
+    /// Times from a feed and a running session.
+    private var timeCases: [SpecimenCase] {
+        [
+            SpecimenCase("Just now") { style = .relative; offset = 20; anchor = .now },
+            SpecimenCase("Yesterday") { style = .relative; offset = 26 * 3600; anchor = .now },
+            SpecimenCase("A year ago") { style = .relative; offset = 400 * 86_400; anchor = .now },
+            SpecimenCase("On the trail") { style = .elapsed; offset = 3 * 3600; anchor = .now },
+            SpecimenCase("Session clock") { style = .clock; offset = 5 * 60; anchor = .now },
+        ]
+    }
 }
 
 private struct ExpandableTextPage: View {
+    /// A place's notes, as Dalada shows them.
+    private static let lakeNotes = "A quiet lake two hours from the city. The road is good until the last two kilometres, then a dirt track that turns into mud after rain. Bring your own firewood: there is none left near the shore. Pike in the morning, perch in the afternoon. The ranger asks for a fee at the gate."
+
     @State private var lineLimit = 3
     @State private var state: SpecimenState = .content
+    /// The text folded; the cases change it.
+    @State private var text = ExpandableTextPage.lakeNotes
 
     var body: some View {
         ComponentPage(
@@ -158,13 +227,15 @@ private struct ExpandableTextPage: View {
             summary: "Text folded to a few lines with “More” when it does not fit.",
             since: "0.6.0",
             apps: [.dalada, .platina],
-            canvas: .fill
+            canvas: .fill,
+            code: textCode,
+            cases: textCases
         ) {
             if state == .loading {
                 ExpandableTextSkeleton(lines: lineLimit)
             } else {
                 ExpandableText(
-                    "A quiet lake two hours from the city. The road is good until the last two kilometres, then a dirt track that turns into mud after rain. Bring your own firewood: there is none left near the shore. Pike in the morning, perch in the afternoon. The ranger asks for a fee at the gate.",
+                    text,
                     lineLimit: lineLimit
                 )
             }
@@ -172,6 +243,34 @@ private struct ExpandableTextPage: View {
             StateControl(state: $state)
             StepperControl("Lines", value: $lineLimit, in: 1...6)
         }
+    }
+
+    /// The call as the controls set it, the defaults left out.
+    private var textCode: String {
+        if state == .loading {
+            return SwiftCode.call("ExpandableTextSkeleton", [.number("lines", Double(lineLimit), default: 3)])
+        }
+        return SwiftCode.call("ExpandableText", [
+            .positional(SwiftCode.string(text)),
+            .number("lineLimit", Double(lineLimit), default: 3),
+        ])
+    }
+
+    /// Texts from a place's page, short and long.
+    private var textCases: [SpecimenCase] {
+        [
+            SpecimenCase("Place notes") { text = ExpandableTextPage.lakeNotes; lineLimit = 3; state = .content },
+            SpecimenCase("Short") { text = "Shady shore, good for kids."; lineLimit = 3; state = .content },
+            SpecimenCase("One line") { text = ExpandableTextPage.lakeNotes; lineLimit = 1; state = .content },
+            SpecimenCase("Long link") {
+                text = "https://dalada.kz/places/big-almaty-lake?share=trip&from=2026-10-12&to=2026-10-14&members=aigerim,daulet,alex,marat"
+                lineLimit = 2; state = .content
+            },
+            SpecimenCase("Long review") {
+                text = "We came for the weekend with two kids and a dog. The first evening was windy, so pitch the tent behind the big rocks on the left shore. The water is cold even in August, but the kids swam near the reeds where it is shallow. Pike bit early in the morning on a spinner; by ten the lake was full of boats and nothing bit. Take cash: the ranger at the gate does not take cards, and the nearest shop is forty minutes back towards the city."
+                lineLimit = 4; state = .content
+            },
+        ]
     }
 }
 
@@ -535,7 +634,9 @@ private struct FormSectionPage: View {
             donts: [
                 "Use the system Form or a List for a form.",
                 "Add dividers between its rows yourself.",
-            ]
+            ],
+            code: sectionCode,
+            cases: sectionCases
         ) {
             NavigationStack {
                 Group {
@@ -570,6 +671,57 @@ private struct FormSectionPage: View {
             ToggleControl("Footer", isOn: $showsFooter)
             StepperControl("Rows", value: $rows, in: 1...4)
         }
+    }
+
+    /// The call as the controls set it, with the preview's first rows.
+    private var sectionCode: String {
+        if state == .loading {
+            return SwiftCode.call("CardListSkeleton", [
+                .labeled("layout", ".section"),
+                .number("count", Double(rows), default: 3),
+            ])
+        }
+        var rowsCode = [
+            SwiftCode.call("UniversalRow", [
+                .positional(SwiftCode.string("Repeat")),
+                .text("icon", "repeat"),
+                .labeled("accessory", ".menu($period, options: periods)"),
+            ]),
+        ]
+        if rows > 1 {
+            rowsCode.append(SwiftCode.call("UniversalRow", [
+                .positional(SwiftCode.string("Reminder")),
+                .text("icon", "bell"),
+                .text("hint", "A day before the charge"),
+                .labeled("accessory", ".toggle($reminder)"),
+            ]))
+        }
+        return SwiftCode.call("FormSection", [
+            showsHeader ? .text("header", "Payment") : nil,
+            showsFooter ? .text("footer", "Charged on the 17th of every month.") : nil,
+        ], trailing: rowsCode.joined(separator: "\n"))
+    }
+
+    /// Sections as a subscription's edit sheet shows them.
+    private var sectionCases: [SpecimenCase] {
+        [
+            SpecimenCase("Subscription") {
+                showsHeader = true; showsFooter = true; rows = 4; title = "Groceries"; period = "month"
+                quiet = true; state = .content
+            },
+            SpecimenCase("One row") {
+                showsHeader = false; showsFooter = false; rows = 1; title = "Groceries"; period = "year"
+                quiet = true; state = .content
+            },
+            SpecimenCase("No footer") {
+                showsHeader = true; showsFooter = false; rows = 2; title = "Groceries"; period = "week"
+                quiet = false; state = .content
+            },
+            SpecimenCase("Long title") {
+                showsHeader = true; showsFooter = true; rows = 3; period = "month"; quiet = true
+                title = "Groceries and household supplies for the whole family"; state = .content
+            },
+        ]
     }
 }
 
@@ -616,7 +768,9 @@ private struct CardListPage: View {
                 "grid (8.15.0): the cards side by side in AppLayout.cardColumns() where the width holds two or more, on an iPad or in a Mac window under .readableWidth(AppLayout.wideWidth); one in a row on a phone, as here.",
                 "cardListToolbar(mode:selection:allIDs:onAdd:onDeleteSelected:) is the same toolbar on every list: select, change the order, add; Done; Delete N under the list.",
                 "Reordering: a long press lifts a card, moving it over another puts it there (a tick on each step). VoiceOver: move up, move down.",
-            ]
+            ],
+            code: listCode,
+            cases: listCases
         ) {
             NavigationStack {
                 ScrollView {
@@ -687,6 +841,67 @@ private struct CardListPage: View {
             row
         }
     }
+
+    /// The list and its toolbar as the controls set them.
+    private var listCode: String {
+        if state == .loading {
+            return SwiftCode.call("CardListSkeleton", [
+                .option("layout", ".\(layout)", default: ".cards"),
+                .number("count", Double(min(count, 6)), default: 3),
+            ])
+        }
+        var row = SwiftCode.call("UniversalRow", [
+            .positional("account.name"),
+            .labeled("leadingIcon", ".sfSymbol(account.symbol, color: AppColors.accent, size: AppIconSize.Tile.sm)"),
+            .labeled("value", "account.balance"),
+        ])
+        if layout == .stack {
+            row = SwiftCode.modifier(row, "padding", [.positional(".horizontal"), .positional("AppSpacing.lg")])
+            row = SwiftCode.modifier(row, "cardStyle")
+        }
+        let call = SwiftCode.call("CardList", [
+            .positional("accounts"),
+            .option("layout", ".\(layout)", default: ".cards"),
+            .labeled("mode", "mode"),
+            .labeled("selection", "$selection"),
+            .labeled("onMove", "{ accounts.move(fromOffsets: $0, toOffset: $1) }"),
+        ])
+        let list = "\(call) { account in\n\(SwiftCode.indent(row))\n}"
+        return SwiftCode.modifier(list, "cardListToolbar", [
+            .labeled("mode", "$mode"),
+            .labeled("selection", "$selection"),
+            .labeled("allIDs", "accounts.map(\\.id)"),
+            .text("addLabel", "New account"),
+            .labeled("onAdd", "addAccount"),
+            .labeled("onDeleteSelected", "confirmDelete"),
+        ])
+    }
+
+    /// A person's accounts, few and many, in each mode.
+    private var listCases: [SpecimenCase] {
+        [
+            SpecimenCase("Accounts") {
+                layout = .cards; mode = .browsing; count = 5; items = CardListPage.make(5); selection = []
+                state = .content
+            },
+            SpecimenCase("In one card") {
+                layout = .section; mode = .browsing; count = 12; items = CardListPage.make(12); selection = []
+                state = .content
+            },
+            SpecimenCase("Picking two") {
+                layout = .cards; mode = .selecting; items = CardListPage.make(count); selection = [0, 1]
+                state = .content
+            },
+            SpecimenCase("Reordering") {
+                layout = .stack; mode = .reordering; count = 5; items = CardListPage.make(5); selection = []
+                state = .content
+            },
+            SpecimenCase("200 accounts") {
+                layout = .section; mode = .browsing; count = 200; items = CardListPage.make(200); selection = []
+                state = .content
+            },
+        ]
+    }
 }
 
 private struct EditSheetContainerPage: View {
@@ -698,7 +913,9 @@ private struct EditSheetContainerPage: View {
         ComponentPage(
             name: "EditSheetContainer",
             summary: "The shell of an edit sheet: navigation bar with Cancel and Save, a form inside.",
-            apps: [.tenra, .dalada, .platina]
+            apps: [.tenra, .dalada, .platina],
+            code: sheetCode,
+            cases: sheetCases
         ) {
             DSButton("Open the sheet", appearance: .secondary, fullWidth: true) { isPresented = true }
             .sheet(isPresented: $isPresented) {
@@ -717,6 +934,34 @@ private struct EditSheetContainerPage: View {
         } controls: {
             ToggleControl("Saving (3.0.0): a spinner for Save", isOn: $isSaving)
         }
+    }
+
+    /// The call as the controls set it, with the preview's one field.
+    private var sheetCode: String {
+        let form = """
+            Section("Name") {
+                TextField("Account name", text: $name)
+            }
+            """
+        return SwiftCode.call("EditSheetContainer", [
+            .text("title", "Edit account"),
+            .labeled("isSaveDisabled", "name.isEmpty"),
+            .flag("isSaving", isSaving),
+            .labeled("onSave", "{ save() }"),
+            .labeled("onCancel", "{ dismiss() }"),
+        ], trailing: form)
+    }
+
+    /// Accounts to edit; each opens the sheet.
+    private var sheetCases: [SpecimenCase] {
+        [
+            SpecimenCase("Edit account") { name = "Kaspi Gold"; isSaving = false; isPresented = true },
+            SpecimenCase("Empty name") { name = ""; isSaving = false; isPresented = true },
+            SpecimenCase("Saving") { name = "Kaspi Gold"; isSaving = true; isPresented = true },
+            SpecimenCase("Long name") {
+                name = "Joint savings for the summer trip to Issyk-Kul"; isSaving = false; isPresented = true
+            },
+        ]
     }
 }
 
@@ -785,8 +1030,11 @@ private struct SampleEvent: Identifiable {
 
 private struct ArticleBodyPage: View {
     @State private var state: SpecimenState = .content
+    /// The article shown; the cases change it.
+    @State private var blocks: [ArticleBody.Block] = ArticleBodyPage.iceGuide
 
-    private let blocks: [ArticleBody.Block] = [
+    /// The page's first article: a guide to the ice.
+    private static let iceGuide: [ArticleBody.Block] = [
         .heading("Before you go", level: 2),
         .paragraph("Check the ice at the shore first: **10 cm** holds a person, *15 cm* a group."),
         .bullets(["A spare pair of gloves", "Ice picks around the neck", "A charged phone"]),
@@ -802,7 +1050,9 @@ private struct ArticleBodyPage: View {
             since: "2.8.0",
             apps: [.tenra, .dalada, .platina],
             canvas: .fill,
-            notes: ["The app parses its article format into blocks; inline Markdown inside a block is DesignKit's."]
+            notes: ["The app parses its article format into blocks; inline Markdown inside a block is DesignKit's."],
+            code: articleCode,
+            cases: articleCases
         ) {
             if state == .loading {
                 ArticleBodySkeleton()
@@ -812,6 +1062,62 @@ private struct ArticleBodyPage: View {
         } controls: {
             StateControl(state: $state)
         }
+    }
+
+    /// The article's blocks as Swift writes them.
+    private var articleCode: String {
+        if state == .loading {
+            return SwiftCode.call("ArticleBodySkeleton")
+        }
+        let elements = blocks.map { Self.blockCode($0) }
+        return "ArticleBody(\(SwiftCode.array(elements)))"
+    }
+
+    /// One block as Swift writes it.
+    private static func blockCode(_ block: ArticleBody.Block) -> String {
+        switch block {
+        case .heading(let text, let level):
+            return ".heading(\(SwiftCode.string(text)), level: \(level))"
+        case .paragraph(let text):
+            return ".paragraph(\(SwiftCode.string(text)))"
+        case .bullets(let items):
+            return ".bullets(\(SwiftCode.array(items.map { SwiftCode.string($0) })))"
+        case .steps(let items):
+            return ".steps(\(SwiftCode.array(items.map { SwiftCode.string($0) })))"
+        case .note(let text):
+            return ".note(\(SwiftCode.string(text)))"
+        }
+    }
+
+    /// Articles from a guide, an update and a route.
+    private var articleCases: [SpecimenCase] {
+        [
+            SpecimenCase("Ice guide") { blocks = ArticleBodyPage.iceGuide; state = .content },
+            SpecimenCase("One paragraph") {
+                blocks = [.paragraph("Leave the place cleaner than you found it: take your rubbish home.")]
+                state = .content
+            },
+            SpecimenCase("Release notes") {
+                blocks = [
+                    .heading("New in 1.4", level: 2),
+                    .bullets(["Offline maps for the whole region", "Trips shared with friends", "A **darker** map at night"]),
+                    .note("Update the app on every phone in the group to see shared trips."),
+                ]
+                state = .content
+            },
+            SpecimenCase("Long text") {
+                blocks = [
+                    .heading("Getting there", level: 2),
+                    .paragraph("Take the road south from the city past the ski resort turn-off. After the checkpoint the asphalt ends and the road climbs in tight bends for about sixteen kilometres; a regular car makes it in dry weather, but after rain only a four-wheel drive does. Leave early: the checkpoint closes the road to cars at 18:00, and parking at the dam fills up by ten on weekends."),
+                    .paragraph("From the dam it is a walk of forty minutes along the pipeline to the viewpoint. Bring water and a warm layer: at 2,500 m the wind is cold even in July."),
+                ]
+                state = .content
+            },
+            SpecimenCase("Long link") {
+                blocks = [.paragraph("Download the track: https://dalada.kz/routes/big-almaty-lake-observatory-loop-2026-10-12-final.gpx")]
+                state = .content
+            },
+        ]
     }
 }
 
@@ -869,7 +1175,9 @@ private struct MessageBubblePage: View {
             donts: [
                 "Put cards or charts inside the bubble: lay them out under it.",
                 "Animate the history a conversation opens with: only new messages enter.",
-            ]
+            ],
+            code: bubbleCode,
+            cases: bubbleCases
         ) {
             if state == .loading {
                 MessageBubbleSkeleton(role: incoming ? .incoming : .outgoing)
@@ -911,6 +1219,62 @@ private struct MessageBubblePage: View {
             ActionControl("Send", systemImage: "arrow.up.circle.fill", action: send)
             ActionControl("Clear the conversation", systemImage: "xmark.circle") { sent = [] }
         }
+    }
+
+    /// The call as the controls set it, the defaults left out.
+    private var bubbleCode: String {
+        let role = incoming ? ".incoming" : ".outgoing"
+        if state == .loading {
+            return SwiftCode.call("MessageBubbleSkeleton", [.option("role", role, default: ".incoming")])
+        }
+        let time: SwiftCode.Argument? = showsTime ? .labeled("time", "message.sentAt") : nil
+        let failure: SwiftCode.Argument? = failed ? .text("failure", "No connection") : nil
+        let retry: String? = failed ? "retry()" : nil
+        if markdown {
+            return SwiftCode.call("MessageBubble", [
+                .labeled("markdown", "answer"),
+                .option("role", role, default: ".incoming"),
+                time,
+                failure,
+            ], trailing: retry)
+        }
+        var statusArgument: SwiftCode.Argument? = nil
+        if !incoming, let status {
+            statusArgument = .labeled("status", ".\(status)")
+        }
+        return SwiftCode.call("MessageBubble", [
+            .positional(SwiftCode.string(text)),
+            .option("role", role, default: ".outgoing"),
+            time,
+            statusArgument,
+            failure,
+        ], trailing: retry)
+    }
+
+    /// Messages of a chat with an assistant: asked, on the way, not sent, answered.
+    private var bubbleCases: [SpecimenCase] {
+        [
+            SpecimenCase("Question") {
+                text = "How much did I spend on cafés this month?"; markdown = false; incoming = false
+                showsTime = true; status = .read; failed = false; sent = []; state = .content
+            },
+            SpecimenCase("Sending") {
+                text = "Move 20,000 ₸ to Savings"; markdown = false; incoming = false
+                showsTime = true; status = .sending; failed = false; sent = []; state = .content
+            },
+            SpecimenCase("Not sent") {
+                text = "Add 4,500 ₸ for a taxi yesterday"; markdown = false; incoming = false
+                showsTime = false; status = nil; failed = true; sent = []; state = .content
+            },
+            SpecimenCase("Long word") {
+                text = "Receipt KSP-20261017-0004821396-ALMATY-MEGA-PARK-POS0042"; markdown = false; incoming = false
+                showsTime = true; status = .sent; failed = false; sent = []; state = .content
+            },
+            SpecimenCase("Answer") {
+                text = "How much did I spend on cafés this month?"; markdown = true; incoming = true
+                showsTime = true; status = nil; failed = false; sent = []; state = .content
+            },
+        ]
     }
 
     /// Adds the next question, and its reply a moment later.

@@ -238,6 +238,8 @@ private struct ScheduleRowPage: View {
 }
 
 private struct ItemRowPage: View {
+    /// The first row's title, which the cases change.
+    @State private var title = "Morning on Kapchagay"
     @State private var style: ItemRowStyle = .standard
     @State private var leading = 1
     @State private var showsBadge = false
@@ -260,7 +262,9 @@ private struct ItemRowPage: View {
                 "A row of a glass section (8.1.0): it pads itself 12 pt above and below (verticalPadding), and the divider under it starts at its text. verticalPadding: 0 in a stack that spaces its rows or a List.",
                 "Inside a Button or NavigationLink the divider's inset stays in the label: put .rowDividerInset(ItemRowStyle.standard.symbolDividerInset) on the link.",
             ],
-            styles: ["standard", "large"]
+            styles: ["standard", "large"],
+            code: code,
+            cases: cases
         ) {
             FormSection {
                 if state == .loading {
@@ -269,7 +273,7 @@ private struct ItemRowPage: View {
                     ItemRowSkeleton(style: style, showsLeading: leading != 0, verticalPadding: verticalPadding)
                 } else {
                     ItemRow(
-                        "Morning on Kapchagay",
+                        title,
                         badge: showsBadge ? "Auto" : nil,
                         detail: showsDetail ? "Pike on the north shore, a light wind from the hills." : nil,
                         meta: metaLines,
@@ -320,6 +324,69 @@ private struct ItemRowPage: View {
         }
         return lines
     }
+
+    /// The first row as the controls set it, the defaults left out.
+    private var code: String {
+        var meta = ["MetaLine([.text(\"12 Oct\"), .text(\"14.2 km\"), .text(\"3 h 10 min\")])"]
+        if showsNote {
+            meta.append("MetaLine([.label(\"with @aida\", systemImage: \"person.2\")], tint: AppColors.Text.tertiary)")
+        }
+        let badge: SwiftCode.Argument? = showsBadge ? .text("badge", "Auto") : nil
+        let detail: SwiftCode.Argument? = showsDetail
+            ? .text("detail", "Pike on the north shore, a light wind from the hills.") : nil
+        let leadingArgument: SwiftCode.Argument?
+        switch leading {
+        case 1: leadingArgument = .labeled("leading", ".symbol(\"figure.fishing\")")
+        case 2: leadingArgument = .labeled("leading", ".glyph(\"book\")")
+        default: leadingArgument = nil
+        }
+        let accessoryCode: String?
+        switch accessory {
+        case 1: accessoryCode = "DisclosureChevron()"
+        case 2:
+            accessoryCode = SwiftCode.modifier("Image(systemName: \"wrench.and.screwdriver\")", "foregroundStyle",
+                                               [.positional("AppColors.Status.warning")])
+        default: accessoryCode = nil
+        }
+        let padding = verticalPadding == 0 ? "0" : "AppSpacing.md"
+        return SwiftCode.call("ItemRow", [
+            .positional(SwiftCode.string(title)),
+            badge,
+            detail,
+            .labeled("meta", SwiftCode.array(meta)),
+            leadingArgument,
+            .option("style", ".\(style)", default: ".standard"),
+            .labeled("titleLineLimit", "1"),
+            .option("verticalPadding", padding, default: "AppSpacing.md"),
+        ], trailing: accessoryCode)
+    }
+
+    /// Rows as the apps draw them.
+    private var cases: [SpecimenCase] {
+        [
+            SpecimenCase("Trip") {
+                title = "Morning on Kapchagay"; style = .standard; leading = 1; showsBadge = false
+                showsDetail = false; showsNote = true; accessory = 1; verticalPadding = AppSpacing.md; state = .content
+            },
+            SpecimenCase("Long title") {
+                title = "Three days along Charyn Canyon and the Black Gorge with the whole family"; style = .standard
+                leading = 1; showsBadge = false; showsDetail = false; showsNote = false; accessory = 1
+                verticalPadding = AppSpacing.md; state = .content
+            },
+            SpecimenCase("Article") {
+                title = "How to read the ice"; style = .standard; leading = 2; showsBadge = false
+                showsDetail = true; showsNote = false; accessory = 0; verticalPadding = AppSpacing.md; state = .content
+            },
+            SpecimenCase("No symbol") {
+                title = "Evening walk"; style = .large; leading = 0; showsBadge = true
+                showsDetail = false; showsNote = false; accessory = 1; verticalPadding = AppSpacing.md; state = .content
+            },
+            SpecimenCase("Needs repair") {
+                title = "Kayak to Kolsay"; style = .standard; leading = 1; showsBadge = false
+                showsDetail = false; showsNote = true; accessory = 2; verticalPadding = AppSpacing.md; state = .content
+            },
+        ]
+    }
 }
 
 private struct MetaLinePage: View {
@@ -339,7 +406,9 @@ private struct MetaLinePage: View {
                 "dot: facts of one kind (a date, a distance). space: labels with symbols (\"Friends\", \"Pending\").",
                 "A long fact wraps; .lineLimit(1) on the line keeps each to one line.",
                 "At accessibility text sizes the facts go one under another, without dots; a symbol alone stays after its fact.",
-            ]
+            ],
+            code: code,
+            cases: cases
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 MetaLine(
@@ -369,9 +438,48 @@ private struct MetaLinePage: View {
     private var lineTint: Color {
         faint ? AppColors.Text.tertiary : AppColors.Text.secondary
     }
+
+    /// The second line (the one every control changes), in the font the preview gives it.
+    private var code: String {
+        let pending = tinted
+            ? ".label(\"Pending\", systemImage: \"hourglass\", tint: AppColors.Status.warning)"
+            : ".label(\"Pending\", systemImage: \"hourglass\")"
+        let items = SwiftCode.array([".label(\"Friends\", systemImage: \"person.2\")", pending])
+        let tint = faint ? "AppColors.Text.tertiary" : "AppColors.Text.secondary"
+        var line = SwiftCode.call("MetaLine", [
+            .positional(items),
+            .option("separator", separator == 0 ? ".dot" : ".space", default: ".dot"),
+            .option("tint", tint, default: "AppColors.Text.secondary"),
+        ])
+        line = SwiftCode.modifier(line, "font", [.positional("AppTypography.caption")])
+        if oneLine {
+            line = SwiftCode.modifier(line, "lineLimit", [.positional("1")])
+        }
+        return line
+    }
+
+    /// Lines as the apps write them.
+    private var cases: [SpecimenCase] {
+        [
+            SpecimenCase("Pending request") {
+                separator = 1; tinted = true; faint = false; oneLine = false
+            },
+            SpecimenCase("Accepted friend") {
+                separator = 1; tinted = false; faint = false; oneLine = false
+            },
+            SpecimenCase("Note under facts") {
+                separator = 0; tinted = false; faint = true; oneLine = false
+            },
+            SpecimenCase("Narrow cell") {
+                separator = 0; tinted = true; faint = false; oneLine = true
+            },
+        ]
+    }
 }
 
 private struct PersonRowPage: View {
+    /// The person's name, which the cases change.
+    @State private var name = "Aida Nurlanovna"
     @State private var showsSubtitle = true
     @State private var showsDetail = false
     @State private var style: PersonRowStyle = .list
@@ -386,7 +494,9 @@ private struct PersonRowPage: View {
             apps: [.dalada, .platina],
             canvas: .fill,
             notes: ["style: .card (2.8.0): a 64 pt avatar, the name in h4, the @username and a third line (detail), in a card that pads itself."],
-            styles: ["list", "card"]
+            styles: ["list", "card"],
+            code: code,
+            cases: cases
         ) {
             if style == .card {
                 specimen
@@ -407,7 +517,7 @@ private struct PersonRowPage: View {
         if state == .loading {
             PersonRowSkeleton(showsSubtitle: showsSubtitle, style: style)
         } else {
-            PersonRow(name: "Aida Nurlanovna", subtitle: showsSubtitle ? "@aida" : nil,
+            PersonRow(name: name, subtitle: showsSubtitle ? "@aida" : nil,
                       detail: showsDetail ? "Almaty" : nil, style: style) {
                 switch trailing {
                 case 1: DisclosureChevron()
@@ -416,6 +526,50 @@ private struct PersonRowPage: View {
                 }
             }
         }
+    }
+
+    /// The row as the controls set it, the defaults left out.
+    private var code: String {
+        let subtitle: SwiftCode.Argument? = showsSubtitle ? .text("subtitle", "@aida") : nil
+        let detail: SwiftCode.Argument? = showsDetail ? .text("detail", "Almaty") : nil
+        let trailingCode: String?
+        switch trailing {
+        case 1: trailingCode = "DisclosureChevron()"
+        case 2: trailingCode = "DSButton(\"Accept\", size: .small) { accept() }"
+        default: trailingCode = nil
+        }
+        return SwiftCode.call("PersonRow", [
+            .text("name", name),
+            subtitle,
+            detail,
+            .option("style", ".\(style)", default: ".list"),
+        ], trailing: trailingCode)
+    }
+
+    /// People as the apps show them.
+    private var cases: [SpecimenCase] {
+        [
+            SpecimenCase("Friend") {
+                name = "Aida Nurlanovna"; showsSubtitle = true; showsDetail = false; style = .list; trailing = 1
+                state = .content
+            },
+            SpecimenCase("Friend request") {
+                name = "Aida Nurlanovna"; showsSubtitle = true; showsDetail = false; style = .list; trailing = 2
+                state = .content
+            },
+            SpecimenCase("Long name") {
+                name = "Aida Nurlanovna Kassymova-Zhanibekova"; showsSubtitle = true; showsDetail = true
+                style = .list; trailing = 1; state = .content
+            },
+            SpecimenCase("No username") {
+                name = "Aida"; showsSubtitle = false; showsDetail = false; style = .list; trailing = 0
+                state = .content
+            },
+            SpecimenCase("Profile") {
+                name = "Aida Nurlanovna"; showsSubtitle = true; showsDetail = true; style = .card; trailing = 0
+                state = .content
+            },
+        ]
     }
 }
 
@@ -466,6 +620,8 @@ private struct CommentRowPage: View {
 }
 
 private struct ChecklistRowPage: View {
+    /// The first item, which the cases change.
+    @State private var title = "Tent"
     @State private var isChecked = false
     @State private var showsMark = true
     @State private var verticalPadding = AppSpacing.sm
@@ -480,14 +636,16 @@ private struct ChecklistRowPage: View {
             canvas: .fill,
             notes: [
                 "A row of a glass section (8.1.0): it pads itself 12 pt above and below (verticalPadding), and the divider under it starts at its title, after the circle. verticalPadding: 0 in a stack that spaces its rows or a List.",
-            ]
+            ],
+            code: code,
+            cases: cases
         ) {
             FormSection {
                 if state == .loading {
                     ChecklistRowSkeleton(verticalPadding: verticalPadding)
                     ChecklistRowSkeleton(verticalPadding: verticalPadding)
                 } else {
-                    ChecklistRow("Tent", isChecked: isChecked,
+                    ChecklistRow(title, isChecked: isChecked,
                                  accessorySystemImage: showsMark ? "backpack" : nil,
                                  accessoryLabel: showsMark ? "From gear" : nil,
                                  verticalPadding: verticalPadding) { isChecked.toggle() }
@@ -502,6 +660,47 @@ private struct ChecklistRowPage: View {
             ChoiceControl("Vertical padding", selection: $verticalPadding,
                           options: [("Section (8)", AppSpacing.sm), ("None (0)", 0)])
         }
+    }
+
+    /// The first row as the controls set it, the defaults left out.
+    private var code: String {
+        let image: SwiftCode.Argument? = showsMark ? .text("accessorySystemImage", "backpack") : nil
+        let label: SwiftCode.Argument? = showsMark ? .text("accessoryLabel", "From gear") : nil
+        let padding: String
+        if verticalPadding == 0 {
+            padding = "0"
+        } else if verticalPadding == AppSpacing.sm {
+            padding = "AppSpacing.sm"
+        } else {
+            padding = "AppSpacing.md"
+        }
+        return SwiftCode.call("ChecklistRow", [
+            .positional(SwiftCode.string(title)),
+            .labeled("isChecked", isChecked ? "true" : "false"),
+            image,
+            label,
+            .option("verticalPadding", padding, default: "AppSpacing.md"),
+        ], trailing: "toggle()")
+    }
+
+    /// Items of a packing list.
+    private var cases: [SpecimenCase] {
+        [
+            SpecimenCase("To pack") {
+                title = "Tent"; isChecked = false; showsMark = true; verticalPadding = AppSpacing.sm; state = .content
+            },
+            SpecimenCase("Packed") {
+                title = "Tent"; isChecked = true; showsMark = true; verticalPadding = AppSpacing.sm; state = .content
+            },
+            SpecimenCase("Long item") {
+                title = "Spare batteries for the headlamp and the GPS navigator"; isChecked = true; showsMark = false
+                verticalPadding = AppSpacing.sm; state = .content
+            },
+            SpecimenCase("Added by hand") {
+                title = "Thermos"; isChecked = false; showsMark = false; verticalPadding = AppSpacing.sm
+                state = .content
+            },
+        ]
     }
 }
 
