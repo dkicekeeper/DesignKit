@@ -118,7 +118,7 @@ Plasma (light `#D6006F`, dark `#FF4FA0`; the owner's choice of 2026-11-25, `#357
 friend's screen), guides (`ArticleBody`,
 `ExpandableText`), picking (`SearchablePicker`), its game screen
 (`.heroBackground(clearHeight:picture:)`, 8.14.0), sharing (`ShareCardSheet`). Its guide:
-`CLAUDE.md` («DesignKit») and `docs/PLAN.md` §4. CI's `platina` job builds it against this checkout
+`CLAUDE.md` («DesignKit») and `docs/domains/design.md`. CI's `platina` job builds it against this checkout
 on GitHub's Xcode 27 image, as its own CI does (since 8.17.4), and the Gallery's badges read its code
 since 8.17.1 (CI's `Gallery badges` job checks it out with Tenra and Dalada).
 
@@ -298,7 +298,7 @@ release by release (the audits, the owner's reviews, the majors): [CHANGELOG.md]
 | What exists vs Apple HIG / Material / Fluent / Carbon / Polaris / Atlassian / Astryx, next candidates | [docs/benchmark.md](docs/benchmark.md) |
 | Components no app uses yet and where they could go (for the app sessions) | [docs/adoption.md](docs/adoption.md) |
 | Where a component goes (Gallery sections, source folders), how its Gallery page is built | [docs/gallery-structure.md](docs/gallery-structure.md) |
-| How an app uses DesignKit (its adapters, screens, effects in use) | Tenra's `docs/design-system.md`, Dalada's `CLAUDE.md` («Компоненты интерфейса»), Platina's `CLAUDE.md` («DesignKit») and `docs/PLAN.md` §4 |
+| How an app uses DesignKit (its adapters, screens, effects in use) | Tenra's `docs/design-system.md`, Dalada's `CLAUDE.md` («Компоненты интерфейса»), Platina's `CLAUDE.md` («DesignKit») and `docs/domains/design.md` |
 
 <!-- warehouse:standard:start -->
 <!-- Стандарт Warehouse, версия 1. Не править здесь: блок переписывает workflow standard.yml из standard/agents.md репозитория Warehouse. -->
