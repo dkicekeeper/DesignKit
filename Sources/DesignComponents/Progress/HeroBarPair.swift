@@ -45,9 +45,9 @@ public struct HeroBarPair: View {
 
     private var onColor: Bool { heroTone == .onColor }
     /// The current bar: its colour on the page, white on colour.
-    private var barColor: Color { onColor ? AppColors.staticWhite : color }
+    private var barColor: Color { onColor ? AppColors.Text.primaryOnDark : color }
     /// The earlier bar and the baseline.
-    private var mutedColor: Color { onColor ? AppColors.staticWhite : AppColors.Text.secondary }
+    private var mutedColor: Color { onColor ? AppColors.Text.primaryOnDark : AppColors.Text.secondary }
     private var immediate: Bool { !animatesOnAppear || AppAnimation.isReduceMotionEnabled }
     static let cornerRadius: CGFloat = 10
     /// Bars shorter than this read as "missing" — a zero value stays visible.

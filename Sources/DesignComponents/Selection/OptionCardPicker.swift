@@ -136,7 +136,7 @@ private struct OptionPreviewCard<Artwork: View>: View {
                 .selectionOutline(isSelected, cornerRadius: AppRadius.xl)
             Text(verbatim: title)
                 .font(AppTypography.bodyEmphasis)
-                .foregroundStyle(isSelected ? AppColors.accent : AppColors.Text.primary)
+                .foregroundStyle(isSelected ? AppColors.Text.action : AppColors.Text.primary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
         }

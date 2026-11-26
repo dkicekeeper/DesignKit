@@ -22,8 +22,8 @@ import DesignSupport
 ///
 /// ```swift
 /// ChartSelectionBanner(title: "январь 2025", entries: [
-///     .init(value: 480_000, color: AppColors.success, label: "Income", changePercent: 12, better: .higher),
-///     .init(value: 275_000, color: AppColors.destructive, label: "Expenses",
+///     .init(value: 480_000, color: AppColors.Status.positive, label: "Income", changePercent: 12, better: .higher),
+///     .init(value: 275_000, color: AppColors.Status.negative, label: "Expenses",
 ///           details: [.init("Forecast", value: 520_000)]),
 /// ], format: .currency("KZT"))
 /// ```
@@ -228,8 +228,8 @@ struct ChartChangeText: View {
     private var color: Color {
         switch (direction, better) {
         case (.flat, _), (_, nil): return AppColors.Text.secondary
-        case (.up, .higher), (.down, .lower): return AppColors.success
-        default: return AppColors.destructive
+        case (.up, .higher), (.down, .lower): return AppColors.Status.positive
+        default: return AppColors.Status.negative
         }
     }
 

@@ -14,7 +14,7 @@ import DesignSupport
 /// "Health score / Good / 72 / 100" with a 120 pt half-gauge on the right.
 ///
 /// ```swift
-/// ScoreCard(title: "Health score", grade: "Good", score: 72, color: AppColors.success)
+/// ScoreCard(title: "Health score", grade: "Good", score: 72, color: AppColors.Status.positive)
 /// ```
 public struct ScoreCard: View {
     let title: String

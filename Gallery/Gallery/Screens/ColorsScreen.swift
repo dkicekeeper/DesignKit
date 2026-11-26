@@ -30,16 +30,17 @@ struct ColorsScreen: View {
     ]
 
     private let background: [Token] = [
-        .init(name: "Background.base", color: AppColors.Background.base, use: "The screen"),
-        .init(name: "Background.baseAlt", color: AppColors.Background.baseAlt, use: "Grouped-list screen"),
-        .init(name: "Background.baseAltCard", color: AppColors.Background.baseAltCard, use: "Cards, list sections on baseAlt"),
-        .init(name: "Background.elevation1", color: AppColors.Background.elevation1, use: "Sheets, cards on base"),
-        .init(name: "Background.elevation2", color: AppColors.Background.elevation2, use: "Cards on elevation 1"),
-        .init(name: "Background.elevation3", color: AppColors.Background.elevation3, use: "Above everything"),
-        .init(name: "Background.neutral1", color: AppColors.Background.neutral1, use: "Fields, grouped blocks"),
-        .init(name: "Background.neutral2", color: AppColors.Background.neutral2, use: "Tracks, sunken controls"),
-        .init(name: "Background.fill", color: AppColors.Background.fill, use: "Translucent, any surface"),
+        .init(name: "Background.page", color: AppColors.Background.page, use: "The screen"),
+        .init(name: "Background.card", color: AppColors.Background.card, use: "Opaque grey surface: a .fill card, a panel"),
+        .init(name: "Background.container", color: SurfaceStyle.glass.container, use: "Field, plate, chip in a card (on glass)"),
+        .init(name: "Background.container", color: SurfaceStyle.fill.container, use: "… in a grey .fill card"),
+        .init(name: "Background.containerStrong", color: SurfaceStyle.glass.containerStrong, use: "Track, skeleton in a card (on glass)"),
+        .init(name: "Background.containerStrong", color: SurfaceStyle.fill.containerStrong, use: "… in a grey .fill card"),
+        .init(name: "Background.sheet", color: AppColors.Background.sheet, use: "Sheets, modal screens"),
+        .init(name: "Background.floating", color: AppColors.Background.floating, use: "Tooltips, popovers"),
         .init(name: "Background.scrim", color: AppColors.Background.scrim, use: "Dims the app under a moment (8.18.0)"),
+        .init(name: "Background.baseAlt", color: AppColors.Background.baseAlt, use: "A system grouped List only"),
+        .init(name: "Background.baseAltCard", color: AppColors.Background.baseAltCard, use: "Its sections"),
     ]
 
     private let status: [Token] = [
@@ -62,27 +63,10 @@ struct ColorsScreen: View {
         .init(name: "Border.darkModeOnly", color: AppColors.Border.darkModeOnly, use: "Shows in dark only"),
     ]
 
-    private let legacy: [Token] = [
-        .init(name: "bgBase", color: AppColors.bgBase, use: "= Background.base"),
-        .init(name: "bgCard", color: AppColors.bgCard, use: "= Background.neutral1"),
-        .init(name: "bgMuted", color: AppColors.bgMuted, use: "= Background.neutral2"),
-        .init(name: "textPrimary", color: AppColors.textPrimary, use: "= Text.primary"),
-        .init(name: "textSecondary", color: AppColors.textSecondary, use: "= Text.secondary"),
-        .init(name: "textTertiary", color: AppColors.textTertiary, use: "= Text.tertiary"),
-        .init(name: "accent", color: AppColors.accent, use: "DesignKitTheme.accent"),
+    private let accentTokens: [Token] = [
+        .init(name: "accent", color: AppColors.accent, use: "Tints, outlines, tracks (DesignKitTheme.accent)"),
         .init(name: "accentFill", color: AppColors.accentFill, use: "Under white text, 4.5:1 (8.10.0)"),
-        .init(name: "destructive", color: AppColors.destructive, use: "= Status.negative"),
-        .init(name: "success", color: AppColors.success, use: "= Status.positive"),
-        .init(name: "warning", color: AppColors.warning, use: "= Status.warning"),
-        .init(name: "staticWhite", color: AppColors.staticWhite, use: "= Text.primaryOnDark"),
-    ]
-
-    private let financial: [Token] = [
-        .init(name: "income", color: AppColors.income, use: "Money in: fills, bars, icons"),
-        .init(name: "incomeText", color: AppColors.incomeText, use: "Money in as text, 4.5:1 (8.10.0)"),
-        .init(name: "expense", color: AppColors.expense, use: "Money out (not red)"),
-        .init(name: "transfer", color: AppColors.transfer, use: "Between own accounts"),
-        .init(name: "planned", color: AppColors.planned, use: "= Status.info"),
+        .init(name: "Text.action", color: AppColors.Text.action, use: "As text and icons, 4.5:1 (vNext)"),
     ]
 
     var body: some View {
@@ -105,13 +89,10 @@ struct ColorsScreen: View {
                 tokenList(border)
                 darkModeOnlyDemo
             }
-            ShowcaseSection(title: "Flat names (1.x)", subtitle: "Aliases of the groups · keep working") {
-                tokenList(legacy)
+            ShowcaseSection(title: "Accent", subtitle: "The app's brand: DesignKitTheme.accent · the only flat names") {
+                tokenList(accentTokens)
             }
-            ShowcaseSection(title: "Financial", subtitle: "Transaction-type tokens") {
-                tokenList(financial)
-            }
-            ShowcaseSection(title: "Category palette", subtitle: "CategoryColors · 30 picker colours, the first 14 also hashed") {
+            ShowcaseSection(title: "Data", subtitle: "AppColors.Data · 30 picker colours, the first 14 also hashed by name") {
                 paletteDemo
             }
             ShowcaseSection(title: "Palette (3.7.0)", subtitle: "AppColors.Palette · deep hues for markers, lines and zones · the same in both themes") {
@@ -235,10 +216,10 @@ struct ColorsScreen: View {
 
     private var elevationDemo: some View {
         ZStack(alignment: .topLeading) {
-            level("base", AppColors.Background.base, offset: 0)
-            level("elevation1", AppColors.Background.elevation1, offset: 1)
-            level("elevation2", AppColors.Background.elevation2, offset: 2)
-            level("elevation3", AppColors.Background.elevation3, offset: 3)
+            level("page", AppColors.Background.page, offset: 0)
+            level("card", AppColors.Background.card, offset: 1)
+            level("sheet", AppColors.Background.sheet, offset: 2)
+            level("floating", AppColors.Background.floating, offset: 3)
         }
         .frame(height: 200, alignment: .topLeading)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -293,16 +274,16 @@ struct ColorsScreen: View {
         }
     }
 
-    /// The 30 colours a user picks from (`CategoryColors.pickerPalette`, `UniversalRow(accessory: .colors)`'s
+    /// The 30 colours a user picks from (`AppColors.Data.pickerPalette`, `UniversalRow(accessory: .colors)`'s
     /// default). The first 14, marked "#", are the hash palette too: the colour of a name that
-    /// has none stored (`CategoryColors.color(for:)`: an insight's item, a letter avatar,
+    /// has none stored (`AppColors.Data.color(for:)`: an insight's item, a letter avatar,
     /// a category before the user picks one). Under them, a few names and the colour they hash to.
     private var paletteDemo: some View {
-        let hashed = CategoryColors.paletteColors.count
+        let hashed = AppColors.Data.palette.count
         let names = ["Food", "Travel", "Bills", "Health", "Shopping", "Salary", "Gifts", "Home"]
         return VStack(alignment: .leading, spacing: AppSpacing.lg) {
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: AppSpacing.sm), count: 6), spacing: AppSpacing.sm) {
-                ForEach(Array(CategoryColors.pickerPalette.enumerated()), id: \.offset) { index, hex in
+                ForEach(Array(AppColors.Data.pickerPalette.enumerated()), id: \.offset) { index, hex in
                     VStack(spacing: AppSpacing.xxs) {
                         Circle()
                             .fill(Color(hex: hex))
@@ -322,13 +303,13 @@ struct ColorsScreen: View {
                     }
                 }
             }
-            Text("# = also in the hash palette (\(hashed) of \(CategoryColors.pickerPalette.count)). Its size and order are frozen: a new colour goes to the picker only.")
+            Text("# = also in the hash palette (\(hashed) of \(AppColors.Data.pickerPalette.count)). Its size and order are frozen: a new colour goes to the picker only.")
                 .font(AppTypography.caption)
                 .foregroundStyle(AppColors.Text.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 76), spacing: AppSpacing.sm)], spacing: AppSpacing.sm) {
                 ForEach(names, id: \.self) { name in
-                    let color = CategoryColors.color(for: name)
+                    let color = AppColors.Data.color(for: name)
                     Text(name)
                         .font(AppTypography.caption.weight(.medium))
                         .foregroundStyle(color)

@@ -220,7 +220,7 @@ extension ComponentSnapshots {
                         Spacer()
                         Image(systemName: "line.3.horizontal.decrease")
                             .frame(width: 44, height: 44)
-                            .background(AppColors.Background.neutral1, in: Circle())
+                            .background(AppColors.Background.card, in: Circle())
                             .spotlightAnchor("filter")
                     }
                     Color.clear.frame(height: 120)

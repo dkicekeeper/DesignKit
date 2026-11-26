@@ -129,7 +129,7 @@ public struct AmountEntrySheet: View {
             .safeAreaInset(edge: .bottom) {
                 if !noteFocused {
                     CalculatorKeypad(model: calc)
-                        .background(AppColors.bgBase)
+                        .background(AppColors.Background.page)
                 }
             }
             .onChange(of: calc.amountText) { _, newValue in

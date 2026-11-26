@@ -80,7 +80,7 @@ public struct LimitProgressCard: View {
                 Spacer()
                 Text(String(format: "%.0f%%", percentage))
                     .font(AppTypography.body)
-                    .foregroundStyle(isOverLimit ? AppColors.destructive : AppColors.Text.primary)
+                    .foregroundStyle(isOverLimit ? AppColors.Status.negative : AppColors.Text.primary)
             }
 
             LinearProgressBar(

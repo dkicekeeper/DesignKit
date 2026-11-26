@@ -1,49 +1,26 @@
 //
 //  AppColors.swift
-//  Tenra
+//  DesignKit
 //
-//  Semantic color tokens + category palette. Single source of truth for all colors.
+//  The brand accent, and the flat names of 1.x. Every other colour lives in a group by role
+//  (AppColors+Semantic.swift: Text, Background, Status, Border), the data colours in
+//  AppColors+Data.swift and the deep hues in AppColors+Palette.swift.
 //
 
 import SwiftUI
 
 // MARK: - Semantic Colors
 
-/// Semantic colours. Since 1.6.0 the canonical tokens are grouped (`AppColors.Text`,
-/// `.Background`, `.Status`, `.Border`: AppColors+Semantic.swift); the flat names below are
-/// aliases of them and keep working.
+/// DesignKit's colours. The accent is flat (`accent`, `accentFill`); everything else is grouped by
+/// role (`AppColors.Text`, `.Background`, `.Status`, `.Border`, `.Data`, `.Palette`). The flat
+/// names of 1.x below are deprecated (vNext) and go in 9.0.0; a finance colour (money in, money
+/// out, a transfer) is the app's own (Tenra's `DesignKitBridge.swift`).
 public enum AppColors {
-    // MARK: Backgrounds
-    //
-    // Три уровня иерархии — base → card → muted.
-    // bgBase   — фон самого экрана.
-    // bgCard   — приподнятая поверхность (карточки, fallback под cardStyle на iOS<26).
-    // bgMuted  — "утопленный" слой внутри карточек (треки прогресс-баров, фон чипов).
+    // MARK: Accent
 
-    /// Фон самого экрана.
-    public static let bgBase = Background.base
-
-    /// Приподнятая поверхность — карточки, elevated containers.
-    public static let bgCard = Background.neutral1
-
-    /// "Утопленный" фон — chips, прогресс-бар треки, secondary buttons.
-    public static let bgMuted = Background.neutral2
-
-    // MARK: Text Colors
-
-    /// Primary text (используй системный .primary для auto light/dark)
-    public static let textPrimary = Text.primary
-
-    /// Secondary text — системный адаптивный цвет (.secondary).
-    public static let textSecondary = Text.secondary
-
-    /// Tertiary text (используй системный .gray для мета-информации)
-    public nonisolated static let textTertiary = Text.tertiary
-
-    // MARK: Interactive Colors
-
-    /// Accent color (для выделений, selections).
-    /// Configured per app via `DesignKitTheme.accent` (default: indigo).
+    /// The brand accent: tints, outlines, tracks, selection. Configured per app via
+    /// `DesignKitTheme.accent` (default: indigo). As text use `AppColors.Text.action`, its
+    /// readable form.
     public nonisolated static var accent: Color { DesignKitTheme.accent }
 
     /// The accent as a fill under white text or a white symbol (8.10.0): a primary button, the
@@ -52,116 +29,90 @@ public enum AppColors {
     /// Dalada's green a step deeper in both. Tints, outlines and tracks keep `accent`.
     public nonisolated static var accentFill: Color { readableFill(DesignKitTheme.accent) }
 
-    /// Destructive actions
+    // MARK: Deprecated flat names (1.x)
+
+    /// The screen.
+    @available(*, deprecated, message: "Use AppColors.Background.page.")
+    public static let bgBase = Background.page
+
+    /// An opaque grey surface.
+    @available(*, deprecated, message: "Use AppColors.Background.card for an opaque grey surface, AppColors.Background.container inside a card.")
+    public static let bgCard = Background.card
+
+    /// A sunken grey: tracks, chips.
+    @available(*, deprecated, message: "Use AppColors.Background.containerStrong (SurfaceStyle.containerStrong where a Color is needed).")
+    public static let bgMuted = SurfaceStyle.glass.containerStrong
+
+    /// Main text.
+    @available(*, deprecated, message: "Use AppColors.Text.primary.")
+    public static let textPrimary = Text.primary
+
+    /// Secondary text.
+    @available(*, deprecated, message: "Use AppColors.Text.secondary.")
+    public static let textSecondary = Text.secondary
+
+    /// Hints, placeholders.
+    @available(*, deprecated, message: "Use AppColors.Text.tertiary.")
+    public nonisolated static let textTertiary = Text.tertiary
+
+    /// Destructive actions, errors.
+    @available(*, deprecated, message: "Use AppColors.Status.negative (Status.negativeText for text).")
     public nonisolated static let destructive = Status.negative
 
-    /// Success/positive — используй для UI-состояний (кнопки, индикаторы).
-    /// Для финансового дохода используй `income`.
+    /// Success, a positive state.
+    @available(*, deprecated, message: "Use AppColors.Status.positive (Status.positiveText for text).")
     public nonisolated static let success = Status.positive
 
-    /// Warning
+    /// A warning.
+    @available(*, deprecated, message: "Use AppColors.Status.warning (Status.warningText for text).")
     public nonisolated static let warning = Status.warning
 
-    // MARK: Static Colors
-
-    /// Белый цвет без адаптации к теме — для текста поверх тёмных/цветных фонов.
-    /// Не используй для обычного текста: предпочитай `textPrimary`.
+    /// White in both themes, on dark photos and colours.
+    @available(*, deprecated, message: "Use AppColors.Text.primaryOnDark.")
     public static let staticWhite = Text.primaryOnDark
 
-    // MARK: Transaction Type Colors (semantic)
-
-    /// Income transactions — финансово-специфичный зелёный.
-    /// Не зависит от `success`: если дизайн меняет success, income не изменится.
-    /// `nonisolated` so the nonisolated `InsightsService` can read it without a
-    /// MainActor hop (`Color` is `Sendable`).
-    public nonisolated static let income = Color(red: 0.13, green: 0.70, blue: 0.37)
-
-    /// Income as text (8.10.0): an amount of money in, a "paid" mark. `readable(income)`: 4.5:1 on
-    /// the page and on its tint (the bright `income` reads at 2.75:1 on white). Fills, bars, icons
-    /// on a plate and chart marks keep `income`.
-    public nonisolated static let incomeText = readable(income)
-
-    /// Expense transactions.
-    /// Сознательно НЕ красный (как могло бы подсказать "destructive"-чтение расхода):
-    /// если бы расходы рендерились красным, всё приложение визуально кричало бы
-    /// тревогой — большинство транзакций это расходы. Чёрный (`.primary`) даёт
-    /// нейтральный baseline, а контраст создаётся через `income` (зелёный)
-    /// и `transfer` (cyan). Резолвится в тот же цвет, что и `textPrimary`,
-    /// но семантически это отдельный токен — менять расход на другой цвет
-    /// (если когда-нибудь понадобится) можно будет в одной точке.
-    public nonisolated static let expense = Color.primary
-
-    /// Transfer / internal transactions (distinct cyan-teal, not accent blue)
-    public static let transfer = Color(red: 0.0, green: 0.75, blue: 0.85)
-
-    /// Planned / future / scheduled transactions
+    /// Planned, scheduled things.
+    @available(*, deprecated, message: "Use AppColors.Status.info.")
     public static let planned = Status.info
 
+    // MARK: Deprecated finance colours (the app's own since vNext)
+
+    /// Money in: a green of its own, RGB(0.13, 0.70, 0.37).
+    @available(*, deprecated, message: "A finance colour is the app's own: define it in the app (Tenra: DesignKitBridge.swift) or use AppColors.Status.positive.")
+    public nonisolated static let income = Color(red: 0.13, green: 0.70, blue: 0.37)
+
+    /// Money in as text: `readable(income)`.
+    @available(*, deprecated, message: "Use AppColors.readable(<the app's income colour>) or AppColors.Text.positive.")
+    public nonisolated static let incomeText = readable(Color(red: 0.13, green: 0.70, blue: 0.37))
+
+    /// Money out: the primary text colour.
+    @available(*, deprecated, message: "Use AppColors.Text.primary, or the app's own expense colour.")
+    public nonisolated static let expense = Color.primary
+
+    /// An internal transfer: cyan-teal.
+    @available(*, deprecated, message: "A finance colour is the app's own: define it in the app (Tenra: DesignKitBridge.swift).")
+    public static let transfer = Color(red: 0.0, green: 0.75, blue: 0.85)
 }
 
 // MARK: - Category Color Palette
 
-/// Цвета для категорий транзакций — hash-based assignment из палитры
+/// The colour of a name, by hash, and the colours a person picks. Deprecated (vNext): the same
+/// colours as `AppColors.Data`, which names them for any data, not one app's categories.
+@available(*, deprecated, message: "Use AppColors.Data (color(for:opacity:), paletteIndex(for:), palette, pickerPalette).")
 public struct CategoryColors {
-    /// The hash palette as RGB values. Its size and order are frozen: `paletteIndex` maps a
-    /// name to a slot by `hash % count`, so growing or reordering it would re-colour every
-    /// category and avatar that relies on the name hash. New colours go to `pickerExtraRGB`.
-    private nonisolated static let hashPaletteRGB: [UInt64] = [
-        0x3b82f6, 0x8b5cf6, 0xec4899, 0xf97316, 0xeab308,
-        0x22c55e, 0x14b8a6, 0x06b6d4, 0x6366f1, 0xd946ef,
-        0xf43f5e, 0xa855f7, 0x10b981, 0xf59e0b
-    ]
+    /// The colours a user can pick: `AppColors.Data.pickerPalette`.
+    public nonisolated static var pickerPalette: [String] { AppColors.Data.pickerPalette }
 
-    /// Colours offered in the picker only, never hashed into: deeper and neutral shades
-    /// (sky, petrol, deep teal, forest, lime, olive, ochre, rust, maroon, berry, plum,
-    /// deep violet, lavender, navy, slate, stone). Chosen to stay at least as distinct from
-    /// each other and from the hash palette as the hash palette's own closest pairs, and to
-    /// keep at least 2.7:1 against white and 2.3:1 against a dark card.
-    private nonisolated static let pickerExtraRGB: [UInt64] = [
-        0x0ea5e9, 0x0e7490, 0x0f766e, 0x15803d, 0x65a30d, 0x4d7c0f,
-        0xa16207, 0x9a3412, 0xb91c1c, 0xbe185d, 0xa21caf, 0x6d28d9,
-        0xa78bfa, 0x1d4ed8, 0x64748b, 0x78716c
-    ]
+    /// The 14 hash palette colours: `AppColors.Data.palette`.
+    public nonisolated static var paletteColors: [Color] { AppColors.Data.palette }
 
-    /// Pre-computed color palette (avoids hex parsing on every call)
-    private nonisolated static let palette: [Color] = hashPaletteRGB.map { rgb in
-        Color(
-            red:   Double((rgb & 0xFF0000) >> 16) / 255.0,
-            green: Double((rgb & 0x00FF00) >> 8)  / 255.0,
-            blue:  Double( rgb & 0x0000FF)         / 255.0
-        )
-    }
-
-    /// The colours a user can pick for a category (`UniversalRow(accessory: .colors)`'s default), as the
-    /// lowercase `#rrggbb` strings apps store: the 14 palette colours first, in palette order,
-    /// so every fallback colour can also be chosen explicitly, then 16 deeper and neutral shades.
-    public nonisolated static let pickerPalette: [String] = (hashPaletteRGB + pickerExtraRGB).map { rgb in
-        let digits = String(rgb, radix: 16)
-        return "#" + String(repeating: "0", count: max(0, 6 - digits.count)) + digits
-    }
-
-    /// The 14 palette colours in order: what categories hash into, and what an app's own
-    /// name-coloured visuals (letter avatars) draw from, so both share one palette.
-    public nonisolated static var paletteColors: [Color] { palette }
-
-    /// The colour of a name that has none stored, hashed into the 14 palette colours: a
-    /// category before the user picks one, an insight's item, a letter avatar.
-    /// (DesignKit drops Tenra's custom-category override; the palette is the single source.)
-    /// `hexColor(for:)` before 2.1.0: it returns a colour, not a hex string.
+    /// The colour of a name: `AppColors.Data.color(for:opacity:)`.
     public nonisolated static func color(for name: String, opacity: Double = 1.0) -> Color {
-        palette[paletteIndex(for: name)].opacity(opacity)
+        AppColors.Data.color(for: name, opacity: opacity)
     }
 
-    /// Palette slot for a category name: the same on every launch and every device.
-    ///
-    /// FNV-1a over the UTF-8 bytes. Until 0.7.0 this used `String.hashValue`, which Swift seeds
-    /// per process, so a category's fallback colour changed on every launch.
+    /// The palette slot of a name: `AppColors.Data.paletteIndex(for:)`.
     public nonisolated static func paletteIndex(for category: String) -> Int {
-        var hash: UInt64 = 0xcbf2_9ce4_8422_2325
-        for byte in category.utf8 {
-            hash ^= UInt64(byte)
-            hash = hash &* 0x0000_0100_0000_01b3
-        }
-        return Int(hash % UInt64(palette.count))
+        AppColors.Data.paletteIndex(for: category)
     }
 }

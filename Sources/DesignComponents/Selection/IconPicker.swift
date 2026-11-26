@@ -179,11 +179,11 @@ private struct IconPickerSymbolsTab: View {
                         source: .sfSymbol(symbol),
                         style: .circle(
                             size: AppIconSize.Tile.md,
-                            tint: .monochrome(isSelected ? AppColors.staticWhite : AppColors.Text.primary)
+                            tint: .monochrome(isSelected ? AppColors.Text.primaryOnDark : AppColors.Text.primary)
                         )
                     )
                     .frame(width: AppIconSize.Tile.xl, height: AppIconSize.Tile.xl)
-                    .background(isSelected ? AnyShapeStyle(AppColors.accentFill) : AnyShapeStyle(.surfaceNeutral1))
+                    .background(isSelected ? AnyShapeStyle(AppColors.accentFill) : AnyShapeStyle(AppColors.Background.container))
                     .clipShape(.rect(cornerRadius: AppRadius.lg))
                 }
                 .buttonStyle(.plain)
@@ -247,7 +247,7 @@ private struct IconPickerLogosTab: View {
                     Button { pick(entry.domain) } label: {
                         Icon(source: .brandService(entry.domain), size: AppIconSize.Tile.md)
                             .frame(width: AppIconSize.Tile.xl, height: AppIconSize.Tile.xl)
-                            .background(isSelected ? AnyShapeStyle(AppColors.pale(AppColors.accent)) : AnyShapeStyle(.surfaceNeutral1))
+                            .background(isSelected ? AnyShapeStyle(AppColors.pale(AppColors.accent)) : AnyShapeStyle(AppColors.Background.container))
                             .clipShape(.rect(cornerRadius: AppRadius.lg))
                             .selectionOutline(isSelected, cornerRadius: AppRadius.lg)
                     }

@@ -66,7 +66,7 @@ public struct StepTracker: View {
 
     private func connector(visible: Bool, done: Bool) -> some View {
         Rectangle()
-            .fill(visible ? (done ? AnyShapeStyle(AppColors.accentFill) : AnyShapeStyle(.surfaceNeutral2)) : AnyShapeStyle(.clear))
+            .fill(visible ? (done ? AnyShapeStyle(AppColors.accentFill) : AnyShapeStyle(AppColors.Background.containerStrong)) : AnyShapeStyle(.clear))
             .frame(height: lineHeight)
             .frame(maxWidth: .infinity)
     }
@@ -78,17 +78,17 @@ public struct StepTracker: View {
                 Circle().fill(AppColors.accentFill)
                 Icon("checkmark", size: circleSize * 0.45, scalesWithText: false)
                     .fontWeight(.bold)
-                    .foregroundStyle(AppColors.staticWhite)
+                    .foregroundStyle(AppColors.Text.primaryOnDark)
                     // 2.2.0: a step done draws its checkmark on.
                     .drawOnAppear()
             } else if index == current {
-                Circle().fill(.surfaceNeutral1)
+                Circle().fill(AppColors.Background.container)
                 Circle().strokeBorder(AppColors.accent, lineWidth: 2)
                 Text(verbatim: "\(index + 1)")
                     .font(AppTypography.caption.weight(.semibold))
-                    .foregroundStyle(AppColors.accent)
+                    .foregroundStyle(AppColors.Text.action)
             } else {
-                Circle().fill(.surfaceNeutral2)
+                Circle().fill(AppColors.Background.containerStrong)
                 Text(verbatim: "\(index + 1)")
                     .font(AppTypography.caption)
                     .foregroundStyle(AppColors.Text.secondary)

@@ -157,7 +157,7 @@ public struct RowAccessory {
     /// stored colour outside the palette comes first, so it shows as chosen.
     public static func colors(
         _ selection: Binding<String>,
-        palette: [String] = CategoryColors.pickerPalette
+        palette: [String] = AppColors.Data.pickerPalette
     ) -> RowAccessory {
         RowAccessory(kind: .colors(selection, palette: palette))
     }
@@ -270,7 +270,7 @@ struct RowControlView: View {
 
     private var titleColor: Color {
         if !isEnabled { return AppColors.Text.tertiary }
-        return row.titleColor ?? (row.role == .destructive ? AppColors.destructive : AppColors.Text.primary)
+        return row.titleColor ?? (row.role == .destructive ? AppColors.Status.negative : AppColors.Text.primary)
     }
 
     /// The leading icon, grey while the row is disabled.

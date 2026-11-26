@@ -108,7 +108,7 @@ private struct ProportionBarPage: View {
             if state == .loading {
                 ProportionBarSkeleton()
             } else {
-                ProportionBar(ratio: ratio, leftColor: AppColors.income, rightColor: AppColors.bgMuted)
+                ProportionBar(ratio: ratio, leftColor: GallerySamples.incomeColor, rightColor: SurfaceStyle.glass.containerStrong)
             }
         } controls: {
             StateControl(state: $state)
@@ -223,7 +223,7 @@ private struct HalfGaugePage: View {
                     HeroHalfGaugeSkeleton(style: style, diameter: 220, span: span)
                 } else {
                     HeroHalfGauge(value: value, norm: norm ? 0.5 : nil, maxValue: 1, zoneTicks: [0.3, 0.7],
-                                  color: AppColors.success, style: style, tone: tone, span: span, diameter: 220,
+                                  color: AppColors.Status.positive, style: style, tone: tone, span: span, diameter: 220,
                                   lineWidth: bleeds ? 28 : 20)
                         .id("\(value)\(norm)\(style)\(tone)\(span)")
                         .galleryHeroBackground(tone == .onColor)
@@ -231,7 +231,7 @@ private struct HalfGaugePage: View {
             } else if state == .loading {
                 MiniHalfGaugeSkeleton()
             } else {
-                MiniHalfGauge(value: value, norm: norm ? 0.5 : nil, maxValue: 1, color: AppColors.success)
+                MiniHalfGauge(value: value, norm: norm ? 0.5 : nil, maxValue: 1, color: AppColors.Status.positive)
             }
         } controls: {
             StateControl(state: $state)
@@ -309,7 +309,7 @@ private struct BarPairPage: View {
                     HeroBarPair(previous: 320_000, current: current, color: AppColors.accent,
                                 isProjection: projection, currency: "KZT")
                         .id("\(current)\(projection)\(onColor)")
-                        .galleryHeroBackground(onColor, color: AppColors.warning)
+                        .galleryHeroBackground(onColor, color: AppColors.Status.warning)
                 }
             } else if state == .loading {
                 MiniBarPairSkeleton()

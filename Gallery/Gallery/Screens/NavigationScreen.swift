@@ -75,7 +75,7 @@ private struct SectionHeaderPage: View {
                 default:
                     SectionHeader(title, systemImage: showsIcon ? "map" : nil,
                                   trailingSystemImage: trailingSymbol.isEmpty ? nil : trailingSymbol,
-                                  tint: tinted ? AppColors.success : nil, style: style)
+                                  tint: tinted ? AppColors.Status.positive : nil, style: style)
                 }
             }
         } controls: {
@@ -95,7 +95,7 @@ private struct SectionHeaderPage: View {
     private func header<Trailing: View>(leading: String, @ViewBuilder trailing: () -> Trailing) -> SectionHeader {
         SectionHeader(title, systemImage: showsIcon ? leading : nil,
                       trailingSystemImage: trailingSymbol.isEmpty ? nil : trailingSymbol,
-                      tint: tinted ? AppColors.success : nil, style: style, trailing: trailing)
+                      tint: tinted ? AppColors.Status.positive : nil, style: style, trailing: trailing)
     }
 
     private var title: String {
@@ -134,7 +134,7 @@ private struct HeroSectionPage: View {
                     subtitle: "This month",
                     progress: showsProgress ? ProgressConfig(current: spent, total: 250_000, label: "Budget", color: .orange) : nil
                 )
-                .galleryHeroBackground(onColor, color: AppColors.warning)
+                .galleryHeroBackground(onColor, color: AppColors.Status.warning)
             }
         } controls: {
             StateControl(state: $state)

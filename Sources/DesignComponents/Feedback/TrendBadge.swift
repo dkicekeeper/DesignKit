@@ -19,17 +19,18 @@ import DesignSupport
 ///
 /// ```swift
 /// TrendBadge(direction: .up, changePercent: 12.4)
-/// TrendBadge(direction: .up, changePercent: 8, color: AppColors.destructive) // up is bad here
+/// TrendBadge(direction: .up, changePercent: 8, color: AppColors.Status.negative) // up is bad here
 /// ```
 public struct TrendBadge: View {
     public enum Direction: Hashable, Sendable {
         case up, down, flat
 
-        /// Default semantic colour: up = income green, down = destructive, flat = secondary.
+        /// Default semantic colour: up = `Status.positive` (vNext; Tenra passes its income green),
+        /// down = `Status.negative`, flat = `Text.secondary`.
         public var color: Color {
             switch self {
-            case .up: return AppColors.income
-            case .down: return AppColors.destructive
+            case .up: return AppColors.Status.positive
+            case .down: return AppColors.Status.negative
             case .flat: return AppColors.Text.secondary
             }
         }
@@ -136,7 +137,7 @@ private struct TrendPillModifier: ViewModifier {
             content
                 .padding(.horizontal, AppSpacing.sm)
                 .padding(.vertical, AppSpacing.xs)
-                .background(onColor ? AppColors.staticWhite.opacity(0.2) : AppColors.pale(color))
+                .background(onColor ? AppColors.Text.primaryOnDark.opacity(0.2) : AppColors.pale(color))
                 .clipShape(Capsule())
         } else {
             content

@@ -38,7 +38,7 @@ public extension View {
         modifier(ParticleBurstModifier(
             style: .confetti,
             trigger: trigger,
-            colors: colors ?? CategoryColors.paletteColors,
+            colors: colors ?? AppColors.Data.palette,
             playsHaptic: playsHaptic
         ))
     }

@@ -34,8 +34,8 @@ public enum EntityStatus {
 
     public var tintColor: Color {
         switch self {
-        case .active:   return AppColors.success
-        case .paused:   return AppColors.warning
+        case .active:   return AppColors.Status.positive
+        case .paused:   return AppColors.Status.warning
         case .archived: return Color(.systemGray)
         case .pending:  return AppColors.accent
         }

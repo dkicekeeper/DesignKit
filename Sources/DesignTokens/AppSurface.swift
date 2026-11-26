@@ -20,36 +20,51 @@ import SwiftUI
 public enum SurfaceStyle: Hashable, Sendable {
     /// Liquid Glass (the default): Tenra's look.
     case glass
-    /// An opaque grey, `AppColors.Background.neutral1` (`#F2F2F7` on the white page, `#1C1C1E` on
-    /// black, a step lighter in a dark sheet), with no glass. The neutral containers inside it
-    /// (an icon's plate, a track, a skeleton) turn translucent so they still read on the grey:
-    /// `SurfaceStyle.neutral1` / `.neutral2`, `.surfaceNeutral1` / `.surfaceNeutral2`. Platina's
-    /// and Dalada's look.
+    /// An opaque grey, `AppColors.Background.card` (`#F2F2F7` on the white page, `#1C1C1E` on
+    /// black, a step lighter in a dark sheet), with no glass. The containers inside it (an icon's
+    /// plate, a track, a skeleton) turn translucent so they still read on the grey:
+    /// `AppColors.Background.container` / `.containerStrong`. Platina's and Dalada's look. (Named
+    /// `.solid` from 9.0.0, so "fill" means one thing.)
     case fill
 }
 
 public extension SurfaceStyle {
-    /// `AppColors.Background.neutral1` as it reads on this surface: itself on glass; under
-    /// `.fill`, where it is the card's own grey, the translucent `AppColors.Background.fill`
-    /// (`tertiarySystemFill`), a step darker than whatever lies under it (the page, a grey card,
-    /// a card in a sheet). Fields, an icon's plate, an inactive chip.
-    var neutral1: Color {
+    /// A container inside a card on this surface (vNext): a field, an icon's plate, an inactive
+    /// chip. On glass the opaque grey `AppColors.Background.card`; under `.fill`, where that grey
+    /// is the card itself, the translucent `tertiarySystemFill`, a step darker than whatever lies
+    /// under it (the page, a grey card, a card in a sheet). The colour behind the shape style
+    /// `AppColors.Background.container`, for an API that takes a `Color`.
+    var container: Color {
         switch self {
-        case .glass: return AppColors.Background.neutral1
-        case .fill: return AppColors.Background.fill
+        case .glass: return AppColors.Background.card
+        case .fill: return ContainerColors.onFill
         }
     }
 
-    /// `AppColors.Background.neutral2` as it reads on this surface: itself on glass; under
-    /// `.fill` the translucent `secondarySystemFill`, which stays a step darker than a grey card
-    /// in a dark sheet too (where the opaque `neutral2` is the card's own colour). Progress
-    /// tracks, skeletons, sunken controls.
-    var neutral2: Color {
+    /// A stronger container inside a card on this surface (vNext): a progress track, a skeleton,
+    /// a sunken control. On glass the opaque `systemGray5`; under `.fill` the translucent
+    /// `secondarySystemFill`, which stays a step darker than a grey card in a dark sheet too.
+    var containerStrong: Color {
         switch self {
-        case .glass: return AppColors.Background.neutral2
-        case .fill: return Color(.secondarySystemFill)
+        case .glass: return ContainerColors.strongOnGlass
+        case .fill: return ContainerColors.strongOnFill
         }
     }
+
+    /// `AppColors.Background.neutral1` as it reads on this surface.
+    @available(*, deprecated, renamed: "container", message: "Use SurfaceStyle.container.")
+    var neutral1: Color { container }
+
+    /// `AppColors.Background.neutral2` as it reads on this surface.
+    @available(*, deprecated, renamed: "containerStrong", message: "Use SurfaceStyle.containerStrong.")
+    var neutral2: Color { containerStrong }
+}
+
+/// One instance of each container colour, so a preset's plate compares equal to it (`Icon`).
+private enum ContainerColors {
+    nonisolated static let onFill = Color(.tertiarySystemFill)
+    nonisolated static let strongOnGlass = Color(.systemGray5)
+    nonisolated static let strongOnFill = Color(.secondarySystemFill)
 }
 
 // MARK: - Environment
@@ -85,8 +100,8 @@ package extension View {
 
 public extension EnvironmentValues {
     /// The opaque colour of the surface a view lies on (8.20.0): the page's
-    /// (`AppColors.Background.base`), or, inside a `cardStyle()` card under `SurfaceStyle.fill`,
-    /// the card's grey (`AppColors.Background.neutral1`, raised in a dark sheet as the card is).
+    /// (`AppColors.Background.page`), or, inside a `cardStyle()` card under `SurfaceStyle.fill`,
+    /// the card's grey (`AppColors.Background.card`, raised in a dark sheet as the card is).
     /// On a glass card it stays the page's colour, which the glass lets through.
     ///
     /// For a ring or a disc that cuts a shape out of whatever lies under it: the ring between
@@ -98,7 +113,7 @@ public extension EnvironmentValues {
     /// on the page; an app's own sheet presented from inside a card draws its knockouts on the
     /// sheet's page in the card's grey.
     var surfaceBackground: Color {
-        isOnCard && surfaceStyle == .fill ? AppColors.Background.neutral1 : AppColors.Background.base
+        isOnCard && surfaceStyle == .fill ? AppColors.Background.card : AppColors.Background.page
     }
 }
 
@@ -131,22 +146,22 @@ public extension View {
     }
 }
 
-// MARK: - Neutral fills that follow the surface
+// MARK: - Containers that follow the surface
 
-/// A neutral grey that keeps reading on the surface it lies on (8.12.0): `neutral1` or
-/// `neutral2` while surfaces are glass, their translucent fills under `SurfaceStyle.fill`
-/// (`SurfaceStyle.neutral1` / `.neutral2`). Resolved from the view's `surfaceStyle`, so a
-/// `.surfaceStyle(_:)` above it counts.
+/// A container that keeps reading on the surface it lies on (vNext): opaque grey on glass,
+/// translucent on a grey `.fill` card (`SurfaceStyle.container` / `.containerStrong`). Resolved
+/// from the view's `surfaceStyle`, so a `.surfaceStyle(_:)` above it counts. Reached as
+/// `AppColors.Background.container` / `.containerStrong`.
 ///
 /// ```swift
-/// Capsule().fill(.surfaceNeutral2)                         // a track
-/// Text("New").padding(8).background(.surfaceNeutral1, in: Capsule())
+/// Capsule().fill(AppColors.Background.containerStrong)                    // a track
+/// Text("New").padding(8).background(AppColors.Background.container, in: Capsule())
 /// ```
-public struct SurfaceNeutral: ShapeStyle {
-    /// Which neutral: `neutral1` (fields, plates, chips) or `neutral2` (tracks, skeletons).
+public struct SurfaceContainer: ShapeStyle {
+    /// Which container: `standard` (fields, plates, chips) or `strong` (tracks, skeletons).
     public enum Level: Hashable, Sendable {
-        case neutral1
-        case neutral2
+        case standard
+        case strong
     }
 
     public let level: Level
@@ -157,15 +172,41 @@ public struct SurfaceNeutral: ShapeStyle {
 
     public func resolve(in environment: EnvironmentValues) -> Color {
         switch level {
-        case .neutral1: return environment.surfaceStyle.neutral1
-        case .neutral2: return environment.surfaceStyle.neutral2
+        case .standard: return environment.surfaceStyle.container
+        case .strong: return environment.surfaceStyle.containerStrong
+        }
+    }
+}
+
+/// A neutral grey that keeps reading on the surface it lies on (8.12.0). Deprecated (vNext):
+/// `AppColors.Background.container` / `.containerStrong` (`SurfaceContainer`).
+public struct SurfaceNeutral: ShapeStyle {
+    /// Which neutral: `neutral1` (fields, plates, chips) or `neutral2` (tracks, skeletons).
+    public enum Level: Hashable, Sendable {
+        case neutral1
+        case neutral2
+    }
+
+    public let level: Level
+
+    @available(*, deprecated, message: "Use AppColors.Background.container or .containerStrong.")
+    public init(_ level: Level) {
+        self.level = level
+    }
+
+    public func resolve(in environment: EnvironmentValues) -> Color {
+        switch level {
+        case .neutral1: return environment.surfaceStyle.container
+        case .neutral2: return environment.surfaceStyle.containerStrong
         }
     }
 }
 
 public extension ShapeStyle where Self == SurfaceNeutral {
-    /// `AppColors.Background.neutral1` that reads on a grey card too (`SurfaceNeutral`).
+    /// A container that reads on a grey card too.
+    @available(*, deprecated, message: "Use AppColors.Background.container.")
     static var surfaceNeutral1: SurfaceNeutral { SurfaceNeutral(.neutral1) }
-    /// `AppColors.Background.neutral2` that reads on a grey card too (`SurfaceNeutral`).
+    /// A stronger container that reads on a grey card too.
+    @available(*, deprecated, message: "Use AppColors.Background.containerStrong.")
     static var surfaceNeutral2: SurfaceNeutral { SurfaceNeutral(.neutral2) }
 }

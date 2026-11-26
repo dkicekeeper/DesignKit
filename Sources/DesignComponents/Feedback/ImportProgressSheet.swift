@@ -64,7 +64,7 @@ public struct ImportProgressSheet: View {
                 onCancel()
             }
             .buttonStyle(.bordered)
-            .tint(AppColors.destructive)
+            .tint(AppColors.Status.negative)
         }
         .padding(AppSpacing.xxl)
         .interactiveDismissDisabled()

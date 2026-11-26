@@ -249,14 +249,14 @@ public struct HeroSparkline<Point: ChartPoint>: View {
                     y: .value("Value", vals[maxIdx])
                 )
                 .symbolSize(90)
-                .foregroundStyle(onColor ? ChartOnColor.mark : AppColors.success)
+                .foregroundStyle(onColor ? ChartOnColor.mark : AppColors.Status.positive)
                 .accessibilityHidden(true)
                 PointMark(
                     x: .value("Period", dataPoints[minIdx].chartLabel),
                     y: .value("Value", vals[minIdx])
                 )
                 .symbolSize(90)
-                .foregroundStyle(onColor ? ChartOnColor.label : AppColors.destructive)
+                .foregroundStyle(onColor ? ChartOnColor.label : AppColors.Status.negative)
                 .accessibilityHidden(true)
             }
 

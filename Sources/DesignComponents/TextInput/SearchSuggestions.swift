@@ -352,7 +352,7 @@ public struct SearchSuggestionRow: View {
             subtitle: nil,
             icon: .sfSymbol("clock.arrow.circlepath"),
             tint: AppColors.Text.secondary,
-            tileFill: AppColors.Background.neutral1,
+            tileFill: AppColors.Background.card,
             highlighting: typed,
             onFill: onFill
         )

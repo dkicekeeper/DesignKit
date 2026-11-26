@@ -20,7 +20,7 @@ import DesignSupport
 /// A calendar of days tinted by their values.
 ///
 /// ```swift
-/// CalendarHeatmap(values: spendingByDay, color: AppColors.destructive, valueFormat: .currency("KZT"))
+/// CalendarHeatmap(values: spendingByDay, color: AppColors.Status.negative, valueFormat: .currency("KZT"))
 /// ```
 ///
 /// - The steps are the quartiles of the days that have a value, so one big day does not wash
@@ -202,7 +202,7 @@ struct HeatmapModel {
     /// The step's colour: the empty grey (the surface's, 8.12.0), then the colour at a quarter, a
     /// half, three quarters and in full.
     static func fill(level: Int, color: Color, surface: SurfaceStyle) -> Color {
-        level == 0 ? surface.neutral2 : color.opacity(Double(level) / Double(HeatmapMetrics.levels - 1))
+        level == 0 ? surface.containerStrong : color.opacity(Double(level) / Double(HeatmapMetrics.levels - 1))
     }
 }
 

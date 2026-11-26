@@ -28,16 +28,16 @@ extension ComponentSnapshots {
                             source: .sfSymbol("heart.fill"),
                             style: .circle(
                                 size: AppIconSize.Tile.sm,
-                                tint: .monochrome(AppColors.destructive),
-                                backgroundColor: AppColors.destructive.opacity(0.15)
+                                tint: .monochrome(AppColors.Status.negative),
+                                backgroundColor: AppColors.Status.negative.opacity(0.15)
                             )
                         )
                         Icon(
                             source: .sfSymbol("bolt.fill"),
                             style: .roundedSquare(
                                 size: AppIconSize.Tile.sm,
-                                tint: .monochrome(AppColors.warning),
-                                backgroundColor: AppColors.warning.opacity(0.15)
+                                tint: .monochrome(AppColors.Status.warning),
+                                backgroundColor: AppColors.Status.warning.opacity(0.15)
                             )
                         )
                         Icon(source: nil, style: .placeholder(size: AppIconSize.Tile.sm))
@@ -60,9 +60,9 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 PackedCircleIcons(items: [
                     PackedCircleItem(id: "1", iconSource: .sfSymbol("creditcard.fill"), amount: 1_250_000, tint: AppColors.accent),
-                    PackedCircleItem(id: "2", iconSource: .sfSymbol("banknote.fill"), amount: 480_000, tint: AppColors.success),
-                    PackedCircleItem(id: "3", iconSource: .sfSymbol("wallet.bifold.fill"), amount: 220_000, tint: AppColors.warning),
-                    PackedCircleItem(id: "4", iconSource: .sfSymbol("bitcoinsign.circle.fill"), amount: 90_000, tint: AppColors.transfer),
+                    PackedCircleItem(id: "2", iconSource: .sfSymbol("banknote.fill"), amount: 480_000, tint: AppColors.Status.positive),
+                    PackedCircleItem(id: "3", iconSource: .sfSymbol("wallet.bifold.fill"), amount: 220_000, tint: AppColors.Status.warning),
+                    PackedCircleItem(id: "4", iconSource: .sfSymbol("bitcoinsign.circle.fill"), amount: 90_000, tint: SampleColors.transfer),
                 ])
                 .frame(maxWidth: .infinity)
             )
@@ -73,9 +73,9 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 PackedCircleIcons(items: [
                     PackedCircleItem(id: "1", iconSource: .sfSymbol("creditcard.fill"), amount: 1_250_000, tint: AppColors.accent),
-                    PackedCircleItem(id: "2", iconSource: .sfSymbol("banknote.fill"), amount: 480_000, tint: AppColors.success),
-                    PackedCircleItem(id: "3", iconSource: .sfSymbol("wallet.bifold.fill"), amount: 220_000, tint: AppColors.warning),
-                    PackedCircleItem(id: "4", iconSource: .sfSymbol("bitcoinsign.circle.fill"), amount: 90_000, tint: AppColors.transfer),
+                    PackedCircleItem(id: "2", iconSource: .sfSymbol("banknote.fill"), amount: 480_000, tint: AppColors.Status.positive),
+                    PackedCircleItem(id: "3", iconSource: .sfSymbol("wallet.bifold.fill"), amount: 220_000, tint: AppColors.Status.warning),
+                    PackedCircleItem(id: "4", iconSource: .sfSymbol("bitcoinsign.circle.fill"), amount: 90_000, tint: SampleColors.transfer),
                 ], style: .flat)
                 .frame(maxWidth: .infinity)
             )
@@ -109,9 +109,9 @@ extension ComponentSnapshots {
                 await assertComponentSnapshot(
                     PackedCircleIcons(items: [
                         PackedCircleItem(id: "1", iconSource: .sfSymbol("creditcard.fill"), amount: 1_250_000, tint: AppColors.accent),
-                        PackedCircleItem(id: "2", iconSource: .sfSymbol("banknote.fill"), amount: 480_000, tint: AppColors.success),
-                        PackedCircleItem(id: "3", iconSource: .sfSymbol("wallet.bifold.fill"), amount: 220_000, tint: AppColors.warning),
-                        PackedCircleItem(id: "4", iconSource: .sfSymbol("bitcoinsign.circle.fill"), amount: 90_000, tint: AppColors.transfer),
+                        PackedCircleItem(id: "2", iconSource: .sfSymbol("banknote.fill"), amount: 480_000, tint: AppColors.Status.positive),
+                        PackedCircleItem(id: "3", iconSource: .sfSymbol("wallet.bifold.fill"), amount: 220_000, tint: AppColors.Status.warning),
+                        PackedCircleItem(id: "4", iconSource: .sfSymbol("bitcoinsign.circle.fill"), amount: 90_000, tint: SampleColors.transfer),
                         PackedCircleItem(id: "5", iconSource: .sfSymbol("building.columns.fill"), amount: 40_000, tint: .purple),
                     ], maxVisible: 4, style: style)
                     .frame(maxWidth: .infinity),
@@ -130,7 +130,7 @@ extension ComponentSnapshots {
                     PackedCircleItem(id: "3", iconSource: .brandService("Leafnote"), amount: 1_990),
                     PackedCircleItem(id: "4", iconSource: .brandService("Tunewave"), amount: 990),
                     PackedCircleItem(id: "5", iconSource: .sfSymbol("creditcard.fill"), amount: 690, tint: AppColors.accent),
-                    PackedCircleItem(id: "6", iconSource: .sfSymbol("banknote.fill"), amount: 390, tint: AppColors.success),
+                    PackedCircleItem(id: "6", iconSource: .sfSymbol("banknote.fill"), amount: 390, tint: AppColors.Status.positive),
                 ], maxVisible: 6, containerWidth: 320, style: .orbit)
             )
         }
@@ -180,8 +180,8 @@ extension ComponentSnapshots {
                 } trailing: {
                     PackedCircleIcons(items: [
                         PackedCircleItem(id: "1", iconSource: .sfSymbol("car.fill"), amount: 5_200_000, tint: AppColors.accent),
-                        PackedCircleItem(id: "2", iconSource: .sfSymbol("house.fill"), amount: 2_400_000, tint: AppColors.success),
-                        PackedCircleItem(id: "3", iconSource: .sfSymbol("iphone"), amount: 800_000, tint: AppColors.warning),
+                        PackedCircleItem(id: "2", iconSource: .sfSymbol("house.fill"), amount: 2_400_000, tint: AppColors.Status.positive),
+                        PackedCircleItem(id: "3", iconSource: .sfSymbol("iphone"), amount: 800_000, tint: AppColors.Status.warning),
                         PackedCircleItem(id: "4", iconSource: .sfSymbol("tv.fill"), amount: 400_000, tint: .purple),
                         PackedCircleItem(id: "5", iconSource: .sfSymbol("laptopcomputer"), amount: 300_000, tint: .teal),
                     ], style: .shelf)

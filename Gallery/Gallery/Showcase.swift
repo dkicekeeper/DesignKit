@@ -115,11 +115,18 @@ private struct ShowcaseChips: View {
     }
 }
 
+extension EnvironmentValues {
+    /// The context a page's canvas opens in (vNext): `.screen`; a snapshot sets another.
+    @Entry var showcaseCanvasContext: CanvasContext = .screen
+}
+
 extension ContainerValues {
     /// The chip title of a showcase page.
     @Entry var showcaseTitle: String = ""
     /// Set by `ComponentPage`: the page shows one component, which the home screen counts.
     @Entry var showcaseIsComponent: Bool = false
+    /// The component's purpose, which the home screen's search reads (vNext).
+    @Entry var showcaseSummary: String = ""
 }
 
 /// How many components a screen's pages show: the number on the home screen's row, counted
@@ -131,7 +138,7 @@ struct ShowcaseCount<Pages: View>: View {
         Group(subviews: pages) { subviews in
             Text("\(subviews.filter { $0.containerValues.showcaseIsComponent }.count)")
                 .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
                 .monospacedDigit()
         }
     }
@@ -159,6 +166,25 @@ enum CanvasStyle {
     case dark(minHeight: CGFloat)
     /// The light canvas, at least `minHeight` tall (motion, things that move).
     case tall(minHeight: CGFloat)
+}
+
+/// What a preview lies on (vNext): the page, a card of the app's surfaces, or a hero's colour.
+/// The same component reads differently on each (a knockout ring on a grey card, white pieces on
+/// colour), so the canvas shows any of them.
+enum CanvasContext: String, CaseIterable, Identifiable {
+    case screen = "Screen"
+    case card = "Card"
+    case colour = "On colour"
+
+    var id: String { rawValue }
+
+    var systemImage: String {
+        switch self {
+        case .screen: "rectangle"
+        case .card: "rectangle.inset.filled"
+        case .colour: "paintbrush.fill"
+        }
+    }
 }
 
 /// One component on a page of its own:
@@ -206,7 +232,7 @@ struct ComponentPage<Preview: View, Controls: View>: View {
                             Label {
                                 Text(note)
                                     .font(AppTypography.bodySmall)
-                                    .foregroundStyle(AppColors.textPrimary)
+                                    .foregroundStyle(AppColors.Text.primary)
                             } icon: {
                                 Image(systemName: "info.circle")
                                     .foregroundStyle(AppColors.accent)
@@ -232,6 +258,7 @@ struct ComponentPage<Preview: View, Controls: View>: View {
         }
         .containerValue(\.showcaseTitle, name)
         .containerValue(\.showcaseIsComponent, true)
+        .containerValue(\.showcaseSummary, summary)
     }
 }
 
@@ -277,7 +304,7 @@ private struct GuidanceList: View {
                     Label {
                         Text(line)
                             .font(AppTypography.bodySmall)
-                            .foregroundStyle(AppColors.textPrimary)
+                            .foregroundStyle(AppColors.Text.primary)
                             .fixedSize(horizontal: false, vertical: true)
                     } icon: {
                         Image(systemName: isDo ? "checkmark.circle.fill" : "xmark.circle.fill")
@@ -302,17 +329,17 @@ private struct ComponentHeader: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text(name)
                 .font(AppTypography.h2)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
                 .textSelection(.enabled)
             Text(summary)
                 .font(AppTypography.body)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             if !styles.isEmpty {
                 Label {
                     Text(verbatim: "\(styles.count) styles: \(styles.joined(separator: " · "))")
                         .font(AppTypography.bodySmall)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 } icon: {
                     Image(systemName: "square.stack.3d.up")
@@ -363,7 +390,7 @@ private struct PanelSection<Content: View>: View {
             HStack {
                 Text(title.uppercased())
                     .font(AppTypography.caption2.weight(.semibold))
-                    .foregroundStyle(AppColors.textTertiary)
+                    .foregroundStyle(AppColors.Text.tertiary)
                     .tracking(0.6)
                 Spacer(minLength: 0)
                 if let trailing { trailing }
@@ -380,15 +407,53 @@ private struct PreviewCanvas<Content: View>: View {
     @ViewBuilder var content: Content
 
     @State private var scheme: ColorScheme?
+    @State private var context: CanvasContext?
     @Environment(\.colorScheme) private var systemScheme
     @Environment(\.surfaceStyle) private var surface
+    @Environment(\.showcaseCanvasContext) private var initialContext
 
     private var effectiveScheme: ColorScheme { scheme ?? systemScheme }
+    private var effectiveContext: CanvasContext { context ?? initialContext }
 
     var body: some View {
-        PanelSection("Preview", trailing: AnyView(schemeSwitch)) {
+        PanelSection("Preview", trailing: AnyView(HStack(spacing: AppSpacing.sm) { contextMenu; schemeSwitch })) {
             canvas
                 .environment(\.colorScheme, effectiveScheme)
+        }
+    }
+
+    /// Where the preview lies (vNext): the page, a card, a hero's colour.
+    private var contextMenu: some View {
+        Menu {
+            Picker("Context", selection: Binding(get: { effectiveContext }, set: { context = $0 })) {
+                ForEach(CanvasContext.allCases) { context in
+                    Label(context.rawValue, systemImage: context.systemImage).tag(context)
+                }
+            }
+        } label: {
+            Image(systemName: effectiveContext.systemImage)
+                .frame(width: 28, height: 28)
+        }
+        .accessibilityLabel("Context: \(effectiveContext.rawValue)")
+    }
+
+    /// The component in its context: as it is, in a card of the current surfaces, or on the
+    /// accent with the hero's white tone.
+    @ViewBuilder private var placed: some View {
+        switch effectiveContext {
+        case .screen:
+            content
+        case .card:
+            content
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .cardContentPadding()
+                .cardStyle()
+        case .colour:
+            content
+                .frame(maxWidth: .infinity)
+                .padding(AppSpacing.lg)
+                .background(AppColors.accent, in: RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+                .environment(\.heroTone, .onColor)
         }
     }
 
@@ -408,32 +473,32 @@ private struct PreviewCanvas<Content: View>: View {
         let shape = RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous)
         switch style {
         case .standard:
-            content
+            placed
                 .frame(maxWidth: .infinity)
                 .padding(AppSpacing.lg)
                 .background(canvasFill, in: shape)
                 .overlay(shape.strokeBorder(AppColors.Border.normal, lineWidth: 0.5))
         case .fill:
-            content
+            placed
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(AppSpacing.lg)
                 .background(canvasFill, in: shape)
                 .overlay(shape.strokeBorder(AppColors.Border.normal, lineWidth: 0.5))
         case .bleed:
-            content
+            placed
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, AppSpacing.lg)
                 .background(canvasFill, in: shape)
                 .clipShape(shape)
                 .overlay(shape.strokeBorder(AppColors.Border.normal, lineWidth: 0.5))
         case .dark(let minHeight):
-            content
+            placed
                 .frame(maxWidth: .infinity, minHeight: minHeight)
                 .background(Color.black, in: shape)
                 .clipShape(shape)
                 .environment(\.colorScheme, .dark)
         case .tall(let minHeight):
-            content
+            placed
                 .frame(maxWidth: .infinity, minHeight: minHeight)
                 .padding(AppSpacing.lg)
                 .background(canvasFill, in: shape)
@@ -532,7 +597,7 @@ struct ChoiceControl<Value: Hashable>: View {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 Text(title)
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                 Picker(title, selection: $selection) {
                     ForEach(options.indices, id: \.self) { index in
                         Text(options[index].0).tag(options[index].1)
@@ -544,7 +609,7 @@ struct ChoiceControl<Value: Hashable>: View {
             HStack {
                 Text(title)
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                 Spacer(minLength: AppSpacing.sm)
                 Picker(title, selection: $selection) {
                     ForEach(options.indices, id: \.self) { index in
@@ -585,11 +650,11 @@ struct SliderControl: View {
             HStack {
                 Text(title)
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                 Spacer()
                 Text(format(value))
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .monospacedDigit()
             }
             if let step {
@@ -620,11 +685,11 @@ struct StepperControl: View {
             HStack {
                 Text(title)
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                 Spacer()
                 Text("\(value)")
                     .font(AppTypography.bodySmall)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                     .monospacedDigit()
             }
         }
@@ -645,11 +710,11 @@ struct TextControl: View {
         HStack {
             Text(title)
                 .font(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
             TextField(title, text: $text)
                 .font(AppTypography.bodySmall)
                 .multilineTextAlignment(.trailing)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
         }
     }
 }
@@ -689,11 +754,11 @@ struct ShowcaseSection<Content: View>: View {
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(title)
                     .font(AppTypography.h3)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                 if let subtitle {
                     Text(subtitle)
                         .font(AppTypography.bodySmall)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                 }
                 Divider().padding(.top, AppSpacing.xs)
             }
@@ -711,11 +776,11 @@ struct TokenLabel: View {
         HStack(spacing: AppSpacing.xs) {
             Text(name)
                 .font(AppTypography.caption.weight(.medium))
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(AppColors.Text.primary)
             if let value {
                 Text(value)
                     .font(AppTypography.caption2)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
         }
     }

@@ -16,7 +16,7 @@ import DesignSupport
 /// ```swift
 /// CalculationCard(
 ///     systemImage: "banknote.fill",
-///     color: AppColors.success,
+///     color: AppColors.Status.positive,
 ///     title: "How it's calculated",
 ///     heroLabel: "Savings rate",
 ///     heroValue: "18.4%",

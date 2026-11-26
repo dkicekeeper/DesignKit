@@ -89,6 +89,7 @@ Insert with a spring: `withAnimation(AppAnimation.bouncy) { isShown = true }`.
 | `.sparkleBurst(trigger:tint:)` | a ring of sparkles | one Canvas for 0.7 s | a like, a reaction, a favourite (built into `ReactionButton`) |
 | `.shine(trigger:in:)` | a band of light sweeps across a shape once | one gradient for 0.8 s | a card just added, a premium badge |
 | `.attentionPulse(trigger:in:tint:)` | two rings spread and fade | two strokes for 0.9 s | a new feature, a control to notice |
+| `.dsRefreshable { … }` *(vNext)* | mercury out of the Dynamic Island: a thread and drips while pulling, six beads circling while loading, the flow back in | one Canvas (blur + alpha threshold, 240 pt) only while pulling, loading and for 1 s after; the timeline pauses otherwise | every pull to refresh (an accent ring under Reduce Motion) |
 | `AuroraBackground(colors:intensity:)` | a drifting 3×3 mesh gradient | one GPU pass, 30 fps while allowed | a premium screen, a paywall, an onboarding |
 | `.interactiveTilt(in:maxAngle:)` | tilts towards the finger with a glare | a gesture and two 3D transforms | a medal, a card on its own detail screen (not in a scrolling list) |
 | `.scrollReveal()` | settles in at the viewport's edges | `scrollTransition`, no state | the rows and cards of a `ScrollView` |

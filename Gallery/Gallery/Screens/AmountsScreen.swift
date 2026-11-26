@@ -71,7 +71,7 @@ private struct FormattedAmountTextPage: View {
                     currency: "KZT",
                     fontSize: AppTypography.h1,
                     fontWeight: .bold,
-                    color: AppColors.textPrimary,
+                    color: AppColors.Text.primary,
                     policy: policy,
                     sign: sign,
                     currencyDisplay: currencyDisplay
@@ -273,7 +273,7 @@ private struct ConvertedAmountPage: View {
             notes: ["The Gallery sets a sample converter; without one the view shows nothing."]
         ) {
             ConvertedAmount(amount: 100, fromCurrency: from, toCurrency: "KZT",
-                                fontSize: AppTypography.bodySmall, color: AppColors.textSecondary)
+                                fontSize: AppTypography.bodySmall, color: AppColors.Text.secondary)
         } controls: {
             ChoiceControl("From", selection: $from, options: [("USD", "USD"), ("EUR", "EUR"), ("RUB", "RUB")])
         }

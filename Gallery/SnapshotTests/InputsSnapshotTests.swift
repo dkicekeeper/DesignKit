@@ -197,7 +197,7 @@ extension ComponentSnapshots {
                         highlighting: "ka"
                     ) {}
                     SearchSuggestionRow("Coffee", subtitle: "Category", icon: .sfSymbol("cup.and.saucer.fill"),
-                                        tint: AppColors.warning, highlighting: "co")
+                                        tint: AppColors.Status.warning, highlighting: "co")
                 }
                 .padding(AppSpacing.lg)
                 .cardStyle(),
@@ -253,7 +253,7 @@ extension ComponentSnapshots {
                     FormattedAmountText(amount: 1_234_567.89, currency: "KZT",
                                         fontSize: AppTypography.body, fontWeight: .semibold, color: AppColors.Text.primary)
                     FormattedAmountText(amount: 4_990, currency: "USD", prefix: "+",
-                                        fontSize: AppTypography.body, fontWeight: .semibold, color: AppColors.income)
+                                        fontSize: AppTypography.body, fontWeight: .semibold, color: SampleColors.income)
                     SpentBudgetText(spent: 185_000, budget: 250_000, currency: "KZT")
                 }
                 .frame(maxWidth: .infinity, alignment: .leading),
@@ -265,12 +265,12 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 VStack(alignment: .leading, spacing: AppSpacing.sm) {
                     FormattedAmountText(amount: 5_000, currency: "KZT", fontSize: AppTypography.h4,
-                                        color: AppColors.income, sign: .always)
+                                        color: SampleColors.income, sign: .always)
                     FormattedAmountText(amount: -1_200.5, currency: "KZT", fontSize: AppTypography.h4, sign: .always)
                     FormattedAmountText(amount: -1_200.5, currency: "KZT", fontSize: AppTypography.h4, sign: .never)
                     FormattedAmountText(amount: 49.9, currency: "USD", fontSize: AppTypography.h4, currencyDisplay: .code)
                     FormattedAmountText(amount: 1_250, currency: "KZT", fontSize: AppTypography.h4,
-                                        color: AppColors.warning, sign: .always,
+                                        color: AppColors.Status.warning, sign: .always,
                                         currencyDisplay: .systemImage("star.fill"))
                     FormattedAmountText(amount: 318_400, currency: "KZT", fontSize: AppTypography.h4,
                                         currencyDisplay: .numberOnly)
@@ -289,7 +289,7 @@ extension ComponentSnapshots {
                     SpentBudgetText(spent: 185_000, budget: 250_000, currency: "KZT")
                     HeroProportionBar(segments: [
                         DonutSlice(id: "food", amount: 42_000, color: AppColors.accent, label: "Food", percentage: 58),
-                        DonutSlice(id: "rent", amount: 30_000, color: AppColors.success, label: "Rent", percentage: 42),
+                        DonutSlice(id: "rent", amount: 30_000, color: AppColors.Status.positive, label: "Rent", percentage: 42),
                     ], currency: "KZT")
                     AmountVisibilityToggle(isHidden: .constant(true))
                 }

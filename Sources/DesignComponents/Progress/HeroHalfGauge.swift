@@ -113,10 +113,10 @@ public struct HeroHalfGauge: View {
     }
 
     /// The arc's colour: its tint on the page, white on colour.
-    private var arcColor: Color { tone == .onColor ? AppColors.staticWhite : color }
+    private var arcColor: Color { tone == .onColor ? AppColors.Text.primaryOnDark : color }
     /// The track's colour, the full scale under the arc.
     private var trackColor: Color {
-        tone == .onColor ? AppColors.staticWhite.opacity(0.3) : AppColors.Text.secondary.opacity(0.15)
+        tone == .onColor ? AppColors.Text.primaryOnDark.opacity(0.3) : AppColors.Text.secondary.opacity(0.15)
     }
 
     public var body: some View {
@@ -406,7 +406,7 @@ struct BleedGaugeCanvas: View, Animatable {
                 knob.addFilter(.shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 3))
                 knob.fill(
                     Path(ellipseIn: CGRect(x: center.x - outer / 2, y: center.y - outer / 2, width: outer, height: outer)),
-                    with: .color(AppColors.staticWhite)
+                    with: .color(AppColors.Text.primaryOnDark)
                 )
             }
             context.fill(

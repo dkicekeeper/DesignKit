@@ -73,7 +73,7 @@ private struct MotionSpringsPage: View {
                         GeometryReader { proxy in
                             ZStack(alignment: .leading) {
                                 Capsule()
-                                    .fill(AppColors.Background.neutral2)
+                                    .fill(AppColors.Background.containerStrong)
                                     .frame(height: 4)
                                 Circle()
                                     .fill(AppColors.accent)
@@ -271,7 +271,7 @@ private struct ScrollRevealPage: View {
                         AmountRow(
                             "Item \(index + 1)",
                             subtitle: "Groceries",
-                            leading: .tinted(.sfSymbol("cart.fill"), CategoryColors.color(for: "row\(index)")),
+                            leading: .tinted(.sfSymbol("cart.fill"), AppColors.Data.color(for: "row\(index)")),
                             value: .amount(Double(1_000 * (index + 3)), caption: nil),
                             currency: "KZT"
                         )
@@ -320,7 +320,7 @@ private struct SpringsPage: View {
                         GeometryReader { proxy in
                             ZStack(alignment: .leading) {
                                 Capsule()
-                                    .fill(AppColors.bgMuted)
+                                    .fill(AppColors.Background.containerStrong)
                                     .frame(height: 4)
                                 Circle()
                                     .fill(AppColors.accent)
@@ -383,10 +383,10 @@ private struct StaggeredEntrancePage: View {
             HStack(spacing: -AppSpacing.sm) {
                 ForEach(0..<6, id: \.self) { index in
                     Circle()
-                        .fill(CategoryColors.color(for: "icon\(index)"))
+                        .fill(AppColors.Data.color(for: "icon\(index)"))
                         .frame(width: AppIconSize.xxl, height: AppIconSize.xxl)
                         .overlay(Image(systemName: "person.fill").foregroundStyle(.white))
-                        .overlay(Circle().strokeBorder(AppColors.bgBase, lineWidth: 2))
+                        .overlay(Circle().strokeBorder(AppColors.Background.page, lineWidth: 2))
                         .staggeredEntrance(delay: Double(index) * AppAnimation.facepileStagger)
                         .id("\(replay)-\(index)")
                 }
@@ -501,7 +501,7 @@ private struct StreamingTextPage: View {
         let string = text as NSString
         return sample.amounts.compactMap { amount in
             let range = string.range(of: amount)
-            return range.location == NSNotFound ? nil : .init(range: range, color: AppColors.success)
+            return range.location == NSNotFound ? nil : .init(range: range, color: AppColors.Status.positive)
         }
     }
 
@@ -665,7 +665,7 @@ private struct ScrollHeroPage: View {
                         AmountRow(
                             "Stop \(index + 1)",
                             subtitle: "Day \(index / 3 + 1)",
-                            leading: .tinted(.sfSymbol("mappin"), CategoryColors.color(for: "stop\(index)")),
+                            leading: .tinted(.sfSymbol("mappin"), AppColors.Data.color(for: "stop\(index)")),
                             value: .amount(Double(2_500 * (index + 1)), caption: nil),
                             currency: "KZT"
                         )

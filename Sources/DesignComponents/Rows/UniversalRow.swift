@@ -434,7 +434,7 @@ public extension UniversalRow where Content == Text {
     /// site — see `LoanEditView`, `SubscriptionEditView`, etc., where the same three
     /// modifiers were duplicated on every row's content closure.
     ///
-    /// Use `titleColor: AppColors.destructive` for destructive labels; otherwise
+    /// Use `titleColor: AppColors.Status.negative` for destructive labels; otherwise
     /// stick to the default so all forms remain visually consistent.
     init(
         config: RowConfiguration = .standard,
@@ -496,7 +496,7 @@ public extension UniversalRow where Content == Text, Trailing == EmptyView {
         config: RowConfiguration = .standard,
         accessory: RowAccessory = .none
     ) {
-        let tint = iconColor ?? (role == .destructive ? AppColors.destructive : AppColors.accent)
+        let tint = iconColor ?? (role == .destructive ? AppColors.Status.negative : AppColors.accent)
         self.init(
             title,
             leadingIcon: icon.map { .sfSymbol($0, color: tint, size: AppIconSize.lg) },

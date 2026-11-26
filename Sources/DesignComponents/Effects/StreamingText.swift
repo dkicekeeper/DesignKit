@@ -24,7 +24,7 @@ import DesignTokens
 ///
 /// ```swift
 /// StreamingText(voice.transcript, highlights: entities.map {
-///     .init(range: $0.range, color: $0.confidence > 0.8 ? AppColors.success : AppColors.warning)
+///     .init(range: $0.range, color: $0.confidence > 0.8 ? AppColors.Status.positive : AppColors.Status.warning)
 /// })
 /// ```
 public struct StreamingText: View {

@@ -57,7 +57,7 @@ public struct VoiceOrbButton: View {
                 .frame(width: Self.size, height: Self.size)
                 .overlay {
                     Icon(systemImage, size: AppIconSize.lg, scalesWithText: false)
-                        .foregroundStyle(AppColors.staticWhite)
+                        .foregroundStyle(AppColors.Text.primaryOnDark)
                         .shadow(color: .black.opacity(0.25), radius: 4)
                 }
                 .contentShape(Circle().inset(by: Self.tapInset))

@@ -43,16 +43,16 @@ private struct SurfaceStylePage: View {
             notes: [
                 "It reaches cardStyle() and everything on it (FormSection, CardList, the cards), filter chips, ProgressRingTile, an Icon's glass plate, OnboardingStepIndicator and MessageBanner.",
                 "Buttons (DSButton, .buttonStyle(.glass)), floating chrome (MessageComposer, GlassActionMenu, the system's bars) and glass drawn on a coloured hero stay Liquid Glass.",
-                "Under .fill the greys inside a card (an icon's plate, tracks, chips, skeletons) turn translucent, a step darker than the card: .surfaceNeutral1 and .surfaceNeutral2 for an app's own.",
+                "Under .fill the greys inside a card (an icon's plate, tracks, chips, skeletons) turn translucent, a step darker than the card: AppColors.Background.container and .containerStrong for an app's own.",
             ],
             styles: [".glass", ".fill"],
             dos: [
                 "Choose it once for the app, next to DesignKitTheme.accent.",
-                "Fill an app's own neutral shape inside a card with .surfaceNeutral1 or .surfaceNeutral2.",
+                "Fill an app's own container inside a card with AppColors.Background.container or .containerStrong.",
             ],
             donts: [
                 "Don't use .fill on a grey page (systemGroupedBackground): the cards melt into it.",
-                "Don't put AppColors.Background.neutral1 inside a grey card: it is the card's own colour.",
+                "Don't put AppColors.Background.card inside a grey card: it is the card's own colour.",
             ]
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.lg) {
@@ -87,7 +87,7 @@ private struct SurfaceStylePage: View {
             }
             // The page the surfaces lie on, whatever the Gallery's own canvas.
             .padding(AppSpacing.lg)
-            .background(AppColors.Background.base, in: .rect(cornerRadius: AppRadius.lg))
+            .background(AppColors.Background.page, in: .rect(cornerRadius: AppRadius.lg))
             .surfaceStyle(surface)
         } controls: {
             ChoiceControl("Surface", selection: $surface, options: [("Glass", .glass), ("Fill", .fill)])
@@ -113,9 +113,9 @@ private struct CardStylePage: View {
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 Text("Total balance").font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
                 Text("₸ 1 284 500").font(AppTypography.h2)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
             }
             .padding(padded ? AppSpacing.lg : 0)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -141,10 +141,10 @@ private struct FormCardStylePage: View {
                         Text(label).font(AppTypography.body)
                         Spacer()
                         Text("Choose").font(AppTypography.body)
-                            .foregroundStyle(AppColors.textSecondary)
+                            .foregroundStyle(AppColors.Text.secondary)
                         Image(systemName: "chevron.up.chevron.down")
                             .font(AppTypography.caption)
-                            .foregroundStyle(AppColors.textTertiary)
+                            .foregroundStyle(AppColors.Text.tertiary)
                     }
                     .padding(AppSpacing.lg)
                     if label != "Account" { Divider().padding(.leading, AppSpacing.lg) }

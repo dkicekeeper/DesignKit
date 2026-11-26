@@ -29,9 +29,9 @@ extension MonthStats: ChartPoint {
 
 // 2. A series: how to read and colour a value.
 let spending = ChartSeries<MonthStats>(id: "spending", name: "Expenses",
-                                       coloring: .solid(AppColors.destructive)) { $0.expenses }
+                                       coloring: .solid(AppColors.Status.negative)) { $0.expenses }
 let net = ChartSeries<MonthStats>(id: "net", name: "Net",
-                                  coloring: .signed(positive: AppColors.success, negative: AppColors.destructive),
+                                  coloring: .signed(positive: AppColors.Status.positive, negative: AppColors.Status.negative),
                                   baseline: .signed) { $0.net }
 
 // 3. A chart.
