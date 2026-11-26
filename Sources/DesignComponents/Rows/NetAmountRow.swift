@@ -18,7 +18,7 @@ import DesignSupport
 /// ```swift
 /// NetAmountRow(label: "May 2026", inflow: 530_000, outflow: 320_000, net: 210_000, currency: "KZT")
 /// NetAmountRow(label: "June 2026", inflow: 0, outflow: 0, net: 0, currency: "KZT",
-///              singleValue: 410_000, singleColor: AppColors.success)
+///              singleValue: 410_000, singleColor: AppColors.Status.positive)
 /// ```
 public struct NetAmountRow: View {
     let label: String
@@ -75,7 +75,7 @@ public struct NetAmountRow: View {
                             currency: currency,
                             fontSize: AppTypography.body,
                             fontWeight: .semibold,
-                            color: net >= 0 ? AppColors.Text.primary : AppColors.destructive
+                            color: net >= 0 ? AppColors.Text.primary : AppColors.Status.negative
                         )
                     }
                 }
@@ -88,7 +88,7 @@ public struct NetAmountRow: View {
                             prefix: "+",
                             fontSize: AppTypography.bodySmall,
                             fontWeight: .regular,
-                            color: AppColors.success
+                            color: AppColors.Status.positive
                         )
                         FormattedAmountText(
                             amount: outflow,
@@ -96,7 +96,7 @@ public struct NetAmountRow: View {
                             prefix: "-",
                             fontSize: AppTypography.bodySmall,
                             fontWeight: .regular,
-                            color: AppColors.destructive
+                            color: AppColors.Status.negative
                         )
                     }
                 }

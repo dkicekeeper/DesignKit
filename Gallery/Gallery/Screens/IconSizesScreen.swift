@@ -89,14 +89,14 @@ struct IconSizesScreen: View {
                 HStack(spacing: AppSpacing.sm) {
                     Text(name)
                         .font(AppTypography.bodySmall.weight(.semibold).monospaced())
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(AppColors.Text.primary)
                     Text("\(Int(value)) pt")
                         .font(AppTypography.caption)
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.Text.secondary)
                 }
                 Text(use)
                     .font(AppTypography.caption)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
         }
     }

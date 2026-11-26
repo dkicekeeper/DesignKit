@@ -77,7 +77,7 @@ private struct UniversalRowPage: View {
     @State private var date = Date()
     @State private var count = 3
     @State private var level = 0.35
-    @State private var colorHex = CategoryColors.pickerPalette[3]
+    @State private var colorHex = AppColors.Data.pickerPalette[3]
     @State private var picked = false
     @State private var bank = ""
 

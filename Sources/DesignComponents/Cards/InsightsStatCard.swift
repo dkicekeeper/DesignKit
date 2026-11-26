@@ -83,7 +83,7 @@ public struct InsightsStatCard<Trend: View>: View {
             let delta = ((current - previous) / abs(previous)) * 100
             if abs(delta) >= 0.5 {
                 let isUp = delta > 0
-                let color: Color = (isUp == upIsGood) ? AppColors.success : AppColors.destructive
+                let color: Color = (isUp == upIsGood) ? AppColors.Status.positive : AppColors.Status.negative
                 HStack(spacing: 2) {
                     Icon(isUp ? "arrow.up" : "arrow.down", size: AppIconSize.sm, scalesWithText: false)
                         .fontWeight(.bold)

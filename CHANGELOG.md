@@ -17,6 +17,85 @@ Versions follow semantic versioning; apps pin an exact version. A PR declares it
 note in `.changes/`; at the merge the release bot gives it the next number and writes its section
 here (docs/releasing.md).
 
+## 8.21.1 - 2026-11-26
+
+The Gallery's `PersonRow` page names Platina, which shows its friends with it. Nothing changes in an app.
+[#125](https://github.com/dkicekeeper/DesignKit/pull/125)
+
+### Gallery and tooling
+
+- `PersonRow`'s page carries Platina's badge: its friends list and a friend's screen (`style: .card`) use it. CI's Gallery badges job failed on `main` until the badge followed Platina's code.
+
+## 8.21.0 - 2026-11-26
+
+The Gallery finds a component by typing, previews each app as it is set up, and shows a component in a card or on colour.
+
+Pull to refresh with mercury: `.dsRefreshable` replaces the system's `.refreshable` in every app, with black liquid that runs out of the Dynamic Island and turns the accent.
+
+Colours by role: every colour has one name, named for where it goes. The flat names of 1.x and the finance colours are deprecated, accent text reads at 4.5:1, and the colours of named things become `AppColors.Data`.
+[#123](https://github.com/dkicekeeper/DesignKit/pull/123)
+
+### Added
+
+- `.dsRefreshable(action:)`: pull to refresh with the same closure as `.refreshable`, on the `List` or `ScrollView` itself. The system's refresh does the work (the trigger, holding the content, the haptic, VoiceOver) and its spinner is hidden app-wide; over the scroll view black liquid runs out of the Dynamic Island as the person pulls, turns the accent, breaks into six beads that circle while the action runs (at least 0.6 s) and flows back into the island. From the top edge, all accent, where there is no island; a soft shadow under the beads on a coloured hero; an accent ring under Reduce Motion.
+- `RefreshIndicator(phase:source:)` and `RefreshPhase`: the mercury in a fixed phase, from the island or the top edge.
+- `AppColors.Background.page`, `.card`, `.sheet` and `.floating`: the screen, an opaque grey surface (the card of `SurfaceStyle.fill`, a banner's base, a panel), a sheet, a tooltip or popover. Today's colours under names that say where they go.
+- `AppColors.Background.container` and `.containerStrong` (`SurfaceContainer`): a shape inside a card (a field, a plate, a chip; a track, a skeleton), opaque on glass and translucent on a grey card as before; `SurfaceStyle.container` / `.containerStrong` where a `Color` is needed.
+- `AppColors.Data`: `color(for:opacity:)`, `paletteIndex(for:)`, `palette` and `pickerPalette`, the colours of anything with a name, and `series`, eight colours for a chart's series with neighbours at least 45 degrees apart.
+- `AmountComparisonBar(incomeColor:)`, `PayoffProgressCard(progressColor:)`, `ScheduleRow(doneColor:)`: the app's own colour of money in.
+
+### Changed
+
+- `AppColors.Text.action` is the accent made readable (`readable(accent)`): links, text buttons, chosen labels and icons in a line in `MessageComposer`, `PickerCarousel`, the "Today" of `LineChart` and `BarChart`, `MessageBubble`'s retry, `CalculatorKeypad`'s operators, `ArticleBody`, `ExpandableText`, `StepTracker`, `ThumbnailCard`, `SearchablePicker`, `OptionCardPicker`, `ReactionButton`, `MonthCalendar`'s today, `PagerArrows` and `DateRangePickerSheet`. Tenra's indigo is a step lighter on a dark card, Dalada's green a step deeper on a light one; Platina's accent reads as it is.
+- `TrendBadge`'s rise, `AmountComparisonBar`, `PayoffProgressCard` and `ScheduleRow`'s "paid" mark default to `Status.positive` (the system green) instead of Tenra's income green; Tenra passes its own. `AmountComparisonBar`'s income amount is its colour made readable. The cards built on them take no colour (`CashFlowCard`, `ComparisonCard`, `HoldingCard`, `MetricCard`): their income and rises are the system green in every app, Tenra's included.
+- `CurrencyList`'s sections are `cardStyle()` cards on the caller's page (glass, or grey under `SurfaceStyle.fill`), not white cards on the grouped grey.
+- Under `SurfaceStyle.fill`, a logo's plate, `MessageComposer`'s idle buttons, `TypingIndicator`'s bubble, an unearned `AchievementMedal` and the placeholder behind a loading photo in `PhotoTile` and `PhotoCarousel` follow the surface like every other container (a translucent grey on a grey card).
+
+### Deprecated
+
+- `AppColors.bgBase`, `bgCard`, `bgMuted`, `textPrimary`, `textSecondary`, `textTertiary`, `staticWhite`, `destructive`, `success`, `warning`, `planned` → the groups (`Background.page`, `.card`, `.containerStrong`, `Text.*`, `Text.primaryOnDark`, `Status.*`).
+- `AppColors.income`, `incomeText`, `expense`, `transfer` → the app's own colours (Tenra: `DesignKitBridge.swift`).
+- `AppColors.Background.base`, `elevation1`, `elevation2`, `elevation3`, `neutral1`, `neutral2`, `fill` → `page`, `sheet`, `floating`, `card`, `container`, `containerStrong`.
+- `SurfaceStyle.neutral1` / `.neutral2` → `.container` / `.containerStrong`; `.surfaceNeutral1` / `.surfaceNeutral2` and `SurfaceNeutral` → `AppColors.Background.container` / `.containerStrong`.
+- `CategoryColors` → `AppColors.Data`.
+
+### Migration
+
+- Replace `.refreshable { … }` with `.dsRefreshable { … }`, the same closure, on the list or scroll view itself. The apps' lint warns on `.refreshable` from this version (`system-refreshable`); it becomes an error in 9.0.0, whose rewrites change it (`scripts/migrations/9.0.0.json`).
+
+```swift
+List(trips) { TripRow(trip: $0) }
+    .dsRefreshable { await store.reload() }
+```
+
+- Nothing breaks: the old names keep their values and warn with their replacement until 9.0.0. To move now, run the 9.0.0 rewrites (`scripts/migrations/9.0.0.json`, docs/migration-9.0.md):
+
+```bash
+python3 <DesignKit>/scripts/migrate.py --from 8.21.0 --to 9.0.0 --source <App> --apply
+```
+
+- Tenra defines its finance colours next to its adapters, under names of its own, and passes them:
+
+```swift
+extension Color {
+    static let income = Color(red: 0.13, green: 0.70, blue: 0.37)
+    static let transfer = Color(red: 0.0, green: 0.75, blue: 0.85)
+}
+AmountComparisonBar(expenseAmount: spent, incomeAmount: earned, currency: "KZT", incomeColor: .income)
+```
+
+### Gallery and tooling
+
+- Search on the home screen: the component pages by name (a skeleton, a 1.x name with View and a `.ds` modifier find their component) and by a word of their summary, and the foundations by title.
+- One menu of app presets instead of separate theme and surface menus: Tenra (indigo, glass), Dalada (green, grey cards), Platina (grey cards) and a custom accent from a colour picker with its surfaces.
+- Platina's preset is Plasma (light `#D6006F`, dark `#FF4FA0`), the owner's choice for Platina's accent; docs/adoption.md tells Platina's session how to set it.
+- Every page's canvas has a context beside its light and dark switch: on the page, in a card of the current surfaces, or on the accent with the hero's white tone. Snapshots of a page in a grey card and on colour (`GalleryPagesSnapshotTests.canvasContexts`).
+- A page in Status & Feedback: a live list to pull, and the indicator in a phase you pick. Snapshots of six phases (`FeedbackSnapshotTests.refreshIndicator`).
+- `scripts/designkit_lint.py` has warnings: reported as GitHub annotations, never counted in the failures or the baseline. The first is `system-refreshable`.
+- Unit tests of the droplets' geometry, the island's frame and the phase clock.
+- The Colors screen shows the roles, the accent and `AppColors.Data`; the flat names and the finance colours are gone from it. The Gallery passes Tenra's income and transfer colours as an app would.
+- `scripts/migrations/9.0.0.json` and docs/migration-9.0.md: the rewrites and notes for the colour names; `docs/design-system.md` opens its Colors section with which colour goes where.
+
 ## 8.20.2 - 2026-11-25
 
 The release bot pushes a release's tag again when GitHub refuses it at first. Nothing changes in an app.

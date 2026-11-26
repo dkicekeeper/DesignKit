@@ -213,7 +213,7 @@ private struct ActivityTimelinePage: View {
             Text(event.title).font(AppTypography.bodyEmphasis)
             Text(event.detail)
                 .font(AppTypography.caption)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
         }
     }
 }
@@ -237,7 +237,7 @@ private struct MonthCalendarPage: View {
                 MonthCalendar(range: range, itemsByDay: tripsByDay, itemName: \.name) { trip in
                     Image(systemName: trip.symbol)
                         .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(AppColors.staticWhite)
+                        .foregroundStyle(AppColors.Text.primaryOnDark)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(trip.color)
                 } accessory: { period in
@@ -345,7 +345,7 @@ private struct ReadableWidthPage: View {
                         Icon(source: .sfSymbol(symbol), size: AppIconSize.Tile.sm)
                         VStack(alignment: .leading, spacing: AppSpacing.sm) {
                             Text(title).font(AppTypography.h4)
-                                .foregroundStyle(AppColors.textPrimary)
+                                .foregroundStyle(AppColors.Text.primary)
                             LinearProgressBar(value: progress, animatesOnAppear: false)
                         }
                     }
@@ -363,7 +363,7 @@ private struct ReadableWidthPage: View {
                 }
                 Text("The lake lies at 2,500 m, an hour's drive above the city. The road closes after heavy snow; the last stretch is a walk of about forty minutes along the pipeline.")
                     .font(AppTypography.body)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .cardContentPadding()
                     .cardStyle()
@@ -471,7 +471,7 @@ private struct AdaptiveColumnsPage: View {
             Icon(source: .sfSymbol(symbol), size: AppIconSize.Tile.sm)
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(title).font(AppTypography.h4)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .foregroundStyle(AppColors.Text.primary)
                 Text(detail).font(AppTypography.bodySmall)
                     .foregroundStyle(AppColors.Text.secondary)
             }
@@ -496,7 +496,7 @@ private struct LayoutScreenPreview<Content: View>: View {
             VStack(spacing: 0) { content }
                 .padding(.vertical, AppSpacing.lg)
                 .frame(width: width, height: height, alignment: .top)
-                .background(AppColors.Background.base)
+                .background(AppColors.Background.page)
                 .scaleEffect(scale, anchor: .topLeading)
         }
         .aspectRatio(width / height, contentMode: .fit)

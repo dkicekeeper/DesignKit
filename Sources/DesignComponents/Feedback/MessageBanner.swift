@@ -53,9 +53,9 @@ public struct MessageBanner: View {
 
         var tintColor: Color {
             switch self {
-            case .success: return AppColors.success
-            case .error: return AppColors.destructive
-            case .warning: return AppColors.warning
+            case .success: return AppColors.Status.positive
+            case .error: return AppColors.Status.negative
+            case .warning: return AppColors.Status.warning
             case .info: return AppColors.accent
             }
         }
@@ -163,7 +163,7 @@ private struct BannerSurface: ViewModifier {
         case .fill:
             content
                 .background(AppColors.pale(tint), in: .rect(cornerRadius: AppRadius.xl))
-                .background(AppColors.Background.neutral1, in: .rect(cornerRadius: AppRadius.xl))
+                .background(AppColors.Background.card, in: .rect(cornerRadius: AppRadius.xl))
         }
     }
 }

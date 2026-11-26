@@ -14,7 +14,7 @@ import DesignComponents
 extension View {
     /// On `onColor`, the specimen on a hero's gradient of `color`, padded as a hero is.
     @ViewBuilder
-    func galleryHeroBackground(_ onColor: Bool, color: Color = AppColors.success) -> some View {
+    func galleryHeroBackground(_ onColor: Bool, color: Color = AppColors.Status.positive) -> some View {
         if onColor {
             frame(maxWidth: .infinity)
                 .padding(AppSpacing.lg)

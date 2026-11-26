@@ -36,21 +36,21 @@ extension ComponentSnapshots {
                     RowDivider(inset: AppIconSize.Tile.sm + AppSpacing.md)
                     TransactionRow(
                         .entry(title: "Salary", account: .deleted("Old card")),
-                        icon: .sfSymbol("banknote.fill"), iconTint: .monochrome(AppColors.income),
-                        iconBackground: AppColors.pale(AppColors.income),
+                        icon: .sfSymbol("banknote.fill"), iconTint: .monochrome(SampleColors.income),
+                        iconBackground: AppColors.pale(SampleColors.income),
                         badgeSystemImage: "arrow.clockwise",
-                        amounts: [.init(450_000, currency: "KZT", prefix: "+", color: AppColors.income)],
+                        amounts: [.init(450_000, currency: "KZT", prefix: "+", color: SampleColors.income)],
                         isPending: true,
                         accessibilityLabel: "Salary"
                     )
                     RowDivider(inset: AppIconSize.Tile.sm + AppSpacing.md)
                     TransactionRow(
                         .transfer(from: kaspi, to: deposit),
-                        icon: .sfSymbol("arrow.left.arrow.right"), iconTint: .monochrome(AppColors.transfer),
-                        iconBackground: AppColors.pale(AppColors.transfer),
+                        icon: .sfSymbol("arrow.left.arrow.right"), iconTint: .monochrome(SampleColors.transfer),
+                        iconBackground: AppColors.pale(SampleColors.transfer),
                         amounts: [
                             .init(100_000, currency: "KZT", prefix: "-", color: AppColors.Text.primary),
-                            .init(100_000, currency: "KZT", prefix: "+", color: AppColors.income),
+                            .init(100_000, currency: "KZT", prefix: "+", color: SampleColors.income),
                         ],
                         accessibilityLabel: "Transfer"
                     )
@@ -71,7 +71,7 @@ extension ComponentSnapshots {
                     switch option {
                     case "Gradient": LinearGradient(colors: [.orange, .pink], startPoint: .top, endPoint: .bottom)
                     case "Photo": LinearGradient(colors: [.teal, .blue], startPoint: .top, endPoint: .bottom)
-                    default: Rectangle().fill(AppColors.bgBase)
+                    default: Rectangle().fill(AppColors.Background.page)
                     }
                 } settings: { _ in
                     FormSection {
@@ -97,7 +97,7 @@ extension ComponentSnapshots {
             await assertComponentSnapshot(
                 StreamingText(
                     text,
-                    highlights: [.init(range: (text as NSString).range(of: "2500"), color: AppColors.success)]
+                    highlights: [.init(range: (text as NSString).range(of: "2500"), color: AppColors.Status.positive)]
                 )
                 .frame(maxWidth: .infinity, alignment: .leading)
             )
@@ -116,7 +116,7 @@ extension ComponentSnapshots {
                 await assertComponentSnapshot(
                     StreamingText(
                         sample.text,
-                        highlights: [.init(range: (sample.text as NSString).range(of: sample.amount), color: AppColors.success)]
+                        highlights: [.init(range: (sample.text as NSString).range(of: sample.amount), color: AppColors.Status.positive)]
                     )
                     .frame(maxWidth: .infinity, alignment: .leading),
                     named: sample.name,

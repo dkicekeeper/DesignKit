@@ -50,8 +50,8 @@ public struct Skeleton: View {
     }
 
     /// The grey of every skeleton shape: `neutral2`, translucent on a grey card under
-    /// `SurfaceStyle.fill` (8.12.0, `.surfaceNeutral2`).
-    static let fill = SurfaceNeutral(.neutral2)
+    /// `SurfaceStyle.fill` (8.12.0, `AppColors.Background.containerStrong`).
+    static let fill = SurfaceContainer(.strong)
 
     /// A circle: an avatar, a round icon, a dot.
     public static func circle(_ diameter: CGFloat) -> Skeleton {
@@ -238,7 +238,7 @@ private struct ShimmerModifier: ViewModifier {
         let bandWidth = max(width * 0.6, 80)
         let x = -bandWidth + (width + bandWidth) * phase
         return LinearGradient(
-            colors: [.clear, AppColors.staticWhite.opacity(0.35), .clear],
+            colors: [.clear, AppColors.Text.primaryOnDark.opacity(0.35), .clear],
             startPoint: .leading,
             endPoint: .trailing
         )

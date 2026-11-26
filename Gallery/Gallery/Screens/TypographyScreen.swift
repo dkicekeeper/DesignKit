@@ -28,10 +28,10 @@ struct TypographyScreen: View {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(sample)
                                 .font(font)
-                                .foregroundStyle(AppColors.textPrimary)
+                                .foregroundStyle(AppColors.Text.primary)
                             Text(name)
                                 .font(AppTypography.caption2)
-                                .foregroundStyle(AppColors.textSecondary)
+                                .foregroundStyle(AppColors.Text.secondary)
                         }
                     }
                 }
@@ -68,9 +68,9 @@ struct TypographyScreen: View {
             }
             Text(title)
                 .font(AppTypography.caption2)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
         }
-        .foregroundStyle(AppColors.textPrimary)
+        .foregroundStyle(AppColors.Text.primary)
     }
 }
 

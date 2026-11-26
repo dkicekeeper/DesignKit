@@ -98,7 +98,7 @@ public struct PickerCarousel<Item: Identifiable, Picture: View>: View {
                 if let focusedItem, let opensWith = condition(focusedItem) {
                     Label { Text(verbatim: opensWith) } icon: { Icon("lock.fill", size: AppIconSize.md) }
                         .font(AppTypography.bodyEmphasis)
-                        .foregroundStyle(AppColors.accent)
+                        .foregroundStyle(AppColors.Text.action)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -130,14 +130,14 @@ public struct PickerCarousel<Item: Identifiable, Picture: View>: View {
                     PickerCarouselMetrics.reservedLines(PickerCarouselMetrics.lines, font: AppTypography.bodyEmphasis)
                     Text(title(item))
                         .font(AppTypography.bodyEmphasis)
-                        .foregroundStyle(isChosen ? AppColors.accent : AppColors.Text.primary)
+                        .foregroundStyle(isChosen ? AppColors.Text.action : AppColors.Text.primary)
                         .multilineTextAlignment(.center)
                         .lineLimit(PickerCarouselMetrics.lines)
                 }
             }
             .padding(AppSpacing.md)
             .frame(width: PickerCarouselMetrics.cardWidth)
-            .background(RoundedRectangle(cornerRadius: AppRadius.lg).fill(AppColors.Background.elevation1))
+            .background(RoundedRectangle(cornerRadius: AppRadius.lg).fill(AppColors.Background.sheet))
             .selectionOutline(isChosen, cornerRadius: AppRadius.lg)
             .overlay(alignment: .topTrailing) {
                 if !isOpen {
@@ -223,6 +223,6 @@ public struct PickerCarouselSkeleton: View {
         }
         .padding(AppSpacing.md)
         .frame(width: PickerCarouselMetrics.cardWidth)
-        .background(RoundedRectangle(cornerRadius: AppRadius.lg).fill(AppColors.Background.elevation1))
+        .background(RoundedRectangle(cornerRadius: AppRadius.lg).fill(AppColors.Background.sheet))
     }
 }

@@ -87,7 +87,7 @@ private struct ReviewCardPage: View {
                         ? "Quiet spot, clean water, a good road until the last two kilometres. Bring your own firewood: there is none left near the shore. Pike in the morning, perch in the afternoon. The ranger asks for a fee at the gate."
                         : "Quiet spot, clean water."
                 ) {
-                    Image(systemName: "ellipsis").foregroundStyle(AppColors.textTertiary)
+                    Image(systemName: "ellipsis").foregroundStyle(AppColors.Text.tertiary)
                 } actions: {
                     if showsActions {
                         ReactionButton(systemImage: "lightbulb", selectedSystemImage: "lightbulb.fill",
@@ -203,7 +203,7 @@ private struct RecommendationBoxPage: View {
                 RecommendationBoxSkeleton(lines: 2)
             } else {
                 RecommendationBox(text: "You spent 18% less on dining this month. Keep the same pace to reach your goal.",
-                                  color: [AppColors.success, AppColors.warning, AppColors.accent][tone],
+                                  color: [AppColors.Status.positive, AppColors.Status.warning, AppColors.accent][tone],
                                   icon: ["lightbulb.fill", "exclamationmark.triangle.fill", "sparkles"][tone])
             }
         } controls: {

@@ -41,12 +41,15 @@ public struct PayoffProgressCard<Accessory: View>: View {
     let currency: String
     let progress: Double
     let phase: Phase
+    let progressColor: Color
     let accessory: Accessory
 
     /// - Parameters:
     ///   - remaining: Left to pay, shown on the leading edge above the bar.
     ///   - total: The original amount, shown on the trailing edge.
     ///   - progress: 0…1, the share already paid.
+    ///   - progressColor: The bar and the "done" mark (8.21.0): `Status.positive` unless the app
+    ///     has its own (Tenra's income green); the mark is it made readable.
     ///   - accessory: A view on the trailing edge of the header (a type or status badge).
     public init(
         iconSource: IconSource?,
@@ -57,6 +60,7 @@ public struct PayoffProgressCard<Accessory: View>: View {
         currency: String,
         progress: Double,
         phase: Phase,
+        progressColor: Color = AppColors.Status.positive,
         @ViewBuilder accessory: () -> Accessory
     ) {
         self.iconSource = iconSource
@@ -67,6 +71,7 @@ public struct PayoffProgressCard<Accessory: View>: View {
         self.currency = currency
         self.progress = progress
         self.phase = phase
+        self.progressColor = progressColor
         self.accessory = accessory()
     }
 
@@ -111,7 +116,7 @@ public struct PayoffProgressCard<Accessory: View>: View {
                     )
                 }
                 ProgressView(value: progress)
-                    .tint(AppColors.income)
+                    .tint(progressColor)
                     .accessibilityValue(String(format: "%.0f%%", progress * 100))
             }
 
@@ -121,7 +126,7 @@ public struct PayoffProgressCard<Accessory: View>: View {
                 case .done(let caption):
                     HStack(spacing: AppSpacing.xs) {
                         Icon("checkmark.circle.fill", size: AppIconSize.sm)
-                            .foregroundStyle(AppColors.incomeText)
+                            .foregroundStyle(AppColors.readable(progressColor))
                         Text(caption)
                             .font(AppTypography.bodySmall)
                             .foregroundStyle(AppColors.Text.secondary)
@@ -163,12 +168,13 @@ public extension PayoffProgressCard where Accessory == EmptyView {
         total: Double,
         currency: String,
         progress: Double,
-        phase: Phase
+        phase: Phase,
+        progressColor: Color = AppColors.Status.positive
     ) {
         self.init(
             iconSource: iconSource, title: title, subtitle: subtitle,
             remaining: remaining, total: total, currency: currency,
-            progress: progress, phase: phase
+            progress: progress, phase: phase, progressColor: progressColor
         ) { EmptyView() }
     }
 }

@@ -78,6 +78,18 @@ class TokensTests(unittest.TestCase):
                          "raw-animation", "raw-color", "swipe-actions", "system-form"):
                 self.assertIn(f"design-lint {rule}", text, rule)
 
+    def test_refreshable_is_a_warning(self):
+        code = "List { row }\n    .refreshable { await load() }\n"
+        with AppFolder({"Screen.swift": code}) as root:
+            status, text = run(root, "tokens")
+            self.assertEqual(status, 0)
+            self.assertIn("::warning", text)
+            self.assertIn("design-lint system-refreshable", text)
+        with AppFolder({"Screen.swift": "List { row }\n    .dsRefreshable { await load() }\n"}) as root:
+            status, text = run(root, "tokens")
+            self.assertEqual(status, 0)
+            self.assertNotIn("system-refreshable", text)
+
     def test_form_section_is_not_a_form(self):
         with AppFolder({"Screen.swift": "FormSection { }\nEditForm { }\n"}) as root:
             self.assertEqual(run(root, "tokens")[0], 0)

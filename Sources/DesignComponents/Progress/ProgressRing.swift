@@ -17,12 +17,12 @@ import DesignSupport
 /// Color model — a "trajectory" AngularGradient over the full circle; the animated
 /// trim reveals it, so the arc TIP continuously heats up with the fill level
 /// (no threshold snapping):
-/// - 0 – 45 %   → solid `AppColors.success` (green — calm zone)
+/// - 0 – 45 %   → solid `AppColors.Status.positive` (green — calm zone)
 /// - 45 – 80 %  → blend `success` → `warning`
 /// - 80 – 100 % → blend `warning` → `destructive` (the red tip appears exactly at the limit)
 /// - `isOverBudget` → red-dominant gradient (`warning` start → `destructive`)
 /// - `celebratesCompletion` (a goal ring) or `overrideColor` → one hue with depth; a goal is
-///   green (`AppColors.success`), at any fill and past 100 % (2.3.1)
+///   green (`AppColors.Status.positive`), at any fill and past 100 % (2.3.1)
 ///
 /// Because the gradient is static and only `trim` animates, the entrance sweep and
 /// value changes recolor the tip for free — no color interpolation code.
@@ -67,7 +67,7 @@ public struct ProgressRing: View {
     var lineWidth: CGFloat = 3
 
     /// Whether spending exceeds the budget limit.
-    /// When `true` the arc is rendered in `AppColors.destructive`.
+    /// When `true` the arc is rendered in `AppColors.Status.negative`.
     var isOverBudget: Bool = false
 
     /// Explicit arc color. When set, it overrides the budget-semantic three-tier
@@ -107,7 +107,7 @@ public struct ProgressRing: View {
     /// (gradient stops aren't animatable; the trim animation does the work).
     private var arcGradient: AngularGradient {
         let stops: [Gradient.Stop]
-        if let hue = overrideColor ?? (celebratesCompletion ? AppColors.success : nil) {
+        if let hue = overrideColor ?? (celebratesCompletion ? AppColors.Status.positive : nil) {
             // Caller owns the semantics (loan hero), or a goal ring where fuller is better:
             // keep one hue, add depth.
             stops = [
@@ -117,16 +117,16 @@ public struct ProgressRing: View {
         } else if isOverBudget || progress > 1.0 {
             // Over the limit — unmistakably red, with a warning-colored tail.
             stops = [
-                .init(color: AppColors.warning, location: 0),
-                .init(color: AppColors.destructive, location: 1)
+                .init(color: AppColors.Status.warning, location: 0),
+                .init(color: AppColors.Status.negative, location: 1)
             ]
         } else {
             // Trajectory palette: calm green half, heating up toward the limit.
             stops = [
-                .init(color: AppColors.success, location: 0),
-                .init(color: AppColors.success, location: 0.45),
-                .init(color: AppColors.warning, location: 0.8),
-                .init(color: AppColors.destructive, location: 1)
+                .init(color: AppColors.Status.positive, location: 0),
+                .init(color: AppColors.Status.positive, location: 0.45),
+                .init(color: AppColors.Status.warning, location: 0.8),
+                .init(color: AppColors.Status.negative, location: 1)
             ]
         }
         return AngularGradient(stops: stops, center: .center)
@@ -158,7 +158,7 @@ public struct ProgressRing: View {
     /// completion moment plays (2.3.0). For a ring with nothing inside it.
     private var isCelebratedComplete: Bool { celebratesCompletion && progress >= 1 }
 
-    private var completionTint: Color { overrideColor ?? AppColors.success }
+    private var completionTint: Color { overrideColor ?? AppColors.Status.positive }
 
     public var body: some View {
         // Round caps protrude half a lineWidth BEYOND the trimmed path ends. An

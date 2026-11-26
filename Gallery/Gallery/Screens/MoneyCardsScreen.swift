@@ -198,8 +198,8 @@ private struct FinanceCardPage: View {
                             ForEach(0..<3, id: \.self) { index in
                                 Icon(source: .sfSymbol(["creditcard.fill", "banknote.fill", "wallet.bifold.fill"][index]),
                                          style: .circle(size: AppIconSize.xxl, tint: .monochrome(.white),
-                                                        backgroundColor: [AppColors.accent, AppColors.success, AppColors.warning][index]))
-                                    .overlay(Circle().strokeBorder(AppColors.bgBase, lineWidth: 2))
+                                                        backgroundColor: [AppColors.accent, AppColors.Status.positive, AppColors.Status.warning][index]))
+                                    .overlay(Circle().strokeBorder(AppColors.Background.page, lineWidth: 2))
                             }
                         }
                     }
@@ -249,9 +249,9 @@ private struct TotalsCardPage: View {
 
     private var items: [TotalsCard.Item] {
         let all: [TotalsCard.Item] = [
-            .init(title: "Income", amount: 530_000, previous: showsChange ? 480_000 : nil, color: AppColors.success),
+            .init(title: "Income", amount: 530_000, previous: showsChange ? 480_000 : nil, color: AppColors.Status.positive),
             .init(title: "Expenses", amount: 320_000, previous: showsChange ? 350_000 : nil,
-                  color: AppColors.destructive, increaseIsGood: false),
+                  color: AppColors.Status.negative, increaseIsGood: false),
             .init(title: "Net", amount: 210_000, previous: showsChange ? 130_000 : nil),
         ]
         return Array(all.prefix(count))
@@ -356,7 +356,7 @@ private struct CalculationCardPage: View {
             } else {
                 CalculationCard(
                     systemImage: "banknote.fill",
-                    color: AppColors.success,
+                    color: AppColors.Status.positive,
                     title: "How it's calculated",
                     heroLabel: showsHero ? "Savings rate" : nil,
                     heroValue: showsHero ? "18.4%" : nil,
@@ -382,10 +382,10 @@ private struct WeightBreakdownCardPage: View {
     @State private var state: SpecimenState = .content
 
     private let all: [WeightBreakdownCard.Segment] = [
-        .init(title: "Savings", systemImage: "banknote.fill", color: AppColors.success, weight: 40),
+        .init(title: "Savings", systemImage: "banknote.fill", color: AppColors.Status.positive, weight: 40),
         .init(title: "Regular payments", systemImage: "repeat.circle", color: AppColors.accent, weight: 27),
-        .init(title: "Safety cushion", systemImage: "shield.lefthalf.filled", color: AppColors.income, weight: 20),
-        .init(title: "Cash flow", systemImage: "chart.line.uptrend.xyaxis", color: AppColors.destructive, weight: 13),
+        .init(title: "Safety cushion", systemImage: "shield.lefthalf.filled", color: GallerySamples.incomeColor, weight: 20),
+        .init(title: "Cash flow", systemImage: "chart.line.uptrend.xyaxis", color: AppColors.Status.negative, weight: 13),
     ]
 
     var body: some View {

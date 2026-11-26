@@ -229,8 +229,8 @@ private let sampleSuggestions: [SearchSuggestion] = [
     SearchSuggestion("Kaindy Lake", subtitle: "Lake · 280 km", icon: .sfSymbol("drop.fill"), tint: AppColors.accent),
     SearchSuggestion("Big Almaty Lake", subtitle: "Lake · 28 km", icon: .sfSymbol("drop.fill"), tint: AppColors.accent),
     SearchSuggestion("Kolsai Lakes", subtitle: "Lakes · 300 km", icon: .sfSymbol("drop.fill"), tint: AppColors.accent),
-    SearchSuggestion("Coffee", subtitle: "Category", icon: .sfSymbol("cup.and.saucer.fill"), tint: AppColors.warning),
-    SearchSuggestion("Car", subtitle: "Category", icon: .sfSymbol("car.fill"), tint: AppColors.warning),
+    SearchSuggestion("Coffee", subtitle: "Category", icon: .sfSymbol("cup.and.saucer.fill"), tint: AppColors.Status.warning),
+    SearchSuggestion("Car", subtitle: "Category", icon: .sfSymbol("car.fill"), tint: AppColors.Status.warning),
 ]
 
 private let sampleRecent = RecentSearches(["Kapchagay", "pike", "coffee"])

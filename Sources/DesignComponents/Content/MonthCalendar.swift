@@ -226,7 +226,7 @@ public struct MonthCalendar<Item: Identifiable, Marker: View, Accessory: View>: 
         return VStack(spacing: AppSpacing.xs) {
             Text(verbatim: "\(calendar.component(.day, from: day))")
                 .font(isToday ? AppTypography.body.weight(.semibold) : AppTypography.body)
-                .foregroundStyle(isToday ? AppColors.accent : AppColors.Text.primary)
+                .foregroundStyle(isToday ? AppColors.Text.action : AppColors.Text.primary)
                 .frame(width: 48, height: 48)
                 .background(isToday ? AppColors.pale(AppColors.accent) : Color.clear)
                 .clipShape(Circle())
@@ -248,7 +248,7 @@ public struct MonthCalendar<Item: Identifiable, Marker: View, Accessory: View>: 
                             .font(.system(size: AppIconSize.sm, weight: .bold))
                             .foregroundStyle(AppColors.Text.secondary)
                             .frame(width: AppIconSize.md, height: AppIconSize.md)
-                            .background(Circle().fill(.surfaceNeutral1))
+                            .background(Circle().fill(AppColors.Background.container))
                             .transition(.scale(scale: AppAnimation.facepileHiddenScale).combined(with: .opacity))
                     }
                 }

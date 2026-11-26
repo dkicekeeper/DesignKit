@@ -305,8 +305,8 @@ Since 0.4.0 · Apps: Dalada
   Tap-to-rate input: whole stars, 1…`maximum`.
 
 ```swift
-init(rating: Double, maximum: Int = 5, size: CGFloat = 14, color: Color = AppColors.warning)
-init(rating: Binding<Int>, maximum: Int = 5, size: CGFloat = 32, color: Color = AppColors.warning)
+init(rating: Double, maximum: Int = 5, size: CGFloat = 14, color: Color = AppColors.Status.warning)
+init(rating: Binding<Int>, maximum: Int = 5, size: CGFloat = 32, color: Color = AppColors.Status.warning)
 ```
 
 ### SelectionIndicator
@@ -644,7 +644,7 @@ Since 2.1.0 · Apps: Tenra · Styles: `.info`, `.list`
   A row with an icon, a name and money.
 
 ```swift
-init(_ text: String, amount: Double? = nil, amountColor: Color = AppColors.planned)
+init(_ text: String, amount: Double? = nil, amountColor: Color = AppColors.Status.info)
 init(_ title: String, subtitle: String? = nil, subtitleLineLimit: Int? = nil, leading: Leading, value: Value, currency: String, style: Style = .info, detail: Detail? = nil, accessory: Accessory = .none, transitionSourceID: String? = nil, transitionNamespace: Namespace.ID? = nil)
 init(_ title: String, leading: Leading, value: Value, currency: String, style: Style = .info, detail: Detail? = nil, accessory: Accessory = .none, transitionSourceID: String? = nil, transitionNamespace: Namespace.ID? = nil, @ViewBuilder subtitle: () -> Subtitle)
 ```
@@ -665,10 +665,10 @@ Since 2.1.0 · Apps: Tenra
   A row with an icon, a name and money.
 
 ```swift
-init(_ text: String, amount: Double? = nil, amountColor: Color = AppColors.planned)
+init(_ text: String, amount: Double? = nil, amountColor: Color = AppColors.Status.info)
 init(_ title: String, subtitle: String? = nil, subtitleLineLimit: Int? = nil, leading: Leading, value: Value, currency: String, style: Style = .info, detail: Detail? = nil, accessory: Accessory = .none, transitionSourceID: String? = nil, transitionNamespace: Namespace.ID? = nil)
 init(_ title: String, leading: Leading, value: Value, currency: String, style: Style = .info, detail: Detail? = nil, accessory: Accessory = .none, transitionSourceID: String? = nil, transitionNamespace: Namespace.ID? = nil, @ViewBuilder subtitle: () -> Subtitle)
-init(_ text: String, amount: Double? = nil, amountColor: Color = AppColors.planned)
+init(_ text: String, amount: Double? = nil, amountColor: Color = AppColors.Status.info)
 init(_ title: String, subtitle: String? = nil, subtitleLineLimit: Int? = nil, leading: Leading, value: Value, currency: String, style: Style = .info, detail: Detail? = nil, accessory: Accessory = .none, transitionSourceID: String? = nil, transitionNamespace: Namespace.ID? = nil)
 init(_ title: String, leading: Leading, value: Value, currency: String, style: Style = .info, detail: Detail? = nil, accessory: Accessory = .none, transitionSourceID: String? = nil, transitionNamespace: Namespace.ID? = nil, @ViewBuilder subtitle: () -> Subtitle)
 ```
@@ -696,7 +696,7 @@ Since 1.1.0 · Apps: Tenra
   A schedule entry: "✓ #3 · 12 Mar 2026 ……… 45 000 ₸ / int: 3 200 ₸".
 
 ```swift
-init(title: String, subtitle: String, amount: Double, currency: String, detail: String? = nil, detailColor: Color = AppColors.expense, isDone: Bool)
+init(title: String, subtitle: String, amount: Double, currency: String, detail: String? = nil, detailColor: Color = AppColors.Text.primary, doneColor: Color = AppColors.Status.positive, isDone: Bool)
 ```
 
 ### ItemRow
@@ -739,7 +739,7 @@ init(_ items: [MetaItem], separator: Separator = .dot, tint: Color = AppColors.T
 
 A person in a list: avatar, name, a line under it, a trailing slot. The app passes its photo avatar. The card style is the person at the top of their profile.
 
-Since 1.12.0 · Apps: Dalada · Styles: `.list`, `.card`
+Since 1.12.0 · Apps: Dalada, Platina · Styles: `.list`, `.card`
 
 - `PersonRow` in `Sources/DesignComponents/Rows/PersonRow.swift`; skeleton `PersonRowSkeleton`
   A row for a person.
@@ -775,7 +775,7 @@ Since 1.12.0 · Apps: Dalada, Platina
   A checklist item; a tap toggles it.
 
 ```swift
-init(_ title: String, isChecked: Bool, tint: Color = AppColors.success, accessorySystemImage: String? = nil, accessoryLabel: String? = nil, verticalPadding: CGFloat = AppSpacing.md, onToggle: @escaping () -> Void)
+init(_ title: String, isChecked: Bool, tint: Color = AppColors.Status.positive, accessorySystemImage: String? = nil, accessoryLabel: String? = nil, verticalPadding: CGFloat = AppSpacing.md, onToggle: @escaping () -> Void)
 ```
 
 - A row of a glass section (8.1.0): it pads itself 12 pt above and below (verticalPadding), and the divider under it starts at its title, after the circle. verticalPadding: 0 in a stack that spaces its rows or a List.
@@ -1024,8 +1024,8 @@ Since 1.2.0 · Apps: Tenra
   "Car loan / Halyk Bank ……… [Credit]", "1 200 000 ₸ ……… 3 000 000 ₸" over a bar, "📅 12 Nov 2026 ……… 18 left".
 
 ```swift
-init(iconSource: IconSource?, title: String, subtitle: String? = nil, remaining: Double, total: Double, currency: String, progress: Double, phase: Phase, @ViewBuilder accessory: () -> Accessory)
-init(iconSource: IconSource?, title: String, subtitle: String? = nil, remaining: Double, total: Double, currency: String, progress: Double, phase: Phase)
+init(iconSource: IconSource?, title: String, subtitle: String? = nil, remaining: Double, total: Double, currency: String, progress: Double, phase: Phase, progressColor: Color = AppColors.Status.positive, @ViewBuilder accessory: () -> Accessory)
+init(iconSource: IconSource?, title: String, subtitle: String? = nil, remaining: Double, total: Double, currency: String, progress: Double, phase: Phase, progressColor: Color = AppColors.Status.positive)
 ```
 
 ### ScoreCard
@@ -1445,7 +1445,7 @@ Apps: none yet
 - `AmountComparisonBar` in `Sources/DesignComponents/Progress/AmountComparisonBar.swift`; skeleton `AmountComparisonBarSkeleton`
 
 ```swift
-init(expenseAmount: Double, incomeAmount: Double, currency: String, animatesOnAppear: Bool = true)
+init(expenseAmount: Double, incomeAmount: Double, currency: String, animatesOnAppear: Bool = true, incomeColor: Color = AppColors.Status.positive)
 ```
 
 ### MiniDonut
@@ -1534,6 +1534,31 @@ init(values: [Double], highlighted: Int? = nil, color: Color = AppColors.accent,
 - Labels under the bars (a weekday's initial): the coloured bar's in its colour.
 
 ## Status & Feedback
+
+### .dsRefreshable · RefreshIndicator
+
+Pull to refresh with mercury: black liquid runs out of the Dynamic Island as you pull, turns the accent, breaks into beads that circle while loading and flows back in.
+
+Since 8.21.0 · Apps: none yet
+
+- `.dsRefreshable` in `Sources/DesignComponents/Feedback/DSRefreshable.swift`
+  Pull to refresh with DesignKit's mercury (8.21.0): the same closure as `.refreshable`. Black liquid runs out of the Dynamic Island as the person pulls, turns the accent, breaks into beads that circle while `action` runs (at least 0.6 s) and flows back into the island. Without an island it runs from the top edge; under Reduce Motion an accent ring.
+- `RefreshIndicator` in `Sources/DesignComponents/Feedback/RefreshIndicator.swift`
+  The indicator of a pull to refresh, in a phase (8.21.0). `.dsRefreshable` lays it over a scroll view and drives it; use it yourself only to show a phase (the Gallery, a header of your own).
+
+```swift
+func dsRefreshable(action: @escaping @Sendable () async -> Void) -> some View
+init(phase: RefreshPhase, source: Source = .automatic)
+```
+
+- The same closure as .refreshable, on the List or ScrollView itself. The system's refresh does the work (the trigger, holding the content, the haptic, VoiceOver); its spinner is hidden app-wide.
+- Out of the island on an iPhone that has one, with the list at the screen's top; from the top edge otherwise (this list in a page, a sheet, landscape, an iPad, a Mac).
+- The beads circle at least 0.6 s, so a fast answer does not blink. Under Reduce Motion an accent ring.
+- On a coloured hero the beads cast a soft shadow, so they do not melt into a colour like their own.
+
+- Do: Replace every .refreshable with .dsRefreshable: the apps' lint warns on .refreshable.
+- Don't: Don't put it on a view around the scroll view: it reads the scroll view's pull.
+- Don't: Don't add a spinner of your own while it refreshes: the beads are the spinner.
 
 ### LoadMoreFooter
 
@@ -1674,7 +1699,7 @@ A short value or hint in an opaque bubble with a tail pointing at its target: th
 Since 2.0.0 · Apps: none yet
 
 - `Tooltip` in `Sources/DesignComponents/Feedback/Tooltip.swift`
-  An opaque bubble on the top level surface (`AppColors.Background.elevation3`) with a soft shadow and a tail.
+  An opaque bubble on the top level surface (`AppColors.Background.floating`) with a soft shadow and a tail.
 
 ```swift
 init(arrowEdge: VerticalEdge = .bottom, arrowAlignment: TooltipArrowAlignment = .center, @ViewBuilder content: () -> Content)

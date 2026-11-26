@@ -36,7 +36,7 @@ struct ColorSwatch: View {
 
                     Icon("checkmark", size: AppIconSize.md, scalesWithText: false)
                         .fontWeight(.bold)
-                        .foregroundStyle(AppColors.staticWhite)
+                        .foregroundStyle(AppColors.Text.primaryOnDark)
                 }
             }
         }

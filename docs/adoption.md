@@ -79,6 +79,19 @@ side by side on an iPad (`AppLayout.cardColumns`) and its play days in a `Calend
 Platina#2 an `InfoTip` explains the share of players who earned a trophy, over its rarest trophies
 and, with `StatsStrip`'s `info:` (8.19.0), by the counter on a trophy's screen.
 
+**Its accent (the owner's choice, 2026-11-25): Plasma**, light `#D6006F`, dark `#FF4FA0`, in place
+of `#3573BA`, whose links read at 3.5:1 on a dark grey card. Platina's session sets both: its
+asset-catalog `AccentColor` (a light and a dark appearance) and `DesignKitTheme.accent` in
+`App.init()`, as a pair:
+
+```swift
+DesignKitTheme.accent = Color(UIColor { $0.userInterfaceStyle == .dark
+    ? UIColor(red: 1, green: 0x4F / 255, blue: 0xA0 / 255, alpha: 1)
+    : UIColor(red: 0xD6 / 255, green: 0, blue: 0x6F / 255, alpha: 1) })
+```
+
+The Gallery's Platina preset shows it (8.21.0). Its pull to refresh is `.dsRefreshable` (8.21.0).
+
 ## Ten (ParticleCreature) in Tenra
 
 Since Tenra#79 Tenra's code uses all of the creature: both styles, `CreatureGlyph` (tab, toolbar,

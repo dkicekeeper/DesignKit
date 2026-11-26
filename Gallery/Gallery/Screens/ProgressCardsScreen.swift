@@ -82,7 +82,7 @@ private struct TargetProgressCardPage: View {
             } else {
                 TargetProgressCard(
                     systemImage: "banknote.fill",
-                    color: AppColors.success,
+                    color: AppColors.Status.positive,
                     title: "Savings rate",
                     badge: "Weight 30%",
                     summary: "Score \(Int(progress * 100)) of 100",
@@ -125,7 +125,7 @@ private struct PayoffProgressCardPage: View {
                         : .inProgress(nextDate: "12 Nov 2026", remainingCaption: "18 left")
                 ) {
                     Badge(progress >= 1 ? "Paid off" : "Credit",
-                              color: progress >= 1 ? AppColors.income : AppColors.expense)
+                              color: progress >= 1 ? GallerySamples.incomeColor : AppColors.Text.primary)
                 }
             }
         } controls: {
@@ -141,7 +141,7 @@ private struct ScoreCardPage: View {
     @State private var state: SpecimenState = .content
 
     private var grade: (String, Color) {
-        score >= 70 ? ("Good", AppColors.success) : score >= 40 ? ("Fair", AppColors.warning) : ("Needs attention", AppColors.destructive)
+        score >= 70 ? ("Good", AppColors.Status.positive) : score >= 40 ? ("Fair", AppColors.Status.warning) : ("Needs attention", AppColors.Status.negative)
     }
 
     var body: some View {
@@ -244,8 +244,8 @@ private struct ScoreGaugeSample: View {
     var body: some View {
         ScoreGaugeCard(score: hasData ? Int(score) : nil, zoneTicks: [40, 70],
                        grade: hasData ? (score >= 70 ? "Good" : score >= 40 ? "Fair" : "Low") : "Not enough data",
-                       color: hasData ? (score >= 70 ? AppColors.success : score >= 40 ? AppColors.warning : AppColors.destructive)
-                           : AppColors.textSecondary,
+                       color: hasData ? (score >= 70 ? AppColors.Status.positive : score >= 40 ? AppColors.Status.warning : AppColors.Status.negative)
+                           : AppColors.Text.secondary,
                        subtitle: hasData ? "You're on track" : "Add a month of income to see your score",
                        decodesScore: decodes,
                        style: style,
@@ -267,8 +267,8 @@ private struct SavingsRateSample: View {
     var body: some View {
         ScoreGaugeCard(value: hasData ? rate : nil, fractionDigits: 1, unit: "%", maxScore: 40, zoneTicks: [10, 20],
                        grade: hasData ? (rate >= 20 ? "On target" : rate >= 10 ? "Below target" : "Low") : "Not enough data",
-                       color: hasData ? (rate >= 20 ? AppColors.success : rate >= 10 ? AppColors.warning : AppColors.destructive)
-                           : AppColors.textSecondary,
+                       color: hasData ? (rate >= 20 ? AppColors.Status.positive : rate >= 10 ? AppColors.Status.warning : AppColors.Status.negative)
+                           : AppColors.Text.secondary,
                        subtitle: "Target: 20% of income",
                        decodesScore: decodes,
                        style: style,
@@ -294,7 +294,7 @@ private struct LargeExpenseSample: View {
     var body: some View {
         ScoreGaugeCard(amount: hasData ? amount : nil, currency: "KZT", maxValue: max(amount, usual) * 1.15, norm: usual,
                        grade: hasData ? "\((amount / usual).formatted(.number.precision(.fractionLength(1))))× the usual" : "Not enough data",
-                       color: hasData ? (amount / usual >= 8 ? AppColors.destructive : AppColors.warning) : AppColors.textSecondary,
+                       color: hasData ? (amount / usual >= 8 ? AppColors.Status.negative : AppColors.Status.warning) : AppColors.Text.secondary,
                        subtitle: "Furniture, 3 Oct",
                        style: style,
                        tone: tone)
@@ -338,11 +338,11 @@ private struct TargetProgressSampleCard: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text(title)
                 .font(AppTypography.bodyEmphasis)
-                .foregroundStyle(AppColors.textPrimary)
-            LinearProgressBar(value: min(current / target, 1), color: AppColors.success)
+                .foregroundStyle(AppColors.Text.primary)
+            LinearProgressBar(value: min(current / target, 1), color: AppColors.Status.positive)
             Text(verbatim: "\(current.formatted(.number.precision(.fractionLength(0...2)))) of \(target.formatted(.number.precision(.fractionLength(0...2))))")
                 .font(AppTypography.caption)
-                .foregroundStyle(AppColors.textSecondary)
+                .foregroundStyle(AppColors.Text.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .cardContentPadding()
@@ -372,14 +372,14 @@ private struct MetricCardPage: View {
                 case .bottom:
                     MetricCard(title: "Spending", subtitle: "Less than last month",
                                value: .amount(280_000, currency: "KZT"),
-                               trend: showsTrend ? .init(direction: .down, changePercent: -12.5, color: AppColors.success) : nil,
+                               trend: showsTrend ? .init(direction: .down, changePercent: -12.5, color: AppColors.Status.positive) : nil,
                                chartPlacement: .bottom) {
                         HeroBarPair(previous: 320_000, current: 280_000, color: AppColors.accent, currency: "KZT")
                     }
                 case .trailing:
                     MetricCard(title: "Top category", subtitle: "Food took 42% of spending",
                                value: .amount(185_000, currency: "KZT"),
-                               trend: showsTrend ? .init(direction: .up, changePercent: 12.4, color: AppColors.destructive) : nil) {
+                               trend: showsTrend ? .init(direction: .up, changePercent: 12.4, color: AppColors.Status.negative) : nil) {
                         MiniDonut(slices: slices)
                     }
                 case nil:
@@ -414,11 +414,11 @@ private struct InsightsStatCardPage: View {
                     InsightsStatCardSkeleton()
                 } else {
                     InsightsStatCard(title: "Income", amount: 640_000, currency: "KZT",
-                                     color: AppColors.income, previous: showsChange ? 580_000 : nil, upIsGood: true)
+                                     color: GallerySamples.incomeColor, previous: showsChange ? 580_000 : nil, upIsGood: true)
                     InsightsStatCard(title: "Expenses", amount: 921_300, currency: "KZT",
-                                     color: AppColors.expense, previous: showsChange ? 870_000 : nil, upIsGood: false) {
+                                     color: AppColors.Text.primary, previous: showsChange ? 870_000 : nil, upIsGood: false) {
                         if showsFooter {
-                            ProportionBar(ratio: 0.7, leftColor: AppColors.destructive, rightColor: AppColors.bgMuted, height: 6)
+                            ProportionBar(ratio: 0.7, leftColor: AppColors.Status.negative, rightColor: SurfaceStyle.glass.containerStrong, height: 6)
                                 .padding(.top, AppSpacing.xxs)
                         }
                     }
@@ -451,9 +451,9 @@ private struct StatTilePage: View {
                     StatTileSkeleton()
                 } else {
                     StatTile(title: "Distance", value: "12.4 km", systemImage: showsIcon ? "point.topleft.down.to.point.bottomright.curvepath" : nil,
-                             valueColor: accent ? AppColors.accent : AppColors.textPrimary)
+                             valueColor: accent ? AppColors.accent : AppColors.Text.primary)
                     StatTile(title: "Catches", value: "7", systemImage: showsIcon ? "fish" : nil,
-                             valueColor: accent ? AppColors.accent : AppColors.textPrimary)
+                             valueColor: accent ? AppColors.accent : AppColors.Text.primary)
                 }
             }
         } controls: {

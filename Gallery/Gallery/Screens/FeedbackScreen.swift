@@ -38,7 +38,77 @@ struct FeedbackScreen: View {
         PendingItemCardPage()
         NoticeCardPage()
         LoadMoreFooterPage()
+        RefreshablePage()
         SkeletonPrimitivesPage()
+    }
+}
+
+/// `.dsRefreshable` live on a list, and `RefreshIndicator` in a phase you pick (8.21.0).
+private struct RefreshablePage: View {
+    @State private var showsPhase = false
+    @State private var phase = 1
+    @State private var progress = 0.7
+    @State private var elapsed = 0.4
+    @State private var source = RefreshIndicator.Source.island
+    @State private var refreshes = 0
+
+    private var drawnPhase: RefreshPhase {
+        switch phase {
+        case 0: .pulling(progress: progress, elapsed: elapsed)
+        case 2: .finishing(elapsed: elapsed)
+        default: .refreshing(elapsed: elapsed)
+        }
+    }
+
+    var body: some View {
+        ComponentPage(
+            name: ".dsRefreshable · RefreshIndicator",
+            summary: "Pull to refresh with mercury: black liquid runs out of the Dynamic Island as you pull, turns the accent, breaks into beads that circle while loading and flows back in.",
+            since: "8.21.0",
+            canvas: .tall(minHeight: 340),
+            notes: [
+                "The same closure as .refreshable, on the List or ScrollView itself. The system's refresh does the work (the trigger, holding the content, the haptic, VoiceOver); its spinner is hidden app-wide.",
+                "Out of the island on an iPhone that has one, with the list at the screen's top; from the top edge otherwise (this list in a page, a sheet, landscape, an iPad, a Mac).",
+                "The beads circle at least 0.6 s, so a fast answer does not blink. Under Reduce Motion an accent ring.",
+                "On a coloured hero the beads cast a soft shadow, so they do not melt into a colour like their own.",
+            ],
+            dos: [
+                "Replace every .refreshable with .dsRefreshable: the apps' lint warns on .refreshable.",
+            ],
+            donts: [
+                "Don't put it on a view around the scroll view: it reads the scroll view's pull.",
+                "Don't add a spinner of your own while it refreshes: the beads are the spinner.",
+            ]
+        ) {
+            if showsPhase {
+                RefreshIndicator(phase: drawnPhase, source: source)
+                    .frame(height: 160)
+            } else {
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    Text("Pull the list down · refreshed \(refreshes) times")
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppColors.Text.tertiary)
+                    List(0..<12, id: \.self) { index in
+                        Text("Trip \(index + 1)")
+                            .font(AppTypography.body)
+                    }
+                    .listStyle(.plain)
+                    .frame(height: 300)
+                    .dsRefreshable {
+                        try? await Task.sleep(for: .seconds(1.5))
+                        await MainActor.run { refreshes += 1 }
+                    }
+                }
+            }
+        } controls: {
+            ChoiceControl("Show", selection: $showsPhase, options: [("A live list", false), ("A phase", true)])
+            if showsPhase {
+                ChoiceControl("Phase", selection: $phase, options: [("Pulling", 0), ("Refreshing", 1), ("Finishing", 2)])
+                SliderControl("Pull", value: $progress, in: 0...1)
+                SliderControl("Seconds", value: $elapsed, in: 0...1.2)
+                ChoiceControl("Source", selection: $source, options: [("Island", .island), ("Top edge", .topEdge)])
+            }
+        }
     }
 }
 
@@ -820,7 +890,7 @@ private struct MomentOverlayPage: View {
         }
         .padding(AppSpacing.lg)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(AppColors.Background.base)
+        .background(AppColors.Background.page)
     }
 }
 

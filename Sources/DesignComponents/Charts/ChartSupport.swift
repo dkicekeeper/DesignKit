@@ -537,12 +537,12 @@ struct ChartAxisLabels {
 
 /// A chart's marks on colour (`.heroBackground`, 4.5.0): white, the grid and labels translucent.
 enum ChartOnColor {
-    static let mark = AppColors.staticWhite
-    static let label = AppColors.staticWhite.opacity(0.78)
-    static let grid = AppColors.staticWhite.opacity(0.22)
+    static let mark = AppColors.Text.primaryOnDark
+    static let label = AppColors.Text.primaryOnDark.opacity(0.78)
+    static let grid = AppColors.Text.primaryOnDark.opacity(0.22)
     /// The area under a line: white fading out downwards.
     static var area: AnyShapeStyle {
-        AnyShapeStyle(LinearGradient(colors: [AppColors.staticWhite.opacity(0.32), AppColors.staticWhite.opacity(0)],
+        AnyShapeStyle(LinearGradient(colors: [AppColors.Text.primaryOnDark.opacity(0.32), AppColors.Text.primaryOnDark.opacity(0)],
                                      startPoint: .top, endPoint: .bottom))
     }
 }

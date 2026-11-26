@@ -107,9 +107,18 @@ TOKEN_RULES = {
     "system-form": re.compile(r'(?:^|[^\w.])Form\s*\{'),
 }
 
+# Warnings (8.21.0): reported on every run, never counted in the failures or the baseline, so a
+# DesignKit update does not stop at them; each becomes an error in a major.
+TOKEN_WARNINGS = {
+    # The system's pull to refresh. Use .dsRefreshable, the same closure (DesignKit's mercury);
+    # an error from 9.0.0.
+    "system-refreshable": re.compile(r'(?<![\w])\.refreshable\s*[({]'),
+}
 
-def scan_tokens(root, sources, excludes):
+
+def scan_tokens(root, sources, excludes, rules=None):
     """{file: {rule: [(line, text), …]}}"""
+    rules = TOKEN_RULES if rules is None else rules
     hits = collections.defaultdict(lambda: collections.defaultdict(list))
     for rel, path in swift_files(root, sources, excludes):
         with open(path, encoding="utf-8", errors="replace") as source:
@@ -125,13 +134,28 @@ def scan_tokens(root, sources, excludes):
                     continue
                 if stripped.startswith("//") or TOKENS_IGNORE_MARK in line:
                     continue
-                for rule, pattern in TOKEN_RULES.items():
+                for rule, pattern in rules.items():
                     for _ in pattern.finditer(line):
                         hits[rel][rule].append((number, stripped))
     return hits
 
 
+def print_warnings(args):
+    """Each warning rule's hits as a GitHub annotation; never a failure."""
+    warnings = scan_tokens(args.root, args.source, args.exclude, TOKEN_WARNINGS)
+    count = 0
+    for rel, rules in sorted(warnings.items()):
+        for rule, lines in rules.items():
+            for number, text in lines:
+                count += 1
+                print(f"::warning file={rel},line={number},title=design-lint {rule}::{text}")
+    if count:
+        print(f"design-lint: {count} warning(s): use .dsRefreshable for pull to refresh "
+              "(DesignKit's mercury); they become errors in DesignKit 9.0.0.")
+
+
 def check_tokens(args):
+    print_warnings(args)
     hits = scan_tokens(args.root, args.source, args.exclude)
     current = {rel: {rule: len(lines) for rule, lines in sorted(rules.items())}
                for rel, rules in sorted(hits.items())}

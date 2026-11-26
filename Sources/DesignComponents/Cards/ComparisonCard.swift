@@ -65,8 +65,8 @@ public struct ComparisonCard: View {
 
     private var changeColor: Color {
         switch direction {
-        case .up: return increaseIsGood ? AppColors.success : AppColors.destructive
-        case .down: return increaseIsGood ? AppColors.destructive : AppColors.success
+        case .up: return increaseIsGood ? AppColors.Status.positive : AppColors.Status.negative
+        case .down: return increaseIsGood ? AppColors.Status.negative : AppColors.Status.positive
         case .flat: return AppColors.Text.secondary
         }
     }

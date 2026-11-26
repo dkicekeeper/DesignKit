@@ -18,9 +18,9 @@ import DesignSupport
 ///     title: "How the score works",
 ///     message: "Five parts, each weighted by how much it matters.",
 ///     segments: [
-///         .init(title: "Savings", systemImage: "banknote.fill", color: AppColors.success, weight: 40),
+///         .init(title: "Savings", systemImage: "banknote.fill", color: AppColors.Status.positive, weight: 40),
 ///         .init(title: "Cash flow", systemImage: "chart.line.uptrend.xyaxis",
-///               color: AppColors.destructive, weight: 60),
+///               color: AppColors.Status.negative, weight: 60),
 ///     ]
 /// )
 /// ```

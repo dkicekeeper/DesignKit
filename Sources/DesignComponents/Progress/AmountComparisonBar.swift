@@ -17,6 +17,9 @@ public struct AmountComparisonBar: View {
     let currency: String
     /// Sweep-from-zero entrance (see ProportionBar). Disable in lazy lists.
     var animatesOnAppear: Bool = true
+    /// The colour of money in (8.21.0): `Status.positive` unless the app has its own (Tenra's
+    /// income green). Its amount is the same colour made readable.
+    var incomeColor: Color = AppColors.Status.positive
 
     private var total: Double {
         expenseAmount + incomeAmount
@@ -30,12 +33,14 @@ public struct AmountComparisonBar: View {
         expenseAmount: Double,
         incomeAmount: Double,
         currency: String,
-        animatesOnAppear: Bool = true
+        animatesOnAppear: Bool = true,
+        incomeColor: Color = AppColors.Status.positive
     ) {
         self.expenseAmount = expenseAmount
         self.incomeAmount = incomeAmount
         self.currency = currency
         self.animatesOnAppear = animatesOnAppear
+        self.incomeColor = incomeColor
     }
 
     public var body: some View {
@@ -43,15 +48,15 @@ public struct AmountComparisonBar: View {
             if total > 0 {
                 ProportionBar(
                     ratio: expensePercent,
-                    leftColor: AppColors.destructive,
-                    rightColor: AppColors.income,
+                    leftColor: AppColors.Status.negative,
+                    rightColor: incomeColor,
                     height: AppSpacing.md,
                     animatesOnAppear: animatesOnAppear
                 )
             } else {
                 // No data yet — keep the slot height stable with a muted track.
                 RoundedRectangle(cornerRadius: AppRadius.xl)
-                    .fill(.surfaceNeutral2)
+                    .fill(AppColors.Background.containerStrong)
                     .frame(height: AppSpacing.md)
             }
 
@@ -72,7 +77,7 @@ public struct AmountComparisonBar: View {
                     currency: currency,
                     fontSize: AppTypography.h4,
                     fontWeight: .semibold,
-                    color: AppColors.income
+                    color: AppColors.readable(incomeColor)
                 )
             }
         }

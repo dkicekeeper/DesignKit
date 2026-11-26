@@ -15,6 +15,43 @@ extension ComponentSnapshots {
     @MainActor
     @Suite("Feedback")
     struct Feedback {
+        /// `.dsRefreshable`'s mercury in fixed phases (8.21.0): a half and an almost full pull, the
+        /// beads circling, the same from the top edge (no island), on a coloured hero (a shadow
+        /// under the beads) and under `.designKitMotion(false)` (the ring of Reduce Motion).
+        ///
+        /// The renderer turns DesignKit's motion off for every snapshot, and the indicator draws
+        /// its ring then; a fixed phase is a still picture, so the mercury cases turn it back on.
+        @Test func refreshIndicator() async {
+            let cases: [(String, RefreshPhase, RefreshIndicator.Source)] = [
+                ("pulling-half", .pulling(progress: 0.5, elapsed: 0.6), .island),
+                ("pulling-full", .pulling(progress: 0.95, elapsed: 0.6), .island),
+                ("refreshing", .refreshing(elapsed: 0.4), .island),
+                ("top-edge", .refreshing(elapsed: 0.4), .topEdge),
+            ]
+            for (name, phase, source) in cases {
+                await assertComponentSnapshot(
+                    RefreshIndicator(phase: phase, source: source)
+                        .frame(height: 140)
+                        .designKitMotion(true),
+                    named: name
+                )
+            }
+            await assertComponentSnapshot(
+                RefreshIndicator(phase: .refreshing(elapsed: 0.4), source: .island)
+                    .frame(height: 140)
+                    .background(AppColors.accent)
+                    .environment(\.heroTone, .onColor)
+                    .designKitMotion(true),
+                named: "on-colour"
+            )
+            await assertComponentSnapshot(
+                RefreshIndicator(phase: .refreshing(elapsed: 0.4), source: .island)
+                    .frame(height: 140)
+                    .designKitMotion(false),
+                named: "reduce-motion"
+            )
+        }
+
         @Test func statusBanners() async {
             await assertComponentSnapshot(
                 VStack(spacing: AppSpacing.sm) {
@@ -82,7 +119,7 @@ extension ComponentSnapshots {
                     InlineStatusText(message: "Synced a minute ago", type: .success)
                     RecommendationBox(
                         text: "Fishing is banned here until 15 June.",
-                        color: AppColors.destructive,
+                        color: AppColors.Status.negative,
                         icon: "nosign"
                     )
                 }

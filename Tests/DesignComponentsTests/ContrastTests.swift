@@ -7,7 +7,7 @@
 //  on a filled badge and on the accents. 4.5:1 is AA for body text and icons.
 //
 //  8.10.0: white text sits on `AppColors.accentFill` (the accent made readable as a fill) and
-//  income text is `AppColors.incomeText`, so the accents and income pass too; the apps' raw
+//  income text is `readable(income)` (`AppColors.incomeText` before 8.21.0), so the accents and income pass too; the apps' raw
 //  accents and the bright `income` stay for tints, fills and charts.
 //
 
@@ -37,7 +37,7 @@ struct ContrastTests {
             for (mode, traits) in Self.modes {
                 let onPale = AppColors.contrastRatio(status.text, status.pale, in: traits)
                 #expect(onPale >= Self.minimum, "\(status.name) on its pale, \(mode): \(onPale)")
-                let onPage = AppColors.contrastRatio(status.text, AppColors.Background.base, in: traits)
+                let onPage = AppColors.contrastRatio(status.text, AppColors.Background.page, in: traits)
                 #expect(onPage >= Self.minimum, "\(status.name) on the page, \(mode): \(onPage)")
             }
         }
@@ -52,7 +52,7 @@ struct ContrastTests {
         ]
         for (name, color) in tokens {
             for (mode, traits) in Self.modes {
-                let ratio = AppColors.contrastRatio(color, AppColors.Background.base, in: traits)
+                let ratio = AppColors.contrastRatio(color, AppColors.Background.page, in: traits)
                 #expect(ratio >= Self.minimum, "\(name), \(mode): \(ratio)")
             }
         }
@@ -60,7 +60,7 @@ struct ContrastTests {
 
     @Test("Any category colour made readable reads on its own tint")
     func readableCategoryColours() {
-        let colours = CategoryColors.paletteColors + CategoryColors.pickerPalette.map { Color(hex: $0) }
+        let colours = AppColors.Data.palette + AppColors.Data.pickerPalette.map { Color(hex: $0) }
         for (index, colour) in colours.enumerated() {
             for (mode, traits) in Self.modes {
                 let ratio = AppColors.contrastRatio(AppColors.readable(colour), AppColors.pale(colour), in: traits)
@@ -116,10 +116,45 @@ struct ContrastTests {
         #expect(abs(a.r - b.r) < 0.01 && abs(a.g - b.g) < 0.01 && abs(a.b - b.b) < 0.01)
     }
 
+    /// Platina's Plasma: light #D6006F, dark #FF4FA0 (8.21.0).
+    private static let platinaPlasma = Color(UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(red: 0xFF / 255, green: 0x4F / 255, blue: 0xA0 / 255, alpha: 1)
+            : UIColor(red: 0xD6 / 255, green: 0x00 / 255, blue: 0x6F / 255, alpha: 1)
+    })
+
+    /// 8.21.0: a link or a text button in the accent is `Text.action`, the accent made readable,
+    /// so it reads on the page and on a grey card in both themes (Tenra's indigo on a dark card
+    /// read 3.4:1 raw, Dalada's green on a light card 3.8:1).
+    @Test("Accent text reads on the page and on a card: Tenra, Dalada, Platina, both themes")
+    func actionTextReads() {
+        let accents: [(String, Color)] = [
+            ("Tenra's indigo", .indigo), ("Dalada's green", Self.daladaGreen), ("Platina's plasma", Self.platinaPlasma),
+        ]
+        let surfaces: [(String, Color)] = [("page", AppColors.Background.page), ("card", AppColors.Background.card)]
+        for (name, accent) in accents {
+            for (surface, background) in surfaces {
+                for (mode, traits) in Self.modes {
+                    let ratio = AppColors.contrastRatio(AppColors.readable(accent), background, in: traits)
+                    #expect(ratio >= Self.minimum, "\(name) as text on the \(surface), \(mode): \(ratio)")
+                }
+            }
+        }
+        // `Text.action` is that readable accent, of whichever accent the app set.
+        for (_, traits) in Self.modes {
+            let action = UIColor(AppColors.Text.action).resolvedColor(with: traits)
+            let readable = UIColor(AppColors.readable(DesignKitTheme.accent)).resolvedColor(with: traits)
+            #expect(action == readable)
+        }
+    }
+
+    /// Tenra's income green (its DesignKitBridge; DesignKit's `income` before 8.21.0).
+    private static let tenraIncome = Color(red: 0.13, green: 0.70, blue: 0.37)
+
     @Test("Income as text reads on the page in both themes (8.10.0)")
     func incomeText() {
         for (mode, traits) in Self.modes {
-            let ratio = AppColors.contrastRatio(AppColors.incomeText, AppColors.Background.base, in: traits)
+            let ratio = AppColors.contrastRatio(AppColors.readable(Self.tenraIncome), AppColors.Background.page, in: traits)
             #expect(ratio >= Self.minimum, "income text, \(mode): \(ratio)")
         }
     }

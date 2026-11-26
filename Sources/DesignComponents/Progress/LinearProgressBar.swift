@@ -16,7 +16,7 @@ import DesignSupport
 /// - `percentage ≤ 100` → single segment in `color`, width = `percentage / 100` of bar.
 /// - `percentage > 100` → bar fills full width split into two segments:
 ///   the leading `100 / percentage` portion in `color` (the original budget),
-///   the trailing `(percentage - 100) / percentage` portion in `AppColors.destructive`
+///   the trailing `(percentage - 100) / percentage` portion in `AppColors.Status.negative`
 ///   (the overshoot). Higher overshoot ⇒ larger red zone, so magnitude is visible
 ///   instead of a flat 100 % red bar at any percentage above 100.
 /// - `projectedPercentage` set (forecast mode, 2026-07 visual refresh) → the scale
@@ -112,7 +112,7 @@ public struct LinearProgressBar: View {
     public var body: some View {
         ZStack(alignment: .leading) {
             RoundedRectangle(cornerRadius: AppRadius.xs)
-                .fill(.surfaceNeutral2)
+                .fill(AppColors.Background.containerStrong)
                 .frame(maxWidth: .infinity)
                 .frame(height: height)
 
@@ -123,7 +123,7 @@ public struct LinearProgressBar: View {
                         .frame(width: geo.size.width * baseRatio)
                     if overshootRatio > 0 {
                         Rectangle()
-                            .fill(AppColors.destructive)
+                            .fill(AppColors.Status.negative)
                             .frame(width: geo.size.width * overshootRatio)
                     }
                     if projectionRatio > 0 {
@@ -141,7 +141,7 @@ public struct LinearProgressBar: View {
             if let limitRatio {
                 GeometryReader { geo in
                     RoundedRectangle(cornerRadius: 1.25)
-                        .fill(AppColors.destructive)
+                        .fill(AppColors.Status.negative)
                         .frame(width: 2.5, height: height + 8)
                         .position(x: geo.size.width * limitRatio, y: height / 2)
                 }

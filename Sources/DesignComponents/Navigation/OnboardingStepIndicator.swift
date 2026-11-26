@@ -91,7 +91,7 @@ private struct GlassCapsuleModifier: ViewModifier {
     func body(content: Content) -> some View {
         switch surface {
         case .glass: content.glassEffect(.regular, in: Capsule())
-        case .fill: content.background(AppColors.Background.neutral1, in: Capsule())
+        case .fill: content.background(AppColors.Background.card, in: Capsule())
         }
     }
 }

@@ -179,7 +179,7 @@ public struct MessageComposer<Leading: View>: View {
             .padding(.vertical, MessageComposerMetrics.inset)
             // Typing over a busy thread: the surface fills in behind the text (4.9.0).
             .background(
-                AppColors.Background.elevation1.opacity(focusBinding.wrappedValue ? MessageComposerMetrics.focusedFill : 0),
+                AppColors.Background.sheet.opacity(focusBinding.wrappedValue ? MessageComposerMetrics.focusedFill : 0),
                 in: .rect(cornerRadius: MessageComposerMetrics.cornerRadius)
             )
             .glassEffect(.regular.interactive(), in: .rect(cornerRadius: MessageComposerMetrics.cornerRadius))
@@ -224,10 +224,10 @@ public struct MessageComposer<Leading: View>: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(isEnabled ? AppColors.accentFill : AppColors.Background.neutral2)
+                    .fill(isEnabled ? AnyShapeStyle(AppColors.accentFill) : AnyShapeStyle(AppColors.Background.containerStrong))
                 Icon("mic.fill", size: AppIconSize.sm, scalesWithText: false)
                     .fontWeight(.bold)
-                    .foregroundStyle(isEnabled ? AppColors.staticWhite : AppColors.Text.tertiary)
+                    .foregroundStyle(isEnabled ? AppColors.Text.primaryOnDark : AppColors.Text.tertiary)
             }
             .frame(width: MessageComposerMetrics.buttonSize, height: MessageComposerMetrics.buttonSize)
         }
@@ -242,15 +242,15 @@ public struct MessageComposer<Leading: View>: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(isSendEnabled || isSending ? AppColors.accentFill : AppColors.Background.neutral2)
+                    .fill(isSendEnabled || isSending ? AnyShapeStyle(AppColors.accentFill) : AnyShapeStyle(AppColors.Background.containerStrong))
                 if isSending {
                     ProgressView()
                         .controlSize(.small)
-                        .tint(AppColors.staticWhite)
+                        .tint(AppColors.Text.primaryOnDark)
                 } else {
                     Icon("arrow.up", size: AppIconSize.sm, scalesWithText: false)
                         .fontWeight(.bold)
-                        .foregroundStyle(isSendEnabled ? AppColors.staticWhite : AppColors.Text.tertiary)
+                        .foregroundStyle(isSendEnabled ? AppColors.Text.primaryOnDark : AppColors.Text.tertiary)
                 }
             }
             .frame(width: MessageComposerMetrics.buttonSize, height: MessageComposerMetrics.buttonSize)
@@ -269,7 +269,7 @@ public struct MessageComposer<Leading: View>: View {
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
                 Text(verbatim: quote.title)
                     .font(AppTypography.caption.weight(.semibold))
-                    .foregroundStyle(AppColors.accent)
+                    .foregroundStyle(AppColors.Text.action)
                     .lineLimit(1)
                 Text(verbatim: quote.text)
                     .font(AppTypography.caption)
