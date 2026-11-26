@@ -65,6 +65,7 @@ private struct RefreshablePage: View {
             name: ".dsRefreshable · RefreshIndicator",
             summary: "Pull to refresh with mercury: black liquid runs out of the Dynamic Island as you pull, turns the accent, breaks into beads that circle while loading and flows back in.",
             since: "8.21.0",
+            apps: [.dalada, .platina],
             canvas: .tall(minHeight: 340),
             notes: [
                 "The same closure as .refreshable, on the List or ScrollView itself. The system's refresh does the work (the trigger, holding the content, the haptic, VoiceOver); its spinner is hidden app-wide.",
